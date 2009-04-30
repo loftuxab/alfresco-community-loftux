@@ -12,9 +12,9 @@
    <#if (theUser.avatarRef??)>
       <#assign avatarUrl = url.context + "/proxy/alfresco/api/node/" + theUser.avatarRef?replace('://', '/') + "/content/thumbnails/avatar?c=queue&amp;ph=true">
    <#else>
-      <#assign avatarUrl = url.context + "components/images/no-user-photo-64.png">
+      <#assign avatarUrl = url.context + "/components/images/no-user-photo-64.png">
    </#if>
-   <img src="${avatarUrl}" alt="{user.userName}" width="16" height="16" />
+   <img src="${avatarUrl}" alt="${theUser.userName}" width="16" height="16" />
 </#macro>
 <#macro userProfile theUser>
    <a href="${url.context}/pages/user/${theUser.userName}/profile">${theUser.fullName?html}</a>
