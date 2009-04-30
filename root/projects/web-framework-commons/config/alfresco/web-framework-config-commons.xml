@@ -57,7 +57,6 @@
                <show id="mimetype" />
                <show id="cm:author" force="true" />
                <show id="cm:categories" />
-               <show id="cm:thumbnails" />
                <show id="size" for-mode="view" />
                <show id="cm:creator" for-mode="view" />
                <show id="cm:created" for-mode="view" />
