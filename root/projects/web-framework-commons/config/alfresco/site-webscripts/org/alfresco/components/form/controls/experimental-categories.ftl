@@ -7,7 +7,7 @@
 </div>
 <#else>
 <#assign controlId = args.htmlid + "-" + field.id>
-<label for="${controlId}">${field.label?html}:<#if field.endpointMandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
+<label for="${controlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
 
 <script type="text/javascript">//<![CDATA[
 (function()
@@ -15,10 +15,10 @@
    <@renderPickerJS "picker" />
    picker.setOptions(
    {
-      itemType: "${field.endpointType}",
-      multiSelectMode: ${field.endpointMany?string},
-      parentNodeRef: "alfresco://company/home",
-      itemFamily: "node"
+      itemType: "cm:category", /* "${field.dataType}" */
+      multiSelectMode: true,
+      parentNodeRef: "alfresco://category/root",
+      itemFamily: "category"
    });
 })();
 //]]></script>

@@ -333,16 +333,16 @@ Alfresco.util.formatFileSize = function(fileSize)
  * Given a filename, returns either a filetype icon or generic icon file stem
  *
  * @method Alfresco.util.getFileIcon
- * @param fileName {string} File to find icon for
- * @param iconSize {int} Icon size: 32
+ * @param p_fileName {string} File to find icon for
+ * @param p_fileType {string} Optional: Filetype to offer further hinting
+ * @param p_iconSize {int} Icon size: 32
  * @return {string} The icon name, e.g. doc-file-32.png
  * @static
- * @throws {Error}
  */
-Alfresco.util.getFileIcon = function(fileName, iconSize)
+Alfresco.util.getFileIcon = function(p_fileName, p_fileType, p_iconSize)
 {
-   // Mapping from extn to icon name
-   var icons = 
+   // Mapping from extn to icon name for cm:content
+   var extns = 
    {
       "doc": "doc",
       "docx": "doc",
@@ -358,24 +358,43 @@ Alfresco.util.getFileIcon = function(fileName, iconSize)
       "png": "img",
       "txt": "text"
    };
-   
-   if (iconSize === undefined)
-   {
-      iconSize = 32;
-   }
-   else if (typeof iconSize == "string")
-   {
-      iconSize = parseInt(iconSize, 10);
-   }
-   
-   var extn = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase(), icon = "generic";
-   if (extn in icons)
-   {
-      icon = icons[extn];
-   }
 
-   return icon + "-file-" + iconSize + ".png";
+   var prefix = "generic",
+      fileType = p_fileType !== undefined ? p_fileType : "cm:content",
+      iconSize = p_iconSize !== undefined ? p_iconSize : 32;
+   
+   // If type = cm:content, then use extn look-up
+   var type = Alfresco.util.getFileIcon.types[fileType];
+   if (type === "file")
+   {
+      var extn = p_fileName.substring(p_fileName.lastIndexOf(".") + 1).toLowerCase();
+      if (extn in extns)
+      {
+         prefix = extns[extn];
+      }
+   }
+   else if (type == undefined)
+   {
+      type = "file";
+   }
+   return prefix + "-" + type + "-" + iconSize + ".png";
 };
+Alfresco.util.getFileIcon.types =
+{
+   "{http://www.alfresco.org/model/content/1.0}content": "file",
+   "cm:content": "file",
+   "{http://www.alfresco.org/model/content/1.0}thumbnail": "file",
+   "cm:thumbnail": "file",
+   "{http://www.alfresco.org/model/content/1.0}folder": "folder",
+   "cm:folder": "folder",
+   "{http://www.alfresco.org/model/content/1.0}category": "category",
+   "cm:category": "category",
+   "{http://www.alfresco.org/model/site/1.0}sites": "site",
+   "st:sites": "site",
+   "{http://www.alfresco.org/model/site/1.0}site": "site",
+   "st:site": "site"
+};
+
 
 /**
  * Formats a Freemarker datetime into more UI-friendly format
@@ -625,6 +644,25 @@ Alfresco.util.stripUnsafeHTMLTags.safeTags =
 };
 
 /**
+ * Returns a unique DOM ID for dynamically-created content
+ *
+ * @method Alfresco.util.getDomId
+ * @param p_prefix {string} Optional prefix instead of "alf-id" default
+ * @return {string} Dom Id guaranteed to be unique on the current page
+ */
+Alfresco.util.getDomId = function(p_prefix)
+{
+   var domId, prefix = (p_prefix && p_prefix !== "undefined" ? p_prefix : "alf-id");
+   do
+   {
+      domId = prefix + Alfresco.util.getDomId._nId++;
+   } while (YAHOO.util.Dom.get(domId) !== null)
+   
+   return domId;
+};
+Alfresco.util.getDomId._nId = 0;
+
+/**
  * Wrapper to create a YUI Button with common attributes.
  * All supplied object parameters are passed to the button constructor
  * e.g. Alfresco.util.createYUIButton(this, "OK", this.onOK, {type: "submit"});
@@ -739,6 +777,31 @@ Alfresco.util.findEventClass = function(p_eventTarget, p_tagName)
 
    return src.className;
 };
+
+/**
+ * Determines whether a Bubbling event should be ignored or not
+ *
+ * @method Alfresco.util.hasEventInterest
+ * @param p_instance {object} Instance checking for event interest
+ * @param p_args {object} Bubbling event args
+ * @return {boolean} false to ignore event
+ */
+Alfresco.util.hasEventInterest = function(p_eventGroup, p_args)
+{
+   var obj = p_args[1],
+      sourceGroup = "source",
+      targetGroup = "target",
+      hasInterest = true;
+
+   if (obj && obj.eventGroup)
+   {
+      sourceGroup = (typeof obj.eventGroup == "string") ? obj.eventGroup : obj.eventGroup.eventGroup;
+      targetGroup = (typeof p_eventGroup == "string") ? p_eventGroup : p_eventGroup.eventGroup;
+
+      hasInterest = (sourceGroup == targetGroup);
+   }
+   return hasInterest;
+},
 
 /**
  * Check if flash is installed.
