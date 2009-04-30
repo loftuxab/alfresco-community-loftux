@@ -35,6 +35,9 @@ import org.dom4j.Element;
  * reader class which is delegated to by this one.
  * 
  * @author Neil McErlean.
+ * @see ConstraintHandlersElementReader
+ * @see DefaultControlsElementReader
+ * @see DependenciesElementReader
  * @see FormElementReader
  */
 public class FormsElementReader implements ConfigElementReader

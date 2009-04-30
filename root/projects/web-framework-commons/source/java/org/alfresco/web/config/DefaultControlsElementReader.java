@@ -39,7 +39,7 @@ import org.dom4j.Element;
  * 
  * @author Neil McErlean.
  */
-public class DefaultControlsElementReader implements ConfigElementReader
+class DefaultControlsElementReader implements ConfigElementReader
 {
     public static final String ELEMENT_DEFAULT_CONTROLS = "default-controls";
     public static final String ELEMENT_CONTROL_PARAM = "control-param";
