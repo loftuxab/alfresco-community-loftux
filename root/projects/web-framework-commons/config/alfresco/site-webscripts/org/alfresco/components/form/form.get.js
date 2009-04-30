@@ -16,7 +16,6 @@ const ASSOC_PREFIX = "assoc:";
  */
 function main()
 {
-   var formModel = null;
    var formUIModel = null;
    
    var itemKind = getArgument("itemKind");
@@ -35,92 +34,14 @@ function main()
          logger.log("Showing form (id=" + formId + ") for item: [" + itemKind + "]" + itemId);
       }
       
-      var formConfig = null;
-      var visibleFields = null;
+      // get the config for the form
+      var formConfig = getFormConfig(itemId, formId);
       
-      // query for configuration for item
-      var nodeConfig = config.scoped[itemId];
-      
-      if (nodeConfig !== null)
-      {
-         // get the forms configuration
-         var formsConfig = nodeConfig.forms;
-
-         if (formsConfig !== null)
-         {
-            if (formId !== null && formId.length > 0)
-            {
-               // look up the specific form
-               formConfig = formsConfig.getForm(formId);
-            }
-            else
-            {
-               // look up the default form
-               formConfig = formsConfig.defaultForm;
-            }
-            
-            if (formConfig != null)
-            {
-               // TODO: deal with hidden vs. show mode, sets and no config at all!
-            
-               // get visible fields for the current mode
-               switch (mode)
-               {
-                  case "view":
-                     visibleFields = formConfig.visibleViewFieldNames;
-                     break;
-                  case "edit":
-                     visibleFields = formConfig.visibleEditFieldNames;
-                     break;
-                  case "create":
-                     visibleFields = formConfig.visibleCreateFieldNames;
-                     break;
-                  default:
-                     visibleFields = formConfig.visibleViewFieldNames;
-                     break;
-               }
-               
-               if (logger.isLoggingEnabled())
-               {
-                  logger.log("Visible fields for " + mode + " mode = " + visibleFields);
-               }
-            }
-         }
-      }
+      // get the configured visible fields
+      var visibleFields = getVisibleFields(mode, formConfig);
       
       // build the JSON object to send to the server
-      var postBody = {};
-      postBody.itemKind = itemKind;
-      postBody.itemId = itemId.replace(":/", "");
-      
-      if (visibleFields !== null)
-      {
-         // TODO: find a way to return/make a native JS array, for now
-         //       convert the Java List to a JS array checking force as we go
-         var postBodyFields = [];
-         var postBodyForcedFields = [];
-         var fieldId = null;
-         for (var f = 0; f < visibleFields.size(); f++)
-         {
-            fieldId = visibleFields.get(f)
-            postBodyFields.push(fieldId);
-            if (formConfig.isFieldForced(fieldId))
-            {
-               postBodyForcedFields.push(fieldId);
-            }
-         }
-         
-         postBody.fields = postBodyFields;
-         if (postBodyForcedFields.length > 0)
-         {
-            postBody.force = postBodyForcedFields;
-         }
-      }
-      
-      if (logger.isLoggingEnabled())
-      {
-         logger.log("postBody = " + jsonUtils.toJSONString(postBody));
-      }
+      var postBody = createPostBody(itemKind, itemId, visibleFields, formConfig);
          
       // make remote call to service
       var connector = remote.connect("alfresco");
@@ -132,7 +53,7 @@ function main()
          logger.log("json = " + json);
       }
       
-      formModel = eval('(' + json + ')');
+      var formModel = eval('(' + json + ')');
       
       // if we got a successful response attempt to render the form
       if (json.status == 200)
@@ -140,99 +61,14 @@ function main()
          // setup caches and variables
          setupCaches(formModel);
          
-         // determine what enctype to use from the arguments
-         var submitType = getArgument("submitType", "multipart");
-         var enctype = null;
-         switch (submitType)
-         {
-            case "multipart":
-               enctype = "multipart/form-data";
-               break;
-            case "json":
-               enctype = "application/json";
-               break;
-            case "urlencoded":
-               enctype = "application/x-www-form-urlencoded";
-               break;
-            default:
-               enctype = "multipart/form-data";
-               break;
-         }
+         // setup the initial form ui model
+         formUIModel = setupFormUIModel(mode, formModel, formConfig);
          
-         // determine what method to use when submitting form
-         var mthd = getArgument("method", "POST");
+         // setup and add items to form ui model
+         formUIModel.items = setupFormUIItems(formModel, formConfig, visibleFields);
          
-         // determine what submisson url to use
-         var submissionUrl = getArgument("submissionUrl", formModel.data.submissionUrl);
-         submissionUrl = url.context + "/proxy/alfresco" + submissionUrl;
-         
-         // determine whether to show caption at top of form
-         var showCaption = getArgument("showCaption", "false");
-         
-         // determine whether to show cancel button
-         var showCancelButton = getArgument("showCancelButton", "false");
-         
-         // determine whether to show reset button
-         var showResetButton = getArgument("showResetButton", "false");
-         
-         // create and setup form ui model basics
-         formUIModel = {};
-         formUIModel.mode = mode;
-         formUIModel.method = mthd;
-         formUIModel.enctype = enctype;
-         formUIModel.submissionUrl = submissionUrl;
-         formUIModel.showCaption = (showCaption === "true") ? true : false;
-         formUIModel.showCancelButton = (showCancelButton === "true") ? true : false;
-         formUIModel.showResetButton = (showResetButton === "true") ? true : false;
-         formUIModel.data = formModel.data.formData;
-         
-         if (formConfig != null)
-         {
-            // iterate round each visible field name, retrieve all data and
-            // add to the form ui model
-            var configuredFields = formConfig.fields;
-            var formUIItems = [];
-            
-            if (visibleFields != null)
-            {
-               for (var f = 0; f < visibleFields.size(); f++)
-               {
-                  var fieldName = visibleFields.get(f);
-                  var fieldConfig = configuredFields[fieldName];
-                  
-                  // setup the field
-                  var fieldDef = setupField(formModel, fieldName, fieldConfig);
-                  
-                  // if a field was created add to the list to be displayed
-                  if (fieldDef !== null)
-                  {
-                     formUIItems.push(fieldDef);
-                     
-                     if (logger.isLoggingEnabled())
-                     {
-                        logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
-                     }
-                  }
-               }
-            }
-            else
-            {
-               model.error = "No fields to render for node type \"" + formModel.data.type + "\" and form id \"" + formId + "\".";
-            }
-         }
-         else
-         {
-            // TODO: This should just show all properties instead
-            model.error = "No configuration found for node type \"" + formModel.data.type + "\" and form id \"" + formId + "\".";
-         }
-         
-         // TODO: deal with 'sets', the fields must be within their appropriate set
-         //       and structured with the correct hierarchy, should this be done in
-         //       here or is it up to the config service to determine the hierarchy?
-         
-         // TODO: see if there is an overidden submissionUrl in the form config
-         
-         formUIModel.items = formUIItems;
+         // constraints were built during form items construction, add 
+         // them to the form ui model
          formUIModel.constraints = formUIConstraints;
       }
       else
@@ -310,10 +146,293 @@ function setupCaches(formModel)
    }
    
    // get the default controls configuration
-   defaultControls = config.global["forms"].defaultControls;
+   defaultControls = config.global.forms.defaultControls;
    
    // get the default constraint handlers configuration
-   defaultConstraintHandlers = config.global["forms"].constraintHandlers;
+   defaultConstraintHandlers = config.global.forms.constraintHandlers;
+}
+
+
+/**
+ * Finds the configuration for the given item id, if
+ * there isn't any configuration for the item null is
+ * returned.
+ *
+ * @method getFormConfig
+ * @param itemId The id of the item to retrieve for config for
+ * @param formId The id of the specific form to lookup or null
+ *               to get the default form
+ * @return Object representing the configuration or null
+ */
+function getFormConfig(itemId, formId)
+{
+   var formConfig = null;
+   
+   // query for configuration for item
+   var nodeConfig = config.scoped[itemId];
+   
+   if (nodeConfig !== null)
+   {
+      // get the forms configuration
+      var formsConfig = nodeConfig.forms;
+
+      if (formsConfig !== null)
+      {
+         if (formId !== null && formId.length > 0)
+         {
+            // look up the specific form
+            formConfig = formsConfig.getForm(formId);
+         }
+         else
+         {
+            // look up the default form
+            formConfig = formsConfig.defaultForm;
+         }
+      }
+   }
+   
+   return formConfig;
+}
+
+/**
+ * Returns the list of fields configured to be visible for the 
+ * given mode. If this method returns null or an empty list the
+ * component should attempt to display ALL known data for the item, 
+ * unless there are fields configured to be hidden.
+ *
+ * @method getVisibleFields
+ * @param mode The mode the form is rendering, 'view', 'edit' or 'create'
+ * @param formConfig The form configuration, maybe null
+ * @return Array of field names or null
+ */
+function getVisibleFields(mode, formConfig)
+{
+   var visibleFields = null;
+   
+   if (formConfig != null)
+   {
+      // get visible fields for the current mode
+      switch (mode)
+      {
+         case "view":
+            visibleFields = formConfig.visibleViewFieldNames;
+            break;
+         case "edit":
+            visibleFields = formConfig.visibleEditFieldNames;
+            break;
+         case "create":
+            visibleFields = formConfig.visibleCreateFieldNames;
+            break;
+         default:
+            visibleFields = formConfig.visibleViewFieldNames;
+            break;
+      }
+   }
+   
+   if (logger.isLoggingEnabled())
+   {
+      logger.log("Visible fields for " + mode + " mode = " + visibleFields);
+   }
+         
+   return visibleFields;
+}
+
+
+/**
+ * Creates an Object to represent the body of the POST request
+ * to send to the form service.
+ *
+ * @method createPostBody
+ * @param itemKind The kind of item
+ * @param itemId The id of the item
+ * @param visibleFields List of fields to get data for
+ * @param formConfig The form configuration object
+ * @return Object representing the POST body
+ */
+function createPostBody(itemKind, itemId, visibleFields, formConfig)
+{
+   var postBody = {};
+   
+   postBody.itemKind = itemKind;
+   postBody.itemId = itemId.replace(":/", "");
+   
+   if (visibleFields !== null)
+   {
+      // TODO: find a way to return/make a native JS array, for now
+      //       convert the Java List to a JS array checking force as we go
+      var postBodyFields = [];
+      var postBodyForcedFields = [];
+      var fieldId = null;
+      for (var f = 0; f < visibleFields.size(); f++)
+      {
+         fieldId = visibleFields.get(f)
+         postBodyFields.push(fieldId);
+         if (formConfig.isFieldForced(fieldId))
+         {
+            postBodyForcedFields.push(fieldId);
+         }
+      }
+      
+      postBody.fields = postBodyFields;
+      if (postBodyForcedFields.length > 0)
+      {
+         postBody.force = postBodyForcedFields;
+      }
+   }
+   
+   if (logger.isLoggingEnabled())
+   {
+      logger.log("postBody = " + jsonUtils.toJSONString(postBody));
+   }
+      
+   return postBody;
+}
+
+/**
+ * Sets up the basics of the form UI model used to generate the UI
+ *
+ * @method setupFormUIModel
+ * @param mode The mode of the form
+ * @param formModel The model returned from the server
+ * @param formConfig The form configuration
+ * @return Object representing the form UI model
+ */
+function setupFormUIModel(mode, formModel, formConfig)
+{
+   // determine what enctype to use from the arguments
+   var submitType = getArgument("submitType", "multipart");
+   var enctype = null;
+   switch (submitType)
+   {
+      case "multipart":
+         enctype = "multipart/form-data";
+         break;
+      case "json":
+         enctype = "application/json";
+         break;
+      case "urlencoded":
+         enctype = "application/x-www-form-urlencoded";
+         break;
+      default:
+         enctype = "multipart/form-data";
+         break;
+   }
+   
+   // determine what method to use when submitting form
+   var mthd = getArgument("method", "POST");
+   
+   // determine what submisson url to use
+   var submissionUrl = null;
+   if (formConfig !== null && formConfig.submissionURL !== null)
+   {
+      submissionUrl = formConfig.submissionURL;
+   }
+   else
+   {   
+      submissionUrl = getArgument("submissionUrl", formModel.data.submissionUrl);
+   }
+   submissionUrl = url.context + "/proxy/alfresco" + submissionUrl;
+   
+   // determine whether to show caption at top of form
+   var showCaption = getArgument("showCaption", "false");
+   
+   // determine whether to show cancel button
+   var showCancelButton = getArgument("showCancelButton", "false");
+   
+   // determine whether to show reset button
+   var showResetButton = getArgument("showResetButton", "false");
+   
+   // create and setup form ui model basics
+   var formUIModel = {};
+   formUIModel.mode = mode;
+   formUIModel.method = mthd;
+   formUIModel.enctype = enctype;
+   formUIModel.submissionUrl = submissionUrl;
+   formUIModel.showCaption = (showCaption === "true") ? true : false;
+   formUIModel.showCancelButton = (showCancelButton === "true") ? true : false;
+   formUIModel.showResetButton = (showResetButton === "true") ? true : false;
+   formUIModel.data = formModel.data.formData;
+   
+   return formUIModel;
+}
+
+/**
+ * Sets up the items property of the form ui model, this consists
+ * of the set and field structure that subsequently needs to be 
+ * rendered.
+ *
+ * @method setupFormUIItems
+ * @param formModel The model returned from the server
+ * @param formConfig The form configuration
+ * @visibleFields List of fields configured to be visible
+ * @return Object representing the form UI model
+ */
+function setupFormUIItems(formModel, formConfig, visibleFields)
+{
+   var formUIItems = [];
+   
+   // setup the set and field structure
+   if (visibleFields !== null)
+   {
+      // if we have visible fields we can presume there is
+      // config present!
+      
+      logger.log("root sets = " + formConfig.rootSets);
+      
+      for (var f = 0; f < visibleFields.size(); f++)
+      {
+         var fieldName = visibleFields.get(f);
+         var fieldConfig = formConfig.fields[fieldName];
+         
+         // setup the field
+         var fieldDef = setupField(formModel, fieldName, fieldConfig);
+         
+         // if a field was created add to the list to be displayed
+         if (fieldDef !== null)
+         {
+            formUIItems.push(fieldDef);
+            
+            if (logger.isLoggingEnabled())
+            {
+               logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
+            }
+         }
+      }
+   }
+   else
+   {
+      // as we have no visible fields and potentially no config the
+      // default behaviour is to show all known fields for the item
+      
+      // TODO: if there is no config at all just show all fields
+      
+      // TODO: iterate around all fields returned from the server
+      //       and determine what set they belong to
+      
+      // TODO: get root sets from config and build set structure using
+      //       config and list built above
+      
+      // for now return an error message
+      model.error = "Not enough configuration found for node type \"" + formModel.data.type + "\".";
+   }
+   
+   return formUIItems;
+}
+
+/**
+ * Creates the item to represent the given set definition.
+ * The item returned represents the set and field structure
+ * defined in the form config.
+ *
+ * @method createSetItem
+ * @param set The set definition to construct
+ * @param formConfig The form configuration
+ */
+function createSetItem(set, formConfig)
+{
+   var set = {};
+   
+   return set;
 }
 
 /**
