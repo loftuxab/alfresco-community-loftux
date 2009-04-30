@@ -22,8 +22,8 @@
              <ul id="Content" class="e2e list active">
                 <#list contentResults.items as content>
                 <li class="details ${content.type}">
-                 <p class="toenail"><a href="${url.context}/proxy/alfresco/${content.browseUrl}"><img src="${url.context}/themes/${theme}/images/icons/${content.displayType}.png" /></a></p>
-                 <h3><a href="${url.context}/proxy/alfresco/${content.browseUrl}">${content.displayName}</a></h3>
+                 <p class="toenail"><a href="${url.context}/proxy/alfresco/${content.doclink}"><img src="${url.context}/themes/${theme}/images/icons/${content.displayType}.png" /></a></p>
+                 <h3><a href="${url.context}/proxy/alfresco/${content.doclink}">${content.displayName}</a></h3>
                  <p><span>${msg('label.modifiedBy')}:</span> ${content.modifiedBy}</p>
                  <p><span>${msg('label.modifiedOn')}:</span> ${content.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
                  <p><span>${msg('label.size')}:</span> ${content.size}</p>
