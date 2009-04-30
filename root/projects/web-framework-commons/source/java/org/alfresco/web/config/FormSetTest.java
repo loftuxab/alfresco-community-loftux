@@ -63,6 +63,7 @@ public class FormSetTest extends TestCase
         
         // Note ordering is important here.
         Set<String> expectedSetIDs = new LinkedHashSet<String>();
+        expectedSetIDs.add(FormConfigElement.DEFAULT_SET_ID);
         expectedSetIDs.add("root1");
         expectedSetIDs.add("intermediate1");
         expectedSetIDs.add("intermediate2");
@@ -79,6 +80,7 @@ public class FormSetTest extends TestCase
         assertNotNull(rootSets);
         
         Set<String> expectedRoots = new LinkedHashSet<String>();
+        expectedRoots.add(FormConfigElement.DEFAULT_SET_ID);
         expectedRoots.add("root1");
         expectedRoots.add("root2");
         expectedRoots.add("root66");

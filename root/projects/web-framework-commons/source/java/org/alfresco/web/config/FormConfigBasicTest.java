@@ -532,9 +532,4 @@ public class FormConfigBasicTest extends BaseTest
         assertNull(myTextControl.getCssDependencies());
         assertNull(myTextControl.getJsDependencies());
     }
-    
-    public void off_testGetFieldsForModeAndSet()
-    {
-        fail("Not yet implemented.");
-    }
 }

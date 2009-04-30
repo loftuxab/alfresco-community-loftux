@@ -53,8 +53,10 @@ public enum Mode
         }
         else
         {
-            //TODO Fix this.
-            logger.debug("Illegal modeString: " + modeString);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Illegal modeString: " + modeString);
+            }
             return null;
         }
     }
