@@ -16,8 +16,8 @@
    <div class="finder-wrapper">
       <div class="search-bar theme-bg-color-3">
          <div class="search-text"><input type="text" id="${args.htmlid}-search-text" name="-" value="" /></div>
-         <div class="search-button">
-            <span id="${args.htmlid}-search-button" class="yui-button yui-push-button"><span class="first-child"><button>${msg("button.search")}</button></span></span>
+         <div class="group-search-button">
+            <span id="${args.htmlid}-group-search-button" class="yui-button yui-push-button"><span class="first-child"><button>${msg("button.search")}</button></span></span>
          </div>
       </div>
       
