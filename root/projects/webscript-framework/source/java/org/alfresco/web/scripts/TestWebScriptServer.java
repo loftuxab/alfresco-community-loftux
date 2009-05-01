@@ -757,6 +757,31 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
     }
 
     /**
+     * Test PATCH Request
+     */
+    public static class PatchRequest extends Request
+    {
+        public PatchRequest(String uri, String put, String contentType)
+            throws UnsupportedEncodingException
+        {
+            super("patch", uri);
+            if (contentType.indexOf(";charset") == -1)
+            {
+                contentType = contentType + ";charset=UTF-8";
+            }
+            setBody(put.getBytes("UTF-8"));
+            setType(contentType);
+        }
+        
+        public PatchRequest(String uri, byte[] put, String contentType)
+        {
+            super("patch", uri);
+            setBody(put);
+            setType(contentType);
+        }
+    }
+    
+    /**
      * A Web Script Test Response
      */
     public interface Response

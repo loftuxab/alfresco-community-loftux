@@ -101,8 +101,6 @@ public interface CMISConstants
 
     // CMIS Relationships
     public static final String REL_PARENTS = "parents";
-    // TODO: CMIS spec issue: parent is not defined in 0.6
-    public static final String REL_PARENT = "parent";
     public static final String REL_REPOSITORY = "repository";
     public static final String REL_CHILDREN = "children";
     public static final String REL_DESCENDANTS = "descendants";
