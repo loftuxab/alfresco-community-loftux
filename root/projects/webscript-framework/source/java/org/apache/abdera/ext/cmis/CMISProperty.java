@@ -36,6 +36,8 @@ import org.apache.abdera.model.ElementWrapper;
 
 
 /**
+ * CMIS Version: 0.6
+ *
  * CMIS Property for the Abdera ATOM library.
  * 
  * Encapsulates access and modification of CMIS extension values to CMIS

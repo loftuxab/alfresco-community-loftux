@@ -37,6 +37,8 @@ import org.apache.abdera.util.AbstractExtensionFactory;
 
 
 /**
+ * CMIS Version: 0.6
+ *
  * CMIS Extension Factory for the Abdera ATOM Library.
  * 
  * Encapsulates access and modification of CMIS extension values to ATOM.
@@ -54,7 +56,7 @@ public class CMISExtensionFactory extends AbstractExtensionFactory
     
     public CMISExtensionFactory()
     {
-        super(CMIS_200805_NS);
+        super(CMIS_NS);
         addImpl(REPOSITORY_INFO, CMISRepositoryInfo.class);
         addImpl(CAPABILITIES, CMISCapabilities.class);
         addImpl(OBJECT, CMISObject.class);

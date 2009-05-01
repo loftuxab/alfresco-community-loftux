@@ -30,6 +30,8 @@ import org.apache.abdera.model.ElementWrapper;
 
 
 /**
+ * CMIS Version: 0.6
+ * 
  * CMIS Repository Info for the Abdera ATOM library.
  * 
  * Encapsulates access and modification of CMIS extension values to ATOM
@@ -87,12 +89,6 @@ public class CMISCapabilities extends ElementWrapper
     public String getJoin()
     {
         Element child = getFirstChild(CMISConstants.CAPABILITY_JOIN);
-        return child.getText();
-    }
-
-    public String getFullText()
-    {
-        Element child = getFirstChild(CMISConstants.CAPABILITY_FULLTEXT);
         return child.getText();
     }
 
