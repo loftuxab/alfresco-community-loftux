@@ -278,33 +278,24 @@ public abstract class AbstractWebScript implements WebScript
 	                script = scripts.get(key);
 	                if (script == null)
 	                {
-	                	ScriptContent scriptContent = null;
-	                	FormatRegistry formatRegistry = getContainer().getFormatRegistry();
+                        FormatRegistry formatRegistry = getContainer().getFormatRegistry();
 	                	
 	                    // Locate script in web script store
+                        ScriptContent scriptContent = null;
 	                	String generalizedMimetype = mimetype;
-	                    String format = formatRegistry.getFormat(null, generalizedMimetype);
-	                    
-	                    if (format != null)
-                        {
-                            scriptContent = getContainer().getScriptProcessor().findScript(
-                                    basePath + "." + format + ".js");
-                        }
-	                    
-                        if (scriptContent == null)
-                        {
+	                	while (generalizedMimetype != null)
+	                	{
+	                        String format = formatRegistry.getFormat(null, generalizedMimetype);
+	                        if (format != null)
+	                        {
+	                            scriptContent = getContainer().getScriptProcessor().findScript(basePath + "." + format + ".js");
+	                            if (scriptContent != null)
+	                            {
+	                                break;
+	                            }
+	                        }
                             generalizedMimetype = formatRegistry.generalizeMimetype(generalizedMimetype);
-                            if (generalizedMimetype != null)
-                            {
-                                format = formatRegistry.getFormat(null, generalizedMimetype);
-                                if (format != null)
-                                {
-                                    scriptContent = getContainer().getScriptProcessor().findScript(
-                                            basePath + "." + format + ".js");
-                                }
-                            }
-
-                        }
+	                	}
 	                    
 	                    // fall-back to default
 						if (scriptContent == null)

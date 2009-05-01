@@ -245,16 +245,17 @@ public class FormatRegistry
     	}
     	
         // TODO: lookup by sorted mimetype list (most specific -> least specific)
-        FormatReader<Object> reader = readers.get(mimetype); 
-        if (reader == null)
-        {
-            String generalizedMimetype = generalizeMimetype(mimetype);
-            if (generalizedMimetype != null)
+    	String generalizedMimetype = mimetype;
+    	while (generalizedMimetype != null)
+    	{
+            FormatReader<Object> reader = readers.get(generalizedMimetype); 
+            if (reader != null)
             {
-                reader = readers.get(generalizedMimetype);
+                return reader;
             }
-        }
-        return reader;
+            generalizedMimetype = generalizeMimetype(generalizedMimetype);
+    	}
+    	return null;
     }
 
     /**
@@ -268,16 +269,17 @@ public class FormatRegistry
     public FormatWriter<Object> getWriter(Object object, String mimetype)
     {
         // TODO: lookup by sorted mimetype list (most specific -> least specific)
-        FormatWriter<Object> writer = writers.get(object.getClass().getName() + "||" + mimetype);
-        if (writer == null)
+        String generalizedMimetype = mimetype; 
+        while (generalizedMimetype != null)
         {
-            String generalizedMimetype = generalizeMimetype(mimetype);
-            if (generalizedMimetype != null)
+            FormatWriter<Object> writer = writers.get(object.getClass().getName() + "||" + generalizedMimetype);
+            if (writer != null)
             {
-                writer = writers.get(object.getClass().getName() + "||" + generalizedMimetype);
+                return writer;
             }
+            generalizedMimetype = generalizeMimetype(generalizedMimetype);
         }
-        return writer;
+        return null;
     }
 
     /**
@@ -291,7 +293,7 @@ public class FormatRegistry
         String generalizedMimetype = null;
         if (mimetype != null)
         {
-            int params = mimetype.indexOf(";");
+            int params = mimetype.lastIndexOf(";");
             if (params != -1)
             {
                 generalizedMimetype = mimetype.substring(0, params);

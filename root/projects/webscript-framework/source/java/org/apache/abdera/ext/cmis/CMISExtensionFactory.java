@@ -70,6 +70,7 @@ public class CMISExtensionFactory extends AbstractExtensionFactory
         addImpl(PROPERTY_ID, CMISPropertyId.class);
         addImpl(PROPERTY_XML, CMISPropertyXml.class);
         addImpl(PROPERTY_HTML, CMISPropertyHtml.class);
+        addImpl(VALUE, CMISValue.class);
         addImpl(ALLOWABLEACTIONS, CMISAllowableActions.class);
         addImpl(CAN_DELETE, CMISAllowableAction.class);
         addImpl(CAN_UPDATE_PROPERTIES, CMISAllowableAction.class); 
