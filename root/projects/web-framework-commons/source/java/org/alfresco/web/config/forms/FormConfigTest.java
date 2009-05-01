@@ -98,7 +98,7 @@ public class FormConfigTest extends BaseTest
     
     public void testVisibleFieldsMustBeCorrectlyOrdered()
     {
-        FormConfigElement setForm = readSetMembershipFormFromConfig();
+        FormConfigElement setForm = readFormFromConfig("set_membership");
 
         List<String> fieldNames = setForm.getVisibleViewFieldNames();
     	
@@ -110,20 +110,6 @@ public class FormConfigTest extends BaseTest
         expectedFieldNames.add("v_set");
         expectedFieldNames.add("cev_set");
     	assertEquals("Visible fields wrong.", expectedFieldNames, fieldNames);
-    }
-
-    private FormConfigElement readSetMembershipFormFromConfig()
-    {
-        Config setConfig = configService.getConfig("set_membership");
-        assertNotNull("setConfig was null.", setConfig);
-    
-        ConfigElement confElement = setConfig.getConfigElement("forms");
-        assertNotNull("confElement was null.", confElement);
-        assertTrue("confElement should be instanceof FormsConfigElement.",
-                confElement instanceof FormsConfigElement);
-        FormsConfigElement setFormsConfigElement = (FormsConfigElement) confElement;
-        FormConfigElement setForm = setFormsConfigElement.getDefaultForm();
-        return setForm;
     }
 
     public void testGetSetsFromForm()
@@ -152,7 +138,7 @@ public class FormConfigTest extends BaseTest
      */
     public void testGetFieldsInTheDefaultSet_ViewEditCreate()
     {
-        FormConfigElement setForm = readSetMembershipFormFromConfig();
+        FormConfigElement setForm = readFormFromConfig("set_membership");
 
         final String testSetId = FormConfigElement.DEFAULT_SET_ID;
 
@@ -178,7 +164,7 @@ public class FormConfigTest extends BaseTest
      */
     public void testGetFieldsInASet_ViewEditCreate()
     {
-        FormConfigElement setForm = readSetMembershipFormFromConfig();
+        FormConfigElement setForm = readFormFromConfig("set_membership");
 
         final String testSetId = "user";
 
@@ -192,6 +178,39 @@ public class FormConfigTest extends BaseTest
                 Arrays.asList(new String[]{"all_set", "e_set", "ce_set", "cev_set"}));
         assertEquals(Arrays.asList(visibleViewFields_View),
                 Arrays.asList(new String[]{"all_set", "v_set", "cev_set"}));
+    }
+    
+    public void testGetRootSetsShouldReturnTheDefaultSetWhenNoSetsDeclared() throws Exception
+    {
+        FormConfigElement formWithoutSets = this.readFormFromConfig("form_without_sets");
+        Map<String, FormSet> rootSets = formWithoutSets.getRootSets();
+        
+        assertEquals("A form without any explicit sets should return one root set.", 1, rootSets.size());
+        assertEquals("The root set was incorrect.",
+                FormConfigElement.DEFAULT_SET_ID, rootSets.keySet().iterator().next());
+        assertNull(rootSets.get(FormConfigElement.DEFAULT_SET_ID).getParentId());
+    }
+    
+    /**
+     * Even when no sets are explicitly declared in the config xml, there is always
+     * the default set. In this scenario all fields are implicit members of that set and
+     * should be visible as normal.
+     */
+    public void testGetVisibleFieldNamesForDefaultSet() throws Exception
+    {
+        FormConfigElement formWithoutSets = this.readFormFromConfig("form_without_sets");
+        final String testSetId = FormConfigElement.DEFAULT_SET_ID;
+        String[] visibleCreateFields = formWithoutSets.getVisibleCreateFieldNamesForSet(testSetId);
+        String[] visibleEditFields = formWithoutSets.getVisibleEditFieldNamesForSet(testSetId);
+        String[] visibleViewFields = formWithoutSets.getVisibleViewFieldNamesForSet(testSetId);
+        
+        List<String> expectedCreateFields = Arrays.asList(new String[]{"all", "c", "ce", "cev"});
+        List<String> expectedEditFields = Arrays.asList(new String[]{"all", "e", "ce", "cev"});
+        List<String> expectedViewFields = Arrays.asList(new String[]{"all", "v", "cev"});
+        
+        assertEquals(expectedCreateFields, Arrays.asList(visibleCreateFields));
+        assertEquals(expectedEditFields, Arrays.asList(visibleEditFields));
+        assertEquals(expectedViewFields, Arrays.asList(visibleViewFields));
     }
     
     public void testAccessAllFieldRelatedData()
@@ -315,5 +334,19 @@ public class FormConfigTest extends BaseTest
         globalConstraintHandlers = globalForms.getConstraintHandlers();
         assertNotNull("global constraint-handlers element should not be null",
                 globalConstraintHandlers);
+    }
+
+    private FormConfigElement readFormFromConfig(String condition)
+    {
+        Config setConfig = configService.getConfig(condition);
+        assertNotNull("setConfig was null.", setConfig);
+    
+        ConfigElement confElement = setConfig.getConfigElement("forms");
+        assertNotNull("confElement was null.", confElement);
+        assertTrue("confElement should be instanceof FormsConfigElement.",
+                confElement instanceof FormsConfigElement);
+        FormsConfigElement setFormsConfigElement = (FormsConfigElement) confElement;
+        FormConfigElement setForm = setFormsConfigElement.getDefaultForm();
+        return setForm;
     }
 }
