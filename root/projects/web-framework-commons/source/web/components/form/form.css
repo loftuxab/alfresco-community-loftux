@@ -1,14 +1,16 @@
 /* FormUI Component */
 
-.form-container .form-fields
+.form-container fieldset
 {
-   padding-bottom: 1em;
-   border-bottom: 1px dashed #c2c2c2;
+   border: 1px solid #aaaaaa;
+   padding: 1.2em 0 0.5em 1.5em;
+   margin-bottom: 1em;
 }
 
-.form-container .form-buttons
+.form-container legend
 {
-   padding-top: 1em;
+   color: #333333;
+   padding: 0 0.4em;
 }
 
 .form-container label
@@ -31,6 +33,17 @@
 .form-container select
 {
    margin: 0.6em 0 1.3em 0;
+}
+
+.form-container .form-fields
+{
+   padding-bottom: 1em;
+   border-bottom: 1px dashed #c2c2c2;
+}
+
+.form-container .form-buttons
+{
+   padding-top: 1em;
 }
 
 .form-container .object-finder

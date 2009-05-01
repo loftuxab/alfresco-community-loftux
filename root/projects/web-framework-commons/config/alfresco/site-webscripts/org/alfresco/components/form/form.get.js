@@ -65,7 +65,7 @@ function main()
          formUIModel = setupFormUIModel(mode, formModel, formConfig);
          
          // setup and add items to form ui model
-         formUIModel.items = setupFormUIItems(formModel, formConfig, visibleFields);
+         formUIModel.items = setupFormUIItems(mode, formModel, formConfig, visibleFields);
          
          // constraints were built during form items construction, add 
          // them to the form ui model
@@ -362,40 +362,31 @@ function setupFormUIModel(mode, formModel, formConfig)
  * rendered.
  *
  * @method setupFormUIItems
+ * @param mode The mode of the form
  * @param formModel The model returned from the server
  * @param formConfig The form configuration
  * @visibleFields List of fields configured to be visible
  * @return Object representing the form UI model
  */
-function setupFormUIItems(formModel, formConfig, visibleFields)
+function setupFormUIItems(mode, formModel, formConfig, visibleFields)
 {
    var formUIItems = [];
    
    // setup the set and field structure
-   if (visibleFields !== null)
+   if (visibleFields !== null && visibleFields.size() > 0)
    {
       // if we have visible fields we can presume there is
       // config present!
       
-      logger.log("root sets = " + formConfig.rootSets);
-      
-      for (var f = 0; f < visibleFields.size(); f++)
+      // get the root sets
+      var rootSets = formConfig.rootSets;      
+      for (var s = 0; s < rootSets.size(); s++)
       {
-         var fieldName = visibleFields.get(f);
-         var fieldConfig = formConfig.fields[fieldName];
-         
-         // setup the field
-         var fieldDef = setupField(formModel, fieldName, fieldConfig);
-         
-         // if a field was created add to the list to be displayed
-         if (fieldDef !== null)
+         var set = setupSet(mode, rootSets.get(s), formModel, formConfig);
+         // if the set got created (as it contained fields or other sets) add to items list
+         if (set !== null)
          {
-            formUIItems.push(fieldDef);
-            
-            if (logger.isLoggingEnabled())
-            {
-               logger.log("Added field definition for \"" + fieldName + "\" " + jsonUtils.toJSONString(fieldDef));
-            }
+            formUIItems.push(set);
          }
       }
    }
@@ -413,24 +404,96 @@ function setupFormUIItems(formModel, formConfig, visibleFields)
       //       config and list built above
       
       // for now return an error message
-      model.error = "Not enough configuration found for node type \"" + formModel.data.type + "\".";
+      model.error = "Not enough configuration found for node type \"" + formModel.data.type + "\", at least one &lt;show&gt; element must be present.";
    }
    
    return formUIItems;
 }
 
 /**
- * Creates the item to represent the given set definition.
+ * Sets up the item to represent the given set definition.
  * The item returned represents the set and field structure
  * defined in the form config.
  *
  * @method createSetItem
- * @param set The set definition to construct
+ * @param mode The mode of the form
+ * @param setConfig The set configuration
+ * @param formModel The model returned from the server 
  * @param formConfig The form configuration
  */
-function createSetItem(set, formConfig)
+function setupSet(mode, setConfig, formModel, formConfig)
 {
-   var set = {};
+   var set = null;
+   
+   // get the fields to display in this set
+   var fieldsForSet = null;
+   
+   switch (mode)
+   {
+      case "view":
+         fieldsForSet = formConfig.getVisibleViewFieldNamesForSet(setConfig.setId);
+         break;
+      case "edit":
+         fieldsForSet = formConfig.getVisibleEditFieldNamesForSet(setConfig.setId);
+         break;
+      case "create":
+         fieldsForSet = formConfig.getVisibleCreateFieldNamesForSet(setConfig.setId);
+         break;
+      default:
+         fieldsForSet = formConfig.getVisibleViewFieldNamesForSet(setConfig.setId);
+         break;
+   }
+   
+   // if there is something to show in the set create the set object
+   if ((fieldsForSet !== null && fieldsForSet.length > 0) || setConfig.children.length > 0)
+   {
+      // setup the basic set object
+      set = {};
+      set.kind = "set";
+      set.id = setConfig.setId;
+      set.appearance = setConfig.appearance;
+      set.children = [];
+      
+      // TODO: Add label and label-id to set config, for now use the id
+      if (set.id.length === 0)
+      {
+         // TODO: externalise the default set label
+         set.label = "Default";
+      }
+      else
+      {
+         set.label = set.id;
+      }
+   
+      // add all the fields to the set
+      for (var f = 0; f < fieldsForSet.length; f++)
+      {
+         var fieldName = fieldsForSet[f];
+         var fieldConfig = formConfig.fields[fieldName];
+         
+         // setup the field
+         var field = setupField(formModel, fieldName, fieldConfig);
+         
+         // if a field was created add to the set's list of children
+         if (field !== null)
+         {
+            set.children.push(field);
+            
+            if (logger.isLoggingEnabled())
+            {
+               logger.log("Added field \"" + fieldName + "\" to set \"" + set.id + "\": " + 
+                     jsonUtils.toJSONString(field));
+            }
+         }
+      }
+      
+      // TODO: recursively setup child sets
+      
+   }
+   else if (logger.isLoggingEnabled())
+   {
+      logger.log("Ignoring set \"" + setConfig.setId + "\" as it does not have any fields or child sets.");
+   }
    
    return set;
 }

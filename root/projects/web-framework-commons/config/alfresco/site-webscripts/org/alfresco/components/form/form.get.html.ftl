@@ -41,9 +41,10 @@
       
       <div id="${formId}-fields" class="form-fields">
          <#list form.items as item>
-            <#if item.control.template?exists>
-               <#assign field=item>
-               <#include "${field.control.template}" />
+            <#if item.kind == "set">
+               <@renderSet set=item />
+            <#else>
+               <@renderField field=item />
             </#if>
          </#list>
       </div>
@@ -63,3 +64,28 @@
 
    </div>
 </#if>
+
+<#macro renderField field>
+   <#if field.control.template?exists>
+      <#include "${field.control.template}" />
+   </#if>
+</#macro>
+
+<#macro renderSet set>
+   <#if set.appearance?exists>
+      <fieldset><legend>${set.label}</legend>
+   </#if>
+   
+   <#list set.children as item>
+      <#if item.kind == "set">
+         <@renderSet set=item />
+      <#else>
+         <@renderField field=item />
+      </#if>
+   </#list>
+   
+   <#if set.appearance?exists>
+      </fieldset>
+   </#if>
+</#macro>
+

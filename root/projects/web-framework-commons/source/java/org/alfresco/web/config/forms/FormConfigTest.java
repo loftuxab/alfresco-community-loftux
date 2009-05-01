@@ -183,12 +183,12 @@ public class FormConfigTest extends BaseTest
     public void testGetRootSetsShouldReturnTheDefaultSetWhenNoSetsDeclared() throws Exception
     {
         FormConfigElement formWithoutSets = this.readFormFromConfig("form_without_sets");
-        Map<String, FormSet> rootSets = formWithoutSets.getRootSets();
+        List<FormSet> rootSets = formWithoutSets.getRootSets();
         
         assertEquals("A form without any explicit sets should return one root set.", 1, rootSets.size());
         assertEquals("The root set was incorrect.",
-                FormConfigElement.DEFAULT_SET_ID, rootSets.keySet().iterator().next());
-        assertNull(rootSets.get(FormConfigElement.DEFAULT_SET_ID).getParentId());
+                FormConfigElement.DEFAULT_SET_ID, rootSets.get(0).getSetId());
+        assertNull(rootSets.get(0).getParentId());
     }
     
     /**

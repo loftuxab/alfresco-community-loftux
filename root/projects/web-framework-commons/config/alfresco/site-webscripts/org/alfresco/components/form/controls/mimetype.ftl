@@ -1,7 +1,14 @@
+<#-- TODO: Allow other content properties to be used, configure via params -->
+<#-- <#assign content=form.data["prop_cm_content"]> -->
+<#-- <#assign mtBegIdx=content?index_of("mimetype=")+9> -->
+<#-- <#assign mtEndIdx=content?index_of("|", mtBegIdx)> -->
+<#-- <#assign mimetype=content?substring(mtBegIdx, mtEndIdx)> -->
+<#assign mimetype=field.value>
+
 <#if form.mode == "view">
 <div class="viewmode-field">
    <span class="viewmode-label">${msg("form.control.mimetype.label")}:</span>
-   <span class="viewmode-value">${getMimetypeLabel("${field.value}")}</span>
+   <span class="viewmode-value">${getMimetypeLabel("${mimetype}")}</span>
 </div>
 <#else>
 <label for="${args.htmlid}_${field.id}">${msg("form.control.mimetype.label")}:</label>
@@ -313,6 +320,6 @@
 </#function>
 
 <#macro mimetypeOption mt>
-   <option value="${mt}"<#if field.value==mt> selected="selected"</#if>>${getMimetypeLabel("${mt}")}</option>
+   <option value="${mt}"<#if mimetype==mt> selected="selected"</#if>>${getMimetypeLabel("${mt}")}</option>
 </#macro>
               
