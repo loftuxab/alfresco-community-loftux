@@ -18,6 +18,7 @@
 .object-finder .picker
 {
    display: none;
+   margin-left: 2em;
    width: 60em;
 }
 
@@ -89,7 +90,14 @@
 {
    border: 2px solid #aaa;
    height: 20em;
+   overflow-x: auto;
    overflow-y: scroll;
+}
+
+.object-finder .picker-items .icon16
+{
+   display: block;
+   min-height: 16px;
 }
 
 .object-finder .picker-items .icon32
@@ -98,9 +106,16 @@
    min-height: 32px;
 }
 
+.object-finder .picker-items a.add-item:hover,
 .object-finder .picker-items a.remove-item:hover
 {
    text-decoration: none;
+}
+
+.object-finder .picker-items .addIcon
+{
+	background: transparent url(../images/add-icon-16.png) no-repeat center center;
+	padding: 8px;
 }
 
 .object-finder .picker-items .removeIcon
@@ -121,6 +136,11 @@
    display: none;
 }
 
+.object-finder .picker-items tbody
+{
+   outline: none;
+}
+
 .object-finder .picker-items.yui-dt .yui-dt-message td
 {
    border: medium none;
@@ -130,7 +150,7 @@
 {
    border-bottom: 1px dashed #d9d9d9;
    border-right: medium none;
-   vertical-align: top;
+   vertical-align: middle;
 }
 
 .object-finder .panel-left,
@@ -144,7 +164,6 @@
    clear: left;
    margin-left: 0.5em;
    margin-right: 6px;
-   overflow-x: hidden;
 }
 
 .object-finder .panel-right .picker-items
@@ -157,4 +176,22 @@
 .yui-skin-default .yui-panel .bd div.yui-u
 {
    padding: 0;
+}
+
+/* Compact Mode */
+.object-finder .picker.compact
+{
+   width: 50em;
+}
+
+.object-finder .compact .picker-items
+{
+   border: 1px solid #aaa;
+   height: 15em;
+}
+
+.object-finder .compact h3
+{
+   font-size: 100%;
+   font-weight: normal;
 }

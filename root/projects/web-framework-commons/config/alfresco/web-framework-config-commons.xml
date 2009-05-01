@@ -29,7 +29,9 @@
 	         <type name="d:content" template="controls/readonly.ftl" />
 	         <type name="d:qname" template="controls/readonly.ftl" />
 	         <type name="d:noderef" template="controls/readonly.ftl" />
-	         <type name="d:category" template="controls/experimental-categories.ftl" />
+	         <type name="d:category" template="controls/experimental-categories.ftl">
+               <control-param name="compactMode">true</control-param>
+            </type>
 	         <type name="d:childassocref" template="controls/experimental-association.ftl" />
 	         <type name="d:assocref" template="controls/experimental-association.ftl" />
 	         <type name="d:path" template="controls/readonly.ftl" />
@@ -56,6 +58,7 @@
                <show id="cm:description" force="true" />
                <show id="mimetype" />
                <show id="cm:author" force="true" />
+               <!-- <show id="cm:taggable" /> -->
                <show id="cm:categories" />
                <show id="size" for-mode="view" />
                <show id="cm:creator" for-mode="view" />
@@ -113,6 +116,11 @@
                </field>
                <field id="size">
                   <control template="controls/size.ftl" />
+               </field>
+               <field id="cm:taggable">
+                  <control>
+                     <control-param name="params">aspect=cm:taggable</control-param>
+                  </control>
                </field>
                <!--
                <field id="cm:originator" read-only="true" />

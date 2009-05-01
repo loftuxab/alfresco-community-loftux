@@ -120,6 +120,15 @@
          itemType: "cm:content",
 
          /**
+          * Compact mode flag
+          * 
+          * @property compactMode
+          * @type boolean
+          * @default false
+          */
+         compactMode: false,
+
+         /**
           * Multiple Select mode flag
           * 
           * @property multipleSelectMode
@@ -238,12 +247,16 @@
        */
       onReady: function ObjectFinder_onReady()
       {
+         if (this.options.compactMode)
+         {
+            Dom.addClass(this.pickerId, "compact");
+         }
          this._getCurrentValueMeta();
          this._createNavigationControls();
          this._createSelectedItemsControls();
-         Alfresco.util.createYUIButton(this, "showPicker-button", this.onShowPicker);
-         Alfresco.util.createYUIButton(this, "ok", this.onOK);
-         Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
+         this.widgets.showPicker = Alfresco.util.createYUIButton(this, "showPicker-button", this.onShowPicker);
+         this.widgets.ok = Alfresco.util.createYUIButton(this, "ok", this.onOK);
+         this.widgets.cancel = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
       },
       
       /**
@@ -255,9 +268,11 @@
        */
       onShowPicker: function ObjectFinder_onShowPicker(e, p_obj)
       {
+         p_obj.set("disabled", true);
          Dom.setStyle(this.pickerId, "display", "block");
          this._createResizer();
          this._populateSelectedItems();
+         this.options.objectRenderer.onPickerShow();
          YAHOO.Bubbling.fire("refreshItemList",
          {
             eventGroup: this
@@ -302,6 +317,7 @@
          this._getCurrentValueMeta();
          
          Dom.setStyle(this.pickerId, "display", "none");
+         this.widgets.showPicker.set("disabled", false);
          Event.preventDefault(e);
       },
 
@@ -315,6 +331,7 @@
       onCancel: function ObjectFinder_onCancel(e, p_obj)
       {
          Dom.setStyle(this.pickerId, "display", "none");
+         this.widgets.showPicker.set("disabled", false);
          Event.preventDefault(e);
       },
 
@@ -652,7 +669,7 @@
             menu: this.pickerId + "-navigatorMenu"
          });
 
-         // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
+         // Clear the lazyLoad flag and fire initEvent to get menu rendered into the DOM
          var navButton = this.widgets.navigationMenu;
          navButton.getMenu().lazyLoad = false;
          navButton.getMenu().initEvent.fire();
@@ -700,12 +717,14 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderCellIcon = function OF_cSIC_renderCellIcon(elCell, oRecord, oColumn, oData)
+         var renderCellIcon = function OF__cSIC_renderCellIcon(elCell, oRecord, oColumn, oData)
          {
-            oColumn.width = 40;
+            var iconSize = me.options.compactMode ? 16 : 32;
+            
+            oColumn.width = iconSize - 6;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            elCell.innerHTML = me.options.objectRenderer.renderItem(oRecord.getData(), 32, '<div class="icon32">{icon}</div>');
+            elCell.innerHTML = me.options.objectRenderer.renderItem(oRecord.getData(), iconSize, '<div class="icon' + iconSize + '">{icon}</div>');
          };
 
          /**
@@ -717,9 +736,17 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderCellName = function OF_cSIC_renderCellName(elCell, oRecord, oColumn, oData)
+         var renderCellName = function OF__cSIC_renderCellName(elCell, oRecord, oColumn, oData)
          {
-            var template = '<h3 class="name">{name}</h3><div class="description">{description}</div>';
+            var template;
+            if (me.options.compactMode)
+            {
+               template = '<h3 class="name">{name}</h3>';
+            }
+            else
+            {
+               template = '<h3 class="name">{name}</h3><div class="description">{description}</div>';
+            }
 
             elCell.innerHTML = me.options.objectRenderer.renderItem(oRecord.getData(), 0, template);
          };
@@ -733,18 +760,16 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderCellRemove = function OF_cSIC_renderCellRemove(elCell, oRecord, oColumn, oData)
+         var renderCellRemove = function OF__cSIC_renderCellRemove(elCell, oRecord, oColumn, oData)
          {  
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            
-            var desc = '<a href="#" class="remove-item" title="' + me._msg("form.control.object-picker.remove-item") + '"><span class="removeIcon">&nbsp;</span></a>';
-            elCell.innerHTML = desc;
+            elCell.innerHTML = '<a href="#" class="remove-item remove-' + me.eventGroup + '" title="' + me._msg("form.control.object-picker.remove-item") + '"><span class="removeIcon">&nbsp;</span></a>';
          };
 
          // DataTable defintion
          var columnDefinitions = [
          {
-            key: "nodeRef", label: "Icon", sortable: false, formatter: renderCellIcon, width: 40
+            key: "nodeRef", label: "Icon", sortable: false, formatter: renderCellIcon, width: this.options.compactMode ? 10 : 26
          },
          {
             key: "name", label: "Item", sortable: false, formatter: renderCellName
@@ -764,7 +789,7 @@
             if (owner !== null)
             {
                var target, rowId, record, nodeRef;
-               
+
                target = args[1].target;
                rowId = target.offsetParent;
                record = me.widgets.dataTable.getRecord(rowId);
@@ -777,12 +802,10 @@
                      item: record.getData()
                   });
                }
-               args[1].stop = true;
             }
-      		 
             return true;
          };
-         YAHOO.Bubbling.addDefaultAction("remove-item", fnRemoveItemHandler);
+         YAHOO.Bubbling.addDefaultAction("remove-" + this.eventGroup, fnRemoveItemHandler);
       },
       
       /**
@@ -796,6 +819,8 @@
          // Empty results table
          this.widgets.dataTable.set("MSG_EMPTY", this._msg("form.control.object-picker.selected-items.empty"));
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
+
+         this.selectedItems = {};
 
          for (var item in this.currentValueMeta)
          {
@@ -827,8 +852,8 @@
             this.widgets.resizer = new YAHOO.util.Resize(this.pickerId + "-left",
             {
                 handles: ["r"],
-                minWidth: 150,
-                maxWidth: (size - 150)
+                minWidth: 200,
+                maxWidth: (size - 200)
             });
             this.widgets.resizer.on("resize", function(e)
             {
@@ -836,7 +861,13 @@
                 Dom.setStyle(this.columns[0], "height", "");
                 Dom.setStyle(this.columns[1], "width", (size - w - 6) + "px");
             }, this, true);
-            this.widgets.resizer.resize(null, 200, 400, 0, 0, true);
+
+            this.widgets.resizer.fireEvent("resize",
+            {
+               ev: 'resize',
+               target: this.widgets.resizer,
+               width: this.widgets.resizer.get("width")
+            });
          }
       },
       
@@ -937,7 +968,24 @@
           * @property itemType
           * @type string
           */
-         itemType: "{http://www.alfresco.org/model/content/1.0}content",
+         itemType: "cm:content",
+
+         /**
+          * Parameters to be passed to the data webscript
+          *
+          * @property params
+          * @type string
+          */
+         params: "",
+
+         /**
+          * Compact mode flag
+          * 
+          * @property compactMode
+          * @type boolean
+          * @default false
+          */
+         compactMode: false,
 
          /**
           * Maximum number of items to display in the results list
@@ -958,7 +1006,7 @@
       widgets: null,
 
       /**
-       * Object container for storing YUI button instances, indexed by item id.
+       * Object container for storing button instances, indexed by item id.
        * 
        * @property addItemButtons
        * @type object
@@ -1017,6 +1065,16 @@
       /**
        * PUBLIC INTERFACE
        */
+
+      /**
+       * The picker has just been shown
+       *
+       * @method onPickerShow
+       */
+      onPickerShow: function ObjectRenderer_onPickerShow()
+      {
+         this.addItemButtons = {};
+      },
 
       /**
        * Generate item icon URL
@@ -1122,11 +1180,20 @@
             var obj = args[1];
             if (obj && obj.item)
             {
-               for (var button in this.addItemButtons)
+               var button;
+               for (var id in this.addItemButtons)
                {
-                  if (this.addItemButtons.hasOwnProperty(button))
+                  if (this.addItemButtons.hasOwnProperty(id))
                   {
-                     this.addItemButtons[button].set("disabled", !this.objectFinder.canItemBeSelected(button));
+                     button = this.addItemButtons[id];
+                     if (typeof button == "string")
+                     {
+                        Dom.setStyle(button, "display", this.objectFinder.canItemBeSelected(id) ? "inline" : "none");
+                     }
+                     else
+                     {
+                        button.set("disabled", !this.objectFinder.canItemBeSelected(id));
+                     }
                   }
                }
             }
@@ -1198,12 +1265,14 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderItemIcon = function ObjectRenderer_renderItemIcon(elCell, oRecord, oColumn, oData)
+         var renderItemIcon = function OR__cC_renderItemIcon(elCell, oRecord, oColumn, oData)
          {
-            oColumn.width = 40;
+            var iconSize = me.options.compactMode ? 16 : 32;
+
+            oColumn.width = iconSize - 6;
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            elCell.innerHTML = me.renderItem(oRecord.getData(), 32, '<div class="icon32">{icon}</div>');
+            elCell.innerHTML = me.renderItem(oRecord.getData(), iconSize, '<div class="icon' + iconSize + '">{icon}</div>');
          };
 
          /**
@@ -1215,20 +1284,23 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderItemName = function ObjectRenderer_renderItemName(elCell, oRecord, oColumn, oData)
+         var renderItemName = function OR__cC_renderItemName(elCell, oRecord, oColumn, oData)
          {
             var template = '';
 
             if (oRecord.getData("hasChildren"))
             {
-               template += '<h3 class="item-name"><a href="#" class="change-parent">{name}</a></h3>';
+               template += '<h3 class="item-name"><a href="#" class="theme-color-1 parent-' + me.eventGroup + '">{name}</a></h3>';
             }
             else
             {
                template += '<h3 class="item-name">{name}</h3>';
             }
-
-            template += '<div class="description">{description}</div>';
+            
+            if (!me.options.compactMode)
+            {
+               template += '<div class="description">{description}</div>';
+            }
 
             elCell.innerHTML = me.renderItem(oRecord.getData(), 0, template);
          };
@@ -1242,46 +1314,58 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderCellAddButton = function ObjectRenderer_renderCellAddButton(elCell, oRecord, oColumn, oData)
+         var renderCellAdd = function OR__cC_renderCellAdd(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            Dom.setStyle(elCell.parentNode, "text-align", "right");
-            
-            var nodeRef = oRecord.getData("nodeRef"),
-               containerId = Alfresco.util.getDomId();
-                        
-            elCell.innerHTML = '<span id="' + containerId + '"></span>';
-            
-            var onItemAdded = function OR_rCAB_onItemAdded(event, p_obj)
-            {
-               YAHOO.Bubbling.fire("selectedItemAdded",
-               {
-                  eventGroup: me,
-                  item: p_obj.getData()
-               });
-            };
-            
+
             if (me.options.itemType == oRecord.getData("type"))
             {
-               // Create Add button?
-               var button = new YAHOO.widget.Button(
-               {
-                  type: "button",
-                  label: me._msg("button.add") + " >>",
-                  name: containerId + "-button",
-                  container: containerId,
-                  onclick:
-                  {
-                     fn: onItemAdded,
-                     obj: oRecord,
-                     scope: me
-                  }
-               });
-               me.addItemButtons[nodeRef] = button;
+               var nodeRef = oRecord.getData("nodeRef"),
+                  containerId = Alfresco.util.getDomId();
 
-               if (!me.objectFinder.canItemBeSelected(nodeRef))
+               if (me.options.compactMode)
                {
-                  button.set("disabled", true);
+                  var style = "";
+                  if (!me.objectFinder.canItemBeSelected(nodeRef))
+                  {
+                     style = 'style="display: none"';
+                  }
+                  elCell.innerHTML = '<a id="' + containerId + '" href="#" ' + style + ' class="add-item add-' + me.eventGroup + '" title="' + me._msg("form.control.object-picker.add-item") + '"><span class="addIcon">&nbsp;</span></a>';
+                  me.addItemButtons[nodeRef] = containerId;
+               }
+               else
+               {
+                  Dom.setStyle(elCell.parentNode, "text-align", "right");
+                  elCell.innerHTML = '<span id="' + containerId + '"></span>';
+
+                  var onItemAdded = function OR__cC_rCAB_onItemAdded(event, p_obj)
+                  {
+                     YAHOO.Bubbling.fire("selectedItemAdded",
+                     {
+                        eventGroup: me,
+                        item: p_obj.getData()
+                     });
+                  };
+
+                  var button = new YAHOO.widget.Button(
+                  {
+                     type: "button",
+                     label: me._msg("button.add") + " >>",
+                     name: containerId + "-button",
+                     container: containerId,
+                     onclick:
+                     {
+                        fn: onItemAdded,
+                        obj: oRecord,
+                        scope: me
+                     }
+                  });
+                  me.addItemButtons[nodeRef] = button;
+
+                  if (!me.objectFinder.canItemBeSelected(nodeRef))
+                  {
+                     button.set("disabled", true);
+                  }
                }
             }
          };
@@ -1289,13 +1373,13 @@
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "nodeRef", label: "Icon", sortable: false, formatter: renderItemIcon, width: 40
+            key: "nodeRef", label: "Icon", sortable: false, formatter: renderItemIcon, width: this.options.compactMode ? 10 : 26
          },
          {
             key: "name", label: "Item", sortable: false, formatter: renderItemName
          },
          {
-            key: "add", label: "Add", sortable: false, formatter: renderCellAddButton, width: 80
+            key: "add", label: "Add", sortable: false, formatter: renderCellAdd, width: this.options.compactMode ? 16 : 80
          }];
 
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
@@ -1305,14 +1389,38 @@
             MSG_EMPTY: this._msg("form.control.object-picker.items-list.loading")
          });
          
-         // Hook navigation action click events
-         var fnNavigationHandler = function OR_rCAB_fnNavigationHandler(layer, args)
+         // Hook add item action click events (for Compact mode)
+         var fnAddItemHandler = function OR__cC_fnAddItemHandler(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
             {
                var target, rowId, record, nodeRef;
-               
+
+               target = args[1].target;
+               rowId = target.offsetParent;
+               record = me.widgets.dataTable.getRecord(rowId);
+               if (record)
+               {
+                  YAHOO.Bubbling.fire("selectedItemAdded",
+                  {
+                     eventGroup: me,
+                     item: record.getData()
+                  });
+               }
+            }
+            return true;
+         };
+         YAHOO.Bubbling.addDefaultAction("add-" + this.eventGroup, fnAddItemHandler);
+
+         // Hook navigation action click events
+         var fnNavigationHandler = function OR__cC_fnNavigationHandler(layer, args)
+         {
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
+            if (owner !== null)
+            {
+               var target, rowId, record, nodeRef;
+         
                target = args[1].target;
                rowId = target.offsetParent;
                record = me.widgets.dataTable.getRecord(rowId);
@@ -1325,12 +1433,10 @@
                      nodeRef: record.getData("nodeRef")
                   });
                }
-               args[1].stop = true;
             }
-      		 
             return true;
          };
-         YAHOO.Bubbling.addDefaultAction("change-parent", fnNavigationHandler);
+         YAHOO.Bubbling.addDefaultAction("parent-" + this.eventGroup, fnNavigationHandler);
 
       },
       
@@ -1340,20 +1446,20 @@
        * @method _updateItems
        * @param nodeRef {string} Parent nodeRef
        */
-      _updateItems: function ObjectFinder__updateItems(nodeRef)
+      _updateItems: function ObjectRenderer__updateItems(nodeRef)
       {
          // Empty results table
          this.widgets.dataTable.set("MSG_EMPTY", this._msg("form.control.object-picker.items-list.loading"));
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
          
-         var successHandler = function ObjectFinder__uI_successHandler(sRequest, oResponse, oPayload)
+         var successHandler = function ObjectRenderer__uI_successHandler(sRequest, oResponse, oPayload)
          {
             this.options.parentNodeRef = nodeRef;
             this.widgets.dataTable.set("MSG_EMPTY", this._msg("form.control.object-picker.items-list.empty"));
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          };
          
-         var failureHandler = function ObjectFinder__uI_failureHandler(sRequest, oResponse)
+         var failureHandler = function ObjectRenderer__uI_failureHandler(sRequest, oResponse)
          {
             if (oResponse.status == 401)
             {
@@ -1375,6 +1481,10 @@
          };
          
          var url = nodeRef.replace("://", "/") + "/children";
+         if (this.options.params)
+         {
+            url += "?" + this.options.params;
+         }
          this.widgets.dataSource.sendRequest(url,
          {
             success: successHandler,

@@ -1,6 +1,9 @@
+<#assign compactMode = field.control.params.compactMode!false>
+
 <#macro renderPickerJS picker="picker">
    var ${picker} = new Alfresco.ObjectFinder("${controlId}").setOptions(
    {
+      compactMode: ${compactMode?string},
       currentValue: "${field.value}",
       minSearchTermLength: "${args.minSearchTermLength!'3'}",
       maxSearchResults: "${args.maxSearchResults!'100'}"

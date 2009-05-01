@@ -15,10 +15,11 @@
    <@renderPickerJS "picker" />
    picker.setOptions(
    {
-      itemType: "cm:category", /* "${field.dataType}" */
+      itemType: "cm:category",
       multiSelectMode: true,
       parentNodeRef: "alfresco://category/root",
-      itemFamily: "category"
+      itemFamily: "category",
+      params: "${field.control.params.params!""}"
    });
 })();
 //]]></script>
