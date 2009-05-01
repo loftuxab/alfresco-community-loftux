@@ -30,6 +30,8 @@ import org.apache.abdera.util.Constants;
 
 
 /**
+ * CMIS Version: 0.6
+ * 
  * CMIS Namespace definitions for the Abdera ATOM library.
  * 
  * Encapsulates access and modification of CMIS extension values to ATOM.
@@ -44,69 +46,74 @@ import org.apache.abdera.util.Constants;
 public interface CMISConstants
 {
     // Namespace
-    public static final String CMIS_200805_NS = "http://www.cmis.org/2008/05";
+    public static final String CMIS_NS = "http://docs.oasis-open.org/ns/cmis/core/200901";
     
     // Mimetypes
     public static final String MIMETYPE_QUERY = "application/cmisquery+xml";
     public static final String MIMETYPE_ALLOWABLEACTIONS = "application/cmisallowableactions+xml";
 
     // CMIS Service Document
-    public static final QName COLLECTION_TYPE = new QName(CMIS_200805_NS, "collectionType");
-    public static final String COLLECTION_ROOT_CHILDREN = "root-children";
-    public static final String COLLECTION_ROOT_DESCENDANTS = "root-descendants";
+    public static final QName COLLECTION_TYPE = new QName(CMIS_NS, "collectionType");
+    public static final String COLLECTION_ROOT_CHILDREN = "rootchildren";
+    public static final String COLLECTION_ROOT_DESCENDANTS = "rootdescendants";
     public static final String COLLECTION_CHECKEDOUT = "checkedout";
     public static final String COLLECTION_UNFILED = "unfiled";
-    public static final String COLLECTION_TYPES_CHILDREN = "types-children";
-    public static final String COLLECTION_TYPES_DESCENDANTS = "types-descendants";
+    public static final String COLLECTION_TYPES_CHILDREN = "typeschildren";
+    public static final String COLLECTION_TYPES_DESCENDANTS = "typesdescendants";
     public static final String COLLECTION_QUERY = "query";
     
     // CMIS Repository Info
-    public static final QName REPOSITORY_INFO = new QName(CMIS_200805_NS, "repositoryInfo");
-    public static final QName REPOSITORY_ID = new QName(CMIS_200805_NS, "repositoryId");
-    public static final QName REPOSITORY_NAME = new QName(CMIS_200805_NS, "repositoryName");
-    public static final QName REPOSITORY_DESCRIPTION = new QName(CMIS_200805_NS, "repositoryDescription");
-    public static final QName REPOSITORY_SPECIFIC_INFO = new QName(CMIS_200805_NS, "repositorySpecificInformation");
-    public static final QName VENDOR_NAME = new QName(CMIS_200805_NS, "vendorName");
-    public static final QName PRODUCT_NAME = new QName(CMIS_200805_NS, "productName");
-    public static final QName PRODUCT_VERSION = new QName(CMIS_200805_NS, "productVersion");
-    public static final QName VERSIONS_SUPPORTED = new QName(CMIS_200805_NS, "cmisVersionsSupported");
-    public static final QName ROOT_FOLDER_ID = new QName(CMIS_200805_NS, "rootFolderId");
+    public static final QName REPOSITORY_INFO = new QName(CMIS_NS, "repositoryInfo");
+    public static final QName REPOSITORY_ID = new QName(CMIS_NS, "repositoryId");
+    public static final QName REPOSITORY_NAME = new QName(CMIS_NS, "repositoryName");
+    public static final QName REPOSITORY_DESCRIPTION = new QName(CMIS_NS, "repositoryDescription");
+    public static final QName REPOSITORY_SPECIFIC_INFO = new QName(CMIS_NS, "repositorySpecificInformation");
+    public static final QName VENDOR_NAME = new QName(CMIS_NS, "vendorName");
+    public static final QName PRODUCT_NAME = new QName(CMIS_NS, "productName");
+    public static final QName PRODUCT_VERSION = new QName(CMIS_NS, "productVersion");
+    public static final QName VERSIONS_SUPPORTED = new QName(CMIS_NS, "cmisVersionsSupported");
+    public static final QName ROOT_FOLDER_ID = new QName(CMIS_NS, "rootFolderId");
     
     // CMIS Capabilities
-    public static final QName CAPABILITIES = new QName(CMIS_200805_NS, "capabilities");
-    public static final QName CAPABILITY_MULTIFILING = new QName(CMIS_200805_NS, "capabilityMultifiling");
-    public static final QName CAPABILITY_UNFILING = new QName(CMIS_200805_NS, "capabilityUnfiling");
-    public static final QName CAPABILITY_VERSION_SPECIFIC_FILING = new QName(CMIS_200805_NS, "capabilityVersionSpecificFiling");
-    public static final QName CAPABILITY_PWC_UPDATEABLE = new QName(CMIS_200805_NS, "capabilityPWCUpdateable");
-    public static final QName CAPABILITY_ALL_VERIONS_SEARCHABLE = new QName(CMIS_200805_NS, "capabilityAllVersionsSearchable");
-    public static final QName CAPABILITY_JOIN = new QName(CMIS_200805_NS, "capabilityJoin");
-    public static final QName CAPABILITY_FULLTEXT = new QName(CMIS_200805_NS, "capabilityFullText");
+    public static final QName CAPABILITIES = new QName(CMIS_NS, "capabilities");
+    public static final QName CAPABILITY_MULTIFILING = new QName(CMIS_NS, "capabilityMultifiling");
+    public static final QName CAPABILITY_UNFILING = new QName(CMIS_NS, "capabilityUnfiling");
+    public static final QName CAPABILITY_VERSION_SPECIFIC_FILING = new QName(CMIS_NS, "capabilityVersionSpecificFiling");
+    public static final QName CAPABILITY_PWC_UPDATEABLE = new QName(CMIS_NS, "capabilityPWCUpdateable");
+    public static final QName CAPABILITY_ALL_VERIONS_SEARCHABLE = new QName(CMIS_NS, "capabilityAllVersionsSearchable");
+    public static final QName CAPABILITY_JOIN = new QName(CMIS_NS, "capabilityJoin");
 
     // CMIS Object
-    public static final QName OBJECT = new QName(CMIS_200805_NS, "object");
-    public static final QName PROPERTIES = new QName(CMIS_200805_NS, "properties");
-    public static final QName PROPERTY_NAME = new QName(CMIS_200805_NS, "name");
-    public static final QName PROPERTY_VALUE = new QName(CMIS_200805_NS, "value");
-    public static final QName PROPERTY_STRING = new QName(CMIS_200805_NS, "propertyString");
-    public static final QName PROPERTY_DECIMAL = new QName(CMIS_200805_NS, "propertyDecimal");
-    public static final QName PROPERTY_INTEGER = new QName(CMIS_200805_NS, "propertyInteger");
-    public static final QName PROPERTY_BOOLEAN = new QName(CMIS_200805_NS, "propertyBoolean");
-    public static final QName PROPERTY_DATETIME = new QName(CMIS_200805_NS, "propertyDateTime");
-    public static final QName PROPERTY_URI = new QName(CMIS_200805_NS, "propertyUri");
-    public static final QName PROPERTY_ID = new QName(CMIS_200805_NS, "propertyId");
-    public static final QName PROPERTY_XML = new QName(CMIS_200805_NS, "propertyXml");
-    public static final QName PROPERTY_HTML = new QName(CMIS_200805_NS, "propertyHtml");
+    public static final QName OBJECT = new QName(CMIS_NS, "object");
+    public static final QName PROPERTIES = new QName(CMIS_NS, "properties");
+    public static final QName PROPERTY_NAME = new QName(CMIS_NS, "name");
+    public static final QName PROPERTY_VALUE = new QName(CMIS_NS, "value");
+    public static final QName PROPERTY_STRING = new QName(CMIS_NS, "propertyString");
+    public static final QName PROPERTY_DECIMAL = new QName(CMIS_NS, "propertyDecimal");
+    public static final QName PROPERTY_INTEGER = new QName(CMIS_NS, "propertyInteger");
+    public static final QName PROPERTY_BOOLEAN = new QName(CMIS_NS, "propertyBoolean");
+    public static final QName PROPERTY_DATETIME = new QName(CMIS_NS, "propertyDateTime");
+    public static final QName PROPERTY_URI = new QName(CMIS_NS, "propertyUri");
+    public static final QName PROPERTY_ID = new QName(CMIS_NS, "propertyId");
+    public static final QName PROPERTY_XML = new QName(CMIS_NS, "propertyXml");
+    public static final QName PROPERTY_HTML = new QName(CMIS_NS, "propertyHtml");
         
     // CMIS Relationships
-    public static final String REL_CHILDREN = "cmis-children";
-    public static final String REL_DESCENDANTS = "cmis-descendants";
-    public static final String REL_PARENT = "cmis-parent";
-    public static final String REL_FOLDERPARENT = "cmis-folderparent";
-    public static final String REL_PARENTS = "cmis-parents";
-    public static final String REL_ALLVERSIONS = "cmis-allversions";
-    public static final String REL_TYPE = "cmis-type";
-    public static final String REL_SOURCE = "cmis-source";
-    public static final String REL_ALLOWABLEACTIONS = "cmis-allowableactions";
+    public static final String REL_PARENTS = "parents";
+    // TODO: CMIS spec issue: parent is not defined in 0.6
+    public static final String REL_PARENT = "parent";
+    public static final String REL_REPOSITORY = "repository";
+    public static final String REL_CHILDREN = "children";
+    public static final String REL_DESCENDANTS = "descendants";
+    public static final String REL_ALLOWABLEACTIONS = "allowableactions";
+    public static final String REL_ALLVERSIONS = "allversions";
+    public static final String REL_LATESTVERSION = "latestversion";
+    public static final String REL_RELATIONSHIPS = "relationships";
+    public static final String REL_TYPE = "type";
+    public static final String REL_SOURCE = "source";
+    public static final String REL_TARGET = "target";
+    public static final String REL_STREAM = "stream";
+    public static final String REL_POLICIES = "policies";
     
     // CMIS Nested Entry
     public static final QName NESTED_ENTRY = Constants.ENTRY;
@@ -133,7 +140,7 @@ public interface CMISConstants
     public static final String PROP_CONTENT_STREAM_LENGTH = "ContentStreamLength";
     public static final String PROP_CONTENT_STREAM_MIMETYPE = "ContentStreamMimetype";
     public static final String PROP_CONTENT_STREAM_FILENAME = "ContentStreamFilename";
-    public static final String PROP_CONTENT_STREAM_URI = "ContentStreamURI";
+    public static final String PROP_CONTENT_STREAM_URI = "ContentStreamUri";
 
     // CMIS Property Types
     public static final String PROP_TYPE_STRING = "string";
@@ -147,34 +154,34 @@ public interface CMISConstants
     public static final String PROP_TYPE_HTML = "html";
     
     // CMIS Allowable Actions
-    public static final QName ALLOWABLEACTIONS = new QName(CMIS_200805_NS, "allowableActions");
-    public static final QName ALLOWABLEACTIONS_PARENT_ID = new QName(CMIS_200805_NS, "parentId");
-    public static final QName ALLOWABLEACTIONS_PARENT_URL = new QName(CMIS_200805_NS, "parentUrl");
-    public static final QName CAN_DELETE = new QName(CMIS_200805_NS, "canDelete");
-    public static final QName CAN_UPDATE_PROPERTIES = new QName(CMIS_200805_NS, "canUpdateProperties"); 
-    public static final QName CAN_GET_PROPERTIES = new QName(CMIS_200805_NS, "canGetProperties"); 
-    public static final QName CAN_GET_RELATIONSHIPS = new QName(CMIS_200805_NS, "canGetRelationships"); 
-    public static final QName CAN_GET_PARENTS = new QName(CMIS_200805_NS, "canGetParents"); 
-    public static final QName CAN_GET_FOLDER_PARENT = new QName(CMIS_200805_NS, "canGetFolderParent"); 
-    public static final QName CAN_GET_DESCENDANTS = new QName(CMIS_200805_NS, "canGetDescendants"); 
-    public static final QName CAN_MOVE = new QName(CMIS_200805_NS, "canMove"); 
-    public static final QName CAN_DELETE_VERSION = new QName(CMIS_200805_NS, "canDeleteVersion"); 
-    public static final QName CAN_DELETE_CONTENT = new QName(CMIS_200805_NS, "canDeleteContent"); 
-    public static final QName CAN_CHECKOUT = new QName(CMIS_200805_NS, "canCheckout"); 
-    public static final QName CAN_CANCEL_CHECKOUT = new QName(CMIS_200805_NS, "canCancelCheckout"); 
-    public static final QName CAN_CHECKIN = new QName(CMIS_200805_NS, "canCheckin"); 
-    public static final QName CAN_SET_CONTENT = new QName(CMIS_200805_NS, "canSetContent"); 
-    public static final QName CAN_GET_ALL_VERSIONS = new QName(CMIS_200805_NS, "canGetAllVersions"); 
-    public static final QName CAN_ADD_TO_FOLDER = new QName(CMIS_200805_NS, "canAddToFolder"); 
-    public static final QName CAN_REMOVE_FROM_FOLDER = new QName(CMIS_200805_NS, "canRemoveFromFolder"); 
-    public static final QName CAN_VIEW_CONTENT = new QName(CMIS_200805_NS, "canViewContent"); 
-    public static final QName CAN_ADD_POLICY = new QName(CMIS_200805_NS, "canAddPolicy"); 
-    public static final QName CAN_GET_APPLIED_POLICIES = new QName(CMIS_200805_NS, "canGetAppliedPolicies"); 
-    public static final QName CAN_REMOVE_POLICY = new QName(CMIS_200805_NS, "canRemovePolicy"); 
-    public static final QName CAN_GET_CHILDREN = new QName(CMIS_200805_NS, "canGetChildren"); 
-    public static final QName CAN_CREATE_DOCUMENT = new QName(CMIS_200805_NS, "canCreateDocument"); 
-    public static final QName CAN_CREATE_FOLDER = new QName(CMIS_200805_NS, "canCreateFolder"); 
-    public static final QName CAN_CREATE_RELATIONSHIP = new QName(CMIS_200805_NS, "canCreateRelationship"); 
-    public static final QName CAN_CREATE_POLICY = new QName(CMIS_200805_NS, "canCreatePolicy"); 
-    public static final QName CAN_DELETE_TREE = new QName(CMIS_200805_NS, "canDeleteTree");
+    public static final QName ALLOWABLEACTIONS = new QName(CMIS_NS, "allowableActions");
+    public static final QName ALLOWABLEACTIONS_PARENT_ID = new QName(CMIS_NS, "parentId");
+    public static final QName ALLOWABLEACTIONS_PARENT_URL = new QName(CMIS_NS, "parentUrl");
+    public static final QName CAN_DELETE = new QName(CMIS_NS, "canDelete");
+    public static final QName CAN_UPDATE_PROPERTIES = new QName(CMIS_NS, "canUpdateProperties"); 
+    public static final QName CAN_GET_PROPERTIES = new QName(CMIS_NS, "canGetProperties"); 
+    public static final QName CAN_GET_RELATIONSHIPS = new QName(CMIS_NS, "canGetRelationships"); 
+    public static final QName CAN_GET_PARENTS = new QName(CMIS_NS, "canGetParents"); 
+    public static final QName CAN_GET_FOLDER_PARENT = new QName(CMIS_NS, "canGetFolderParent"); 
+    public static final QName CAN_GET_DESCENDANTS = new QName(CMIS_NS, "canGetDescendants"); 
+    public static final QName CAN_MOVE = new QName(CMIS_NS, "canMove"); 
+    public static final QName CAN_DELETE_VERSION = new QName(CMIS_NS, "canDeleteVersion"); 
+    public static final QName CAN_DELETE_CONTENT = new QName(CMIS_NS, "canDeleteContent"); 
+    public static final QName CAN_CHECKOUT = new QName(CMIS_NS, "canCheckout"); 
+    public static final QName CAN_CANCEL_CHECKOUT = new QName(CMIS_NS, "canCancelCheckout"); 
+    public static final QName CAN_CHECKIN = new QName(CMIS_NS, "canCheckin"); 
+    public static final QName CAN_SET_CONTENT = new QName(CMIS_NS, "canSetContent"); 
+    public static final QName CAN_GET_ALL_VERSIONS = new QName(CMIS_NS, "canGetAllVersions"); 
+    public static final QName CAN_ADD_TO_FOLDER = new QName(CMIS_NS, "canAddToFolder"); 
+    public static final QName CAN_REMOVE_FROM_FOLDER = new QName(CMIS_NS, "canRemoveFromFolder"); 
+    public static final QName CAN_VIEW_CONTENT = new QName(CMIS_NS, "canViewContent"); 
+    public static final QName CAN_ADD_POLICY = new QName(CMIS_NS, "canAddPolicy"); 
+    public static final QName CAN_GET_APPLIED_POLICIES = new QName(CMIS_NS, "canGetAppliedPolicies"); 
+    public static final QName CAN_REMOVE_POLICY = new QName(CMIS_NS, "canRemovePolicy"); 
+    public static final QName CAN_GET_CHILDREN = new QName(CMIS_NS, "canGetChildren"); 
+    public static final QName CAN_CREATE_DOCUMENT = new QName(CMIS_NS, "canCreateDocument"); 
+    public static final QName CAN_CREATE_FOLDER = new QName(CMIS_NS, "canCreateFolder"); 
+    public static final QName CAN_CREATE_RELATIONSHIP = new QName(CMIS_NS, "canCreateRelationship"); 
+    public static final QName CAN_CREATE_POLICY = new QName(CMIS_NS, "canCreatePolicy"); 
+    public static final QName CAN_DELETE_TREE = new QName(CMIS_NS, "canDeleteTree");
 }
