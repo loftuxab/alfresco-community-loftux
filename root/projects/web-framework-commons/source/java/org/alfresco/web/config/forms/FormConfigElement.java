@@ -363,18 +363,22 @@ public class FormConfigElement extends ConfigElementAdapter
     {
         List <String> result = new ArrayList<String>();
 
+        // Does the requested setId exist?
         FormSet specifiedSet = getSets().get(setId);
         if (specifiedSet == null)
         {
             return null;
         }
 
+        // Get all fields visible in the specified mode - irrespective of set membership.
         final List<String> visibleFields = getFieldNamesVisibleInMode(mode);
         if (visibleFields == null)
         {
             return null;
         }
         
+        // Now go through the fields and filter out those that are not members of
+        // the specified set
         for (String fieldName : visibleFields)
         {
             final FormField formField = getFields().get(fieldName);
@@ -382,10 +386,11 @@ public class FormConfigElement extends ConfigElementAdapter
             {
                 continue;
             }
-            final String set = formField.getSet();
+            String set = formField.getSet();
             if (set == null)
             {
-                continue;
+                // All fields without an explicit set are in the default set.
+                set = FormConfigElement.DEFAULT_SET_ID;
             }
             if (set.equals(setId))
             {

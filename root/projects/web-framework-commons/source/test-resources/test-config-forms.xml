@@ -112,4 +112,29 @@
           </form>
       </forms>
    </config>
+   
+   <config evaluator="string-compare" condition="form_without_sets">
+      <!-- This form has no explicit sets declared. Therefore all fields
+           are members of the default set. -->
+      <forms>
+          <form>
+             <field-visibility>
+                <show id="all" />
+                <show id="c" for-mode="create" />
+                <show id="e" for-mode="edit" />
+                <show id="v" for-mode="view" />
+                <show id="ce" for-mode="create, edit" />
+                <show id="cev" for-mode="create, edit, view" />
+             </field-visibility>
+             <appearance>
+                <field id="all" />
+                <field id="c" />
+                <field id="e" />
+                <field id="v" />
+                <field id="ce" />
+                <field id="cev" set="" />
+             </appearance>
+          </form>
+      </forms>
+   </config>
 </alfresco-config>
