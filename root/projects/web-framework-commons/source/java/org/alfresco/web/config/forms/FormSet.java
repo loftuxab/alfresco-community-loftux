@@ -1,8 +1,8 @@
 package org.alfresco.web.config.forms;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 /**
  * This class represents a &lt;set&gt; element within a &lt;form&gt; element.
@@ -19,7 +19,7 @@ public class FormSet
      * This filed will be null for a 'root' set.
      */
     private FormSet parent;
-    private Map<String, FormSet> children = new LinkedHashMap<String, FormSet>();
+    private List<FormSet> children = new ArrayList<FormSet>();
     
     public FormSet(String setId, String parentId, String appearance)
     {
@@ -45,9 +45,9 @@ public class FormSet
         return this.parent;
     }
     
-    public Map<String, FormSet> getChildren()
+    public List<FormSet> getChildren()
     {
-        return Collections.unmodifiableMap(this.children);
+        return Collections.unmodifiableList(this.children);
     }
     
     void setParent(FormSet parentObject)
@@ -57,7 +57,7 @@ public class FormSet
     
     void addChild(FormSet newChild)
     {
-        this.children.put(newChild.getSetId(), newChild);
+        this.children.add(newChild);
     }
     
     @Override

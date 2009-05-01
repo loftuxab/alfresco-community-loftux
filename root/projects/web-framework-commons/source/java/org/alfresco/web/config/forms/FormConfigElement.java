@@ -236,9 +236,9 @@ public class FormConfigElement extends ConfigElementAdapter
      * @return
      * @see #DEFAULT_SET_ID
      */
-    public Map<String, FormSet> getRootSets()
+    public List<FormSet> getRootSets()
     {
-        Map<String, FormSet> result = new LinkedHashMap<String, FormSet>();
+        List<FormSet> result = new ArrayList<FormSet>(sets.size());
         for (Iterator<String> iter = sets.keySet().iterator(); iter.hasNext(); )
         {
             String nextKey = iter.next();
@@ -246,7 +246,7 @@ public class FormConfigElement extends ConfigElementAdapter
             String nextParentID = nextSet.getParentId();
             if (nextParentID == null)
             {
-                result.put(nextKey, nextSet);
+                result.add(nextSet);
             }
         }
         return result;
@@ -382,16 +382,19 @@ public class FormConfigElement extends ConfigElementAdapter
         for (String fieldName : visibleFields)
         {
             final FormField formField = getFields().get(fieldName);
-            if (formField == null)
+            String set = null;
+            if (formField != null)
             {
-                continue;
+                set = formField.getSet();
             }
-            String set = formField.getSet();
+            
             if (set == null)
             {
                 // All fields without an explicit set are in the default set.
                 set = FormConfigElement.DEFAULT_SET_ID;
             }
+            
+            // if set of field matches requested one add to results
             if (set.equals(setId))
             {
                 result.add(fieldName);
