@@ -701,8 +701,15 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
     public static class PostRequest extends Request
     {
         public PostRequest(String uri, String post, String contentType)
+            throws UnsupportedEncodingException 
         {
-            this(uri, post.getBytes(), contentType);
+            super("post", uri);
+            if (contentType.indexOf(";charset") == -1)
+            {
+                contentType = contentType + ";charset=UTF-8";
+            }
+            setBody(post.getBytes("UTF-8"));
+            setType(contentType);
         }
 
         public PostRequest(String uri, byte[] post, String contentType)
@@ -719,8 +726,15 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
     public static class PutRequest extends Request
     {
         public PutRequest(String uri, String put, String contentType)
+            throws UnsupportedEncodingException
         {
-            this(uri, put.getBytes(), contentType);
+            super("put", uri);
+            if (contentType.indexOf(";charset") == -1)
+            {
+                contentType = contentType + ";charset=UTF-8";
+            }
+            setBody(put.getBytes("UTF-8"));
+            setType(contentType);
         }
         
         public PutRequest(String uri, byte[] put, String contentType)

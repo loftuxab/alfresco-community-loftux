@@ -1,7 +1,5 @@
 v0.5 to v0.6 Changes Implemented by Alfresco:
 
-CMIS XSD Modifications...
-
 1) CHANGE: CMIS Namespace
 
 Was: http://www.cmis.org/2008/05
@@ -32,14 +30,10 @@ Now: rootchildren, rootdescendants, typeschildren, typesdescendants
 
 NOTE: Not defined in part 1 of spec.
 
-Data Model Modifications...
-
 8) CHANGED: Base Type names
 
 Was: Document, Folder, Relationship, Policy
 Now: document, folder, relationship, policy
-
-AtomPub Binding Modifications...
 
 9) CHANGED: Atom Link Types
 
@@ -50,15 +44,21 @@ Now: parents, repository, children, descendants, allowableactions, allversions,
 
 10) REMOVED: 'cmis-folderparent' Atom Link Type
 
+11) REMOVED: RESTful AtomPub bindings no longer accept Headers as arguments
 
+12) CHANGED: Property multi-value serialization
+
+Was: multiple property entries (indexed)
+Now: multiple value entries within property
+
+Note: Abdera CMIS Extension modified to take into account schema changes.
+      - CMISValue class added which supports several getters
+      - CMISProperty.getValue() now returns CMISValue instead of String
+      - CMISProperty.getNativeValue() returns appropriate Java object for property type
+      - CMISProperty.getValues() added which returns List<CMISValue>
+      - CMISProperty.getNativeValues() returns appropriate List of Java objects for property type
+      
 Internal Implementation Modifications...
 
 a) Version supported is now 0.6
 b) Rename getters from getRootType to getBaseType
-
-
-
-TODO:
-- multi-valued properties
-- remove HEADERS as Args
-

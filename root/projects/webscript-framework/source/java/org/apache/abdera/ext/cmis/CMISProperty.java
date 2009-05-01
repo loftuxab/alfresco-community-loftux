@@ -25,14 +25,15 @@
 package org.apache.abdera.ext.cmis;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.alfresco.util.ISO8601DateFormat;
 import org.apache.abdera.factory.Factory;
 import org.apache.abdera.model.Element;
-import org.apache.abdera.model.ElementWrapper;
+import org.apache.abdera.model.ExtensibleElementWrapper;
 
 
 /**
@@ -50,7 +51,7 @@ import org.apache.abdera.model.ElementWrapper;
  * 
  * @author davidc
  */
-public abstract class CMISProperty extends ElementWrapper
+public abstract class CMISProperty extends ExtensibleElementWrapper
 {
     /**
      * @param internal
@@ -93,73 +94,143 @@ public abstract class CMISProperty extends ElementWrapper
      */
     public boolean isNull()
     {
-        return getFirstChild(CMISConstants.PROPERTY_VALUE) == null ? true : false;
-    }
-    
-    /**
-     * Gets property value (as String)
-     * 
-     * @return  property value (or null, if not specified)
-     */
-    public String getValue()
-    {
-        Element child = getFirstChild(CMISConstants.PROPERTY_VALUE);
-        if (child != null)
-        {
-            return child.getText();
-        }
-        return null;
+        return getFirstChild() == null ? true : false;
     }
 
     /**
+     * Is property value multi-valued?
+     * 
+     * @return  true => more than one value exists
+     */
+    public boolean isMultiValued()
+    {
+        List<CMISValue> children = getElements();
+        return children.size() > 1;
+    }
+    
+    /**
+     * Gets property value
+     * 
+     * NOTE: Assumes there's only one value. In case of multi-valued, returns first value.
+     * 
+     * @return  value (or null, if not specified)
+     */
+    public CMISValue getValue()
+    {
+        CMISValue child = (CMISValue)getFirstChild(CMISConstants.PROPERTY_VALUE);
+        if (child != null)
+        {
+            return child;
+        }
+        return null;
+    }
+    
+    /**
+     * Gets property values
+     * 
+     * NOTE: Always returns a collection, even when only one value
+     * 
+     * @return
+     */
+    public List<CMISValue> getValues()
+    {
+       return getElements(); 
+    }
+
+    /**
+     * Gets native value
+     * 
+     * NOTE: Short-cut for retrieving first value of property
+     * 
+     * @return  property value (or null, if not specified)
+     */
+    public Object getNativeValue()
+    {
+        CMISValue value = getValue();
+        return value == null ? null : value.getNativeValue();
+    }
+    
+    /**
+     * Gets native values
+     * 
+     * NOTE: Short-cut for retrieving values as multi-valued collection
+     * 
+     * @return
+     */
+    public List<Object> getNativeValues()
+    {
+        List<CMISValue> values = getValues();
+        ArrayList<Object> nativeValues = new ArrayList<Object>(values.size());
+        for (CMISValue value : values)
+        {
+            nativeValues.add(value.getNativeValue());
+        }
+        return nativeValues;
+    }
+    
+    /**
      * Gets String value
+     *
+     * NOTE: Short-cut for retrieving first value of property
      * 
      * @return  string value
      */
     public String getStringValue()
     {
-        return getValue();
+        CMISValue value = getValue();
+        return value == null ? null : value.getStringValue();
     }
 
     /**
      * Gets Decimal value
      * 
+     * NOTE: Short-cut for retrieving first value of property
+     * 
      * @return  decimal value
      */
     public BigDecimal getDecimalValue()
     {
-        return new BigDecimal(getValue());
+        CMISValue value = getValue();
+        return value == null ? null : value.getDecimalValue();
     }
 
     /**
      * Gets Integer value
      * 
+     * NOTE: Short-cut for retrieving first value of property
+     * 
      * @return  integer value
      */
     public int getIntegerValue()
     {
-        return new Integer(getValue());
+        CMISValue value = getValue();
+        return value == null ? null : value.getIntegerValue();
     }
 
     /**
      * Gets Boolean value
      * 
+     * NOTE: Short-cut for retrieving first value of property
+     * 
      * @return  boolean value
      */
     public boolean getBooleanValue()
     {
-        return Boolean.valueOf(getValue());
+        CMISValue value = getValue();
+        return value == null ? null : value.getBooleanValue();
     }
 
     /**
      * Gets Date value
      * 
+     * NOTE: Short-cut for retrieving first value of property
+     * 
      * @return  date value
      */
     public Date getDateValue()
     {
-        // TODO: Use mechanism is reliant on Alfresco code
-        return ISO8601DateFormat.parse(getValue());
+        CMISValue value = getValue();
+        return value == null ? null : value.getDateValue();
     }
 
     

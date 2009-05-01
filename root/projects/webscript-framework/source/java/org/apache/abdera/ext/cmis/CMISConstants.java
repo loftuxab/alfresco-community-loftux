@@ -97,7 +97,8 @@ public interface CMISConstants
     public static final QName PROPERTY_ID = new QName(CMIS_NS, "propertyId");
     public static final QName PROPERTY_XML = new QName(CMIS_NS, "propertyXml");
     public static final QName PROPERTY_HTML = new QName(CMIS_NS, "propertyHtml");
-        
+    public static final QName VALUE = new QName(CMIS_NS, "value");
+
     // CMIS Relationships
     public static final String REL_PARENTS = "parents";
     // TODO: CMIS spec issue: parent is not defined in 0.6
