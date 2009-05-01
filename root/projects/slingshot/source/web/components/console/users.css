@@ -217,3 +217,43 @@
 {
    float: left;
 }
+
+.users .small
+{
+   margin-left: 1.75em;
+   font-size: 85%;
+}
+
+.users .update-photo-row
+{
+   margin-left: 1.5em;
+   padding: 0.333em;
+   height: 5em;
+}
+
+.users .updateuser-clearphoto-button
+{
+   margin-top: 1em;
+   margin-left: 6em;
+}
+
+.users .grouppicker-row
+{
+   padding-left: 1.2em;
+   margin-top: -1.5em;
+   max-width: 50em;
+}
+
+.users .groupselection-row
+{
+   padding-left: 2em;
+   padding-bottom: 0.5em;
+}
+
+.users .group-item
+{
+   background: transparent url(images/remove.png) no-repeat 0px 0px;
+   margin-right: 12px;
+   padding-left: 16px;
+   cursor: pointer;
+}

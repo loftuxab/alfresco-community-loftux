@@ -123,7 +123,7 @@
           * Number of characters required for a search.
           * 
           * @property minSearchTermLength
-          * @type int
+          * @type number
           * @default 3
           */
          minSearchTermLength: 3,
@@ -132,10 +132,19 @@
           * Maximum number of items to display in the results list
           * 
           * @property maxSearchResults
-          * @type int
+          * @type number
           * @default 100
           */
-         maxSearchResults: 100
+         maxSearchResults: 100,
+         
+         /**
+          * If true, then automatically prefix a wildcard character to the search term
+          * 
+          * @property wildcardPrefix
+          * @type boolean
+          * @default false
+          */
+         wildcardPrefix: false
       },
 
       /**
@@ -240,7 +249,7 @@
          }
          
          // Search button
-         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
+         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "group-search-button", this.onSearchClick);
 
          // DataSource definition  
          this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups?includeInternal=false&");
@@ -636,7 +645,7 @@
        */
       _buildSearchParams: function GroupFinder__buildSearchParams(searchTerm)
       {
-         return "shortNameFilter=" + encodeURIComponent(searchTerm);
+         return "shortNameFilter=" + (this.options.wildcardPrefix ? "*" : "") + encodeURIComponent(searchTerm);
       },
       
       /**

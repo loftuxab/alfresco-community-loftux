@@ -294,6 +294,7 @@ span.navigation-separator-alt
 
 select,
 input[type="text"],
+input[type="password"],
 textarea
 {
    padding: 2px;

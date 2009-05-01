@@ -79,7 +79,7 @@
          <div class="header-bar">${msg("label.about")}</div>
          <div class="photo-row">
             <div class="photo">
-               <img class="photoimg" src="${url.context}/components/images/no-user-photo-64.png" alt="" />
+               <img class="view-photoimg" src="${url.context}/components/images/no-user-photo-64.png" alt="" />
             </div>
             <div id="${el}-view-name" class="name-label"></div>
             <div id="${el}-view-jobtitle" class="field-label"></div>
@@ -204,19 +204,20 @@
             <span class="crud-label">${msg("label.password")}:&nbsp;*</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-create-password" type="text" maxlength="256" />
+            <input class="crud-input" id="${el}-create-password" type="password" maxlength="256" />
          </div>
          <div class="field-row">
             <span class="crud-label">${msg("label.verifypassword")}:&nbsp;*</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-create-verifypassword" type="text" maxlength="256" />
+            <input class="crud-input" id="${el}-create-verifypassword" type="password" maxlength="256" />
          </div>
          <div class="field-row">
             <span class="crud-label">${msg("label.groups")}:</span>
          </div>
-         <div class="field-row">
-         </div>
+         <!-- groups picker inserted here -->
+         <div class="grouppicker-row" id="${el}-create-groupfinder"></div>
+         <div class="groupselection-row" id="${el}-create-groups"></div>
          <div class="field-row">
             <span class="crud-label">${msg("label.quota")}:</span>
          </div>
@@ -266,21 +267,85 @@
       <div id="${el}-update-main" class="update-main">
          <!-- Each info section separated by a header-bar div -->
          <div class="header-bar">${msg("label.info")}</div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.firstname")}:&nbsp;*</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-update-firstname" type="text" maxlength="256" />
+         </div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.lastname")}:&nbsp;*</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-update-lastname" type="text" maxlength="256" />
+         </div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.email")}:&nbsp;*</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-update-email" type="text" maxlength="256" />
+         </div>
          
+         <div class="header-bar">${msg("label.aboutuser")}</div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.groups")}:</span>
+         </div>
+         <!-- groups picker inserted here -->
+         <div class="field-row" id="${el}-update-groupfinder"></div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.quota")}:</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input-quota" id="${el}-update-quota" type="text" maxlength="8" />
+            <select id="${el}-update-quotatype">
+               <option value="gb">${msg("size.gigabytes")}</option>
+               <option value="mb">${msg("size.megabytes")}</option>
+               <option value="kb">${msg("size.kilobytes")}</option>
+            </select>
+         </div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.newpassword")}:</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-update-password" type="password" maxlength="256" />
+            <br/>
+            <span class="small">${msg("label.leaveblank")}</span>
+         </div>
+         <div class="field-row">
+            <span class="crud-label">${msg("label.verifypassword")}:</span>
+         </div>
+         <div class="field-row">
+            <input class="crud-input" id="${el}-update-verifypassword" type="password" maxlength="256" />
+         </div>
+
+         <div class="field-row">
+            <span class="crud-label"><input type="checkbox" id="${el}-update-disableaccount" />&nbsp;${msg("label.disableaccount")}</span>
+         </div>
+         
+         <div class="header-bar">${msg("label.photo")}</div>
+         <div class="update-photo-row">
+            <div class="photo">
+               <img class="update-photoimg left" src="${url.context}/components/images/no-user-photo-64.png" alt="" />
+               <div class="updateuser-clearphoto-button">
+                  <span class="yui-button yui-push-button" id="${el}-updateuser-clearphoto-button">
+                     <span class="first-child"><button>${msg("button.usedefault")}</button></span>
+                  </span>
+               </div>
+            </div>
+         </div>
       </div>
       
       <div>
-         <!-- buttons
-         <div class="deleteuser-button">
-            <span class="yui-button yui-push-button" id="${el}-deleteuser-button">
-               <span class="first-child"><button>${msg("button.deleteuser")}</button></span>
+         <div class="updateuser-save-button left">
+            <span class="yui-button yui-push-button" id="${el}-updateuser-save-button">
+               <span class="first-child"><button>${msg("button.savechanges")}</button></span>
             </span>
          </div>
-         <div class="edituser-button">
-            <span class="yui-button yui-push-button" id="${el}-edituser-button">
-               <span class="first-child"><button>${msg("button.edituser")}</button></span>
+         <div class="updateuser-cancel-button">
+            <span class="yui-button yui-push-button" id="${el}-updateuser-cancel-button">
+               <span class="first-child"><button>${msg("button.cancel")}</button></span>
             </span>
-         </div>-->
+         </div>
       </div>
    </div>
    

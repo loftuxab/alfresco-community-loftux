@@ -544,7 +544,7 @@
                var person = YAHOO.lang.JSON.parse(res.serverResponse.responseText);
                
                // apply avatar image URL
-               var photos = Dom.getElementsByClassName("photoimg", "img");
+               var photos = Dom.getElementsByClassName("view-photoimg", "img");
                for (var i in photos)
                {
                   photos[i].src = person.avatar ?
@@ -620,8 +620,14 @@
       
       YAHOO.extend(CreatePanelHandler, Alfresco.ConsolePanelHandler,
       {
+         _groups: [],
+         
          onLoad: function onLoad()
          {
+            // events we are interested in
+            YAHOO.Bubbling.on("itemSelected", this.onGroupSelected, this);
+            YAHOO.Bubbling.on("removeGroup", this.onRemoveGroup, this);
+            
             var validFields = [];
             var onFieldKeyUp = function onFieldKeyUp(e)
             {
@@ -659,6 +665,108 @@
             Event.on(parent.id + "-create-password", "keyup", onFieldKeyUp);
             validFields[parent.id + "-create-verifypassword"] = false;
             Event.on(parent.id + "-create-verifypassword", "keyup", onFieldKeyUp);
+            
+            // Load in the Groups Finder component from the server
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/group-finder",
+               dataObj:
+               {
+                  htmlid: parent.id + "-create-groupfinder"
+               },
+               successCallback:
+               {
+                  fn: this.onGroupFinderLoaded,
+                  scope: this
+               },
+               failureMessage: "Could not load Group Finder component",
+               execScripts: true
+            });
+         },
+         
+         onGroupFinderLoaded: function onGroupFinderLoaded(res)
+         {
+            // Inject the component from the XHR request into it's placeholder DIV element
+            var finderDiv = Dom.get(parent.id + "-create-groupfinder");
+            finderDiv.innerHTML = res.serverResponse.responseText;
+            
+            // Find the Group Finder by container ID
+            parent.modules.createGroupFinder = Alfresco.util.ComponentManager.find(
+            {
+               id: parent.id + "-create-groupfinder"
+            })[0];
+            
+            // Set the correct options for our use
+            parent.modules.createGroupFinder.setOptions(
+            {
+               viewMode: Alfresco.GroupFinder.VIEW_MODE_COMPACT,
+               singleSelectMode: false,
+               minSearchTermLength: 1,
+               wildcardPrefix: true
+            });
+         },
+         
+         /**
+          * Group selected event handler
+          *
+          * @method onGroupSelected
+          * @param e {object} DomEvent
+          * @param args {array} Event parameters (depends on event type)
+          */
+         onGroupSelected: function onGroupSelected(e, args)
+         {
+            this.addGroup(args[1]);
+         },
+         
+         /**
+          * Add a group to the list of selected groups
+          *
+          * @method addGroup
+          * @param group {object} Group object
+          */
+         addGroup: function addGroup(group)
+         {
+            var found = false;
+            for (var i=0, j=this._groups.length; i<j; i++)
+            {
+               if (this._groups[i].itemName === group.itemName)
+               {
+                  found = true;
+                  break;
+               }
+            }
+            
+            if (!found)
+            {
+               this._groups.push(group);
+               
+               var groupDiv = Dom.get(parent.id + "-create-groups");
+               var html = groupDiv.innerHTML;
+               var idx = (this._groups.length-1);
+               html += " <span id='" + parent.id + "_group" + idx + "' onclick=\"YAHOO.Bubbling.fire('removeGroup', {id: " +
+                     idx + "});\" class='group-item' title='" + $html(parent._msg("label.removegroup")) + "'>" + $html(group.displayName) + "</span>";
+               groupDiv.innerHTML = html;
+            }
+         },
+         
+         getGroups: function getGroups()
+         {
+            return this._groups;
+         },
+         
+         /**
+          * Group removed event handler
+          *
+          * @method onRemoveGroup
+          * @param e {object} DomEvent
+          * @param args {array} Event parameters (depends on event type)
+          */
+         onRemoveGroup: function onRemoveGroup(e, args)
+         {
+            var i = args[1].id;
+            var el = Dom.get(parent.id + "_group" + i);
+            el.parentNode.removeChild(el);
+            this._groups.splice(i, 1);
          },
          
          onBeforeShow: function onBeforeShow()
@@ -671,13 +779,6 @@
             {
                Dom.get(parent.id + id).value = "";
             };
-            
-            // clear avatar image URL
-            var photos = Dom.getElementsByClassName("photoimg", "img");
-            for (var i in photos)
-            {
-               photos[i].src = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
-            }
             
             // clear data fields
             fnClearEl("-create-firstname");
@@ -736,33 +837,40 @@
             // Hide the main panel area before it is displayed - so we don't show
             // old data to the user before the Update() method paints the results
             Dom.get(parent.id + "-update-title").innerHTML = "";
-            Dom.setStyle(parent.id + "-createupdate-main", "visibility", "hidden");
+            Dom.setStyle(parent.id + "-update-main", "visibility", "hidden");
+            
+            /*var fnClearEl = function(id)
+            {
+               Dom.get(parent.id + id).value = "";
+            };
+            
+            // clear data fields
+            fnClearEl("-update-firstname");
+            fnClearEl("-update-lastname");
+            fnClearEl("-update-email");
+            fnClearEl("-update-password");
+            fnClearEl("-update-verifypassword");
+            fnClearEl("-update-quota");*/
          },
          
          onShow: function onShow()
          {
             window.scrollTo(0, 0);
-            this._refresh();
          },
          
          onUpdate: function onUpdate()
-         {
-            this._refresh();
-         },
-         
-         _refresh: function _refresh()
          {
             var success = function(res)
             {
                var fnSetter = function(id, val)
                {
-                  Dom.get(parent.id + id).innerHTML = val ? $html(val) : "";
+                  Dom.get(parent.id + id).value = val;
                };
                
                var person = YAHOO.lang.JSON.parse(res.serverResponse.responseText);
                
                // apply avatar image URL
-               var photos = Dom.getElementsByClassName("photoimg", "img");
+               var photos = Dom.getElementsByClassName("update-photoimg", "img");
                for (var i in photos)
                {
                   photos[i].src = person.avatar ?
@@ -774,41 +882,44 @@
                var firstName = person.firstName;
                var lastName = person.lastName;
                var fullName = firstName + ' ' + (lastName ? lastName : "");
-               fnSetter("-update-title", fullName);
-               /*fnSetter("-view-name", fullName);
-               fnSetter("-view-jobtitle", person.jobtitle);
-               fnSetter("-view-organization", person.organization);
-               // biography is a special html field
-               var bio = person.persondescription ? person.persondescription : "";
-               Dom.get(parent.id + "-view-bio").innerHTML = Alfresco.util.stripUnsafeHTMLTags(bio).replace(/\n/g, "<br/>");
+               Dom.get(parent.id + "-update-title").innerHTML = $html(fullName);
+               fnSetter("-update-firstname", firstName);
+               fnSetter("-update-lastname", lastName);
+               fnSetter("-update-email", person.email);
+               fnSetter("-update-password", "");
+               fnSetter("-update-verifypassword", "");
                
-               // Contact section fields
-               fnSetter("-view-location", person.location);
-               fnSetter("-view-email", person.email);
-               fnSetter("-view-telephone", person.telephone);
-               fnSetter("-view-mobile", person.mobile);
-               fnSetter("-view-skype", person.skype);
-               fnSetter("-view-instantmsg", person.instantmsg);
+               // convert quota to closest value type
+               var quota = person.quota;
+               if (quota != -1)
+               {
+                  if (quota < 1048576)
+                  {
+                     // show in kilobytes
+                     quota = Math.round(quota / 1024);
+                     Dom.get(parent.id + "-update-quotatype").value = "kb";
+                  }
+                  else if (quota < 1073741824)
+                  {
+                     // show in metabytes
+                     quota = Math.round(quota / 1048576);
+                     Dom.get(parent.id + "-update-quotatype").value = "mb";
+                  }
+                  else
+                  {
+                     // show in gigabytes
+                     quota = Math.round(quota / 1073741824);
+                     Dom.get(parent.id + "-update-quotatype").value = "gb";
+                  }
+                  fnSetter("-update-quota", quota.toString());
+               }
+               else
+               {
+                  fnSetter("-update-quota", "");
+               }
                
-               // Company section fields
-               fnSetter("-view-companyname", person.organization);
-               // build the company address up and set manually - encoding each value
-               var addr = "";
-               addr += person.companyaddress1 ? ($html(person.companyaddress1) + "<br/>") : "";
-               addr += person.companyaddress2 ? ($html(person.companyaddress2) + "<br/>") : "";
-               addr += person.companyaddress3 ? ($html(person.companyaddress3) + "<br/>") : "";
-               addr += person.companypostcode ? ($html(person.companypostcode) + "<br/>") : "";
-               Dom.get(parent.id + "-view-companyaddress").innerHTML = addr;
-               fnSetter("-view-companytelephone", person.companytelephone);
-               fnSetter("-view-companyfax", person.companyfax);
-               fnSetter("-view-companyemail", person.companyemail);
-               
-               // More section fields
-               fnSetter("-view-username", parent.currentUserId);
-               fnSetter("-view-enabled", person.enabled ? parent._msg("label.enabled") : parent._msg("label.disabled"));
-               fnSetter("-view-quota", (person.quota > 0 ? Alfresco.util.formatFileSize(person.quota) : ""));
-               fnSetter("-view-usage", Alfresco.util.formatFileSize(person.sizeCurrent));
-               fnSetter("-view-groups", person.groups.join(", "));*/
+               // account enabled/disabled
+               Dom.get(parent.id + "-update-disableaccount").checked = (person.enabled == false);
                
                // Make main panel area visible
                Dom.setStyle(parent.id + "-update-main", "visibility", "visible");
@@ -869,6 +980,14 @@
        * @type object
        */
       widgets: {},
+      
+      /**
+       * Object container for storing module instances.
+       * 
+       * @property modules
+       * @type object
+       */
+      modules: {},
       
       /**
        * Object container for storing YUI pop dialog instances.
@@ -1315,11 +1434,12 @@
        * Create a user - returning true on success, false on any error.
        * 
        * @method _createUser
+       * @param handler {function} Handler function to be called on successful creation
        * @private
        */
       _createUser: function ConsoleUsers__createUser(handler)
       {
-         // TODO: verify password against second
+         // TODO: verify password against second field!
          
          var me = this;
          var fnGetter = function(id)
@@ -1379,6 +1499,15 @@
                // ignore if we cannot parse quota field
             }
          }
+         
+         // gather the selected groups and convert to an array of Group IDs
+         var selectedGroups = this._getCurrentPanel().getGroups();
+         var groups = [];
+         for (var i=0, j=selectedGroups.length; i<j; i++)
+         {
+            groups.push(selectedGroups[i].itemName);
+         }
+         
          var personObj =
          {
             userName: username,
@@ -1386,7 +1515,8 @@
             lastName: fnGetter("-create-lastname"),
             email: fnGetter("-create-email"),
             disableAccount: Dom.get(me.id + "-create-disableaccount").checked,
-            quota: quota
+            quota: quota,
+            groups: groups
          };
          
          Alfresco.util.Ajax.request(
@@ -1400,7 +1530,19 @@
                fn: createSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.create-failure")   
+            failureCallback:
+            {
+               fn: function(res)
+               {
+                  var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     title: this._msg("message.failure"),
+                     text: this._msg("message.create-failure", json.message)
+                  });
+               },
+               scope: this
+            }
          });
       },
       
@@ -1446,6 +1588,20 @@
                newPanel.onShow();
             }
          }
+      },
+      
+      _getCurrentPanel: function ConsoleUsers__getCurrentPanel()
+      {
+         var panel = null;
+         for (var index in this.panels)
+         {
+            if (this.panels[index].id === this.currentPanelId)
+            {
+               panel = this.panels[index];
+               break;
+            }
+         }
+         return panel;
       },
       
       /**

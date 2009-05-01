@@ -262,6 +262,7 @@ em
 
 select,
 input[type="text"],
+input[type="password"],
 textarea
 {
    border: 1px solid #C5D6E2;
