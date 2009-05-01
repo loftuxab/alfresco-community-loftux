@@ -791,14 +791,23 @@ Alfresco.util.hasEventInterest = function(p_eventGroup, p_args)
    var obj = p_args[1],
       sourceGroup = "source",
       targetGroup = "target",
-      hasInterest = true;
+      hasInterest = false;
 
-   if (obj && obj.eventGroup)
+   if (obj)
    {
-      sourceGroup = (typeof obj.eventGroup == "string") ? obj.eventGroup : obj.eventGroup.eventGroup;
-      targetGroup = (typeof p_eventGroup == "string") ? p_eventGroup : p_eventGroup.eventGroup;
+      // Was this a defaultAction event?
+      if (obj.action === "navigate")
+      {
+         obj.eventGroup = obj.anchor.rel;
+      }
+      
+      if (obj.eventGroup)
+      {
+         sourceGroup = (typeof obj.eventGroup == "string") ? obj.eventGroup : obj.eventGroup.eventGroup;
+         targetGroup = (typeof p_eventGroup == "string") ? p_eventGroup : p_eventGroup.eventGroup;
 
-      hasInterest = (sourceGroup == targetGroup);
+         hasInterest = (sourceGroup == targetGroup);
+      }
    }
    return hasInterest;
 },
