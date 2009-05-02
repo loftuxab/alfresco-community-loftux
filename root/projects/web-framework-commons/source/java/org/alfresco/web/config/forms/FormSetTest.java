@@ -45,15 +45,15 @@ public class FormSetTest extends TestCase
     public void setUp()
     {
         this.testElement = new FormConfigElement();
-        this.testElement.addSet("root1", null, null);
-        this.testElement.addSet("intermediate1", "root1", null);
-        this.testElement.addSet("intermediate2", "root1", null);
-        this.testElement.addSet("leaf1", "intermediate1", null);
+        this.testElement.addSet("root1", null, null, null, null);
+        this.testElement.addSet("intermediate1", "root1", null, null, null);
+        this.testElement.addSet("intermediate2", "root1", null, null, null);
+        this.testElement.addSet("leaf1", "intermediate1", null, null, null);
 
-        this.testElement.addSet("root2", null, null);
+        this.testElement.addSet("root2", null, null, null, null);
 
-        this.testElement.addSet("root66", null, null);
-        this.testElement.addSet("leaf2", "root66", null);
+        this.testElement.addSet("root66", null, null, null, null);
+        this.testElement.addSet("leaf2", "root66", null, null, null);
     }
     
     public void testGetSetIDsAreCorrect()
@@ -127,10 +127,10 @@ public class FormSetTest extends TestCase
         try
         {
             FormConfigElement brokenFormElement = new FormConfigElement();
-            brokenFormElement.addSet("root", "leaf", null);
+            brokenFormElement.addSet("root", "leaf", null, null, null);
             // This next line will not in fact be called but it illustrates what we're
             // trying to prevent.
-            brokenFormElement.addSet("leaf", "root", null);
+            brokenFormElement.addSet("leaf", "root", null, null, null);
         }
         catch (ConfigException expected)
         {
@@ -144,7 +144,7 @@ public class FormSetTest extends TestCase
         // It should not be possible to create the default set except as a 'root set'.
         try
         {
-            this.testElement.addSet(FormConfigElement.DEFAULT_SET_ID, "root1", null);
+            this.testElement.addSet(FormConfigElement.DEFAULT_SET_ID, "root1", null, null, null);
         }
         catch(ConfigException expected)
         {

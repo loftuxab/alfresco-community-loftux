@@ -91,7 +91,7 @@
                 <show id="cev_set" for-mode="create, edit, view" />
              </field-visibility>
              <appearance>
-                <set id="user" appearance="tabX" />
+                <set id="user" appearance="tabX" label="User Details" label-id="user-details" />
                 <!-- Implicit default set -->
                 <field id="all" />
                 <field id="c" />
