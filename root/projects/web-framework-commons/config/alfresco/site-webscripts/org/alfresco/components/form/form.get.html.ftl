@@ -73,7 +73,13 @@
 
 <#macro renderSet set>
    <#if set.appearance?exists>
-      <fieldset><legend>${set.label}</legend>
+      <#if set.appearance == "fieldset">
+         <fieldset><legend>${set.label}</legend>
+      <#elseif set.appearance == "panel">
+         <div class="form-panel">
+            <div class="form-panel-heading">${set.label}</div>
+            <div class="form-panel-body">
+      </#if>
    </#if>
    
    <#list set.children as item>
@@ -85,7 +91,12 @@
    </#list>
    
    <#if set.appearance?exists>
-      </fieldset>
+      <#if set.appearance == "fieldset">
+         </fieldset>
+      <#elseif set.appearance == "panel">
+            </div>
+         </div>
+      </#if>
    </#if>
 </#macro>
 

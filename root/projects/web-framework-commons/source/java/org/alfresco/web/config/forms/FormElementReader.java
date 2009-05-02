@@ -43,6 +43,8 @@ import org.dom4j.Element;
 class FormElementReader implements ConfigElementReader
 {
 	public static final String ATTR_APPEARANCE = "appearance";
+	public static final String ATTR_LABEL = "label";
+	public static final String ATTR_LABEL_ID = "label-id";
     public static final String ATTR_FOR_MODE = "for-mode";
     public static final String ATTR_FORM_ID = "id";
     public static final String ATTR_MESSAGE = "message";
@@ -185,8 +187,10 @@ class FormElementReader implements ConfigElementReader
             String setId = setElem.attributeValue(ATTR_NAME_ID);
             String parentSetId = setElem.attributeValue(ATTR_PARENT);
             String appearance = setElem.attributeValue(ATTR_APPEARANCE);
+            String label = setElem.attributeValue(ATTR_LABEL);
+            String labelId = setElem.attributeValue(ATTR_LABEL_ID);
             
-            result.addSet(setId, parentSetId, appearance);
+            result.addSet(setId, parentSetId, appearance, label, labelId);
         }
     }
 

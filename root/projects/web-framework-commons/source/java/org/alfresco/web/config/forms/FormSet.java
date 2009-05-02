@@ -14,6 +14,8 @@ public class FormSet
     private final String setId;
     private final String parentId;
     private final String appearance;
+    private final String label;
+    private final String labelId;
     
     /**
      * This filed will be null for a 'root' set.
@@ -21,11 +23,19 @@ public class FormSet
     private FormSet parent;
     private List<FormSet> children = new ArrayList<FormSet>();
     
-    public FormSet(String setId, String parentId, String appearance)
+    public FormSet(String setId)
+    {
+        this(setId, null, null, null, null);
+    }
+    
+    public FormSet(String setId, String parentId, String appearance,
+                   String label, String labelId)
     {
         this.setId = setId;
         this.parentId = parentId;
         this.appearance = appearance;
+        this.label = label;
+        this.labelId = labelId;
     }
     public String getSetId()
     {
@@ -40,6 +50,16 @@ public class FormSet
         return appearance;
     }
 
+    public String getLabel()
+    {
+        return this.label;
+    }
+    
+    public String getLabelId()
+    {
+        return this.labelId;
+    }
+    
     public FormSet getParent()
     {
         return this.parent;
@@ -64,8 +84,9 @@ public class FormSet
     public String toString()
     {
         StringBuilder result = new StringBuilder();
-        result.append("Set id='").append(setId).append("' parentId='")
+        result.append("Set: id='").append(setId).append("' parentId='")
             .append(parentId).append("' appearance='").append(appearance)
+            .append("' label='").append(label).append("' labelId='").append(labelId)
             .append("'");
 
         return result.toString();

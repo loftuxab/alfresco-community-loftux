@@ -445,7 +445,7 @@ function setupSet(mode, setConfig, formModel, formConfig)
    }
    
    // if there is something to show in the set create the set object
-   if ((fieldsForSet !== null && fieldsForSet.length > 0) || setConfig.children.length > 0)
+   if ((fieldsForSet !== null && fieldsForSet.length > 0) || setConfig.children.size() > 0)
    {
       // setup the basic set object
       set = {};
@@ -454,17 +454,34 @@ function setupSet(mode, setConfig, formModel, formConfig)
       set.appearance = setConfig.appearance;
       set.children = [];
       
-      // TODO: Add label and label-id to set config, for now use the id
-      if (set.id.length === 0)
+      // work out label to use
+      var label = null;
+            
+      if (setConfig.labelId !== null)
       {
-         // TODO: externalise the default set label
-         set.label = "Default";
+         label = msg.get(setConfig.labelId);
+      }
+      else if (setConfig.label !== null)
+      {
+         label = setConfig.label;
       }
       else
       {
-         set.label = set.id;
+         // if there is no label specified in the config,
+         // use the label from the properties file otherwise
+         // use the set id
+         if (setConfig.setId + "" === "")
+         {
+            label = msg.get("form.default.set.label");
+         }
+         else
+         {
+            label = setConfig.setId;
+         }
       }
-   
+      
+      set.label = label;
+      
       // add all the fields to the set
       for (var f = 0; f < fieldsForSet.length; f++)
       {
@@ -487,8 +504,12 @@ function setupSet(mode, setConfig, formModel, formConfig)
          }
       }
       
-      // TODO: recursively setup child sets
-      
+      // recursively setup child sets
+      for (var c = 0; c < setConfig.children.size(); c++)
+      {
+         var childSet = setupSet(mode, setConfig.children.get(c), formModel, formConfig);
+         set.children.push(childSet);
+      }
    }
    else if (logger.isLoggingEnabled())
    {

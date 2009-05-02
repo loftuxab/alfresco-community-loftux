@@ -75,7 +75,7 @@ public class FormConfigElement extends ConfigElementAdapter
         super(name);
         // There should always be a 'default set' for those fields which do not declare
         // explicit membership of any set.
-        FormSet defaultSet = new FormSet(DEFAULT_SET_ID, null, null);
+        FormSet defaultSet = new FormSet(DEFAULT_SET_ID);
         this.sets.put(DEFAULT_SET_ID, defaultSet);
     }
 
@@ -168,7 +168,9 @@ public class FormConfigElement extends ConfigElementAdapter
             String setId = nextOldSetData.getSetId();
             String parentId = nextOldSetData.getParentId();
             String appearance = nextOldSetData.getAppearance();
-            result.addSet(setId, parentId, appearance);
+            String label = nextOldSetData.getLabel();
+            String labelId = nextOldSetData.getLabelId();
+            result.addSet(setId, parentId, appearance, label, labelId);
         }
         for (String nextNewSet : otherFormElem.sets.keySet())
         {
@@ -176,7 +178,9 @@ public class FormConfigElement extends ConfigElementAdapter
             String setId = nextNewSetData.getSetId();
             String parentId = nextNewSetData.getParentId();
             String appearance = nextNewSetData.getAppearance();
-            result.addSet(setId, parentId, appearance);
+            String label = nextNewSetData.getLabel();
+            String labelId = nextNewSetData.getLabelId();
+            result.addSet(setId, parentId, appearance, label, labelId);
         }
     }
 
@@ -543,9 +547,11 @@ public class FormConfigElement extends ConfigElementAdapter
         }
     }
     
-    /* package */void addSet(String setId, String parentSetId, String appearance)
+    /* package */void addSet(String setId, String parentSetId, String appearance,
+                             String label, String labelId)
     {
-        FormSet newFormSetObject = new FormSet(setId, parentSetId, appearance);
+        FormSet newFormSetObject = new FormSet(setId, parentSetId, appearance, 
+                    label, labelId);
         
         // We disallow the declaration of sets whose parents do not already exist.
         // The reason for this is to ensure that cycles within the parent structure
