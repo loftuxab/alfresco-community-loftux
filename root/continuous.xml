@@ -1105,9 +1105,9 @@
             file="${dir.project.webclient.dist}/${file.name.jar.webclient}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.webscriptframework.dist}/${file.name.jar.webscriptframework}" />
-      <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
+<!--      <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.webframework.dist}/${file.name.jar.webframework}" />
-
+-->
       <!-- Deployment Libraries -->
       <mkdir dir="${dir.continuous.assemble.sdk}/lib/deployment"/>
       <copy todir="${dir.continuous.assemble.sdk}/lib/deployment"
@@ -1206,12 +1206,22 @@
       <!-- Library Eclipse Projects -->
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.sdk.projects.server}/.project" />
+<!--
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.sdk.projects.server}/.classpath" />
+-->
       <copy todir="${dir.continuous.assemble.sdk}/lib/remote" 
             file="${dir.project.sdk.projects.remote}/.project" />
+<!--
       <copy todir="${dir.continuous.assemble.sdk}/lib/remote"
             file="${dir.project.sdk.projects.remote}/.classpath" />
+-->
+      <generate-classpath classprop="serverlibs" libdir="${dir.continuous.assemble.sdk}/lib/server/" 
+            classfile="${dir.continuous.assemble.sdk}/lib/server/.classpath">
+      </generate-classpath>
+      <generate-classpath classprop="remotelibs" libdir="${dir.continuous.assemble.sdk}/lib/remote/" 
+            classfile="${dir.continuous.assemble.sdk}/lib/remote/.classpath">
+      </generate-classpath>
 
       <!-- Sample Projects -->
       <mkdir dir="${dir.continuous.assemble.sdk}/samples" />
@@ -1220,6 +1230,15 @@
                   excludes="**/build/**" />
       </copy>
    </target>
+
+<target name="classpaths" depends="continuous-init">
+      <generate-classpath classprop="serverlibs" libdir="${dir.continuous.assemble.sdk}/lib/server/" 
+            classfile="${dir.continuous.assemble.sdk}/lib/server/.classpath">
+      </generate-classpath>
+      <generate-classpath classprop="remotelibs" libdir="${dir.continuous.assemble.sdk}/lib/remote/" 
+            classfile="${dir.continuous.assemble.sdk}/lib/remote/.classpath">
+      </generate-classpath>
+</target>
    
    <!-- *************************** -->
    <!-- ** Documentation targets ** -->
