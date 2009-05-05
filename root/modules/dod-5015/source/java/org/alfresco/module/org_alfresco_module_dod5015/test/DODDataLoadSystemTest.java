@@ -70,10 +70,15 @@ public class DODDataLoadSystemTest extends BaseSpringTest
         
 	public void testLoadFilePlanData()
 	{
-	    loadFilePlanData(null, false);
+	    loadFilePlanData(null);
 	}
 	
-	public void loadFilePlanData(String siteName, boolean bCommit)
+	private NodeRef loadFilePlanData(String siteName)
+	{
+	    return loadFilePlanData(siteName, nodeService, importer);
+	}
+	
+	public NodeRef loadFilePlanData(String siteName, NodeService nodeService, ImporterService importerService)
 	{
 	    NodeRef filePlan = null;
 	    
@@ -81,8 +86,8 @@ public class DODDataLoadSystemTest extends BaseSpringTest
 	    if (siteName == null)
 	    {
 	        // For now creating the filePlan beneth the
-	        NodeRef rootNode = this.nodeService.getRootNode(SPACES_STORE);
-	        filePlan = this.nodeService.createNode(
+	        NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
+	        filePlan = nodeService.createNode(
 	                                    rootNode, 
 	                                    ContentModel.ASSOC_CHILDREN, 
 	                                    QName.createQName(RecordsManagementModel.RM_URI, "filePlan"), 
@@ -100,10 +105,9 @@ public class DODDataLoadSystemTest extends BaseSpringTest
 	    assertNotNull("The DODExampleFilePlan.xml import file could not be found", is);
 	    Reader viewReader = new InputStreamReader(is);
 	    Location location = new Location(filePlan);
-	    importer.importView(viewReader, location, REPLACE_BINDING, null);
+	    importerService.importView(viewReader, location, REPLACE_BINDING, null);
 	    
-	    // Commit the uploaded data if asked to
-	    // TODO ...
+	    return filePlan;
 	}
 	
 	// TODO .. do we need to redecalre this here ??

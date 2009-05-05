@@ -22,25 +22,41 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.module.org_alfresco_module_dod5015;
+package org.alfresco.module.org_alfresco_module_dod5015.script;
 
-import java.io.Serializable;
-import java.util.Map;
-
+import org.alfresco.repo.jscript.ScriptNode;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
-
+import org.mozilla.javascript.Scriptable;
 
 /**
  * @author Roy Wetherall
  */
-public interface RecordsManagementService
+public class ScriptRecord extends ScriptNode
 {
-    String generateRecordId(NodeRef recordCategory);
+    private static final long serialVersionUID = 1801006559401292415L;
+
+    /**
+     * Constructor
+     * 
+     * @param nodeRef
+     * @param services
+     * @param scope
+     */
+    public ScriptRecord(NodeRef nodeRef, ServiceRegistry services, Scriptable scope)
+    {
+        super(nodeRef, services, scope);
+    }
     
-    String[] getRecordStates(NodeRef record);
-    
-    void addRecordState(NodeRef record, String stateName, Map<String, Serializable> context);
-    
-    void removeRecordState(NodeRef record, String stateName, Map<String, Serializable> context);
-    
+    /**
+     * Constructor
+     * 
+     * @param nodeRef
+     * @param services
+     */
+    public ScriptRecord(NodeRef nodeRef, ServiceRegistry services)
+    {
+        super(nodeRef, services);
+    }
+
 }
