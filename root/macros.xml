@@ -290,5 +290,39 @@
        </sequential>
    </macrodef>
 
+   <macrodef name="generate-classpath">
+      <attribute name="libdir"/>
+      <attribute name="classfile"/>
+      <attribute name="classprop"/>
+      <sequential>
+      <echo file="@{classfile}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="]]></echo>
+<!--
+	<classpathentry exported="true" kind="lib" path="alfresco"/>
+-->
+	  <pathconvert pathsep="@@@" property="@{classprop}">
+		 <path>
+            <fileset dir="@{libdir}" includes="**/*.jar"/>
+		 </path>
+         <map from="@{libdir}" to=""/>
+      </pathconvert>
+	  <echo file="@{classfile}" append="true">${@{classprop}}</echo>
+
+      <replace file="@{classfile}" token="@@@">
+         <replacevalue><![CDATA["/>
+	<classpathentry exported="true" kind="lib" path="]]></replacevalue>
+      </replace>
+
+      <echo file="@{classfile}" append="true"><![CDATA["/>
+	<classpathentry kind="output" path=""/>
+</classpath>
+]]></echo>
+       </sequential>
+   </macrodef>
+
+
+
 </project>
 
