@@ -24,23 +24,47 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import org.alfresco.service.cmr.repository.NodeRef;
-
 
 /**
+ * Record state
+ * 
  * @author Roy Wetherall
  */
-public interface RecordsManagementService
+public class RecordState
 {
-    String generateRecordId(NodeRef recordCategory);
+    private String name;
     
-    String[] getRecordStates(NodeRef record);
+    private String onAddStateAction;
     
-    void addRecordState(NodeRef record, String stateName, Map<String, Serializable> context);
+    private String onRemoveStateAction;
+            
+    public void setName(String name)
+    {
+        this.name = name;
+    }
     
-    void removeRecordState(NodeRef record, String stateName, Map<String, Serializable> context);
+    public String getName()
+    {
+        return this.name;
+    }
     
+    public void setOnAddStateAction(String onAddStateAction)
+    {
+        this.onAddStateAction = onAddStateAction;
+    }
+    
+    public String getOnAddStateAction()
+    {
+        return this.onAddStateAction;
+    }
+    
+    public void setOnRemoveStateAction(String onRemoveStateAction)
+    {
+        this.onRemoveStateAction = onRemoveStateAction;
+    }
+    
+    public String getOnRemoveStateAction()
+    {
+        return this.onRemoveStateAction;
+    }
 }

@@ -24,19 +24,97 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.util.GUID;
 
 /**
+ * Records Management Service Implementation
+ * 
  * @author Roy Wetherall
  */
 public class RecordsManagementServiceImpl implements RecordsManagementService
-{
-    /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getFilePlan()
-     */
-    public NodeRef getFilePlan()
+{    
+    private Map<String, RecordState> states;
+    
+    private ActionService actionService;
+    
+    public void setActionService(ActionService actionService)
     {
-        return null;
+        this.actionService = actionService;
+    }
+    
+    public void setStates(List<RecordState> states)
+    {
+        // Clear the existing map of states
+        this.states = new HashMap<String, RecordState>(states.size());
+        for (RecordState recordState : states)
+        {
+            this.states.put(recordState.getName(), recordState);
+        }
+    }    
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#addRecordState(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.util.Map)
+     */
+    public void addRecordState(NodeRef record, String stateName, Map<String, Serializable> context)
+    {
+        // Get the state
+        RecordState state = states.get(stateName);
+        if (state == null)
+        {
+            throw new AlfrescoRuntimeException("The record state '" + stateName + "' has not been defined");
+        }
+        
+        // Create the action
+        Action action = this.actionService.createAction(state.getOnAddStateAction());
+        action.setParameterValues(context);
+        
+        // Execute the action
+        this.actionService.executeAction(action, record);        
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#removeRecordState(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.util.Map)
+     */
+    public void removeRecordState(NodeRef record, String stateName, Map<String, Serializable> context)
+    {
+        // Get the state
+        RecordState state = states.get(stateName);
+        if (state == null)
+        {
+            throw new AlfrescoRuntimeException("The record state '" + stateName + "' has not been defined");
+        }
+        
+        // Create the action
+        Action action = this.actionService.createAction(state.getOnRemoveStateAction());
+        action.setParameterValues(context);
+        
+        // Execute the action
+        this.actionService.executeAction(action, record);
     }
 
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getRecordStates(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public String[] getRecordStates(NodeRef record)
+    {
+        throw new UnsupportedOperationException("Currently unsupported");
+    }
+
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#generateRecordId(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public String generateRecordId(NodeRef recordCategory)
+    {
+        // TODO something better than just a GUID
+        return GUID.generate();
+    }    
 }

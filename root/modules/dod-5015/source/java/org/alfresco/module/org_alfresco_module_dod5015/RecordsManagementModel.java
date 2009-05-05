@@ -41,5 +41,25 @@ public interface RecordsManagementModel
     // File plan type 
     public static QName TYPE_FILE_PLAN = QName.createQName(RM_URI, "filePlan");
     
+    // Incomplete record aspect
+    public static QName ASPECT_INCOMPLETE_RECORD = QName.createQName(RM_URI, "incompleteRecord");
+    
+    // Record aspect
+    public static QName ASPECT_RECORD = QName.createQName(RM_URI, "record");
+    public static QName PROP_DATE_FILED = QName.createQName(RM_URI, "dateFiled");
+    public static QName PROP_PUBLICATION_DATE = QName.createQName(RM_URI, "publicationDate");
+    public static QName PROP_SUPPLEMENTAL_MARKING_LIST = QName.createQName(RM_URI, "supplementalMarkingList");
+    public static QName PROP_MEDIA_TYPE = QName.createQName(RM_URI, "mediaType");
+    public static QName PROP_FORMAT = QName.createQName(RM_URI, "format");
+    public static QName PROP_DATE_RECEIVED = QName.createQName(RM_URI, "dateReceived");
+    
+    // Fileable aspect
+    public static QName ASPECT_FILABLE = QName.createQName(RM_URI, "fileable");
+    
+    // Record component identifier aspect
+    public static QName ASPECT_RECORD_COMPONENT_ID = QName.createQName(RM_URI, "recordComponentIdentifier");
+    public static QName PROP_INDENTIFIER = QName.createQName(RM_URI, "identifier");
+    
+    
 	
 }
