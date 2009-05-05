@@ -97,23 +97,70 @@ function getArgument(argName, defValue)
 {
    var result = null;
    
-   if (typeof defValue !== "undefined")
-   {
-      result = defValue;
-   }
-   
-   var argValue = context.properties[argName];
+   var argValue = instance.properties[argName];
    if (argValue !== null)
    {
-      result = argValue;
+      if (argValue.length > 0)
+      {
+         // check for parameterised values i.e. {xyz}
+         // if found leave result resolution to 'args' map
+         // as the value will have been resolved
+         if (argValue.charAt(0) !== "{" || 
+             argValue.charAt(argValue.length-1) !== "}")
+         {
+            result = argValue;
+         }
+      }
+      else
+      {
+         result = "";
+      }
    }
-   else
+   
+   // if result is null try the 'context.properties' map
+   if (result === null)
+   {
+      argValue = context.properties[argName];
+      if (argValue !== null)
+      {
+         if (argValue.length > 0)
+         {
+            // check for parameterised values i.e. {xyz}
+            // if found leave result resolution to 'args' map
+            // as the value will have been resolved
+            if (argValue.charAt(0) !== "{" || 
+                argValue.charAt(argValue.length-1) !== "}")
+            {
+               result = argValue;
+            }
+         }
+         else
+         {
+            result = "";
+         }
+      }
+   }
+   
+   // if result is still null try the 'args' map
+   if (result === null)
    {
       argValue = args[argName];
       if (argValue !== null)
       {
    	   result = argValue;
       }
+   }
+   
+   // if we still don't have a result and a default has been
+   // defined, return that instead
+   if (result === null && typeof defValue !== "undefined")
+   {
+      result = defValue;
+   }
+   
+   if (logger.isLoggingEnabled())
+   {
+      logger.log("Returning \"" + result + "\" from getArgument for \"" + argName + "\"");
    }
    
    return result;
