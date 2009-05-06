@@ -278,7 +278,7 @@ function getVisibleFields(mode, formConfig)
    
    if (logger.isLoggingEnabled())
    {
-      logger.log("Visible fields for " + mode + " mode = " + visibleFields);
+      logger.log("Fields configured to be visible for " + mode + " mode = " + visibleFields);
    }
          
    return visibleFields;
@@ -595,7 +595,9 @@ function setupField(formModel, fieldName, fieldConfig)
          logger.warn("\"" + fieldName + "\" is ambiguous, a property and an association exists with this name, prefix with either \"prop:\" or \"assoc:\" to uniquely identify the field");
       }
       
-      fieldDef = createTransientField(fieldName, { template: "controls/ambiguous.ftl" });
+      var control = {};
+      control.template = "controls/ambiguous.ftl";
+      fieldDef = createTransientField(fieldName, control);
    }
    else
    {
@@ -666,14 +668,11 @@ function setupField(formModel, fieldName, fieldConfig)
       else
       {
          // the field does not have a definition but may be a 'transient' field
-         // if there is at least a control template create a transient field
-         if (fieldConfig !== null && fieldConfig.template !== null)
+         fieldDef = createTransientField(fieldName, fieldConfig);
+         
+         if (fieldDef === null && logger.isLoggingEnabled())
          {
-            fieldDef = createTransientField(fieldName, fieldConfig);
-         }
-         else if (logger.isLoggingEnabled())
-         {
-            logger.log("Ignoring field \"" + fieldName + "\" as a field definition or configuration could not be located");
+            logger.log("Ignoring field \"" + fieldName + "\" as a field definition or sufficient configuration could not be located");
          }
       }
    }
@@ -1036,10 +1035,14 @@ function setupFieldValue(formModel, fieldDef, fieldConfig)
 function createTransientField(fieldName, fieldConfig)
 {
    // we can't continue without at least a control template
-   if (fieldConfig === null || fieldConfig.template === null)
+   if (fieldConfig === null || fieldConfig.control === null || 
+       fieldConfig.control.template === null)
    {
       return null;
    }
+   
+   if (logger.isLoggingEnabled())
+      logger.log("Creating transient field for \"" + fieldName + "\"");
    
    var fieldDef = {};
    
@@ -1058,7 +1061,7 @@ function createTransientField(fieldName, fieldConfig)
    
    // setup control
    fieldDef.control = {};
-   fieldDef.control.template = fieldConfig.template;
+   fieldDef.control.template = fieldConfig.control.template;
    
    var params = {};
    if (typeof fieldConfig.params !== "undefined")

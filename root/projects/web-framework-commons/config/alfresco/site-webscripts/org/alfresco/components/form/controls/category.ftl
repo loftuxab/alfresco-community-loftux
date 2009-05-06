@@ -2,6 +2,9 @@
 
 <#if form.mode == "view">
 <div class="viewmode-field">
+   <#if field.mandatory && field.value == "">
+      <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.incomplete.field")}" /><span>
+   </#if>
    <span class="viewmode-label">${field.label?html}:</span>
    <span class="viewmode-value">${field.value?html}</span>
 </div>
@@ -12,13 +15,14 @@
 <script type="text/javascript">//<![CDATA[
 (function()
 {
-   <@renderPickerJS "picker" />
+   <@renderPickerJS field "picker" />
    picker.setOptions(
    {
       itemType: "cm:category",
-      multiSelectMode: true,
+      multipleSelectMode: true,
       parentNodeRef: "alfresco://category/root",
       itemFamily: "category",
+      maintainAddedRemovedItems: false,
       params: "${field.control.params.params!""}"
    });
 })();
@@ -26,9 +30,7 @@
 
 <div id="${controlId}" class="object-finder">
    
-   <input type="hidden" id="${controlId}-added" name="${field.name}_added" />
-   <input type="hidden" id="${controlId}-removed" name="${field.name}_removed" />
-   <input type="hidden" id="${controlId}-current" name="-" value="${field.value}" />
+   <input type="hidden" id="${controlId}-current" name="${field.name}" value="${field.value}" />
    <div id="${controlId}-currentValue" class="current-values"></div>
    <div class="show-picker">
       <button id="${controlId}-showPicker-button">${msg("button.select")}</button>
