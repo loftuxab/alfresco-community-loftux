@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.apache.abdera.ext.cmis;
+package org.alfresco.abdera.ext.cmis;
 
 import javax.xml.namespace.QName;
 
@@ -30,16 +30,9 @@ import org.apache.abdera.util.Constants;
 
 
 /**
- * CMIS Version: 0.6
+ * CMIS Version: 0.61
  * 
- * CMIS Namespace definitions for the Abdera ATOM library.
- * 
- * Encapsulates access and modification of CMIS extension values to ATOM.
- * 
- * NOTE: Potentially, this extension can be contributed to Abdera upon
- *       publication of CMIS.  This is why it is organised under a
- *       non-Alfresco Java package.  It follows the conventions of all
- *       other Abdera extensions.
+ * CMIS Namespace and Schema definitions for the Abdera ATOM library.
  * 
  * @author davidc
  */
@@ -66,13 +59,14 @@ public interface CMISConstants
     public static final QName REPOSITORY_INFO = new QName(CMIS_NS, "repositoryInfo");
     public static final QName REPOSITORY_ID = new QName(CMIS_NS, "repositoryId");
     public static final QName REPOSITORY_NAME = new QName(CMIS_NS, "repositoryName");
+    public static final QName REPOSITORY_RELATIONSHIP = new QName(CMIS_NS, "repositoryRelationship");
     public static final QName REPOSITORY_DESCRIPTION = new QName(CMIS_NS, "repositoryDescription");
-    public static final QName REPOSITORY_SPECIFIC_INFO = new QName(CMIS_NS, "repositorySpecificInformation");
     public static final QName VENDOR_NAME = new QName(CMIS_NS, "vendorName");
     public static final QName PRODUCT_NAME = new QName(CMIS_NS, "productName");
     public static final QName PRODUCT_VERSION = new QName(CMIS_NS, "productVersion");
-    public static final QName VERSIONS_SUPPORTED = new QName(CMIS_NS, "cmisVersionsSupported");
     public static final QName ROOT_FOLDER_ID = new QName(CMIS_NS, "rootFolderId");
+    public static final QName VERSION_SUPPORTED = new QName(CMIS_NS, "cmisVersionSupported");
+    public static final QName REPOSITORY_SPECIFIC_INFO = new QName(CMIS_NS, "repositorySpecificInformation");
     
     // CMIS Capabilities
     public static final QName CAPABILITIES = new QName(CMIS_NS, "capabilities");
@@ -80,9 +74,11 @@ public interface CMISConstants
     public static final QName CAPABILITY_UNFILING = new QName(CMIS_NS, "capabilityUnfiling");
     public static final QName CAPABILITY_VERSION_SPECIFIC_FILING = new QName(CMIS_NS, "capabilityVersionSpecificFiling");
     public static final QName CAPABILITY_PWC_UPDATEABLE = new QName(CMIS_NS, "capabilityPWCUpdateable");
+    public static final QName CAPABILITY_PWC_SEARCHABLE = new QName(CMIS_NS, "capabilityPWCSearchable");
     public static final QName CAPABILITY_ALL_VERIONS_SEARCHABLE = new QName(CMIS_NS, "capabilityAllVersionsSearchable");
+    public static final QName CAPABILITY_QUERY = new QName(CMIS_NS, "capabilityQuery");
     public static final QName CAPABILITY_JOIN = new QName(CMIS_NS, "capabilityJoin");
-
+    
     // CMIS Object
     public static final QName OBJECT = new QName(CMIS_NS, "object");
     public static final QName PROPERTIES = new QName(CMIS_NS, "properties");

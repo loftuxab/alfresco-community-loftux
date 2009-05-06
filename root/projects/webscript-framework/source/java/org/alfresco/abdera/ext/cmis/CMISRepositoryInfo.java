@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.apache.abdera.ext.cmis;
+package org.alfresco.abdera.ext.cmis;
 
 import org.apache.abdera.factory.Factory;
 import org.apache.abdera.model.Element;
@@ -30,17 +30,12 @@ import org.apache.abdera.model.ElementWrapper;
 
 
 /**
- * CMIS Version: 0.6
+ * CMIS Version: 0.61
  *
  * CMIS Repository Info for the Abdera ATOM library.
  * 
  * Encapsulates access and modification of CMIS extension values to ATOM
  * Service Document.
- * 
- * NOTE: Potentially, this extension can be contributed to Abdera upon
- *       publication of CMIS.  This is why it is organised under a
- *       non-Alfresco Java package.  It follows the conventions of all
- *       other Abdera extensions.
  * 
  * @author davidc
  */
@@ -55,7 +50,6 @@ public class CMISRepositoryInfo extends ElementWrapper
     {
         super(factory, CMISConstants.REPOSITORY_INFO);
     }
-
     
     public String getId()
     {
@@ -77,6 +71,16 @@ public class CMISRepositoryInfo extends ElementWrapper
         return null;
     }
 
+    public String getRelatonship()
+    {
+        Element child = getFirstChild(CMISConstants.REPOSITORY_RELATIONSHIP);
+        if (child != null)
+        {
+            return child.getText();
+        }
+        return null;
+    }
+    
     public String getDescription()
     {
         Element child = getFirstChild(CMISConstants.REPOSITORY_DESCRIPTION);
@@ -85,11 +89,6 @@ public class CMISRepositoryInfo extends ElementWrapper
             return child.getText();
         }
         return null;
-    }
-
-    public Element getSpecificInfo()
-    {
-        return getFirstChild(CMISConstants.REPOSITORY_SPECIFIC_INFO);
     }
 
     public String getVendorName()
@@ -101,7 +100,7 @@ public class CMISRepositoryInfo extends ElementWrapper
         }
         return null;
     }
-    
+
     public String getProductName()
     {
         Element child = getFirstChild(CMISConstants.PRODUCT_NAME);
@@ -122,16 +121,6 @@ public class CMISRepositoryInfo extends ElementWrapper
         return null;
     }
     
-    public String getVersionsSupported()
-    {
-        Element child = getFirstChild(CMISConstants.VERSIONS_SUPPORTED);
-        if (child != null)
-        {
-            return child.getText();
-        }
-        return null;
-    }
-    
     public String getRootFolderId()
     {
         Element child = getFirstChild(CMISConstants.ROOT_FOLDER_ID);
@@ -141,7 +130,22 @@ public class CMISRepositoryInfo extends ElementWrapper
         }
         return null;
     }
+    
+    public String getVersionSupported()
+    {
+        Element child = getFirstChild(CMISConstants.VERSION_SUPPORTED);
+        if (child != null)
+        {
+            return child.getText();
+        }
+        return null;
+    }
 
+    public Element getSpecificInfo()
+    {
+        return getFirstChild(CMISConstants.REPOSITORY_SPECIFIC_INFO);
+    }
+    
     public CMISCapabilities getCapabilities()
     {
         Element child = getFirstChild(CMISConstants.CAPABILITIES);

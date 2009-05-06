@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.apache.abdera.ext.cmis;
+package org.alfresco.abdera.ext.cmis;
 
 import org.apache.abdera.factory.Factory;
 import org.apache.abdera.model.Element;
@@ -30,17 +30,9 @@ import org.apache.abdera.model.ElementWrapper;
 
 
 /**
- * CMIS Version: 0.6
+ * CMIS Version: 0.61
  * 
- * CMIS Repository Info for the Abdera ATOM library.
- * 
- * Encapsulates access and modification of CMIS extension values to ATOM
- * Service Document.
- * 
- * NOTE: Potentially, this extension can be contributed to Abdera upon
- *       publication of CMIS.  This is why it is organised under a
- *       non-Alfresco Java package.  It follows the conventions of all
- *       other Abdera extensions.
+ * CMIS Repository Capabilities for the Abdera ATOM library.
  * 
  * @author davidc
  */
@@ -80,12 +72,24 @@ public class CMISCapabilities extends ElementWrapper
         return Boolean.valueOf(child.getText());
     }
 
+    public boolean isPWCSearchable()
+    {
+        Element child = getFirstChild(CMISConstants.CAPABILITY_PWC_SEARCHABLE);
+        return Boolean.valueOf(child.getText());
+    }
+
     public boolean isAllVersionsSearchable()
     {
         Element child = getFirstChild(CMISConstants.CAPABILITY_ALL_VERIONS_SEARCHABLE);
         return Boolean.valueOf(child.getText());
     }
 
+    public String getQuery()
+    {
+        Element child = getFirstChild(CMISConstants.CAPABILITY_QUERY);
+        return child.getText();
+    }
+    
     public String getJoin()
     {
         Element child = getFirstChild(CMISConstants.CAPABILITY_JOIN);
