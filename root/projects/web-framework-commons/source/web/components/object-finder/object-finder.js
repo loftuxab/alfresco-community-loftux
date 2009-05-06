@@ -154,7 +154,18 @@
           * @type int
           * @default 100
           */
-         maxSearchResults: 100
+         maxSearchResults: 100,
+         
+         /**
+          * Flag to determine whether the added and removed items
+          * should be maintained and posted separately.
+          * If set to true (the default) the picker will update
+          * a "${field.name}_added" and a "${field.name}_removed"
+          * hidden field, if set to false the picker will just
+          * update a "${field.name}" hidden field with the current
+          * value.
+          */
+         maintainAddedRemovedItems: true
       },
 
       /**
@@ -309,8 +320,15 @@
        */
       onOK: function ObjectFinder_onOK(e, p_obj)
       {
-         Dom.get(this.id + "-added").value = this.getAddedItems().toString();
-         Dom.get(this.id + "-removed").value = this.getRemovedItems().toString();
+         if (this.options.maintainAddedRemovedItems)
+         {
+            Dom.get(this.id + "-added").value = this.getAddedItems().toString();
+            Dom.get(this.id + "-removed").value = this.getRemovedItems().toString();
+         }
+         else
+         {
+            Dom.get(this.id + "-current").value = this.getRemovedItems().toString();
+         }
          
          this.options.currentValue = this.getSelectedItems().toString();
          Dom.get(this.id + "-current").value = this.options.currentValue;

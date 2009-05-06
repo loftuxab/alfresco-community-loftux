@@ -1,6 +1,6 @@
 <#assign compactMode = field.control.params.compactMode!false>
 
-<#macro renderPickerJS picker="picker">
+<#macro renderPickerJS field picker="picker">
    var ${picker} = new Alfresco.ObjectFinder("${controlId}").setOptions(
    {
       compactMode: ${compactMode?string},
