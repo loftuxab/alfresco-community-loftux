@@ -48,7 +48,7 @@
       </property>
       <property name="extensionFactories">
          <list>
-           <bean class="org.apache.abdera.ext.cmis.CMISExtensionFactory"/>
+           <bean class="org.alfresco.abdera.ext.cmis.CMISExtensionFactory"/>
          </list>
       </property>
    </bean>

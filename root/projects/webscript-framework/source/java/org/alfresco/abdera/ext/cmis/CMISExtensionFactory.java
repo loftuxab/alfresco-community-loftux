@@ -22,31 +22,24 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.apache.abdera.ext.cmis;
+package org.alfresco.abdera.ext.cmis;
 
-import org.apache.abdera.ext.cmis.CMISProperty.CMISPropertyBoolean;
-import org.apache.abdera.ext.cmis.CMISProperty.CMISPropertyDateTime;
-import org.apache.abdera.ext.cmis.CMISProperty.CMISPropertyDecimal;
-import org.apache.abdera.ext.cmis.CMISProperty.CMISPropertyHtml;
-import org.apache.abdera.ext.cmis.CMISProperty.CMISPropertyId;
-import org.apache.abdera.ext.cmis.CMISProperty.CMISPropertyInteger;
-import org.apache.abdera.ext.cmis.CMISProperty.CMISPropertyString;
-import org.apache.abdera.ext.cmis.CMISProperty.CMISPropertyUri;
-import org.apache.abdera.ext.cmis.CMISProperty.CMISPropertyXml;
+import org.alfresco.abdera.ext.cmis.CMISProperty.CMISPropertyBoolean;
+import org.alfresco.abdera.ext.cmis.CMISProperty.CMISPropertyDateTime;
+import org.alfresco.abdera.ext.cmis.CMISProperty.CMISPropertyDecimal;
+import org.alfresco.abdera.ext.cmis.CMISProperty.CMISPropertyHtml;
+import org.alfresco.abdera.ext.cmis.CMISProperty.CMISPropertyId;
+import org.alfresco.abdera.ext.cmis.CMISProperty.CMISPropertyInteger;
+import org.alfresco.abdera.ext.cmis.CMISProperty.CMISPropertyString;
+import org.alfresco.abdera.ext.cmis.CMISProperty.CMISPropertyUri;
+import org.alfresco.abdera.ext.cmis.CMISProperty.CMISPropertyXml;
 import org.apache.abdera.util.AbstractExtensionFactory;
 
 
 /**
- * CMIS Version: 0.6
+ * CMIS Version: 0.61
  *
  * CMIS Extension Factory for the Abdera ATOM Library.
- * 
- * Encapsulates access and modification of CMIS extension values to ATOM.
- * 
- * NOTE: Potentially, this extension can be contributed to Abdera upon
- *       publication of CMIS.  This is why it is organised under a
- *       non-Alfresco Java package.  It follows the conventions of all
- *       other Abdera extensions.
  * 
  * @author davidc
  */

@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.apache.abdera.ext.cmis;
+package org.alfresco.abdera.ext.cmis;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,16 +33,9 @@ import org.apache.abdera.model.ElementWrapper;
 
 
 /**
- * CMIS Version: 0.6
+ * CMIS Version: 0.61
  *
  * CMIS Properties Element Wrapper for the Abdera ATOM library.
- * 
- * Encapsulates access and modification of CMIS extension values to ATOM.
- * 
- * NOTE: Potentially, this extension can be contributed to Abdera upon
- *       publication of CMIS.  This is why it is organised under a
- *       non-Alfresco Java package.  It follows the conventions of all
- *       other Abdera extensions.
  * 
  * @author davidc
  */
