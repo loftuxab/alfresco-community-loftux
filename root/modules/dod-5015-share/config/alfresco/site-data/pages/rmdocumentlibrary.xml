@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>Records Management Document Library</title>
+   <title-id>page.rmDocumentLibrary.title</title-id>
+   <description>Records Management Document library with Tree view</description>
+   <description-id>page.rmDocumentLibrary.description</description-id>
+   <template-instance>rmdocumentlibrary</template-instance>
+   <authentication>user</authentication>
+</page>

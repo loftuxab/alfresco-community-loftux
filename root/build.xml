@@ -1129,5 +1129,14 @@
            depends="init">
       <echoproperties />
    </target>
+   
+   <target name="deploy-rm-share" depends="init">
+      <!-- copy all source files -->
+      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.modules}/dod-5015-share/config">
+            <include name="**/*.*" />
+         </fileset>
+      </copy>
+   </target>
 
 </project>
