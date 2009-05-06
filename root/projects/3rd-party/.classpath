@@ -120,7 +120,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0.jar" sourcepath="src/tm-extractors-1.0.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.1.jar" sourcepath="src/poi-3.0.2-src.zip"/>
 	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.2.jar" sourcepath="src/commons-dbcp-1.2.2-src.zip"/>
-	<classpathentry kind="lib" path="lib/optional/log4j-1.2.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/optional/log4j-1.2.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-analyzers-2.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-core-2.4.1.jar" sourcepath="src/lucene-2.4-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-snowball-2.4.1.jar"/>
