@@ -8,7 +8,7 @@ if (p !== null)
    {
       usedPages = [];
    }
-
+   
    var availablePages = config.scoped["SitePages"]["pages"].childrenMap["page"], urlMap = {};
    for (i = 0; i < availablePages.size(); i++)
    {
@@ -20,17 +20,25 @@ if (p !== null)
          urlMap[pageId] = pageUrl;
       }
    }
-
+   
    // Find the label for each page
    for (var i = 0; i < usedPages.length; i++)
    {
       var usedPage = usedPages[i], p = sitedata.getPage(usedPage.pageId), pageUrl = urlMap[usedPage.pageId];
-      usedPage.title = p.title;
-      usedPage.titleId = p.titleId;
-      if (pageUrl)
+      if (p != null)
       {
-         // Overwrite the stored pageUrl with the latest one from config file
-         usedPage.pageUrl = pageUrl;  
+         usedPage.title = p.title;
+         usedPage.titleId = p.titleId;
+         if (pageUrl)
+         {
+            // Overwrite the stored pageUrl with the latest one from config file
+            usedPage.pageUrl = pageUrl;  
+         }
+      }
+      else
+      {
+         // page does not exist! output error to help the developer
+         usedPage.title = "ERROR: page " + usedPage.pageId + " not found!";
       }
    }
    
