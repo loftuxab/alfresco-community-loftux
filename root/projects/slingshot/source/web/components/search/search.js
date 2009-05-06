@@ -637,7 +637,7 @@
       {
          // update the search results field
          var searchFor = '<b>' + $html(this.searchTerm) + '</b>';
-         var searchIn = (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", '<b>' + this.options.siteName+ '</b>'));
+         var searchIn = (this.searchAll ? this._msg("search.info.inallsites") : this._msg("search.info.insite", '<b>' + $html(this.options.siteName) + '</b>'));
          var resultsCount = '<b>' + this.resultsCount + '</b>';
          if (this.hasMoreResults)
          {
@@ -665,7 +665,7 @@
          }
          
          // update the search results field
-         var text = this.searchAll ? this._msg("search.searchsiteonly", this.options.siteName) : this._msg("search.searchall");
+         var text = this.searchAll ? this._msg("search.searchsiteonly", $html(this.options.siteName)) : this._msg("search.searchall");
          
          // Update the link text
          var elem = Dom.get(this.id + '-scope-toggle-link');
