@@ -64,10 +64,8 @@
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("viewUserClick", this.onViewUserClick, this);
       
-      /* History navigation events */
-      YAHOO.Bubbling.on("panelChanged", this.onPanelChanged, this);
-      YAHOO.Bubbling.on("searchChanged", this.onSearchChanged, this);
-      YAHOO.Bubbling.on("userIdChanged", this.onUserIdChanged, this);
+      /* History navigation event */
+      YAHOO.Bubbling.on("stateChanged", this.onStateChanged, this);
       
       /* Define panel handlers */
       var parent = this;
@@ -817,7 +815,6 @@
          onLoad: function onLoad()
          {
             // Buttons
-            //parent.widgets.deleteuserButton = Alfresco.util.createYUIButton(parent, "deleteuser-button", parent.onDeleteUserClick);
          },
          
          onHistoryInit: function onHistoryInit()
@@ -1109,30 +1106,14 @@
          this.popups.deleteDialog.render(document.body);
          
          // YUI History
-         var bookmarkedSearch = YAHOO.util.History.getBookmarkedState("search") || "";
-         var bookmarkedPanel = YAHOO.util.History.getBookmarkedState("panel") || this.panels[0].id;
-         var bookmarkedUserId = YAHOO.util.History.getBookmarkedState("userid") || "";
+         var bookmarkedState = YAHOO.util.History.getBookmarkedState("state") || this.encodeHistoryState({"panel": this.panels[0].id});
          
          // Register History Manager callbacks
-         YAHOO.util.History.register("panel", bookmarkedPanel, function CU_onHistoryManagerPanelChanged(newPanel)
+         YAHOO.util.History.register("state", bookmarkedState, function CU_onHistoryManagerStateChanged(newState)
          {
-            YAHOO.Bubbling.fire("panelChanged",
+            YAHOO.Bubbling.fire("stateChanged",
             {
-               panel: newPanel
-            });
-         });
-         YAHOO.util.History.register("search", bookmarkedSearch, function CU_onHistoryManagerSearchChanged(newTerm)
-         {
-            YAHOO.Bubbling.fire("searchChanged",
-            {
-               search: newTerm
-            });
-         });
-         YAHOO.util.History.register("userid", bookmarkedUserId, function CU_onHistoryManagerUserIdChanged(newUserId)
-         {
-            YAHOO.Bubbling.fire("userIdChanged",
-            {
-               userid: newUserId
+               state: newState
             });
          });
          
@@ -1154,7 +1135,7 @@
             this.onHistoryManagerReady();
          }
       },
-   
+      
       /**
        * Fired by YUI when History Manager is initialised and available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -1170,21 +1151,26 @@
             this.panels[i].onLoad();
          }
          
-         // display the initial panel based on history or default
-         var bookmarkedPanel = YAHOO.util.History.getBookmarkedState("panel") || this.panels[0].id;
-         YAHOO.Bubbling.fire("panelChanged",
+         // display the initial panel based on history state or default
+         var bookmarkedState = YAHOO.util.History.getBookmarkedState("history") || this.encodeHistoryState({"panel": this.panels[0].id});
+         YAHOO.Bubbling.fire("stateChanged",
          {
-            panel: bookmarkedPanel
+            state: bookmarkedState
          });
          
          // Fire the onHistoryInit() panel lifecycle event for the panel found in the history state
          // - handles initial display based on any stored bookmark state
-         for (var i in this.panels)
+         var state = this.decodeHistoryState(bookmarkedState);
+         var bookmarkedPanel = (state.panel ? state.panel : null);
+         if (bookmarkedPanel !== null)
          {
-            if (this.panels[i].id === bookmarkedPanel)
+            for (var i in this.panels)
             {
-               this.panels[i].onHistoryInit();
-               break;
+               if (this.panels[i].id === bookmarkedPanel)
+               {
+                  this.panels[i].onHistoryInit();
+                  break;
+               }
             }
          }
       },
@@ -1195,56 +1181,38 @@
        */
       
       /**
-       * Panel changed history manager event handler
+       * History manager state change event handler
        *
-       * @method onPanelChanged
+       * @method onStateChanged
        * @param e {object} DomEvent
        * @param args {array} Event parameters (depends on event type)
        */
-      onPanelChanged: function ConsoleUsers_onPanelChanged(e, args)
+      onStateChanged: function ConsoleUsers_onStateChanged(e, args)
       {
-         var panel = args[1].panel;
+         var state = this.decodeHistoryState(args[1].state);
          
-         this._showPanel(panel);
-      },
-      
-      /**
-       * Search changed history manager event handler
-       *
-       * @method onSearchChanged
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onSearchChanged: function ConsoleUsers_onSearchChanged(e, args)
-      {
-         // keep track of the last search performed
-         var searchTerm = args[1].search;
-         this.searchTerm = searchTerm;
-         
-         // annoyingly we need to check the panel ID so we don't update multiple times
-         if (this.currentPanelId === "search")
+         // test if panel has actually changed?
+         if (state.panel)
          {
+            this._showPanel(state.panel);
+         }
+         
+         if (state.search && this.currentPanelId === "search")
+         {
+            // keep track of the last search performed
+            var searchTerm = state.search;
+            this.searchTerm = searchTerm;
+            
             this._updateCurrentPanel();
          }
-      },
-      
-      /**
-       * UserId changed history manager event handler
-       *
-       * @method onUserIdChanged
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onUserIdChanged: function ConsoleUsers_onUserIdChanged(e, args)
-      {
-         var userid = args[1].userid;
-         this.currentUserId = userid;
          
-         // annoyingly we need to check the panel ID so we don't update multiple times
-         if (this.currentPanelId === "view" ||
-             this.currentPanelId === "create" ||
-             this.currentPanelId === "update")
+         if (state.userid &&
+             (this.currentPanelId === "view" ||
+              this.currentPanelId === "create" ||
+              this.currentPanelId === "update"))
          {
+            this.currentUserId = state.userid;
+            
             this._updateCurrentPanel();
          }
       },
@@ -1271,7 +1239,7 @@
             return;
          }
          
-         YAHOO.util.History.multiNavigate({panel: "search", "search": searchTerm});
+         YAHOO.util.History.navigate("state", this.encodeHistoryState({"search": searchTerm}));
       },
       
       /**
@@ -1283,7 +1251,7 @@
        */
       onNewUserClick: function ConsoleUsers_onNewUserClick(e, args)
       {
-         YAHOO.util.History.navigate("panel", "create");
+         YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "create"}));
       },
       
       /**
@@ -1295,7 +1263,7 @@
        */
       onEditUserClick: function ConsoleUsers_onEditUserClick(e, args)
       {
-         YAHOO.util.History.navigate("panel", "update");
+         YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "update"}));
       },
       
       /**
@@ -1308,7 +1276,7 @@
       onViewUserClick: function ConsoleUsers_onViewUserClick(e, args)
       {
          var userid = args[1].username;
-         YAHOO.util.History.multiNavigate({panel: "view", userid: userid});
+         YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "view", "userid": userid}));
       },
       
       /**
@@ -1358,7 +1326,7 @@
          {
             text: this._msg("message.delete-success")
          });
-         YAHOO.util.History.navigate("panel", "search");
+         YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "search"}));
       },
       
       /**
@@ -1387,7 +1355,7 @@
             {
                text: this._msg("message.create-success")
             });
-            YAHOO.util.History.navigate("panel", "search");
+            YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "search"}));
          };
          this._createUser(handler);
       },
@@ -1423,12 +1391,80 @@
        */
       onCreateUserCancelClick: function ConsoleUsers_onCreateUserCancelClick(e, args)
       {
-         YAHOO.util.History.navigate("panel", "search");
+         YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "search"}));
       },
       
       /**
        * PRIVATE FUNCTIONS
        */
+      
+      /**
+       * Decode packed URL state into its component name value pairs.
+       * 
+       * @method decodeHistoryState
+       * @param state {string} packed state from the url history
+       * @private
+       */
+      decodeHistoryState: function ConsoleUsers_decodeHistoryState(state)
+      {
+         var obj = {};
+         var pairs = state.split("&");
+         for (var i=0; i<pairs.length; i++)
+         {
+            var pair = pairs[i].split("=");
+            obj[pair[0]] = decodeURIComponent(pair[1]);
+         }
+         return obj;
+      },
+      
+      /**
+       * Encode state object into a packed string for use as url history value.
+       * 
+       * @method encodeHistoryState
+       * @param obj {object} state object
+       * @private
+       */
+      encodeHistoryState: function ConsoleUsers_encodeHistoryState(obj)
+      {
+         // wrap up current state values
+         var stateObj = {};
+         if (this.currentPanelId !== "")
+         {
+            stateObj.panel = this.currentPanelId;
+         }
+         if (this.currentUserId !== "")
+         {
+            stateObj.userid = this.currentUserId;
+         }
+         if (this.searchTerm !== "")
+         {
+            stateObj.search = this.searchTerm;
+         }
+         
+         // convert to encoded url history state - overwriting with any supplied values
+         var state = "";
+         if (obj.panel || stateObj.panel)
+         {
+            state += "panel=" + encodeURIComponent(obj.panel ? obj.panel : stateObj.panel);
+         }
+         if (obj.userid || stateObj.userid)
+         {
+            if (state.length !== 0)
+            {
+               state += "&";
+            }
+            state += "userid=" + encodeURIComponent(obj.userid ? obj.userid : stateObj.userid);
+         }
+         if (obj.search || stateObj.search)
+         {
+            if (state.length !== 0)
+            {
+               state += "&";
+            }
+            state += "search=" + encodeURIComponent(obj.search ? obj.search : stateObj.search);
+         }
+         return state;
+      },
       
       /**
        * Create a user - returning true on success, false on any error.
