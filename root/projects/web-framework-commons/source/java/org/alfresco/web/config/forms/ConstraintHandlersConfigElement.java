@@ -129,9 +129,18 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
 
     /**
      * This method returns the registered constraint types.
+     * @return a String[] of the constraint types.
+     */
+    String[] getConstraintTypes()
+    {
+        return this.getConstraintTypesAsList().toArray(new String[0]);
+    }
+
+    /**
+     * This method returns the registered constraint types.
      * @return an unmodifiable List of the constraint types.
      */
-    List<String> getConstraintTypes()
+    List<String> getConstraintTypesAsList()
     {
         Set<String> result = items.keySet();
         // See the comment above on ordering in LinkedHashMaps' keys.
@@ -187,11 +196,16 @@ public class ConstraintHandlersConfigElement extends ConfigElementAdapter
         return items.get(type).getEvent();
     }
 
-    public List<String> getItemNames()
+    public String[] getItemNames()
     {
-    	return this.getConstraintTypes();
+    	return this.getItemNamesAsList().toArray(new String[0]);
     }
     
+    public List<String> getItemNamesAsList()
+    {
+        return this.getConstraintTypesAsList();
+    }
+
     public Map<String, ConstraintHandlerDefinition> getItems()
     {
     	return Collections.unmodifiableMap(items);

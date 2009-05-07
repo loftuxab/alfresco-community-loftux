@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.config.forms;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +60,9 @@ public class FormSetTest extends TestCase
     public void testGetSetIDsAreCorrect()
     {
         Map<String, FormSet> sets = this.testElement.getSets();
-        assertEquals("Error in set names.", testElement.getSetIDs(), sets.keySet());
+        List<String> setNames = new ArrayList<String>();
+        setNames.addAll(sets.keySet());
+        assertEquals("Error in set names.", testElement.getSetIDsAsList(), setNames);
         
         // Note ordering is important here.
         Set<String> expectedSetIDs = new LinkedHashSet<String>();
@@ -76,7 +79,7 @@ public class FormSetTest extends TestCase
     
     public void testRootSetsCorrectlyIdentified()
     {
-        List<FormSet> rootSets = testElement.getRootSets();
+        List<FormSet> rootSets = testElement.getRootSetsAsList();
         assertNotNull(rootSets);
         assertEquals("Expecting 4 root sets", 4, rootSets.size());
         assertEquals(FormConfigElement.DEFAULT_SET_ID, rootSets.get(0).getSetId());
@@ -87,7 +90,7 @@ public class FormSetTest extends TestCase
     
     public void testRootSetsShouldHaveNoParent()
     {
-        List<FormSet> rootSets = testElement.getRootSets();
+        List<FormSet> rootSets = testElement.getRootSetsAsList();
         for (FormSet nextRoot : rootSets)
         {
             assertNull(nextRoot.getParent());
@@ -100,14 +103,14 @@ public class FormSetTest extends TestCase
         
         // parent with children
         FormSet root1 = allSets.get("root1");
-        List<FormSet> root1Children = root1.getChildren();
+        List<FormSet> root1Children = root1.getChildrenAsList();
         assertEquals("Expecting 2 children for root1", 2, root1Children.size());
         assertEquals("intermediate1", root1Children.get(0).getSetId());
         assertEquals("intermediate2", root1Children.get(1).getSetId());
 
         // parent without children
         FormSet root2 = allSets.get("root2");
-        List<FormSet> root2Children = root2.getChildren();
+        List<FormSet> root2Children = root2.getChildrenAsList();
         assertEquals("Expecting 0 children for root2", 0, root2Children.size());
     }
     

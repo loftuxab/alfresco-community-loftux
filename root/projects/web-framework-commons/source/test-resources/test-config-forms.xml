@@ -38,6 +38,10 @@
 	         <field-visibility>
 	            <show id="name" />
                 <show id="title" for-mode="view, create" />
+                <show id="role0" />
+                <show id="role1" />
+                <show id="role2" />
+                <show id="role3" />
 	         </field-visibility>
 	         <appearance>
 	            <set id="details" appearance="fieldset" />
@@ -66,6 +70,11 @@
 	                  <control-param name="four">quatre</control-param>
 	               </control>
 	            </field>
+	            <!-- Test fields for role-handling. -->
+                <field id="role0" />
+                <field id="role1" requires-role="" />
+                <field id="role2" requires-role="Coordinator" />
+                <field id="role3" requires-role="Foo" />
 	         </appearance>
 	      </form>
       </forms>
