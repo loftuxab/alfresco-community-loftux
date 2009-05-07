@@ -140,11 +140,19 @@ public class FormsConfigElement extends ConfigElementAdapter
     public ConfigElement combine(ConfigElement otherConfigElement)
     {
         FormsConfigElement otherFormsElem = (FormsConfigElement)otherConfigElement;
+
         FormsConfigElement result = new FormsConfigElement();
 
-        ConfigElement combinedDefaultForm = this.defaultFormElement == null ?
-                otherFormsElem.getDefaultForm()
-                : this.defaultFormElement.combine(otherFormsElem.getDefaultForm());
+        ConfigElement combinedDefaultForm;
+        if (this.getDefaultForm() == null)
+        {
+            combinedDefaultForm = otherFormsElem.getDefaultForm();
+        }
+        else
+        {
+            combinedDefaultForm = this.defaultFormElement.combine(otherFormsElem.getDefaultForm());
+        }
+        
         result.setDefaultForm((FormConfigElement)combinedDefaultForm);
         
         for (String thisFormId : this.formElementsById.keySet())
@@ -171,7 +179,7 @@ public class FormsConfigElement extends ConfigElementAdapter
         		result.addFormById(otherFormsElem.formElementsById.get(otherFormId), otherFormId);
         	}
         }
-
+        
         // Combine default-controls
         ConfigElement combinedDefaultControls = this.defaultControlsElement == null ?
                 otherFormsElem.getDefaultControls()
