@@ -325,10 +325,6 @@
             Dom.get(this.id + "-added").value = this.getAddedItems().toString();
             Dom.get(this.id + "-removed").value = this.getRemovedItems().toString();
          }
-         else
-         {
-            Dom.get(this.id + "-current").value = this.getRemovedItems().toString();
-         }
          
          this.options.currentValue = this.getSelectedItems().toString();
          Dom.get(this.id + "-current").value = this.options.currentValue;
