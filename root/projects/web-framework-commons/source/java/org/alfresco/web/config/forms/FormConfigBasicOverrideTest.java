@@ -28,6 +28,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
+
 public class FormConfigBasicOverrideTest extends FormConfigBasicTest
 {
     // This class inherits all of its test messages from the superclass and simply
@@ -100,5 +103,20 @@ public class FormConfigBasicOverrideTest extends FormConfigBasicTest
 
         assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(depsCE.getCss()));
         assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(depsCE.getJs()));
+    }
+    
+    public void testCombiningFormsAcrossXmlFiles() throws Exception
+    {
+        Config testConfigObj = configService.getConfig("combiningFormsAcrossXmlFiles");
+        assertNotNull(testConfigObj);
+
+        ConfigElement testFormsConfigObj = testConfigObj.getConfigElement("forms");
+        assertNotNull(testFormsConfigObj);
+        FormsConfigElement testFormsConfigElement = (FormsConfigElement) testFormsConfigObj;
+        FormConfigElement testDefaultForm = testFormsConfigElement.getDefaultForm();
+        assertNotNull(testDefaultForm);
+        
+        FormConfigElement formWithId = testFormsConfigElement.getForm("testing");
+        assertNotNull(formWithId);
     }
 }

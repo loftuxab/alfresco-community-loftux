@@ -74,5 +74,17 @@
           </form>
       </forms>
    </config>
+
+   <config evaluator="string-compare" condition="combiningFormsAcrossXmlFiles">
+      <forms>
+         <form id="testing">
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+            </field-visibility>
+         </form>
+      </forms>
+   </config>
 </alfresco-config>
      
