@@ -310,9 +310,9 @@ function createPostBody(itemKind, itemId, visibleFields, formConfig)
       var postBodyFields = [];
       var postBodyForcedFields = [];
       var fieldId = null;
-      for (var f = 0; f < visibleFields.size(); f++)
+      for (var f = 0; f < visibleFields.length; f++)
       {
-         fieldId = visibleFields.get(f)
+         fieldId = visibleFields[f]
          postBodyFields.push(fieldId);
          if (formConfig.isFieldForced(fieldId))
          {
@@ -420,16 +420,16 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
    var formUIItems = [];
    
    // setup the set and field structure
-   if (visibleFields !== null && visibleFields.size() > 0)
+   if (visibleFields !== null && visibleFields.length > 0)
    {
       // if we have visible fields we can presume there is
       // config present!
       
       // get the root sets
       var rootSets = formConfig.rootSets;      
-      for (var s = 0; s < rootSets.size(); s++)
+      for (var s = 0; s < rootSets.length; s++)
       {
-         var set = setupSet(mode, rootSets.get(s), formModel, formConfig);
+         var set = setupSet(mode, rootSets[s], formModel, formConfig);
          // if the set got created (as it contained fields or other sets) add to items list
          if (set !== null)
          {
@@ -492,7 +492,7 @@ function setupSet(mode, setConfig, formModel, formConfig)
    }
    
    // if there is something to show in the set create the set object
-   if ((fieldsForSet !== null && fieldsForSet.length > 0) || setConfig.children.size() > 0)
+   if ((fieldsForSet !== null && fieldsForSet.length > 0) || setConfig.children.length > 0)
    {
       // setup the basic set object
       set = {};
@@ -552,9 +552,9 @@ function setupSet(mode, setConfig, formModel, formConfig)
       }
       
       // recursively setup child sets
-      for (var c = 0; c < setConfig.children.size(); c++)
+      for (var c = 0; c < setConfig.children.length; c++)
       {
-         var childSet = setupSet(mode, setConfig.children.get(c), formModel, formConfig);
+         var childSet = setupSet(mode, setConfig.children[c], formModel, formConfig);
          set.children.push(childSet);
       }
    }
@@ -765,9 +765,9 @@ function setupFieldControl(fieldDef, fieldConfig)
    if (defaultControlConfig !== null)
    {
       var paramsConfig = defaultControlConfig.params;
-      for (var p = 0; p < paramsConfig.size(); p++)
+      for (var p = 0; p < paramsConfig.length; p++)
       {
-         control.params[paramsConfig.get(p).name] = paramsConfig.get(p).value;
+         control.params[paramsConfig[p].name] = paramsConfig[p].value;
       }
    }
    
@@ -775,9 +775,9 @@ function setupFieldControl(fieldDef, fieldConfig)
    if (fieldConfig !== null)
    {
       var paramsConfig = fieldConfig.control.params;
-      for (var p = 0; p < paramsConfig.size(); p++)
+      for (var p = 0; p < paramsConfig.length; p++)
       {
-         control.params[paramsConfig.get(p).name] = paramsConfig.get(p).value;
+         control.params[paramsConfig[p].name] = paramsConfig[p].value;
       }
    }
    
@@ -1067,9 +1067,9 @@ function createTransientField(fieldName, fieldConfig)
    if (typeof fieldConfig.params !== "undefined")
    {
       var paramsConfig = fieldConfig.params;
-      for (var p = 0; p < paramsConfig.size(); p++)
+      for (var p = 0; p < paramsConfig.length; p++)
       {
-         params[paramsConfig.get(p).name] = paramsConfig.get(p).value;
+         params[paramsConfig[p].name] = paramsConfig[p].value;
       }
    }
    fieldDef.control.params = params;

@@ -101,7 +101,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
             List<ControlParam> nextControlParams = null;
             if (nextDefaultControls != null)
             {
-                nextControlParams = nextDefaultControls.getParams();
+                nextControlParams = nextDefaultControls.getParamsAsList();
             }
             
             result.addDataMapping(nextDataType, nextTemplate,
@@ -116,7 +116,7 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
             List<ControlParam> nextControlParams = null;
             if (nextDefaultControls != null)
             {
-                nextControlParams = nextDefaultControls.getParams();
+                nextControlParams = nextDefaultControls.getParamsAsList();
             }
             
             result.addDataMapping(nextDataType, nextTemplate,
@@ -140,14 +140,20 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         }
         this.datatypeDefCtrlMappings.put(dataType, newControl);
     }
+
+    public String[] getItemNames()
+    {
+        return this.getItemNamesAsList().toArray(new String[0]);
+    }
     
-    public List<String> getItemNames()
+    public List<String> getItemNamesAsList()
     {
         Set<String> result = datatypeDefCtrlMappings.keySet();
         List<String> resultList = new ArrayList<String>(result);
     	return Collections.unmodifiableList(resultList);
     }
     
+    // This is fine.
     public Map<String, Control> getItems()
     {
     	return Collections.unmodifiableMap(datatypeDefCtrlMappings);
@@ -174,6 +180,11 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
         }
     }
 
+    public ControlParam[] getControlParamsFor(String dataType)
+    {
+        return this.getControlParamsAsListFor(dataType).toArray(new ControlParam[0]);
+    }
+
     /**
      * This method returns an unmodifiable List of <code>ControlParam</code> objects
      * associated with the specified dataType.
@@ -183,9 +194,9 @@ public class DefaultControlsConfigElement extends ConfigElementAdapter
      * 
      * @see org.alfresco.web.config.ControlParam
      */
-    public List<ControlParam> getControlParamsFor(String dataType)
+    public List<ControlParam> getControlParamsAsListFor(String dataType)
     {
         return Collections.unmodifiableList(datatypeDefCtrlMappings.get(
-                dataType).getParams());
+                dataType).getParamsAsList());
     }
 }

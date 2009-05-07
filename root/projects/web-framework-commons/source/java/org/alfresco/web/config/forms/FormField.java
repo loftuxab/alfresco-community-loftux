@@ -50,6 +50,7 @@ public class FormField
 	private static final String ATTR_HELP_TEXT = "help";
 	private static final String ATTR_SET = "set";
     private static final String ATTR_READ_ONLY = "read-only";
+    private static final String ATTR_REQUIRES_ROLE = "requires-role";
 
 	private static Log logger = LogFactory.getLog(FormField.class);
     
@@ -165,6 +166,24 @@ public class FormField
     public String getHelpTextId()
     {
     	return attributes.get(ATTR_HELP_TEXT_ID);
+    }
+    
+    /**
+     * This method returns the value of the "requires-role" attribute. If the config
+     * xml has provided a value equal to the empty string, null is returned.
+     * @return
+     */
+    public String getRequiresRole()
+    {
+        final String result = attributes.get(ATTR_REQUIRES_ROLE);
+        if ("".equals(result))
+        {
+            return null;
+        }
+        else
+        {
+            return result;
+        }
     }
     // End of convenience accessor methods.
         

@@ -64,8 +64,13 @@ public class FormSet
     {
         return this.parent;
     }
-    
-    public List<FormSet> getChildren()
+
+    public FormSet[] getChildren()
+    {
+        return this.getChildrenAsList().toArray(new FormSet[0]);
+    }
+
+    public List<FormSet> getChildrenAsList()
     {
         return Collections.unmodifiableList(this.children);
     }

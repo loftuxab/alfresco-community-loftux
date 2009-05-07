@@ -36,7 +36,10 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.xml.XMLConfigService;
+import org.alfresco.connector.User;
 import org.alfresco.util.BaseTest;
+import org.alfresco.web.site.DefaultRequestContext;
+import org.alfresco.web.site.ThreadLocalRequestContext;
 
 /**
  * JUnit tests to exercise the forms-related capabilities in to the web client
@@ -100,7 +103,7 @@ public class FormConfigTest extends BaseTest
     {
         FormConfigElement setForm = readFormFromConfig("set_membership");
 
-        List<String> fieldNames = setForm.getVisibleViewFieldNames();
+        List<String> fieldNames = setForm.getVisibleViewFieldNamesAsList();
     	
     	List<String> expectedFieldNames = new ArrayList<String>();
         expectedFieldNames.add("all");
@@ -183,7 +186,7 @@ public class FormConfigTest extends BaseTest
     public void testGetRootSetsShouldReturnTheDefaultSetWhenNoSetsDeclared() throws Exception
     {
         FormConfigElement formWithoutSets = this.readFormFromConfig("form_without_sets");
-        List<FormSet> rootSets = formWithoutSets.getRootSets();
+        List<FormSet> rootSets = formWithoutSets.getRootSetsAsList();
         
         assertEquals("A form without any explicit sets should return one root set.", 1, rootSets.size());
         assertEquals("The root set was incorrect.",
@@ -217,7 +220,7 @@ public class FormConfigTest extends BaseTest
     {
         // Field checks
         Map<String, FormField> fields = defaultFormInContent.getFields();
-        assertEquals("Wrong number of Fields.", 5, fields.size());
+        assertEquals("Wrong number of Fields.", 9, fields.size());
 
         FormField usernameField = fields.get("username");
         assertNotNull("usernameField was null.", usernameField);
@@ -234,7 +237,7 @@ public class FormConfigTest extends BaseTest
         assertEquals("name field had incorrect template.",
                 "alfresco/extension/formcontrols/my-name.ftl", nameTemplate);
 
-        List<ControlParam> controlParams = nameField.getControl().getParams();
+        List<ControlParam> controlParams = nameField.getControl().getParamsAsList();
         assertNotNull("name field should have control params.", controlParams);
         assertEquals("name field has incorrect number of control params.", 1,
                 controlParams.size());
@@ -261,18 +264,22 @@ public class FormConfigTest extends BaseTest
 
         FormField testField = fields.get("fieldWithMixedCtrlParams");
 
-        List<ControlParam> controlParams = testField.getControl().getParams();
+        List<ControlParam> controlParams = testField.getControl().getParamsAsList();
         assertNotNull("field should have control params.", controlParams);
         assertEquals("field has incorrect number of control params.", 4,
                 controlParams.size());
 
-        List<ControlParam> expectedCPs = new ArrayList<ControlParam>();
-        expectedCPs.add(new ControlParam("one", "un"));
-        expectedCPs.add(new ControlParam("two", "deux"));
-        expectedCPs.add(new ControlParam("three", ""));
-        expectedCPs.add(new ControlParam("four", "quatre"));
+        assertEquals("one", controlParams.get(0).getName());
+        assertEquals("un", controlParams.get(0).getValue());
         
-        assertEquals(expectedCPs, controlParams);
+        assertEquals("two", controlParams.get(1).getName());
+        assertEquals("deux", controlParams.get(1).getValue());
+        
+        assertEquals("three", controlParams.get(2).getName());
+        assertEquals("", controlParams.get(2).getValue());
+        
+        assertEquals("four", controlParams.get(3).getName());
+        assertEquals("quatre", controlParams.get(3).getValue());
     }
     
     public void testFormsShouldSupportMultipleConstraintMessageTags()
@@ -290,6 +297,86 @@ public class FormConfigTest extends BaseTest
     	
     	assertEquals("limit exceeded", applesField.getMessage());
     	assertEquals("", applesField.getMessageId());
+    }
+    
+    /**
+     * This method tests that a field defined without any role returns null for its
+     * requires-role attribute.
+     */
+    public void testGetFieldWithoutRequiresRole() throws Exception
+    {
+        FormField noRoleField = defaultFormInContent.getFields().get("role0");
+        String requiredRole = noRoleField.getRequiresRole();
+        assertNull(requiredRole);
+    }
+    
+    public void testRoleBasedFieldVisibilityAtFormLevel_UserHasNoRole() throws Exception
+    {
+        // Testing the FormConfigElement.getVisible[View|Edit|Create]FieldNames methods
+        List<String> expectedVisibleFields_Create = Arrays.asList(new String[]{"name", "title", "role0", "role1"});
+        List<String> expectedVisibleFields_Edit = Arrays.asList(new String[]{"name", "role0", "role1"});
+        List<String> expectedVisibleFields_View = Arrays.asList(new String[]{"name", "title", "role0", "role1"});
+        
+        assertEquals(expectedVisibleFields_Create, defaultFormInContent.getVisibleCreateFieldNamesAsList());
+        assertEquals(expectedVisibleFields_Edit, defaultFormInContent.getVisibleEditFieldNamesAsList());
+        assertEquals(expectedVisibleFields_View, defaultFormInContent.getVisibleViewFieldNamesAsList());
+        
+        // Testing the isFieldVisible method
+        for (String s : expectedVisibleFields_Create)
+        {
+            assertTrue(defaultFormInContent.isFieldVisible(s, Mode.CREATE));
+        }
+        assertFalse(defaultFormInContent.isFieldVisible("role2", Mode.CREATE));
+        assertFalse(defaultFormInContent.isFieldVisible("role3", Mode.CREATE));
+    }
+    
+    //TODO Switch this on and fix it.
+    public void off_testRoleBasedFieldVisibilityAtFormLevel_UserHasRole() throws Exception
+    {
+        // We'll construct a DefaultRequestContext simply to execute the static
+        // initialisation of its superclass, ThreadLocalRequestContext.
+        new DefaultRequestContext(null);
+        User testUser = new User("alfresco");
+//        testUser.setRole("Coordinator");
+        ThreadLocalRequestContext.getRequestContext().setUser(testUser);
+        
+        // Testing the FormConfigElement.getVisible[View|Edit|Create]FieldNames methods
+        List<String> expectedVisibleFields_Create = Arrays.asList(new String[]{"name", "title", "role0", "role1", "role2"});
+        List<String> expectedVisibleFields_Edit = Arrays.asList(new String[]{"name", "role0", "role1", "role2"});
+        List<String> expectedVisibleFields_View = Arrays.asList(new String[]{"name", "title", "role0", "role1", "role2"});
+        
+        assertEquals(expectedVisibleFields_Create, defaultFormInContent.getVisibleCreateFieldNamesAsList());
+        assertEquals(expectedVisibleFields_Edit, defaultFormInContent.getVisibleEditFieldNamesAsList());
+        assertEquals(expectedVisibleFields_View, defaultFormInContent.getVisibleViewFieldNamesAsList());
+
+        // Testing the isFieldVisible method
+        for (String s : expectedVisibleFields_Create)
+        {
+            assertTrue(defaultFormInContent.isFieldVisible(s, Mode.CREATE));
+        }
+        assertFalse(defaultFormInContent.isFieldVisible("role3", Mode.CREATE));
+    }
+
+    /**
+     * This method tests that a field defined with an empty string for a role
+     * should return null for its requires-role attribute.
+     */
+    public void testGetFieldWithEmptyRequiresRole() throws Exception
+    {
+        FormField emptyRoleField = defaultFormInContent.getFields().get("role1");
+        String requiredRole = emptyRoleField.getRequiresRole();
+        assertNull(requiredRole);
+    }
+    
+    /**
+     * This method tests that a field defined with a non-empty requires'role string
+     * returns the correct string for its requires-role attribute.
+     */
+    public void testGetFieldWithValidRequiresRole() throws Exception
+    {
+        FormField validRoleField = defaultFormInContent.getFields().get("role2");
+        String requiredRole = validRoleField.getRequiresRole();
+        assertEquals("Coordinator", requiredRole);
     }
     
     public void testFormConfigElementShouldHaveNoChildren()

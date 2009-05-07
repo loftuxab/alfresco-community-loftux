@@ -1,10 +1,4 @@
 <alfresco-config>
-   <plug-ins>
-      <element-readers>
-         <element-reader element-name="forms" class="org.alfresco.web.config.forms.FormsElementReader"/>
-      </element-readers>
-   </plug-ins>
-
    <config>
       <forms>
 	      <default-controls>

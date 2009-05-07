@@ -84,12 +84,17 @@ public class Control
         this.template = newTemplate;
     }
 
+    public ControlParam[] getParams()
+    {
+        return this.getParamsAsList().toArray(new ControlParam[0]);
+    }
+    
     /**
      * This method returns an unmodifiable List of <code>ControlParam</code>
      * objects that are associated with this Control.
      * @return an unmodifiable List of ControlParam references.
      */
-    public List<ControlParam> getParams()
+    public List<ControlParam> getParamsAsList()
     {
         List<ControlParam> result = new ArrayList<ControlParam>(controlParams.size());
         for (Map.Entry<String, ControlParam> entry : controlParams.entrySet())

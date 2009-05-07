@@ -73,7 +73,7 @@ public class ConstraintHandlersConfigTest extends BaseTest
 
         ConstraintHandlersConfigElement chConfigElement
             = (ConstraintHandlersConfigElement) globalConstraintHandlers;
-        List<String> actualTypes = chConfigElement.getConstraintTypes();
+        List<String> actualTypes = chConfigElement.getConstraintTypesAsList();
         assertEquals("Incorrect type count.",
                 expectedValidationHandlers.size(), actualTypes.size());
         

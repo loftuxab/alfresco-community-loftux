@@ -32,9 +32,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.http.HttpSession;
+
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.element.ConfigElementAdapter;
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.ConnectorService;
+import org.alfresco.connector.Response;
+import org.alfresco.connector.User;
+import org.alfresco.connector.exception.ConnectorServiceException;
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.site.FrameworkHelper;
+import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.ThreadLocalRequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -226,12 +237,31 @@ public class FormConfigElement extends ConfigElementAdapter
     {
         return Collections.unmodifiableMap(this.sets);
     }
-    
-    public Set<String> getSetIDs()
+
+    public String[] getSetIDs()
     {
-        return Collections.unmodifiableSet(this.sets.keySet());
+        return this.getSetIDsAsList().toArray(new String[0]);
     }
     
+    public List<String> getSetIDsAsList()
+    {
+        Set<String> keySet = sets.keySet();
+        
+        List<String> result = new ArrayList<String>(keySet.size());
+        result.addAll(keySet);
+        
+        return Collections.unmodifiableList(result);
+    }
+
+    public FormSet[] getRootSets()
+    {
+        RequestContext rc = ThreadLocalRequestContext.getRequestContext();
+        sets.toString();
+
+        return this.getRootSetsAsList().toArray(new FormSet[0]);
+
+    }
+
     /**
      * This method returns a Map of those &lt;set&gt;s which have no declared parentID
      * i&#46;e&#46; those that are 'roots' in the tree of sets. Note that this map will
@@ -240,7 +270,7 @@ public class FormConfigElement extends ConfigElementAdapter
      * @return
      * @see #DEFAULT_SET_ID
      */
-    public List<FormSet> getRootSets()
+    public List<FormSet> getRootSetsAsList()
     {
         List<FormSet> result = new ArrayList<FormSet>(sets.size());
         for (Iterator<String> iter = sets.keySet().iterator(); iter.hasNext(); )
@@ -256,11 +286,15 @@ public class FormConfigElement extends ConfigElementAdapter
         return result;
     }
     
+    //TODO In the case where we have <field-visibility> but no <appearance> i.e. no <fields>
+    //     this method should include FormField objects for each 'show'n field.
+    //     These objects will have no associated metadata.
     public Map<String, FormField> getFields()
     {
         return Collections.unmodifiableMap(this.fields);
     }
     
+    //TODO Delete this method.
     /**
      * This method returns true if the config XML contains any show tags under the
      * field-visibility tag. This is important as the presence of any show tags
@@ -273,10 +307,40 @@ public class FormConfigElement extends ConfigElementAdapter
         return !fieldVisibilityManager.isManagingHiddenFields();
     }
     
+    public String[] getHiddenCreateFieldNames()
+    {
+        return this.getHiddenCreateFieldNamesAsList().toArray(new String[0]);
+    }
+
+    public String[] getHiddenEditFieldNames()
+    {
+        return this.getHiddenEditFieldNamesAsList().toArray(new String[0]);
+    }
+    
+    public String[] getHiddenViewFieldNames()
+    {
+        return this.getHiddenViewFieldNamesAsList().toArray(new String[0]);
+    }
+    
+    public String[] getVisibleCreateFieldNames()
+    {
+        return this.getVisibleCreateFieldNamesAsList().toArray(new String[0]);
+    }
+
+    public String[] getVisibleEditFieldNames()
+    {
+        return this.getVisibleEditFieldNamesAsList().toArray(new String[0]);
+    }
+    
+    public String[] getVisibleViewFieldNames()
+    {
+        return this.getVisibleViewFieldNamesAsList().toArray(new String[0]);
+    }
+    
     /**
      * @see FieldVisibilityManager#getFieldNamesHiddenInMode(Mode)
      */
-    public List<String> getHiddenCreateFieldNames()
+    public List<String> getHiddenCreateFieldNamesAsList()
     {
         return getFieldNamesHiddenInMode(Mode.CREATE);
     }
@@ -284,7 +348,7 @@ public class FormConfigElement extends ConfigElementAdapter
     /**
      * @see FieldVisibilityManager#getFieldNamesHiddenInMode(Mode)
      */
-    public List<String> getHiddenEditFieldNames()
+    public List<String> getHiddenEditFieldNamesAsList()
     {
         return getFieldNamesHiddenInMode(Mode.EDIT);
     }
@@ -292,7 +356,7 @@ public class FormConfigElement extends ConfigElementAdapter
     /**
      * @see FieldVisibilityManager#getFieldNamesHiddenInMode(Mode)
      */
-    public List<String> getHiddenViewFieldNames()
+    public List<String> getHiddenViewFieldNamesAsList()
     {
         return getFieldNamesHiddenInMode(Mode.VIEW);
     }
@@ -300,7 +364,7 @@ public class FormConfigElement extends ConfigElementAdapter
     /**
      * @see FieldVisibilityManager#getFieldNamesVisibleInMode(Mode)
      */
-    public List<String> getVisibleCreateFieldNames()
+    public List<String> getVisibleCreateFieldNamesAsList()
     {
         return getFieldNamesVisibleInMode(Mode.CREATE);
     }
@@ -308,7 +372,7 @@ public class FormConfigElement extends ConfigElementAdapter
     /**
      * @see FieldVisibilityManager#getFieldNamesVisibleInMode(Mode)
      */
-    public List<String> getVisibleEditFieldNames()
+    public List<String> getVisibleEditFieldNamesAsList()
     {
         return getFieldNamesVisibleInMode(Mode.EDIT);
     }
@@ -316,7 +380,7 @@ public class FormConfigElement extends ConfigElementAdapter
     /**
      * @see FieldVisibilityManager#getFieldNamesVisibleInMode(Mode)
      */
-    public List<String> getVisibleViewFieldNames()
+    public List<String> getVisibleViewFieldNamesAsList()
     {
         return getFieldNamesVisibleInMode(Mode.VIEW);
     }
@@ -445,6 +509,8 @@ public class FormConfigElement extends ConfigElementAdapter
     
     /**
      * This method checks whether the specified field is visible in the specified mode.
+     * The field will only be visible if the <field-visibility> tags specify it as such
+     * and if the user's role matches any requires-role attribute on that field.
      * 
      * @param fieldId the id of the field
      * @param m a mode.
@@ -452,7 +518,32 @@ public class FormConfigElement extends ConfigElementAdapter
      */
     public boolean isFieldVisible(String fieldId, Mode m)
     {
-        return fieldVisibilityManager.isFieldVisible(fieldId, m);
+        boolean isFieldVisibleIgnoringRole = fieldVisibilityManager.isFieldVisible(fieldId, m);
+        if (isFieldVisibleIgnoringRole == false)
+        {
+            return false;
+        }
+        else
+        {
+            // The field may be visible, subject to the user's role.
+            String userRoleString = this.getUserRoleFromRequestContext();
+            FormField formField = this.getFields().get(fieldId);
+            if (formField == null)
+            {
+                // There is no field-specific config data and hence no requires-role
+                return true;
+            }
+            
+            String fieldRequiredRole = formField.getRequiresRole();
+            if (fieldRequiredRole == null)
+            {
+                return true;
+            }
+            else
+            {
+                return fieldRequiredRole.equals(userRoleString);
+            }
+        }
     }
 
     /**
@@ -470,7 +561,7 @@ public class FormConfigElement extends ConfigElementAdapter
         // as this is intended for use by JavaScript clients where method overloading
         // is not supported.
         Mode m = Mode.modeFromString(modeString);
-        return fieldVisibilityManager.isFieldVisible(fieldId, m);
+        return this.isFieldVisible(fieldId, m);
     }
     
     /**
@@ -484,12 +575,17 @@ public class FormConfigElement extends ConfigElementAdapter
         return this.forcedFields.contains(fieldId);
     }
     
+    public String[] getForcedFields()
+    {
+        return this.getForcedFieldsAsList().toArray(new String[0]);
+    }
+    
     /**
      * Returns the list of fields that have been forced to be visible
      * 
      * @return List of field ids
      */
-    public List<String> getForcedFields()
+    public List<String> getForcedFieldsAsList()
     {
         return this.forcedFields;
     }
@@ -503,6 +599,97 @@ public class FormConfigElement extends ConfigElementAdapter
     private List<String> getFieldNamesVisibleInMode(Mode mode)
     {
         List<String> result = fieldVisibilityManager.getFieldNamesVisibleInMode(mode);
+
+        String roleString = getUserRoleFromRequestContext();
+        List<String> filteredResult = filterFieldNamesByRole(result, roleString);
+        return filteredResult;
+    }
+
+    /**
+     * This method extracts the user role from the ThreadLocalRequestContext.
+     * If the RequestContext is null or if the User object within that context is null,
+     * then the roleString will also be null.
+     * 
+     * @return a String representing the user role if it is available, else null.
+     */
+    private String getUserRoleFromRequestContext()
+    {
+        String roleString;
+        final RequestContext requestContext = ThreadLocalRequestContext.getRequestContext();
+        if (requestContext == null)
+        {
+            roleString = null;
+        }
+        else
+        {
+            //TODO This all needs to be finished - obviously.
+            
+//            // This is the correct way to get the userId.
+//            // The JSON call below needs the current site's shortname, which may not be the siteID below
+//            String siteID = requestContext.getSiteConfiguration().getId();
+//            String userID = requestContext.getUserId();
+//            
+//            ConnectorService connService = FrameworkHelper.getConnectorService();
+//            
+//            String currentUserId = requestContext.getUserId();
+//            HttpSession currentSession = requestContext.getRequest().getSession();
+//            final String ENDPOINT_ID = "alfresco";
+//            Connector connector;
+//            try
+//            {
+//                connector = connService.getConnector(ENDPOINT_ID, currentUserId, currentSession);
+//            } catch (ConnectorServiceException e)
+//            {
+//                //TODO warning
+//                return null;
+//            }
+//
+//            // This call to a hard-coded site does return role data.
+//            Response r = connector.call("/api/sites/" + "neilUrlName" + "/memberships/" + userID);
+//            String jsonResponseString = r.getResponse();
+//            System.out.println(jsonResponseString);
+//            
+//            r = connector.call("/api/sites");
+//            jsonResponseString = r.getResponse();
+//            System.out.println(jsonResponseString);
+            
+//            final User userObject = requestContext.getUser();
+//            roleString = userObject == null ? null : userObject.getRole();
+            
+            //TODO Returning a hard-coded null.
+            roleString = null;
+        }
+        return roleString;
+    }
+    
+    private List<String> filterFieldNamesByRole(List<String> fieldNames, String roleString)
+    {
+        if (fieldNames == null)
+        {
+            return null;
+        }
+        
+        List<String> result = new ArrayList<String>();
+        for (String fieldName : fieldNames)
+        {
+            FormField f = this.getFields().get(fieldName);
+            if (f == null)
+            {
+                // There is no specific config for this field, hence no requires-role
+                result.add(fieldName);
+                continue;
+            }
+            // if the field requires no role, then include it
+            if (f.getRequiresRole() == null)
+            {
+                result.add(fieldName);
+            }
+            else if (f.getRequiresRole().equals(roleString))
+            {
+                result.add(fieldName);
+            }
+            // else do not include the field
+        }
         return result;
     }
 

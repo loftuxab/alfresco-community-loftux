@@ -71,7 +71,7 @@ public class FormConfigBasicOverrideTest extends FormConfigBasicTest
     @Override
     public void testGetForcedFields()
     {
-        List<String> forcedFields = noAppearanceDefaultForm.getForcedFields();
+        List<String> forcedFields = noAppearanceDefaultForm.getForcedFieldsAsList();
         assertEquals("Wrong forced fields count", 2, forcedFields.size());
 
         assertTrue("Expected cm:name to be forced", noAppearanceDefaultForm

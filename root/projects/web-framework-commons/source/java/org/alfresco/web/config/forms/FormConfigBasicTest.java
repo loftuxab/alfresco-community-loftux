@@ -280,11 +280,11 @@ public class FormConfigBasicTest extends BaseTest
         assertEquals("/form-controls/mytextfield.ftl", textItem.getTemplate());
         assertEquals("/form-controls/test.ftl", testItem.getTemplate());
         
-        assertEquals(Collections.emptyList(), longItem.getParams());
+        assertEquals(Collections.emptyList(), longItem.getParamsAsList());
         assertEquals(getExpectedControlParamsForDText(),
-                textItem.getParams());
+                textItem.getParamsAsList());
         assertEquals(getExpectedControlParamsForDTest(),
-                testItem.getParams());
+                testItem.getParamsAsList());
     }
 
     /*
@@ -297,9 +297,9 @@ public class FormConfigBasicTest extends BaseTest
                 = (DefaultControlsConfigElement)globalDefaultControls;
         
         Map<String, Control> defCtrlItems = defaultControls.getItems();
-        List<ControlParam> controlParamsGlobal = defCtrlItems.get("d:test").getParams();
+        List<ControlParam> controlParamsGlobal = defCtrlItems.get("d:test").getParamsAsList();
         
-        List<ControlParam> controlParamsField = myExampleDefaultForm.getFields().get("my:text").getControl().getParams();
+        List<ControlParam> controlParamsField = myExampleDefaultForm.getFields().get("my:text").getControl().getParamsAsList();
         
         // The simple fact that the above code compiles and runs is enough to ensure
         // that the APIs are consistent. But here's an assert to dissuade changes.
@@ -343,7 +343,7 @@ public class FormConfigBasicTest extends BaseTest
     
     public void testFieldsVisibleInViewModeShouldStillBeVisibleWithNoAppearanceTag()
     {
-        List<String> fieldNames = noAppearanceDefaultForm.getVisibleViewFieldNames();
+        List<String> fieldNames = noAppearanceDefaultForm.getVisibleViewFieldNamesAsList();
         
         // The order specified in the config XML should also be preserved.
         List<String> expectedFieldNames = new ArrayList<String>();
@@ -384,7 +384,7 @@ public class FormConfigBasicTest extends BaseTest
 
     public void testGetForcedFields()
     {
-        List<String> forcedFields = noAppearanceDefaultForm.getForcedFields();
+        List<String> forcedFields = noAppearanceDefaultForm.getForcedFieldsAsList();
         assertEquals("Expecting one forced field", 1, forcedFields.size());
 
         assertTrue("Expected cm:name to be forced", noAppearanceDefaultForm
@@ -395,9 +395,9 @@ public class FormConfigBasicTest extends BaseTest
 
     public void testGetVisibleFieldsForFormWithoutFieldVisibilityReturnsNull()
     {
-        assertEquals(null, noVisibilityDefaultForm.getVisibleCreateFieldNames());
-        assertEquals(null, noVisibilityDefaultForm.getVisibleEditFieldNames());
-        assertEquals(null, noVisibilityDefaultForm.getVisibleViewFieldNames());
+        assertEquals(null, noVisibilityDefaultForm.getVisibleCreateFieldNamesAsList());
+        assertEquals(null, noVisibilityDefaultForm.getVisibleEditFieldNamesAsList());
+        assertEquals(null, noVisibilityDefaultForm.getVisibleViewFieldNamesAsList());
     }
     
     public void testFieldVisibilityForTwoCombinedFormTags()
@@ -413,13 +413,13 @@ public class FormConfigBasicTest extends BaseTest
         expectedFields.add("my:int");
         expectedFields.add("my:broken");
         
-        assertEquals(new ArrayList<String>(expectedFields), myExampleDefaultForm.getVisibleCreateFieldNames());
-        assertEquals(new ArrayList<String>(expectedFields), myExampleDefaultForm.getVisibleEditFieldNames());
-        assertEquals(new ArrayList<String>(expectedFields), myExampleDefaultForm.getVisibleViewFieldNames());
+        assertEquals(new ArrayList<String>(expectedFields), myExampleDefaultForm.getVisibleCreateFieldNamesAsList());
+        assertEquals(new ArrayList<String>(expectedFields), myExampleDefaultForm.getVisibleEditFieldNamesAsList());
+        assertEquals(new ArrayList<String>(expectedFields), myExampleDefaultForm.getVisibleViewFieldNamesAsList());
 
-        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleCreateFieldNames());
-        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleEditFieldNames());
-        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleViewFieldNames());
+        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleCreateFieldNamesAsList());
+        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleEditFieldNamesAsList());
+        assertEquals(new ArrayList<String>(expectedFields), combinedConfig.getVisibleViewFieldNamesAsList());
     }
     
     /**
