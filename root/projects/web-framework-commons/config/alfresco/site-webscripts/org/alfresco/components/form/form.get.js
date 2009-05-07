@@ -672,7 +672,7 @@ function setupField(formModel, fieldName, fieldConfig)
          
          if (fieldDef === null && logger.isLoggingEnabled())
          {
-            logger.log("Ignoring field \"" + fieldName + "\" as a field definition or sufficient configuration could not be located");
+            logger.log("Ignoring field \"" + fieldName + "\" as neither a field definition or sufficient configuration could be located");
          }
       }
    }
