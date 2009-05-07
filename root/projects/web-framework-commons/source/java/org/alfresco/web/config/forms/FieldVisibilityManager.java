@@ -220,12 +220,9 @@ class FieldVisibilityManager
 
     /**
      * This method attempts to return a List of the fieldIDs of the fields which are
-     * visible in the specified Mode, given the user's role.
-     * Note that this class does not consider the 'requires-role' attribute for the
-     * fields and hence may include fields as visible, which should not in fact be
-     * visible for the user's role.
-     * Such a request only makes sense if this class is managing 'shown' fields, in
-     * other words, if there has been at least one show tag.
+     * visible in the specified Mode. Such a request only makes sense if this
+     * class is managing 'shown' fields, in other words, if there has been at least
+     * one show tag.
      * 
      * @param mode the Mode.
      * @return the list of fields visible in the specified mode if this is knowable,
