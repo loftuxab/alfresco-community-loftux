@@ -236,7 +236,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
     public Response submitRequest(Request req)
         throws IOException
     {
-        return submitRequest(req.getMethod(), req.getUri(), req.getHeaders(), req.getBody(), req.getType());
+        return submitRequest(req.getMethod(), req.getUri(), req.getHeaders(), req.getBody(), req.getEncoding(), req.getType());
     }
     
     /**
@@ -252,7 +252,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
      * @return              response           
      * @throws IOException
      */
-    public Response submitRequest(String method, String uri, Map<String, String> headers, byte[] body, String contentType)
+    public Response submitRequest(String method, String uri, Map<String, String> headers, byte[] body, String encoding, String contentType)
         throws IOException
     {
         MockHttpServletRequest req = createMockServletRequest(method, uri);
@@ -270,6 +270,11 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
         if (body != null)
         {            
             req.setContent(body);
+        }
+        
+        if (encoding != null)
+        {
+            req.setCharacterEncoding(encoding);
         }
         
         // Set the content type
@@ -451,7 +456,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
                  command[0].equals("delete"))
         {
             String uri = (command.length > 1) ? command[1] : null;
-            Response res = submitRequest(command[0], uri, headers, null, null);
+            Response res = submitRequest(command[0], uri, headers, null, null, null);
             bout.write(("Response status: " + res.getStatus()).getBytes());
             out.println();
             bout.write(res.getContentAsByteArray());
@@ -467,7 +472,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
             {
                 body += command[i] + " ";
             }
-            Response res = submitRequest(command[0], uri, headers, body.getBytes(), contentType);
+            Response res = submitRequest(command[0], uri, headers, body.getBytes(), null, contentType);
             bout.write(("Response status: " + res.getStatus()).getBytes());
             out.println();
             bout.write(res.getContentAsByteArray());
@@ -483,7 +488,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
             {
                 body += command[i] + " ";
             }
-            Response res = submitRequest(command[0], uri, headers, body.getBytes(), contentType);
+            Response res = submitRequest(command[0], uri, headers, body.getBytes(), null, contentType);
             bout.write(("Response status: " + res.getStatus()).getBytes());
             out.println();
             bout.write(res.getContentAsByteArray());
@@ -508,7 +513,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
                 {
                     uri += "&alf:method=" + command[2];
                 }
-                Response res = submitRequest("post", uri, headers, null, null);
+                Response res = submitRequest("post", uri, headers, null, null, null);
                 bout.write(res.getContentAsByteArray());
                 out.println();
             }
@@ -518,7 +523,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
                 Map<String, String> tunnelheaders = new HashMap<String, String>();
                 tunnelheaders.putAll(headers);
                 tunnelheaders.put("X-HTTP-Method-Override", command[2]);
-                Response res = submitRequest("post", command[3], tunnelheaders, null, null);
+                Response res = submitRequest("post", command[3], tunnelheaders, null, null, null);
                 bout.write(res.getContentAsByteArray());
                 out.println();
             }
@@ -594,6 +599,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
         private Map<String, String> args;
         private Map<String, String> headers;
         private byte[] body;
+        private String encoding = "UTF-8";
         private String contentType;
         
         public Request(Request req)
@@ -603,6 +609,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
             this.args = req.args;
             this.headers = req.headers;
             this.body = req.body;
+            this.encoding = req.encoding;
             this.contentType = req.contentType;
         }
         
@@ -672,6 +679,17 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
             return body;
         }
         
+        public Request setEncoding(String encoding)
+        {
+            this.encoding = encoding;
+            return this;
+        }
+        
+        public String getEncoding()
+        {
+            return encoding;
+        }
+
         public Request setType(String contentType)
         {
             this.contentType = contentType;
@@ -704,11 +722,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
             throws UnsupportedEncodingException 
         {
             super("post", uri);
-            if (contentType.indexOf(";charset") == -1)
-            {
-                contentType = contentType + ";charset=UTF-8";
-            }
-            setBody(post.getBytes("UTF-8"));
+            setBody(getEncoding() == null ? post.getBytes() : post.getBytes(getEncoding()));
             setType(contentType);
         }
 
@@ -729,11 +743,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
             throws UnsupportedEncodingException
         {
             super("put", uri);
-            if (contentType.indexOf(";charset") == -1)
-            {
-                contentType = contentType + ";charset=UTF-8";
-            }
-            setBody(put.getBytes("UTF-8"));
+            setBody(getEncoding() == null ? put.getBytes() : put.getBytes(getEncoding()));
             setType(contentType);
         }
         
@@ -765,11 +775,7 @@ public class TestWebScriptServer implements ApplicationContextAware, Initializin
             throws UnsupportedEncodingException
         {
             super("patch", uri);
-            if (contentType.indexOf(";charset") == -1)
-            {
-                contentType = contentType + ";charset=UTF-8";
-            }
-            setBody(put.getBytes("UTF-8"));
+            setBody(getEncoding() == null ? put.getBytes() : put.getBytes(getEncoding()));
             setType(contentType);
         }
         
