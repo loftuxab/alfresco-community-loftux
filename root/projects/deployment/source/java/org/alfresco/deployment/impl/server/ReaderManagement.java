@@ -49,8 +49,8 @@ public class ReaderManagement {
     		DeployedFile file) 
     {
     	ReaderThread worker = new ReaderThread(is, os);
-        worker.start();
         fThreads.put(file, worker);
+        worker.start();
     }
     
     /**
