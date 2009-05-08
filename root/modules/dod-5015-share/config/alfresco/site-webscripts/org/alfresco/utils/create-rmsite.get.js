@@ -5,7 +5,7 @@ function main()
    {
       "shortName" : args["shortname"],
       "sitePreset" : "rm-site-dashboard",
-      "title" : msg.get("page.rmSiteDashboard.title"),
+      "title" : msg.get("title.rmsite"),
       "description" : ""
    };
    var scriptRemoteConnector = remote.connect("alfresco");
