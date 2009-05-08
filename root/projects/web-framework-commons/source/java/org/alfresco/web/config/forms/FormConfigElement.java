@@ -32,18 +32,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpSession;
-
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.element.ConfigElementAdapter;
-import org.alfresco.connector.Connector;
-import org.alfresco.connector.ConnectorService;
-import org.alfresco.connector.Response;
-import org.alfresco.connector.exception.ConnectorServiceException;
-import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.ThreadLocalRequestContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
