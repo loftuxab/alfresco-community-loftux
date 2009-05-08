@@ -12,12 +12,14 @@ namespace AlfrescoPowerPoint2003
       private const string COMMANDBAR_NAME = "Alfresco";
       private const string COMMANDBAR_BUTTON_CAPTION = "Alfresco";
       private const string COMMANDBAR_BUTTON_DESCRIPTION = "Show/hide the Alfresco Add-In window";
+      private const string COMMANDBAR_HELP_DESCRIPTION = "Alfresco Add-In online help";
 
       private AlfrescoPane m_AlfrescoPane;
       private string m_DefaultTemplate = "wcservice/office/";
       private AppWatcher m_AppWatcher;
       private Office.CommandBar m_CommandBar;
       private Office.CommandBarButton m_AlfrescoButton;
+      private Office.CommandBarButton m_HelpButton;
 
       private void ThisAddIn_Startup(object sender, System.EventArgs e)
       {
@@ -112,23 +114,37 @@ namespace AlfrescoPowerPoint2003
             m_AlfrescoButton = (Office.CommandBarButton)m_CommandBar.Controls.Add(Office.MsoControlType.msoControlButton, missing, missing, missing, trueValue);
             if (m_AlfrescoButton != null)
             {
-               m_AlfrescoButton.Style = Office.MsoButtonStyle.msoButtonCaption;
+               m_AlfrescoButton.Style = Office.MsoButtonStyle.msoButtonIconAndCaption;
                m_AlfrescoButton.Caption = COMMANDBAR_BUTTON_CAPTION;
                m_AlfrescoButton.DescriptionText = COMMANDBAR_BUTTON_DESCRIPTION;
+               m_AlfrescoButton.TooltipText = COMMANDBAR_BUTTON_DESCRIPTION;
                Bitmap bmpButton = new Bitmap(GetType(), "toolbar.ico");
                m_AlfrescoButton.Picture = new ToolbarPicture(bmpButton);
                Bitmap bmpMask = new Bitmap(GetType(), "toolbar_mask.ico");
                m_AlfrescoButton.Mask = new ToolbarPicture(bmpMask);
-               m_AlfrescoButton.Style = Office.MsoButtonStyle.msoButtonIconAndCaption;
                m_AlfrescoButton.Tag = "AlfrescoButton";
 
                // Finally add the event handler and make sure the button is visible
                m_AlfrescoButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(m_AlfrescoButton_Click);
-               m_CommandBar.Visible = true;
+            }
+
+            // Add the help button to the command bar (as a temporary control) and an event handler.
+            m_HelpButton = (Office.CommandBarButton)m_CommandBar.Controls.Add(Office.MsoControlType.msoControlButton, missing, missing, missing, trueValue);
+            if (m_HelpButton != null)
+            {
+               m_HelpButton.Style = Office.MsoButtonStyle.msoButtonIcon;
+               m_HelpButton.DescriptionText = COMMANDBAR_HELP_DESCRIPTION;
+               m_HelpButton.TooltipText = COMMANDBAR_HELP_DESCRIPTION;
+               m_HelpButton.FaceId = 984;
+               m_HelpButton.Tag = "AlfrescoHelpButton";
+
+               // Finally add the event handler and make sure the button is visible
+               m_HelpButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(m_HelpButton_Click);
             }
 
             // We need to find this toolbar later, so protect it from user changes
             m_CommandBar.Protection = Microsoft.Office.Core.MsoBarProtection.msoBarNoCustomize;
+            m_CommandBar.Visible = true;
          }
       }
 
@@ -180,6 +196,16 @@ namespace AlfrescoPowerPoint2003
          {
             OpenAlfrescoPane(true);
          }
+      }
+
+      /// <summary>
+      /// Help toolbar button event handler
+      /// </summary>
+      /// <param name="Ctrl"></param>
+      /// <param name="CancelDefault"></param>
+      void m_HelpButton_Click(Microsoft.Office.Core.CommandBarButton Ctrl, ref bool CancelDefault)
+      {
+         System.Diagnostics.Process.Start(Properties.Resources.HelpURL);
       }
 
       /// <summary>

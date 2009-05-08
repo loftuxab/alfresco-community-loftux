@@ -61,6 +61,15 @@ namespace AlfrescoWord2003.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to http://www.alfresco.com/help/32/labs/msaddin/.
+        /// </summary>
+        internal static string HelpURL {
+            get {
+                return ResourceManager.GetString("HelpURL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Alfresco Office Add-In.
         /// </summary>
         internal static string MessageBoxTitle {
@@ -79,7 +88,7 @@ namespace AlfrescoWord2003.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to insert content into the document.
+        ///   Looks up a localized string similar to Unable to insert the document from Alfresco.
         /// </summary>
         internal static string UnableToInsert {
             get {

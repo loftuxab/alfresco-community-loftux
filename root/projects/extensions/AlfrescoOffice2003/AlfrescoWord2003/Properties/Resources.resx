@@ -117,14 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="HelpURL" xml:space="preserve">
+    <value>http://www.alfresco.com/help/32/labs/msaddin/</value>
+  </data>
   <data name="MessageBoxTitle" xml:space="preserve">
     <value>Alfresco Office Add-In</value>
-  </data>
-  <data name="UnableToAuthenticate" xml:space="preserve">
-    <value>Couldn't authenticate with Alfresco server</value>
-  </data>
-  <data name="UnableToInsert" xml:space="preserve">
-    <value>Unable to insert content into the document</value>
   </data>
   <data name="UnableToAuthenticate" xml:space="preserve">
     <value>Couldn't authenticate with Alfresco server</value>
