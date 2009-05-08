@@ -253,11 +253,7 @@ public class FormConfigElement extends ConfigElementAdapter
 
     public FormSet[] getRootSets()
     {
-        RequestContext rc = ThreadLocalRequestContext.getRequestContext();
-        sets.toString();
-
         return this.getRootSetsAsList().toArray(new FormSet[0]);
-
     }
 
     /**
@@ -290,19 +286,6 @@ public class FormConfigElement extends ConfigElementAdapter
     public Map<String, FormField> getFields()
     {
         return Collections.unmodifiableMap(this.fields);
-    }
-    
-    //TODO Delete this method.
-    /**
-     * This method returns true if the config XML contains any show tags under the
-     * field-visibility tag. This is important as the presence of any show tags
-     * changes the field visibility algorithm from one that manages which fields are
-     * hidden to one that manages which fields are shown.
-     * @return true if the field-visibility tag contains one or more show tags else false.
-     */
-    public boolean isShowOriented()
-    {
-        return !fieldVisibilityManager.isManagingHiddenFields();
     }
     
     public String[] getHiddenCreateFieldNames()
@@ -394,9 +377,6 @@ public class FormConfigElement extends ConfigElementAdapter
      */
     public String[] getVisibleCreateFieldNamesForSet(String setId)
     {
-        //TODO String[] is better than List<String> here as it is JS-friendly.
-        //     But we need to get consistency in this class API.
-
         List <String> result = getVisibleFieldNamesFor(setId, Mode.CREATE);
         if (result == null)
         {
