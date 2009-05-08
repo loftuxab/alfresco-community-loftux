@@ -1268,7 +1268,7 @@ Alfresco.forms.validation.url = function url(field, args, event, form, silent, m
       args = {};
    }
    
-   args.pattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+   args.pattern = /(ftp|http|https):\/\/[\w\-_]+(\.[\w\-_]+)*([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/;
    args.match = true;
 
    return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
