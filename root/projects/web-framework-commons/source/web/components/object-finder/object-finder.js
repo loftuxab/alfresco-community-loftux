@@ -112,6 +112,15 @@
          currentValue: "",
          
          /**
+          * The id of element holding the current 
+          * value for the control
+          *
+          * @property currentValueId
+          * @type string
+          */
+         currentValueId: null,
+         
+         /**
           * The type of the item to find
           *
           * @property itemType
@@ -327,7 +336,10 @@
          }
          
          this.options.currentValue = this.getSelectedItems().toString();
-         Dom.get(this.id + "-current").value = this.options.currentValue;
+         if (this.options.currentValueId !== null)
+         {
+            Dom.get(this.options.currentValueId).value = this.options.currentValue;
+         }
          this._getCurrentValueMeta();
          
          Dom.setStyle(this.pickerId, "display", "none");
@@ -361,7 +373,7 @@
        * @param id {string} Item id (nodeRef)
        * @return {boolean}
        */
-      canItemBeSelected: function ObjectFinder_isItemSelected(id)
+      canItemBeSelected: function ObjectFinder_canItemBeSelected(id)
       {
          if (!this.options.multipleSelectMode && this.singleSelectedItem !== null)
          {
@@ -471,7 +483,7 @@
                }
             }
 
-            Dom.get(this.id + "-currentValue").innerHTML = displayValue;
+            Dom.get(this.id + "-currentValueDisplay").innerHTML = displayValue;
          }
       },
 
@@ -1236,7 +1248,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["type", "hasChildren", "name", "description", "displayPath", "hasChildren", "nodeRef"]
+             fields: ["type", "hasChildren", "name", "description", "displayPath", "hasChildren", "nodeRef", "selectable"]
          };
 
          this.widgets.dataSource.doBeforeParseData = function ObjectRenderer_doBeforeParseData(oRequest, oFullResponse)
@@ -1332,7 +1344,7 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            if (me.options.itemType == oRecord.getData("type"))
+            if (oRecord.getData("selectable"))
             {
                var nodeRef = oRecord.getData("nodeRef"),
                   containerId = Alfresco.util.getDomId();
@@ -1494,10 +1506,10 @@
             }
          };
          
-         var url = nodeRef.replace("://", "/") + "/children";
+         var url = nodeRef.replace("://", "/") + "/children?selectableType=" + this.options.itemType;
          if (this.options.params)
          {
-            url += "?" + this.options.params;
+            url += "&" + this.options.params;
          }
          this.widgets.dataSource.sendRequest(url,
          {
