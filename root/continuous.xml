@@ -978,7 +978,7 @@
 
    <target name="distribute-sdk" 
            description="Creates the sdk distribution file for all platforms" 
-           depends="set-build-number, verify-sdk">
+           depends="set-build-number">
       <zip destfile="${dir.continuous.dist}/${file.name.dist.sdk}.zip">
          <zipfileset dir="${dir.continuous.assemble.sdk}" />
          <zipfileset dir="${dir.project.installer.extras}"
