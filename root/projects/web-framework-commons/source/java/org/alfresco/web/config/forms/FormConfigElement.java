@@ -271,12 +271,55 @@ public class FormConfigElement extends ConfigElementAdapter
         return result;
     }
     
-    //TODO In the case where we have <field-visibility> but no <appearance> i.e. no <fields>
-    //     this method should include FormField objects for each 'show'n field.
-    //     These objects will have no associated metadata.
+    /**
+     * This method returns a Map of field names mentioned in the forms config, with any
+     * associated config data as the associated value.
+     * This will include any fields specified under the &lt;appearance&gt; tag in
+     * the config as well as those mentioned under &lt;field-visibility&gt;. The former
+     * will have associated config data whilst the latter will not.
+     * 
+     * @return a mapping of field names to their associated FormField data objects.
+     */
     public Map<String, FormField> getFields()
     {
-        return Collections.unmodifiableMap(this.fields);
+        // In the case where we have <field-visibility> but no <appearance> i.e. no <fields>
+        // this method should include FormField objects for each 'show'n field.
+        // These objects will have no associated metadata.
+        
+        // Get field names that are visible in any mode.
+        List<String> fieldsVisibleInAnyMode = new ArrayList<String>();
+        for (Mode m : Mode.values())
+        {
+            List<String> newFields = fieldVisibilityManager.getFieldNamesVisibleInMode(m);
+            
+            // There is a lot of looping going on here, but we need to maintain the order
+            // of the field entries.
+            if (newFields != null)
+            {
+                for (String s : newFields)
+                {
+                    if (fieldsVisibleInAnyMode.contains(s) == false) fieldsVisibleInAnyMode.add(s);
+                }
+            }
+        }
+        
+        // Put any fields from the <appearance> block into the result.
+        // These fields will have config data.
+        Map<String, FormField> result = new LinkedHashMap<String, FormField>();
+        result.putAll(this.fields);
+
+        // Go through those fields marked as to-be-shown in <field-visibility>
+        // and if they are not already included, add them to the result.
+        // These fields will not have associated data.
+        for (String s : fieldsVisibleInAnyMode)
+        {
+            if (result.containsKey(s) == false) 
+            {
+                result.put(s, new FormField(s, null));
+            }
+        }
+
+        return Collections.unmodifiableMap(result);
     }
     
     public String[] getHiddenCreateFieldNames()
