@@ -9,7 +9,7 @@
    <span class="viewmode-value">${field.value?html}</span>
 </div>
 <#else>
-<#assign controlId = args.htmlid + "-" + field.id>
+<#assign controlId = args.htmlid + "-" + field.id + "-cntrl">
 <label for="${controlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
 
 <script type="text/javascript">//<![CDATA[
@@ -28,10 +28,11 @@
 })();
 //]]></script>
 
+<input type="hidden" id="${args.htmlid}_${field.id}" name="${field.name}" value="${field.value}" />
+
 <div id="${controlId}" class="object-finder">
    
-   <input type="hidden" id="${controlId}-current" name="${field.name}" value="${field.value}" />
-   <div id="${controlId}-currentValue" class="current-values"></div>
+   <div id="${controlId}-currentValueDisplay" class="current-values"></div>
    <div class="show-picker">
       <button id="${controlId}-showPicker-button">${msg("button.select")}</button>
    </div>

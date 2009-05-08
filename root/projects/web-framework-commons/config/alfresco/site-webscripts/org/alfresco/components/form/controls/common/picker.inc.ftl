@@ -5,6 +5,7 @@
    {
       compactMode: ${compactMode?string},
       currentValue: "${field.value}",
+      currentValueId: "${args.htmlid}_${field.id}",
       minSearchTermLength: "${args.minSearchTermLength!'3'}",
       maxSearchResults: "${args.maxSearchResults!'100'}"
    }).setMessages(

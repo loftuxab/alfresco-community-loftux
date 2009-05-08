@@ -861,7 +861,7 @@ function setupFieldText(fieldDef, fieldConfig)
 function setupFieldConstraints(fieldDef, fieldConfig)
 {
    // setup mandatory constraint if field is marked as such
-   if (fieldDef.mandatory && fieldDef.disabled == false)
+   if ((fieldDef.mandatory || fieldDef.endpointMandatory) && fieldDef.disabled == false)
    {
       var constraint = createFieldConstraint("MANDATORY", {}, fieldDef, fieldConfig);
       
