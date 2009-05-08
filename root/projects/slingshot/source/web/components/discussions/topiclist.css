@@ -35,6 +35,7 @@
 
 .topiclist-infobar .paginator
 {
+   float: left;
    text-align: center;
 }
 

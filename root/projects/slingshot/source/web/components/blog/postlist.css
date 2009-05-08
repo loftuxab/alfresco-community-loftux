@@ -36,6 +36,7 @@
 
 .postlist-infobar .paginator
 {
+   float: left;
    text-align: right;
 }
 
