@@ -173,8 +173,21 @@
           * hidden field, if set to false the picker will just
           * update a "${field.name}" hidden field with the current
           * value.
+          * 
+          * @property maintainAddedRemovedItems
+          * @type boolean
+          * @default true
           */
-         maintainAddedRemovedItems: true
+         maintainAddedRemovedItems: true,
+         
+         /**
+          * Flag to determine whether the picker is in disabled mode
+          *
+          * @property disabled
+          * @type boolean
+          * @default false
+          */
+         disabled: false
       },
 
       /**
@@ -267,16 +280,21 @@
        */
       onReady: function ObjectFinder_onReady()
       {
-         if (this.options.compactMode)
-         {
-            Dom.addClass(this.pickerId, "compact");
-         }
          this._getCurrentValueMeta();
-         this._createNavigationControls();
-         this._createSelectedItemsControls();
-         this.widgets.showPicker = Alfresco.util.createYUIButton(this, "showPicker-button", this.onShowPicker);
-         this.widgets.ok = Alfresco.util.createYUIButton(this, "ok", this.onOK);
-         this.widgets.cancel = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
+         
+         if (this.options.disabled == false)
+         {
+            if (this.options.compactMode)
+            {
+               Dom.addClass(this.pickerId, "compact");
+            }
+         
+            this._createNavigationControls();
+            this._createSelectedItemsControls();
+            this.widgets.showPicker = Alfresco.util.createYUIButton(this, "showPicker-button", this.onShowPicker);
+            this.widgets.ok = Alfresco.util.createYUIButton(this, "ok", this.onOK);
+            this.widgets.cancel = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
+         }
       },
       
       /**

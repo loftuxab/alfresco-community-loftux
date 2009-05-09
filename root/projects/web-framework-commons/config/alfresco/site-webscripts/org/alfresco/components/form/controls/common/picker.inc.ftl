@@ -3,6 +3,7 @@
 <#macro renderPickerJS field picker="picker">
    var ${picker} = new Alfresco.ObjectFinder("${controlId}").setOptions(
    {
+      <#if form.mode == "view" || field.disabled>disabled: true,</#if>
       compactMode: ${compactMode?string},
       currentValue: "${field.value}",
       currentValueId: "${args.htmlid}_${field.id}",
