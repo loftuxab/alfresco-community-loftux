@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,44 +21,20 @@
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
+ *
+ * Script: onCreateNode.js
+ * Author: Roy Wetherall
+ * 
+ * Behaviour script executed when content node is created within a recordFolder or recordCategory
  */
-package org.alfresco.module.org_alfresco_module_dod5015.script;
-
-import org.alfresco.repo.jscript.ScriptNode;
-import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.mozilla.javascript.Scriptable;
-
-/**
- * @author Roy Wetherall
- */
-public class ScriptRecord extends ScriptNode
+function main()
 {
-    private static final long serialVersionUID = 1801006559401292415L;
-
-    /**
-     * Constructor
-     * 
-     * @param nodeRef
-     * @param services
-     * @param scope
-     */
-    public ScriptRecord(NodeRef nodeRef, ServiceRegistry services, Scriptable scope)
-    {
-        super(nodeRef, services, scope);
-    }
-    
-    /**
-     * Constructor
-     * 
-     * @param nodeRef
-     * @param services
-     */
-    public ScriptRecord(NodeRef nodeRef, ServiceRegistry services)
-    {
-        super(nodeRef, services);
-    }
-
-    
-    
+	var document = behaviour.args[0].child;
+	if (document.isDocument == true && document.hasAspect(rmService.ASPECT_RECORD) == false)
+	{
+   		// Apply the incomplete record aspect
+   		document.addAspect(rmService.ASPECT_INCOMPLETE_RECORD);
+	}
 }
+
+main();

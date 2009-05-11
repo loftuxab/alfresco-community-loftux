@@ -31,6 +31,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 
 
 /**
+ * TODO record marker?
+ * 
  * @author Roy Wetherall
  */
 public interface RecordsManagementService

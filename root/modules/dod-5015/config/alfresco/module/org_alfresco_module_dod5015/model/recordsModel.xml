@@ -28,14 +28,26 @@
    <types>
    
       <type name="rma:filePlan">
+      
          <title>File Plan</title>
          <parent>cm:folder</parent>
-        
-         <!-- TODO do we need this on here?
-         <mandatory-aspects>                   
-            <aspect>rma:recordComponentIdentifier</aspect>
-         </mandatory-aspects>
-         -->
+         
+         <associations>
+            
+            <child-association name="rma:filedRecords">
+               	<source>
+                  	<mandatory>false</mandatory>
+                  	<many>false</many>
+               	</source>
+               	<target>
+                  	<class>cm:content</class>
+                  	<mandatory>false</mandatory>
+                  	<many>true</many>
+            	</target>
+            </child-association>
+         
+         </associations>
+       
          
       </type>
       
@@ -71,6 +83,41 @@
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
+                                       
+            <property name="rma:cutOffSchedulePeriod">
+               <title>Cut off schedule period</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+               <default>none|0</default>
+            </property>
+            
+            <property name="rma:retentionSchedulePeriod">
+               <title>Retention schedule period</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+               <default>none|0</default>
+            </property>
+            
+            <property name="rma:accessionIndicator">
+               <title>Accession Indicator</title>
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+               <default>false</default>
+            </property>
+            
+            <property name="rma:accessionLocation">
+               <title>Accession Location</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+               <default>NARA</default>
+            </property>
+                               
+            <property name="rma:accessionPeriod">
+               <title>Accession Period</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+               <default>year|25</default>
+            </property>
     
          </properties>
          
@@ -93,6 +140,8 @@
          <mandatory-aspects>         
             <aspect>cm:titled</aspect>            
             <aspect>rma:recordComponentIdentifier</aspect>
+            <aspect>rma:fileable</aspect>
+            <aspect>rma:reviewDetails</aspect>
          </mandatory-aspects>
          
       </type>      
@@ -118,12 +167,21 @@
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
+                                                     
+            <property name="rma:isClosed">
+               <title>Indicates whether the folder is closed</title>
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+               <default>false</default>
+            </property>
             
          </properties>       
          
          <mandatory-aspects>         
             <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
+            <aspect>rma:fileable</aspect>
+            <aspect>rma:reviewDetails</aspect>
          </mandatory-aspects>
          
       </type>
@@ -156,26 +214,13 @@
    
    <aspects>
    
-      <aspect name="rma:cutOffSchedule">
-         <title>Cut off schedule details</title>         
-         <properties>                
-            <property name="rma:cutOffSchedulePeriod">
-               <title>Cut off schedule period</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-         </properties>
+      <aspect name="rma:incompleteRecord">
+         <title>Incomplete Record</title>
+         <description>Used to mark a record that is incomplete and has yet to be filed.</description>         
       </aspect>
    
-      <aspect name="rma:retentionSchedule">
-         <title>Retention schedule details</title>         
-         <properties>                
-            <property name="rma:retentionSchedulePeriod">
-               <title>Retention schedule period</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-         </properties>
+      <aspect name="rma:fileable">
+         <title>Used to mark object types that are fileable</title>         
       </aspect>
    
       <aspect name="rma:recordComponentIdentifier">
@@ -188,15 +233,28 @@
             </property>
          </properties>
       </aspect>
+      
+      <aspect name="rma:reviewDetails">
+         <title>Review Indicator</title>                  
+         <properties>                                  
+            <property name="rma:reviewPeriod">
+               <title>Review Period</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+               <default>none|0</default>
+            </property>            
+         </properties>         
+      </aspect>
+      
+      <!-- Record Meta-data -->
          
       <aspect name="rma:record">
          <title>Record</title>
          
          <properties>
          
-            <!-- cm:name used for the Unique Record Identifier -->
+            <!-- rma:identifier used for the Unique Record Identifier -->
             <!-- cm:title used for the Title -->
-            <!-- cm:author user for Author/Origionator -->
             
             <property name="rma:dateFiled">
                <title>Date Filed</title>
@@ -207,6 +265,12 @@
             <property name="rma:publicationDate">
                <title>Publication Date</title>
                <type>d:date</type>
+               <mandatory>true</mandatory>
+            </property>
+            
+            <property name="rma:originator">
+               <title>Originator</title>
+               <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
             
@@ -222,14 +286,14 @@
                <mandatory>false</mandatory>
             </property>
                                     
-            <property name="rma:MediaType">
+            <property name="rma:mediaType">
                <title>Media Type</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
                         
             <property name="rma:format">
-               <title>SupplementalMarkingList</title>
+               <title>Format</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
@@ -259,34 +323,63 @@
                <title>Location</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property>                                  
+            </property>                                        
          
          </properties>         
          
          <mandatory-aspects>         
-            <aspect>cm:titled</aspect>
-            <aspect>cm:author</aspect>
+            <aspect>cm:titled</aspect>           
+            <aspect>rma:recordComponentIdentifier</aspect>
          </mandatory-aspects>
          
       </aspect>
-      
-      <aspect name="rma:reviewIndicator">
-         <title>Review Indicator</title>         
-         <properties>          
-            <!-- TODO
-                 This property should have the period data type
-              -->              
-            <property name="rma:reviewPeriod">
-               <title>Review Period</title>
-               <type>d:text</type>
+   
+   
+	  <!-- State management aspects -->   
+   
+   	  <aspect name="rma:pendingReview">
+         <title>Pending Review</title>         
+         <properties>                
+            <property name="rma:reviewAsOf">
+               <title>Review as of date</title>
+               <type>d:date</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+      </aspect>	
+   
+   	  <aspect name="rma:pendingCutOff">
+         <title>Pending cut off</title>         
+         <properties>                
+            <property name="rma:cutOffAsOf">
+               <title>Cut off as of date</title>
+               <type>d:date</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+      </aspect>	
+   
+      <aspect name="rma:cutOff">
+         <title>Cut Off</title>         
+         <properties>                
+            <property name="rma:destroyAsOf">
+               <title>Destruction as of date</title>
+               <type>d:date</type>
                <mandatory>false</mandatory>
             </property>
          </properties>
       </aspect>
       
-      <aspect name="rma:accessionIndicator">
-         <title>Accession Indicator</title>                  
-      </aspect>
+      <aspect name="rma:retained">
+         <title>Retained</title>         
+         <properties>                
+            <property name="rma:endRetentionAsOf">
+               <title>End retention as of date</title>
+               <type>d:date</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+      </aspect>      
       
       <!-- Custom properties marker aspects -->      
       

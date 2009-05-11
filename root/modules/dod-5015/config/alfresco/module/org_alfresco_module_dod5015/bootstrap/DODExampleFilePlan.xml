@@ -33,13 +33,7 @@
       		<cm:contains>
       			
       			<rma:recordCategory view:childName="cm:AIS Audit Records">
-      			
-      				<view:aspects>
-			            <rma:reviewIndicator></rma:reviewIndicator>
-			            <rma:cutOffSchedule></rma:cutOffSchedule>
-			            <rma:retentionSchedule></rma:retentionSchedule>
-			      	</view:aspects>
-      			
+      			      				  			
 			    	<view:properties>
 			    	    <cm:name>AIS Audit Records</cm:name>
 				   		<rma:identifier>0318-01</rma:identifier>
@@ -48,8 +42,8 @@
 				   		<rma:dispositionAuthority>N1-218-00-4 item 023</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off monthly, hold 1 month, then destroy.</rma:dispositionInstructions>
 				   		<rma:reviewPeriod>week|1</rma:reviewPeriod>
-				   		<rma:cutOffSchedule>monthend|1</rma:cutOffSchedule>
-				   		<rma:retentionSchedule>month|1</rma:retentionSchedule>
+				   		<rma:cutOffSchedulePeriod>monthend|1</rma:cutOffSchedulePeriod>
+				   		<rma:retentionSchedulePeriod>month|1</rma:retentionSchedulePeriod>
 			    	</view:properties>
 			    	
 			    	<view:associations>
@@ -68,11 +62,6 @@
       			
       			<rma:recordCategory view:childName="cm:Unit Manning Documents">
       			
-      				<view:aspects>
-			            <rma:cutOffSchedule></rma:cutOffSchedule>
-			            <rma:retentionSchedule></rma:retentionSchedule>
-			      	</view:aspects>
-      			
       				<view:properties>
 			    	    <cm:name>Unit Manning Documents</cm:name>
 				   		<rma:identifier>0318-02</rma:identifier>
@@ -80,8 +69,8 @@
 				   		<cm:description>Consisting of manpower document and monthly strength report forwarded to OSD and other activities which are maintained by personnel office as the official record copy.</cm:description>
 				   		<rma:dispositionAuthority>N1-218-89-1 item 002</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off every 3 months, hold 3 months, then destroy.</rma:dispositionInstructions>
-				   		<rma:cutOffSchedule>quaterend|1</rma:cutOffSchedule>
-				   		<rma:retentionSchedule>month|3</rma:retentionSchedule>
+				   		<rma:cutOffSchedulePeriod>quaterend|1</rma:cutOffSchedulePeriod>
+				   		<rma:retentionSchedulePeriod>month|3</rma:retentionSchedulePeriod>
 			    	</view:properties>	
 			    	
 			    	<view:associations>
@@ -100,11 +89,6 @@
       			
       			<rma:recordCategory view:childName="cm:Overtime Reports">
       			
-      				<view:aspects>
-			            <rma:cutOffSchedule></rma:cutOffSchedule>
-			            <rma:retentionSchedule></rma:retentionSchedule>
-			      	</view:aspects>
-      			
       				<view:properties>
 			    	    <cm:name>Overtime Reports</cm:name>
 				   		<rma:identifier>0318-03</rma:identifier>
@@ -112,8 +96,35 @@
 				   		<cm:description>Overtime reports and related documents which are maintained by JS/combatant controller as the official record copy.</cm:description>
 				   		<rma:dispositionAuthority>N1-218-00-7 item 28</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off at end of FY, hold 3 years, then destroy.</rma:dispositionInstructions>
-				   		<rma:cutOffSchedule>fyend|1</rma:cutOffSchedule>
-				   		<rma:retentionSchedule>year|3</rma:retentionSchedule>
+				   		<rma:cutOffSchedulePeriod>fyend|1</rma:cutOffSchedulePeriod>
+				   		<rma:retentionSchedulePeriod>year|3</rma:retentionSchedulePeriod>
+			    	</view:properties>	
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="cm:Bi-Weekly Cost Reports">
+      			
+      				<view:properties>
+			    	    <cm:name>Bi-Weekly Cost Reports</cm:name>
+				   		<rma:identifier>0318-04</rma:identifier>
+				   		<cm:title>Bi-Weekly Cost Reports</cm:title>
+				   		<cm:description>Bi-wekly cost reports which are maintained by JS/combatant command controler as the official record copy.</cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-7 item 2</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cut off at end of CY, hold 2 years, then destroy.</rma:dispositionInstructions>
+				   		<rma:cutOffSchedulePeriod>yearend|1</rma:cutOffSchedulePeriod>
+				   		<rma:retentionSchedulePeriod>year|2</rma:retentionSchedulePeriod>
 			    	</view:properties>	
 			    	
 			    	<view:associations>
@@ -143,6 +154,88 @@
 	   		<cm:title>Military Files</cm:title>
 	   		<cm:description>Record series for military files</cm:description>
     	</view:properties>
+    	
+    	<view:associations>
+      		<cm:contains>
+      			
+      			<rma:recordCategory view:childName="cm:Military Assignment Documents">
+      			
+      				<view:properties>
+			    	    <cm:name>Military Assignment Documents</cm:name>
+				   		<rma:identifier>0412-01</rma:identifier>
+				   		<cm:title>Military Assignment Documents</cm:title>
+				   		<cm:description>Policy matters pertaining to military assignments which are maintained by any JS/combatant command activity as the official record copy.</cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-3 item 30</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cut off when superseded, hold 5 years, then destroy.</rma:dispositionInstructions>				   		
+				   		<rma:retentionSchedulePeriod>year|5</rma:retentionSchedulePeriod>
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="cm:Official Military Personnel Privilege Card Applications">
+      			
+			    	<view:properties>
+			    	    <cm:name>Official Military Personnel Privilege Card Applications</cm:name>
+				   		<rma:identifier>0412-02</rma:identifier>
+				   		<cm:title>Official Military Personnel Privilege Card Applications</cm:title>
+				   		<cm:description>Consisting of: documents reflecting applications for priviege cards and ration cards, including Department of Defense Forms (DD Forms) 1172 (Application for Unifomed Services Identification and Privilege Card) and similar documents which are maintained by any JS/combatant command activity.</cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-3 item 20</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cut off when no longer needed and destroy immediately.</rma:dispositionInstructions>				   		
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="cm:Personnel Security Program Records">
+      			
+			    	<view:properties>
+			    	    <cm:name>Personnel Security Program Records</cm:name>
+				   		<rma:identifier>0412-03</rma:identifier>
+				   		<cm:title>Personnel Security Program Records</cm:title>
+				   		<cm:description>Position sensitivity files including requests for information relating to the designation of sensitive and non-sensitive personnel positions in an agency and results of final actions taken consisting of approved requests which are maintained by any JS/combatant command activity</cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-4 item 017</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cutoff when position is abolished, re-designated, or no longer needed, whichever is later.  Destroy immediately after cutoff.</rma:dispositionInstructions>				   		
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      		</cm:contains>
+      	</view:associations>
     
   	</rma:recordSeries>
 
@@ -154,6 +247,129 @@
 	   		<cm:title>Civilian Files</cm:title>
 	   		<cm:description>Record series for civilian files</cm:description>
     	</view:properties>
+    	
+    	<view:associations>
+      		<cm:contains>
+      			
+      			<rma:recordCategory view:childName="cm:Employee Performance File System Records">
+      			
+      				<view:properties>
+			    	    <cm:name>Employee Performance File System Records</cm:name>
+				   		<rma:identifier>0430-01</rma:identifier>
+				   		<cm:title>Employee Performance File System Records</cm:title>
+				   		<cm:description>Consisting of: performance records superseded through an administrative, judicial, or quasi-judicial procedure which are maintained by any JS/combatant command activity</cm:description>
+				   		<rma:dispositionAuthority>GRS 1 item 23b(1)</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cutoff when superseded.  Destroy immediately after cutoff</rma:dispositionInstructions>				   		
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="cm:Foreign Employee Award Files">
+      			
+      				<view:properties>
+			    	    <cm:name>Foreign Employee Award Files</cm:name>
+				   		<rma:identifier>0430-02</rma:identifier>
+				   		<cm:title>Foreign Employee Award Files</cm:title>
+				   		<cm:description>Decorations to foreign nationals and US citizens not employed by the US Government consisting of: case files of recommendations,  decisions, awards announcements, board meeting minutes, and related documents which are maintained by any JS/combatant command activity</cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-3 item 18</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Permanent. Cut off on completion of case, hold 2 years, then retire to offline storage.  Transfer to federal records holding area 5 years after retirement to offline storage.  Transfer to NARA 25 years after cutoff.</rma:dispositionInstructions>
+				   		<rma:retentionSchedulePeriod>year|2</rma:retentionSchedulePeriod>	
+				   		<rma:accessionIndicator>true</rma:accessionIndicator>			   		
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>transfer</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="cm:Case Files and Papers">
+      			
+      				<view:properties>
+			    	    <cm:name>Case Files and Papers</cm:name>
+				   		<rma:identifier>0430-03</rma:identifier>
+				   		<cm:title>Case Files and Papers</cm:title>
+				   		<cm:description>Consisting of library containing information on personnel actions which are maintained by R&amp;A Br and Deputy Chief Information Office</cm:description>
+				   		<rma:dispositionAuthority>None</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions> Disposal not authorized. Disposition pending NARA approval.</rma:dispositionInstructions>			   		
+			    	</view:properties>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="Withholding of Within-Grade Increase (WGI) Records">
+      			
+      				<view:properties>
+			    	    <cm:name>Withholding of Within-Grade Increase (WGI) Records</cm:name>
+				   		<rma:identifier>0430-04</rma:identifier>
+				   		<cm:title>Withholding of Within-Grade Increase (WGI) Records</cm:title>
+				   		<cm:description>Files concerning an employee’s performance rating of record with work examples which establish less than fully successful performance, notice of withholding of WGI, employee's request for reconsideration of denied WGI, and decision concerning such a reconsideration request which are maintained by any JS/combatant command activity.</cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-3 item 16</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cut off on completion of WGI action or on separation, whichever is earlier; hold 3 years, then destroy/delete.</rma:dispositionInstructions>
+				   		<rma:retentionSchedulePeriod>year|3</rma:retentionSchedulePeriod>				   		
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="Payroll Differential and Allowances">
+      			
+      				<view:properties>
+			    	    <cm:name>Payroll Differential and Allowances</cm:name>
+				   		<rma:identifier>0430-05</rma:identifier>
+				   		<cm:title>Payroll Differential and Allowances</cm:title>
+				   		<cm:description>Consisting of: information to assist overseas civilian personnel offices to document employee eligibility for foreign post differential and foreign quarters and post allowances, including SF 1190 (Foreign Allowances Application, Grant, and Report) and similar information which are maintained by any JS/combatant command activity.</cm:description>
+				   		<rma:dispositionAuthority> N1-218-00-3 item 3</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cut off at end of Fiscal Year (FY) in which all allowances granted are terminated, hold 3 years, then destroy.</rma:dispositionInstructions>
+				   		<rma:retentionSchedulePeriod>year|3</rma:retentionSchedulePeriod>				   		
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      		</cm:contains>
+      	</view:associations>
     
   	</rma:recordSeries>  	
 
@@ -165,6 +381,118 @@
 	   		<cm:title>Miscellaneous Files</cm:title>
 	   		<cm:description>Record series for miscellaneous files</cm:description>
     	</view:properties>
+    	
+    	<view:associations>
+      		<cm:contains>
+      			
+      			<rma:recordCategory view:childName="cm:Civilian Employee Training Program Records">
+      			
+      				<view:properties>
+			    	    <cm:name>Civilian Employee Training Program Records</cm:name>
+				   		<rma:identifier>0950-01</rma:identifier>
+				   		<cm:title>Civilian Employee Training Program Records</cm:title>
+				   		<cm:description>Decorations to foreign nationals and US citizens not employed by the US Government consisting of: case files of recommendations,  decisions, awards announcements, board meeting minutes, and related documents which are maintained by any JS/combatant command activity</cm:description>
+				   		<rma:dispositionAuthority>GRS 1 item 29b</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cut off annually, hold 5 years, then destroy, or destroy when obsolete, whichever is earlier.</rma:dispositionInstructions>
+				   		<rma:cutOffSchedulePeriod>year|1</rma:cutOffSchedulePeriod>
+				   		<rma:retentionSchedulePeriod>year|5</rma:retentionSchedulePeriod>				   		
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="cm:Purchase of Foreign Award Medals and Decorations">
+      			
+      				<view:properties>
+			    	    <cm:name>Purchase of Foreign Award Medals and Decorations</cm:name>
+				   		<rma:identifier>0950-02</rma:identifier>
+				   		<cm:title>Purchase of Foreign Award Medals and Decorations</cm:title>
+				   		<cm:description>Forms reflecting purchase of foreign award medals and decorations.  </cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-3 item 11</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cutoff when related record is transferred to inactive storage, hold 1 year, destroy.</rma:dispositionInstructions>
+				   		<rma:retentionSchedulePeriod>year|1</rma:retentionSchedulePeriod>				   		
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="cm:Monthly Cockpit Crew Training">
+      			
+      				<view:properties>
+			    	    <cm:name>Monthly Cockpit Crew Training</cm:name>
+				   		<rma:identifier>0950-03</rma:identifier>
+				   		<cm:title>Monthly Cockpit/Crew Training</cm:title>
+				   		<cm:description>Consisting of skills training/evaluation forms, e.g., AF Form 4031.</cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-3 item 13</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cutoff after training is complete, hold 1 year, destroy.</rma:dispositionInstructions>
+				   		<rma:retentionSchedulePeriod>year|1</rma:retentionSchedulePeriod>				   		
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>destroy</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      			
+      			<rma:recordCategory view:childName="cm:Science Advisor Records">
+      			
+      				<view:properties>
+			    	    <cm:name>Science Advisor Records</cm:name>
+				   		<rma:identifier>0950-04</rma:identifier>
+				   		<cm:title>Science Advisor Records</cm:title>
+				   		<cm:description>Consisting of: reports, studies, tasking orders, and similar records. Reports are usually informal and unpublished. Records may be generated at all activities</cm:description>
+				   		<rma:dispositionAuthority>N1-218-00-10 item 44</rma:dispositionAuthority>
+				   		<rma:dispositionInstructions>Cut off on completion of study, hold 5 years, then transfer to Inactive Storage. Transfer to NARA 25 years after cutoff.</rma:dispositionInstructions>
+				   		<rma:retentionSchedulePeriod>year|5</rma:retentionSchedulePeriod>	
+				   		<rma:accessionIndicator>true</rma:accessionIndicator>			   		
+			    	</view:properties>
+			    	
+			    	<view:associations>
+      		        
+      		           <rma:dispositionActions>      		           
+      		      			<rma:dispositionAction view:childName="rma:dispositionAction">      		      			
+      		      				<view:properties>
+      		      					<rma:dispositionAction>transfer</rma:dispositionAction>
+      		      				</view:properties>      		      			
+      		      			</rma:dispositionAction>      		           
+      		           </rma:dispositionActions>
+      		        
+      		        </view:associations>
+      			
+      			</rma:recordCategory>
+      		
+      		</cm:contains>
+      	</view:associations>
     
   	</rma:recordSeries>
   	

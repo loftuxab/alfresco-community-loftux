@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,15 +113,15 @@ public class DODSystemTest extends BaseSpringTest
 	public void testBasicFileingTest()
 	{
 	    // Get a record category to file into
-	    NodeRef rc041201 = getRecordCategory("Military Files", "Military Assignment Documents");	    
+	    NodeRef recordCategory = getRecordCategory("Reports", "AIS Audit Records");	    
 	    
-	    assertNotNull(rc041201);
-	    System.out.println(this.nodeService.getProperty(rc041201, ContentModel.PROP_NAME));
+	    assertNotNull(recordCategory);
+	    System.out.println(this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
 	    
 	    /* Programatic filing */
 	    
 	    // Create the document
-	    NodeRef recordOne = this.nodeService.createNode(rc041201, 
+	    NodeRef recordOne = this.nodeService.createNode(recordCategory, 
 	                                                    ContentModel.ASSOC_CONTAINS, 
 	                                                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
 	                                                    ContentModel.TYPE_CONTENT).getChildRef();
@@ -131,33 +132,28 @@ public class DODSystemTest extends BaseSpringTest
 	    writer.setEncoding("UTF-8");
 	    writer.putContent("There is some content in this record");
 	    
-	    // Checke that the document has been marked as incomplete
-	    assertTrue(this.nodeService.hasAspect(recordOne, RecordsManagementModel.ASPECT_INCOMPLETE_RECORD));	    
+	    // Checked that the document has been marked as incomplete
+	    //assertTrue(this.nodeService.hasAspect(recordOne, RecordsManagementModel.ASPECT_INCOMPLETE_RECORD));	    
 	    
-	    // -----
-	    
+	    // File a document in the record category
 	    Map<String, Serializable> stateContext = new HashMap<String, Serializable>(5);
-	    stateContext.put("fileableNode", rc041201);
+	    stateContext.put("fileableNode", recordCategory);
+	    Map<String, Serializable> propValues = new HashMap<String, Serializable>(5);
+	    propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE.toString(), new Date());
+	    propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), "markingListValue");
+	    propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE.toString(), "mediaTypeValue"); 
+	    propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
+	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
+	    stateContext.put("recordProperties", (Serializable)propValues);
 	    rmService.addRecordState(recordOne, "filed", stateContext);
 	    
+	    // Check the values of the filed record
+	    assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_REVIEW_AS_OF));
+	    //assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_CUT_OFF_AS_OF));
+	   // System.out.println("Cut off as of date: " + this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_CUT_OFF_AS_OF).toString());
+	    System.out.println("Review as of date: " + this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_REVIEW_AS_OF).toString());
 	    
-	    // Given the document, find the record category
-	    
-	    // Remove incomplete record aspect
-	    
-	    // Need to apply the record aspect.  Madatory properties include:
-	    //   - unique identifier (calculated)
-	    //   - dateFiled (calculated)
-	    //   - publicationDate
-	    //   - origionator (calculated on current user)
-	    //   - origionating organization
-	    
-	    // Based on the classification or record apply the appropriate extended aspect	    
-	    
-	    // Calcualte property values based on the containing record category if directly within the RC:
-	    //  - next review date
-	    //  - cut off date ...
-	    
+	    // TODO commit to check that the filed record can be created correctly
 	    
 	}
         
