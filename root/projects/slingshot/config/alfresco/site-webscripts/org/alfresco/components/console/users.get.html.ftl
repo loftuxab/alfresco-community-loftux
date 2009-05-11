@@ -43,7 +43,7 @@
             </div>
          </div>
          <div class="yui-u align-right">
-            <!-- TODO: enabled/disabled account list filter -->
+            <!-- TODO: enabled/disabled account list filter? -->
          </div>
       </div>
       <div class="search-main">
@@ -136,7 +136,6 @@
          </div>
          
          <div class="header-bar">${msg("label.moreuserinfo")}</div>
-         <!-- TODO: Account Status -->
          <div class="field-row">
             <span class="field-label-right">${msg("label.username")}:</span>
             <span id="${el}-view-username" class="field-value"></span>
@@ -291,7 +290,8 @@
             <span class="crud-label">${msg("label.groups")}:</span>
          </div>
          <!-- groups picker inserted here -->
-         <div class="field-row" id="${el}-update-groupfinder"></div>
+         <div class="grouppicker-row" id="${el}-update-groupfinder"></div>
+         <div class="groupselection-row" id="${el}-update-groups"></div>
          <div class="field-row">
             <span class="crud-label">${msg("label.quota")}:</span>
          </div>

@@ -295,6 +295,13 @@ Alfresco.util.combinePaths = function()
 };
 
 /**
+ * Constants for conversion between bytes, kilobytes, megabytes and gigabytes
+ */
+Alfresco.util.BYTES_KB = 1024;
+Alfresco.util.BYTES_MB = 1048576;
+Alfresco.util.BYTES_GB = 1073741824;
+
+/**
  * Converts a file size in bytes to human readable form
  *
  * @method Alfresco.util.formatFileSize
@@ -310,22 +317,22 @@ Alfresco.util.formatFileSize = function(fileSize)
       fileSize = parseInt(fileSize, 10);
    }
    
-   if (fileSize < 1024)
+   if (fileSize < Alfresco.util.BYTES_KB)
    {
       return fileSize + " " + Alfresco.util.message("size.bytes");
    }
-   else if (fileSize < 1048576)
+   else if (fileSize < Alfresco.util.BYTES_MB)
    {
-      fileSize = Math.round(fileSize / 1024);
+      fileSize = Math.round(fileSize / Alfresco.util.BYTES_KB);
       return fileSize + " " + Alfresco.util.message("size.kilobytes");
    }
-   else if (fileSize < 1073741824)
+   else if (fileSize < Alfresco.util.BYTES_GB)
    {
-      fileSize = Math.round(fileSize / 1048576);
+      fileSize = Math.round(fileSize / Alfresco.util.BYTES_MB);
       return fileSize + " " + Alfresco.util.message("size.megabytes");
    }
 
-   fileSize = Math.round(fileSize / 1073741824);
+   fileSize = Math.round(fileSize / Alfresco.util.BYTES_GB);
    return fileSize + " " + Alfresco.util.message("size.gigabytes");
 };
 
