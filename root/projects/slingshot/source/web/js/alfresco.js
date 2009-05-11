@@ -1338,13 +1338,30 @@ Alfresco.util.ComponentManager = function()
       },
 
       /**
+       * Unregister a component from the ComponentManager
+       * @method unregister
+       * @param p_aComponent {object} Component instance to be unregistered
+       */
+      unregister: function CM_unregister(p_oComponent)
+      {
+         for (var i = 0, j = components.length; i < j; i++)
+         {
+            if (components[i] == p_oComponent)
+            {
+               components[i] = null;
+               delete components[p_oComponent.id];
+            }
+         }
+      },
+
+      /**
        * Allows components to find other registered components by name, id or both
        * e.g. find({name: "Alfresco.DocumentLibrary"})
        * @method find
        * @param p_oParams {object} List of paramters to search by
        * @return {Array} Array of components found in the search
        */
-      find: function(p_oParams)
+      find: function CM_find(p_oParams)
       {
          var found = [];
          var bMatch, component;
@@ -1375,7 +1392,7 @@ Alfresco.util.ComponentManager = function()
        * @param p_sName {string} Name of registered component to search on
        * @return {object|null} Component found in the search
        */
-      findFirst: function(p_sName)
+      findFirst: function CM_findFirst(p_sName)
       {
          var found = Alfresco.util.ComponentManager.find(
          {
@@ -1392,7 +1409,7 @@ Alfresco.util.ComponentManager = function()
        * @param p_sId {string} Id of registered component to return
        * @return {object|null} Component with given Id
        */
-      get: function(p_sId)
+      get: function CM_get(p_sId)
       {
          return (components[p_sId]);
       }

@@ -1,5 +1,6 @@
 // Get the Documents Modified data for this site
-var json = remote.call("/slingshot/doclib/doclist/documents/site/" + page.url.templateArgs.site + "/documentLibrary?filter=recentlyModified&max=10");
+var url = args.dod5015 ? "/slingshot/doclib/dod5015/doclist/documents/site/" : "/slingshot/doclib/doclist/documents/site/";
+var json = remote.call(url + page.url.templateArgs.site + "/documentLibrary?filter=recentlyModified&max=10");
 
 // Create the model
 var docs = eval('(' + json + ')');
