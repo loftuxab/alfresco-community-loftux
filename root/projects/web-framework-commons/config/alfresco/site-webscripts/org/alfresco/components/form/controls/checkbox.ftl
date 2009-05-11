@@ -1,4 +1,5 @@
-<#if field.value?exists><#assign isTrue=field.value><#else><#assign isTrue=false></#if>
+<#assign isTrue=false>
+<#if field.value?exists && field.value?is_boolean><#assign isTrue=field.value></#if>
 
 <#if form.mode == "view">
 <div class="viewmode-field">
