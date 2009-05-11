@@ -4,7 +4,7 @@
 <#if field.control.params.showTime?exists && field.control.params.showTime == "true"><#assign showTime=true><#else><#assign showTime=false></#if>
 <#if showTime><#assign viewFormat>${msg("form.view.time.format")}</#assign><#else><#assign viewFormat>${msg("form.view.date.format")}</#assign></#if>
 
-<#assign dpId=args.htmlid + "_" + field.id>
+<#assign dpId=fieldHtmlId>
 <#assign dpVar=dpId?replace("-", "_")>
 
 <#if form.mode == "view">

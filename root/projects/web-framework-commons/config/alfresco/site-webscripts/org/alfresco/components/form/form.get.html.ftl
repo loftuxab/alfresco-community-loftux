@@ -67,6 +67,7 @@
 
 <#macro renderField field>
    <#if field.control.template?exists>
+      <#assign fieldHtmlId=args.htmlid + "_" + field.id >
       <#include "${field.control.template}" />
    </#if>
 </#macro>

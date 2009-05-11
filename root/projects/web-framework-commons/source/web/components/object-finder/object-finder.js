@@ -48,14 +48,16 @@
     * ObjectFinder constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
+    * @param {String} currentValueHtmlId The HTML id of the parent element
     * @return {Alfresco.ObjectFinder} The new ObjectFinder instance
     * @constructor
     */
-   Alfresco.ObjectFinder = function(htmlId)
+   Alfresco.ObjectFinder = function(htmlId, currentValueHtmlId)
    {
       // Mandatory properties
       this.name = "Alfresco.ObjectFinder";
       this.id = htmlId;
+      this.currentValueHtmlId = currentValueHtmlId;
 
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -110,15 +112,6 @@
           * @type string
           */
          currentValue: "",
-         
-         /**
-          * The id of element holding the current 
-          * value for the control
-          *
-          * @property currentValueId
-          * @type string
-          */
-         currentValueId: null,
          
          /**
           * The type of the item to find
@@ -354,10 +347,7 @@
          }
          
          this.options.currentValue = this.getSelectedItems().toString();
-         if (this.options.currentValueId !== null)
-         {
-            Dom.get(this.options.currentValueId).value = this.options.currentValue;
-         }
+         Dom.get(this.currentValueHtmlId).value = this.options.currentValue;
          this._getCurrentValueMeta();
          
          Dom.setStyle(this.pickerId, "display", "none");

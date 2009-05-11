@@ -1,6 +1,6 @@
 <#include "common/picker.inc.ftl" />
 
-<#assign controlId = args.htmlid + "-" + field.id + "-cntrl">
+<#assign controlId = fieldHtmlId + "-cntrl">
 
 <script type="text/javascript">//<![CDATA[
 (function()
@@ -35,7 +35,7 @@
    <div id="${controlId}-currentValueDisplay" class="current-values"></div>
    
    <#if form.mode != "view" && field.disabled == false>
-   <input type="hidden" id="${args.htmlid}_${field.id}" name="${field.name}" value="${field.value}" />
+   <input type="hidden" id="${fieldHtmlId}" name="${field.name}" value="${field.value}" />
    <div class="show-picker">
       <button id="${controlId}-showPicker-button">${msg("button.select")}</button>
    </div>
