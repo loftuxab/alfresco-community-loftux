@@ -70,7 +70,7 @@
    {
       this.name = "Alfresco.FlashUpload";
       this.id = containerId;
-      this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf";
+      this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf?dt=" + (new Date()).getTime();
       this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45);
       
       /* Register this component */

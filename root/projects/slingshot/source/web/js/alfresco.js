@@ -2297,7 +2297,7 @@ Alfresco.util.Anim = function()
          // Make sure element is displayed
          if (adjustDisplay && Dom.getStyle(el, "display") === "none")
          {
-            Dom.setStyle(el, "display", "");
+            Dom.setStyle(el, "display", "block");
          }
 
          // Put variables in scope so they can be used in the callback below
@@ -2311,7 +2311,7 @@ Alfresco.util.Anim = function()
             {
                opacity:
                {
-                  to: fadeIn ? 1 : 0
+                  to: fadeIn ? (YAHOO.env.ua.webkit > 0 ? 0.99 : 1) : 0
                }
             }, 0.5);
             fade.onComplete.subscribe(function(e)

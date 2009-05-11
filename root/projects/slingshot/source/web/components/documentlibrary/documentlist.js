@@ -1456,7 +1456,7 @@
             // Need the "More >" container?
             var splitAt = record.getData("type") == "folder" ? 1 : 3;
             actions = YAHOO.util.Selector.query("div", clone);
-            if (actions.length > splitAt)
+            if (actions.length > (splitAt + 1))
             {
                var moreContainer = Dom.get(this.id + "-moreActions").cloneNode(true);
                var containerDivs = YAHOO.util.Selector.query("div", moreContainer);

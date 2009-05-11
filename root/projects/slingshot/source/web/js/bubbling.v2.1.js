@@ -1,9 +1,9 @@
 /*
-Copyright (c) 2007, Caridy Patiño. All rights reserved.
-Portions Copyright (c) 2007, Yahoo!, Inc. All rights reserved.
+Copyright (c) 2008, Bubbling Library Team. All rights reserved.
+Portions Copyright (c) 2008, Yahoo!, Inc. All rights reserved.
 Code licensed under the BSD License:
 http://www.bubbling-library.com/eng/licence
-version: 1.5.0
+version: 2.1
 */
 YAHOO.namespace("plugin","behavior");
 (function() {
@@ -12,14 +12,16 @@ YAHOO.namespace("plugin","behavior");
 	  $D = YAHOO.util.Dom,
 	  $L = YAHOO.lang,
 	  $  = YAHOO.util.Dom.get;
-
+	  
   /**
   * @class Bubbling
   */
   YAHOO.Bubbling = function () {
   	var obj = {},
-		ua = navigator.userAgent.toLowerCase(),
-        isOpera = (ua.indexOf('opera') > -1);
+	    _config = {
+			classname: 'js'
+		},
+		_handle = null;
 	// private stuff
 	var navRelExternal = function (layer, args) {
 		  var el = args[1].anchor;
@@ -34,20 +36,98 @@ YAHOO.namespace("plugin","behavior");
     var defaultActionsControl = function (layer, args) {
 	  obj.processingAction (layer, args, obj.defaultActions);
     };
-	var _searchYUIButton = function (t) {
-		var el = obj.getOwnerByClassName( t, 'yui-button' ), bt = null, id = null;
-		if ($L.isObject(el) && YAHOO.widget.Button) {
-			bt = YAHOO.widget.Button.getButton(el.id);
+	var _target = {newRef: null, oldRef: null, value: null}; // last target (this variable will be used by the onChange/onFocus/onBlur layer)
+	
+	function _onBlur() {
+		if (_target.oldRef) {
+			// firing the blur
+			obj.fire( 'blur', {
+				target: _target.oldRef
+			});
 		}
-		return bt;
-	};
+	}
+	
+	function _onFocus() {
+		if (_target.newRef) {
+			// firing the blur
+			obj.fire( 'focus', {
+				target: _target.newRef,
+				blur: _target.oldRef
+			});
+		}
+	}
+	
+	function _onChange() {
+		if (_target.newRef) {
+			_target.newValue = (_target.tagName=="SELECT"?_target.newRef[_target.newRef.selectedIndex].value:_target.newRef.value);
+		    if (_target.newValue != _target.oldValue) {
+				if (YAHOO.env.ua.webkit && (_target.tagName == "SELECT")) {
+					_target.newRef.setAttribute( 'default', _target.newValue );
+				}
+				// firing the blur
+				obj.fire( 'change', {
+					target: _target.newRef,
+					value: _target.newValue,
+					newValue: _target.newValue,
+					oldValue: _target.oldValue,
+					rel: _target.newRef.getAttribute( 'rel' )
+				});
+				_target.oldValue = _target.newValue;
+			}
+		}
+	}
+	
+	function _setTarget (newRef, tn) {
+		_target = {
+			oldRef: _target.newRef,
+			newRef: newRef,
+			tagName: (newRef&&newRef.tagName?newRef.tagName.toUpperCase():null),
+			oldValue: (newRef?newRef.value:null)
+		};
+		if (tn=='SELECT') { // select element (hack for safari: default attribute)
+			_target.oldValue = (YAHOO.env.ua.webkit?newRef.getAttribute('default'):newRef[newRef.selectedIndex].value);
+		}
+	}
+
+	function _isFocusable (t) {
+		var tagName, tags = '[INPUT][TEXTAREA][SELECT][BUTTON][A][IMG]';
+		if (t && (tagName = t.tagName.toUpperCase())) {
+			if (t.getAttribute('tabindex') || (tags.indexOf('['+tagName+']') !== -1))  {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function _checkFocus (t, conf) {
+		/* checking the tagName */
+		var tn = (t&&t.tagName?t.tagName.toUpperCase():null);
+		if (t && tn) {
+			if (tn == 'OPTION') {
+				return _checkFocus (t.parentNode, conf);
+			} else {
+				/* checking if the target is the document */
+				if (document.body && (t === document.body)) {
+					// the document received the focus, trigger the onBlur and onChange
+					_onChange ();
+					_setTarget (null);
+					_onBlur ();
+				} else if ((t !== _target.newRef) && _isFocusable(t)) {
+					/* checking if the target element is focusable */
+					/* - 1: setting the new target */
+					_onChange ();
+					_setTarget (t, tn);
+					_onBlur ();
+					_onFocus ();
+				}
+			}
+		}
+	}
 
 	// public vars
 	obj.ready = false;
-	obj.force2alfa = false;
 	obj.bubble = {}; // CustomEvent Handles
-    obj.onReady = new $Y.CustomEvent('bubblingOnReady', obj, true);
-
+    
 	// mapping external methods...
 	obj.getOwnerByClassName = function(node, className) {
 		return ($D.hasClass(node, className)?node:$D.getAncestorByClassName (node, className));
@@ -69,7 +149,10 @@ YAHOO.namespace("plugin","behavior");
 	  e = e || $E.getEvent();
 	  m = m || {};
 	  m.action = b;
+	  // comparing the targets and the value of the targets
 	  m.target = args.target || (e?$E.getTarget(e):null);
+	  //_monitorChanges( m.target, m );
+	  _checkFocus (m.target, m);
 	  m.flagged = false; m.decrepitate = false;
 	  m.event = e;
 	  m.stop = false;
@@ -87,9 +170,15 @@ YAHOO.namespace("plugin","behavior");
 	};
 	obj.onEventTrigger = function(b, e, m){
 	  e = e || $E.getEvent();
+	  var t = 
 	  m = m || {};
 	  m.action = b;
 	  m.target = (e?$E.getTarget(e):null);
+	  // comparing the target and the value of the target (if clicks)
+	  if ((b == 'navigate') || (b == 'property')) {
+	  	//_checkChanges( m.target, m );
+		_checkFocus(m.target, m);
+	  }
 	  m.flagged = false; m.decrepitate = false;
 	  m.event = e;
 	  m.stop = false;
@@ -102,15 +191,23 @@ YAHOO.namespace("plugin","behavior");
 	obj.onNavigate = function(e){
 	  var conf = {
 	  	anchor: this.getOwnerByTagName( $E.getTarget(e), 'A' ),
-		button: _searchYUIButton($E.getTarget(e))
+		button: obj.getYUIButton($E.getTarget(e))
 	  };
-	  if (!conf.anchor && !conf.button) {
-	  	conf.input = this.getOwnerByTagName( $E.getTarget(e), 'INPUT' );
-	  }
 	  if (conf.button) {
-            conf.value = conf.button.get('value');
-	  } else if (conf.input) {
-	        conf.value = conf.input.getAttribute('value');
+          conf.value = conf.button.get('value');
+          conf.rel = conf.button._button.getAttribute('rel');
+	  } else if (conf.anchor) {
+		  conf.rel = conf.anchor.getAttribute('rel');
+	  } else {
+	  	  conf.input = this.getOwnerByTagName( $E.getTarget(e), 'INPUT' );
+	  	  conf.select = this.getOwnerByTagName( $E.getTarget(e), 'SELECT' );
+		  if (conf.input) {
+				conf.value = conf.input.getAttribute('value');
+				conf.rel = conf.input.getAttribute('rel');
+		  } else if (conf.select) {
+				conf.value = conf.select[conf.select.selectedIndex].value;
+				conf.rel = conf.select.getAttribute('rel');
+		  }
 	  }
 	  if (!this.onEventTrigger ('navigate', e, conf)) {
 	    this.onEventTrigger ('god', e, conf); // if nobody claim the event, god can handle it...
@@ -119,12 +216,12 @@ YAHOO.namespace("plugin","behavior");
 	obj.onProperty = function(e){
 	  this.onEventTrigger ('property', e, {
 	  	anchor: this.getOwnerByTagName( $E.getTarget(e), 'A' ),
-		button: _searchYUIButton($E.getTarget(e))
+		button: obj.getYUIButton($E.getTarget(e))
 	  });
 	};
 	obj._timeoutId = 0;
 	obj.onRepaint = function(e){
-	  // Downshift Your Code (can’t let something happen multiple times in a second)
+	  // Downshift Your Code (can't let something happen multiple times in a second)
 	  // http://yuiblog.com/blog/2007/07/09/downshift-your-code/
       clearTimeout(obj._timeoutId);
       obj._timeoutId = setTimeout(function(){
@@ -159,10 +256,10 @@ YAHOO.namespace("plugin","behavior");
 	  this.onKeyPressedTrigger(args);
 	};
 	/**
-	* * Este método determina la acción por defecto para un elemento
+	* * This method will try to match the classname of the DOM element with the list of actions (literal object)
 	* @public
 	* @param {object} el        element reference
-	* @param {object} actions   object with the list of posibles actions
+	* @param {object} actions   object with the list of possibles actions
 	* @return void
 	*/
 	obj.getActionName = function (el, depot) {
@@ -172,7 +269,7 @@ YAHOO.namespace("plugin","behavior");
 	  if (el && ($L.isObject(el) || (el = $( el )))) {
 	  	try{
 			r = el.getAttribute("rel"); // if rel is available...
-		}catch(e){};
+		} catch (e) {};
 		for (b in depot) { // behaviors in the depot...
 			if ((depot.hasOwnProperty(b)) && (f(b) || (b === r))) {
 				return b;
@@ -182,7 +279,30 @@ YAHOO.namespace("plugin","behavior");
 	  return null;
 	};
 	/**
-	* * Este método determina el primer tab hijo basado en el tabName
+	* * This method will try to match the classnames of the DOM element with the list of actions (literal object)
+	* @public
+	* @param {object} el        element reference
+	* @param {object} actions   object with the list of possibles actions
+	* @return void
+	*/
+	obj.getAllActions = function (el, depot) {
+	  depot = depot || {};
+	  var b = null, r = null, actions = [],
+	      f = ($D.inDocument(el)?function(b){return $D.hasClass(el, b)}:function(b){return el.hasClass(b);}); // f: check is certain object has a classname
+	  if (el && ($L.isObject(el) || (el = $( el )))) {
+	  	try{
+			r = el.getAttribute("rel"); // if rel is available...
+		} catch (e) {};
+		for (b in depot) { // behaviors in the depot...
+			if ((depot.hasOwnProperty(b)) && (f(b) || (b === r))) {
+				actions.push(b);
+			}
+		}
+	  }
+	  return actions;
+	};
+	/**
+	* * Getting the first child element based on the tagName
 	* @public
 	* @param {object} el Child element reference
 	* @param {object} c  ClassName of the Ancestor
@@ -198,11 +318,11 @@ YAHOO.namespace("plugin","behavior");
 	  return null;
 	};
 	/**
-	* * Este método determina si un evento es interno o no a un contenedor...
+	* * Analyzing the target and the related target elements to see if the action was within a certain element
 	* @public
-	* @param {object} e  Referencia al evento
-	* @param {object} el Referencia al contendor
-	* @return void
+	* @param {object} e  event reference
+	* @param {object} el DOM element reference
+	* @return bool
 	*/
 	obj.virtualTarget = function (e, el) {
 	  if (el && ($L.isObject(el) || (el = $( el ))) && $L.isObject(e)) {
@@ -218,7 +338,19 @@ YAHOO.namespace("plugin","behavior");
 	  }
 	  return false;
 	};
-
+	/**
+	* * getting the real YUI Button reference from a dom element, usually the target for a certain event
+	* @public
+	* @param {object} t      dom element reference
+	* @return void
+	*/
+	obj.getYUIButton = function (t) {
+		var el = this.getOwnerByClassName( t, 'yui-button' ), bt = null, id = null;
+		if ($L.isObject(el) && YAHOO.widget.Button) {
+			bt = YAHOO.widget.Button.getButton(el.id);
+		}
+		return bt;
+	};
 	/**
 	* * Creating a new behaviors layer...
 	* @public
@@ -239,7 +371,7 @@ YAHOO.namespace("plugin","behavior");
 		return result;
     };
 	/**
-	* * Subcribing an bahavior to certain bahaviors layer...
+	* * Subscribing an behavior to certain behaviors layer...
 	* @public
 	* @param {string} layer  Behavior layer GUID
 	* @param {object} bh     The function that represent the behavior
@@ -279,15 +411,15 @@ YAHOO.namespace("plugin","behavior");
 	* @public
 	* @param {string} layer     Behavior layer GUID
 	* @param {object} args      Event object (extended)
-	* @param {object} actions   List of availables behaviors...
-	* @param {boolean} force    Proccess the actions without worry about the flagged value...
+	* @param {object} actions   List of available behaviors...
+	* @param {boolean} force    Process the actions without worry about the flagged value...
 	* @return void
 	*/
 	obj.processingAction = function (layer, args, actions, force) {
       var behavior = null, t;
 	  if (!(args[1].flagged || args[1].decrepitate) || force) {
 	  	  // checking for anchor, input or button
-		  t = args[1].anchor || args[1].input || args[1].button;
+		  t = args[1].anchor || args[1].button || args[1].input || args[1].select;
 		  if (t) {
 			behavior = this.getActionName ( t, actions );
 			args[1].el = t;
@@ -307,15 +439,12 @@ YAHOO.namespace("plugin","behavior");
 		}
     };
 
-	// default behaviors
-	$E.addListener(window, "resize", obj.onRepaint, obj, true);
-
 	// default Suscriptions
 	obj.on('navigate', navRelExternal);
 	obj.on('navigate', defaultActionsControl);
-
+	
 	// initialization of the font and scroll monitors
-	obj.initMonitors = function ( config ) {
+	obj.initMonitors = function () {
 	    var fMonitors = function () {
             var oMonitors = new YAHOO.widget.Module('yui-cms-font-monitor', {
                 monitorresize:true,
@@ -333,8 +462,21 @@ YAHOO.namespace("plugin","behavior");
     };
 	// initialization inside the selfconstructor
 	obj.init = function () {
+	  var el = document.body; /* the top of the DOM */
+	  clearInterval(_handle); /* there is not need to keep waiting for the timer to execute this function */
 	  if (!this.ready) {
-	    var el = document.body;
+	  	this.ready = true;
+		
+		// override the default configuration object with an external configuration object
+	  	YAHOO._Bubbling = YAHOO._Bubbling || {};
+	  	$L.augmentObject(_config, YAHOO._Bubbling, true);
+		
+		// hack to add the class JS to the body
+		$D.addClass (el, _config.classname);
+		
+		// default behaviors
+		$E.addListener(window, "resize", obj.onRepaint, obj, true);
+
 	    $E.addListener(el,
 			"click",
 			obj.onNavigate,
@@ -347,7 +489,7 @@ YAHOO.namespace("plugin","behavior");
 	    */
 	    $E.addListener(
 	        el,
-	        (isOpera ? "mousedown" : "contextmenu"),
+	        (YAHOO.env.ua.opera ? "mousedown" : "contextmenu"),
 	        obj.onProperty,
 	        obj,
 	        true
@@ -356,7 +498,7 @@ YAHOO.namespace("plugin","behavior");
 	        Assign a "click" event handler to the trigger element(s) for
 	        Opera to prevent default browser behaviors.
 	    */
-	    if(isOpera) {
+	    if(YAHOO.env.ua.opera) {
 	        $E.addListener(
 	            el,
 	            "click",
@@ -372,16 +514,26 @@ YAHOO.namespace("plugin","behavior");
         $E.addListener(document, "keyup",  obj.onKeyPressed, obj, true);
 		$E.addListener(document, "keydown",  obj.onKeyPressed, obj, true);
 
-		this.ready = true;
-		obj.onReady.fire();
+		obj.fire('ready', {module:'bubbling'});
 	  }
 	};
-	$E.onDOMReady(obj.init, obj, true);
-
 	// creating the default layers...
-	obj.addLayer (['navigate','god','property','key','repaint','rollover', 'rollout']); // god layer - hack: the layer after the common navigate layer...
+	obj.addLayer (['navigate','god','property','key','repaint','rollover', 'rollout', 'blur', 'focus', 'change', 'ready']); // god layer - hack: the layer after the common navigate layer...
 
+    // all the listeners will be added to the document.body, but we need to wait until the object become available to add the listeners.
+	_handle = setInterval(function() {
+	    try {
+	        // throws an error if document.body is not exist
+			if ($L.isObject(document.body)) {
+				obj.init ();
+			}
+	    } catch (e) { 
+	    }
+	}, $E.POLL_INTERVAL);
+	// if something goes wrong, we just wait for the onDOMReady...
+	$E.onDOMReady(obj.init, obj, true);
+	
 	return obj;
   }();
 })();
-YAHOO.register("bubbling", YAHOO.Bubbling, {version: "1.5.0", build: "222"});
+YAHOO.register("bubbling", YAHOO.Bubbling, {version: "2.1", build: "234"});
