@@ -91,14 +91,6 @@
          },
          
          /**
-          * Event handler - called once if bookmarked history state is found
-          * @method onHistoryInit
-          */
-         onHistoryInit: function onHistoryInit()
-         {
-         },
-         
-         /**
           * Event handler - called just before panel is going to be made visible
           * @method onBeforeShow
           */
@@ -228,18 +220,6 @@
                scope: parent,
                correctScope: true
             }, "keydown").enable();
-         },
-         
-         onHistoryInit: function onHistoryInit()
-         {
-            var bookmarkedSearch = YAHOO.util.History.getBookmarkedState("search") || null;
-            if (bookmarkedSearch !== null)
-            {
-               YAHOO.Bubbling.fire("searchChanged",
-               {
-                  search: bookmarkedSearch
-               });
-            }
          },
          
          onShow: function onShow()
@@ -505,18 +485,6 @@
             parent.widgets.edituserButton = Alfresco.util.createYUIButton(parent, "edituser-button", parent.onEditUserClick);
          },
          
-         onHistoryInit: function onHistoryInit()
-         {
-            var bookmarkedUserId = YAHOO.util.History.getBookmarkedState("userid") || null;
-            if (bookmarkedUserId !== null)
-            {
-               YAHOO.Bubbling.fire("userIdChanged",
-               {
-                  userid: bookmarkedUserId
-               });
-            }
-         },
-         
          onBeforeShow: function onBeforeShow()
          {
             // Hide the main panel area before it is displayed - so we don't show
@@ -618,13 +586,15 @@
       
       YAHOO.extend(CreatePanelHandler, Alfresco.ConsolePanelHandler,
       {
+         _visible: false,
+         
          _groups: [],
          
          onLoad: function onLoad()
          {
             // events we are interested in
             YAHOO.Bubbling.on("itemSelected", this.onGroupSelected, this);
-            YAHOO.Bubbling.on("removeGroup", this.onRemoveGroup, this);
+            YAHOO.Bubbling.on("removeGroupCreate", this.onRemoveGroupCreate, this);
             
             var validFields = [];
             var onFieldKeyUp = function onFieldKeyUp(e)
@@ -705,15 +675,20 @@
          },
          
          /**
-          * Group selected event handler
-          *
+          * Group selected event handler.
+          * This event can be fired from either Groups picker - so we much ensure
+          * the event is for the current panel by checking panel visibility.
+          * 
           * @method onGroupSelected
           * @param e {object} DomEvent
           * @param args {array} Event parameters (depends on event type)
           */
          onGroupSelected: function onGroupSelected(e, args)
          {
-            this.addGroup(args[1]);
+            if (this._visible)
+            {
+               this.addGroup(args[1]);
+            }
          },
          
          /**
@@ -727,7 +702,7 @@
             var found = false;
             for (var i=0, j=this._groups.length; i<j; i++)
             {
-               if (this._groups[i].itemName === group.itemName)
+               if (this._groups[i] != null && this._groups[i].itemName === group.itemName)
                {
                   found = true;
                   break;
@@ -740,8 +715,8 @@
                
                var groupDiv = Dom.get(parent.id + "-create-groups");
                var html = groupDiv.innerHTML;
-               var idx = (this._groups.length-1);
-               html += " <span id='" + parent.id + "_group" + idx + "' onclick=\"YAHOO.Bubbling.fire('removeGroup', {id: " +
+               var idx = (this._groups.length - 1);
+               html += " <span id='" + parent.id + "_group" + idx + "' onclick=\"YAHOO.Bubbling.fire('removeGroupCreate', {id: " +
                      idx + "});\" class='group-item' title='" + $html(parent._msg("label.removegroup")) + "'>" + $html(group.displayName) + "</span>";
                groupDiv.innerHTML = html;
             }
@@ -749,22 +724,30 @@
          
          getGroups: function getGroups()
          {
-            return this._groups;
+            var groups = [];
+            for (var i=0, j=this._groups.length; i<j; i++)
+            {
+               if (this._groups[i] != null)
+               {
+                  groups.push(this._groups[i].itemName);
+               }
+            }
+            return groups;
          },
          
          /**
           * Group removed event handler
           *
-          * @method onRemoveGroup
+          * @method onRemoveGroupCreate
           * @param e {object} DomEvent
           * @param args {array} Event parameters (depends on event type)
           */
-         onRemoveGroup: function onRemoveGroup(e, args)
+         onRemoveGroupCreate: function onRemoveGroupCreate(e, args)
          {
             var i = args[1].id;
             var el = Dom.get(parent.id + "_group" + i);
             el.parentNode.removeChild(el);
-            this._groups.splice(i, 1);
+            this._groups[i] = null;
          },
          
          onBeforeShow: function onBeforeShow()
@@ -794,12 +777,18 @@
          
          onShow: function onShow()
          {
+            this._visible = true;
             window.scrollTo(0, 0);
             
             // Make main panel area visible
             Dom.setStyle(parent.id + "-create-main", "visibility", "visible");
             
             Dom.get(parent.id + "-create-firstname").focus();
+         },
+         
+         onHide: function onHide()
+         {
+            this._visible = false;
          }
       });
       new CreatePanelHandler();
@@ -812,21 +801,201 @@
       
       YAHOO.extend(UpdatePanelHandler, Alfresco.ConsolePanelHandler,
       {
+         _visible: false,
+         
+         _removedGroups: [],
+         _addedGroups: [],
+         _originalGroups: [],
+         _groups: [],
+         
          onLoad: function onLoad()
          {
+            // events we are interested in
+            YAHOO.Bubbling.on("itemSelected", this.onGroupSelected, this);
+            YAHOO.Bubbling.on("removeGroupUpdate", this.onRemoveGroupUpdate, this);
+            
+            var validFields = [];
+            var onFieldKeyUp = function onFieldKeyUp(e)
+            {
+               validFields[this.id] = (this.value.length !== 0);
+               var valid = true;
+               for (var i in validFields)
+               {
+                  if (validFields[i] == false)
+                  {
+                     valid = false;
+                     break;
+                  }
+               }
+               parent.widgets.updateuserSaveButton.set("disabled", !valid);
+            };
+            
             // Buttons
+            parent.widgets.updateuserSaveButton = Alfresco.util.createYUIButton(parent, "updateuser-save-button", parent.onUpdateUserOKClick);
+            parent.widgets.updateuserCancelButton = Alfresco.util.createYUIButton(parent, "updateuser-cancel-button", parent.onUpdateUserCancelClick);
+            
+            // Event handlers for mandatory fields
+            validFields[parent.id + "-update-firstname"] = false;
+            Event.on(parent.id + "-update-firstname", "keyup", onFieldKeyUp);
+            validFields[parent.id + "-update-lastname"] = false;
+            Event.on(parent.id + "-update-lastname", "keyup", onFieldKeyUp);
+            validFields[parent.id + "-update-email"] = false;
+            Event.on(parent.id + "-update-email", "keyup", onFieldKeyUp);
+            
+            // Load in the Groups Finder component from the server
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/group-finder",
+               dataObj:
+               {
+                  htmlid: parent.id + "-update-groupfinder"
+               },
+               successCallback:
+               {
+                  fn: this.onGroupFinderLoaded,
+                  scope: this
+               },
+               failureMessage: "Could not load Group Finder component",
+               execScripts: true
+            });
          },
          
-         onHistoryInit: function onHistoryInit()
+         onGroupFinderLoaded: function onGroupFinderLoaded(res)
          {
-            var bookmarkedUserId = YAHOO.util.History.getBookmarkedState("userid") || null;
-            if (bookmarkedUserId !== null)
+            // Inject the component from the XHR request into it's placeholder DIV element
+            var finderDiv = Dom.get(parent.id + "-update-groupfinder");
+            finderDiv.innerHTML = res.serverResponse.responseText;
+            
+            // Find the Group Finder by container ID
+            parent.modules.updateGroupFinder = Alfresco.util.ComponentManager.find(
             {
-               YAHOO.Bubbling.fire("userIdChanged",
-               {
-                  userid: bookmarkedUserId
-               });
+               id: parent.id + "-update-groupfinder"
+            })[0];
+            
+            // Set the correct options for our use
+            parent.modules.updateGroupFinder.setOptions(
+            {
+               viewMode: Alfresco.GroupFinder.VIEW_MODE_COMPACT,
+               singleSelectMode: false,
+               minSearchTermLength: 1,
+               wildcardPrefix: true
+            });
+         },
+         
+         /**
+          * Group selected event handler.
+          * This event can be fired from either Groups picker - so we much ensure
+          * the event is for the current panel by checking panel visibility.
+          * 
+          * @method onGroupSelected
+          * @param e {object} DomEvent
+          * @param args {array} Event parameters (depends on event type)
+          */
+         onGroupSelected: function onGroupSelected(e, args)
+         {
+            if (this._visible)
+            {
+               this.addGroup(args[1]);
             }
+         },
+         
+         /**
+          * Add a group to the list of selected groups
+          *
+          * @method addGroup
+          * @param group {object} Group object
+          */
+         addGroup: function addGroup(group)
+         {
+            var found = false;
+            for (var i=0, j=this._groups.length; i<j; i++)
+            {
+               if (this._groups[i] != null && this._groups[i].itemName === group.itemName)
+               {
+                  found = true;
+                  break;
+               }
+            }
+            
+            if (!found)
+            {
+               this._groups.push(group);
+               
+               var groupDiv = Dom.get(parent.id + "-update-groups");
+               var html = groupDiv.innerHTML;
+               var idx = (this._groups.length-1);
+               html += " <span id='" + parent.id + "_group" + idx + "' onclick=\"YAHOO.Bubbling.fire('removeGroupUpdate', {id: " +
+                     idx + "});\" class='group-item' title='" + $html(parent._msg("label.removegroup")) + "'>" + $html(group.displayName) + "</span>";
+               groupDiv.innerHTML = html;
+               
+               // if this group wasn't one of the original list, then add it to the addition list
+               found = false;
+               for (var i=0, j=this._originalGroups.length; i<j; i++)
+               {
+                  if (this._originalGroups[i] === group.itemName)
+                  {
+                     found = true;
+                     break;
+                  }
+               }
+               if (!found)
+               {
+                  this._addedGroups.push(group.itemName);
+               }
+            }
+         },
+         
+         /**
+          * Group removed event handler
+          *
+          * @method onRemoveGroupUpdate
+          * @param e {object} DomEvent
+          * @param args {array} Event parameters (depends on event type)
+          */
+         onRemoveGroupUpdate: function onRemoveGroupUpdate(e, args)
+         {
+            var i = args[1].id;
+            var el = Dom.get(parent.id + "_group" + i);
+            el.parentNode.removeChild(el);
+            var group = this._groups[i];
+            this._groups[i] = null;
+            
+            // if this group was one of the original list, then add it to the removed list
+            for (var i=0, j=this._originalGroups.length; i<j; i++)
+            {
+               if (this._originalGroups[i] === group.itemName)
+               {
+                  this._removedGroups.push(group.itemName);
+                  break;
+               }
+            }
+            // also remove from the added groups list
+            for (var i=0, j=this._addedGroups.length; i<j; i++)
+            {
+               if (this._addedGroups[i] === group.itemName)
+               {
+                  this._addedGroups.splice(i, 1);
+                  break;
+               }
+            }
+         },
+         
+         getAddedGroups: function getAddedGroups()
+         {
+            return this._addedGroups;
+         },
+         
+         getRemovedGroups: function getRemovedGroups()
+         {
+            return this._removedGroups;
+         },
+         
+         resetGroups: function resetGroups()
+         {
+            this._groups = [];
+            this._addedGroups = [];
+            this._removedGroups = [];
+            Dom.get(parent.id + "-update-groups").innerHTML = "";
          },
          
          onBeforeShow: function onBeforeShow()
@@ -835,28 +1004,22 @@
             // old data to the user before the Update() method paints the results
             Dom.get(parent.id + "-update-title").innerHTML = "";
             Dom.setStyle(parent.id + "-update-main", "visibility", "hidden");
-            
-            /*var fnClearEl = function(id)
-            {
-               Dom.get(parent.id + id).value = "";
-            };
-            
-            // clear data fields
-            fnClearEl("-update-firstname");
-            fnClearEl("-update-lastname");
-            fnClearEl("-update-email");
-            fnClearEl("-update-password");
-            fnClearEl("-update-verifypassword");
-            fnClearEl("-update-quota");*/
          },
          
          onShow: function onShow()
          {
+            this._visible = true;
             window.scrollTo(0, 0);
+         },
+          
+         onHide: function onHide()
+         {
+            this._visible = false;
          },
          
          onUpdate: function onUpdate()
          {
+            var me = this;
             var success = function(res)
             {
                var fnSetter = function(id, val)
@@ -890,22 +1053,22 @@
                var quota = person.quota;
                if (quota != -1)
                {
-                  if (quota < 1048576)
+                  if (quota < Alfresco.util.BYTES_MB)
                   {
                      // show in kilobytes
-                     quota = Math.round(quota / 1024);
+                     quota = Math.round(quota / Alfresco.util.BYTES_KB);
                      Dom.get(parent.id + "-update-quotatype").value = "kb";
                   }
-                  else if (quota < 1073741824)
+                  else if (quota < Alfresco.util.BYTES_GB)
                   {
                      // show in metabytes
-                     quota = Math.round(quota / 1048576);
+                     quota = Math.round(quota / Alfresco.util.BYTES_MB);
                      Dom.get(parent.id + "-update-quotatype").value = "mb";
                   }
                   else
                   {
                      // show in gigabytes
-                     quota = Math.round(quota / 1073741824);
+                     quota = Math.round(quota / Alfresco.util.BYTES_GB);
                      Dom.get(parent.id + "-update-quotatype").value = "gb";
                   }
                   fnSetter("-update-quota", quota.toString());
@@ -917,6 +1080,14 @@
                
                // account enabled/disabled
                Dom.get(parent.id + "-update-disableaccount").checked = (person.enabled == false);
+               
+               // add groups the user is already assigned to and maintain a copy of the original group list
+               me.resetGroups();
+               me._originalGroups = person.groups;
+               for (var i=0, j=person.groups.length; i<j; i++)
+               {
+                  me.addGroup({"itemName": person.groups[i], "displayName": person.groups[i].substring(6)});
+               }
                
                // Make main panel area visible
                Dom.setStyle(parent.id + "-update-main", "visibility", "visible");
@@ -1152,27 +1323,11 @@
          }
          
          // display the initial panel based on history state or default
-         var bookmarkedState = YAHOO.util.History.getBookmarkedState("history") || this.encodeHistoryState({"panel": this.panels[0].id});
+         var bookmarkedState = YAHOO.util.History.getBookmarkedState("state") || this.encodeHistoryState({"panel": this.panels[0].id});
          YAHOO.Bubbling.fire("stateChanged",
          {
             state: bookmarkedState
          });
-         
-         // Fire the onHistoryInit() panel lifecycle event for the panel found in the history state
-         // - handles initial display based on any stored bookmark state
-         var state = this.decodeHistoryState(bookmarkedState);
-         var bookmarkedPanel = (state.panel ? state.panel : null);
-         if (bookmarkedPanel !== null)
-         {
-            for (var i in this.panels)
-            {
-               if (this.panels[i].id === bookmarkedPanel)
-               {
-                  this.panels[i].onHistoryInit();
-                  break;
-               }
-            }
-         }
       },
       
       /**
@@ -1239,7 +1394,7 @@
             return;
          }
          
-         YAHOO.util.History.navigate("state", this.encodeHistoryState({"search": searchTerm}));
+         this._refreshUIState({"search": searchTerm});
       },
       
       /**
@@ -1251,7 +1406,7 @@
        */
       onNewUserClick: function ConsoleUsers_onNewUserClick(e, args)
       {
-         YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "create"}));
+         this._refreshUIState({"panel": "create"});
       },
       
       /**
@@ -1263,7 +1418,7 @@
        */
       onEditUserClick: function ConsoleUsers_onEditUserClick(e, args)
       {
-         YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "update"}));
+         this._refreshUIState({"panel": "update"});
       },
       
       /**
@@ -1276,7 +1431,7 @@
       onViewUserClick: function ConsoleUsers_onViewUserClick(e, args)
       {
          var userid = args[1].username;
-         YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "view", "userid": userid}));
+         this._refreshUIState({"panel": "view", "userid": userid});
       },
       
       /**
@@ -1326,7 +1481,7 @@
          {
             text: this._msg("message.delete-success")
          });
-         YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "search"}));
+         this._refreshUIState({"panel": "search"});
       },
       
       /**
@@ -1351,11 +1506,12 @@
       {
          var handler = function(res)
          {
+            window.scrollTo(0, 0);
             Alfresco.util.PopupManager.displayMessage(
             {
                text: this._msg("message.create-success")
             });
-            YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "search"}));
+            this._refreshUIState({"panel": "search"});
          };
          this._createUser(handler);
       },
@@ -1369,15 +1525,18 @@
        */
       onCreateUserAnotherClick: function ConsoleUsers_onCreateUserAnotherClick(e, args)
       {
+         var me = this;
          var handler = function(res)
          {
+            window.scrollTo(0, 0);
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.create-success")
+               text: me._msg("message.create-success")
             });
             
-            window.scrollTo(0, 0);
-            Dom.get(this.id + "-create-firstname").focus();
+            // TODO: clear fields?
+            
+            Dom.get(me.id + "-create-firstname").focus();
          };
          this._createUser(handler);
       },
@@ -1391,7 +1550,41 @@
        */
       onCreateUserCancelClick: function ConsoleUsers_onCreateUserCancelClick(e, args)
       {
-         YAHOO.util.History.navigate("state", this.encodeHistoryState({"panel": "search"}));
+         this._refreshUIState({"panel": "search"});
+      },
+      
+      /**
+       * Fired when the Update User OK button is clicked.
+       *
+       * @method onUpdateUserOKClick
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onUpdateUserOKClick: function ConsoleUsers_onUpdateUserOKClick(e, args)
+      {
+         var me = this;
+         var handler = function(res)
+         {
+            window.scrollTo(0, 0);
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: me._msg("message.update-success")
+            });
+            me._refreshUIState({"panel": "view"});
+         };
+         this._updateUser(handler);
+      },
+      
+      /**
+       * Fired when the Update User Cancel button is clicked.
+       *
+       * @method onUpdateUserCancelClick
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onUpdateUserCancelClick: function ConsoleUsers_onUpdateUserCancelClick(e, args)
+      {
+         this._refreshUIState({"panel": "view"});
       },
       
       /**
@@ -1476,6 +1669,7 @@
       _createUser: function ConsoleUsers__createUser(handler)
       {
          // TODO: verify password against second field!
+         // TODO: respect minimum field length for username/password
          
          var me = this;
          var fnGetter = function(id)
@@ -1508,41 +1702,10 @@
          
          // gather up the data for our JSON PUT request
          var username = fnGetter("-create-username");
-         var quota = -1;
-         var quotaValue = Dom.get(me.id + "-create-quota").value;
-         if (quotaValue.length !== 0)
-         {
-            // convert from giga/mega/kilo bytes
-            try
-            {
-               quota = parseInt(quotaValue);
-               var quotaType = Dom.get(me.id + "-create-quotatype").value;
-               if (quotaType === "gb")
-               {
-                  quota *= 1073741824;
-               }
-               else if (quotaType === "mb")
-               {
-                  quota *= 1048576;
-               }
-               else if (quotaType === "kb")
-               {
-                  quota *= 1024;
-               }
-            }
-            catch (e)
-            {
-               // ignore if we cannot parse quota field
-            }
-         }
+         var quota = this._calculateQuota(me.id + "-create");
          
-         // gather the selected groups and convert to an array of Group IDs
-         var selectedGroups = this._getCurrentPanel().getGroups();
-         var groups = [];
-         for (var i=0, j=selectedGroups.length; i<j; i++)
-         {
-            groups.push(selectedGroups[i].itemName);
-         }
+         // gather the selected groups from the panel
+         var groups = this._getCurrentPanel().getGroups();
          
          var personObj =
          {
@@ -1580,6 +1743,141 @@
                scope: this
             }
          });
+      },
+      
+      /**
+       * Update a user - returning true on success, false on any error.
+       * 
+       * @method _updateUser
+       * @param handler {function} Handler function to be called on successful update
+       * @private
+       */
+      _updateUser: function ConsoleUsers__updateUser(handler)
+      {
+         // TODO: verify password against second field!
+         // TODO: respect minimum field length for password
+         
+         var me = this;
+         var fnGetter = function(id)
+         {
+            return Dom.get(me.id + id).value;
+         };
+         
+         var updateSuccess = function(res)
+         {
+            // TODO: reset user photo if required
+            
+            if (fnGetter("-update-password") !== "")
+            {
+               var passwordObj =
+               {
+                  newpw: fnGetter("-update-password")
+               };
+               
+               // update the password for the user
+               Alfresco.util.Ajax.request(
+               {
+                  url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + encodeURIComponent(this.currentUserId),
+                  method: Alfresco.util.Ajax.POST,
+                  dataObj: passwordObj,
+                  requestContentType: Alfresco.util.Ajax.JSON,
+                  successCallback:
+                  {
+                     fn: handler,
+                     scope: me
+                  },
+                  failureMessage: me._msg("message.password-failure")   
+               });
+            }
+            else
+            {
+               handler.call();
+            }
+         };
+         
+         // gather up the data for our JSON PUT request
+         var quota = this._calculateQuota(me.id + "-update");
+         
+         // gather the groups for addition and groups for removal from the panel
+         var addGroups = this._getCurrentPanel().getAddedGroups();
+         var removeGroups = this._getCurrentPanel().getRemovedGroups();
+         
+         var personObj =
+         {
+            firstName: fnGetter("-update-firstname"),
+            lastName: fnGetter("-update-lastname"),
+            email: fnGetter("-update-email"),
+            disableAccount: Dom.get(me.id + "-update-disableaccount").checked,
+            quota: quota,
+            addGroups: addGroups,
+            removeGroups: removeGroups
+         };
+         
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(this.currentUserId),
+            method: Alfresco.util.Ajax.PUT,
+            dataObj: personObj,
+            requestContentType: Alfresco.util.Ajax.JSON,
+            successCallback:
+            {
+               fn: updateSuccess,
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: function(res)
+               {
+                  var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     title: this._msg("message.failure"),
+                     text: this._msg("message.update-failure", json.message)
+                  });
+               },
+               scope: this
+            }
+         });
+      },
+      
+      /**
+       * Return the quota value as input by the user - converted to bytes.
+       * 
+       * @method _calculateQuota
+       * @param idPrefix {string} ID prefix of the quota UI elements
+       * @return the quota value as input by the user - converted to bytes
+       * @private
+       */
+      _calculateQuota: function ConsoleUsers__calculateQuota(idPrefix)
+      {
+         var quota = -1;
+         var quotaValue = Dom.get(idPrefix + "-quota").value;
+         if (quotaValue.length !== 0)
+         {
+            // convert from giga/mega/kilo bytes
+            try
+            {
+               quota = parseInt(quotaValue);
+               var quotaType = Dom.get(idPrefix + "-quotatype").value;
+               if (quotaType === "gb")
+               {
+                  quota *= Alfresco.util.BYTES_GB;
+               }
+               else if (quotaType === "mb")
+               {
+                  quota *= Alfresco.util.BYTES_MB;
+               }
+               else if (quotaType === "kb")
+               {
+                  quota *= Alfresco.util.BYTES_KB;
+               }
+            }
+            catch (e)
+            {
+               // ignore if we cannot parse quota field
+            }
+         }
+         return quota;
       },
       
       /**
@@ -1626,6 +1924,13 @@
          }
       },
       
+      /**
+       * Return the object representing the currently visible panel.
+       * 
+       * @method _getCurrentPanel
+       * @return the currently visible panel object
+       * @private
+       */
       _getCurrentPanel: function ConsoleUsers__getCurrentPanel()
       {
          var panel = null;
@@ -1656,6 +1961,24 @@
                break;
             }
          }
+      },
+      
+      /**
+       * Refresh the UI based on the given state object, can contain any or all of the
+       * following state properties:
+       * {
+       *    panel: thepanelid,
+       *    userid: theuserid,
+       *    search: thesearchterm
+       * }
+       * 
+       * @method _refreshUIState
+       * @param state {object} UI state object, see above
+       * @private
+       */
+      _refreshUIState: function ConsoleUsers__refreshUIState(state)
+      {
+         YAHOO.util.History.navigate("state", this.encodeHistoryState(state));
       },
       
       /**
