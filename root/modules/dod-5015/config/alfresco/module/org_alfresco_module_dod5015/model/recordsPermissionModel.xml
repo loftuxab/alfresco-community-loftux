@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE permissions >
+
+<permissions>
+    
+    <!-- Namespaces used in type references -->
+    
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
+      <namespace uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+      <namespace uri="http://www.alfresco.org/model/recordsmanagement/1.0" prefix="rma"/>
+   </namespaces>
+   
+   
+   <permissionSet type="rma:filePlan" expose="selected">
+
+      <permissionGroup name="Records Administrator" allowFullControl="false" expose="true" />
+      
+      <permissionGroup name="Records Manager" allowFullControl="false" expose="true" />
+      
+      <permissionGroup name="Local Records Manager" allowFullControl="false" expose="true" />      
+      
+   </permissionSet>
+   
+   <permissionSet type="rma:fileable" expose="selected">
+   
+      <permissionGroup name="File" allowFullControl="false" expose="true">
+         <includePermissionGroup type="sys:base" permissionGroup="AddChildren"/>
+      </permissionGroup>
+      
+      <permissionGroup name"Retrieve" allowFullControl="false" expose="true">
+         <includePermissionGroup type="sys:base" permissionGroup="Read"/>
+      </permissionGroup>
+   
+   </permissionSet>
+
+</permissions>

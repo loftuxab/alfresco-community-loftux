@@ -24,6 +24,10 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
+import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.jscript.Scopeable;
@@ -134,4 +138,116 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	{
 	    return this.rmService.generateRecordId(recordCategory.getNodeRef());
 	}
+	
+	/**
+	 * TODO .. this code is in here for the demo 
+	 *      .. should be moved into the period data type implementation
+	 *      
+     * Calculates the next interval date for a given type of date interval.
+     * 
+     * @param period
+     * @param fromDate
+     * @return 
+     */
+    public Serializable calculateAsOfDate(String period, Serializable fromDate)
+    {
+        Date date = (Date)this.valueConverter.convertValueForRepo(fromDate);
+        
+        // Split the period value and retrieve the unit and value
+        String[] arr = period.split("\\|");
+        String unit = arr[0];
+        String valueString = arr[1];
+        int value = Integer.parseInt(valueString);
+        
+        Calendar calendar = Calendar.getInstance();     
+        calendar.setTime(date);
+        
+        if (unit.equals("none") == true)
+        {
+            // Return null as there is no period date to calculate
+            return null;
+        }
+        else if (unit.equals("day") == true) 
+        {
+            // Daily calculation
+            calendar.add(Calendar.DAY_OF_YEAR, value);
+        } 
+        else if (unit.equals("week") == true) 
+        {
+            // Weekly calculation
+            calendar.add(Calendar.WEEK_OF_YEAR, value);
+        } 
+        else if (unit.equals("month") == true) 
+        {
+            // Monthly calculation
+            calendar.add(Calendar.MONTH, value);
+        }
+        else if (unit.equals("year") == true) 
+        {
+            // Annual calculation
+            calendar.add(Calendar.YEAR, value);
+        }
+        else if (unit.equals("monthend") == true) 
+        {
+            // Month end calculation
+            calendar.add(Calendar.MONTH, value);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+            
+            // Set the time one minute to midnight
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+        } 
+        else if (unit.equals("quaterend") == true) 
+        {
+            // Quater end calculation
+            calendar.add(Calendar.MONTH, value*3);
+            int currentMonth = calendar.get(Calendar.MONTH);
+            if (currentMonth >= 0 && currentMonth <= 2)
+            {
+                calendar.set(Calendar.MONTH, 0);
+            }
+            else if (currentMonth >= 3 && currentMonth <= 5)
+            {
+                calendar.set(Calendar.MONTH, 3);
+            }
+            else if (currentMonth >= 6 && currentMonth <= 8)
+            {
+                calendar.set(Calendar.MONTH, 6);
+            }
+            else if (currentMonth >= 9 && currentMonth <= 11)
+            {
+                calendar.set(Calendar.MONTH, 9);
+            }
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+
+            // Set the time one minute to midnight
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+        } 
+        else if (unit.equals("yearend") == true) 
+        {
+            // Year end calculation
+            calendar.add(Calendar.YEAR, value);
+            calendar.set(Calendar.MONTH, 0);
+            calendar.set(Calendar.DAY_OF_MONTH, 1);
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+
+            // Set the time one minute to midnight
+            calendar.set(Calendar.HOUR_OF_DAY, 23);
+            calendar.set(Calendar.MINUTE, 59);
+        } 
+        else if (unit.equals("fyend") == true) 
+        {
+            // Financial year end calculation
+            throw new RuntimeException("Finacial year end is currently unsupported.");
+
+            // Set the time one minute to midnight 
+            //calendar.set(Calendar.HOUR_OF_DAY, 23);
+            //calendar.set(Calendar.MINUTE, 59);
+        } 
+                
+        return valueConverter.convertValueForScript(services, scope, null, calendar.getTime());
+    }
 }

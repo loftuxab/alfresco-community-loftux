@@ -41,6 +41,11 @@ public interface RecordsManagementModel
     // File plan type 
     public static QName TYPE_FILE_PLAN = QName.createQName(RM_URI, "filePlan");
     
+    // Record Category
+    public static QName TYPE_RECORD_CATEGORY = QName.createQName(RM_URI, "recordCategory");
+    public static QName PROP_CUT_OFF_SCHEDULE_PERIOD = QName.createQName(RM_URI, "cutOffSchedulePeriod");
+    public static QName PROP_RETENTION_SCHEDULE_PERIOD = QName.createQName(RM_URI, "retentionSchedulePeriod");    
+    
     // Incomplete record aspect
     public static QName ASPECT_INCOMPLETE_RECORD = QName.createQName(RM_URI, "incompleteRecord");
     
@@ -51,7 +56,7 @@ public interface RecordsManagementModel
     public static QName PROP_SUPPLEMENTAL_MARKING_LIST = QName.createQName(RM_URI, "supplementalMarkingList");
     public static QName PROP_MEDIA_TYPE = QName.createQName(RM_URI, "mediaType");
     public static QName PROP_FORMAT = QName.createQName(RM_URI, "format");
-    public static QName PROP_DATE_RECEIVED = QName.createQName(RM_URI, "dateReceived");
+    public static QName PROP_DATE_RECEIVED = QName.createQName(RM_URI, "dateReceived");  
     
     // Fileable aspect
     public static QName ASPECT_FILABLE = QName.createQName(RM_URI, "fileable");
@@ -60,6 +65,26 @@ public interface RecordsManagementModel
     public static QName ASPECT_RECORD_COMPONENT_ID = QName.createQName(RM_URI, "recordComponentIdentifier");
     public static QName PROP_INDENTIFIER = QName.createQName(RM_URI, "identifier");
     
+    // Review details aspect
+    public static QName PROP_REVIEW_PERIOD = QName.createQName(RM_URI, "reviewPeriod");
+    
+    /** State management aspects */
+    
+    // Pending review aspect
+    public static QName ASPECT_PENDING_REVIEW = QName.createQName(RM_URI, "pendingReview");
+    public static QName PROP_REVIEW_AS_OF = QName.createQName(RM_URI, "reviewAsOf");
+    
+    // Pending cut off aspect
+    public static QName ASPECT_PENDING_CUT_OFF = QName.createQName(RM_URI, "pendingCutOff");
+    public static QName PROP_CUT_OFF_AS_OF = QName.createQName(RM_URI, "cutOffAsOf");    
+    
+    // Cut off aspect
+    public static QName ASPECT_CUT_OFF = QName.createQName(RM_URI, "cutOff");
+    public static QName PROP_DESTROY_AS_OF = QName.createQName(RM_URI, "destroyAsOf");
+    
+    // Retention aspect
+    public static QName ASPECT_RETENTION = QName.createQName(RM_URI, "retention");
+    public static QName PROP_END_RETENTION_AS_OF = QName.createQName(RM_URI, "endRetentionAsOf");
     
 	
 }
