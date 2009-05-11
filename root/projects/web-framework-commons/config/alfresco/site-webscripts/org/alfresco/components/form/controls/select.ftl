@@ -7,8 +7,8 @@
    <span class="viewmode-value">${field.value?html}</span>
 </div>
 <#else>
-<label for="${args.htmlid}_${field.id}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
-<select id="${args.htmlid}_${field.id}" name="${field.name}" 
+<label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
+<select id="${fieldHtmlId}" name="${field.name}" 
        <#if field.description?exists>title="${field.description}"</#if>
        <#if field.control.params.size?exists>size="${field.control.params.size}"</#if> 
        <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>

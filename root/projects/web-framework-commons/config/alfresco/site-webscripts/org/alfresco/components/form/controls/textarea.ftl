@@ -10,8 +10,8 @@
    <span class="viewmode-value">${field.value?html}</span>
 </div>
 <#else>
-<label for="${args.htmlid}_${field.id}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
-<textarea id="${args.htmlid}_${field.id}" name="${field.name}" rows="${rows}" columns="${columns}"
+<label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
+<textarea id="${fieldHtmlId}" name="${field.name}" rows="${rows}" columns="${columns}"
           <#if field.description?exists>title="${field.description}"</#if>
           <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>
           <#if field.disabled>disabled="true"</#if>>${field.value}</textarea>
