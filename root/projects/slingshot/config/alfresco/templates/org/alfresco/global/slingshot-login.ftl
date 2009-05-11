@@ -100,6 +100,7 @@
          {
             this.destroy();
             YAHOO.util.Dom.get("username").focus();
+            YAHOO.util.Dom.get("username").select();
          },
          isDefault: true
       }]

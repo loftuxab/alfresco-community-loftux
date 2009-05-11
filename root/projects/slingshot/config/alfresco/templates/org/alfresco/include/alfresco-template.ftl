@@ -80,7 +80,7 @@
 <!-- Site-wide Common Assets -->
    <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
    <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/presentation.css" />
-   <@script type="text/javascript" src="${url.context}/js/bubbling.v1.5.0.js"></@script>
+   <@script type="text/javascript" src="${url.context}/js/bubbling.v2.1.js"></@script>
    <@script type="text/javascript" src="${url.context}/js/flash/AC_OETags.js"></@script>
    <#-- NOTE: Do not attempt to load -min.js version of messages.js -->
    <script type="text/javascript" src="${url.context}/service/messages.js?locale=${locale}"></script>
