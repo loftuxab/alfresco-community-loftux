@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,6 +34,8 @@ import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.util.GUID;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Records Management Service Implementation
@@ -41,7 +43,9 @@ import org.alfresco.util.GUID;
  * @author Roy Wetherall
  */
 public class RecordsManagementServiceImpl implements RecordsManagementService
-{    
+{
+    private static Log logger = LogFactory.getLog(RecordsManagementServiceImpl.class);
+
     private Map<String, RecordState> states;
     
     private ActionService actionService;
@@ -66,6 +70,11 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
      */
     public void addRecordState(NodeRef record, String stateName, Map<String, Serializable> context)
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("adding record state for node " + record);
+        }
+        
         // Get the state
         RecordState state = states.get(stateName);
         if (state == null)
@@ -86,6 +95,11 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
      */
     public void removeRecordState(NodeRef record, String stateName, Map<String, Serializable> context)
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("removing record state for node " + record);
+        }
+
         // Get the state
         RecordState state = states.get(stateName);
         if (state == null)
