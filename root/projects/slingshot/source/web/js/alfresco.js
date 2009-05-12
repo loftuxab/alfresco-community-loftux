@@ -3010,6 +3010,7 @@ Alfresco.service.BaseService.prototype =
     * @type string
     */
     Alfresco.service.Preferences.FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
+    Alfresco.service.Preferences.IMAP_FAVOURITE_SITES = "org.alfresco.share.sites.imap.favourites";
 
 })();
 

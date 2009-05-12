@@ -4,7 +4,7 @@
    float: left;
 }
 
-.my-sites div.my-actions span.favourite
+.my-sites div.my-actions span.favourite, .my-sites div.my-actions span.imap-favourite 
 {
    background-repeat: no-repeat;
    background-position: center;
@@ -17,6 +17,16 @@
 .my-sites div.my-actions span.favourite.enabled
 {
    background-image: url(../images/star-selected_16x16.png);
+}
+
+.my-sites div.my-actions span.imap-favourite
+{
+   background-image: url(../images/imap-fav-deselected-16.png);
+}
+
+.my-sites div.my-actions span.imap-favourite.enabled
+{
+   background-image: url(../images/imap-fav-selected-16.png);
 }
 
 .my-sites div.site

@@ -146,6 +146,7 @@
                this._addDeleteHandling(i);               
             }
             this._addFavouriteHandling(i);
+            this._addImapFavouriteHandling(i);
          }
       },
 
@@ -244,6 +245,77 @@
          }
       },
 
+	 /**
+       * Adds an event handler that adds or removes the site as favourite site
+       *
+       * @method _addImapFavouriteHandling
+       * @param siteIndex {int} The index of the site in the this.options.sites array
+       * @private
+       */
+      _addImapFavouriteHandling: function MySites__addImapFavouriteHandling(siteIndex)
+      {
+         var me = this;
+         var imapFavouriteSpan = Dom.get(this.id + "-imap-favourite-span-" + siteIndex);
+         if (imapFavouriteSpan)
+         {
+            var imapFavouriteClickHandler = function (event, obj)
+            {
+               /**
+                * We assume that the change of favourite site will work and therefore change
+                * the gui immediatly after the server call.
+                * If it doesn't we revoke the gui changes and display an error message
+                */
+               var responseConfig =
+               {
+                  failureCallback:
+                  {
+                     fn: function(event, obj)
+                     {
+                        obj.thisComponent._addImapFavouriteHandling(obj.siteIndex);
+                        obj.thisComponent._toggleImapFavourite(obj.siteIndex);
+                        Alfresco.util.PopupManager.displayPrompt(
+                        {
+                           text: Alfresco.util.message("message.siteFavourite.failure", obj.thisComponent.name)
+                        });
+                     },
+                     scope: this,
+                     obj:
+                     {
+                         siteIndex: siteIndex,
+                         thisComponent: me
+                     }
+                  },
+                  successCallback:
+                  {
+                     fn: function(event, obj)
+                     {
+                        obj.thisComponent._addImapFavouriteHandling(obj.siteIndex);
+                        var site = obj.thisComponent.options.sites[obj.siteIndex];
+                        YAHOO.Bubbling.fire(site.isImapFavourite ? "favouriteSiteAdded" : "favouriteSiteRemoved", site);
+                     },
+                     scope: this,
+                     obj:
+                     {
+                        siteIndex: siteIndex,
+                        thisComponent: me
+                     }
+                  }
+               };
+
+               // Remove listener so we don't do double submits
+               Event.removeListener(imapFavouriteSpan, "click", imapFavouriteClickHandler);
+               me._toggleImapFavourite(siteIndex);
+               me.preferencesService.set(
+                  Alfresco.service.Preferences.IMAP_FAVOURITE_SITES + "." + me.options.sites[siteIndex].shortName,
+                  me.options.sites[siteIndex].isImapFavourite,
+                  responseConfig);
+            };
+
+            // Add listener to favourite icons
+            Event.addListener(imapFavouriteSpan, "click", imapFavouriteClickHandler);
+         }
+      },
+      
       /**
        * Helper method to change the gui and our local data model of sites
        * @method _toggleFavourite
@@ -254,6 +326,25 @@
          var span = YAHOO.util.Dom.get(this.id + "-favourite-span-" + siteIndex);
          this.options.sites[siteIndex].isFavourite = !this.options.sites[siteIndex].isFavourite;
          if (this.options.sites[siteIndex].isFavourite)
+         {
+            YAHOO.util.Dom.addClass(span, "enabled");
+         }
+         else
+         {
+            YAHOO.util.Dom.removeClass(span, "enabled");
+         }
+      },	 
+      
+      /**
+       * Helper method to change the gui and our local data model of sites
+       * @method _toggleImapFavourite
+       * @param siteIndex {integer} the index in our local data model
+       */
+      _toggleImapFavourite: function MySites__toggleImapFavourite(siteIndex)
+      {
+         var span = YAHOO.util.Dom.get(this.id + "-imap-favourite-span-" + siteIndex);
+         this.options.sites[siteIndex].isImapFavourite = !this.options.sites[siteIndex].isImapFavourite;
+         if (this.options.sites[siteIndex].isImapFavourite)
          {
             YAHOO.util.Dom.addClass(span, "enabled");
          }

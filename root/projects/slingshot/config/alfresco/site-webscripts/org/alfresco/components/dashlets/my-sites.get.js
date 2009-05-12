@@ -1,4 +1,5 @@
 const PREF_FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
+const PREF_IMAP_FAVOURITE_SITES = "org.alfresco.share.sites.imap.favourites";
 
 /**
  * Sort favourites to the top, then in alphabetical order
@@ -17,10 +18,23 @@ function main()
       var i, ii, j, jj;
 
       // Create javascript objects from the server response
-      var sites = eval('(' + result + ')'), site, favourites = {}, managers;
+      var sites = eval('(' + result + ')'), site, favourites = {}, imapFavourites = {}, managers;
 
       if (sites.length > 0)
       {
+      
+      
+         //Check for IMAP server status
+         result = remote.call("/imap/servstatus");
+         if (result.status == 200)
+         {
+            model.imapServerStatus = result;
+         }
+         else
+         {
+            model.imapServerStatus = "disabled";
+         }
+         
          // Call the repo for the user's favourite sites
          result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
          if (result.status == 200 && result != "{}")
@@ -35,6 +49,20 @@ function main()
             }
          }
 
+		 // Call the repo for the user's imap favourite sites
+         result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_IMAP_FAVOURITE_SITES);
+         if (result.status == 200 && result != "{}")
+         {
+            var imapPrefs = eval('(' + result + ')');
+            
+            // Populate the imap favourites object literal for easy look-up later
+            imapFavourites = eval('(imapPrefs.' + PREF_IMAP_FAVOURITE_SITES + ')');
+            if (typeof imapFavourites != "object")
+            {
+               imapFavourites = {};
+            }
+         }
+         
          for (i = 0, ii = sites.length; i < ii; i++)
          {
             site = sites[i];
@@ -56,6 +84,9 @@ function main()
             
             // Is this site a user favourite?
             site.isFavourite = !!(favourites[site.shortName]);
+            
+            // Is this site a user imap favourite?
+            site.isImapFavourite = !!(imapFavourites[site.shortName]);
          }
 
          // Sort the favourites to the top
