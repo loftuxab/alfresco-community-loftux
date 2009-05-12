@@ -79,7 +79,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-ridl-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-sandbox-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-unoil-2.0.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/xstream-1.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/xstream-1.2.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xpp3-1.1.3_8.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/bsh-1.3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/jbpm-jpdl-3.2.2.jar"/>

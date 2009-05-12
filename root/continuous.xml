@@ -667,22 +667,38 @@
    <!-- ** Enterprise targets ** -->
    <!-- ************************ -->
    <target name="distribute-enterprise-examples" depends="continuous-init" if="dir.enterpriseproject.examples.config">
-	  <!-- Hyperic plugin -->
+      <!-- Hyperic plugin -->
       <copy todir="${dir.continuous.dist}/">
-         <fileset dir="${dir.enterpriseproject.examples.config}/hyperic"/>
+         <fileset dir="${dir.enterpriseproject.examples.config}/hyperic" />
       </copy>
-      <!-- Weblogic .ear -->
-      <ear destfile="${dir.continuous.dist}/${file.name.ear.alfresco}" 
-           appxml="${dir.enterpriseproject.examples.src.metainf}/application.xml" >
+      <!-- Weblogic / Websphere.ear -->
+      <ear destfile="${dir.continuous.dist}/${file.name.ear.alfresco}" appxml="${dir.enterpriseproject.examples.src.metainf}/application.xml">
          <fileset dir="${dir.project.webclient.dist}" includes="${file.name.war.webclient}" />
          <fileset dir="${dir.project.slingshot.dist}" includes="${file.name.war.slingshot}" />
-         <metainf dir="${dir.enterpriseproject.examples.src.metainf}" excludes="application.xml"/>
+         <metainf dir="${dir.enterpriseproject.examples.src.metainf}" excludes="application.xml" />
       </ear>
+
+      <!-- Websphere myfaces shared library -->
+      <zip destfile="${dir.continuous.dist}/${file.name.zip.was.shared.lib}">
+         <zipfileset prefix="myfaces1_1" dir="${dir.project.3rdparty.lib}/commons">
+            <include name="commons-beanutils-1.7.0.jar" />
+            <include name="commons-codec-1.3.jar" />
+            <include name="commons-collections-3.1.jar" />
+            <include name="commons-digester-1.6.jar" />
+            <include name="commons-lang-2.1.jar" />
+            <include name="commons-logging-1.1.jar" />
+         </zipfileset>
+         <zipfileset prefix="myfaces1_1" dir="${dir.project.3rdparty.lib}">
+            <include name="myfaces-api-1.1.5.jar" />
+            <include name="myfaces-impl-1.1.5.jar" />
+         </zipfileset>
+      </zip>
+
       <!-- JMX Dumper -->
       <copy todir="${dir.continuous.dist}/">
-         <fileset dir="${dir.enterpriseproject.jmx-dumper.dist}"/>
+         <fileset dir="${dir.enterpriseproject.jmx-dumper.dist}" />
       </copy>
-   </target>      
+   </target>
 
    <!-- ************************ -->
    <!-- ** Deployment targets ** -->

@@ -148,7 +148,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-ridl-2.0.3.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-sandbox-2.0.3.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/openoffice/openoffice-unoil-2.0.3.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/openoffice/xstream-1.1.3.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/openoffice/xstream-1.2.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/xalan/serializer.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/xalan/xalan.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/activation.jar" />

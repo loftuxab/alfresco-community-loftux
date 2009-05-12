@@ -110,7 +110,7 @@
       <property name="path"><value>alfresco/site-data/content-associations</value></property>
    </bean>
    <bean id="webframework.classpathstore.contentassociation" parent="webframework.classpathstore">
-      <property name="mustExist"><value>true</value></property>   
+      <property name="mustExist"><value>false</value></property>   
       <property name="classPath"><value>alfresco/site-data/content-associations</value></property>
    </bean>
    <bean id="webframework.classpathstore.contentassociation.custom" parent="webframework.classpathstore">
@@ -160,7 +160,7 @@
       <property name="path"><value>alfresco/site-data/page-associations</value></property>
    </bean>
    <bean id="webframework.classpathstore.pageassociation" parent="webframework.classpathstore">
-      <property name="mustExist"><value>true</value></property>   
+      <property name="mustExist"><value>false</value></property>   
       <property name="classPath"><value>alfresco/site-data/page-associations</value></property>
    </bean>
    <bean id="webframework.classpathstore.pageassociation.custom" parent="webframework.classpathstore">
