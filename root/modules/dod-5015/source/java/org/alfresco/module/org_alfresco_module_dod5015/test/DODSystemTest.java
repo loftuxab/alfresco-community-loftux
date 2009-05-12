@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -90,8 +90,7 @@ public class DODSystemTest extends BaseSpringTest
 	
 	private void setUpTestData()
 	{
-	    DODDataLoadSystemTest dataLoader = new DODDataLoadSystemTest();
-	    filePlan = dataLoader.loadFilePlanData(null, this.nodeService, this.importService);
+        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService);
 	}
 	
 	private NodeRef getRecordCategory(String seriesName, String categoryName)
@@ -157,6 +156,6 @@ public class DODSystemTest extends BaseSpringTest
 	    
 	}
         
-	
-    
+        
+
 }
