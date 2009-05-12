@@ -8,6 +8,7 @@
          shortName: '${site.shortName?js_string}',
          title: '${site.title?js_string}',
          isFavourite: ${site.isFavourite?string},
+         isImapFavourite: ${site.isImapFavourite?string},
          isSiteManager: ${site.isSiteManager?string}
       }<#if (site_has_next)>,</#if>
    </#list>
@@ -31,6 +32,9 @@
          <div>
             <div class="my-actions">
                <span id="${args.htmlid}-favourite-span-${site_index}" class="favourite <#if (site.isFavourite)>enabled</#if>" title="${msg("link.favouriteSite")}">&nbsp;</span>
+               <#if imapServerStatus = "enabled">
+                  <span id="${args.htmlid}-imap-favourite-span-${site_index}" class="imap-favourite <#if (site.isImapFavourite)>enabled</#if>" title="${msg("link.imap_favouriteSite")}">&nbsp;</span>
+               </#if>
             </div>
             <div class="site">
                <a href="${url.context}/page/site/${site.shortName}/dashboard" class="theme-color-1">${site.title?html}</a>
