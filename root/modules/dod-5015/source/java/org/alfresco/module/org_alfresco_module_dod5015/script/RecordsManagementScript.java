@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,6 +36,8 @@ import org.alfresco.repo.jscript.ValueConverter;
 import org.alfresco.repo.processor.BaseProcessorExtension;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -45,6 +47,8 @@ import org.mozilla.javascript.Scriptable;
  */
 public class RecordsManagementScript extends BaseProcessorExtension implements Scopeable, RecordsManagementModel 
 {
+    private static Log logger = LogFactory.getLog(RecordsManagementScript.class);
+
    /** Scriptable scope object */
 	private Scriptable scope;
 	
@@ -104,6 +108,11 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	 */
 	public ScriptRecord makeRecord(ScriptNode node)
 	{
+	    if (logger.isDebugEnabled())
+	    {
+	        logger.debug("makeRecord: " + node);
+	    }
+	    
 	    NodeRef nodeRef = node.getNodeRef();
 	    this.services.getNodeService().addAspect(nodeRef, RecordsManagementModel.ASPECT_RECORD, null);
 	    return new ScriptRecord(nodeRef, this.services, this.scope);
