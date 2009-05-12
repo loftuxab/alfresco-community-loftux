@@ -16,24 +16,15 @@ function main()
    if (result.status == 200)
    {
       var i, ii, j, jj;
-
+      
       // Create javascript objects from the server response
       var sites = eval('(' + result + ')'), site, favourites = {}, imapFavourites = {}, managers;
-
+      
       if (sites.length > 0)
       {
-      
-      
-         //Check for IMAP server status
+         // Check for IMAP server status
          result = remote.call("/imap/servstatus");
-         if (result.status == 200)
-         {
-            model.imapServerStatus = result;
-         }
-         else
-         {
-            model.imapServerStatus = "disabled";
-         }
+         model.imapServerStatus = (result.status == 200 ? result : "disabled");
          
          // Call the repo for the user's favourite sites
          result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
@@ -48,18 +39,21 @@ function main()
                favourites = {};
             }
          }
-
-		 // Call the repo for the user's imap favourite sites
-         result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_IMAP_FAVOURITE_SITES);
-         if (result.status == 200 && result != "{}")
-         {
-            var imapPrefs = eval('(' + result + ')');
-            
-            // Populate the imap favourites object literal for easy look-up later
-            imapFavourites = eval('(imapPrefs.' + PREF_IMAP_FAVOURITE_SITES + ')');
-            if (typeof imapFavourites != "object")
+         
+		   // Call the repo for the user's imap favourite sites
+		   if (model.imapServerStatus !== "disabled")
+		   {
+            result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_IMAP_FAVOURITE_SITES);
+            if (result.status == 200 && result != "{}")
             {
-               imapFavourites = {};
+               var imapPrefs = eval('(' + result + ')');
+               
+               // Populate the imap favourites object literal for easy look-up later
+               imapFavourites = eval('(imapPrefs.' + PREF_IMAP_FAVOURITE_SITES + ')');
+               if (typeof imapFavourites != "object")
+               {
+                  imapFavourites = {};
+               }
             }
          }
          
