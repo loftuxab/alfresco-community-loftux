@@ -181,6 +181,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/geronimo-jaxws_2.1_spec-1.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/geronimo-stax-api_1.0_spec-1.0.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/geronimo-ws-metadata_2.0_spec-1.1.2.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/greenmail-1.3-patched.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/guessencoding-1.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/hibernate-3.2.6-patched.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/hrtlib.jar" />
@@ -203,6 +204,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/jta.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/jug-lgpl-2.0.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/optional/log4j-1.2.15.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/jutf7-1.0.0.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/lucene-analyzers-2.4.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/lucene-core-2.4.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/lucene-snowball-2.4.1.jar" />
@@ -226,6 +228,8 @@
          <pathelement location="${dir.project.3rdparty.lib}/saaj.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/saxpath.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/shale-test-1.0.4.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/slf4j-api-1.3.1.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/slf4j-simple-1.3.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/spring-2.0.8.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/standard.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/stax-utils-20060502.jar" />
