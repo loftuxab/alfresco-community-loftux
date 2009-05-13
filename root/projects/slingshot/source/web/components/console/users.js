@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -1679,6 +1679,9 @@
          
          var createSuccess = function(res)
          {
+            // get back username created (for multi-tenant)
+            username = res.json.userName;
+            
             var passwordObj =
             {
                newpw: fnGetter("-create-password")
@@ -1687,7 +1690,7 @@
             // set the given password for the user
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + encodeURIComponent(username),
+               url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + username,
                method: Alfresco.util.Ajax.POST,
                dataObj: passwordObj,
                requestContentType: Alfresco.util.Ajax.JSON,
