@@ -1427,14 +1427,15 @@ WebStudio.PageEditor.prototype.faultRegionSuccess = function(html, binding)
 		// fire the load event
 		Alf.fireEvent(regionDiv, "load");				
 
-		// restore the page editor (if it was enabled originally)			
+		// restore the page editor (if it was enabled originally)		
 		if(restorePageEditor)
 		{
 			// TODO: Ideally, this should trigger from completion of tags and load of the DOM element
 			// it should be tied to an update event of some kind
 			
 			// delay
-			_this.showPageEditor.delay(500, _this);
+			_this.show();
+			_this.resizeTabItems();
 		}						
 	};
 	
@@ -1487,7 +1488,7 @@ WebStudio.PageEditor.prototype.faultRegionSuccess = function(html, binding)
 				}
 			}
 		}
-
+		
 		if(!hasDependencies)
 		{
 			// if we don't require any loading
@@ -1515,13 +1516,9 @@ WebStudio.PageEditor.prototype.faultRegionSuccess = function(html, binding)
 		if(divRegionId == regionId && divRegionScopeId == regionScopeId)
 		{
 			var restorePageEditor = false;
-			if(this.pageEditor)
+			if(this.isShow)
 			{
-				this.hidePageEditor();
-				
-				this.pageEditor.hideTabItems();
-				this.pageEditor.removeTabItems();
-				this.pageEditor = null;
+				this.hide();
 				
 				restorePageEditor = true;
 			} 			
