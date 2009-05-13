@@ -996,9 +996,6 @@ WebStudio.dd = WebStudio.dd ||
  			
  			var ddId = payload.ddId;
  			
- 			// unregister
- 			WebStudio.dd.unregister(ddId);
- 			
  			var draggableOptions = WebStudio.dd.get(ddId);
  			if (draggableOptions)
  			{
@@ -1007,6 +1004,9 @@ WebStudio.dd = WebStudio.dd ||
  					options.onDrop(el, draggableOptions);
  				}
 			}
+
+ 			// unregister
+ 			WebStudio.dd.unregister(ddId);
 		};		
 		
 		jQuery(el).droppable(options);

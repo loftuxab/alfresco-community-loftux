@@ -3240,6 +3240,9 @@
 		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template-designer.class.js" />
 		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/renderers/absolute.js" />
 		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/template-designer/template/renderers/table.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/pageblocker/pageblocker.class.js" />
+		<fileset file="${dir.project.webstudio}/source/web/overlay/default/components/content-view/content-view.class.js" />
+		
 
 		<fileset file="${dir.project.webstudio}/source/web/overlay/default/dialogs/login-dialog.class.js" />
 		<fileset file="${dir.project.webstudio}/source/web/overlay/default/dialogs/sandbox-dialog.class.js" />
