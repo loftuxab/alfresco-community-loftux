@@ -33,11 +33,12 @@
       </actionSet>
 
       <actionSet id="folder">
-         <action id="onActionDetails" permission="edit" type="action-link" label="actions.document.details" />
+         <action id="onActionDetails" permission="edit" type="action-link" label="actions.folder.details" />
+         <action id="onActionMetadata" type="simple-link" href="{folderDetailsUrl}" label="actions.folder.metadata" />
          <action id="onActionCopyTo" type="action-link" label="actions.folder.copy-to" />
          <action id="onActionMoveTo" permission="delete" type="action-link" label="actions.folder.move-to" />
          <action id="onActionDelete" permission="delete" type="action-link" label="actions.folder.delete" />
-         <action id="onActionManagePermissions" permission="permissions" type="action-link" label="actions.document.manage-permissions" />
+         <action id="onActionManagePermissions" permission="permissions" type="action-link" label="actions.folder.manage-permissions" />
       </actionSet>
 
       <actionSet id="link">

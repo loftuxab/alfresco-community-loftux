@@ -1,7 +1,7 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
    <@link rel="stylesheet" type="text/css" href="${url.context}/templates/edit-metadata/edit-metadata.css" />
-   <@script type="text/javascript" src="${page.url.context}/templates/edit-metadata/edit-metadata.js"></@script>
+<#--   <@script type="text/javascript" src="${page.url.context}/templates/edit-metadata/edit-metadata.js"></@script> -->
 </@>
 
 <@templateBody>

@@ -24,10 +24,10 @@
  */
  
 /**
- * Document actions component.
+ * Folder actions component.
  * 
  * @namespace Alfresco
- * @class Alfresco.DocumentActions
+ * @class Alfresco.FolderActions
  */
 (function()
 {
@@ -44,21 +44,21 @@
    var $html = Alfresco.util.encodeHTML;
    
    /**
-    * DocumentActions constructor.
+    * FolderActions constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.DocumentActions} The new DocumentActions instance
+    * @return {Alfresco.FolderActions} The new FolderActions instance
     * @constructor
     */
-   Alfresco.DocumentActions = function(htmlId)
+   Alfresco.FolderActions = function(htmlId)
    {
-      this.name = "Alfresco.DocumentActions";
+      this.name = "Alfresco.FolderActions";
       this.id = htmlId;
       
       // initialise prototype properties
       this.widgets = {};
       this.modules = {};
-      this.docData = null;
+      this.folderData = null;
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -67,14 +67,14 @@
       Alfresco.util.YUILoaderHelper.require(["button"], this.onComponentsLoaded, this);
    
       /* Decoupled event listeners */
-      YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
+      YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);
       YAHOO.Bubbling.on("fileRenamed", this.onDetailsEdited, this);
       YAHOO.Bubbling.on("folderRenamed", this.onDetailsEdited, this);
       
       return this;
-   }
+   };
    
-   Alfresco.DocumentActions.prototype =
+   Alfresco.FolderActions.prototype =
    {
       /**
        * Object container for initialization options
@@ -119,12 +119,12 @@
        modules: {},
        
        /**
-        * The data for the document
+        * The data for the folder
         * 
-        * @property docData
+        * @property folderData
         * @type object
         */
-       docData: null,
+       folderData: null,
        
       /**
        * Set multiple initialization options at once.
@@ -146,7 +146,7 @@
        * @param obj {object} Object literal specifying a set of messages
        * @return {Alfresco.Search} returns 'this' for method chaining
        */
-      setMessages: function DocumentActions_setMessages(obj)
+      setMessages: function FolderActions_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
@@ -158,52 +158,44 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function DocumentActions_onComponentsLoaded()
+      onComponentsLoaded: function FolderActions_onComponentsLoaded()
       {
          // do nothing
       },
       
       /**
-       * Event handler called when the "documentDetailsAvailable" event is received
+       * Event handler called when the "folderDetailsAvailable" event is received
        */
-      onDocumentDetailsAvailable: function DocumentActions_onDocumentDetailsAvailable(layer, args)
+      onFolderDetailsAvailable: function FolderActions_onFolderDetailsAvailable(layer, args)
       {
          // reference to self
          var me = this;
          
-         // remember the data for the document
-         this.docData = args[1];
-         
-         // update the href for the download link
-         var url = Alfresco.constants.PROXY_URI + this.docData.contentUrl;
-         Dom.get(this.id + "-download-action").href = url + "?a=true";
+         // remember the data for the folder
+         this.folderData = args[1];
          
          // update the href for the edit metadata link
          var metadataUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
-            "/edit-metadata?nodeRef=" + this.docData.nodeRef;
+            "/edit-metadata?nodeRef=" + this.folderData.nodeRef;
          try
          {
             Dom.get(this.id + "-edit-metadata-action").href = metadataUrl;
          }
          catch (e)
          {
-            // Action must be missing
+            // Edit metadata action missing from config
          }
          
-         /**
-          * NOTE: If linefeeds exist between the <div> and <a> tags, the firstChild property
-          *       in the outer loop will return a text node "\n" instead of the <a> tag.
-          */
           // Disable actions not accessible to current user
-          var actionsContainer = Dom.get(this.id + "-actionSet-document");
-         if (this.docData.permissions && this.docData.permissions.userAccess)
+         var actionsContainer = Dom.get(this.id + "-actionSet-folder");
+         if (this.folderData.permissions && this.folderData.permissions.userAccess)
          {
-            var userAccess = this.docData.permissions.userAccess;
+            var userAccess = this.folderData.permissions.userAccess;
             var actions = YAHOO.util.Selector.query("div", actionsContainer);
             var actionPermissions, i, ii, j, jj;
             for (i = 0, ii = actions.length; i < ii; i++)
             {
-               if (actions[i].firstChild.rel != "")
+               if (actions[i].firstChild.rel !== "")
                {
                   actionPermissions = actions[i].firstChild.rel.split(",");
                   for (j = 0, jj = actionPermissions.length; j < jj; j++)
@@ -220,7 +212,7 @@
          Dom.setStyle(actionsContainer, "visibility", "visible");
          
          // Hook action events
-         var fnActionHandler = function DocumentActions_fnActionHandler(layer, args)
+         var fnActionHandler = function FolderActions_fnActionHandler(layer, args)
          {
             var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
@@ -235,7 +227,7 @@
             }
       		 
             return true;
-         }
+         };
          
          YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler);
          
@@ -249,19 +241,19 @@
        *
        * @method onReady
        */
-      onDetailsEdited: function DocumentDetails_onDetailsEdited(layer, args)
+      onDetailsEdited: function FolderActions_onDetailsEdited(layer, args)
       {
          // Reload the page, rather than trying to replace edited metadata in-place
          window.location.reload(true);
       },
       
       /**
-       * Copy single document or folder.
+       * Copy single folder.
        *
        * @method onActionCopyTo
        * @param obj {object} Not used
        */
-      onActionCopyTo: function DocumentActions_onActionCopyTo(obj)
+      onActionCopyTo: function FolderActions_onActionCopyTo(obj)
       {
          if (!this.modules.copyTo)
          {
@@ -269,17 +261,17 @@
             {
                siteId: this.options.siteId,
                containerId: this.options.containerId,
-               path: this.docData.location.path,
-               files: this.docData
+               path: this.folderData.location.path,
+               files: this.folderData
             });
          }
          else
          {
             this.modules.copyTo.setOptions(
             {
-               path: this.docData.location.path,
-               files: this.docData
-            })
+               path: this.folderData.location.path,
+               files: this.folderData
+            });
          }
 
          // show the dialog         
@@ -287,12 +279,12 @@
       },
       
       /**
-       * Move single document or folder.
+       * Move single folder.
        *
        * @method onActionMoveTo
        * @param obj {object} Not used
        */
-      onActionMoveTo: function DocumentActions_onActionMoveTo(obj)
+      onActionMoveTo: function FolderActions_onActionMoveTo(obj)
       {
          if (!this.modules.moveTo)
          {
@@ -300,52 +292,21 @@
             {
                siteId: this.options.siteId,
                containerId: this.options.containerId,
-               path: this.docData.location.path,
-               files: this.docData
+               path: this.folderData.location.path,
+               files: this.folderData
             });
          }
          else
          {
             this.modules.moveTo.setOptions(
             {
-               path: this.docData.location.path,
-               files: this.docData
-            })
+               path: this.folderData.location.path,
+               files: this.folderData
+            });
          }
          
          // show the dialog
          this.modules.moveTo.showDialog();
-      },
-      
-      /**
-       * Assign workflow.
-       *
-       * @method onActionAssignWorkflow
-       * @param obj {object} Not used
-       */
-      onActionAssignWorkflow: function DocumentActions_onActionAssignWorkflow(obj)
-      {
-         if (!this.modules.assignWorkflow)
-         {
-            this.modules.assignWorkflow = new Alfresco.module.DoclibWorkflow(this.id + "-workflow").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.docData.location.path,
-               files: this.docData
-            });
-         }
-         else
-         {
-            this.modules.assignWorkflow.setOptions(
-            {
-               path: this.docData.location.path,
-               files: this.docData
-            })
-         }
-         
-         // show the dialog
-         this.modules.assignWorkflow.showDialog();
       },
       
       /**
@@ -354,25 +315,25 @@
        * @method onActionDelete
        * @param obj {object} Not used
        */
-      onActionDelete: function DocumentActions_onActionDelete(obj)
+      onActionDelete: function FolderActions_onActionDelete(obj)
       {
          var me = this;
 
          Alfresco.util.PopupManager.displayPrompt(
          {
-            text: this._msg("document-actions.delete.confirm", this.docData.fileName),
+            text: this._msg("folder-actions.delete.confirm", this.folderData.fileName),
             buttons: [
             {
-               text: this._msg("document-actions.button.delete"),
-               handler: function DocumentActions_onActionDelete_delete()
+               text: this._msg("folder-actions.button.delete"),
+               handler: function FolderActions_onActionDelete_delete()
                {
                   this.destroy();
-                  me._onActionDeleteConfirm.call(me, this.docData);
+                  me._onActionDeleteConfirm.call(me, this.folderData);
                }
             },
             {
                text: this._msg("button.cancel"),
-               handler: function DocumentActions_onActionDelete_cancel()
+               handler: function FolderActions_onActionDelete_cancel()
                {
                   this.destroy();
                },
@@ -388,15 +349,15 @@
        * @param obj {object} Not used
        * @private
        */
-      _onActionDeleteConfirm: function DocumentActions__onActionDeleteConfirm(record)
+      _onActionDeleteConfirm: function FolderActions__onActionDeleteConfirm(record)
       {
-         var fileType = this.docData.type;
-         var fileName = this.docData.fileName;
-         var filePath = this.docData.location.path + "/" + fileName;
-         var displayName = this.docData.displayName;
+         var fileType = this.folderData.type,
+            fileName = this.folderData.fileName,
+            filePath = this.folderData.location.path + "/" + fileName,
+            displayName = this.folderData.displayName;
          
          var callbackUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary#path=";
-         var encodedPath = (YAHOO.env.ua.gecko > 0) ? encodeURIComponent(this.docData.location.path) : this.docData.location.path;
+         var encodedPath = (YAHOO.env.ua.gecko > 0) ? encodeURIComponent(this.folderData.location.path) : this.folderData.location.path;
          
          this.modules.actions.genericAction(
          {
@@ -404,7 +365,7 @@
             {
                callback:
                {
-                  fn: function DocumentActions_oADC_success(data)
+                  fn: function FolderActions_oADC_success(data)
                   {
                      window.location = callbackUrl + encodedPath;
                   }
@@ -412,7 +373,7 @@
             },
             failure:
             {
-               message: this._msg("document-actions.delete.failure", displayName)
+               message: this._msg("folder-actions.delete.failure", displayName)
             },
             webscript:
             {
@@ -423,10 +384,39 @@
             {
                site: this.options.siteId,
                container: this.options.containerId,
-               path: this.docData.location.path,
+               path: this.folderData.location.path,
                file: fileName
             }
          });
+      },
+
+      /**
+       * Set permissions on a single document or folder.
+       *
+       * @method onActionManagePermissions
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionManagePermissions: function FolderActions_onActionManagePermissions(row)
+      {
+         if (!this.modules.permissions)
+         {
+            this.modules.permissions = new Alfresco.module.DoclibPermissions(this.id + "-permissions").setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.folderData.location.path,
+               files: this.folderData
+            });
+         }
+         else
+         {
+            this.modules.permissions.setOptions(
+            {
+               path: this.folderData.location.path,
+               files: this.folderData
+            });
+         }
+         this.modules.permissions.showDialog();
       },
       
       /**
@@ -437,9 +427,9 @@
        * @return {string} The custom message
        * @private
        */
-      _msg: function DocumentActions__msg(messageId)
+      _msg: function FolderActions__msg(messageId)
       {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.DocumentActions", Array.prototype.slice.call(arguments).slice(1));
+         return Alfresco.util.message.call(this, messageId, "Alfresco.FolderActions", Array.prototype.slice.call(arguments).slice(1));
       }
    };
 })();

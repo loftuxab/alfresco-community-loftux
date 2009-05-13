@@ -1,0 +1,11 @@
+<documentList>
+   <actionSets>
+      <actionSet id="folder">
+         <action id="onActionDetails" type="simple-link" label="actions.folder.metadata" domId="{htmlid}-edit-metadata-action" />
+         <action id="onActionCopyTo" type="action-link" label="actions.folder.copy-to" />
+         <action id="onActionMoveTo" permission="delete" type="action-link" label="actions.folder.move-to" />
+         <action id="onActionDelete" permission="delete" type="action-link" label="actions.folder.delete" />
+         <action id="onActionManagePermissions" permission="permissions" type="action-link" label="actions.folder.manage-permissions" />
+      </actionSet>
+   </actionSets>
+</documentList>
