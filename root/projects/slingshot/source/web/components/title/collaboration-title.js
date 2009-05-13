@@ -194,8 +194,6 @@
        */
       joinSite: function CollaborationTitle_joinSite(user, site)
       {
-         user = encodeURIComponent(user);
-
          // make ajax call to site service to join current user
          Alfresco.util.Ajax.jsonRequest(
          {
@@ -328,8 +326,6 @@
        */
       leaveSite: function CollaborationTitle_leaveSite(user, site)
       {
-         user = encodeURIComponent(user);
-
          // make ajax call to site service to join user
          Alfresco.util.Ajax.request(
          {

@@ -565,7 +565,7 @@
             // make an ajax call to get user details
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(parent.currentUserId) + "?groups=true",
+               url: Alfresco.constants.PROXY_URI + "api/people/" + parent.currentUserId + "?groups=true",
                method: Alfresco.util.Ajax.GET,
                successCallback:
                {
@@ -1096,7 +1096,7 @@
             // make an ajax call to get user details
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(parent.currentUserId) + "?groups=true",
+               url: Alfresco.constants.PROXY_URI + "api/people/" + parent.currentUserId + "?groups=true",
                method: Alfresco.util.Ajax.GET,
                successCallback:
                {
@@ -1457,7 +1457,7 @@
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.DELETE,
-            url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(this.currentUserId),
+            url: Alfresco.constants.PROXY_URI + "api/people/" + this.currentUserId,
             successCallback:
             {
                fn: this.onDeletedUser,
@@ -1780,7 +1780,7 @@
                // update the password for the user
                Alfresco.util.Ajax.request(
                {
-                  url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + encodeURIComponent(this.currentUserId),
+                  url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + this.currentUserId,
                   method: Alfresco.util.Ajax.POST,
                   dataObj: passwordObj,
                   requestContentType: Alfresco.util.Ajax.JSON,
@@ -1818,7 +1818,7 @@
          
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(this.currentUserId),
+            url: Alfresco.constants.PROXY_URI + "api/people/" + this.currentUserId,
             method: Alfresco.util.Ajax.PUT,
             dataObj: personObj,
             requestContentType: Alfresco.util.Ajax.JSON,
