@@ -1263,15 +1263,24 @@ Alfresco.forms.validation.url = function url(field, args, event, form, silent, m
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating field '" + field.id + "' is a valid URL");
 
-   if (!args)
+   var expression = /(ftp|http|https):\/\/[\w\-_]+(\.[\w\-_]+)*([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/,
+      valid = true;
+
+   if (field.value.length > 0)
    {
-      args = {};
+      // Check an empty string replacement returns an empty string
+      var pattern = new RegExp(expression);
+      valid = field.value.replace(pattern, "") === "";
+
+      // Inform the user if invalid
+      if (!valid && !silent && form !== null)
+      {
+         var msg = (message != null) ? message : "is invalid.";
+         form.addError(form.getFieldLabel(field.id) + " " + msg, field);
+      }
    }
    
-   args.pattern = /(ftp|http|https):\/\/[\w\-_]+(\.[\w\-_]+)*([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/;
-   args.match = true;
-
-   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
+   return valid;
 };
 
 
