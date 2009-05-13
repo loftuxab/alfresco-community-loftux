@@ -601,6 +601,13 @@
                });
             }
             
+            // Update "Empty" message to reflect subfolders are available but hidden?
+            var itemCounts = me.doclistMetadata.itemCounts;
+            if (itemCounts.documents === 0 && itemCounts.folders > 0 && !me.options.showFolders)
+            {
+               me.widgets.dataTable.set("MSG_EMPTY", Alfresco.util.message("message.empty.subfolders", "Alfresco.DocumentList", itemCounts.folders));
+            }
+            
             return oParsedResponse;
          };
          
@@ -1412,7 +1419,8 @@
             // Token replacement
             clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML),
             {
-               downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true"
+               downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
+               folderDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + record.getData("nodeRef")
             });
             
             // Generate an id
@@ -1454,7 +1462,7 @@
             }
             
             // Need the "More >" container?
-            var splitAt = record.getData("type") == "folder" ? 1 : 3;
+            var splitAt = record.getData("type") == "folder" ? 2 : 3;
             actions = YAHOO.util.Selector.query("div", clone);
             if (actions.length > (splitAt + 1))
             {

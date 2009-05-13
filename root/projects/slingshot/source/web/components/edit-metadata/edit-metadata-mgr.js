@@ -74,6 +74,16 @@
          nodeRef: null,
          
          /**
+          * Current node type.
+          * The manager needs to know whether the following page is document-details or folder-details
+          * 
+          * @property nodeType
+          * @type string
+          * @default "document"
+          */
+         nodeType: "document",
+         
+         /**
           * Current siteId.
           * 
           * @property siteId
@@ -150,7 +160,7 @@
        */
       onMetadataUpdateSuccess: function EditMetadataMgr_onMetadataUpdateSuccess(response)
       {
-         this._showDocDetails();
+         this._showDetailsPage();
       },
       
       /**
@@ -177,21 +187,21 @@
        */
       onCancelButtonClick: function EditMetadataMgr_onCancel(type, args)
       {
-         this._showDocDetails();
+         this._showDetailsPage();
       },
       
       /**
-       * Displays the document details page for the current node
+       * Displays the corresponding details page for the current node
        *
-       * @method _showDocDetails
+       * @method _showDetailsPage
        * @private
        */
-      _showDocDetails: function EditMetadataMgr__showDocDetails()
+      _showDetailsPage: function EditMetadataMgr__showDetailsPage()
       {
-         // go back to the document details page for the node
-         var docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
-            "/document-details?nodeRef=" + this.options.nodeRef;
-         window.location.href = docDetailsUrl;
+         // go back to the appropriate details page for the node
+         var detailsPageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
+            "/" + this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
+         window.location.href = detailsPageUrl;
       },
       
       /**

@@ -2,6 +2,7 @@
    new Alfresco.EditMetadataMgr("${args.htmlid}").setOptions(
    {
       nodeRef: "${page.url.args.nodeRef!}",
+      nodeType: "${nodeType}",
       siteId: "${page.url.templateArgs.site!""}"
    }).setMessages(
       ${messages}
