@@ -25,6 +25,19 @@
       <namespace uri="http://www.alfresco.org/model/recordsmanagement/1.0" prefix="rma"/>
    </namespaces>
    
+   <constraints>
+      <constraint name="rma:smList" type="LIST">
+         <parameter name="allowedValues">
+            <list>
+               <value>NOFORN</value>      <!-- Not Releasable to Foreign Nationals/Governments/Non-US Citizens -->
+               <value>NOCONTRACT</value>  <!-- Not Releasable to Contractors or Contractor/Consultants -->
+               <value>FOUO</value>        <!-- For Official Use Only -->
+            </list>
+         </parameter>
+         <parameter name="caseSensitive"><value>true</value></parameter>
+      </constraint>
+   </constraints>
+   
    <types>
    
       <type name="rma:filePlan">
@@ -166,6 +179,10 @@
                <title>Record Folder Supplemental Marking List</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <multiple>true</multiple>
+               <constraints>
+                  <constraint ref="rma:smList"/>
+               </constraints>
             </property>
                                                      
             <property name="rma:isClosed">
@@ -284,6 +301,10 @@
                <title>Supplemental Marking List</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <multiple>true</multiple>
+               <constraints>
+                  <constraint ref="rma:smList"/>
+               </constraints>
             </property>
                                     
             <property name="rma:mediaType">

@@ -28,7 +28,7 @@
          <includePermissionGroup type="sys:base" permissionGroup="AddChildren"/>
       </permissionGroup>
       
-      <permissionGroup name"Retrieve" allowFullControl="false" expose="true">
+      <permissionGroup name="Retrieve" allowFullControl="false" expose="true">
          <includePermissionGroup type="sys:base" permissionGroup="Read"/>
       </permissionGroup>
    
