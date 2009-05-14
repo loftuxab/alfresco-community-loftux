@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2009 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,20 +21,38 @@
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
- *
- * Script: onCreateNode.js
- * Author: Roy Wetherall
- * 
- * Behaviour script executed when content node is created within a recordFolder or recordCategory
  */
-function main()
-{
-	var document = behaviour.args[0].child;
-	if (document.isDocument == true && document.hasAspect(rmService.ASPECT_RECORD) == false)
-	{
-   		// Apply the incomplete record aspect
-   		document.addAspect(rmService.ASPECT_INCOMPLETE_RECORD);
-	}
-}
+package org.alfresco.module.org_alfresco_module_dod5015;
 
-main();
+
+/**
+ * Record Management Action
+ * 
+ * @author Roy Wetherall
+ */
+public class RecordsManagementAction
+{
+    private String name;
+    
+    private String actionName;
+            
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
+    public String getName()
+    {
+        return this.name;
+    }
+    
+    public void setActionName(String actionName)
+    {
+        this.actionName = actionName;
+    }
+    
+    public String getActionName()
+    {
+        return this.actionName;
+    }
+}

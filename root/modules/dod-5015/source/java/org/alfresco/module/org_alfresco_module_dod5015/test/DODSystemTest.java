@@ -102,6 +102,8 @@ public class DODSystemTest extends BaseSpringTest
 	    assertNotNull(recordCategory);
 	    System.out.println(this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
 	    
+	    // TODO .. we need to file this record within a record folder .....
+	    
 	    /* Programatic filing */
 	    
 	    // Create the document
@@ -120,16 +122,16 @@ public class DODSystemTest extends BaseSpringTest
 	    //assertTrue(this.nodeService.hasAspect(recordOne, RecordsManagementModel.ASPECT_INCOMPLETE_RECORD));	    
 	    
 	    // File a document in the record category
-	    Map<String, Serializable> stateContext = new HashMap<String, Serializable>(5);
-	    stateContext.put("fileableNode", recordCategory);
+	    Map<String, Serializable> rmActionParameters = new HashMap<String, Serializable>(5);
+	    rmActionParameters.put("fileableNode", recordCategory);
 	    Map<String, Serializable> propValues = new HashMap<String, Serializable>(5);
 	    propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE.toString(), new Date());
 	    propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), "markingListValue");
 	    propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE.toString(), "mediaTypeValue"); 
 	    propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
 	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
-	    stateContext.put("recordProperties", (Serializable)propValues);
-	    rmService.addRecordState(recordOne, "filed", stateContext);
+	    rmActionParameters.put("recordProperties", (Serializable)propValues);
+	    rmService.executeRecordAction(recordOne, "filed", rmActionParameters);
 	    
 	    // Check the values of the filed record
 	    assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_REVIEW_AS_OF));

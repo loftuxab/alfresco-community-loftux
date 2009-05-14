@@ -45,7 +45,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
 {
     private static Log logger = LogFactory.getLog(RecordsManagementServiceImpl.class);
 
-    private Map<String, RecordState> states;
+    private Map<String, RecordsManagementAction> rmActions;
     
     private ActionService actionService;
     
@@ -54,71 +54,41 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
         this.actionService = actionService;
     }
     
-    public void setStates(List<RecordState> states)
+    public void setRecordsManagementActions(List<RecordsManagementAction> rmActions)
     {
         // Clear the existing map of states
-        this.states = new HashMap<String, RecordState>(states.size());
-        for (RecordState recordState : states)
+        this.rmActions = new HashMap<String, RecordsManagementAction>(rmActions.size());
+        for (RecordsManagementAction recordState : rmActions)
         {
-            this.states.put(recordState.getName(), recordState);
+            this.rmActions.put(recordState.getName(), recordState);
         }
     }    
     
-    /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#addRecordState(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.util.Map)
-     */
-    public void addRecordState(NodeRef record, String stateName, Map<String, Serializable> context)
+    public void executeRecordAction(NodeRef filePlanComponent, String name, Map<String, Serializable> parameters)
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("adding record state for node " + record);
+            logger.debug("Executing record managment action on " + filePlanComponent);
         }
         
         // Get the state
-        RecordState state = states.get(stateName);
-        if (state == null)
+        RecordsManagementAction rmAction = rmActions.get(name);
+        if (rmAction == null)
         {
-            throw new AlfrescoRuntimeException("The record state '" + stateName + "' has not been defined");
+            throw new AlfrescoRuntimeException("The record management action '" + name + "' has not been defined");
         }
         
         // Create the action
-        Action action = this.actionService.createAction(state.getOnAddStateAction());
-        action.setParameterValues(context);
+        Action action = this.actionService.createAction(rmAction.getActionName());
+        action.setParameterValues(parameters);
         
         // Execute the action
-        this.actionService.executeAction(action, record);        
-    }
-    
-    /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#removeRecordState(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.util.Map)
-     */
-    public void removeRecordState(NodeRef record, String stateName, Map<String, Serializable> context)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("removing record state for node " + record);
-        }
-
-        // Get the state
-        RecordState state = states.get(stateName);
-        if (state == null)
-        {
-            throw new AlfrescoRuntimeException("The record state '" + stateName + "' has not been defined");
-        }
-        
-        // Create the action
-        Action action = this.actionService.createAction(state.getOnRemoveStateAction());
-        action.setParameterValues(context);
-        
-        // Execute the action
-        this.actionService.executeAction(action, record);
+        this.actionService.executeAction(action, filePlanComponent);        
     }
 
-    /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getRecordStates(org.alfresco.service.cmr.repository.NodeRef)
-     */
-    public String[] getRecordStates(NodeRef record)
+    public List<String> getRecordActions()
     {
-        throw new UnsupportedOperationException("Currently unsupported");
-    }    
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
