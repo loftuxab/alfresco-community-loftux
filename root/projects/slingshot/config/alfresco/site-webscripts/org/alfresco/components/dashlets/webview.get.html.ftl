@@ -3,7 +3,7 @@
    {
       componentId: "${instance.object.id}",
       webviewURI: "${uri}",
-      webviewTitle: "${webviewTitle}",
+      webviewTitle: "${webviewTitle?js_string}",
       webviewHeight: "${height}"
    });
 //]]></script>
@@ -21,6 +21,3 @@
    </div><#-- end of body -->
 
 </div><#-- end of dashlet -->
-
-
-

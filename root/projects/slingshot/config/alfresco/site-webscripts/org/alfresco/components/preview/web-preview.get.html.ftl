@@ -3,7 +3,7 @@
 new Alfresco.WebPreview("${args.htmlid}").setOptions(
 {
    nodeRef: "${node.nodeRef}",
-   name: "${node.name?html}",
+   name: "${node.name?js_string}",
    icon: "${node.icon}",
    mimeType: "${node.mimeType}",
    previews: [<#list node.previews as p>"${p}"<#if (p_has_next)>, </#if></#list>]
