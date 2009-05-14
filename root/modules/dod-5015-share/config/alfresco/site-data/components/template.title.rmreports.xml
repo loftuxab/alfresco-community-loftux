@@ -3,5 +3,5 @@
    <scope>template</scope>
    <region-id>title</region-id>
    <source-id>rmreports</source-id>
-   <url>/components/title/search-title</url>
+   <url>/components/title/collaboration-title</url>
 </component>
