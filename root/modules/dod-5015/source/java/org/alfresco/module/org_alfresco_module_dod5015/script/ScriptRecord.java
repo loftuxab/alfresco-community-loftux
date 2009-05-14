@@ -24,9 +24,14 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
+import java.util.List;
+
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.jscript.ScriptNode;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -59,6 +64,27 @@ public class ScriptRecord extends ScriptNode
         super(nodeRef, services);
     }
 
+    /**
+     * 
+     * @return
+     */
+    public boolean isFiledInFolder()
+    {
+        boolean result = true;
+        
+        List<ChildAssociationRef> assocs = this.services.getNodeService().getParentAssocs(this.nodeRef);
+        for (ChildAssociationRef assoc : assocs)
+        {
+            QName parentClassName = this.services.getNodeService().getType(assoc.getParentRef());
+            if (this.services.getDictionaryService().isSubClass(parentClassName, RecordsManagementModel.TYPE_RECORD_FOLDER) == false)
+            {
+                result = false;
+                break;
+            }
+        }
+        
+        return result;        
+    }
     
     
 }

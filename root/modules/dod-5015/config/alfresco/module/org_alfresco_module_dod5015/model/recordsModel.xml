@@ -104,6 +104,13 @@
                <default>none|0</default>
             </property>
             
+            <property name="rma:retentionIndicator">
+               <title>Retention Indicator</title>
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+               <default>false</default>
+            </property>
+            
             <property name="rma:retentionSchedulePeriod">
                <title>Retention schedule period</title>
                <type>d:text</type>
@@ -226,6 +233,17 @@
          </properties>       
       
       </type>
+            
+      <type name="rma:nonElectronicRecord">
+         
+         <title>Non-Electronic Record</title>
+         <parent>cm:cmobject</parent>           
+         
+         <mandatory-aspects>         
+            <aspect>rma:record</aspect>            
+         </mandatory-aspects>
+      
+      </type>
    	
    </types>
    
@@ -344,8 +362,8 @@
                <title>Location</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property>                                        
-         
+            </property>    
+                                             
          </properties>         
          
          <mandatory-aspects>         
@@ -355,6 +373,173 @@
          
       </aspect>
    
+      <aspect name="rma:scannedRecord">
+      	<title>Scanned Record</title>
+      	<parent>rma:customRMData</parent>
+      	<properties>
+      		<property name="rma:scannedFormat">
+      			<title>Image Format</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>
+      		<property name="rma:scannedFormatVersion">
+      			<title>Image Format Version</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>
+      		<property name="rma:resolutionX">
+      			<title>Image Resolution X</title>
+      			<type>d:int</type>
+      			<mandatory>true</mandatory>
+      		</property>
+      		<property name="rma:resolutionY">
+      			<title>Image Resolution Y</title>
+      			<type>d:int</type>
+      			<mandatory>true</mandatory>
+      		</property>
+      		<property name="rma:scannedBitDepth">
+      			<title>Scanned Bit Depth</title>
+      			<type>d:int</type>
+      			<mandatory>false</mandatory>
+      		</property>
+      	</properties>
+      </aspect>
+   
+      <aspect name="rma:pdfRecord">
+      	<title>PDF Record</title>
+      	<parent>rma:customRMData</parent>
+      	<properties>      		
+      		<property name="rma:producingApplication">
+      			<title>Producing Application</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>   		
+      		<property name="rma:producingApplicationVersion">
+      			<title>Producing Application Version</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>   		
+      		<property name="rma:pdfVersion">
+      			<title>PDF Version</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>   		
+      		<property name="rma:creatingApplication">
+      			<title>Creating Application</title>
+      			<type>d:text</type>
+      			<mandatory>false</mandatory>
+      		</property>   		
+      		<property name="rma:documentSecuritySettings">
+      			<title>Document Security Settings</title>
+      			<type>d:text</type>
+      			<mandatory>false</mandatory>
+      		</property>
+      	</properties>
+      </aspect>
+   
+      <aspect name="rma:digitalPhotographRecord">
+      	<title>Digital Photograph Record</title>
+      	<parent>rma:customRMData</parent>
+      	<properties>   		
+      		<property name="rma:caption">
+      			<title>Caption</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>   		
+      		<property name="rma:photographer">
+      			<title>Photographer</title>
+      			<type>d:text</type>
+      			<mandatory>false</mandatory>
+      		</property>   		
+      		<property name="rma:copyright">
+      			<title>Copyright</title>
+      			<type>d:text</type>
+      			<mandatory>false</mandatory>
+      		</property>   		
+      		<property name="rma:bitDepth">
+      			<title>Bit Depth</title>
+      			<type>d:text</type>
+      			<mandatory>false</mandatory>
+      		</property>   		
+      		<property name="rma:imageSizeX">
+      			<title>Image Size X</title>
+      			<type>d:int</type>
+      			<mandatory>false</mandatory>
+      		</property>   		
+      		<property name="rma:imageSizeY">
+      			<title>Image Size Y</title>
+      			<type>d:int</type>
+      			<mandatory>false</mandatory>
+      		</property>   		
+      		<property name="rma:imageSource">
+      			<title>Image Source</title>
+      			<type>d:text</type>
+      			<mandatory>false</mandatory>
+      		</property>   		
+      		<property name="rma:compression">
+      			<title>Compression</title>
+      			<type>d:text</type>
+      			<mandatory>false</mandatory>
+      		</property>   		
+      		<property name="rma:iccIcmProfile">
+      			<title>ICC/ICM Profile</title>
+      			<type>d:text</type>
+      			<mandatory>false</mandatory>
+      		</property>   		
+      		<property name="rma:exifInformation">
+      			<title>EXIF Information</title>
+      			<type>d:text</type>
+      			<mandatory>false</mandatory>
+      		</property>
+      	</properties>
+      </aspect>     
+      
+      <aspect name="rma:webRecord">
+      	<title>Web Record</title>
+      	<parent>rma:customRMData</parent>
+      	<properties>  		
+      		<property name="rma:webFileName">
+      			<title>Web File Name</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>	
+      		<property name="rma:webPlatform">
+      			<title>Web Platform</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>	
+      		<property name="rma:webSiteName">
+      			<title>Web Site Name</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>	
+      		<property name="rma:webSiteURL">
+      			<title>Web Site URL</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>	
+      		<property name="rma:captureMethod">
+      			<title>Capture Method</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>	
+      		<property name="rma:captureDate">
+      			<title>Capture Date</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>	
+      		<property name="rma:contact">
+      			<title>Contact</title>
+      			<type>d:text</type>
+      			<mandatory>true</mandatory>
+      		</property>	
+      		<property name="rma:contentManagementSystem">
+      			<title>Content Management System</title>
+      			<type>d:text</type>
+      			<mandatory>false</mandatory>
+      		</property>
+      	</properties>
+      </aspect>                   
    
 	  <!-- State management aspects -->   
    
@@ -383,10 +568,10 @@
       <aspect name="rma:cutOff">
          <title>Cut Off</title>         
          <properties>                
-            <property name="rma:destroyAsOf">
-               <title>Destruction as of date</title>
+            <property name="rma:cutOfDate">
+               <title>Cut Of Date</title>
                <type>d:date</type>
-               <mandatory>false</mandatory>
+               <mandatory>true</mandatory>
             </property>
          </properties>
       </aspect>
@@ -402,18 +587,9 @@
          </properties>
       </aspect>      
       
-      <!-- Custom properties marker aspects -->      
-      
-      <aspect name="rma:customRecordCategoryProperties">
-         <title>Custom Record Category Properties</title>
-      </aspect>
-            
-      <aspect name="rma:customRecordFolderProperties">
-         <title>Custom Record Folder Properties</title>         
-      </aspect>      
-      
-      <aspect name="rma:customRecordProperties">
-         <title>Custom Record Properties</title>
+      <!-- Custom data marker aspect -->            
+      <aspect name="rma:customRMData">
+         <title>Custom Records Management Data</title>
       </aspect>
       
    </aspects>

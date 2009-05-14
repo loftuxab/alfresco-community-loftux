@@ -25,9 +25,11 @@
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
 import java.io.Serializable;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.jscript.Scopeable;
@@ -35,7 +37,12 @@ import org.alfresco.repo.jscript.ScriptNode;
 import org.alfresco.repo.jscript.ValueConverter;
 import org.alfresco.repo.processor.BaseProcessorExtension;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.dictionary.ClassDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mozilla.javascript.Scriptable;
@@ -56,9 +63,6 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	private ServiceRegistry services;
 	
 	private RecordsManagementService rmService;
-    
-    /** Value converter */
-    private ValueConverter valueConverter = new ValueConverter();
     	
 	/**
 	 * Set the service registry
@@ -138,125 +142,54 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	    return record;
 	}
 	
-	/**
-	 * 
-	 * @param recordCategory
-	 * @return
-	 */
-	public String generateRecordId(ScriptNode recordCategory)
+	public ScriptRecordCategory getRecordCategory(ScriptNode node)
 	{
-	    return this.rmService.generateRecordId(recordCategory.getNodeRef());
+	    // Get the record categories for this node
+	    NodeRef nodeRef = node.getNodeRef();
+	    List<NodeRef> recordCategories = new ArrayList<NodeRef>(1);
+	    getRecordCategory(nodeRef, recordCategories);
+	    
+	    // Create the record category script node
+	    return new ScriptRecordCategory(scope, services, recordCategories);
 	}
 	
-	/**
-	 * TODO .. this code is in here for the demo 
-	 *      .. should be moved into the period data type implementation
-	 *      
-     * Calculates the next interval date for a given type of date interval.
-     * 
-     * @param period
-     * @param fromDate
-     * @return 
-     */
-    public Serializable calculateAsOfDate(String period, Serializable fromDate)
+	private void getRecordCategory(NodeRef nodeRef, List<NodeRef> recordCategories)
+	{
+	    if (nodeRef != null)
+	    {
+    	    if (RecordsManagementModel.TYPE_RECORD_CATEGORY.equals(this.services.getNodeService().getType(nodeRef)) == true)
+    	    {
+    	        recordCategories.add(nodeRef);
+    	    }
+    	    else
+    	    {
+    	        List<ChildAssociationRef> assocs = this.services.getNodeService().getParentAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+    	        for (ChildAssociationRef assoc : assocs)
+                {
+                    NodeRef parent = assoc.getParentRef();
+                    getRecordCategory(parent, recordCategories);
+                }
+    	    }
+	    }
+	}
+	
+	/** ============== TEMP METHODS ADDED FOR PROTOTYPE ============= */
+    
+    public String[] getCustomRMAspects(Map<String, Serializable> properties)
     {
-        Date date = (Date)this.valueConverter.convertValueForRepo(fromDate);
-        
-        // Split the period value and retrieve the unit and value
-        String[] arr = period.split("\\|");
-        String unit = arr[0];
-        String valueString = arr[1];
-        int value = Integer.parseInt(valueString);
-        
-        Calendar calendar = Calendar.getInstance();     
-        calendar.setTime(date);
-        
-        if (unit.equals("none") == true)
+        List<String> aspects = new ArrayList<String>(10);
+        for (String propName : properties.keySet())
         {
-            // Return null as there is no period date to calculate
-            return null;
+            QName propQName = QName.createQName(propName);            
+            PropertyDefinition propDef = services.getDictionaryService().getProperty(propQName);
+            ClassDefinition containerClass = propDef.getContainerClass();
+            if (containerClass.isAspect() == true &&
+                    services.getDictionaryService().isSubClass(containerClass.getName(), RecordsManagementModel.ASPECT_CUSTOM_RM_DATA) == true)
+            {
+                aspects.add(containerClass.getName().toString());
+            }
         }
-        else if (unit.equals("day") == true) 
-        {
-            // Daily calculation
-            calendar.add(Calendar.DAY_OF_YEAR, value);
-        } 
-        else if (unit.equals("week") == true) 
-        {
-            // Weekly calculation
-            calendar.add(Calendar.WEEK_OF_YEAR, value);
-        } 
-        else if (unit.equals("month") == true) 
-        {
-            // Monthly calculation
-            calendar.add(Calendar.MONTH, value);
-        }
-        else if (unit.equals("year") == true) 
-        {
-            // Annual calculation
-            calendar.add(Calendar.YEAR, value);
-        }
-        else if (unit.equals("monthend") == true) 
-        {
-            // Month end calculation
-            calendar.add(Calendar.MONTH, value);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            calendar.add(Calendar.DAY_OF_YEAR, -1);
-            
-            // Set the time one minute to midnight
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MINUTE, 59);
-        } 
-        else if (unit.equals("quaterend") == true) 
-        {
-            // Quater end calculation
-            calendar.add(Calendar.MONTH, value*3);
-            int currentMonth = calendar.get(Calendar.MONTH);
-            if (currentMonth >= 0 && currentMonth <= 2)
-            {
-                calendar.set(Calendar.MONTH, 0);
-            }
-            else if (currentMonth >= 3 && currentMonth <= 5)
-            {
-                calendar.set(Calendar.MONTH, 3);
-            }
-            else if (currentMonth >= 6 && currentMonth <= 8)
-            {
-                calendar.set(Calendar.MONTH, 6);
-            }
-            else if (currentMonth >= 9 && currentMonth <= 11)
-            {
-                calendar.set(Calendar.MONTH, 9);
-            }
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            calendar.add(Calendar.DAY_OF_YEAR, -1);
-
-            // Set the time one minute to midnight
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MINUTE, 59);
-        } 
-        else if (unit.equals("yearend") == true) 
-        {
-            // Year end calculation
-            calendar.add(Calendar.YEAR, value);
-            calendar.set(Calendar.MONTH, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            calendar.add(Calendar.DAY_OF_YEAR, -1);
-
-            // Set the time one minute to midnight
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MINUTE, 59);
-        } 
-        else if (unit.equals("fyend") == true) 
-        {
-            // Financial year end calculation
-            throw new RuntimeException("Finacial year end is currently unsupported.");
-
-            // Set the time one minute to midnight 
-            //calendar.set(Calendar.HOUR_OF_DAY, 23);
-            //calendar.set(Calendar.MINUTE, 59);
-        } 
-                
-        return valueConverter.convertValueForScript(services, scope, null, calendar.getTime());
+        
+        return (String[])aspects.toArray(new String[aspects.size()]);
     }
 }

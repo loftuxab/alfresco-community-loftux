@@ -1,27 +1,18 @@
+/**
+ * File Record Action
+ *
+ * @actionedUponNode 		the record we are filing
+ *
+ * @param fileableNode  	the node we are filing the record into
+ * @param recordProperties  the record properties we are going to set
+ */
+
 function main(document)
 {
-	
-
     var fileableNode = action.parameters["fileableNode"];
 	if (fileableNode.hasAspect(rmService.ASPECT_FILABLE) == true)
 	{		
-		// Inspect the filable node
-		var recordCategory;
-		var filedInFolder = false;
-		// TODO chanage to use new dictionary method added to node
-		if (fileableNode.type.endsWith("recordFolder") == true)
-		{
-			filedInFolder = true;
-			recordCategory = fileable.parent;
-		}
-		else if (fileableNode.type.endsWith("recordCategory") == true)
-		{
-			recordCategory = fileableNode;
-		}
-		else
-		{
-		   throw "The filing type " + filable.type + " is currently unsupported.";
-		}	
+	    var recordCategory = rmService.getRecordCategory(fileableNode);
 	
 		// TODO Check whether the record is already a child of the filable node or not ..	
 			// TODO if it is a child then the incomplete record aspect must be present
@@ -40,46 +31,55 @@ function main(document)
 			record = rmService.makeRecord(document);
 			
 			// Calculated properties
-			record.properties[rmService.PROP_INDENTIFIER] = rmService.generateRecordId(recordCategory);
+			record.properties[rmService.PROP_INDENTIFIER] = recordCategory.nextRecordId;
 			record.properties[rmService.PROP_DATE_FILED] = new Date();
 			
-			// TODO add the extended meta-data aspects to the record
-			
-			// TODO set the property values
+			// Get hte record properties
 			var recordProperties = action.parameters["recordProperties"];
+			
+			// Add any custom aspects that are implied by the provided properties
+			var customAspects = rmService.getCustomRMAspects(recordProperties);
+			for (customAspect in customAspects)
+			{
+				record.addAspect(customAspect);
+			}
+			
+			// Set the property values
 			for (propName in recordProperties)
 			{
 				record.properties[propName] = recordProperties[propName];
-			}			
+			}		
+			record.save();	
 		}
 		
-		// Re-calculate the cut off schedule
-		var filed = record.properties[rmService.PROP_DATE_FILED];
-		var period = recordCategory.properties[rmService.PROP_CUT_OFF_SCHEDULE_PERIOD];
-		var asOfDate = rmService.calculateAsOfDate(period, filed);
-		if (asOfDate != null)
+		// Only calculate a cut off scedule for a record filed directly in a category
+		if (record.isFiledInFolder() == false)
 		{
-			record.addAspect(rmService.ASPECT_PENDING_CUT_OFF);
-			record.properties[rmService.PROP_CUT_OFF_AS_OF] = asOfDate;
+			// Re-calculate the cut off schedule
+			var filed = record.properties[rmService.PROP_DATE_FILED];
+			var asOfDate = recordCategory.getCutOffDate(filed);
+			if (asOfDate != null)
+			{
+				record.addAspect(rmService.ASPECT_PENDING_CUT_OFF);
+				record.properties[rmService.PROP_CUT_OFF_AS_OF] = asOfDate;
+				record.save();
+			}
 		}
 		
 		// Re-calculate the review schedule
-		period = recordCategory.properties[rmService.PROP_REVIEW_PERIOD];
-		asOfDate = rmService.calculateAsOfDate(period, filed);
-		if (asOfDate != null)
+		var asOfDate2 = recordCategory.getNextReviewDate(filed);
+		if (asOfDate2 != null)
 		{
 			record.addAspect(rmService.ASPECT_PENDING_REVIEW);
-			record.properties[rmService.PROP_REVIEW_AS_OF] = asOfDate;
+			record.properties[rmService.PROP_REVIEW_AS_OF] = asOfDate2;
+			record.save();
 		}
-		
-		// Remove the incomplete record aspect if it is marks as such
+
+		// Remove the incomplete record aspect if it's present
 		if (record.hasAspect(rmService.ASPECT_INCOMPLETE_RECORD) == true)
 		{
 		   record.removeAspect(rmService.ASPECT_INCOMPLETE_RECORD);
 		}
-		
-		// Save the records properties
-		record.save();
 	}
 	else
 	{
