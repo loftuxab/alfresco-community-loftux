@@ -142,7 +142,7 @@
             {
                file: "?file=" + folderData.fileName
             });
-            pathHtml += '">' + Alfresco.util.message("path.folders", this.name) + '</a></span>';
+            pathHtml += '">' + Alfresco.util.message("path.documents", this.name) + '</a></span>';
          }
          else
          {
