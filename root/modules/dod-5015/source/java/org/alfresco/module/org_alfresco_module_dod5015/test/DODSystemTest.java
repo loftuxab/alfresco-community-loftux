@@ -207,16 +207,16 @@ public class DODSystemTest extends BaseSpringTest
         //assertTrue(this.nodeService.hasAspect(recordOne, RecordsManagementModel.ASPECT_INCOMPLETE_RECORD));       
         
         // File a document in the record category
-        Map<String, Serializable> stateContext = new HashMap<String, Serializable>(5);
-        stateContext.put("fileableNode", recordFolder);
+        Map<String, Serializable> parameters = new HashMap<String, Serializable>(5);
+        parameters.put("fileableNode", recordFolder);
         Map<String, Serializable> propValues = new HashMap<String, Serializable>(5);
         propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE.toString(), new Date());
         propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), "markingListValue");
         propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE.toString(), "mediaTypeValue"); 
         propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
         propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
-        stateContext.put("recordProperties", (Serializable)propValues);
-        rmService.addRecordState(newRecord, "filed", stateContext);
+        parameters.put("recordProperties", (Serializable)propValues);
+        rmService.executeRecordAction(newRecord, "filed", parameters);
         
         // Check the values of the filed record
         assertNotNull(this.nodeService.getProperty(newRecord, RecordsManagementModel.PROP_REVIEW_AS_OF));        
