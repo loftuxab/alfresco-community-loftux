@@ -206,7 +206,7 @@
             <template-instance>dashboard-3-columns</template-instance>
             <authentication>user</authentication>
             <properties>
-               <sitePages>[{"pageId":"rmdocumentlibrary"}, {"pageId":"rmsearch"}, {"pageId":"rmreports"}, {"pageId":"calendar"}]</sitePages>
+               <sitePages>[{"pageId":"rmdocumentlibrary"}, {"pageId":"rmsearch"}, {"pageId":"rmreports"}]</sitePages>
             </properties>
          </page>
       </pages>
