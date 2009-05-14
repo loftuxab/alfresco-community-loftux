@@ -3,7 +3,6 @@
    {
       siteId: "${siteId}",
       siteName: "${siteName?js_string}",
-      containerId: "",
       initialSearchTerm: "${searchTerm?js_string}",
       initialSearchAll: "${searchAll?string}"
    }).setMessages(

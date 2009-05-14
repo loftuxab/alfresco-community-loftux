@@ -93,15 +93,6 @@
           * Title/name of the site
           */
          siteName: "",
-
-         /**
-          * ContainerId representing root container
-          *
-          * @property containerId
-          * @type string
-          * @default ""
-          */
-         containerId: "",
          
          /**
           * Maximum number of results displayed.
@@ -685,15 +676,13 @@
       _buildSearchParams: function Search__buildSearchParams(searchAll, searchTerm)
       {
          var site = searchAll ? "" : this.options.siteId;
-         var container = searchAll ? "" : this.options.containerId;
-         var params = YAHOO.lang.substitute("site={site}&container={container}&term={term}&maxResults={maxResults}",
+         var params = YAHOO.lang.substitute("site={site}&term={term}&maxResults={maxResults}",
          {
             site: encodeURIComponent(site),
-            container: encodeURIComponent(container),
             term : encodeURIComponent(searchTerm),
             maxResults : this.options.maxResults + 1 // to be able to know whether we got more results
          });
-
+         
          return params;
       },
       
