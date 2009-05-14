@@ -193,7 +193,8 @@
             </property>
                                                      
             <property name="rma:isClosed">
-               <title>Indicates whether the folder is closed</title>
+               <title>Record Folder Closed</title>
+               <description>Indicates whether the folder is closed</description>
                <type>d:boolean</type>
                <mandatory>true</mandatory>
                <default>false</default>
@@ -224,7 +225,8 @@
             </property>        
                                    
             <property name="rma:dispositionPeriod">
-               <title>Period after which the disposition will take place</title>
+               <title>Disposition Period</title>
+               <description>Period after which the disposition will take place</description>
                <type>d:text</type>
                <mandatory>true</mandatory>
                <default>immediately|0</default>

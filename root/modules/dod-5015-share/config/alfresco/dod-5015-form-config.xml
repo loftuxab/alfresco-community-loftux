@@ -1,0 +1,119 @@
+<alfresco-config>
+   
+   <config>
+      <forms>
+         <dependencies>
+            <css src="/components/form/period.css" />
+         </dependencies>
+      </forms>
+   </config>
+   
+   <!-- Records Management Forms -->
+   <config evaluator="node-type" condition="rma:filePlan">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:name" />
+            </field-visibility>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="node-type" condition="rma:recordSeries">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="rma:identifier" />
+               <show id="cm:title" />
+               <show id="cm:description" />
+            </field-visibility>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="node-type" condition="rma:recordCategory">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="rma:identifier" />
+               <show id="cm:title" />
+               <show id="cm:description" />
+               <show id="rma:dispositionAuthority" />
+               <show id="rma:dispositionInstructions" />
+               <show id="rma:cutOffSchedulePeriod" />
+               <show id="rma:retentionSchedulePeriod" />
+               <show id="rma:accessionIndicator" />
+               <show id="rma:accessionLocation" />
+               <show id="rma:accessionPeriod" />
+               <show id="rma:reviewPeriod" />
+               <show id="rma:dispositionActions" />
+            </field-visibility>
+            <appearance>
+               <field id="rma:dispositionActions" label="Disposition Actions" />
+               <field id="rma:cutOffSchedulePeriod">
+                  <control template="controls/period.ftl" />
+               </field>
+               <field id="rma:retentionSchedulePeriod">
+                  <control template="controls/period.ftl" />
+               </field>
+               <field id="rma:accessionPeriod">
+                  <control template="controls/period.ftl" />
+               </field>
+               <field id="rma:reviewPeriod">
+                  <control template="controls/period.ftl" />
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="node-type" condition="rma:recordFolder">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="rma:identifier" />
+               <show id="cm:title" />
+               <show id="cm:description" />
+               <show id="rma:recordFolderLocation" />
+               <show id="rma:recordFolderSupplementalMarkingList" />
+               <show id="rma:isClosed" />
+               <show id="rma:reviewPeriod" />
+               <show id="rma:dispositionActions" />
+            </field-visibility>
+            <appearance>
+               <field id="rma:dispositionActions" label="Disposition Actions" />
+               <field id="rma:reviewPeriod">
+                  <control template="controls/period.ftl" />
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+   
+   <config evaluator="node-type" condition="cm:content">
+      <forms>
+         <form>
+            <field-visibility>
+               <!-- Record Aspect -->
+               <show id="rma:dateFiled" />
+               <show id="rma:publicationDate" />
+               <show id="rma:originator" />
+               <show id="rma:originatingOrganization" />
+               <show id="rma:supplementalMarkingList" />
+               <show id="rma:mediaType" />
+               <show id="rma:format" />
+               <show id="rma:dateReceived" />
+               <show id="rma:address" />
+               <show id="rma:otherAddress" />
+               <show id="rma:location" />
+               
+               <hide id="app:editInline" />
+            </field-visibility>
+         </form>
+      </forms>
+   </config>
+   
+</alfresco-config>
