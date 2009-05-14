@@ -71,6 +71,11 @@ public interface RecordsManagementModel
     // Review details aspect
     public static QName PROP_REVIEW_PERIOD = QName.createQName(RM_URI, "reviewPeriod");
     
+    // Disposition action
+    public static QName TYPE_DISPOSITION_ACTION = QName.createQName(RM_URI, "dispositionAction");
+    public static QName PROP_DISPOSITION_ACTION = QName.createQName(RM_URI, "dispositionAction");
+    public static QName PROP_DISPOSITION_PERIOD = QName.createQName(RM_URI, "dispositionPeriod");
+    
     /** State management aspects */
     
     // Pending review aspect

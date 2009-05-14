@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.util.BaseSpringTest;
@@ -58,5 +59,23 @@ public class DODDataLoadSystemTest extends BaseSpringTest
 	public void testLoadFilePlanData()
 	{
 	    TestUtilities.loadFilePlanData(null, nodeService, importer);
+	}
+	
+	/**
+	 * Loads test disposition actions object into repository, disabled by default
+	 * as a valid parent NodeRef is required.
+	 * 
+	 * WARNING: This test is set to commit the data to the repository, if you don't
+	 *          want this to happen comment out the setComplete and endTransaction
+	 *          calls below.
+	 */
+	public void xtestLoadDispositionActions()
+	{
+	    TestUtilities.loadDispositionActions(new NodeRef(
+	                DODSystemTest.SPACES_STORE, "your-noderef-here"),
+	                this.nodeService);
+	    
+	    setComplete();
+        endTransaction();
 	}
 }
