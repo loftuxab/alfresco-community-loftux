@@ -3,7 +3,7 @@
 <#if activePage = "blog-postview" || activePage = "blog-postedit"><#assign activePage="blog-postlist"></#if>
 <#if activePage = "links-linkedit" || activePage = "links-view"><#assign activePage="links"></#if>
 <#if activePage = "discussions-topicview" || activePage = "discussions-createtopic"><#assign activePage="discussions-topiclist"></#if>
-<#if activePage = "document-details"><#assign activePage="documentlibrary"></#if>
+<#if activePage = "document-details" || activePage = "folder-details"><#assign activePage="documentlibrary"></#if>
 <#if activePage = "wiki-create"><#assign activePage="wiki"></#if>
 <div class="site-navigation">
 <#if siteExists??>
@@ -26,7 +26,7 @@
    </a></span>
    </#list>
 <span class="navigation-separator-alt">&nbsp;</span>
-   <#if ("site-members" == activePage) || ("sent-invites" == activePage) || ("invite" == activePage)>
+   <#if activePage = "site-members" || activePage = "pending-invites" || activePage = "invite" || activePage = "site-groups" || activePage = "add-groups">
       <#assign linkClass>class="active-page theme-color-4"</#assign>      
    <#else>
       <#assign linkClass>class="theme-color-4"</#assign>
