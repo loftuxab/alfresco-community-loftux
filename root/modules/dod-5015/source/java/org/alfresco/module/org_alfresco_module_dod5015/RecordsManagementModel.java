@@ -65,7 +65,7 @@ public interface RecordsManagementModel
     
     // Record component identifier aspect
     public static QName ASPECT_RECORD_COMPONENT_ID = QName.createQName(RM_URI, "recordComponentIdentifier");
-    public static QName PROP_INDENTIFIER = QName.createQName(RM_URI, "identifier");
+    public static QName PROP_IDENTIFIER = QName.createQName(RM_URI, "identifier");
     
     // Review details aspect
     public static QName PROP_REVIEW_PERIOD = QName.createQName(RM_URI, "reviewPeriod");
