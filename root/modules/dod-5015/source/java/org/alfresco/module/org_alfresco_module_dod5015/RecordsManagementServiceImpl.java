@@ -33,7 +33,6 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.util.GUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -121,14 +120,5 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
     public String[] getRecordStates(NodeRef record)
     {
         throw new UnsupportedOperationException("Currently unsupported");
-    }
-
-    /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#generateRecordId(org.alfresco.service.cmr.repository.NodeRef)
-     */
-    public String generateRecordId(NodeRef recordCategory)
-    {
-        // TODO something better than just a GUID
-        return GUID.generate();
     }    
 }

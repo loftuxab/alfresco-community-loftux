@@ -37,8 +37,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public interface RecordsManagementService
 {
-    String generateRecordId(NodeRef recordCategory);
-    
     String[] getRecordStates(NodeRef record);
     
     void addRecordState(NodeRef record, String stateName, Map<String, Serializable> context);

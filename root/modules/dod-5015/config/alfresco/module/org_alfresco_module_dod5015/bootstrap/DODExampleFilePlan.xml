@@ -43,6 +43,7 @@
 				   		<rma:dispositionInstructions>Cut off monthly, hold 1 month, then destroy.</rma:dispositionInstructions>
 				   		<rma:reviewPeriod>week|1</rma:reviewPeriod>
 				   		<rma:cutOffSchedulePeriod>monthend|1</rma:cutOffSchedulePeriod>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>month|1</rma:retentionSchedulePeriod>
 			    	</view:properties>
 			    	
@@ -81,6 +82,7 @@
 				   		<rma:dispositionAuthority>N1-218-89-1 item 002</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off every 3 months, hold 3 months, then destroy.</rma:dispositionInstructions>
 				   		<rma:cutOffSchedulePeriod>quaterend|1</rma:cutOffSchedulePeriod>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>month|3</rma:retentionSchedulePeriod>
 			    	</view:properties>	
 			    	
@@ -117,6 +119,7 @@
 				   		<rma:dispositionAuthority>N1-218-00-7 item 28</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off at end of FY, hold 3 years, then destroy.</rma:dispositionInstructions>
 				   		<rma:cutOffSchedulePeriod>fyend|1</rma:cutOffSchedulePeriod>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>year|3</rma:retentionSchedulePeriod>
 			    	</view:properties>	
 			    	
@@ -153,6 +156,7 @@
 				   		<rma:dispositionAuthority>N1-218-00-7 item 2</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off at end of CY, hold 2 years, then destroy.</rma:dispositionInstructions>
 				   		<rma:cutOffSchedulePeriod>yearend|1</rma:cutOffSchedulePeriod>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>year|2</rma:retentionSchedulePeriod>
 			    	</view:properties>	
 			    	
@@ -205,6 +209,7 @@
 				   		<cm:description>Policy matters pertaining to military assignments which are maintained by any JS/combatant command activity as the official record copy.</cm:description>
 				   		<rma:dispositionAuthority>N1-218-00-3 item 30</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off when superseded, hold 5 years, then destroy.</rma:dispositionInstructions>				   		
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>year|5</rma:retentionSchedulePeriod>
 			    	</view:properties>
 			    	
@@ -355,6 +360,7 @@
 				   		<cm:description>Decorations to foreign nationals and US citizens not employed by the US Government consisting of: case files of recommendations,  decisions, awards announcements, board meeting minutes, and related documents which are maintained by any JS/combatant command activity</cm:description>
 				   		<rma:dispositionAuthority>N1-218-00-3 item 18</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Permanent. Cut off on completion of case, hold 2 years, then retire to offline storage.  Transfer to federal records holding area 5 years after retirement to offline storage.  Transfer to NARA 25 years after cutoff.</rma:dispositionInstructions>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>year|2</rma:retentionSchedulePeriod>	
 				   		<rma:accessionIndicator>true</rma:accessionIndicator>			   		
 			    	</view:properties>
@@ -423,6 +429,7 @@
 				   		<cm:description>Files concerning an employee’s performance rating of record with work examples which establish less than fully successful performance, notice of withholding of WGI, employee's request for reconsideration of denied WGI, and decision concerning such a reconsideration request which are maintained by any JS/combatant command activity.</cm:description>
 				   		<rma:dispositionAuthority>N1-218-00-3 item 16</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off on completion of WGI action or on separation, whichever is earlier; hold 3 years, then destroy/delete.</rma:dispositionInstructions>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>year|3</rma:retentionSchedulePeriod>				   		
 			    	</view:properties>
 			    	
@@ -458,6 +465,7 @@
 				   		<cm:description>Consisting of: information to assist overseas civilian personnel offices to document employee eligibility for foreign post differential and foreign quarters and post allowances, including SF 1190 (Foreign Allowances Application, Grant, and Report) and similar information which are maintained by any JS/combatant command activity.</cm:description>
 				   		<rma:dispositionAuthority> N1-218-00-3 item 3</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off at end of Fiscal Year (FY) in which all allowances granted are terminated, hold 3 years, then destroy.</rma:dispositionInstructions>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>year|3</rma:retentionSchedulePeriod>				   		
 			    	</view:properties>
 			    	
@@ -511,6 +519,7 @@
 				   		<rma:dispositionAuthority>GRS 1 item 29b</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off annually, hold 5 years, then destroy, or destroy when obsolete, whichever is earlier.</rma:dispositionInstructions>
 				   		<rma:cutOffSchedulePeriod>year|1</rma:cutOffSchedulePeriod>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>year|5</rma:retentionSchedulePeriod>				   		
 			    	</view:properties>
 			    	
@@ -560,6 +569,7 @@
 				   		<cm:description>Forms reflecting purchase of foreign award medals and decorations.  </cm:description>
 				   		<rma:dispositionAuthority>N1-218-00-3 item 11</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cutoff when related record is transferred to inactive storage, hold 1 year, destroy.</rma:dispositionInstructions>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>year|1</rma:retentionSchedulePeriod>				   		
 			    	</view:properties>
 			    	
@@ -586,6 +596,7 @@
 				   		<cm:description>Consisting of skills training/evaluation forms, e.g., AF Form 4031.</cm:description>
 				   		<rma:dispositionAuthority>N1-218-00-3 item 13</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cutoff after training is complete, hold 1 year, destroy.</rma:dispositionInstructions>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>year|1</rma:retentionSchedulePeriod>				   		
 			    	</view:properties>
 			    	
@@ -628,6 +639,7 @@
 				   		<cm:description>Consisting of: reports, studies, tasking orders, and similar records. Reports are usually informal and unpublished. Records may be generated at all activities</cm:description>
 				   		<rma:dispositionAuthority>N1-218-00-10 item 44</rma:dispositionAuthority>
 				   		<rma:dispositionInstructions>Cut off on completion of study, hold 5 years, then transfer to Inactive Storage. Transfer to NARA 25 years after cutoff.</rma:dispositionInstructions>
+				   		<rma:retentionIndicator>true</rma:retentionIndicator>
 				   		<rma:retentionSchedulePeriod>year|5</rma:retentionSchedulePeriod>	
 				   		<rma:accessionIndicator>true</rma:accessionIndicator>			   		
 			    	</view:properties>

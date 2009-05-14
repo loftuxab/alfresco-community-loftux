@@ -148,8 +148,8 @@ public class DODSystemTest extends BaseSpringTest
 	    
 	    // Check the values of the filed record
 	    assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_REVIEW_AS_OF));
-	    //assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_CUT_OFF_AS_OF));
-	   // System.out.println("Cut off as of date: " + this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_CUT_OFF_AS_OF).toString());
+	    assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_CUT_OFF_AS_OF));
+	    System.out.println("Cut off as of date: " + this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_CUT_OFF_AS_OF).toString());
 	    System.out.println("Review as of date: " + this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_REVIEW_AS_OF).toString());
 	    
 	    // TODO commit to check that the filed record can be created correctly

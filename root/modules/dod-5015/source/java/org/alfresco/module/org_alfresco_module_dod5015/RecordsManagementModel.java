@@ -46,6 +46,8 @@ public interface RecordsManagementModel
     public static QName PROP_CUT_OFF_SCHEDULE_PERIOD = QName.createQName(RM_URI, "cutOffSchedulePeriod");
     public static QName PROP_RETENTION_SCHEDULE_PERIOD = QName.createQName(RM_URI, "retentionSchedulePeriod");    
     
+    public static QName TYPE_RECORD_FOLDER = QName.createQName(RM_URI, "recordFolder");
+    
     // Incomplete record aspect
     public static QName ASPECT_INCOMPLETE_RECORD = QName.createQName(RM_URI, "incompleteRecord");
     
@@ -75,16 +77,19 @@ public interface RecordsManagementModel
     public static QName PROP_REVIEW_AS_OF = QName.createQName(RM_URI, "reviewAsOf");
     
     // Pending cut off aspect
-    public static QName ASPECT_PENDING_CUT_OFF = QName.createQName(RM_URI, "pendingCutOff");
-    public static QName PROP_CUT_OFF_AS_OF = QName.createQName(RM_URI, "cutOffAsOf");    
+    public static QName ASPECT_PENDING_CUT_OFF = QName.createQName(RM_URI, "pendingCutOff"); 
+    public static QName PROP_CUT_OFF_AS_OF = QName.createQName(RM_URI, "cutOffAsOf");        
     
     // Cut off aspect
     public static QName ASPECT_CUT_OFF = QName.createQName(RM_URI, "cutOff");
-    public static QName PROP_DESTROY_AS_OF = QName.createQName(RM_URI, "destroyAsOf");
+    public static QName PROP_CUT_OFF_DATE = QName.createQName(RM_URI, "cutOffDate");
     
     // Retention aspect
     public static QName ASPECT_RETENTION = QName.createQName(RM_URI, "retention");
     public static QName PROP_END_RETENTION_AS_OF = QName.createQName(RM_URI, "endRetentionAsOf");
+    
+    // Custom RM data aspect
+    public static QName ASPECT_CUSTOM_RM_DATA = QName.createQName(RM_URI, "customRMData");
     
 	
 }
