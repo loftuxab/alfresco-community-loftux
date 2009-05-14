@@ -1134,7 +1134,19 @@
       <echoproperties />
    </target>
 
-   <target name="deploy-rm-repo-exploded" depends="package-dod5015-jar">
+
+   <!-- ****************************************************** -->
+   <!-- ************** DOD5015 Exploded targets ************** -->
+   <!-- ****************************************************** -->
+
+   <target name="incremental-dod5015-repo-exploded"
+           depends="init,
+                    deploy-dod5015-repo-exploded">
+   </target>
+
+   <target name="deploy-dod5015-repo-exploded"
+           depends="init,
+                    package-dod5015-jar">
       <!-- copy jar -->
       <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/lib"
             file="${dir.module.dod5015.dist}/${file.name.jar.dod5015}" />
@@ -1145,12 +1157,20 @@
          </fileset>
       </copy>
    </target>
+
+   <target name="incremental-dod5015-share-exploded"
+           depends="init,
+                    deploy-dod5015-share-exploded,
+                    minimize-slingshot-deployed-javascript">
+   </target>
    
-   <target name="deploy-rm-share-exploded" depends="init">
+   <target name="deploy-dod5015-share-exploded"
+           depends="init">
       <!-- copy all source files -->
       <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}">
          <fileset dir="${dir.modules}/dod-5015-share/source/web" />
       </copy>
+      <!-- copy webscripts, etc. -->
       <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.modules}/dod-5015-share/config">
             <include name="**/*.*" />
