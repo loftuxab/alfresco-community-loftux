@@ -52,11 +52,11 @@ function main(document)
 			record.save();	
 		}
 		
-		// Only calculate a cut off scedule for a record filed directly in a category
+		var filed = record.properties[rmService.PROP_DATE_FILED];
+		// Only calculate a cut off schedule for a record filed directly in a category
 		if (record.isFiledInFolder() == false)
 		{
 			// Re-calculate the cut off schedule
-			var filed = record.properties[rmService.PROP_DATE_FILED];
 			var asOfDate = recordCategory.getCutOffDate(filed);
 			if (asOfDate != null)
 			{
