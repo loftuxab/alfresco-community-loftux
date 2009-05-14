@@ -285,6 +285,11 @@
       <property name="templateProcessor" ref="webframework.templateprocessor" />
       <property name="scriptProcessor" ref="webframework.scriptprocessor" />
       <property name="templateStore" ref="webframework.store.templates" />
+      <property name="scriptObjects">
+         <map>
+            <entry key="remote" value-ref="webscripts.script.remote" />
+         </map>
+      </property>
    </bean>
    
    <bean id="webframework.processor.jsp" class="org.alfresco.web.framework.render.bean.JSPProcessor" />

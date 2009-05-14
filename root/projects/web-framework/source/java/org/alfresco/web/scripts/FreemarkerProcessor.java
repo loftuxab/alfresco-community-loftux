@@ -52,6 +52,7 @@ public class FreemarkerProcessor extends AbstractProcessor
     private PresentationTemplateProcessor templateProcessor;
     private PresentationScriptProcessor scriptProcessor;
     private Store templateStore;
+    private Map<String, Object> scriptObjects;
     
     
     public void init(ApplicationContext applicationContext)
@@ -118,6 +119,17 @@ public class FreemarkerProcessor extends AbstractProcessor
     public Store getTemplateStore()
     {
         return this.templateStore;
+    }
+    
+    /**
+     * Set any additional objects to be applied to the script model when executing any JavaScript
+     * attached to the template.
+     * 
+     * @param scriptObjects
+     */
+    public void setScriptObjects(Map<String, Object> scriptObjects)
+    {
+        this.scriptObjects = scriptObjects;
     }
     
     public void executeHeader(ProcessorContext pc)
@@ -187,10 +199,16 @@ public class FreemarkerProcessor extends AbstractProcessor
                     if (script != null)
                     {
                         // build the model
-                        Map<String, Object> scriptModel = new HashMap<String, Object>(16);
+                        Map<String, Object> scriptModel = new HashMap<String, Object>(32);
                         ProcessorModelHelper.populateScriptModel(context, scriptModel);
                         
-                        // add in the model object
+                        // add any externally configured script objects
+                        if (this.scriptObjects != null)
+                        {
+                            scriptModel.putAll(this.scriptObjects);
+                        }
+                        
+                        // add in the model result object
                         scriptModel.put("model", resultModel);
                         
                         // execute the script
