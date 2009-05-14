@@ -56,11 +56,21 @@ public class ScriptRecordCategory implements Serializable, Scopeable
     
     private ServiceRegistry services;
     
+    /**
+     * @see org.alfresco.repo.jscript.Scopeable#setScope(org.mozilla.javascript.Scriptable)
+     */
     public void setScope(Scriptable scope)
     {
         this.scope = scope;
     }
     
+    /**
+     * Constructor
+     * 
+     * @param scope
+     * @param services
+     * @param recordCategory
+     */
     public ScriptRecordCategory(Scriptable scope, ServiceRegistry services, NodeRef recordCategory)
     {
         this.recordCategoryNodeRefs = new ArrayList<NodeRef>(1);
@@ -69,6 +79,13 @@ public class ScriptRecordCategory implements Serializable, Scopeable
         this.scope = scope;
     }
     
+    /**
+     * Constructor
+     * 
+     * @param scope
+     * @param services
+     * @param recordCategoryNodeRefs
+     */
     public ScriptRecordCategory(Scriptable scope, ServiceRegistry services, List<NodeRef> recordCategoryNodeRefs)
     {
         this.recordCategoryNodeRefs = recordCategoryNodeRefs;
@@ -76,33 +93,77 @@ public class ScriptRecordCategory implements Serializable, Scopeable
         this.scope = scope;
     }
     
+    /**
+     * TODO
+     * Currently assumes the first record category as the one to use ...
+     * 
+     * @return
+     */
+    private NodeRef getRecordCategory()
+    {
+        return this.recordCategoryNodeRefs.get(0);
+    }
+    
+    /**
+     * 
+     * @return
+     */
+    public boolean getHasRetention()
+    {
+        return ((Boolean)this.services.getNodeService().getProperty(
+                                            getRecordCategory(), 
+                                            RecordsManagementModel.PROP_RETENTION_INDICATOR)).booleanValue();
+    }
+    
+    /**
+     * 
+     * @return
+     */
     public String getNextRecordId()
     {
         return GUID.generate();
     }
     
+    /**
+     * 
+     * @param fromDate
+     * @return
+     */
     public Serializable getCutOffDate(Serializable fromDate)
     {
         return calculatePropertyAsOfDate(RecordsManagementModel.PROP_CUT_OFF_SCHEDULE_PERIOD, fromDate);
     }
     
+    /**
+     * 
+     * @param fromDate
+     * @return
+     */
     public Serializable getNextReviewDate(Serializable fromDate)
     {
         return calculatePropertyAsOfDate(RecordsManagementModel.PROP_REVIEW_PERIOD, fromDate);
     }
     
+    /**
+     * 
+     * @param fromDate
+     * @return
+     */
     public Serializable getEndRetentionDate(Serializable fromDate)
     {
         return calculatePropertyAsOfDate(RecordsManagementModel.PROP_RETENTION_SCHEDULE_PERIOD, fromDate);
     }   
     
+    /**
+     * 
+     * @param property
+     * @param fromDate
+     * @return
+     */
     private Serializable calculatePropertyAsOfDate(QName property, Serializable fromDate)
     {
-        // TODO .. for now assume only one record category
-        NodeRef recordCategory = this.recordCategoryNodeRefs.get(0);
-        
         // Get the period value of the property
-        String period = (String)this.services.getNodeService().getProperty(recordCategory, property);
+        String period = (String)this.services.getNodeService().getProperty(getRecordCategory(), property);
         
         return calculateAsOfDate(period, fromDate);
     }

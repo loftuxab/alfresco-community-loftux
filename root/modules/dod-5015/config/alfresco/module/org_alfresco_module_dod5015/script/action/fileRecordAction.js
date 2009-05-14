@@ -31,7 +31,7 @@ function main(document)
 			record = rmService.makeRecord(document);
 			
 			// Calculated properties
-			record.properties[rmService.PROP_IDENTIFIER] = recordCategory.nextRecordId;
+			record.properties[rmService.PROP_INDENTIFIER] = recordCategory.nextRecordId;
 			record.properties[rmService.PROP_DATE_FILED] = new Date();
 			
 			// Get hte record properties

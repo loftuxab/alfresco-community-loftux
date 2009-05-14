@@ -17,11 +17,11 @@
     
     <bean id="recordsManagementService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceImpl">
     	<property name="actionService" ref="ActionService"/>
-    	<property name="states">
+    	<property name="recordsManagementActions">
     		<list>
-    			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordState">
+    			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">
     				<property name="name" value="filed"/>
-    				<property name="onAddStateAction" value="fileRecordAction"/>
+    				<property name="actionName" value="fileRecordAction"/>
     			</bean>
     		</list>    		
     	</property>
@@ -71,7 +71,7 @@
         <property name="scriptLocation">
         	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
             	<constructor-arg>
-            		<value>alfresco/module/org_alfresco_module_dod5015/script/fileRecordAction.js</value>
+            		<value>alfresco/module/org_alfresco_module_dod5015/script/action/fileRecordAction.js</value>
             	</constructor-arg>
             </bean>
 		</property>
@@ -79,9 +79,8 @@
 	         <value>false</value>
 	     </property>
     </bean>
-    
-    
-    <!-- Behaviours -->
+        
+    <!-- Behaviors -->
     <bean id="org_alfresco_module_dod5015_onCreateChildAssociation_rmaRecordFolder_cmContains" class="org.alfresco.repo.policy.registration.AssociationPolicyRegistration" parent="policyRegistration">   
         <property name="policyNames">
            <list>
@@ -100,40 +99,12 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/org_alfresco_module_dod5015/script/onCreateNode.js</value>
+		            		<value>alfresco/module/org_alfresco_module_dod5015/script/behavior/onCreateNode.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
 			</bean>        
         </property> 
     </bean>
-    
-    <!--
-    <bean id="org_alfresco_module_dod5015_onCreateChildAssociation_rmaRecordCategory_cmContains" class="org.alfresco.repo.policy.registration.AssociationPolicyRegistration" parent="policyRegistration">   
-        <property name="policyNames">
-           <list>
-        	  <value>{http://www.alfresco.org}onCreateChildAssociation</value>
-              <value>{http://www.alfresco.org}onCreateNodeAssociation</value>
-           </list>
-        </property>  	   
-        <property name="className">
-            <value>{http://www.alfresco.org/model/recordsmanagement/1.0}recordCategory</value>
-        </property> 	        	   
-        <property name="associationType">
-            <value>{http://www.alfresco.org/model/content/1.0}contains</value>
-        </property>    
-        <property name="behaviour">
-           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
-		        <property name="location">
-		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
-		            	<constructor-arg>
-		            		<value>alfresco/module/org_alfresco_module_dod5015/script/onCreateNode.js</value>
-		            	</constructor-arg>
-		            </bean>
-				</property>
-			</bean>        
-        </property> 
-    </bean>
-    -->
     
 </beans>

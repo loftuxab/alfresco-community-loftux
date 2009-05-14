@@ -44,6 +44,7 @@ public interface RecordsManagementModel
     // Record Category
     public static QName TYPE_RECORD_CATEGORY = QName.createQName(RM_URI, "recordCategory");
     public static QName PROP_CUT_OFF_SCHEDULE_PERIOD = QName.createQName(RM_URI, "cutOffSchedulePeriod");
+    public static QName PROP_RETENTION_INDICATOR = QName.createQName(RM_URI, "retentionIndicator");
     public static QName PROP_RETENTION_SCHEDULE_PERIOD = QName.createQName(RM_URI, "retentionSchedulePeriod");    
     
     public static QName TYPE_RECORD_FOLDER = QName.createQName(RM_URI, "recordFolder");

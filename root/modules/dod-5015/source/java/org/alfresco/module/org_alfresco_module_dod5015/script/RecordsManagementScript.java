@@ -62,6 +62,7 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	/** The service registry */
 	private ServiceRegistry services;
 	
+	/** Records management service */
 	private RecordsManagementService rmService;
     	
 	/**
@@ -142,6 +143,29 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	    return record;
 	}
 	
+	/**
+	 * 
+	 * @param node
+	 * @return
+	 */
+	public ScriptRecordFolder getRecordFolder(ScriptNode node)
+	{
+	    ScriptRecordFolder recordFolder = null;
+	    NodeRef nodeRef = node.getNodeRef();
+	    QName nodeType = this.services.getNodeService().getType(nodeRef);
+	    if (this.services.getDictionaryService().isSubClass(nodeType, RecordsManagementModel.TYPE_RECORD_FOLDER) == true)
+	    {
+	        recordFolder = new ScriptRecordFolder(nodeRef, services, scope);
+	    }
+	    
+	    return recordFolder;
+	}
+	
+	/**
+	 * 
+	 * @param node
+	 * @return
+	 */
 	public ScriptRecordCategory getRecordCategory(ScriptNode node)
 	{
 	    // Get the record categories for this node
@@ -153,6 +177,11 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	    return new ScriptRecordCategory(scope, services, recordCategories);
 	}
 	
+	/**
+	 * 
+	 * @param nodeRef
+	 * @param recordCategories
+	 */
 	private void getRecordCategory(NodeRef nodeRef, List<NodeRef> recordCategories)
 	{
 	    if (nodeRef != null)
