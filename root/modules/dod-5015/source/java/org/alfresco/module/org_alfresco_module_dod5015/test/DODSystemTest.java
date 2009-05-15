@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +70,11 @@ public class DODSystemTest extends BaseSpringTest
 	
 	private AuthenticationComponent authenticationComponent;
 	
+	// base test data for supplemental markings list (see also recordsModel.xml)
+	private final static String NOFORN     = "NOFORN";     // Not Releasable to Foreign Nationals/Governments/Non-US Citizens
+	private final static String NOCONTRACT = "NOCONTRACT"; // Not Releasable to Contractors or Contractor/Consultants
+	private final static String FOUO       = "FOUO";       // For Official Use Only 
+	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
 	{
@@ -93,8 +99,20 @@ public class DODSystemTest extends BaseSpringTest
 	{
         filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService);
 	}
-	
-	public void testBasicFileingTest()
+    @Override
+    protected void onTearDownInTransaction() throws Exception
+    {
+        // trigger integrity/constraint checks
+        setComplete();
+        endTransaction();
+    }
+    
+    public void testSetup()
+    {
+        // NOOP
+    }
+    
+	public void testBasicFilingTest()
 	{
 	    // Get a record category to file into
 	    NodeRef recordFolder = getRecordFolder("Reports", "AIS Audit Records", "January AIS Audit Records");    
@@ -126,7 +144,12 @@ public class DODSystemTest extends BaseSpringTest
 	    rmActionParameters.put("recordFolder", recordFolder);
 	    Map<String, Serializable> propValues = new HashMap<String, Serializable>(5);
 	    propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE.toString(), new Date());
-	    propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), "markingListValue");
+	    
+	    List<String> smList = new ArrayList<String>(2);
+        smList.add(FOUO);
+        smList.add(NOFORN);
+	    propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), (Serializable)smList);
+	    
 	    propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE.toString(), "mediaTypeValue"); 
 	    propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
 	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
@@ -215,7 +238,13 @@ public class DODSystemTest extends BaseSpringTest
         parameters.put("recordFolder", recordFolder);
         Map<String, Serializable> propValues = new HashMap<String, Serializable>(5);
         propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE.toString(), new Date());
-        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), "markingListValue");
+        
+        List<String> smList = new ArrayList<String>(3);
+        smList.add(FOUO);
+        smList.add(NOFORN);
+        smList.add(NOCONTRACT);
+        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), (Serializable)smList);
+        
         propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE.toString(), "mediaTypeValue"); 
         propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
         propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
@@ -244,13 +273,10 @@ public class DODSystemTest extends BaseSpringTest
         searchParameters.addStore(SPACES_STORE);
         
         String query = "PATH:\"rma:filePlan/cm:" + ISO9075.encode(seriesName) + "/cm:" + ISO9075.encode(categoryName) + "\"";
-
+        
         searchParameters.setQuery(query);
         searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
         ResultSet rs = this.searchService.query(searchParameters);
-        
-        //setComplete();
-        //endTransaction();
         
         final NodeRef result = rs.getNodeRef(0);
         return result;
@@ -267,9 +293,6 @@ public class DODSystemTest extends BaseSpringTest
         searchParameters.setQuery(query);
         searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
         ResultSet rs = this.searchService.query(searchParameters);
-        
-        //setComplete();
-        //endTransaction();
         
         return rs.getNodeRef(0);
     }

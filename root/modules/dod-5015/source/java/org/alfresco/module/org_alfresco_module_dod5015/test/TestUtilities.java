@@ -90,7 +90,7 @@ public class TestUtilities
         {
             // For now creating the filePlan beneth the
             NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
-            filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CONTAINS,
+            filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
                     QName.createQName(RecordsManagementModel.RM_URI, "filePlan"),
                     RecordsManagementModel.TYPE_FILE_PLAN).getChildRef();
         } else

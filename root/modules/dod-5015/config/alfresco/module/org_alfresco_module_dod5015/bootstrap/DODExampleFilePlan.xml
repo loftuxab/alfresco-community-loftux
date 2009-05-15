@@ -613,14 +613,14 @@
                        <cm:contains>
                             <rma:recordFolder view:childName="cm:January Cockpit/Crew Training">
                                 <view:properties>
-                                    <cm:name>January Cockpit/Crew Training</cm:name>
+                                    <cm:name>January Cockpit Crew Training</cm:name>
                                     <rma:identifier>0950-03</rma:identifier>
                                     <cm:title>January Cockpit/Crew Training</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
                             <rma:recordFolder view:childName="cm:February Cockpit/Crew Training">
                                 <view:properties>
-                                    <cm:name>February Cockpit/Crew Training</cm:name>
+                                    <cm:name>February Cockpit Crew Training</cm:name>
                                     <rma:identifier>0950-03</rma:identifier>
                                     <cm:title>February Cockpit/Crew Training</cm:title>
                                 </view:properties>

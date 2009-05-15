@@ -55,7 +55,19 @@ public class DODDataLoadSystemTest extends BaseSpringTest
 		// Set the current security context as admin
 		this.authenticationComponent.setCurrentUser(AuthenticationUtil.getSystemUserName());		
 	}
-        
+    @Override
+    protected void onTearDownInTransaction() throws Exception
+    {
+        // trigger integrity/constraint checks
+        setComplete();
+        endTransaction();
+    }
+    
+    public void testSetup()
+    {
+        // NOOP
+    }
+    
 	public void testLoadFilePlanData()
 	{
 	    TestUtilities.loadFilePlanData(null, nodeService, importer);
