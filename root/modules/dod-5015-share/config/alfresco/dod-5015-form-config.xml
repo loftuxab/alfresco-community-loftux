@@ -81,10 +81,8 @@
                <show id="rma:recordFolderSupplementalMarkingList" />
                <show id="rma:isClosed" />
                <show id="rma:reviewPeriod" />
-               <show id="rma:dispositionActions" />
             </field-visibility>
             <appearance>
-               <field id="rma:dispositionActions" label="Disposition Actions" />
                <field id="rma:reviewPeriod">
                   <control template="controls/period.ftl" />
                </field>
@@ -109,8 +107,6 @@
                <show id="rma:address" />
                <show id="rma:otherAddress" />
                <show id="rma:location" />
-               
-               <hide id="app:editInline" />
             </field-visibility>
          </form>
       </forms>
