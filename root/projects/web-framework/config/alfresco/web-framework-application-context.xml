@@ -287,7 +287,7 @@
       <property name="templateStore" ref="webframework.store.templates" />
       <property name="scriptObjects">
          <map>
-            <entry key="remote" value-ref="webscripts.script.remote" />
+            <entry key="remote" value-ref="webframework.script.remote" />
          </map>
       </property>
    </bean>
