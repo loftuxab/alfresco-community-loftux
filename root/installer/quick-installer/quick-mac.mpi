@@ -3319,9 +3319,9 @@ InstallComponent 26AB25DD-F99D-443E-885E-E83824C414CB -setup Install -type pane 
 InstallComponent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A -setup Install -type pane -title {Copying Files} -component CopyFiles -active Yes -parent StandardInstall
 InstallComponent 3C792AD2-7426-4EB0-B6EB-BBE13E8C56F1 -setup Install -type action -title {Disable Buttons} -component ModifyWidget -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
 InstallComponent 95BB0407-03A2-493A-B74A-133E8F7F111A -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
-InstallComponent 25F8202E-DCA2-4FDD-839A-DCF216CFBDB0 -setup Install -type action -conditions 0421762A-7F7F-40AC-85C9-D39F4607C278 -title {Execute IM untar} -component ExecuteExternalProgram -command reorder -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
+InstallComponent 25F8202E-DCA2-4FDD-839A-DCF216CFBDB0 -setup Install -type action -conditions 0421762A-7F7F-40AC-85C9-D39F4607C278 -title {Execute IM untar} -component ExecuteExternalProgram -command insert -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
 Condition 0421762A-7F7F-40AC-85C9-D39F4607C278 -active Yes -parent 25F8202E-DCA2-4FDD-839A-DCF216CFBDB0 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id EDE206D6-55BC-A5BB-4477-7CDA03979430
-InstallComponent 8CEC308E-6CC0-4A81-BB9B-2CB6177A06B0 -setup Install -type action -conditions {C1A9A28A-36AA-43B7-996F-7FD4F98C2606 1C51A752-5F3B-468F-9EFF-7CD7D2198119} -title {Delete File} -component DeleteFile -command reorder -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
+InstallComponent 8CEC308E-6CC0-4A81-BB9B-2CB6177A06B0 -setup Install -type action -conditions {C1A9A28A-36AA-43B7-996F-7FD4F98C2606 1C51A752-5F3B-468F-9EFF-7CD7D2198119} -title {Delete File} -component DeleteFile -command insert -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
 Condition C1A9A28A-36AA-43B7-996F-7FD4F98C2606 -active Yes -parent 8CEC308E-6CC0-4A81-BB9B-2CB6177A06B0 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id DA50A318-F7A6-978F-5F38-D2118CD15FC7
 Condition 1C51A752-5F3B-468F-9EFF-7CD7D2198119 -active Yes -parent 8CEC308E-6CC0-4A81-BB9B-2CB6177A06B0 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 6151E18D-7B2E-0B3A-66AC-293C090F40D2
 InstallComponent A7A67250-725D-453B-94A7-3384D68498D3 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
@@ -5569,7 +5569,7 @@ D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,Conditions
 {2 conditions}
 
 D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,URL
-http://wiki.alfresco.com/wiki/Alfresco_Enterprise_3_1
+http://wiki.alfresco.com/wiki/Alfresco_<%Codeline%>_<%Version%>
 
 D425AAA6-9AE6-42BF-812A-9648213060EF,Comment
 {Do not display this pane if this is an upgrade install unless there is more than one installation present}
