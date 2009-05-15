@@ -49,8 +49,8 @@ public interface RecordsManagementModel
     
     public static QName TYPE_RECORD_FOLDER = QName.createQName(RM_URI, "recordFolder");
     
-    // Incomplete record aspect
-    public static QName ASPECT_INCOMPLETE_RECORD = QName.createQName(RM_URI, "incompleteRecord");
+    // Undeclared record aspect
+    public static QName ASPECT_UNDECLARED_RECORD = QName.createQName(RM_URI, "undeclaredRecord");
     
     // Record aspect
     public static QName ASPECT_RECORD = QName.createQName(RM_URI, "record");

@@ -160,7 +160,6 @@
          <mandatory-aspects>         
             <aspect>cm:titled</aspect>            
             <aspect>rma:recordComponentIdentifier</aspect>
-            <aspect>rma:fileable</aspect>
             <aspect>rma:reviewDetails</aspect>
          </mandatory-aspects>
          
@@ -205,7 +204,6 @@
          <mandatory-aspects>         
             <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
-            <aspect>rma:fileable</aspect>
             <aspect>rma:reviewDetails</aspect>
          </mandatory-aspects>
          
@@ -251,13 +249,8 @@
    
    <aspects>
    
-      <aspect name="rma:incompleteRecord">
-         <title>Incomplete Record</title>
-         <description>Used to mark a record that is incomplete and has yet to be filed.</description>         
-      </aspect>
-   
-      <aspect name="rma:fileable">
-         <title>Used to mark object types that are fileable</title>         
+      <aspect name="rma:undeclaredRecord">
+         <title>Undeclared Record</title>         
       </aspect>
    
       <aspect name="rma:recordComponentIdentifier">

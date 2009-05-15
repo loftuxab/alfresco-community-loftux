@@ -35,8 +35,8 @@ function main()
 	var document = behaviour.args[0].child;
 	if (document.isDocument == true && document.hasAspect(rmService.ASPECT_RECORD) == false)
 	{
-   		// Apply the incomplete record aspect
-   		document.addAspect(rmService.ASPECT_INCOMPLETE_RECORD);
+   		// Apply the undeclared record aspect
+   		document.addAspect(rmService.ASPECT_UNDECLARED_RECORD);
 	}
 }
 
