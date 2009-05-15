@@ -97,17 +97,17 @@ public class DODSystemTest extends BaseSpringTest
 	public void testBasicFileingTest()
 	{
 	    // Get a record category to file into
-	    NodeRef recordCategory = getRecordCategory("Reports", "AIS Audit Records");	    
+	    NodeRef recordFolder = getRecordFolder("Reports", "AIS Audit Records", "January AIS Audit Records");    
 	    
-	    assertNotNull(recordCategory);
-	    System.out.println(this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+	    assertNotNull(recordFolder);
+	    System.out.println(this.nodeService.getProperty(recordFolder, ContentModel.PROP_NAME));
 	    
 	    // TODO .. we need to file this record within a record folder .....
 	    
 	    /* Programatic filing */
 	    
 	    // Create the document
-	    NodeRef recordOne = this.nodeService.createNode(recordCategory, 
+	    NodeRef recordOne = this.nodeService.createNode(recordFolder, 
 	                                                    ContentModel.ASSOC_CONTAINS, 
 	                                                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
 	                                                    ContentModel.TYPE_CONTENT).getChildRef();
@@ -119,11 +119,11 @@ public class DODSystemTest extends BaseSpringTest
 	    writer.putContent("There is some content in this record");
 	    
 	    // Checked that the document has been marked as incomplete
-	    //assertTrue(this.nodeService.hasAspect(recordOne, RecordsManagementModel.ASPECT_INCOMPLETE_RECORD));	    
+	    assertTrue(this.nodeService.hasAspect(recordOne, RecordsManagementModel.ASPECT_UNDECLARED_RECORD));	    
 	    
 	    // File a document in the record category
 	    Map<String, Serializable> rmActionParameters = new HashMap<String, Serializable>(5);
-	    rmActionParameters.put("fileableNode", recordCategory);
+	    rmActionParameters.put("recordFolder", recordFolder);
 	    Map<String, Serializable> propValues = new HashMap<String, Serializable>(5);
 	    propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE.toString(), new Date());
 	    propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), "markingListValue");
@@ -131,13 +131,17 @@ public class DODSystemTest extends BaseSpringTest
 	    propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
 	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
 	    rmActionParameters.put("recordProperties", (Serializable)propValues);
-	    rmService.executeRecordAction(recordOne, "filed", rmActionParameters);
+	    rmService.executeRecordAction(recordOne, "declareRecord", rmActionParameters);
 	    
 	    // Check the values of the filed record
+	    assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_IDENTIFIER));
+	    System.out.println("Record id: " + this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_IDENTIFIER));
+	    assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_DATE_FILED));
 	    assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_REVIEW_AS_OF));
 	    assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_CUT_OFF_AS_OF));
-	    System.out.println("Cut off as of date: " + this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_CUT_OFF_AS_OF).toString());
-	    System.out.println("Review as of date: " + this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_REVIEW_AS_OF).toString());
+	    
+
+        assertFalse(this.nodeService.hasAspect(recordOne, RecordsManagementModel.ASPECT_UNDECLARED_RECORD));  
 	    
 	    // TODO commit to check that the filed record can be created correctly
 	    
@@ -204,11 +208,11 @@ public class DODSystemTest extends BaseSpringTest
         writer.putContent("There is some content in this record");
         
         // Checked that the document has been marked as incomplete
-        //assertTrue(this.nodeService.hasAspect(recordOne, RecordsManagementModel.ASPECT_INCOMPLETE_RECORD));       
+        assertTrue(this.nodeService.hasAspect(newRecord, RecordsManagementModel.ASPECT_UNDECLARED_RECORD));       
         
         // File a document in the record category
         Map<String, Serializable> parameters = new HashMap<String, Serializable>(5);
-        parameters.put("fileableNode", recordFolder);
+        parameters.put("recordFolder", recordFolder);
         Map<String, Serializable> propValues = new HashMap<String, Serializable>(5);
         propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE.toString(), new Date());
         propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), "markingListValue");
@@ -216,7 +220,7 @@ public class DODSystemTest extends BaseSpringTest
         propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
         propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
         parameters.put("recordProperties", (Serializable)propValues);
-        rmService.executeRecordAction(newRecord, "filed", parameters);
+        rmService.executeRecordAction(newRecord, "declareRecord", parameters);
         
         // Check the values of the filed record
         assertNotNull(this.nodeService.getProperty(newRecord, RecordsManagementModel.PROP_REVIEW_AS_OF));        

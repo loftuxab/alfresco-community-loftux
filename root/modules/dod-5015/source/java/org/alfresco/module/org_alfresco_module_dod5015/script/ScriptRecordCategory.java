@@ -117,15 +117,6 @@ public class ScriptRecordCategory implements Serializable, Scopeable
     
     /**
      * 
-     * @return
-     */
-    public String getNextRecordId()
-    {
-        return GUID.generate();
-    }
-    
-    /**
-     * 
      * @param fromDate
      * @return
      */

@@ -20,8 +20,20 @@
     	<property name="recordsManagementActions">
     		<list>
     			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">
-    				<property name="name" value="filed"/>
-    				<property name="actionName" value="fileRecordAction"/>
+    				<property name="name" value="declareRecord"/>
+    				<property name="actionName" value="declareRecordAction"/>
+    			</bean>
+    			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">
+    				<property name="name" value="cutOff"/>
+    				<property name="actionName" value="cutOffAction"/>
+    			</bean>
+    			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">
+    				<property name="name" value="retain"/>
+    				<property name="actionName" value="retainAction"/>
+    			</bean>
+    			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">
+    				<property name="name" value="reviewed"/>
+    				<property name="actionName" value="reviewedAction"/>
     			</bean>
     		</list>    		
     	</property>
@@ -67,11 +79,50 @@
     
     <!-- Actions -->
     
-    <bean id="fileRecordAction" parent="script">
+    <bean id="declareRecordAction" parent="script">
         <property name="scriptLocation">
         	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
             	<constructor-arg>
-            		<value>alfresco/module/org_alfresco_module_dod5015/script/action/fileRecordAction.js</value>
+            		<value>alfresco/module/org_alfresco_module_dod5015/script/action/declareRecordAction.js</value>
+            	</constructor-arg>
+            </bean>
+		</property>
+	    <property name="publicAction">
+	         <value>false</value>
+	     </property>
+    </bean>
+    
+    <bean id="cutOffAction" parent="script">
+        <property name="scriptLocation">
+        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+            	<constructor-arg>
+            		<value>alfresco/module/org_alfresco_module_dod5015/script/action/cutOffAction.js</value>
+            	</constructor-arg>
+            </bean>
+		</property>
+	    <property name="publicAction">
+	         <value>false</value>
+	     </property>
+    </bean>
+    
+    <bean id="retainAction" parent="script">
+        <property name="scriptLocation">
+        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+            	<constructor-arg>
+            		<value>alfresco/module/org_alfresco_module_dod5015/script/action/retainAction.js</value>
+            	</constructor-arg>
+            </bean>
+		</property>
+	    <property name="publicAction">
+	         <value>false</value>
+	     </property>
+    </bean>
+    
+    <bean id="reviewAction" parent="script">
+        <property name="scriptLocation">
+        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+            	<constructor-arg>
+            		<value>alfresco/module/org_alfresco_module_dod5015/script/action/reviewAction.js</value>
             	</constructor-arg>
             </bean>
 		</property>
