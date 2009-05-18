@@ -38,10 +38,14 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchParameters;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ImporterBinding;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.ISO9075;
 
 /**
  * This class is an initial placeholder for miscellaneous helper methods used in
@@ -88,7 +92,7 @@ public class TestUtilities
         // If no siteName is provided create a filePlan in a well known location
         if (siteName == null)
         {
-            // For now creating the filePlan beneth the
+            // For now creating the filePlan beneath the
             NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
             filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
                     QName.createQName(RecordsManagementModel.RM_URI, "filePlan"),
@@ -125,6 +129,41 @@ public class TestUtilities
         
         nodeService.addProperties(node, props);
     }
+    
+    protected static NodeRef getRecordCategory(SearchService searchService, String seriesName, String categoryName)
+    {
+        SearchParameters searchParameters = new SearchParameters();
+        searchParameters.addStore(SPACES_STORE);
+        
+        String query = "PATH:\"rma:filePlan/cm:" + ISO9075.encode(seriesName) + "/cm:" + ISO9075.encode(categoryName) + "\"";
+
+        searchParameters.setQuery(query);
+        searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
+        ResultSet rs = searchService.query(searchParameters);
+        
+        //setComplete();
+        //endTransaction();
+        return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
+    }
+    
+    protected static NodeRef getRecordFolder(SearchService searchService, String seriesName, String categoryName, String folderName)
+    {
+        SearchParameters searchParameters = new SearchParameters();
+        searchParameters.addStore(SPACES_STORE);
+        String query = "PATH:\"rma:filePlan/cm:" + ISO9075.encode(seriesName)
+            + "/cm:" + ISO9075.encode(categoryName)
+            + "/cm:" + ISO9075.encode(folderName) + "\"";
+        System.out.println("Query: " + query);
+        searchParameters.setQuery(query);
+        searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
+        ResultSet rs = searchService.query(searchParameters);
+        
+        //setComplete();
+        //endTransaction();
+        
+        return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
+    }
+
     
     // TODO .. do we need to redeclare this here ??
     private static ImporterBinding REPLACE_BINDING = new ImporterBinding()

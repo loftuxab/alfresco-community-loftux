@@ -28,8 +28,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
@@ -37,6 +39,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -176,19 +179,18 @@ public class DODSystemTest extends BaseSpringTest
 	 */
 	public void testReadRecordFolders()
 	{
-	    //TODO May delete this test once things are up and running.
-        NodeRef recordFolder = getRecordFolder("Reports", "AIS Audit Records", "January AIS Audit Records");     
+        NodeRef recordFolder = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");     
         assertNotNull(recordFolder);
-
+        
         // Include this as it has brackets in its name.
-        recordFolder = getRecordFolder("Miscellaneous Files", "Civilian Employee Training Program Records", "Chuck Stevens Training Records (2008)");
+        recordFolder = TestUtilities.getRecordFolder(searchService, "Miscellaneous Files", "Civilian Employee Training Program Records", "Chuck Stevens Training Records (2008)");
         assertNotNull(recordFolder);
         
         // Include this as it has a slash in its name.
-        recordFolder = getRecordFolder("Miscellaneous Files", "Monthly Cockpit Crew Training", "January Cockpit/Crew Training");     
+        recordFolder = TestUtilities.getRecordFolder(searchService, "Miscellaneous Files", "Monthly Cockpit Crew Training", "January Cockpit/Crew Training");     
         assertNotNull(recordFolder);
 	}
-	
+
 	/**
 	 * This test case reads all the record categories under the spaces store and asserts
 	 * that each has a cm:description and that it is non-null and has non-whitespace
@@ -215,7 +217,7 @@ public class DODSystemTest extends BaseSpringTest
     public void testFileRecordInAFolder()
     {
         // The below recordFolder is in a category with a review-period.
-        NodeRef recordFolder = getRecordFolder("Reports", "AIS Audit Records", "January AIS Audit Records");     
+        NodeRef recordFolder = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");     
         assertNotNull(recordFolder);
         
         // Create the document
@@ -248,13 +250,14 @@ public class DODSystemTest extends BaseSpringTest
         propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE.toString(), "mediaTypeValue"); 
         propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
         propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
+
         parameters.put("recordProperties", (Serializable)propValues);
         rmService.executeRecordAction(newRecord, "declareRecord", parameters);
         
         // Check the values of the filed record
         assertNotNull(this.nodeService.getProperty(newRecord, RecordsManagementModel.PROP_REVIEW_AS_OF));        
     }
-
+    
     /**
      * Gets all Record Categories under the SPACES_STORE.
      * @return
@@ -267,21 +270,6 @@ public class DODSystemTest extends BaseSpringTest
         return types.getNodeRefs();
     }
 
-    private NodeRef getRecordCategory(String seriesName, String categoryName)
-    {
-        SearchParameters searchParameters = new SearchParameters();
-        searchParameters.addStore(SPACES_STORE);
-        
-        String query = "PATH:\"rma:filePlan/cm:" + ISO9075.encode(seriesName) + "/cm:" + ISO9075.encode(categoryName) + "\"";
-        
-        searchParameters.setQuery(query);
-        searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
-        ResultSet rs = this.searchService.query(searchParameters);
-        
-        final NodeRef result = rs.getNodeRef(0);
-        return result;
-    }
-    
     private NodeRef getRecordFolder(String seriesName, String categoryName, String folderName)
     {
         SearchParameters searchParameters = new SearchParameters();
@@ -296,4 +284,4 @@ public class DODSystemTest extends BaseSpringTest
         
         return rs.getNodeRef(0);
     }
-}
+ }

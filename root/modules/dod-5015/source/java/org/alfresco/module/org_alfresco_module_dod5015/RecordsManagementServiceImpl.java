@@ -48,7 +48,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
     private Map<String, RecordsManagementAction> rmActions;
     
     private ActionService actionService;
-    
+
     public void setActionService(ActionService actionService)
     {
         this.actionService = actionService;
@@ -68,7 +68,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Executing record managment action on " + filePlanComponent);
+            logger.debug("Executing record management action on " + filePlanComponent);
         }
         
         // Get the state
