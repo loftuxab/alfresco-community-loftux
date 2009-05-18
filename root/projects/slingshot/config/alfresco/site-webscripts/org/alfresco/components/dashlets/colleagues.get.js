@@ -1,12 +1,12 @@
 function sortByName(membership1, membership2)
 {
-   var name1 = membership1.person ? membership1.person.firstName + membership1.person.lastName : "";
-   var name2 = membership2.person ? membership2.person.firstName + membership2.person.lastName : "";
+   var name1 = membership1.authority ? membership1.authority.firstName + membership1.authority.lastName : "";
+   var name2 = membership2.authority ? membership2.authority.firstName + membership2.authority.lastName : "";
    return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
 }
 
 // Call the repo for the site memberships
-var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?size=100");
+var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?size=100&amp;authorityType='USER'");
 
 var memberships = [];
 
