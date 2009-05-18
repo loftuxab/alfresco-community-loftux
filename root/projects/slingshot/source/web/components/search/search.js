@@ -214,9 +214,9 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["index", "nodeRef", "type", "name", "displayName", "description",
+             fields: ["nodeRef", "type", "name", "displayName", "description",
                       "modifiedOn", "modifiedByUser", "modifiedBy", "size",
-                      "title", "browseUrl", "site", "container", "tags"]
+                      "title", "browseUrl", "site", "tags"]
          };
          
          // setup of the datatable.
@@ -564,10 +564,9 @@
       },
       
       /**
-       * Updates document list by calling data webscript with current site and path
+       * Updates search results list by calling data webscript with current site and query term
        *
-       * @method _updateDocList
-       * @param path {string} Path to navigate to
+       * @method _performSearch
        */
       _performSearch: function Search__performSearch(searchTerm, searchAll)
       {
@@ -668,10 +667,9 @@
       },
 
       /**
-       * Build URI parameter string for doclist JSON data webscript
+       * Build URI parameter string for search JSON data webscript
        *
-       * @method _buildDocListParams
-       * @param path {string} Path to query
+       * @method _buildSearchParams
        */
       _buildSearchParams: function Search__buildSearchParams(searchAll, searchTerm)
       {

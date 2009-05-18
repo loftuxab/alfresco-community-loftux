@@ -109,9 +109,9 @@
       modules: {},
 
       /**
-       * Search term used for the search.
+       * Search query used for the search.
        */
-      searchTerm: "",
+      searchQuery: "",
 
       /**
        * Number of search results.
@@ -169,15 +169,15 @@
       onReady: function Search_onReady()
       {
          // DataSource definition
-         var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/search?";
+         var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/rmsearch?";
          this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["index", "nodeRef", "type", "name", "displayName", "description",
-                      "modifiedOn", "modifiedByUser", "modifiedBy", "size", "title", "browseUrl"]
+             fields: ["nodeRef", "name", "title", "description", "modifiedOn", "modifiedByUser", "modifiedBy",
+                      "createdOn", "createdByUser", "createdBy", "size", "browseUrl", "properties.identifier"]
          };
          
          // setup of the datatable.
@@ -185,6 +185,11 @@
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
+         
+         //
+         // TODO: TEMP!!!
+         //
+         this._performSearch("");
       },
       
       _setupDataTable: function Search_setupDataTable()
@@ -219,17 +224,7 @@
           */
          renderCellURI = function Search_renderCellURI(elCell, oRecord, oColumn, oData)
          {
-            
-         };
-         
-         /**
-          * Author custom datacell formatter
-          *
-          * @method renderCellAuthor
-          */
-         renderCellAuthor = function Search_renderCellAuthor(elCell, oRecord, oColumn, oData)
-         {
-            
+            elCell.innerHTML = oRecord.getData("properties.identifier");
          };
          
          /**
@@ -239,23 +234,32 @@
           */
          renderCellDate = function Search_renderCellDate(elCell, oRecord, oColumn, oData)
          {
-            
+            elCell.innerHTML = Alfresco.util.formatDate(oData);
+         };
+         
+         /**
+          * Generic HTML-safe custom datacell formatter
+          */
+         var renderCellSafeHTML = function renderCellSafeHTML(elCell, oRecord, oColumn, oData)
+         {
+            elCell.innerHTML = $html(oData);
          };
          
          // DataTable column defintions
          var columnDefinitions =
          [
             { key: "image", label: "", sortable: false, formatter: renderCellImage, width: "64px" },
-            { key: "uri", label: me._msg("label.uri"), sortable: true, formatter: renderCellURI },
-            { key: "subject", label: me._msg("label.subject"), sortable: true },
-            { key: "author", label: me._msg("label.author"), sortable: true, formatter: renderCellAuthor },
-            { key: "datefiled", label: me._msg("label.datefiled"), sortable: true, formatter: renderCellDate }
+            { key: "uri", label: me._msg("label.uri"), sortable: true, resizeable: true, formatter: renderCellURI },
+            { key: "subject", label: me._msg("label.subject"), field: "title", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
+            { key: "author", label: me._msg("label.author"), field: "createdBy", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
+            { key: "datefiled", label: me._msg("label.datefiled"), sortable: true, resizeable: true, formatter: renderCellDate }
          ];
          
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 32,
+            draggableColumns: true,
             initialLoad: false
          });
          
@@ -290,7 +294,7 @@
                   oResponse.results = oResponse.results.slice(0, me.options.maxResults);
                }
                me.resultsCount = oResponse.results.length;
-               me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
+               me.renderLoopSize = 32;
             }
             
             // Must return true to have the "Loading..." message replaced by the error message
@@ -337,11 +341,11 @@
       
       /**
        * Updates document list by calling data webscript with current site and path
-       *
-       * @method _updateDocList
+       * 
+       * @method _performSearch
        * @param path {string} Path to navigate to
        */
-      _performSearch: function Search__performSearch(searchTerm, searchAll)
+      _performSearch: function Search__performSearch(searchQuery)
       {
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
@@ -352,8 +356,7 @@
          
          function successHandler(sRequest, oResponse, oPayload)
          {
-            this.searchTerm = searchTerm;
-            this.searchAll = searchAll;
+            this.searchQuery = searchQuery;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          }
          
@@ -380,7 +383,7 @@
             }
          }
          
-         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchAll, searchTerm),
+         this.widgets.dataSource.sendRequest(this._buildSearchParams(searchQuery),
          {
             success: successHandler,
             failure: failureHandler,
@@ -389,21 +392,20 @@
       },
 
       /**
-       * Build URI parameter string for doclist JSON data webscript
+       * Build URI parameter string for search JSON data webscript
        *
-       * @method _buildDocListParams
+       * @method _buildSearchParams
        * @param path {string} Path to query
        */
-      _buildSearchParams: function Search__buildSearchParams(searchAll, searchTerm)
+      _buildSearchParams: function Search__buildSearchParams(searchQuery)
       {
-         var site = searchAll ? "" : this.options.siteId;
-         var params = YAHOO.lang.substitute("site={site}&term={term}&maxResults={maxResults}",
+         var params = YAHOO.lang.substitute("site={site}&query={query}&maxResults={maxResults}",
          {
-            site: encodeURIComponent(site),
-            term : encodeURIComponent(searchTerm),
+            site: encodeURIComponent(this.options.siteId),
+            query : encodeURIComponent(searchQuery),
             maxResults : this.options.maxResults + 1 // to be able to know whether we got more results
          });
-
+         
          return params;
       },
       
