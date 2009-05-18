@@ -273,12 +273,33 @@ public class SecurityConfigSection extends ConfigSection {
         
     //  Inform listeners, validate the configuration change
     
-    sts = fireConfigurationChange(ConfigId.SecurityACLManager, aclMgr);
+    sts = setAccessControlManager(aclMgr);
 
-    //  Set the server access control manager and initialization parameters
+    //  Set initialization parameters
+        
+    m_aclParams  = params;
+      
+    //  Return the change status
+    
+    return sts;
+  }
+
+  /**
+   * Set the access control manager to be used to control per share access
+   *
+   * @param aclMgr the access control manager to be used to control per share access
+   * @exception InvalidConfigurationException
+   */
+  public final int setAccessControlManager(AccessControlManager aclMgr)
+    throws InvalidConfigurationException {
+     
+    //  Inform listeners, validate the configuration change
+    
+    int sts = fireConfigurationChange(ConfigId.SecurityACLManager, aclMgr);
+
+    //  Set the server access control manager
         
     m_aclManager = aclMgr;
-    m_aclParams  = params;
       
     //  Return the change status
     

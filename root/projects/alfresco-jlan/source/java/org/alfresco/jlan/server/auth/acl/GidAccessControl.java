@@ -42,19 +42,7 @@ public class GidAccessControl extends AccessControl {
   
   private int m_gid;
   
-    /**
-     * Default constructor to allow container initialization.
-     */
-    protected GidAccessControl()
-    {        
-    }
-    
-	public void setGid(int gid)
-    {
-        m_gid = gid;
-    }
-
-    /**
+	/**
 	 * Class constructor
 	 *
 	 * @param gidStr String
@@ -62,7 +50,7 @@ public class GidAccessControl extends AccessControl {
 	 * @param type String
 	 * @param access int 
 	 */	
-	protected GidAccessControl(String gidStr, int gid, String type, int access) {
+	public GidAccessControl(String gidStr, int gid, String type, int access) {
 		super(gidStr, type, access);
 		
 		//	Set the required group id
