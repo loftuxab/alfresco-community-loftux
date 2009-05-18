@@ -1,0 +1,8 @@
+<webscript>
+   <shortname>rmsearch</shortname>
+   <description>Record Search Component Data Webscript</description>
+   <url>/slingshot/rmsearch?query={query}&amp;site={site}</url>
+   <format default="json">argument</format>
+   <authentication>user</authentication>
+   <transaction>required</transaction>
+</webscript>
