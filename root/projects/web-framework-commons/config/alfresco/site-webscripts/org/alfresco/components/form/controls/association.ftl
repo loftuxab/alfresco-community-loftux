@@ -12,6 +12,10 @@
       multipleSelectMode: ${field.endpointMany?string},
       parentNodeRef: "alfresco://company/home",
       itemFamily: "node"
+      <#if field.control.params.showTargetLink?exists>
+      , showLinkToTarget: ${field.control.params.showTargetLink},
+      targetLinkTemplate: "${url.context}/page/site/${page.url.templateArgs.site!""}/document-details?nodeRef={nodeRef}"
+      </#if>
    });
 })();
 //]]></script>

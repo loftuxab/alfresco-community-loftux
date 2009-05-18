@@ -154,17 +154,29 @@
             type: "submit"
          });
          
+         // force the generated button to have a name of "-" so it gets ignored in
+         // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+         Dom.get(this.id + "-submit-button").name = "-";
+         
          if (Dom.get(this.id + "-reset") !== null)
          {
             this.buttons.reset = Alfresco.util.createYUIButton(this, "reset", null,
             {
                type: "reset"
             });
+            
+            // force the generated button to have a name of "-" so it gets ignored in
+            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+            Dom.get(this.id + "-reset-button").name = "-";
          }
          
          if (Dom.get(this.id + "-cancel") !== null)
          {
             this.buttons.cancel = Alfresco.util.createYUIButton(this, "cancel", null);
+            
+            // force the generated button to have a name of "-" so it gets ignored in
+            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+            Dom.get(this.id + "-cancel-button").name = "-";
          }
          
          // fire event to inform any listening components that the form HTML is ready

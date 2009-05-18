@@ -14,7 +14,7 @@
 <input id="${fieldHtmlId}" name="${field.name}" type="hidden" value="${field.value}"/>
 <div id="${fieldHtmlId}-container" class="period">
    <#assign periodVar=fieldHtmlId?replace("-", "_")>
-   <select id="${fieldHtmlId}-when" onchange="javascript:${periodVar}_changed();">
+   <select id="${fieldHtmlId}-when" name="-" onchange="javascript:${periodVar}_changed();">
       <@whenOption val="fyend" />
       <@whenOption val="immediately" />
       <@whenOption val="month" />
@@ -25,7 +25,7 @@
       <@whenOption val="year" />
       <@whenOption val="yearend" />
    </select>
-   <span>Frequency</span><input id="${fieldHtmlId}-freq" type="text" value="${frequency}" onkeyup="javascript:${periodVar}_changed();" />
+   <span>Frequency</span><input id="${fieldHtmlId}-freq" name="-" type="text" value="${frequency}" onkeyup="javascript:${periodVar}_changed();" />
 </div>
 
 <script type="text/javascript">//<![CDATA[
