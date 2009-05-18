@@ -140,6 +140,26 @@
          multipleSelectMode: true,
          
          /**
+          * Determines whether a link to the target
+          * node should be rendered
+          *
+          * @property showLinkToTarget
+          * @type boolean
+          * @default false
+          */
+         showLinkToTarget: false,
+         
+         /**
+          * Template to use for link to target nodes, must
+          * be supplied when showLinkToTarget property is
+          * set to true
+          *
+          * @property targetLinkTemplate
+          * @type string
+          */
+         targetLinkTemplate: null,
+         
+         /**
           *** NOT IMPLEMENTED ***
           * Number of characters required for a search
           * 
@@ -287,6 +307,12 @@
             this.widgets.showPicker = Alfresco.util.createYUIButton(this, "showPicker-button", this.onShowPicker);
             this.widgets.ok = Alfresco.util.createYUIButton(this, "ok", this.onOK);
             this.widgets.cancel = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
+            
+            // force the generated buttons to have a name of "-" so it gets ignored in
+            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+            Dom.get(this.id + "-showPicker-button-button").name = "-";
+            Dom.get(this.id + "-ok-button").name = "-";
+            Dom.get(this.id + "-cancel-button").name = "-";
          }
       },
       
@@ -487,7 +513,15 @@
             {
                for (var i = 0, ii = items.length; i < ii; i++)
                {
-                  displayValue += this.options.objectRenderer.renderItem(items[i], 16, "<div>{icon} {name}</div>");
+                  if (this.options.showLinkToTarget && this.options.targetLinkTemplate != null)
+                  {
+                     displayValue += this.options.objectRenderer.renderItem(items[i], 16, 
+                        "<div>{icon} <a href='" + this.options.targetLinkTemplate + "'>{name}</a></div>");
+                  }
+                  else
+                  {
+                     displayValue += this.options.objectRenderer.renderItem(items[i], 16, "<div>{icon} {name}</div>");
+                  }
                }
             }
 
@@ -702,6 +736,11 @@
             type: "menu", 
             menu: this.pickerId + "-navigatorMenu"
          });
+         
+         // force the generated buttons to have a name of "-" so it gets ignored in
+         // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+         Dom.get(this.pickerId + "-folderUp-button").name = "-";
+         Dom.get(this.pickerId + "-navigator-button").name = "-";
 
          // Clear the lazyLoad flag and fire initEvent to get menu rendered into the DOM
          var navButton = this.widgets.navigationMenu;
