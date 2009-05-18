@@ -26,25 +26,31 @@ package org.alfresco.module.org_alfresco_module_dod5015.script;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.jscript.Scopeable;
 import org.alfresco.repo.jscript.ScriptNode;
-import org.alfresco.repo.jscript.ValueConverter;
 import org.alfresco.repo.processor.BaseProcessorExtension;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.ClassDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -73,6 +79,11 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	public void setServiceRegistry(ServiceRegistry services) 
 	{
 		this.services = services;
+	}
+	
+	public NodeService getNodeService()
+	{
+	    return this.services.getNodeService();
 	}
 	
 	/**
@@ -168,6 +179,8 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	 */
 	public ScriptRecordCategory getRecordCategory(ScriptNode node)
 	{
+        System.out.println("RecordsManagementScript.getRecordCategory");
+        System.out.println("node = " + node);
 	    // Get the record categories for this node
 	    NodeRef nodeRef = node.getNodeRef();
 	    List<NodeRef> recordCategories = new ArrayList<NodeRef>(1);
@@ -177,6 +190,58 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	    return new ScriptRecordCategory(scope, services, recordCategories);
 	}
 	
+	public void executeRecordAction(String filePlanComponent, String name,
+	        JSONObject parameters)
+	{
+	    NodeRef node = new NodeRef(filePlanComponent);
+	    
+	    //TODO NEIL Are all actions on pre-existing nodes? Assume yes.
+	    if (this.services.getNodeService().exists(node) == false)
+	    {
+	        throw new InvalidNodeRefException(node.toString(), node);
+	    }
+	    
+	    Map<String, Serializable> paramsMap = new HashMap<String, Serializable>();
+	    if (parameters != null)
+	    {
+	        for (Iterator iter = parameters.keys(); iter.hasNext(); )
+	        {
+	            String nextKey = (String)iter.next();
+	            String nextValue = null;
+	            try { nextValue = parameters.get(nextKey).toString(); }
+	            catch (JSONException e)
+	            {
+	                if (logger.isWarnEnabled())
+	                {
+	                    StringBuilder buf = new StringBuilder();
+	                    buf.append("JSONException in executeRecordAction. ")
+	                    .append(e.getMessage());
+	                    logger.warn(buf.toString());
+	                }
+	                //TODO NEIL Is this ok?
+	                // If the JSON is malformed, there is little we can do at this point.
+	                return;
+	            }
+	            
+	            paramsMap.put(nextKey, nextValue);
+	        }
+	    }
+	    
+	    if (logger.isDebugEnabled())
+	    {
+	        StringBuilder buf = new StringBuilder();
+	        buf.append("executeRecordAction ")
+	            .append(node)
+	            .append(" ")
+	            .append(name)
+	            .append(" ")
+	            .append(paramsMap);
+	        logger.debug(buf.toString());
+	    }
+	    
+	    this.rmService.executeRecordAction(node, name, paramsMap);
+	}
+
 	/**
 	 * 
 	 * @param nodeRef
