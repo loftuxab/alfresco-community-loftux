@@ -38,21 +38,14 @@ import org.alfresco.jlan.server.core.SharedDevice;
  */
 public class UserAccessControl extends AccessControl {
 
-    /**
-     * Default constructor to allow container initialization.
-     */
-    protected UserAccessControl()
-    {        
-    }
-
-    /**
+	/**
 	 * Class constructor
 	 *
 	 * @param userName String
 	 * @param type String
 	 * @param access int 
 	 */	
-	protected UserAccessControl(String userName, String type, int access) {
+	public UserAccessControl(String userName, String type, int access) {
 		super(userName, type, access);
 	}
 	

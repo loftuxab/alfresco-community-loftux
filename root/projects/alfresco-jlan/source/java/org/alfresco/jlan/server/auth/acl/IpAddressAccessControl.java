@@ -46,24 +46,7 @@ public class IpAddressAccessControl extends AccessControl {
 	private String m_subnet;	
 	private String m_netMask;
 	
-    /**
-     * Default constructor to allow container initialization.
-     */
-    protected IpAddressAccessControl()
-    {        
-    }
-
-    public void setSubnet(String subnet)
-    {
-        m_subnet = subnet;
-    }
-
-    public void setNetMask(String mask)
-    {
-        m_netMask = mask;
-    }
-
-    /**
+	/**
 	 * Class constructor
 	 *
 	 * @param address String
@@ -71,7 +54,7 @@ public class IpAddressAccessControl extends AccessControl {
 	 * @param type String
 	 * @param access int 
 	 */	
-	protected IpAddressAccessControl(String address, String mask, String type, int access) {
+	public IpAddressAccessControl(String address, String mask, String type, int access) {
 		super(address, type, access);
 		
 		//	Save the subnet and network mask, if specified
