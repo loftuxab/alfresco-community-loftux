@@ -251,7 +251,7 @@
          var url = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}&tn={tn}",
          {
             site: this.options.siteId,
-            container: this.options.container,
+            container: this.options.containerId,
             d: new Date().getTime(),
             tn: this.options.numTags
          });

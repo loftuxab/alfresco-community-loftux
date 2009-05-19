@@ -2,7 +2,7 @@
    new Alfresco.DocListTags("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      container: "${args.container!""}"
+      containerId: "${template.properties.container!"documentLibrary"}"
    });
 //]]></script>
 <div id="${args.htmlid}-body" class="tags doclib-filter">

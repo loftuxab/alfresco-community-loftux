@@ -1,4 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <template-instance>
    <template-type>org/alfresco/wiki-page</template-type>
+   <properties>
+      <container>wiki</container>
+   </properties>
 </template-instance>

@@ -3,7 +3,7 @@
    new Alfresco.TopicReplies("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site}",
-      containerId: "${args.container!'discussions'}",
+      containerId: "${template.properties.container!'discussions'}",
       editorConfig : 
       {
          <#--

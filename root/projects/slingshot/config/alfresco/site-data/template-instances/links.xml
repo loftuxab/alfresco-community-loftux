@@ -2,4 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/links</template-type>
    <description>Links</description>
+   <properties>
+      <container>links</container>
+   </properties>
 </template-instance>

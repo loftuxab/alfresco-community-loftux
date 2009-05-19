@@ -4,7 +4,5 @@
    <region-id>filters</region-id>
    <source-id>links</source-id>
    <url>/components/links/filters</url>
-   <properties>
-      <container>links</container>
-   </properties>
+   <properties></properties>
 </component>

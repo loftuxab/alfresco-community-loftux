@@ -1,4 +1,4 @@
-<#assign container = args.container!'discussions' />
+<#assign container = template.properties.container!'discussions' />
 
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DiscussionsTopic("${args.htmlid}").setOptions(

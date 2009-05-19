@@ -2,7 +2,7 @@
    new Alfresco.BlogToolbar("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs["site"]!""}",
-      containerId: "${args.container!'blog'}",
+      containerId: "${template.properties.container!'blog'}",
       allowCreate: ${blog.permissions.create?string},
       allowConfigure: ${blog.permissions.edit?string}
    }).setMessages(

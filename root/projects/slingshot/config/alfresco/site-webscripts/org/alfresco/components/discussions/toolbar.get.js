@@ -10,7 +10,7 @@ function main()
    };
 
    // Call the repo to get the permissions for the user for this blog
-   var result = remote.call("/api/forum/site/" + page.url.templateArgs.site + "/" + (args.container ? args.container : "discussions") + "/posts?startIndex=0&pageSize=0");
+   var result = remote.call("/api/forum/site/" + page.url.templateArgs.site + "/" + (template.properties.container ? template.properties.container : "discussions") + "/posts?startIndex=0&pageSize=0");
    // Create javascript objects from the server response
    var obj = eval('(' + result + ')');
    if (result.status == 200)

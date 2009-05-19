@@ -4,7 +4,5 @@
    <region-id>tags</region-id>
    <source-id>links</source-id>
    <url>/components/links/tags</url>
-   <properties>
-      <container>links</container>
-   </properties>
+   <properties></properties>
 </component>

@@ -4,7 +4,5 @@
    <region-id>createpost</region-id>
    <source-id>blog-postedit</source-id>
    <url>/components/blog/postedit</url>
-   <properties>
-      <container>blog</container>
-   </properties>
+   <properties></properties>
 </component>

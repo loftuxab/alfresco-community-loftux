@@ -84,10 +84,10 @@
          /**
           * ContainerId representing root container
           *
-          * @property container
+          * @property containerId
           * @type string
           */
-         container: ""
+         containerId: ""
       },      
 
       /**
@@ -177,7 +177,7 @@
          var uri = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/tagscopes/site/{site}/{container}/tags?d={d}",
          {
             site: this.options.siteId,
-            container: this.options.container,
+            container: this.options.containerId,
             d: new Date().getTime()
          });
          

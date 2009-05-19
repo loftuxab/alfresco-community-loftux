@@ -5,7 +5,6 @@
    <source-id>documentlibrary</source-id>
    <url>/components/documentlibrary/documentlist</url>
    <properties>
-      <container>documentLibrary</container>
       <pagination>true</pagination>
    </properties>
 </component>
