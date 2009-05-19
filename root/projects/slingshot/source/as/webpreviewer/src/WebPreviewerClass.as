@@ -3,11 +3,13 @@ package
 	import flash.external.ExternalInterface;
 	import flash.system.System;
 	
+	import mx.controls.Alert;
 	import mx.core.Application;
 	import mx.events.FlexEvent;
 	
 	import org.alfresco.previewer.DocumentZoomDisplayEvent;
 	import org.alfresco.previewer.Previewer;
+	import org.alfresco.previewer.PreviewerEvent;
 	import org.hasseg.externalMouseWheel.ExternalMouseWheelSupport;
 
 	/**
@@ -36,7 +38,7 @@ package
 		 */ 		
 		public function WebPreviewerClass()
 		{
-			super();
+			super();			
 			this.addEventListener(FlexEvent.APPLICATION_COMPLETE, onApplicationComplete);
 		}
 		
@@ -46,6 +48,7 @@ package
 		 */
 		public function onApplicationComplete(event:FlexEvent):void
 		{
+			 
 			// Add mouse wheel scroll support for browsers on mac.
 			ExternalMouseWheelSupport.getInstance(stage);
 			
@@ -53,10 +56,16 @@ package
 			previewer.documentDisplay.addEventListener(DocumentZoomDisplayEvent.DOCUMENT_LOAD_ERROR, onDocumentDisplayError);
 			previewer.documentDisplay.addEventListener(DocumentZoomDisplayEvent.DOCUMENT_CONTENT_TYPE_ERROR, onDocumentDisplayError);
 			
+			// Make sure we can notify the html/javascript environment when we enter and leaves full window mode.
+			previewer.addEventListener(PreviewerEvent.FULL_WINDOW_BUTTON_CLICK, onFullWindowClick);
+			previewer.addEventListener(PreviewerEvent.FULL_WINDOW_ESCAPE, onFullWindowEscape);
+			
 			// Get variables from the embed/object tag
 			var url:String = Application.application.parameters.url;							
 			var paging:String = Application.application.parameters.paging;
 			var fileName:String = Application.application.parameters.fileName;
+			var showFullScreenButton:String = Application.application.parameters.show_fullscreen_button;
+			var showFullWindowButton:String = Application.application.parameters.show_fullwindow_button;			
 			jsCallback = Application.application.parameters.jsCallback;
 			
 			// i18n labels
@@ -66,18 +75,24 @@ package
 			i18n.fitWidth = Application.application.parameters.i18n_fitWidth;
 			i18n.fitHeight = Application.application.parameters.i18n_fitHeight;
 			i18n.fullscreen = Application.application.parameters.i18n_fullscreen;
+			i18n.fullwindow = Application.application.parameters.i18n_fullwindow;
+			i18n.fullwindowEscape = Application.application.parameters.i18n_fullwindow_escape;
 			i18n.page = Application.application.parameters.i18n_page;
 			i18n.pageOf = Application.application.parameters.i18n_pageOf;
 						
-			// Set variables on the preview component							
-			previewer.paging = (paging.toLowerCase() == "true");
+			// Set variables on the preview component								
+			previewer.paging = paging != null && paging.toLowerCase() == "true";
 			previewer.fileName = fileName;
+			previewer.showFullScreenButton = showFullScreenButton != null && showFullScreenButton.toLowerCase() == "true";
+			previewer.showFullWindowButton = showFullWindowButton != null && showFullWindowButton.toLowerCase() == "true";
 			previewer.i18nLabels = i18n;
 			
 			trace(System.totalMemory);
+			
 			// Start the loading the content in to the previewer				
 			previewer.url = url; 			
 		}
+		
 		
 		/**
 		 * Called if something goes wrong during the loading of the content specified by url.
@@ -86,13 +101,42 @@ package
 		 */
 		private function onDocumentDisplayError(event:DocumentZoomDisplayEvent):void
 		{
+			var code:String = "error";
+			code = event.type == DocumentZoomDisplayEvent.DOCUMENT_LOAD_ERROR ? "io" : code;
+			code = event.type == DocumentZoomDisplayEvent.DOCUMENT_CONTENT_TYPE_ERROR ? "content" : code;
+			dispatchJavascriptEvent({ error: { code: code } });			
+		}
+		
+		/**
+		 * Called if user presses full window button in previewer component.
+		 * 
+		 * @param event An object describing the button click event.
+		 */
+		private function onFullWindowClick(event: PreviewerEvent):void
+		{			
+			dispatchJavascriptEvent({ event: { type: "onFullWindowClick" } });
+		}
+
+		/**
+		 * Called if user presses escape in full window mode in previewer component.
+		 * 
+		 * @param event An object describing the escape event.
+		 */
+		private function onFullWindowEscape(event: PreviewerEvent):void
+		{			
+			dispatchJavascriptEvent({ event: { type: "onFullWindowEscape" } });
+		}
+				
+		/**
+		 * Dispatches an event to the web/html environment.
+		 * 
+		 * @param event The event to dispatch.
+		 */	
+		private function dispatchJavascriptEvent(event:Object):void
+		{
 			if (ExternalInterface.available && jsCallback != null)
-			{		
-				var code:String = "error";
-				code = event.type == DocumentZoomDisplayEvent.DOCUMENT_LOAD_ERROR ? "error.io" : code;
-				code = event.type == DocumentZoomDisplayEvent.DOCUMENT_CONTENT_TYPE_ERROR ? "error.content" : code;
-											
-				ExternalInterface.call(jsCallback, {code: code});
+			{													
+				ExternalInterface.call(jsCallback, event);
 			}				
 		}
 		

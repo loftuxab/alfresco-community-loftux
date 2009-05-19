@@ -34,9 +34,11 @@
 		
 		<!-- FULLSCREEN -->
 		<mx:VRule id="fullScreenSeparator" styleName="headerSeparator" width="2" height="14" />
-		<mx:Button id="fullScreenButton" styleName="fullScreenButton" label="Fullscreen" height="22" buttonMode="true"/>	
+		<mx:Button id="fullScreenButton" styleName="fullScreenButton" height="22" buttonMode="true"/>
+		<mx:Button id="fullWindowButton" styleName="fullWindowButton" height="22" buttonMode="true"/>	
 		
 		<mx:Spacer width="100%"/>
+		<mx:Label id="messageLabel" styleName="messageLabel" text="" includeInLayout="false" visible="false"/>
 	</mx:ApplicationControlBar>		
 
 	<!-- VERTICAL SEPARATOR -->	
@@ -49,15 +51,25 @@
 	<previewer:states>
 		
 		<!-- FULL SCREEN FOR MULTI PAGED DOCUMENTS -->
-		<mx:State name="fullScreen">		
+		<mx:State name="fullScreen" basedOn="fullWindow">		
 			<mx:SetProperty target="{zoomPercentageTextInput}" name="enabled" value="false"/>			
 			<mx:SetProperty target="{pageTextInput}" name="enabled" value="false"/>
+			<mx:SetProperty target="{messageLabel}" name="visible" value="false"/>
+			<mx:SetProperty target="{messageLabel}" name="includeInLayout" value="false"/>											
+		</mx:State>
+
+		<!-- FULL WINDOW FOR MULTI PAGED DOCUMENTS -->
+		<mx:State name="fullWindow">		
 			<mx:SetProperty target="{fullScreenSeparator}" name="visible" value="false"/>
 			<mx:SetProperty target="{fullScreenSeparator}" name="includeInLayout" value="false"/>
 			<mx:SetProperty target="{fullScreenButton}" name="visible" value="false"/>
 			<mx:SetProperty target="{fullScreenButton}" name="includeInLayout" value="false"/>					
+			<mx:SetProperty target="{fullWindowButton}" name="visible" value="false"/>
+			<mx:SetProperty target="{fullWindowButton}" name="includeInLayout" value="false"/>					
 			<mx:SetProperty target="{fileNameLabel}" name="visible" value="true"/>
 			<mx:SetProperty target="{fileNameLabel}" name="includeInLayout" value="true"/>			
+			<mx:SetProperty target="{messageLabel}" name="visible" value="true"/>
+			<mx:SetProperty target="{messageLabel}" name="includeInLayout" value="true"/>			
 		</mx:State>
 
 		<!-- SINGLE PAGED DOCUMENTS -->
@@ -79,14 +91,24 @@
 		</mx:State>
 
 		<!-- FULLSCREEN FOR SINGLE PAGED DOCUMENTS -->
-		<mx:State name="singlePagedFullScreen" basedOn="singlePaged">		
-			<mx:SetProperty target="{zoomPercentageTextInput}" name="enabled" value="false"/>			
+		<mx:State name="singlePagedFullScreen" basedOn="singlePagedFullWindow">		
+			<mx:SetProperty target="{zoomPercentageTextInput}" name="enabled" value="false"/>
+			<mx:SetProperty target="{messageLabel}" name="visible" value="false"/>
+			<mx:SetProperty target="{messageLabel}" name="includeInLayout" value="false"/>								
+		</mx:State>
+
+		<!-- FULLSCREEN FOR SINGLE PAGED DOCUMENTS -->
+		<mx:State name="singlePagedFullWindow" basedOn="singlePaged">		
 			<mx:SetProperty target="{fullScreenSeparator}" name="visible" value="false"/>
 			<mx:SetProperty target="{fullScreenSeparator}" name="includeInLayout" value="false"/>
 			<mx:SetProperty target="{fullScreenButton}" name="visible" value="false"/>
 			<mx:SetProperty target="{fullScreenButton}" name="includeInLayout" value="false"/>					
+			<mx:SetProperty target="{fullWindowButton}" name="visible" value="false"/>
+			<mx:SetProperty target="{fullWindowButton}" name="includeInLayout" value="false"/>					
 			<mx:SetProperty target="{fileNameLabel}" name="visible" value="true"/>
-			<mx:SetProperty target="{fileNameLabel}" name="includeInLayout" value="true"/>		
+			<mx:SetProperty target="{fileNameLabel}" name="includeInLayout" value="true"/>
+			<mx:SetProperty target="{messageLabel}" name="visible" value="true"/>
+			<mx:SetProperty target="{messageLabel}" name="includeInLayout" value="true"/>								
 		</mx:State>
 		
 		<mx:State name="disabled" basedOn="">		
@@ -102,6 +124,8 @@
 			<mx:SetProperty target="{snapPointsButton}" name="buttonMode" value="false"/>			
 			<mx:SetProperty target="{fullScreenButton}" name="enabled" value="false"/>					
 			<mx:SetProperty target="{fullScreenButton}" name="buttonMode" value="false"/>					
+			<mx:SetProperty target="{fullWindowButton}" name="enabled" value="false"/>					
+			<mx:SetProperty target="{fullWindowButton}" name="buttonMode" value="false"/>					
 			<mx:SetProperty target="{previousButton}" name="enabled" value="false"/>
 			<mx:SetProperty target="{previousButton}" name="buttonMode" value="false"/>
 			<mx:SetProperty target="{pageTextInput}" name="enabled" value="false"/>

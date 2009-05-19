@@ -34,6 +34,7 @@ package org.alfresco.previewer
 	import mx.collections.ArrayCollection;
 	import mx.containers.ApplicationControlBar;
 	import mx.containers.VBox;
+	import mx.controls.Alert;
 	import mx.controls.Button;
 	import mx.controls.Label;
 	import mx.controls.Menu;
@@ -77,6 +78,9 @@ package org.alfresco.previewer
 		public var nextButton:Button;
 
 		public var fullScreenButton:Button;
+		public var fullWindowButton:Button;
+
+		public var messageLabel:Label;
 		
 		public var documentDisplay:DocumentZoomDisplay;
 		
@@ -183,8 +187,32 @@ package org.alfresco.previewer
 		{
 			i18n = labels;
 			fullScreenButton.label = i18n.fullscreen;
+			fullWindowButton.label = i18n.fullwindow;
+			messageLabel.text = i18n.fullwindowEscape;
 			pageLabel.text = i18n.page;
 			ofLabel.text = i18n.pageOf;
+		}
+		
+		/**
+		 * Hides/displays the full screen button.
+		 * 
+		 * @param show True if the full screen button shall be displayed.
+		 */		
+		public function set showFullWindowButton(show:Boolean):void
+		{
+			fullWindowButton.includeInLayout = show;
+			fullWindowButton.visible = show;
+		}
+					
+		/**
+		 * Hides/displays the full window button.
+		 * 
+		 * @param show True if the full window button shall be displayed.
+		 */		
+		public function set showFullScreenButton(show:Boolean):void
+		{
+			fullScreenButton.includeInLayout = show;
+			fullScreenButton.visible = show;
 		}
 			
 		/**
@@ -234,7 +262,8 @@ package org.alfresco.previewer
             pageTextInput.addEventListener(KeyboardEvent.KEY_DOWN, onCurrentPageKeyDown);
 
             // Setup listeners for fullscreen controls
-            fullScreenButton.addEventListener(MouseEvent.CLICK, onFullscreenClick);            
+            fullScreenButton.addEventListener(MouseEvent.CLICK, onFullScreenClick);
+            fullWindowButton.addEventListener(MouseEvent.CLICK, onFullWindowClick);            
         }
 			
 		/**
@@ -295,7 +324,7 @@ package org.alfresco.previewer
 			// Set slider to the new zoom value, changed by the document display itself 
 			zoomSlider.value = event.documentScale;
 			
-			// Update zoom gi controls
+			// Update zoom gui controls
 			updateZoomControls();
 		}
 		
@@ -520,7 +549,7 @@ package org.alfresco.previewer
       	 * Called when the user clicks the fullScreenButton.
       	 * Will change the display to cover all of the users monitor.
       	 */
-      	private function onFullscreenClick(event:MouseEvent):void
+      	private function onFullScreenClick(event:MouseEvent):void
 		{	
 			// Make sure we get a change to take action when toggling between normal and full screen	
 			stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreenDisplayStates);
@@ -529,6 +558,9 @@ package org.alfresco.previewer
 			stage.displayState = StageDisplayState.FULL_SCREEN;
 		}
 		
+		/**
+		 * Called when entering OR exiting fullscreen mode.
+		 */
 		private function onFullScreenDisplayStates(event:FullScreenEvent):void
 		{
 			if (event.fullScreen)
@@ -559,5 +591,56 @@ package org.alfresco.previewer
 				}				
 			}
 		}
+				      	
+      	/**
+      	 * Called when the user clicks the fullWindowButton.
+      	 * Will dispatch an event to let the user's browser maximize the previewer if it listens to the event.
+      	 */
+      	private function onFullWindowClick(event:MouseEvent):void
+		{	
+			// Let others know we are entering full window mode 
+			dispatchEvent(new PreviewerEvent(PreviewerEvent.FULL_WINDOW_BUTTON_CLICK));
+			
+			// Listen for escape keys since that shall exit the full window mode			
+			addEventListener(KeyboardEvent.KEY_DOWN, onFullWindowEscape);
+				
+			// Display as full window
+			if(currentState == "singlePaged" || currentState == "singlePagedFullScreen")
+			{
+	 			currentState = "singlePagedFullWindow";					 	
+			}
+			else
+			{
+				currentState = "fullWindow";	
+			}		
+		}
+		
+		/**
+		 * Called when the user presses the escape key in full window mode.
+		 * Will exit full window mode.
+		 * 
+		 * @param event Describes the key the user pressed
+		 */
+		public function onFullWindowEscape(event:KeyboardEvent):void
+		{
+			if(event.keyCode == Keyboard.ESCAPE) 
+			{
+				/**
+				 * Escape was pressed. Exit fulls window mode, stop listeningn for escape keys 
+				 * and let other components know we have exited full window mode.
+				 */
+				stage.removeEventListener(KeyboardEvent.KEY_DOWN, onFullWindowEscape);
+				dispatchEvent(new PreviewerEvent(PreviewerEvent.FULL_WINDOW_ESCAPE));
+				if (currentState == "singlePagedFullWindow")
+				{
+		 			currentState = "singlePaged";					 	
+				}
+				else
+				{
+				 	currentState = "";	
+				}				
+			}			
+		}
+		
 	}
 }

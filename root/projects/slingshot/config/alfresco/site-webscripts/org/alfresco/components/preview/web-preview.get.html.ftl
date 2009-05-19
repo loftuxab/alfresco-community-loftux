@@ -17,12 +17,12 @@ new Alfresco.WebPreview("${args.htmlid}").setOptions(
       <div class="title">
          <h4>
             <img id="${args.htmlid}-title-img" src="${url.context}/components/images/generic-file-32.png" alt="File" />
-            <span id="${args.htmlid}-title-span"></span>
+            <span id="${args.htmlid}-title-span"></span>            
          </h4>
       </div>
    </div>
    <div class="bd">
-      <div id="${args.htmlid}-swfPlayer-div" class="preview-swf">
+      <div id="${args.htmlid}-shadow-swf-div" class="preview-swf">
          <div id="${args.htmlid}-swfPlayerMessage-div"></div>
       </div>
    </div>

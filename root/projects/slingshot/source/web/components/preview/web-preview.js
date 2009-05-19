@@ -163,7 +163,6 @@
       onComponentsLoaded: function WP_onComponentsLoaded()
       {
          // Save a reference to the HTMLElement displaying texts so we can alter the texts later
-         this.widgets.swfPlayerDiv = Dom.get(this.id + "-swfPlayer-div");
          this.widgets.swfPlayerMessage = Dom.get(this.id + "-swfPlayerMessage-div");
          this.widgets.titleText = Dom.get(this.id + "-title-span");
          this.widgets.titleImg = Dom.get(this.id + "-title-img");
@@ -171,7 +170,6 @@
          // Set title and icon         
          this.widgets.titleText["innerHTML"] = this.options.name;
          this.widgets.titleImg.src = Alfresco.constants.URL_CONTEXT + this.options.icon.substring(1);
-
 
          // nodeRef is mandatory
          if (this.options.nodeRef === undefined)
@@ -184,9 +182,10 @@
             var previewCtx = this._resolvePreview();
             if (previewCtx)
             {                  
-               // Use swfobject
+               // Create flash web preview by using swfobject
+               var shadowSfwDivId = this.id + "-shadow-swf-div";
                var so = new YAHOO.deconcept.SWFObject(Alfresco.constants.URL_CONTEXT + "/components/preview/WebPreviewer.swf",
-                       "WebPreviewer", "100%", "670", "9.0.45");
+                       "WebPreviewer_" + this.id, "100%", "100%", "9.0.45");
                so.addVariable("fileName", this.options.name);
                so.addVariable("paging", previewCtx.paging);
                so.addVariable("url", previewCtx.url);
@@ -196,16 +195,41 @@
                so.addVariable("i18n_fitWidth", $msg("preview.fitWidth"));
                so.addVariable("i18n_fitHeight", $msg("preview.fitHeight"));
                so.addVariable("i18n_fullscreen", $msg("preview.fullscreen"));
+               so.addVariable("i18n_fullwindow", $msg("preview.fullwindow"));
+               so.addVariable("i18n_fullwindow_escape", $msg("preview.fullwindowEscape"));
                so.addVariable("i18n_page", $msg("preview.page"));
-               so.addVariable("i18n_pageOf", $msg("preview.pageOf"));
+               so.addVariable("i18n_pageOf", $msg("preview.pageOf"));               
+               so.addVariable("show_fullscreen_button", true);
+               so.addVariable("show_fullwindow_button", true);
                so.addParam("allowScriptAccess", "sameDomain");
                so.addParam("allowFullScreen", "true");
-               so.addParam("wmode", "transparent");                
-               so.write(this.id + "-swfPlayer-div");     
+               so.addParam("wmode", "transparent");
+
+               /**
+                * To support full window mode an extra div is created with absolute positioning
+                * This is to make sure the flash move is on top of all other divs.
+                */               
+               var realSwfDiv = document.createElement("div");
+               
+               var realSwfDivEl = new YAHOO.util.Element(realSwfDiv);
+               realSwfDivEl.set("id", this.id + "-real-swf-div");
+               realSwfDivEl.setStyle("position", "absolute");
+               this.widgets.realSwfDivEl = realSwfDivEl;
+
+               // Place the new div on top of the "shadow-sfw-div" that is there to occupy the space the previewer needs
+               this.widgets.shadowSfwDivEl = new YAHOO.util.Element(shadowSfwDivId);
+               this._positionOver(this.widgets.realSwfDivEl, this.widgets.shadowSfwDivEl);
+
+               // Add the new div to the dom
+               this.widgets.realSwfDivEl.appendTo(document.body);
+
+               // Finally create the flash web preview o’n the new div
+               so.write(realSwfDivEl.get("id"));
+
             }
             else
             {
-               // Cant find a preview
+               // Can't find a preview
                var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "/" + encodeURIComponent(this.options.name) + "?a=true";
                this.widgets.swfPlayerMessage["innerHTML"] = $msg("label.noPreview", url);
             }
@@ -267,32 +291,64 @@
       },
 
       /**
-       * Called from the WebPreviewer when an event is dispatched.
+       * Called from the WebPreviewer when an event or error is dispatched.
+       *
        *
        * @method onWebPreviewerEvent
        * @param event {object} an WebPreview message
        */
       onWebPreviewerEvent: function WP_onWebPreviewerEvent(event)
       {
-         // Inform the user about the failure
-         var message = "Error";
-         if (event.code)
+         var swfTag = Dom.get("WebPreviewer_" + this.id);
+         if (event.event)
          {
-            message = $msg(event.code);
-         } 
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: message
-         });
+            if (event.event.type == "onFullWindowClick")
+            {
+               var clientRegion = Dom.getClientRegion();
+               this.widgets.realSwfDivEl.setStyle("left", clientRegion.left + "px");
+               this.widgets.realSwfDivEl.setStyle("top", clientRegion.top + "px");
+               this.widgets.realSwfDivEl.setStyle("width", "100%");
+               this.widgets.realSwfDivEl.setStyle("height", "100%");
+            }
+            else if (event.event.type == "onFullWindowEscape")
+            {               
+               this._positionOver(this.widgets.realSwfDivEl, this.widgets.shadowSfwDivEl);
+            }
+         }
+         else if(event.error) {
+            // Inform the user about the failure
+            var message = "Error";
+            if (event.error.code)
+            {
+               message = $msg("error." + event.error.code);
+            }
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: message
+            });
 
-         // Tell other components that the preview failed
-         YAHOO.Bubbling.fire("webPreviewFailure",
-         {
-            error: event.code,
-            nodeRef: this.showConfig.nodeRef,
-            failureUrl: this.showConfig.failureUrl
-         });
+            // Tell other components that the preview failed
+            YAHOO.Bubbling.fire("webPreviewFailure",
+            {
+               error: event.error.code,
+               nodeRef: this.showConfig.nodeRef,
+               failureUrl: this.showConfig.failureUrl
+            });
 
+         }
+      },
+
+      /**
+       *
+       * @param event
+       */
+      _positionOver: function WP__positionOver(positionedYuiEl, sourceYuiEl)
+      {
+         var region = Dom.getRegion(sourceYuiEl.get("id"));
+         positionedYuiEl.setStyle("left", region.left + "px");
+         positionedYuiEl.setStyle("top", region.top + "px");
+         positionedYuiEl.setStyle("width", region.width + "px");
+         positionedYuiEl.setStyle("height", region.height + "px");
       },
 
       /**
@@ -307,6 +363,7 @@
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.WebPreview", Array.prototype.slice.call(arguments).slice(1));
       }
+
    };
 
 })();
