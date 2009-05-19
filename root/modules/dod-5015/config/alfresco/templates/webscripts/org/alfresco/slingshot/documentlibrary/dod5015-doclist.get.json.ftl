@@ -18,12 +18,6 @@
             "edit" : ${user.permissions.edit?string},
             "delete" : ${user.permissions.delete?string}
          }
-      },
-      "onlineEditing": ${doclist.onlineEditing?string},
-      "itemCounts":
-      {
-         "folders": ${(itemCount.folders!0)?string},
-         "documents": ${(itemCount.documents!0)?string}
       }
    },
    "items":
