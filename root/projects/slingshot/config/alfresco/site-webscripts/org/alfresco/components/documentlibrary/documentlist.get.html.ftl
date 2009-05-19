@@ -15,7 +15,7 @@
    new Alfresco.DocumentList("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      containerId: "${args.container!"documentLibrary"}",
+      containerId: "${template.properties.container!"documentLibrary"}",
       initialPath: "${page.url.args["path"]!""}",
       <@initialFilter />
       usePagination: ${(args.pagination!false)?string},

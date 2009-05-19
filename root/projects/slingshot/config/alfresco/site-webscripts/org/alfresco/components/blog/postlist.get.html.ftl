@@ -2,7 +2,7 @@
    new Alfresco.BlogPostList("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!''}",
-      containerId: "${args.container!'blog'}",
+      containerId: "${template.properties.container!'blog'}",
       initialFilter:
       {
          filterId: "${page.url.args.filterId!'new'}",

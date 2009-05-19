@@ -4,7 +4,5 @@
    <region-id>createlink</region-id>
    <source-id>links-linkedit</source-id>
    <url>/components/links/linkedit</url>
-   <properties>
-      <container>links</container>
-   </properties>
+   <properties></properties>
 </component>

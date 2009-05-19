@@ -5,7 +5,6 @@
    <source-id>blog-postview</source-id>
    <url>/components/blog/comments</url>
    <properties>
-      <container>blog</container>
       <editorWidth>538</editorWidth>
       <editorHeight>150</editorHeight>
    </properties>

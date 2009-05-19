@@ -4,7 +4,5 @@
    <region-id>tags</region-id>
    <source-id>calendar</source-id>
    <url>/components/tags</url>
-   <properties>
-      <container>calendar</container>
-   </properties>   
+   <properties></properties>   
 </component>

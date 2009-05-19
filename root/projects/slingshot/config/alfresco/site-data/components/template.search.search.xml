@@ -4,7 +4,5 @@
    <region-id>search</region-id>
    <source-id>search</source-id>
    <url>/components/search/search</url>
-   <properties>
-      <container>documentLibrary</container>
-   </properties>
+   <properties></properties>
 </component>

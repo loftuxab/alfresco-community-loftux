@@ -4,7 +4,5 @@
    <region-id>replies</region-id>
    <source-id>discussions-topicview</source-id>
    <url>/components/discussions/replies</url>
-   <properties>
-      <container>discussions</container>
-   </properties>
+   <properties></properties>
 </component>

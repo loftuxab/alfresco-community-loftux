@@ -2,7 +2,7 @@
    new Alfresco.TagComponent("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      container: "${args.container!""}"
+      containerId: "${template.properties.container!""}"
    }).setMessages(
       ${messages}
    );

@@ -2,7 +2,7 @@
    new Alfresco.DiscussionsToolbar("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs["site"]!""}",
-      containerId: "${args.container!'discussions'}",
+      containerId: "${template.properties.container!'discussions'}",
       allowCreate: ${forum.forumPermissions.create?string}
    }).setMessages(
       ${messages}

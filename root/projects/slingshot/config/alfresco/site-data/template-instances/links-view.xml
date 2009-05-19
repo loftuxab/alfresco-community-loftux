@@ -2,10 +2,6 @@
 <template-instance>
    <template-type>org/alfresco/links-view</template-type>
    <properties>
-      <!--
-      <hasBreadcrumb>true</hasBreadcrumb>
-      <hasTreeview>false</hasTreeview>
-      <hasPackager>true</hasPackager>
-       -->
+      <container>links</container>
    </properties>
 </template-instance>

@@ -2,7 +2,7 @@
    new Alfresco.FolderActions("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      containerId: "${args.container!"documentLibrary"}"
+      containerId: "${template.properties.container!"documentLibrary"}"
    }).setMessages(
       ${messages}
    );

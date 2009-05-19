@@ -8,7 +8,7 @@ function getTags(site, container)
 }
 
 var site = page.url.templateArgs.site,
-   container = args.container,
+   container = template.properties.container,
    tags = [];
 
 var data = getTags(site, container);
