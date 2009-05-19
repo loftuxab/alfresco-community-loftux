@@ -22,7 +22,7 @@ function main(document)
 						
 	// Make the document a record
 	record = rmService.makeRecord(document);
-	
+
 	// Calculated properties
 	var filedDate = new Date();
 	var recordId = filedDate.getFullYear() + "-" + utils.pad(document.properties["sys:node-dbid"].toString(), 10);
@@ -32,7 +32,7 @@ function main(document)
 	
 	// Get hte record properties
 	var recordProperties = action.parameters["recordProperties"];
-	
+
 	// Add any custom aspects that are implied by the provided properties
 	var customAspects = rmService.getCustomRMAspects(recordProperties);
 	for (customAspect in customAspects)

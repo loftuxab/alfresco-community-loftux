@@ -24,6 +24,7 @@ function main()
     }
 
     // extract optional data from request body (if present)
+    //TODO NEIL Are the params optional or mandatory?
     var params = null; 
     if (json.has("params"))
     {

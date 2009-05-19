@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.jscript.ScriptNode;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -48,10 +50,16 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
     private Map<String, RecordsManagementAction> rmActions;
     
     private ActionService actionService;
+    private ServiceRegistry services;
 
     public void setActionService(ActionService actionService)
     {
         this.actionService = actionService;
+    }
+    
+    public void setServiceRegistry(ServiceRegistry services)
+    {
+        this.services = services;
     }
     
     public void setRecordsManagementActions(List<RecordsManagementAction> rmActions)
@@ -69,7 +77,16 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
         if (logger.isDebugEnabled())
         {
             logger.debug("Executing record management action on " + filePlanComponent);
+            logger.debug("    actionName = " + name);
+            logger.debug("    parameters = " + parameters);
         }
+        
+        //TODO Fix this up after the demo.
+        // Replace the noderef String in parameters with a ScriptNodeRef
+        Serializable existingString = parameters.get("recordFolder");
+        ScriptNode scrNode = new ScriptNode(new NodeRef(existingString.toString()), this.services);
+        parameters.put("recordFolder", scrNode);
+        logger.debug("    new parameters = " + parameters);
         
         // Get the state
         RecordsManagementAction rmAction = rmActions.get(name);
