@@ -16,7 +16,8 @@
     <!-- Records Management Service -->
     
     <bean id="recordsManagementService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceImpl">
-    	<property name="actionService" ref="ActionService"/>
+        <property name="actionService" ref="ActionService"/>
+        <property name="serviceRegistry" ref="ServiceRegistry"/>
     	<property name="recordsManagementActions">
     		<list>
     			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">

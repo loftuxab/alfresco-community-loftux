@@ -25,14 +25,14 @@
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -45,6 +45,7 @@ import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 
 /**
  * This class tests the Rest API for the submission of RM actions.
@@ -59,6 +60,7 @@ public class RmRestApiSystemTest extends BaseWebScriptTest
     protected ContentService contentService;
     protected SearchService searchService;
     protected ImporterService importService;
+    protected ServiceRegistry services;
 
     @Override
     protected void setUp() throws Exception
@@ -68,6 +70,7 @@ public class RmRestApiSystemTest extends BaseWebScriptTest
         this.contentService = (ContentService)getServer().getApplicationContext().getBean("ContentService");
         this.searchService = (SearchService)getServer().getApplicationContext().getBean("SearchService");
         this.importService = (ImporterService)getServer().getApplicationContext().getBean("ImporterService");
+        this.services = (ServiceRegistry)getServer().getApplicationContext().getBean("ServiceRegistry");
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
 
@@ -78,7 +81,13 @@ public class RmRestApiSystemTest extends BaseWebScriptTest
         TestUtilities.loadFilePlanData(null, this.nodeService, this.importService);
     }
 
-    public void testPost_DeclareRecord_ToNonExistentNode() throws Exception
+    /**
+     * This test method ensures that a POST of an RM action to a non-existent node
+     * will result in a 404 status.
+     * 
+     * @throws Exception
+     */
+    public void testPost_RecordAction_ToNonExistentNode() throws Exception
     {
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");     
         assertNotNull(recordCategory);
@@ -104,8 +113,11 @@ public class RmRestApiSystemTest extends BaseWebScriptTest
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");     
         assertNotNull(recordCategory);
 
+        NodeRef recordFolder = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");
+        assertNotNull(recordFolder);
+
         // Create a testNode/file which is to be declared as a record.
-        NodeRef nodeToBeDeclared = this.nodeService.createNode(recordCategory, 
+        NodeRef nodeToBeDeclared = this.nodeService.createNode(recordFolder, 
                 ContentModel.ASSOC_CONTAINS, 
                 QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
                 ContentModel.TYPE_CONTENT).getChildRef();
@@ -117,23 +129,29 @@ public class RmRestApiSystemTest extends BaseWebScriptTest
         writer.putContent("There is some content in this record");
         
         // Construct the JSON request for declareRecord.
-        JSONObject jsonPostData = new JSONObject();
-        jsonPostData.put("nodeRef", nodeToBeDeclared.toString());
-        jsonPostData.put("name", "declareRecord");
-        
-        // Set parameters on the action.
-        Map<String, Serializable> paramData = new HashMap<String, Serializable>();
-        paramData.put("recordFolder", "???");
-        paramData.put("recordProperties", "?????");
-        jsonPostData.put("params", paramData);
+        String jsonString = new JSONStringer().object()
+            .key("name").value("declareRecord")
+            .key("nodeRef").value(nodeToBeDeclared.toString())
+            .key("params").object()
+                .key("recordFolder").value(recordFolder)
+                .key("recordProperties").object()
+                    .key(RecordsManagementModel.PROP_PUBLICATION_DATE.toString()).value(new Date())
+                    .key(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString()).array()
+                        .value(DODSystemTest.FOUO)
+                        .value(DODSystemTest.NOFORN)
+                    .endArray()
+                    .key(RecordsManagementModel.PROP_MEDIA_TYPE.toString()).value("mediaTypeValue")
+                    .key(RecordsManagementModel.PROP_FORMAT.toString()).value("formatValue")
+                    .key(RecordsManagementModel.PROP_DATE_RECEIVED.toString()).value(new Date())
+                .endObject()
+            .endObject()
+        .endObject()
+        .toString();
         
         // Submit the JSON request.
-        String jsonPostString = jsonPostData.toString();
-        System.out.println("JSON= " + jsonPostString);
-        
         final int expectedStatus = 200;
         Response rsp = sendRequest(new PostRequest(REST_URL,
-                                      jsonPostString, APPLICATION_JSON), expectedStatus);
+                                      jsonString, APPLICATION_JSON), expectedStatus);
         
         System.out.println(rsp.getContentAsString());
         //TODO NEIL Assert something about the rsp contents.

@@ -74,9 +74,9 @@ public class DODSystemTest extends BaseSpringTest
 	private AuthenticationComponent authenticationComponent;
 	
 	// base test data for supplemental markings list (see also recordsModel.xml)
-	private final static String NOFORN     = "NOFORN";     // Not Releasable to Foreign Nationals/Governments/Non-US Citizens
-	private final static String NOCONTRACT = "NOCONTRACT"; // Not Releasable to Contractors or Contractor/Consultants
-	private final static String FOUO       = "FOUO";       // For Official Use Only 
+	protected final static String NOFORN     = "NOFORN";     // Not Releasable to Foreign Nationals/Governments/Non-US Citizens
+	protected final static String NOCONTRACT = "NOCONTRACT"; // Not Releasable to Contractors or Contractor/Consultants
+	protected final static String FOUO       = "FOUO";       // For Official Use Only 
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 

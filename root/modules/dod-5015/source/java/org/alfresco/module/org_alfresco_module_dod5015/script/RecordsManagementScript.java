@@ -49,6 +49,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mozilla.javascript.Scriptable;
@@ -60,6 +61,9 @@ import org.mozilla.javascript.Scriptable;
  */
 public class RecordsManagementScript extends BaseProcessorExtension implements Scopeable, RecordsManagementModel 
 {
+    private static final String RECORD_PROPERTIES = "recordProperties";
+    private static final String RECORD_FOLDER = "recordFolder";
+
     private static Log logger = LogFactory.getLog(RecordsManagementScript.class);
 
    /** Scriptable scope object */
@@ -179,8 +183,6 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	 */
 	public ScriptRecordCategory getRecordCategory(ScriptNode node)
 	{
-        System.out.println("RecordsManagementScript.getRecordCategory");
-        System.out.println("node = " + node);
 	    // Get the record categories for this node
 	    NodeRef nodeRef = node.getNodeRef();
 	    List<NodeRef> recordCategories = new ArrayList<NodeRef>(1);
@@ -201,30 +203,59 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	        throw new InvalidNodeRefException(node.toString(), node);
 	    }
 	    
-	    Map<String, Serializable> paramsMap = new HashMap<String, Serializable>();
+	    // I'm declaring paramsMap as the concrete type HashMap because it
+	    // implements Serializable whereas Map does not.
+	    // This comment applies to a number of Collection declarations below.
+	    HashMap<String, Serializable> paramsMap = new HashMap<String, Serializable>();
 	    if (parameters != null)
 	    {
-	        for (Iterator iter = parameters.keys(); iter.hasNext(); )
-	        {
-	            String nextKey = (String)iter.next();
-	            String nextValue = null;
-	            try { nextValue = parameters.get(nextKey).toString(); }
-	            catch (JSONException e)
-	            {
-	                if (logger.isWarnEnabled())
-	                {
-	                    StringBuilder buf = new StringBuilder();
-	                    buf.append("JSONException in executeRecordAction. ")
-	                    .append(e.getMessage());
-	                    logger.warn(buf.toString());
-	                }
-	                //TODO NEIL Is this ok?
-	                // If the JSON is malformed, there is little we can do at this point.
-	                return;
-	            }
-	            
-	            paramsMap.put(nextKey, nextValue);
-	        }
+	        //TODO NEIL How much should this code know about the structure of the JSON?
+	        //          To get started, I'm going to hardcode in a bit.
+	        //TODO Fix this up after demo
+	        String recordFolder;
+            try
+            {
+                recordFolder = parameters.getString(RECORD_FOLDER);
+                paramsMap.put(RECORD_FOLDER, recordFolder);
+
+                JSONObject recProps = parameters.getJSONObject(RECORD_PROPERTIES);
+
+                HashMap<String, Serializable> propsMap = new HashMap<String, Serializable>();
+                for (Iterator iter = recProps.keys(); iter.hasNext(); )
+                {
+                    String nextKey = (String)iter.next();
+                    Object object = recProps.get(nextKey);
+                    
+                    //TODO NEIL I'm assuming that props are either String values or JSONArrays.
+                    //TODO      Reconsider after the demo.
+                    Serializable nextValue;
+                    if (object instanceof JSONArray)
+                    {
+                        JSONArray array = (JSONArray)object;
+                        
+                        ArrayList<String> arrayValues = new ArrayList<String>(array.length());
+                        for (int i = 0; i < array.length(); i++)
+                        {
+                            arrayValues.add((String)array.get(i));
+                        }
+                        nextValue = arrayValues;
+                    }
+                    else
+                    {
+                        nextValue = (Serializable)object;
+                    }
+                    
+                    propsMap.put(nextKey, nextValue);
+                }
+                paramsMap.put(RECORD_PROPERTIES, propsMap);
+            } catch (JSONException e)
+            {
+                if (logger.isWarnEnabled())
+                {
+                    logger.warn(e);
+                    throw new AlfrescoRuntimeException("Error executing record action " + name, e);
+                }
+            }
 	    }
 	    
 	    if (logger.isDebugEnabled())
@@ -284,6 +315,6 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
             }
         }
         
-        return (String[])aspects.toArray(new String[aspects.size()]);
+        return aspects.toArray(new String[aspects.size()]);
     }
 }
