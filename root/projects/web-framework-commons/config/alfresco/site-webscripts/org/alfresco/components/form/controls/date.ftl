@@ -19,7 +19,7 @@
 
 <label for="${dpId}-date">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
 <input id="${dpId}" type="hidden" name="${field.name}" value="${field.value}" />
-<input id="${dpId}-date" type="text" class="date-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
+<input id="${dpId}-date" name="-" type="text" class="date-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
 
 <#if field.disabled == false>
 <a id="${dpId}-icon" href="javascript:${dpVar}_cal.show();"><img src="${url.context}/components/form/images/calendar.png" class="datepicker-icon"/></a>
@@ -28,7 +28,7 @@
 <div id="${dpId}-cal" class="datepicker"></div>
 
 <#if showTime>
-<input id="${dpId}-time" type="text" class="time-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
+<input id="${dpId}-time" name="-" type="text" class="time-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
 </#if>
 
 <div class="format-info">
