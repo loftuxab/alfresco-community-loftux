@@ -861,7 +861,7 @@ Alfresco.util.addMessages = function(p_obj, p_messageScope)
    }
    else
    {
-      Alfresco.messages.scope[p_messageScope] = p_obj;
+      Alfresco.messages.scope[p_messageScope] = YAHOO.lang.merge(Alfresco.messages.scope[p_messageScope] || {}, p_obj);
       return true;
    }
    // for completeness...

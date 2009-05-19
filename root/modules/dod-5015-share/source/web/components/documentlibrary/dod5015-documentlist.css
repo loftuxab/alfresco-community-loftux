@@ -1,0 +1,42 @@
+/* Actions: Icons */
+.doclist .onActionCutoff a
+{
+   background-image: url(images/generic-16.png);
+}
+
+.doclist .onActionUncutoff a
+{
+   background-image: url(images/generic-16.png);
+}
+
+
+.doclist .onActionReview a
+{
+   background-image: url(images/generic-16.png);
+}
+
+.doclist .onActionTransfer a
+{
+   background-image: url(images/generic-16.png);
+}
+
+
+.doclist .onActionAccession a
+{
+   background-image: url(images/generic-16.png);
+}
+
+.doclist .onActionDestroy a
+{
+   background-image: url(images/generic-16.png);
+}
+
+.doclist .onActionFreeze a
+{
+   background-image: url(images/generic-16.png);
+}
+
+.doclist .onActionUnfreeze a
+{
+   background-image: url(images/generic-16.png);
+}

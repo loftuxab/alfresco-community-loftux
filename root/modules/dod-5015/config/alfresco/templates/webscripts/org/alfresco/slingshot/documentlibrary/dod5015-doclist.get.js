@@ -1,5 +1,5 @@
-<import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/action-sets.lib.js">
-<import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/filters.lib.js">
+<import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/dod5015-action-sets.lib.js">
+<import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/dod5015-filters.lib.js">
 <import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/parse-args.lib.js">
 var THUMBNAIL_NAME = "doclib";
 
@@ -14,11 +14,11 @@ function getDocList(filter)
    var items = new Array();
    var assets;
    
-   // Is our thumbnail type registered?
+   // Is our thumbnail tpe registered?
    var haveThumbnails = thumbnailService.isThumbnailNameRegistered(THUMBNAIL_NAME);
 
    // Use helper function to get the arguments
-   var parsedArgs = getParsedArgs();
+   var parsedArgs = getParsedArgs("rma:filePlan");
    if (parsedArgs === null)
    {
       return;
@@ -96,7 +96,7 @@ function getDocList(filter)
    assets = assets.slice(startIndex, pagePos * pageSize);
    
    var itemStatus, itemOwner, actionSet, thumbnail, createdBy, modifiedBy, activeWorkflows, assetType, linkAsset, isLink;
-   var defaultLocation, location, qnamePaths, displayPaths, locationAsset;
+   var defaultLocation, location, qnamePaths, displayPaths, locationAsset, assetSubtype;
 
    // Location if we're in a site
    var defaultLocation =
@@ -154,26 +154,34 @@ function getDocList(filter)
       createdBy = people.getPerson(asset.properties["cm:creator"]);
       modifiedBy = people.getPerson(asset.properties["cm:modifier"]);
       
-      // Asset type
-      if (asset.isContainer)
+      // Asset type - basic UI type
+      assetType = asset.isContainer ? "recordFolder" : "document";
+
+      // Asset subtype
+      switch (String(asset.typeShort))
       {
-         assetType = "folder";
+         case "app:folderlink":
+            assetType = "recordFolder";
+            isLink = true;
+            break;
+         case "app:filelink":
+            assetType = "document";
+            isLink = true;
+            break;
+         case "rma:recordSeries":
+            assetType = "recordSeries";
+            break;
+         case "rma:recordCategory":
+            assetType = "recordCategory";
+            break;
+         case "rma:recordFolder":
+            assetType = "recordFolder";
+            break;
+         case "rma:nonElectronicRecord":
+            assetType = "nonElectronicRecord";
+            break;
       }
-      else if (asset.type == "{http://www.alfresco.org/model/application/1.0}folderlink")
-      {
-         assetType = "folder";
-         isLink = true;
-      }
-      else if (asset.type == "{http://www.alfresco.org/model/application/1.0}filelink")
-      {
-         assetType = "document";
-         isLink = true;
-      }
-      else
-      {
-         assetType = "document";
-      }
-      
+
       if (isLink)
       {
          /**

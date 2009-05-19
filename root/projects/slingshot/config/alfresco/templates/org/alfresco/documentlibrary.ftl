@@ -37,6 +37,7 @@
 </@>
 
 <@templateBody>
+   <!-- doclibType = ${doclibType} -->
    <div id="alf-hd">
       <@region id="header" scope="global" protected=true />
       <@region id="title" scope="template" protected=true />
@@ -46,14 +47,14 @@
       <div class="yui-t1" id="divDocLibraryWrapper">
          <div id="yui-main">
             <div class="yui-b" id="divDocLibraryDocs">
-               <@region id="toolbar" scope="template" protected=true />
-               <@region id="documentlist" scope="template" protected=true />
+               <@region id=doclibType + "toolbar" scope="template" protected=true />
+               <@region id=doclibType + "documentlist" scope="template" protected=true />
             </div>
          </div>
          <div class="yui-b" id="divDocLibraryFilters">
-            <@region id="filter" scope="template" protected=true />
-            <@region id="tree" scope="template" protected=true />
-            <@region id="tags" scope="template" protected=true />            
+            <@region id=doclibType + "filter" scope="template" protected=true />
+            <@region id=doclibType + "tree" scope="template" protected=true />
+            <@region id=doclibType + "tags" scope="template" protected=true />            
          </div>
       </div>
 

@@ -1,0 +1,60 @@
+<documentList>
+   <actionSets>
+      <actionSet id="empty"></actionSet>
+
+      <actionSet id="recordSeries">
+         <action id="onActionDetails" permission="edit" type="action-link" label="actions.series.metadata" />
+         <action id="onActionDelete" permission="delete" type="action-link" label="actions.series.delete" />
+      </actionSet>
+
+      <actionSet id="recordCategory">
+         <action id="onActionDetails" permission="edit" type="action-link" label="actions.category.metadata" />
+         <action id="onActionDelete" permission="delete" type="action-link" label="actions.category.delete" />
+      </actionSet>
+
+      <actionSet id="recordFolder">
+         <action id="onActionDetails" permission="edit" type="action-link" label="actions.folder.metadata" />
+         <action id="onActionDelete" permission="delete" type="action-link" label="actions.folder.delete" />
+      </actionSet>
+
+      <actionSet id="undeclared">
+         <action id="onActionUploadNewVersion" type="action-link" label="actions.record.upload-new-version" />
+         <action id="onActionDelete" type="action-link" permission="delete" label="actions.record.delete" />
+      </actionSet>
+
+      <actionSet id="open">
+         <action id="onActionCutoff" type="action-link" permission="" label="actions.record.cutoff" />
+         <action id="onActionFreeze" type="action-link" permission="freeze" label="actions.record.freeze" />
+         <action id="onActionUnfreeze" type="action-link" permission="unfreeze" label="actions.record.unfreeze" />
+      </actionSet>
+
+      <actionSet id="declared">
+         <action id="onActionReview" type="action-link" permission="" label="actions.record.review" />
+         <action id="onActionCutoff" type="action-link" permission="" label="actions.record.cutoff" />
+         <action id="onActionFreeze" type="action-link" permission="freeze" label="actions.record.freeze" />
+         <action id="onActionUnfreeze" type="action-link" permission="unfreeze" label="actions.record.unfreeze" />
+      </actionSet>
+
+      <actionSet id="pendingReview">
+         <action id="onActionReviewed" type="action-link" permission="" label="actions.record.reviewed" />
+         <action id="onActionFreeze" type="action-link" permission="freeze" label="actions.record.freeze" />
+         <action id="onActionUnfreeze" type="action-link" permission="unfreeze" label="actions.record.unfreeze" />
+      </actionSet>
+
+      <actionSet id="pendingDisposition">
+         <action id="onActionDestroy" type="action-link" permission="" label="actions.record.destroy" />
+         <action id="onActionTransfer" type="action-link" permission="" label="actions.record.transfer" />
+         <action id="onActionFreeze" type="action-link" permission="freeze" label="actions.record.freeze" />
+         <action id="onActionUnfreeze" type="action-link" permission="unfreeze" label="actions.record.unfreeze" />
+      </actionSet>
+
+      <actionSet id="retained">
+         <action id="onActionFreeze" type="action-link" permission="freeze" label="actions.record.freeze" />
+         <action id="onActionUnfreeze" type="action-link" permission="unfreeze" label="actions.record.unfreeze" />
+      </actionSet>
+
+      <actionSet id="destroyed"></actionSet>
+
+      <actionSet id="transferred"></actionSet>
+   </actionSets>
+</documentList>
