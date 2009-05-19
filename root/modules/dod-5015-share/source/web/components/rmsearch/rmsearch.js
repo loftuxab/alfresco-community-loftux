@@ -59,7 +59,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json", "menu"], this.onComponentsLoaded, this);
       
       return this;
    };
@@ -168,6 +168,41 @@
        */
       onReady: function Search_onReady()
       {
+         // Menus
+         //this.widgets.metadataMenu = new YAHOO.widget.Menu(this.id + "-metadata", {position: "static", hidedelay: 700, lazyload: true});
+         //this.widgets.metadataMenu.render();
+         
+         var onMetadataClick = function onMetadataClick(e)
+         {
+            var el = Event.getTarget(e);
+            var columnKey = el.id.substring(el.id.lastIndexOf('-') + 1);
+            var col = this.widgets.dataTable.getColumn(columnKey)
+            if (col)
+            {
+               if (col.hidden)
+               {
+                  this.widgets.dataTable.showColumn(col);
+               }
+               else
+               {
+                  this.widgets.dataTable.hideColumn(col);
+               }
+            }
+         };
+         
+         var elAcceptor = function(el)
+         {
+            return (el.id.indexOf("-metadata-") != -1);
+         };
+         
+         var elVisitor = function(el)
+         {
+            Event.on(el, "click", onMetadataClick);
+         };
+         
+         // Apply meta-data field event handlers
+         Dom.getElementsBy(elAcceptor, "input", Dom.get(this.id + "-metadata"), elVisitor);
+         
          // DataSource definition
          var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/rmsearch?";
          this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
@@ -177,7 +212,9 @@
          {
              resultsList: "items",
              fields: ["nodeRef", "name", "title", "description", "modifiedOn", "modifiedByUser", "modifiedBy",
-                      "createdOn", "createdByUser", "createdBy", "size", "browseUrl", "properties.identifier"]
+                      "createdOn", "createdByUser", "createdBy", "size", "browseUrl",
+                      "properties.identifier", "properties.dateFiled", "properties.publicationDate", "properties.dateReceived",
+                      "properties.originatingOrganization", "properties.mediaType", "properties.format", "properties.location"]
          };
          
          // setup of the datatable.
@@ -234,7 +271,10 @@
           */
          renderCellDate = function Search_renderCellDate(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = Alfresco.util.formatDate(oData);
+            if (oData)
+            {
+               elCell.innerHTML = Alfresco.util.formatDate(oData);
+            }
          };
          
          /**
@@ -245,14 +285,35 @@
             elCell.innerHTML = $html(oData);
          };
          
+         /**
+          * URI custom datacell sorter
+          */
+         var sortCellURI = function sortCellURI(a, b, desc)
+         {
+            var numA = parseInt(a.getData("properties.identifier")),
+                numB = parseInt(b.getData("properties.identifier"));
+            
+            if (desc)
+            {
+               return (numA < numB ? 1 : (numA > numB ? -1 : 0));
+            }
+            return (numA < numB ? -1 : (numA > numB ? 1 : 0));
+         };
+         
          // DataTable column defintions
          var columnDefinitions =
          [
             { key: "image", label: "", sortable: false, formatter: renderCellImage, width: "64px" },
-            { key: "uri", label: me._msg("label.uri"), sortable: true, resizeable: true, formatter: renderCellURI },
-            { key: "subject", label: me._msg("label.subject"), field: "title", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
-            { key: "author", label: me._msg("label.author"), field: "createdBy", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
-            { key: "datefiled", label: me._msg("label.datefiled"), sortable: true, resizeable: true, formatter: renderCellDate }
+            { key: "identifier", label: me._msg("label.identifier"), sortable: true, sortOptions: {sortFunction: sortCellURI}, resizeable: true, formatter: renderCellURI },
+            { key: "title", label: me._msg("label.title"), field: "title", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
+            { key: "originator", label: me._msg("label.originator"), field: "createdBy", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
+            { key: "dateFiled", label: me._msg("label.dateFiled"), field: "properties.dateFiled", sortable: true, resizeable: true, formatter: renderCellDate },
+            { key: "publicationDate", label: me._msg("label.publicationDate"), field: "properties.publicationDate", sortable: true, resizeable: true, formatter: renderCellDate },
+            { key: "originatingOrganization", label: me._msg("label.originatingOrganization"), field: "properties.originatingOrganization", sortable: true, resizeable: true, hidden: true },
+            { key: "mediaType", label: me._msg("label.mediaType"), field: "properties.mediaType", sortable: true, resizeable: true, hidden: true },
+            { key: "format", label: me._msg("label.format"), field: "properties.format", sortable: true, resizeable: true, hidden: true },
+            { key: "dateReceived", label: me._msg("label.dateReceived"), field: "properties.dateReceived", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true },
+            { key: "location", label: me._msg("label.location"), field: "properties.location", sortable: true, resizeable: true, hidden: true }
          ];
          
          // DataTable definition

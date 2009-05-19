@@ -37,6 +37,25 @@
    border: 1px solid #AAAAAA;
 }
 
+.search label
+{
+   padding-left: 4px;
+   vertical-align: 5%;
+}
+
+.search .metadata
+{
+   border: 1px solid #ffffff;
+   background-color: #D7D7D7;
+   line-height: 1.5em;
+   padding: 6px 6px 4px 8px;
+   float: left;
+   height: 4.5em;
+   min-width: 20em;
+   overflow-y: auto;
+   overflow-x: hidden;
+}
+
 .search .results
 {
    margin: 16px 10px 10px;
