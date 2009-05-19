@@ -19,19 +19,12 @@ function main()
    // Assume regular cm:folder type
    var containerType = "cm:folder";
 
-   if (false) /* TODO: Awaiting auth bug fix */
+   var connector = remote.connect("alfresco");
+   result = connector.get("/slingshot/doclib/container/" + siteId + "/" + containerId);
+   if (result.status == 200)
    {
-      var connector = remote.connect("alfresco");
-      result = connector.get("/slingshot/doclib/container/" + siteId + "/" + containerId);
-      if (result.status == 200)
-      {
-         var data = eval('(' + result + ')');
-         containerType = data.container.type;
-      }
-   }
-   else
-   {
-      containerType = siteId == "rm" ? "rma:filePlan" : "cm:folder";
+      var data = eval('(' + result + ')');
+      containerType = data.container.type;
    }
 
    var p = sitedata.getPage("site/" + siteId + "/dashboard");
