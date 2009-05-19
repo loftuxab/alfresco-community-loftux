@@ -1,23 +1,12 @@
-//http://localhost:8080/alfresco/service/slingshot/dashlets/my-tasks?filter={filter?}&date={date?}
-function getUserTasks()
-{
-  var data = remote.call("/slingshot/dashlets/my-tasks");
-  return eval('(' + data + ')');      
-}
-//http://localhost:8080/alfresco/service/calendar/events/user
-function getUserEvents()
-{
-  var data = remote.call("/calendar/events/user");
-  return eval('(' + data + ')');
-}
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/utils.js">
 
-var userTasks = getUserTasks().tasks;
+var userTasks = getUserTasks('all').tasks;
+var overdueTasks = getUserTasks('overdue').tasks;
+
 var userEvents = getUserEvents().events;
 
 model.role=page.url.templateArgs.site;
 model.numTasks = userTasks.length;
-model.tasks = userTasks;
+model.numOverdueTasks = overdueTasks.length
 model.numEvents = userEvents.length;
-model.events = userEvents;
-model.pageTitle = 'Sites';
 model.backButton = true;

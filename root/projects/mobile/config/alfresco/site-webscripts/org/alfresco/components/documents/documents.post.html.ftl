@@ -1,10 +1,14 @@
 <#include "documents.ftl" />
 <script type="text/javascript" charset="utf-8">
 <#if (workflowResult?string='true')>
-   alert('${msg("Workflow Assigned")}');
+   var workflowResult = '${msg("label.workflowAssigned")}';
 <#else>
-   alert('${msg("Workflow Not Assigned")}');
+   var workflowResult = '${msg("label.workflowAssigned")}';
 </#if>
+App.addMessage(workflowResult);
+window.addEventListener('DOMContentLoaded',function(){
+   App.showMessage();
+});
 </script>
 <div id="container">
    <div id="${htmlid}Panel" class="panel selected">

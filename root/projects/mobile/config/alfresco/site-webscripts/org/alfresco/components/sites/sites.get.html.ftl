@@ -1,7 +1,7 @@
 <div id="container">
    <div id="${htmlid}Panel" class="panel selected">
       <div class="toolbar">
-         <h1>${pageTitle}</h1>
+         <h1>${msg('label.sites')}</h1>
          <#if (backButton??)>
             <a class="back button">${msg('label.backText')}</a>
          </#if>
@@ -10,7 +10,7 @@
          </#if>
       </div>
       <div class="content">
-         <div class="tabs">
+         <div id="sitesTabs" class="tabs">
             <ul class="tablinks">
               <li><a href="#Fav" class="button active">${msg('label.favorites')}</a></li>
               <li><a href="#My" class="button">${msg('label.mySites')}</a></li>
@@ -24,12 +24,12 @@
               </ul>
               <ul id="My" class="e2e list hilite">
                 <#list sites as site>
-                <li><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.shortName}</a></li>
+                <li class="sites"><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.shortName}</a></li>
                 </#list>
               </ul>
               <ul id="All" class="e2e list hilite">
                 <#list allSites as site>
-                <li><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.shortName}</a></li>
+                <li class="sites"><a id="${site.shortName}" href="#site?site=${site.shortName}" class="panelLink">${site.shortName}</a></li>
                 </#list>
               </ul>
             </div>
