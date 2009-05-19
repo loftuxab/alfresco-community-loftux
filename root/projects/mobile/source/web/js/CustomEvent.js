@@ -1,4 +1,4 @@
-Core.util.CustomEvent = function CustomEvent(type,context) {
+Mobile.util.CustomEvent = function CustomEvent(type,context) {
   this.type = type;
   this.scope = context || window;
   this.subscribers = [];
@@ -6,13 +6,13 @@ Core.util.CustomEvent = function CustomEvent(type,context) {
 /**
  *  
  */
-Core.util.CustomEvent.prototype = {
+Mobile.util.CustomEvent.prototype = {
   subscribe : function subscribe(fn,obj,overrideContext) 
   {
     if (!fn) {
       return null;
     }    
-    this.subscribers.push( new Core.util.EventSubscriber(fn, obj, overrideContext) );
+    this.subscribers.push( new Mobile.util.EventSubscriber(fn, obj, overrideContext) );
   },
   unsubscribe : function unsubscribe(fn,obj)
   {
@@ -42,7 +42,6 @@ Core.util.CustomEvent.prototype = {
   fire : function fire (o)
   {
     this.lastError = null;
-
     var errors = [],
     len=this.subscribers.length;
 
@@ -94,14 +93,14 @@ Core.util.CustomEvent.prototype = {
   }
 };
 
-Core.util.EventSubscriber = function EventSubscriber(fn,obj,overrideContext)
+Mobile.util.EventSubscriber = function EventSubscriber(fn,obj,overrideContext)
 {
   this.fn = fn;
   this.obj = obj || null;
   this.overrideContext = overrideContext;
 };
 
-Core.util.EventSubscriber.prototype = {
+Mobile.util.EventSubscriber.prototype = {
   getScope : function(defaultScope)
   {
     if (this.overrideContext) {

@@ -125,3 +125,82 @@ function getDocuments(site,container,filter,amount)
 
     return data;
 }
+
+//http://localhost:8080/alfresco/service/slingshot/dashlets/my-tasks?filter={filter?}&date={date?}
+function getUserTasks(filter)
+{
+  var filter = filter || 'all';
+  var data = remote.call("/slingshot/dashlets/my-tasks?filter=" + filter);
+  data = eval('(' + data + ')');
+  return data;
+}
+
+//http://localhost:8080/alfresco/service/calendar/events/user
+function getUserEvents()
+{
+  var data = remote.call("/calendar/events/user");
+  return eval('(' + data + ')');
+}
+
+const PREF_FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
+
+// http://localhost:8080/alfresco/service/api/sites
+function getAllSites()
+{
+  var data  = remote.call("/api/sites");
+  return eval('('+ data+')');
+}
+//http://localhost:8080/alfresco/service/api/people/admin/sites?size={pagesize?}&pos={position?}
+function getUserSites(u)
+{
+   var userName = u || user.name;
+   // Call the repo for sites the user is a member of
+   var result = remote.call("/api/people/" + stringUtils.urlEncode(userName) + "/sites");
+   if (result.status == 200)
+   {
+      var i, ii, j, jj;
+
+      // Create javascript objects from the server response
+      var sites = eval('(' + result + ')'), site, favourites = {}, userfavs = [];
+
+      if (sites.length > 0)
+      {
+         // Call the repo for the user's favourite sites
+         result = remote.call("/api/people/" + stringUtils.urlEncode(userName) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
+         if (result.status == 200 && result != "{}")
+         {
+            var prefs = eval('(' + result + ')');
+            
+            // Populate the favourites object literal for easy look-up later
+            favourites = eval('(prefs.' + PREF_FAVOURITE_SITES + ')');
+            if (typeof favourites != "object")
+            {
+               favourites = {};
+            }
+         }
+
+         for (i = 0, ii = sites.length; i < ii; i++)
+         {
+            site = sites[i];
+            
+            // Is this site a user favourite?
+            if (favourites[site.shortName]) 
+            {
+              site.isFavourite = true;
+              userfavs.push(site);
+            }
+            site.isFavourite = !!(favourites[site.shortName]);
+         }
+         var userSites =
+         {
+            sites : sites,
+            favSites: userfavs
+         };
+         return userSites;
+      }
+      return {
+         sites:[],
+         favSites:[]
+      };
+   }
+};

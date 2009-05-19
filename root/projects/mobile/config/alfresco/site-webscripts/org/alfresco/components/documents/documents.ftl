@@ -11,7 +11,7 @@
 </#macro>
 
 <#macro panelContent>
-<div class="tabs">
+<div id="documentsTabs" class="tabs">
    <ul class="tablinks">
       <li><a href="#My" class="button">${msg('label.my')}</a></li>
       <li><a href="#RMod" class="button active">${msg('label.recentlyModified')}</a></li>
@@ -60,7 +60,7 @@
          <ul class="e2e list">
             <#list allDocs as doc >
             <li class="details ${doc.type}">
-               <p class="toenail"><a href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>
+               <p class="toenail"><a href="${url.context}/proxy/alfresco/api/node/content/${doc.nodeRef?replace(':/','')}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png"/></a></p>
                <h3><a href="${url.context}/proxy/alfresco/${doc.contentUrl}">${doc.displayName}</a></h3>
                <p><span>${msg('label.modifiedBy')}:</span> ${doc.modifiedBy}</p>
                <p><span>${msg('label.modifiedOn')}:</span> ${doc.modifiedOn?string("dd MMM yyyy HH:mm")}</p>

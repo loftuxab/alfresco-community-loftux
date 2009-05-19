@@ -1,10 +1,11 @@
 (  
   function(){
-    Button = function Button(config)
+    Mobile.util.Button  = (Mobile.util.Button) || {};
+    Mobile.util.Button = function Button(config)
     {
-      Button.superclass.constructor.call(this,config);
+      Mobile.util.Button.superclass.constructor.call(this,config);
     };
-    Button = Core.util.extend(Button,UIControl,{
+    Mobile.util.Button = Mobile.util.extend(Mobile.util.Button,Mobile.util.UIControl,{
       init : function init()
       {        
         return this;
@@ -19,12 +20,12 @@
 (
   function()
   {
-
-    TabPanel = function TabPanel(config)
+    Mobile.util.TabPanel  = (Mobile.util.TabPanel) || {};
+    Mobile.util.TabPanel = function TabPanel(config)
     {
-      TabPanel.superclass.constructor.call(this,config);
+      Mobile.util.TabPanel.superclass.constructor.call(this,config);
     };
-    TabPanel = Core.util.extend(TabPanel,UIControl,{
+    Mobile.util.TabPanel = Mobile.util.extend(Mobile.util.TabPanel,Mobile.util.UIControl,{
       init : function()
       {
         //this.config.el should reference to .tabs element
@@ -39,8 +40,7 @@
         var that = this;
         this.elements.on('click',function(e)
         {
-
-          if (e.srcElement.className.indexOf('button')!=-1)
+          if (e.srcElement.nodeName.toUpperCase()==='A' && e.srcElement.className.indexOf('button')!=-1)
           {
             e.preventDefault();
             that.onClick(e.srcElement);
@@ -60,25 +60,18 @@
                {
                   if (x$(hash)) {
                      this.activeEls = x$(el,x$(hash).first());
-                     that.onClick(this.activeEls.elements[0])                     
+                     that.onClick(this.activeEls.elements[0]);
                   }
                }
               }
            );
         }; 
-        //TODO - change to Button instance create new button for each .tabs.button 
-        // console.log(x$(this.config.el).find('.button').each(function(el){
-        // console.log(el);
-        // //todo create new button instance and add click handler in config.
-        // //button mus read config and assign as required. But what about activeels? keep handler on TB but create buttons too. just make handler call button mewthods when required
-        // }));
       },
       onClick : function(el)
       {
         if (x$(el).is('.button'))
         {
           var href =  el.href;
-          // console.log(href)
           if (href.indexOf('#')!==-1)
           { 
             var contentId = href.split('#')[1];
@@ -91,8 +84,18 @@
             }
           }
         }
-        // console.log(e.srcElement);
       }
     });
  }()
 );
+Mobile.util.TabPanel.BEHAVIOUR_NAME = 'tabs';
+window.addEventListener('DOMContentLoaded',function(){
+App.registerBehaviour(Mobile.util.TabPanel.BEHAVIOUR_NAME,function(rootNode)
+   {
+      x$(rootNode).find('.tabs').each(function(el)
+          {
+            var tb = new Mobile.util.TabPanel({el:el,id:el.id}).init();
+          }
+      );
+   });
+});

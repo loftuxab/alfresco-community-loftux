@@ -1,80 +1,54 @@
 (
 function(){
     App = function App(config){
-      App.superclass.constructor.call(this,config);
+      App.superclass.constructor.call(this,config || {
+         id : 'App',
+         setUpCustomEvents : ['next','previous']
+      });
     };
-    App = new (Core.util.extend(App,UIControl,
+    App = new (Mobile.util.extend(App,Mobile.util.UIControl,
       {
         panelStack : [],
         currentPanelIndex : 0,
+        behaviours : {},
+        messages : [],
         init : function init(config)
         {
-          if (config && config.flash)
-          {
-           x$('#flash').first().innerHTML = config.flash.text//  alert(config.flash.text)
-          }
-          //initialise panels
+          //initialise panel for current page so it can be slid out
           this.panels = x$('.panel');
-          this.panels.each(function(el) {
-            var p = new Panel({
+          this.panels.each(function setupPanel(el) {
+            var p = new Mobile.util.Panel({
               el:el,
               id:el.id,
-              title:el.id.split('-').join(' '),
-              setUpCustomEvents:[]
+              title:el.id.split('-').join(' ')
             });
             p.init();
             App.addPanel(el.id,p);
+            p.on('show',
+               function(e,panel){
+                  App.showMessage();
+               },
+               p,
+               App
+            );
             // p.hide(-1);
-          });
-          //move out?
-          // handle new panels
-          x$('.panelLink').click( function(e){
-             e.preventDefault();
-            var el = e.srcElement;
-            // console.log(el)
-            //make sure el is a link (shouldn't it be srcElement??)
-            while(el.nodeName.toUpperCase()!='A')
-            {
-              el = el.parentNode;
-            };
+          });          
 
-            var panel = App.addPanel(el.id,new Panel( 
-                { 
-                 el : el,
-                 id:'panel-'+el.id,
-                 title:el.id.split('-').join(' '),
-                 buttons : {
-                   backText: 'Back'
-                 },
-                 href:el.href
-               }
-             )).init();
-             App.hideBrowserNavBar();
-             App.next();
-            
-            return false;
-          });
-
-          x$('.tabs').each(function(el)
-          {
-            var tb = new TabPanel({el:el}).init();
-          });
-
-          window.addEventListener('load',function() {
-            setTimeout(function() {
+          window.addEventListener('load',function AppSetup() {
+            setTimeout(function AppSetup() {
               App.hideBrowserNavBar();
               App.onOrientationChange();
             },0);
           });
           
-          x$('.searchform').each(function(el){
+          x$('.searchform').each(function setupSearchForm(el){
 
-            x$(el).on('submit',function(e)
+            x$(el).on('submit',function searchSubmitHandler(e)
             {
-              new Panel( 
+              new Mobile.util.Panel( 
               { 
                el : e.srcElement,
-               id:'panel-'+el.id,
+               id:Mobile.util.Panel.NAME_PREFIX+el.id,
                title:el.id.split('-').join(' '),
                buttons : {
                  backText: 'Back'
@@ -82,71 +56,17 @@ function(){
                href:el.href
               }).init();
               // e.preventDefault();
-            })
-          });
-
-          x$('.datepicker').each(function(el) {
-            function openDate() {
-             var now = new Date();
-             var days = { };
-             var years = { };
-             var months = { 1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec' };
- 
-             for( var i = 1; i < 32; i += 1 ) {
-               days[i] = i;
-             }
-
-             for( i = now.getFullYear()-100; i < now.getFullYear()+1; i += 1 ) {
-               years[i] = i;
-             }
-
-             SpinningWheel.addSlot(years, 'right', 1999);
-             SpinningWheel.addSlot(months, '', 4);
-             SpinningWheel.addSlot(days, 'right', 12);
- 
-             SpinningWheel.setCancelAction(function(e) { alert('cancel')});
-             SpinningWheel.setDoneAction(function (e) { 
-               function padZeros(value) {
-                 return (value<10) ? '0' + value : value;
-               }
-               var results = SpinningWheel.getSelectedValues().keys;
-	             document.getElementById('date').value = results[0]+'/'+padZeros(results[1])+'/'+padZeros(results[2]);
-             });
-             SpinningWheel.open();
-            }
-
-            x$(el).on('click',function(e) {
-              openDate();
-              
-            })
-          });
-          // x$('#searchBut').on('click',function(e)
-          //   {
-          //     var el = e.srcElement();
-          //      el.parentNode.submit();
-          //     })
-          if (config && config.flash && config.flash.text)
-          {
-            setTimeout(function() {
-              // alert(x$('#flash').first())
-              x$('#flash').css({
-                opacity:'0',              
-                webkitTransitionProperty: 'opacity',
-                webkitTransitionDuration : '1s',
-                webkitTransitionTimingFunction: 'ease-in-out',
-                opacity:'0.8' //setting to '1' fades it out!
-              },100);
             });
-            //hide after some time
-            setTimeout(function(){
-              x$('#flash').css({
-                webkitTransitionProperty: 'opacity',
-                webkitTransitionDuration : '1s',
-                webkitTransitionTimingFunction: 'ease-in-out',
-                opacity:'0'
-            })},4000);
+          });
 
-          }
+          x$(document).click(function(e) {
+            // App.hideBrowserNavBar();
+            if (x$(e.srcElement).is('.back.button'))
+            {
+               e.preventDefault();
+               App.previous();
+            }
+          });
           
           document.body.addEventListener('orientationchange',this.onOrientationChange);          
           return this;          
@@ -155,12 +75,13 @@ function(){
          * 
          *  
          */
-        previous : function()
+        previous : function previous()
         {
           //slide right -> inactive
           if(this.currentPanelIndex>0)
           {
             this.panelStack[this.currentPanelIndex].o.hide(1);
+            //this.panelStack[this.currentPanelIndex].o.destroy();
             this.currentPanelIndex = Math.max(0,(this.currentPanelIndex-1));
             //slide right -> active
             this.panelStack[this.currentPanelIndex].o.show();
@@ -169,9 +90,9 @@ function(){
           {
             history.go(-1);
           }
-          return this
+          return this;
         },
-        next : function() 
+        next : function next() 
         {
           if(this.currentPanelIndex>=0)
           {
@@ -194,7 +115,7 @@ function(){
         },
         removePanel : function removePanel(name)
         {
-          name = name.replace('panel-','');
+          name = name.replace(Mobile.util.Panel.NAME_PREFIX,'');
           var a = [];
           var panelToRemove;
           for (var i=0,len = this.panelStack.length;i<len;i++)
@@ -207,21 +128,17 @@ function(){
             else {
               panel.o.destroy();
             }
-            return this;
           }
           this.panelStack = a;
+          return this;          
         },
-        onAfterPanelHide : function afterPanelHide() {
-          // console.log('aph',arguments);
+        onAfterPanelHide : function afterPanelHide(e) {
         },
-        onBeforePanelHide : function beforePanelHide() {
-          // console.log('bph',arguments);
+        onBeforePanelHide : function beforePanelHide(e) {
         },
-        onAfterPanelShow : function afterPanelHide() {
-          // console.log('aph',arguments);
+        onAfterPanelShow : function afterPanelHide(e) {
         },
-        onBeforePanelShow : function beforePanelShow() {
-          // console.log('bps',arguments);
+        onBeforePanelShow : function beforePanelShow(e) {
         },    
         onOrientationChange : function onOrientationChange(e) {
           var bodyEl = x$(document.body);
@@ -232,14 +149,112 @@ function(){
         {
           window.scrollTo(0,1);
           return this;
-        }        
+        },
+        registerBehaviour : function registerBehaviour(name,behaviour)
+        {
+           if (!this.behaviours[name])
+           {
+              this.behaviours[name] = behaviour;
+           }
+        },
+        initBehaviour : function initBehaviour(name,rootNode)
+        {
+           if (this.behaviours[name])
+           {
+              this.behaviours[name](rootNode || document);
+           }
+        },
+        addMessage : function addMessage(msg)
+        {
+           this.messages.push(msg);
+        },
+        showMessage : function showMessage()
+        {
+           var msg = this.messages.pop();
+           if (msg)
+           {
+              if (!this.messageEl)
+              {
+                 x$('body').bottom('<div id="Message"><span>' +  msg + '</span></div>');
+                 this.messageEl = x$('#Message');
+              }
+              else 
+              {
+                 this.messageEl.html('inner','<span>'+ msg +'</span>');
+              }
+
+              setTimeout(function fadeInMessage() 
+              {
+                 setTimeout(function () 
+                 {
+                  x$('#Message').css(
+                     {
+                        display:'inline'
+                     }
+                     );
+                  },
+                  0);
+                 
+                 x$('#Message').css(
+                 {
+                    opacity:'0',
+                    webkitTransitionProperty: 'opacity',
+                    webkitTransitionDuration : '1s',
+                    webkitTransitionTimingFunction: 'ease-in-out',
+                    opacity:'1' 
+                 },
+                 100);
+              });
+              //hide after some time
+              setTimeout(function fadeOutMessage()
+               {
+                 x$('#Message').css(
+                    {
+                       opacity:'1',
+                       webkitTransitionProperty: 'opacity',
+                       webkitTransitionDuration : '1s',
+                       webkitTransitionTimingFunction: 'ease-in-out',
+                       opacity:'0'
+                    }
+                  );
+                 setTimeout(function () 
+                 {
+                  x$('#Message').css(
+                     {
+                        display:'none'
+                     }
+                     );
+                 },
+                 1000);
+               },4000);
+           }
+        }
       }
     ))();
   }()
 );
 
-/*
-   window.addEventListener('DOMContentLoaded',function(){
-      App.init();
-});
-*/
+//Behaviour to allow 'click' on any child of a list item of an edge-to-edge list
+App.registerBehaviour('Edge2EdgeListAction', function setupEdge2EdgeBehaviour(rootNode)
+   {
+      var handler = function e2eClickHandler(e) 
+      {
+         var targetEl = e.srcElement;
+         //if not a img, go to href of first child anchor of parent LI.
+         if (targetEl.nodeName.toUpperCase()!=='IMG')
+         {
+            e.stopPropagation();
+            while(targetEl.nodeName.toUpperCase()!='LI')
+            {
+               targetEl = targetEl.parentNode;
+            }
+            var el = x$(targetEl).find('a').first();
+            if (el.href)
+            {
+               window.location=el.href;
+            }
+         }
+      };
+      x$(rootNode).find('ul.e2e').click(handler);      
+   }
+);

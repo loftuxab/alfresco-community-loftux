@@ -75,9 +75,11 @@ function getPeopleResults(term)
 
 var query = page.url.args.term;
 model.contentResults = getContentSearchResults(query);
+model.numContentResults = model.contentResults.items.length;
 model.siteResults = getSiteResults(query);
+model.numSiteResults = model.siteResults.length;
 model.pplResults = getPeopleResults(query);
-
+model.numPplResults = model.pplResults.people.length;
 model.backButton = true;
 //debug stuff
 model.data = model.pplResults.toSource();

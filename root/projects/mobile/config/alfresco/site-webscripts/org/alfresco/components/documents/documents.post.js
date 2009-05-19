@@ -1,23 +1,4 @@
 <import resource="classpath:alfresco/site-webscripts/org/alfresco/utils.js">
-//POST http://localhost:8081/share/proxy/alfresco/slingshot/doclib/action/assign-workflow
-//RESULTS
-// {
-//    "totalResults": 1,
-//    "overallSuccess": true,
-//    "successCount": 1,
-//    "failureCount": 0,
-//    "results":
-//    [
-//       {
-//          "action": "assignWorkflow",
-//          "nodeRef": "Node Type: {http://www.alfresco.org/model/content/1.0}content Node Ref: workspace
-// ://SpacesStore/fdb8e091-b063-42a7-9565-4ef92247701c",
-//          "type": "document",
-//          "success": true,
-//          "id": "background.png"
-//       }
-//    ]
-// }
 
 function assignWorkflow() 
 {

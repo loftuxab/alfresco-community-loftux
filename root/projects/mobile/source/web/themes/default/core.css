@@ -28,8 +28,8 @@ div.panel.loading .content {
 }
 
 a.disabled {
-/*   color:#999 !important;
-   font-style:italic;*/
+   color:#999 !important;
+   font-style:italic;
 }
 
 /* Toolbars */
@@ -108,6 +108,9 @@ a.disabled {
   display:block;
   -webkit-transform: translate(0, 0px);
 }
+.panel.deactive {
+   display:none;
+} 
  body.portrait div.panel{
    min-height:376px;
  }
@@ -153,6 +156,7 @@ input.button {
   overflow:hidden;
   padding: 0px;
   right: auto;
+  cursor:pointer;
 }
 
 a.button
@@ -226,7 +230,8 @@ li.alldocuments:hover a,
 li.allfolders:hover a, 
 li.mainwikipage:hover a,
 li.wikipagelist:hover a,
-li.leavesite:hover a
+li.leavesite:hover a,
+ul.e2e li.sites:hover a
 {
    background-position:8px 8px,100% -32px;
 }
@@ -263,10 +268,13 @@ li.recentdocs a {
 } 
 
 /*#homePage ul.nav li.sites a {*/
-li.sites a {   
+ul.e2e li.sites a,
+li.sites a {
+   padding-left:2.5em;
    background:url(./images/icons/24-site.png) no-repeat 8px 8px,
               url(./images/arrow2.png) 100% 7px no-repeat;
 }
+
 /*#homePage ul.nav li.publicsites a {*/
 li.publicsites a {   
    background:url(./images/icons/browse-sites-24.png) no-repeat 8px 8px,
@@ -282,6 +290,15 @@ li.all a,
 li.tasks a {
    background:url(./images/icons/24-tasks.png) no-repeat 8px 8px,
               url(./images/arrow2.png) 100% 7px no-repeat;        
+}
+
+ul.rr li.tasks p {
+   margin:0;
+}
+ul.rr li.tasks p a {
+   background:none;
+   padding-top:0;
+   font-style:italic;
 }
 
 /*#homePage ul.nav li.siteactivities a {*/
@@ -345,55 +362,46 @@ body#loginPage #btn-login {
 }
 
 
-/*#sitePage ul.list .rr li.documents a {*/
+
 li.documents a {   
    background:url(./images/icons/recent-modified-docs-24-a.png) no-repeat  8px 8px,
               url(./images/arrow2.png) 100% 7px no-repeat;               
 }
-/*#sitePage ul.list .rr li.mydocuments a {*/
+
 li.mydocuments a {   
    background:url(./images/icons/my-docs-24-a.png) no-repeat  8px 8px,
               url(./images/arrow2.png) 100% 7px no-repeat;               
 }
-/*#sitePage ul.list .rr li.alldocuments a {*/
+
 li.alldocuments a {   
    background:url(./images/icons/all-documents-24-a.png) no-repeat  8px 8px,
               url(./images/arrow2.png) 100% 7px no-repeat;            
-/*    background-position:10px -66px;   */
+
 }
 
-/*#sitePage ul.list li.allfolders a, 
-#DocsPage ul.list li.allfolders a {*/
+
 li.allfolders a {
 
    background:url(./images/icons/24-folder.png) no-repeat  8px 8px,
               url(./images/arrow2.png) 100% 7px no-repeat;            
- /*    background-position:10px -22px;   */
+
 }
 
-/*#sitePage ul.list .rr li.mainwikipage a {*/
+
 li.mainwikipage a {   
    background:url(./images/icons/main-wiki-24.png) no-repeat  8px 8px,
               url(./images/arrow2.png) 100% 7px no-repeat;            
-/*    background-position:10px -303px;   */
+
 }
 
-/*#sitePage ul.list .rr li.wikipagelist a{*/
+
 li.wikipagelist a {   
    background:url(./images/icons/wiki-list-24.png) no-repeat  8px 8px,
               url(./images/arrow2.png) 100% 7px no-repeat;               
-/*    background-position:10px -638px;   */
+
 }
 
-/*#sitePage ul.list .rr li.newwikipage a{
-    background-position:10px -352px;   
-}
-*/
-/*#sitePage ul.list .rr li.invitetosite a{
-    background-position:10px -212px;   
-}*/
 
-/*#sitePage ul.list .rr li.leavesite a{*/
 li.leavesite a {
 background:url(./images/icons/24-leave-site.png) no-repeat  8px 8px,
               url(./images/arrow2.png) 100% 7px no-repeat;            
@@ -406,9 +414,7 @@ ul.e2e li.fav a {
 #homePage #homePanel .toolbar {
    display:none;
 }
-/*#homePage .toolbar .back.button {
-   display:none;
-}*/
+
 .content form {
    width:100%;
    font-size:16px;
@@ -420,10 +426,6 @@ ul.e2e li.fav a {
 .content form select,
  .content form input[type="text"],
  .content form textarea
-/*#TaskPage .content form input[type="text"],
-#InviteUserPage .content form input[type="text"],
-#InviteUserPage .content form select {
-*/
 {
    margin:0 1em;
    width:85%;
@@ -435,26 +437,15 @@ ul.e2e li.fav a {
 
 
  .content form div
-/*#TaskPage .content form div,
-#TaskPage .content form,
-#InviteUserPage .content form,
-#InviteUserPage .content form div {
-*/
-{   text-align:center;
+{   
+   text-align:center;
    margin:1em;
+   display:block;
 }
-/*#InviteUserPage */
 .content form label {
    display:block;
    margin-left:1em;
 }
-/*#InviteUserPage .content form input[type="text"],
-#InviteUserPage .content form select {
-   margin:1em 0;
-   width:100%;
-   
-}
-*/
 #searchPage .toolbar {
    display:none;
 }
@@ -489,18 +480,34 @@ ul.e2e li.fav a {
    padding-top:0;
    padding-left:0;
 }
+p#Sites {
+   padding:1em;
+   display:none;
+}
+p#Sites.active  {
+   display:block;
+}
 .tabcontent {
    background-color:#f2f2f2;
    margin:0;
    padding:0 0 1em 0;
 }
-#SitesPage .tabcontent,#TasksPage .tabcontent {
+#SitesPage .tabcontent,#tasksPage .tabcontent {
    padding:0;
 }
-#TaskPage .info {
+div.taskPanel,
+div.taskPanel .content
+{
+   background-color:none;
+   text-align:left;
+}
+div.taskPanel ul.rr li a{
+   padding-left:8px;
+}
+div.taskPanel .info {
    margin-top:1em;
 }
-#TaskPage .content h3 {
+div.taskPanel  h3 {
    margin:0 0 0 0.7em;
    color:#666;
    font-size:16px;
@@ -512,48 +519,79 @@ ul.e2e li.fav a {
 }
 
 
-#UserProfilePage .details {
+#profilePage .details {
    background-color:#fff;
    margin:0;
 }
 
-#UserProfilePage .details h2 {
+#profilePage .details h2 {
    font-size:20px;
 }
-#UserProfilePage .details p {
+#profilePage .details p {
    font-size:12px;
    padding-left:30px;
+   margin:0.5em 0;
 }
-#UserProfilePage .tabcontent h2 {
+#profilePage .tabcontent h2 {
    margin:5px;
    padding:0;
    font-size:12px;
 }
-#UserProfilePage .e2e {
+#profilePage .e2e {
    margin-bottom:0;
 }
-#UserProfilePage .e2e li {
-   border:none;
-   padding:0.5em;
+#profilePage .e2e li {
    color:#000;
    font-weight:normal;
+}
+#profilePage #Info .e2e li {
+   padding:0.5em;
    font-size:12px;
 }
-#UserProfilePage .e2e li span {
-   width:5em;
+#profilePage #Info .e2e li a {
+   display:inline;
+   background:none;
+}
+#profilePage .e2e li span {
    text-align:right;
    display:inline-block;
    font-weight:bold;
    margin-right:1em;
-}
-#UserProfilePage .e2e li a {
    padding:0;
-   display:inline;
+   width:5em;
 }
+
 #alf-ft {
    display:none;
 }
 
 #datePicker {
    margin-left:1em;
+}
+
+#homePage #Message {
+   top:2.8em;
+}
+
+#Message {
+   position:absolute;
+   top:0;;
+   left:0;
+   top:5.4em;
+   height:2.7em;
+   width:100%;
+   text-align:center;
+   color:#000;
+   background-color:#FDFF93;
+   opacity:0;   
+}
+
+#Message span {
+   vertical-align:middle;
+   height:1em;
+   margin:50% 0;
+}
+
+#taskForm .button {
+   margin-right:1em;
 }

@@ -9,13 +9,14 @@ ul.rr,div.rr {
 /*   -webkit-border-radius: 13px;*/
 /*   background-color: white;*/
 /*   border: 1px solid rgb(217, 217, 217);*/
-   margin: 0px 10px 0.5em 10px;
+   margin: 0px 1em 0.5em 1em;
    padding: 0px;
 }
 ul.rr li {
    border-bottom: 1px solid rgb(217, 217, 217);
    background-color: white;
    color: black;
+   list-style:none;
 /*   background:url(./images/iPhoneArrow.png) 100% 50% no-repeat;*/
 }
 ul.rr li:first-child {
@@ -56,7 +57,7 @@ ul.e2e li {
    background-color:#fff;
    margin:0;
 }
-ul.e2e li a {
+#tasksPage ul.e2e li a {
    background:url(./images/arrow2.png) 100% 7px no-repeat;   
 }
 ul.e2e li:active a,
