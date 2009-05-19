@@ -248,24 +248,19 @@
             {
                success: function DLT_lND_success(oResponse)
                {
-                  var results = YAHOO.lang.JSON.parse(oResponse.responseText), item, tempNode;
+                  var results = YAHOO.lang.JSON.parse(oResponse.responseText), item, treeNode;
 
                   if (results.items)
                   {
                      for (var i = 0, j = results.items.length; i < j; i++)
                      {
                         item = results.items[i];
-                        tempNode = new YAHOO.widget.TextNode(
-                        {
-                           label: item.name,
-                           path: $combine(nodePath, item.name),
-                           nodeRef: item.nodeRef,
-                           description: item.description
-                        }, node, false);
+                        item.path = $combine(nodePath, item.name);
+                        treeNode = this._buildTreeNode(item, node, false);
 
                         if (!item.hasChildren)
                         {
-                           tempNode.isLeaf = true;
+                           treeNode.isLeaf = true;
                         }
                      }
                   }
@@ -497,7 +492,7 @@
             do
             {
                node = this.widgets.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
-            } while (this.pathsToExpand.length > 0 && node.expanded)
+            } while (this.pathsToExpand.length > 0 && node.expanded);
             
             if (node !== null)
             {
@@ -758,9 +753,9 @@
          var root = tree.getRoot();
 
          // Add default top-level node
-         var tempNode = new YAHOO.widget.TextNode(
+         var tempNode = this._buildTreeNode(
          {
-            label: Alfresco.util.message("node.root", this.name),
+            name: Alfresco.util.message("node.root", this.name),
             path: "/",
             nodeRef: ""
          }, root, false);
@@ -830,13 +825,8 @@
                         if (!kidFound)
                         {
                            var item = items[i];
-                           var tempNode = new YAHOO.widget.TextNode(
-                           {
-                              label: item.name,
-                              path: $combine(oResponse.argument.node.data.path, item.name),
-                              nodeRef: item.nodeRef,
-                              description: item.description
-                           });
+                           item.path = $combine(oResponse.argument.node.data.path, item.name);
+                           var tempNode = this._buildTreeNode(item);
 
                            if (!item.hasChildren)
                            {
@@ -924,6 +914,26 @@
          {
             this.selectedNode = node;
          }
+      },
+
+      /**
+       * Build a tree node using passed-in data
+       *
+       * @method _buildTreeNode
+       * @param p_oData {object} Object literal containing required data for new node
+       * @param p_oParent {object} Optional parent node
+       * @param p_expanded {object} Optional expanded/collaped state flag
+       * @return {YAHOO.widget.TextNode} The new tree node
+       */
+      _buildTreeNode: function DLT__buildTreeNode(p_oData, p_oParent, p_expanded)
+      {
+         return new YAHOO.widget.TextNode(
+         {
+            label: p_oData.name,
+            path: p_oData.path,
+            nodeRef: p_oData.nodeRef,
+            description: p_oData.description
+         }, p_oParent, p_expanded);
       },
 
       /**

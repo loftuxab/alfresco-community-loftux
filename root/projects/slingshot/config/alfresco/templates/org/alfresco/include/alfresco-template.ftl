@@ -8,7 +8,10 @@
 <#-- Look up page title from message bundles where possible -->
 <#assign pageTitle = page.title />
 <#if page.titleId??>
-<#assign pageTitle = (msg(page.titleId))!page.title />
+   <#assign pageTitle = (msg(page.titleId))!page.title>
+</#if>
+<#if context.properties["page-titleId"]??>
+   <#assign pageTitle = msg(context.properties["page-titleId"])>
 </#if>
 
 <#--

@@ -575,7 +575,7 @@
             resultsList: "items",
             fields:
             [
-               "index", "nodeRef", "type", "isLink", "mimetype", "icon32", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
+               "index", "nodeRef", "type", "isLink", "mimetype", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "size", "contentUrl", "actionSet", "tags",
                "activeWorkflows", "location", "permissions", "onlineEditUrl"
             ],
@@ -787,7 +787,7 @@
 
                if (type == "folder")
                {
-                  elCell.innerHTML = '<span id="' + id + '" class="folder-small">' + (isLink ? '<span></span>' : '') + '<a href="" onclick="' + generatePathOnClick(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-32.png" /></a>';
+                  elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span></span>' : '') + '<a href="" onclick="' + generatePathOnClick(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-32.png" /></a>';
                }
                else
                {
@@ -810,12 +810,12 @@
 
                if (type == "folder")
                {
-                  elCell.innerHTML = '<span id="' + id + '" class="folder">' + (isLink ? '<span></span>' : '') + '<a href="" onclick="' + generatePathOnClick(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-48.png" /></a>';
+                  elCell.innerHTML = '<span class="folder">' + (isLink ? '<span></span>' : '') + '<a href="" onclick="' + generatePathOnClick(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-48.png" /></a>';
                }
                else
                {
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
-                  elCell.innerHTML = '<span id="' + me.id + '-preview-' + oRecord.getId() + '" class="thumbnail">' + (isLink ? '<span></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
+                  elCell.innerHTML = '<span class="thumbnail">' + (isLink ? '<span></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
                }
             }
          };

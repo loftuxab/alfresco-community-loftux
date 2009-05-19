@@ -1,13 +1,17 @@
 // Get ids for all used pages
-var siteId = page.url.templateArgs.site, usedPages = [];
+var siteId = page.url.templateArgs.site,
+   siteProperties = null,
+   pageMetadata = {},
+   usedPages = [];
+
 var p = sitedata.getPage("site/" + siteId + "/dashboard");
 if (p !== null)
 {
+   // Don't try to simplify this - it won't work.
    usedPages = eval('(' + p.properties.sitePages + ')');
-   if (usedPages === null)
-   {
-      usedPages = [];
-   }
+   usedPages = usedPages != null ? usedPages : [];
+   pageMetadata = eval('(' + p.properties.pageMetadata + ')');
+   pageMetadata = pageMetadata != null ? pageMetadata : {};
    
    var availablePages = config.scoped["SitePages"]["pages"].childrenMap["page"], urlMap = {};
    for (i = 0; i < availablePages.size(); i++)
@@ -24,11 +28,16 @@ if (p !== null)
    // Find the label for each page
    for (var i = 0; i < usedPages.length; i++)
    {
-      var usedPage = usedPages[i], p = sitedata.getPage(usedPage.pageId), pageUrl = urlMap[usedPage.pageId];
+      var usedPage = usedPages[i],
+         pageId = usedPage.pageId,
+         p = sitedata.getPage(pageId),
+         pageUrl = urlMap[pageId],
+         pageMeta = pageMetadata[pageId] || {};
+      
       if (p != null)
       {
          usedPage.title = p.title;
-         usedPage.titleId = p.titleId;
+         usedPage.titleId = pageMeta.titleId != null ? pageMeta.titleId : p.titleId;
          if (pageUrl)
          {
             // Overwrite the stored pageUrl with the latest one from config file

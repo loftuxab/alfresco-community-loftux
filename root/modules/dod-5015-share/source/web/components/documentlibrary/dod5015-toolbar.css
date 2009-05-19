@@ -1,0 +1,258 @@
+.toolbar
+{
+   margin: 0px -10px;
+   visibility: hidden;
+}
+
+.toolbar .header-bar,
+.toolbar .nav-bar
+{
+   clear: both;
+   min-height: 1.7em;
+   padding: 4px 0.5em 9px;
+}
+
+.toolbar div.hideable
+{
+   float: left;
+}
+
+.toolbar .toolbar-hidden
+{
+   display: none;
+}
+
+
+/* Header Bar */
+
+.toolbar .header-bar
+{
+   background-color: #e3eaec;
+}
+
+.toolbar .left
+{
+   float: left;
+}
+
+.toolbar .right
+{
+   float: right;
+}
+
+.toolbar .customize,
+.toolbar .hide-navbar
+{
+   float: left;
+}
+
+.toolbar .selected-items li
+{
+   width: auto;
+}
+
+.toolbar .selected-items .yuimenuitemlabel span
+{
+   background-position: 2px 50%;
+   background-repeat: no-repeat;
+   cursor: pointer;
+   display: block;
+   margin-left: -4px;
+   min-height: 16px;
+   padding: 2px 0px 1px 24px;
+}
+
+.toolbar .selected-items hr
+{
+   padding: 0px;
+}
+
+.toolbar .onActionCopyTo
+{
+   background-image: url(images/copy-16.png);
+}
+.toolbar .yuimenuitem-disabled .onActionCopyTo
+{
+   background-image: url(images/copy-16.png);
+}
+
+.toolbar .onActionMoveTo
+{
+   background-image: url(images/move-to-16.png);
+}
+.toolbar .yuimenuitem-disabled .onActionMoveTo
+{
+   background-image: url(images/move-to-16.png);
+}
+
+.toolbar .onActionDelete
+{
+   background-image: url(images/remove-16.png);
+}
+.toolbar .yuimenuitem-disabled .onActionDelete
+{
+   background-image: url(images/remove-16.png);
+}
+
+.toolbar .onActionAssignWorkflow
+{
+   background-image: url(images/workflow-16.png);
+}
+.toolbar .yuimenuitem-disabled .onActionAssignWorkflow
+{
+   background-image: url(images/workflow-16.png);
+}
+
+.toolbar .onActionManagePermissions
+{
+   background-image: url(images/permissions-16.png);
+}
+.toolbar .yuimenuitem-disabled .onActionManagePermissions
+{
+   background-image: url(images/permissions-16.png);
+}
+
+.toolbar .onActionDeselectAll
+{
+   background-image: url(images/select-none-16.png);
+}
+
+
+/* Navigation Bar */
+
+.toolbar .nav-bar
+{
+   border-top: 2px solid #f0f3f4;
+   overflow-y: hidden;
+   padding-bottom: 8px;
+}
+
+.toolbar .nav-bar-left
+{
+   float: left;
+}
+
+.toolbar .nav-bar-right
+{
+   margin-left: 7em;
+}
+
+.toolbar .breadcrumb
+{
+   float: none !important;
+   padding: 0.3em 0.5em 0;
+}
+
+.toolbar span.crumb
+{
+   font-size: 100%;
+   line-height: 1.4em;
+}
+
+.toolbar span.crumb.first
+{
+   padding-left: 0;
+}
+
+.toolbar span.folder
+{
+   background-image: url(images/folder-closed-16.png);
+   background-position: left 50%;
+   background-repeat: no-repeat;
+   padding: 2px 0 2px 20px;
+}
+
+.toolbar span.crumb .separator
+{
+   border: medium none;
+   padding: 0.5em 0 0.5em 0.5em;
+}
+
+
+.toolbar .description
+{
+   padding: 0.5em;
+}
+
+.toolbar .description span.message
+{
+   color: #000;
+   font-size: 108%;
+}
+
+.toolbar .description span.more
+{
+   color: #515d6b;
+   margin-left: 0.3em;
+}
+
+
+/* Header- and Navigation-Bar Buttons */
+
+.toolbar .new-folder button
+{
+   background: transparent url(images/folder-new-16.png) no-repeat 12px 4px;
+   padding-left: 32px; 
+}
+.toolbar .new-folder .yui-button-disabled button
+{
+   background-image: url(images/folder-new-disabled-16.png);
+}
+
+.toolbar .file-upload button
+{
+   background: transparent url(images/upload-16.png) no-repeat 12px 4px;
+   padding-left: 32px; 
+}
+.toolbar .file-upload .yui-button-disabled button
+{
+   background-image: url(images/upload-disabled-16.png);
+}
+
+.toolbar .customize button
+{
+   background: transparent url(images/customize-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
+}
+.toolbar .customize .yui-button-disabled button
+{
+   background-image: url(images/customize-disabled-16.png);
+}
+
+.toolbar .folder-up button
+{
+   background: transparent url(images/up-arrow-16.png) no-repeat 12px 4px;
+   padding-left: 32px; 
+}
+.toolbar .folder-up .yui-button-disabled button
+{
+   background-image: url(images/up-arrow-disabled-16.png);
+}
+
+
+/* Messages */
+.toolbar-file-list
+{
+   max-height: 15em;
+   overflow-y: auto;
+   text-align: left;
+}
+
+.toolbar-file-list span
+{
+   background-position: 1px 0px;
+   background-repeat: no-repeat;
+   display: block;
+   min-height: 18px;
+   padding-left: 20px;
+}
+
+.toolbar-file-list span.folder
+{
+   background-image: url(images/folder-open-16.png);
+}
+
+.toolbar-file-list span.document
+{
+   background-image: url(images/generic-16.png);
+}

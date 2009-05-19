@@ -2,11 +2,12 @@
 // Get ids for all used pages
 var siteId = page.url.templateArgs.site;
 var p = sitedata.getPage("site/" + siteId + "/dashboard");
+
+// Don't try to simplify this - it won't work.
 var usedPages = eval('(' + p.properties.sitePages + ')');
-if (usedPages == null)
-{
-   usedPages = [];
-}
+usedPages = usedPages != null ? usedPages : [];
+pageMetadata = eval('(' + p.properties.pageMetadata + ')');
+pageMetadata = pageMetadata != null ? pageMetadata : {};
 
 // Get ids for all pages that have been configured to be addable for sites
 var availablePages = config.scoped["SitePages"]["pages"].childrenMap["page"];
@@ -21,15 +22,20 @@ var pages = [];
 // Start by adding the current pages in the order they were added
 for (var i = 0; i < usedPages.length; i++)
 {
-   var pageId = usedPages[i].pageId;
+   var pageId = usedPages[i].pageId,
+      usedPage = usedPages[i],
+      pageMeta = pageMetadata[pageId] || {};
    
    // Look up real page object from framework
    var p = sitedata.getPage(pageId);
    if (p)
    {
       // Resolve I18N strings for title/description
-      var title = (p.titleId != null ? msg.get(p.titleId) : p.title);
-      var description = (p.descriptionId != null ? msg.get(p.descriptionId) : p.description);
+      var titleId = pageMeta.titleId != null ? pageMeta.titleId : p.titleId,
+         descriptionId = pageMeta.descriptionId != null ? pageMeta.descriptionId : p.descriptionId;
+      
+      var title = titleId != null ? msg.get(titleId) : p.title;
+      var description = descriptionId != null ? msg.get(descriptionId) : p.description;
       
       // Create a page object
       pages[pages.length] =

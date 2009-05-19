@@ -232,15 +232,6 @@
    position: absolute;
 }
 
-.doclist .documents .folder .maybe
-{
-   background: url(images/folder-48.png) no-repeat;
-   display: block;
-   margin-left: 24px;
-   height: 48px;
-   width: 48px;
-}
-
 .doclist .documents h3.filename
 {
    font-size: 123%;

@@ -276,7 +276,7 @@
          var children = Dom.getChildrenBy(Dom.get(this.id + "-currentPages-ul"), this._isRealPage);
          for (var i = 0; i < children.length; i++)
          {
-            // FInd the page id by extracting part of its Dom id
+            // Find the pageId by extracting part of its Dom id
             var li = children[i];
             var pageId = li.id.substring((this.id + "-currentPage-li-").length);
 
