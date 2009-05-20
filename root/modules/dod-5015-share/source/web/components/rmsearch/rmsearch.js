@@ -300,6 +300,11 @@
             Dom.setStyle(elCell.parentNode, "height", oColumn.height + "px");
             Dom.setStyle(elCell.parentNode, "text-align", "center");
             
+            var url = me._getBrowseUrlForRecord(oRecord);
+            var imageUrl = Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/generic-file-32.png';
+            
+            var name = $html(oRecord.getData("name"));
+            elCell.innerHTML = '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + name + '" title="' + name + '" /></a></span>';
          };
 
          /**
@@ -309,7 +314,8 @@
           */
          renderCellURI = function Search_renderCellURI(elCell, oRecord, oColumn, oData)
          {
-            elCell.innerHTML = oRecord.getData("properties.identifier");
+            var url = me._getBrowseUrlForRecord(oRecord);
+            elCell.innerHTML = '<span><a href="' + encodeURI(url) + '">' + oRecord.getData("properties.identifier") + '</a></span>';
          };
          
          /**
@@ -516,6 +522,19 @@
          });
          
          return params;
+      },
+      
+      /**
+       * Constructs the browse url for a given record.
+       */
+      _getBrowseUrlForRecord: function _getBrowseUrlForRecord(oRecord)
+      {
+         var url = "#";
+         if (oRecord.getData("browseUrl") !== undefined)
+         {
+            url = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/" + oRecord.getData("browseUrl");
+         }
+         return url;
       },
       
       /**
