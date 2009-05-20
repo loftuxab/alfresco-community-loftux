@@ -168,24 +168,72 @@
        */
       onReady: function Search_onReady()
       {
-         // Menus
-         //this.widgets.metadataMenu = new YAHOO.widget.Menu(this.id + "-metadata", {position: "static", hidedelay: 700, lazyload: true});
-         //this.widgets.metadataMenu.render();
+         var me = this;
          
+         // Sorting option menus
+         this.widgets.sortMenu1 = new YAHOO.widget.Button(this.id + "-sort1",
+         {
+            type: "split",
+            menu: this.id + "-sort1-menu"
+         });
+         //this.widgets.sortMenu1.on("click", this.onSortFilterClicked, this, true);
+         this.widgets.sortMenu1.getMenu().subscribe("click", function(p_sType, p_aArgs)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
+            {
+               me.widgets.sortMenu1.set("label", menuItem.cfg.getProperty("text"));
+               //me.onSortFilterClicked.call(me, p_aArgs[1]);
+            }
+         });
+         
+         this.widgets.sortMenu2 = new YAHOO.widget.Button(this.id + "-sort2",
+         {
+            type: "split",
+            menu: this.id + "-sort2-menu"
+         });
+         //this.widgets.sortMenu2.on("click", this.onSortFilterClicked, this, true);
+         this.widgets.sortMenu2.getMenu().subscribe("click", function(p_sType, p_aArgs)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
+            {
+               me.widgets.sortMenu2.set("label", menuItem.cfg.getProperty("text"));
+               //me.onSortFilterClicked.call(me, p_aArgs[1]);
+            }
+         });
+         
+         this.widgets.sortMenu3 = new YAHOO.widget.Button(this.id + "-sort3",
+         {
+            type: "split",
+            menu: this.id + "-sort3-menu"
+         });
+         //this.widgets.sortMenu3.on("click", this.onSortFilterClicked, this, true);
+         this.widgets.sortMenu3.getMenu().subscribe("click", function(p_sType, p_aArgs)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
+            {
+               me.widgets.sortMenu3.set("label", menuItem.cfg.getProperty("text"));
+               //me.onSortFilterClicked.call(me, p_aArgs[1]);
+            }
+         });
+         
+         // Column hide/show meta-data options
          var onMetadataClick = function onMetadataClick(e)
          {
             var el = Event.getTarget(e);
             var columnKey = el.id.substring(el.id.lastIndexOf('-') + 1);
-            var col = this.widgets.dataTable.getColumn(columnKey)
+            var col = me.widgets.dataTable.getColumn(columnKey)
             if (col)
             {
                if (col.hidden)
                {
-                  this.widgets.dataTable.showColumn(col);
+                  me.widgets.dataTable.showColumn(col);
                }
                else
                {
-                  this.widgets.dataTable.hideColumn(col);
+                  me.widgets.dataTable.hideColumn(col);
                }
             }
          };
@@ -200,7 +248,7 @@
             Event.on(el, "click", onMetadataClick);
          };
          
-         // Apply meta-data field event handlers
+         // Apply meta-data field event handlers via element visitor pattern
          Dom.getElementsBy(elAcceptor, "input", Dom.get(this.id + "-metadata"), elVisitor);
          
          // DataSource definition

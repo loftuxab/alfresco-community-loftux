@@ -56,6 +56,11 @@
    overflow-x: hidden;
 }
 
+.search .sortlabel
+{
+   vertical-align: 15%;
+}
+
 .search .results
 {
    margin: 16px 10px 10px;
