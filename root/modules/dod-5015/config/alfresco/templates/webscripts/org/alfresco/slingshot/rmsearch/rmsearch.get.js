@@ -72,7 +72,6 @@ function getRecord(siteId, node)
       // generated properties
       item.modifiedBy = getPersonDisplayName(item.modifiedByUser);
       item.createdBy = getPersonDisplayName(item.createdByUser);
-      // TODO: check this is right in RM doclib!
       item.browseUrl = "document-details?nodeRef=" + node.nodeRef.toString();
    }
    
@@ -122,7 +121,7 @@ function getSearchResults(query, maxResults, siteId)
    var luceneQuery = "";
    // TODO: add query built from supplied info and query itself
    // TODO: temp!
-   luceneQuery = "TEXT:\"record*\"";
+   luceneQuery = 'ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}record"';
    /*if (query !== null && query.length !== 0)
    {
       luceneQuery += "TEXT:\"" + t + "\"" +        // full text
