@@ -71,6 +71,9 @@ public class DODDataLoadSystemTest extends BaseSpringTest
 	public void testLoadFilePlanData()
 	{
 	    TestUtilities.loadFilePlanData(null, nodeService, importer);
+	    
+	    setComplete();
+        endTransaction();
 	}
 	
 	/**

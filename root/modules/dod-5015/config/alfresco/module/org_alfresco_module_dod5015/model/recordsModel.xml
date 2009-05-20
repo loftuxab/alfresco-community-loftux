@@ -5,12 +5,12 @@
 <!-- Note: the rma: namespace is defined further on in the document -->
 <model name="rma:recordsmanagement" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
-   <!-- Meta-data about the model -->
+   <!-- Meta-data about the model -->   
    <description>Records Management Model</description>
    <author>Roy Wetherall</author>
    <version>1.0</version>
 
-   <!-- Imports are required to allow references to definitions in other models -->
+   <!-- Imports are required to allow references to definitions in other models -->   
    <imports>
       <!-- Import Alfresco Dictionary Definitions -->
       <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
@@ -24,7 +24,7 @@
    <namespaces>
       <namespace uri="http://www.alfresco.org/model/recordsmanagement/1.0" prefix="rma"/>
    </namespaces>
-
+   
    <constraints>
       <constraint name="rma:smList" type="LIST">
          <parameter name="allowedValues">
@@ -37,120 +37,210 @@
          <parameter name="caseSensitive"><value>true</value></parameter>
       </constraint>
    </constraints>
-
+   
    <types>
-
+   
       <type name="rma:filePlan">
+      
          <title>File Plan</title>
          <parent>cm:folder</parent>
+         
          <associations>
+            
             <child-association name="rma:filedRecords">
-               <source>
-                  <mandatory>false</mandatory>
-                  <many>false</many>
-               </source>
-               <target>
-                  <class>cm:content</class>
-                  <mandatory>false</mandatory>
-                  <many>true</many>
-               </target>
+                <source>
+                    <mandatory>false</mandatory>
+                    <many>false</many>
+                </source>
+                <target>
+                    <class>cm:content</class>
+                    <mandatory>false</mandatory>
+                    <many>true</many>
+                </target>
             </child-association>
+         
          </associations>
+       
+         
       </type>
-
+      
       <type name="rma:recordSeries">
          <title>Record Series</title>
          <parent>cm:folder</parent>
-         <mandatory-aspects>
-            <aspect>cm:titled</aspect>
+         
+         <mandatory-aspects>               
+            <aspect>cm:titled</aspect>               
             <aspect>rma:recordComponentIdentifier</aspect>
-         </mandatory-aspects>
-      </type>
-
+         </mandatory-aspects>         
+         
+      </type>      
+      
       <type name="rma:recordCategory">
+      
          <title>Record Category</title>
          <parent>cm:folder</parent>
+         
          <properties>
+            
             <!-- cm:name used for the Record Category Name -->
-            <!-- cm:description used for Record Category Decription -->
+            <!-- cm:description used for Record Category Decription --> 
+            
             <property name="rma:dispositionAuthority">
                <title>Disposition Authority</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
+            
             <property name="rma:dispositionInstructions">
                <title>Disposition Instructions</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
+             
+            <!-- 
+                                       
             <property name="rma:cutOffSchedulePeriod">
                <title>Cut off schedule period</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
                <default>none|0</default>
             </property>
+            
             <property name="rma:retentionIndicator">
                <title>Retention Indicator</title>
                <type>d:boolean</type>
                <mandatory>true</mandatory>
                <default>false</default>
             </property>
+            
             <property name="rma:retentionSchedulePeriod">
                <title>Retention schedule period</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
                <default>none|0</default>
             </property>
+            
             <property name="rma:accessionIndicator">
                <title>Accession Indicator</title>
                <type>d:boolean</type>
                <mandatory>true</mandatory>
                <default>false</default>
             </property>
+            
             <property name="rma:accessionLocation">
                <title>Accession Location</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
                <default>NARA</default>
             </property>
+                               
             <property name="rma:accessionPeriod">
                <title>Accession Period</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
                <default>year|25</default>
             </property>
+            -->
+    
          </properties>
+         
          <associations>
+            
             <child-association name="rma:dispositionActions">
-               <source>
-                  <mandatory>false</mandatory>
-                  <many>false</many>
-               </source>
-               <target>
-                  <class>rma:dispositionAction</class>
-                  <mandatory>false</mandatory>
-                  <many>true</many>
-               </target>
+                <source>
+                    <mandatory>false</mandatory>
+                    <many>false</many>
+                </source>
+                <target>
+                    <class>rma:dispositionAction</class>
+                    <mandatory>false</mandatory>
+                    <many>true</many>
+                </target>
             </child-association>
+         
          </associations>
-         <mandatory-aspects>
-            <aspect>cm:titled</aspect>
+         
+         <mandatory-aspects>         
+            <aspect>cm:titled</aspect>            
             <aspect>rma:recordComponentIdentifier</aspect>
             <aspect>rma:reviewDetails</aspect>
          </mandatory-aspects>
+         
+      </type>      
+            
+      <type name="rma:dispositionAction">
+         
+         <title>Disposition Action</title>
+         <parent>cm:cmobject</parent>
+         
+         <properties>
+                    
+            <property name="rma:dispositionAction">
+               <title>Disposition Action Name</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>        
+            
+            <property name="rma:dispositionDescription">
+                <title>Disposition Description</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
+            </property>                       
+                                   
+            <property name="rma:dispositionPeriod">
+               <title>Disposition Period</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property> 
+            
+            <property name="rma:dispositionPeriodProperty">
+               <title>Disposition Period Property</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>       
+            
+            <!-- TODO we need to support multiple events -->
+                                   
+            <property name="rma:dispositionEvent">
+               <title>Disposition Event</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            
+            <property name="rma:dispositionEventTrigger">
+               <title>Disposition Event Trigger</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            
+            <!-- TODO .. limit list to "or" and "and" -->
+            <property name="rma:dispositionEventCombination">
+               <title>Disposition Period/Event Combination</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+               <default>or</default>
+            </property>
+            
+         </properties>       
+      
       </type>
-
+      
       <type name="rma:recordFolder">
+         
          <title>Record Folder</title>
          <parent>cm:folder</parent>
+         
          <properties>
+                    
             <!-- cm:name used for the Folder Identifier -->
-            <!-- cm:title used for the Folder Name -->
+            <!-- cm:title used for the Folder Name -->   
+                                    
             <property name="rma:recordFolderLocation">
                <title>Record Folder Location</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property>
+            </property>        
+                                   
             <property name="rma:recordFolderSupplementalMarkingList">
                <title>Record Folder Supplemental Marking List</title>
                <type>d:text</type>
@@ -160,6 +250,7 @@
                   <constraint ref="rma:smList"/>
                </constraints>
             </property>
+                                                     
             <property name="rma:isClosed">
                <title>Record Folder Closed</title>
                <description>Indicates whether the folder is closed</description>
@@ -167,52 +258,39 @@
                <mandatory>true</mandatory>
                <default>false</default>
             </property>
-         </properties>
-         <mandatory-aspects>
+            
+         </properties>       
+         
+         <mandatory-aspects>         
             <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
             <aspect>rma:reviewDetails</aspect>
          </mandatory-aspects>
+         
       </type>
-
-      <type name="rma:dispositionAction">
-         <title>Disposition Action</title>
-         <parent>cm:cmobject</parent>
-         <properties>
-            <property name="rma:dispositionAction">
-               <title>Disposition action to take</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
-            <property name="rma:dispositionPeriod">
-               <title>Disposition Period</title>
-               <description>Period after which the disposition will take place</description>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-               <default>immediately|0</default>
-            </property>
-         </properties>
-      </type>
-
+            
       <type name="rma:nonElectronicRecord">
+         
          <title>Non-Electronic Record</title>
-         <parent>cm:cmobject</parent>
-         <mandatory-aspects>
-            <aspect>rma:record</aspect>
+         <parent>cm:cmobject</parent>           
+         
+         <mandatory-aspects>         
+            <aspect>rma:record</aspect>            
          </mandatory-aspects>
+      
       </type>
-      
+    
    </types>
-
+   
    <aspects>
-      
+   
       <aspect name="rma:undeclaredRecord">
-         <title>Undeclared Record</title>
+         <title>Undeclared Record</title>         
       </aspect>
-
+   
       <aspect name="rma:recordComponentIdentifier">
-         <title>Record component identifier</title>
-         <properties>
+         <title>Record component identifier</title>         
+         <properties>                
             <property name="rma:identifier">
                <title>Record Component Identifier</title>
                <type>d:text</type>
@@ -220,46 +298,53 @@
             </property>
          </properties>
       </aspect>
-
+      
       <aspect name="rma:reviewDetails">
-         <title>Review Indicator</title>
-         <properties>
+         <title>Review Indicator</title>                  
+         <properties>                                  
             <property name="rma:reviewPeriod">
                <title>Review Period</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
                <default>none|0</default>
-            </property>
-         </properties>
+            </property>            
+         </properties>         
       </aspect>
-
+      
       <!-- Record Meta-data -->
-
+         
       <aspect name="rma:record">
          <title>Record</title>
+         
          <properties>
+         
             <!-- rma:identifier used for the Unique Record Identifier -->
             <!-- cm:title used for the Title -->
+            
             <property name="rma:dateFiled">
                <title>Date Filed</title>
                <type>d:date</type>
                <mandatory>true</mandatory>
             </property>
+            
             <property name="rma:publicationDate">
                <title>Publication Date</title>
                <type>d:date</type>
                <mandatory>true</mandatory>
             </property>
+            
             <property name="rma:originator">
                <title>Originator</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
+            
             <property name="rma:originatingOrganization">
                <title>Originating Organization</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
+                                   
             <property name="rma:supplementalMarkingList">
                <title>Supplemental Marking List</title>
                <type>d:text</type>
@@ -269,265 +354,308 @@
                   <constraint ref="rma:smList"/>
                </constraints>
             </property>
+                                    
             <property name="rma:mediaType">
                <title>Media Type</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
+                        
             <property name="rma:format">
                <title>Format</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
+                        
             <property name="rma:dateReceived">
                <title>Date Received</title>
                <type>d:date</type>
                <mandatory>false</mandatory>
-            </property>
+            </property> 
+                        
             <!-- TODO
-                 Do we need to model this as broken up address?
+                 Do we need to model this as broken up address?  
                  Should we have a separate property for other address or just a multivalue property?
-            -->
+            -->           
             <property name="rma:address">
                <title>Address</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property>
+            </property>                        
             <property name="rma:otherAddress">
                <title>Other Address</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property>
+            </property>     
+                                    
             <property name="rma:location">
                <title>Location</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property>
-         </properties>
-         <mandatory-aspects>
-            <aspect>cm:titled</aspect>
+            </property>    
+                                             
+         </properties>         
+         
+         <mandatory-aspects>         
+            <aspect>cm:titled</aspect>           
             <aspect>rma:recordComponentIdentifier</aspect>
          </mandatory-aspects>
+         
       </aspect>
-
+   
       <aspect name="rma:scannedRecord">
-         <title>Scanned Record</title>
-         <parent>rma:customRMData</parent>
-         <properties>
+        <title>Scanned Record</title>
+        <parent>rma:customRMData</parent>
+        <properties>
             <property name="rma:scannedFormat">
-               <title>Image Format</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
+                <title>Image Format</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
             </property>
             <property name="rma:scannedFormatVersion">
-               <title>Image Format Version</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
+                <title>Image Format Version</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
             </property>
             <property name="rma:resolutionX">
-               <title>Image Resolution X</title>
-               <type>d:int</type>
-               <mandatory>true</mandatory>
+                <title>Image Resolution X</title>
+                <type>d:int</type>
+                <mandatory>true</mandatory>
             </property>
             <property name="rma:resolutionY">
-               <title>Image Resolution Y</title>
-               <type>d:int</type>
-               <mandatory>true</mandatory>
+                <title>Image Resolution Y</title>
+                <type>d:int</type>
+                <mandatory>true</mandatory>
             </property>
             <property name="rma:scannedBitDepth">
-               <title>Scanned Bit Depth</title>
-               <type>d:int</type>
-               <mandatory>false</mandatory>
+                <title>Scanned Bit Depth</title>
+                <type>d:int</type>
+                <mandatory>false</mandatory>
             </property>
-         </properties>
+        </properties>
       </aspect>
-
+   
       <aspect name="rma:pdfRecord">
-         <title>PDF Record</title>
-         <parent>rma:customRMData</parent>
-         <properties>
+        <title>PDF Record</title>
+        <parent>rma:customRMData</parent>
+        <properties>            
             <property name="rma:producingApplication">
-               <title>Producing Application</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>Producing Application</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property>         
             <property name="rma:producingApplicationVersion">
-               <title>Producing Application Version</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>Producing Application Version</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property>         
             <property name="rma:pdfVersion">
-               <title>PDF Version</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>PDF Version</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property>         
             <property name="rma:creatingApplication">
-               <title>Creating Application</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
+                <title>Creating Application</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
+            </property>         
             <property name="rma:documentSecuritySettings">
-               <title>Document Security Settings</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
+                <title>Document Security Settings</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
             </property>
-         </properties>
+        </properties>
       </aspect>
-
+   
       <aspect name="rma:digitalPhotographRecord">
-         <title>Digital Photograph Record</title>
-         <parent>rma:customRMData</parent>
-         <properties>
+        <title>Digital Photograph Record</title>
+        <parent>rma:customRMData</parent>
+        <properties>        
             <property name="rma:caption">
-               <title>Caption</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>Caption</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property>         
             <property name="rma:photographer">
-               <title>Photographer</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
+                <title>Photographer</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
+            </property>         
             <property name="rma:copyright">
-               <title>Copyright</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
+                <title>Copyright</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
+            </property>         
             <property name="rma:bitDepth">
-               <title>Bit Depth</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
+                <title>Bit Depth</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
+            </property>         
             <property name="rma:imageSizeX">
-               <title>Image Size X</title>
-               <type>d:int</type>
-               <mandatory>false</mandatory>
-            </property>
+                <title>Image Size X</title>
+                <type>d:int</type>
+                <mandatory>false</mandatory>
+            </property>         
             <property name="rma:imageSizeY">
-               <title>Image Size Y</title>
-               <type>d:int</type>
-               <mandatory>false</mandatory>
-            </property>
+                <title>Image Size Y</title>
+                <type>d:int</type>
+                <mandatory>false</mandatory>
+            </property>         
             <property name="rma:imageSource">
-               <title>Image Source</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
+                <title>Image Source</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
+            </property>         
             <property name="rma:compression">
-               <title>Compression</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
+                <title>Compression</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
+            </property>         
             <property name="rma:iccIcmProfile">
-               <title>ICC/ICM Profile</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>
+                <title>ICC/ICM Profile</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
+            </property>         
             <property name="rma:exifInformation">
-               <title>EXIF Information</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
+                <title>EXIF Information</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
             </property>
-         </properties>
-      </aspect>
-
+        </properties>
+      </aspect>     
+      
       <aspect name="rma:webRecord">
-         <title>Web Record</title>
-         <parent>rma:customRMData</parent>
-         <properties>
+        <title>Web Record</title>
+        <parent>rma:customRMData</parent>
+        <properties>        
             <property name="rma:webFileName">
-               <title>Web File Name</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>Web File Name</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property> 
             <property name="rma:webPlatform">
-               <title>Web Platform</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>Web Platform</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property> 
             <property name="rma:webSiteName">
-               <title>Web Site Name</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>Web Site Name</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property> 
             <property name="rma:webSiteURL">
-               <title>Web Site URL</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>Web Site URL</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property> 
             <property name="rma:captureMethod">
-               <title>Capture Method</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>Capture Method</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property> 
             <property name="rma:captureDate">
-               <title>Capture Date</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>Capture Date</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property> 
             <property name="rma:contact">
-               <title>Contact</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>
+                <title>Contact</title>
+                <type>d:text</type>
+                <mandatory>true</mandatory>
+            </property> 
             <property name="rma:contentManagementSystem">
-               <title>Content Management System</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
+                <title>Content Management System</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
             </property>
-         </properties>
-      </aspect>
-
-      <!-- State management aspects -->
-      <aspect name="rma:pendingReview">
-         <title>Pending Review</title>
-         <properties>
+        </properties>
+      </aspect>                   
+   
+      <!-- State management aspects -->   
+   
+      <aspect name="rma:reviewSchedule">
+         <title>Review Schedule</title>         
+         <properties>                
             <property name="rma:reviewAsOf">
                <title>Review as of date</title>
                <type>d:date</type>
                <mandatory>false</mandatory>
             </property>
          </properties>
-      </aspect>
-
-      <aspect name="rma:pendingCutOff">
-         <title>Pending cut off</title>
-         <properties>
-            <property name="rma:cutOffAsOf">
-               <title>Cut off as of date</title>
+      </aspect> 
+      
+      <aspect name="rma:dispositionSchedule">
+         <title>Next Disposition Action</title>         
+         <properties>                
+            <property name="rma:nextDispositionAction">
+               <title>Next Disposition Action</title> 
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>              
+            <property name="rma:nextDispositionAsOf">
+               <title>Next Disposition Action</title>
                <type>d:date</type>
-               <mandatory>false</mandatory>
+               <mandatory>true</mandatory>
             </property>
+            
+            <!-- TODO need to model events complete here -->
+            
+            <property name="rma:nextDispositionEligible">
+                <title>Next Disposition Eligible</title>
+                <type>d:boolean</type>
+                <mandatory>true</mandatory>
+                <default>true</default>
+            </property>
+            
+            <!-- TODO model previous action information -->
+                        
          </properties>
+         
+         <!-- TODO association linking back to disposition action ?? -->
+         <!-- TODO association linking record back to record category instead ?? -->
+         
       </aspect>
-
+   
       <aspect name="rma:cutOff">
-         <title>Cut Off</title>
-         <properties>
-            <property name="rma:cutOfDate">
+         <title>Cut Off</title>         
+         <properties>                
+            <property name="rma:cutOffDate">
                <title>Cut Of Date</title>
                <type>d:date</type>
                <mandatory>true</mandatory>
             </property>
          </properties>
       </aspect>
-
+      
+      <!--
+      <aspect name="rma:pendingCutOff">
+         <title>Pending cut off</title>         
+         <properties>                
+            <property name="rma:cutOffAsOf">
+               <title>Cut off as of date</title>
+               <type>d:date</type>
+               <mandatory>false</mandatory>
+            </property>
+         </properties>
+      </aspect>    
+      
       <aspect name="rma:retained">
-         <title>Retained</title>
-         <properties>
+         <title>Retained</title>         
+         <properties>                
             <property name="rma:endRetentionAsOf">
                <title>End retention as of date</title>
                <type>d:date</type>
                <mandatory>false</mandatory>
             </property>
          </properties>
-      </aspect>
-
-      <!-- Custom data marker aspect -->
+      </aspect>      
+      -->
+      
+      <!-- Custom data marker aspect -->            
       <aspect name="rma:customRMData">
          <title>Custom Records Management Data</title>
       </aspect>
-
+      
    </aspects>
-
+   
 </model>
