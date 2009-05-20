@@ -63,9 +63,10 @@
          <div class="yui-u">
             <span>${msg("label.order")}:</span>
             <div>
-               <span>${msg("label.sortFirst")}</span>
+               <span class="sortlabel">${msg("label.sortFirst")}</span>
                <span>
-                  <select id="${el}-sort1">
+                  <input id="${el}-sort1" type="button" name="sort1" value="${msg("label.identifier")}" />
+                  <select id="${el}-sort1-menu">
                      <option value="identifier">${msg("label.identifier")}</option>
                      <option value="title">${msg("label.title")}</option>
                      <option value="originator">${msg("label.originator")}</option>
@@ -80,9 +81,11 @@
                </span>
             </div>
             <div>
-               <span>${msg("label.sortNext")}</span>
+               <span class="sortlabel">${msg("label.sortNext")}</span>
                <span>
-                  <select id="${el}-sort2">
+                  <input id="${el}-sort2" type="button" name="sort2" value="${msg("label.sortNone")}" />
+                  <select id="${el}-sort2-menu">
+                     <option value="">${msg("label.sortNone")}</option>
                      <option value="identifier">${msg("label.identifier")}</option>
                      <option value="title">${msg("label.title")}</option>
                      <option value="originator">${msg("label.originator")}</option>
@@ -97,9 +100,11 @@
                </span>
             </div>
             <div>
-               <span>${msg("label.sortNext")}</span>
+               <span class="sortlabel">${msg("label.sortNext")}</span>
                <span>
-                  <select id="${el}-sort3">
+                  <input id="${el}-sort3" type="button" name="sort3" value="${msg("label.sortNone")}" />
+                  <select id="${el}-sort3-menu">
+                     <option value="">${msg("label.sortNone")}</option>
                      <option value="identifier">${msg("label.identifier")}</option>
                      <option value="title">${msg("label.title")}</option>
                      <option value="originator">${msg("label.originator")}</option>
