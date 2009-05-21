@@ -251,6 +251,25 @@
          // Apply meta-data field event handlers via element visitor pattern
          Dom.getElementsBy(elAcceptor, "input", Dom.get(this.id + "-metadata"), elVisitor);
          
+         var onResultOptionsClick = function onResultOptionsClick(e)
+         {
+            var elToggle = Dom.get(me.id + "-options-toggle");
+            var el = Dom.get(me.id + "-options");
+            if (el.style.display === "none")
+            {
+               el.style.display = "block";
+               Dom.setStyle(elToggle, "background-image", "url(" + Alfresco.constants.URL_CONTEXT + "components/images/expanded.png)");
+            }
+            else
+            {
+               el.style.display = "none";
+               Dom.setStyle(elToggle, "background-image", "url(" + Alfresco.constants.URL_CONTEXT + "components/images/collapsed.png)");
+            }
+         };
+         
+         // Click handler for result options
+         Event.on(Dom.get(this.id + "-options-toggle"), "click", onResultOptionsClick);
+         
          // DataSource definition
          var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/rmsearch?";
          this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
