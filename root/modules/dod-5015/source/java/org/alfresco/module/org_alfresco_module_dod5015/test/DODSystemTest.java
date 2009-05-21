@@ -25,6 +25,8 @@
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,23 +170,37 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         assertNotNull(this.nodeService.getProperty(recordOne, PROP_DISPOSITION_AS_OF));
         System.out.println("Disposition as of: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_AS_OF));
         
-        txn.commit(); 
-	    
 	    // Test the declaration of a record by editing properties
-
-
-        
-//	    propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE.toString(), new Date());
-//	    
-//	    List<String> smList = new ArrayList<String>(2);
-//        smList.add(FOUO);
-//        smList.add(NOFORN);
-//	    propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), (Serializable)smList);
-//	    
-//	    propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE.toString(), "mediaTypeValue"); 
-//	    propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
-//	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
+        Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
+	    propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());	    
+	    List<String> smList = new ArrayList<String>(2);
+        smList.add(FOUO);
+        smList.add(NOFORN);
+	    propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);	    
+	    propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
+	    propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
+	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());
+	    this.nodeService.setProperties(recordOne, propValues);
 	    
+        txn.commit(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_UNDECLARED_RECORD));    
+        
+        propValues = this.nodeService.getProperties(recordOne);        
+        propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        propValues.put(ContentModel.PROP_TITLE, "titleValue");
+        this.nodeService.setProperties(recordOne, propValues);
+        
+        txn.commit(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_UNDECLARED_RECORD));
+        
+        txn.commit();
 	}
 	
 	/**
