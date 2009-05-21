@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -58,7 +57,7 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
     private PolicyComponent policyComponent;
     
     /** Records management action service */
-    private RecordsManagementService rmService;
+    private RecordsManagementActionService rmService;
     
     /** TODO this is temporarily hard coded */
     private List<QName> mandatoryRecordProperties;
@@ -88,7 +87,7 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
      * 
      * @param rmService 
      */
-    public void setRecordsManagementService(RecordsManagementService rmService)
+    public void setRecordsManagementActionService(RecordsManagementActionService rmService)
     {
         this.rmService = rmService;
     }

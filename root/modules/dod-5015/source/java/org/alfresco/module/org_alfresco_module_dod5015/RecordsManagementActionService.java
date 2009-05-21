@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -36,9 +36,11 @@ import org.alfresco.service.cmr.repository.NodeRef;
  * 
  * @author Roy Wetherall
  */
-public interface RecordsManagementService
-{   
+public interface RecordsManagementActionService
+{
     List<String> getRecordActions();
+
+    void executeRecordAction(NodeRef filePlanComponent, String name, Map<String, Serializable> parameters);
     
-    void executeRecordAction(NodeRef filePlanComponent, String name, Map<String, Serializable> parameters);   
+    public void register(RecordsManagementAction rmAction);
 }

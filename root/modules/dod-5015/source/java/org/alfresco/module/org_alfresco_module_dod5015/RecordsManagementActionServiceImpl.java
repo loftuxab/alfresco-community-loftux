@@ -26,14 +26,13 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.jscript.ScriptNode;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.logging.Log;
@@ -44,11 +43,11 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementServiceImpl implements RecordsManagementService
+public class RecordsManagementActionServiceImpl implements RecordsManagementActionService
 {
-    private static Log logger = LogFactory.getLog(RecordsManagementServiceImpl.class);
+    private static Log logger = LogFactory.getLog(RecordsManagementActionServiceImpl.class);
 
-    private Map<String, RecordsManagementAction> rmActions;
+    private Map<String, RecordsManagementAction> rmActions = new HashMap<String, RecordsManagementAction>();
     
     private ActionService actionService;
     private ServiceRegistry services;
@@ -63,16 +62,15 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
         this.services = services;
     }
     
-    public void setRecordsManagementActions(List<RecordsManagementAction> rmActions)
+    public void register(RecordsManagementAction rmAction)
     {
-        // Clear the existing map of states
-        this.rmActions = new HashMap<String, RecordsManagementAction>(rmActions.size());
-        for (RecordsManagementAction recordState : rmActions)
+        if (logger.isDebugEnabled())
         {
-            this.rmActions.put(recordState.getName(), recordState);
+            logger.debug("Registering rmAction " + rmAction);
         }
-    }    
-    
+        this.rmActions.put(rmAction.getName(), rmAction);
+    }
+
     public void executeRecordAction(NodeRef filePlanComponent, String name, Map<String, Serializable> parameters)
     {
         if (logger.isDebugEnabled())
@@ -82,33 +80,27 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
             logger.debug("    parameters = " + parameters);
         }
         
-        //TODO Fix this up after the demo.
-        // Replace the noderef String in parameters with a ScriptNodeRef
-//        Serializable existingString = parameters.get("recordFolder");
-//       ScriptNode scrNode = new ScriptNode(new NodeRef(existingString.toString()), this.services);
-//        parameters.put("recordFolder", scrNode);
-//        logger.debug("    new parameters = " + parameters);
-        
-        // Get the state
-        RecordsManagementAction rmAction = rmActions.get(name);
+        RecordsManagementAction rmAction = this.rmActions.get(name);
         if (rmAction == null)
         {
-            throw new AlfrescoRuntimeException("The record management action '" + name + "' has not been defined");
+            StringBuilder msg = new StringBuilder();
+            msg.append("The record management action '")
+                .append(name)
+                .append("' has not been defined");
+            if (logger.isWarnEnabled())
+            {
+                logger.warn(msg.toString());
+            }
+            throw new AlfrescoRuntimeException(msg.toString());
         }
         
-        // Create the action
-        Action action = this.actionService.createAction(rmAction.getActionName());
-        action.setParameterValues(parameters);
-        
-        // Execute the action
-        this.actionService.executeAction(action, filePlanComponent);    
+        rmAction.execute(filePlanComponent, parameters);
     }
 
-    /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getRecordActions()
-     */
     public List<String> getRecordActions()
     {
-        return new ArrayList<String>(this.rmActions.keySet());
+        List<String> result = new ArrayList<String>(this.rmActions.size());
+        result.addAll(this.rmActions.keySet());
+        return Collections.unmodifiableList(result);
     }
 }

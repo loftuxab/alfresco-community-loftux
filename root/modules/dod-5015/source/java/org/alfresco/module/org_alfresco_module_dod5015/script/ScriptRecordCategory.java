@@ -30,13 +30,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.jscript.Scopeable;
 import org.alfresco.repo.jscript.ValueConverter;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.GUID;
 import org.mozilla.javascript.Scriptable;
 
 /**
