@@ -7,11 +7,12 @@
    <div id="alf-hd">
       <@region id="header" scope="global" protected=true />
       <@region id="title" scope="template" protected=true />
+      <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
       <div class="yui-t1">
          <div id="yui-main">
-            <@region id="reports" scope="template" protected=true />
+            <@region id="report" scope="template" protected=true />
          </div>
       </div>
    </div>
