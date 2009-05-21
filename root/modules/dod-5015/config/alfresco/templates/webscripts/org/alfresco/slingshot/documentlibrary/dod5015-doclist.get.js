@@ -1,4 +1,4 @@
-<import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/dod5015-action-sets.lib.js">
+<import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/dod5015-evaluator.lib.js">
 <import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/dod5015-filters.lib.js">
 <import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/parse-args.lib.js">
 var THUMBNAIL_NAME = "doclib";
@@ -11,9 +11,6 @@ model.doclist = getDocList(args["filter"]);
 /* Create collection of documents and folders in the given space */
 function getDocList(filter)
 {
-   var items = new Array();
-   var assets;
-   
    // Is our thumbnail tpe registered?
    var haveThumbnails = thumbnailService.isThumbnailNameRegistered(THUMBNAIL_NAME);
 
@@ -52,14 +49,14 @@ function getDocList(filter)
       allAssets = allAssets.slice(0, filterParams.limitResults);
    }
       
-   // Ensure folders and folderlinks appear at the top of the list
-   folderAssets = new Array();
-   documentAssets = new Array();
+   // Ensure folders appear at the top of the list
+   folderAssets = [];
+   documentAssets = [];
    for each(asset in allAssets)
    {
       try
       {
-         if (asset.isContainer || asset.type == "{http://www.alfresco.org/model/application/1.0}folderlink")
+         if (asset.isContainer)
          {
             folderAssets.push(asset);
          }
@@ -76,6 +73,8 @@ function getDocList(filter)
    
    var folderAssetsCount = folderAssets.length,
       documentAssetsCount = documentAssets.length;
+   
+   var assets;
    
    if (url.templateArgs.type === "documents")
    {
@@ -95,8 +94,8 @@ function getDocList(filter)
    var startIndex = (pagePos - 1) * pageSize;
    assets = assets.slice(startIndex, pagePos * pageSize);
    
-   var itemStatus, itemOwner, actionSet, thumbnail, createdBy, modifiedBy, activeWorkflows, assetType, linkAsset, isLink;
-   var defaultLocation, location, qnamePaths, displayPaths, locationAsset, assetSubtype;
+   var thumbnail, createdBy, modifiedBy, activeWorkflows, assetType, evaluated;
+   var defaultLocation, location, qnamePaths, displayPaths, locationAsset;
 
    // Location if we're in a site
    var defaultLocation =
@@ -121,84 +120,45 @@ function getDocList(filter)
    {
       user.role = parsedArgs.location.siteNode.getMembersRole(person.properties["userName"]);
    }
+
+   var items = [];
    
    // Locked/working copy status defines action set
    for each (asset in assets)
    {
-      itemStatus = [];
-      itemOwner = null;
       createdBy = null;
       modifiedBy = null;
+      evaluated = {};
       activeWorkflows = [];
-      linkAsset = null;
-      isLink = false;
 
-      // Asset status
-      if (asset.isLocked)
-      {
-         itemStatus.push("locked");
-         itemOwner = people.getPerson(asset.properties["cm:lockOwner"]);
-      }
-      if (asset.hasAspect("cm:workingcopy"))
-      {
-         itemStatus.push("workingCopy");
-         itemOwner = people.getPerson(asset.properties["cm:workingCopyOwner"]);
-      }
-      // Is this user the item owner?
-      if (itemOwner && (itemOwner.properties.userName == person.properties.userName))
-      {
-         itemStatus.push("lockedBySelf");
-      }
-      
       // Get users
       createdBy = people.getPerson(asset.properties["cm:creator"]);
       modifiedBy = people.getPerson(asset.properties["cm:modifier"]);
       
       // Asset type - basic UI type
-      assetType = asset.isContainer ? "recordFolder" : "document";
-
-      // Asset subtype
+      assetType = asset.isContainer ? "record-folder" : "document";
+      // More detailed asset type
       switch (String(asset.typeShort))
       {
-         case "app:folderlink":
-            assetType = "recordFolder";
-            isLink = true;
-            break;
-         case "app:filelink":
-            assetType = "document";
-            isLink = true;
-            break;
          case "rma:recordSeries":
-            assetType = "recordSeries";
+            assetType = "record-series";
             break;
          case "rma:recordCategory":
-            assetType = "recordCategory";
+            assetType = "record-category";
             break;
          case "rma:recordFolder":
-            assetType = "recordFolder";
+            assetType = "record-folder";
             break;
          case "rma:nonElectronicRecord":
-            assetType = "nonElectronicRecord";
+            assetType = "non-electronic-record";
             break;
       }
 
-      if (isLink)
-      {
-         /**
-          * NOTE: After this point, the "asset" object will be changed to a link's destination node
-          *       if the original node was a filelink type
-          */
-         linkAsset = asset;
-         asset = linkAsset.properties.destination;
-      }
-      
       // Does this collection of assets have potentially differering paths?
-      if (filterParams.variablePath || isLink)
+      if (filterParams.variablePath)
       {
-         locationAsset = (isLink && assetType == "document") ? linkAsset : asset;
-
-         qnamePaths = locationAsset.qnamePath.split("/");
-         displayPaths = locationAsset.displayPath.split("/");
+         qnamePaths = asset.qnamePath.split("/");
+         displayPaths = asset.displayPath.split("/");
 
          if ((qnamePaths.length > 5) && (qnamePaths[2] == "st:sites"))
          {
@@ -208,7 +168,7 @@ function getDocList(filter)
                site: qnamePaths[3].substr(3),
                container: qnamePaths[4].substr(3),
                path: "/" + displayPaths.slice(5, displayPaths.length).join("/"),
-               file: locationAsset.name
+               file: asset.name
             }
          }
          else
@@ -218,7 +178,7 @@ function getDocList(filter)
                site: null,
                container: null,
                path: null,
-               file: locationAsset.name
+               file: asset.name
             }
          }
       }
@@ -244,34 +204,19 @@ function getDocList(filter)
          }
       }
       
-      // Get relevant actions set
-      actionSet = getActionSet(asset,
-      {
-         assetType: assetType,
-         isLink: isLink,
-         itemStatus: itemStatus,
-         itemOwner: itemOwner
-      });
-      
-      // Part of an active workflow?
-      for each (activeWorkflow in asset.activeWorkflows)
-      {
-         activeWorkflows.push(activeWorkflow.id);
-      }
+      // Get evaluated properties
+      evaluated = runEvaluator(asset, assetType);
       
       items.push(
       {
          asset: asset,
-         linkAsset: linkAsset,
          type: assetType,
-         isLink: isLink,
-         status: itemStatus,
-         owner: itemOwner,
          createdBy: createdBy,
          modifiedBy: modifiedBy,
-         actionSet: actionSet,
+         status: evaluated.status,
+         actionSet: evaluated.actionSet,
+         actionPermissions: evaluated.actionPermissions,
          tags: asset.tags,
-         activeWorkflows: activeWorkflows,
          location: location
       });
    }

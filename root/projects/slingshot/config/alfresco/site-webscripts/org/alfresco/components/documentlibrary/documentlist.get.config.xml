@@ -2,8 +2,7 @@
 
    <actionSets>
 
-      <actionSet id="empty">
-      </actionSet>
+      <actionSet id="empty"></actionSet>
 
       <actionSet id="document">
          <action id="onActionDownload" type="simple-link" href="{downloadUrl}" label="actions.document.download" />
