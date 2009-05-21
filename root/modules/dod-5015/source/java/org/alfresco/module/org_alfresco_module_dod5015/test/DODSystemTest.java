@@ -57,7 +57,7 @@ import org.alfresco.util.ISO9075;
  * 
  * @author Roy Wetherall
  */
-public class DODSystemTest extends BaseSpringTest 
+public class DODSystemTest extends BaseSpringTest implements RecordsManagementModel
 {    
 	protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 	
@@ -106,9 +106,10 @@ public class DODSystemTest extends BaseSpringTest
     @Override
     protected void onTearDownInTransaction() throws Exception
     {
-        // trigger integrity/constraint checks
-     //   setComplete();
-     //   endTransaction();
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        this.nodeService.deleteNode(filePlan);
+        txn.commit();
     }
     
     public void testSetup()
@@ -123,10 +124,6 @@ public class DODSystemTest extends BaseSpringTest
 	    
 	    assertNotNull(recordFolder);
 	    System.out.println(this.nodeService.getProperty(recordFolder, ContentModel.PROP_NAME));
-	    
-	    // TODO .. we need to file this record within a record folder .....
-	    
-	    /* Programatic filing */
 	    
 	    // Create the document
 	    Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
@@ -149,18 +146,34 @@ public class DODSystemTest extends BaseSpringTest
         txn.begin();
         
 	    // Checked that the document has been marked as incomplete
-	    assertTrue(this.nodeService.hasAspect(recordOne, RecordsManagementModel.ASPECT_UNDECLARED_RECORD));	    
-        assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_IDENTIFIER));
-        System.out.println("Record id: " + this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_IDENTIFIER));
-        assertNotNull(this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_DATE_FILED));
+	    System.out.println("recordOne ...");
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_UNDECLARED_RECORD));	   
+	    assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_RECORD));
+        assertNotNull(this.nodeService.getProperty(recordOne, PROP_IDENTIFIER));
+        System.out.println("Record id: " + this.nodeService.getProperty(recordOne, PROP_IDENTIFIER));
+        assertNotNull(this.nodeService.getProperty(recordOne, PROP_DATE_FILED));
+        System.out.println("Date filed: " + this.nodeService.getProperty(recordOne, PROP_DATE_FILED));
+        
+        // Check the review schedule
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_REVIEW_SCHEDULE));
+        assertNotNull(this.nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
+        System.out.println("Review as of: " + this.nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
 
+        // Check the disposition action
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_SCHEDULE));
+        assertNotNull(this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION_ID));
+        System.out.println("Disposition action id: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION_ID));
+        assertEquals("cutoff", this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION));
+        System.out.println("Disposition action: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION));
+        assertNotNull(this.nodeService.getProperty(recordOne, PROP_DISPOSITION_AS_OF));
+        System.out.println("Disposition as of: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_AS_OF));
+        
         txn.commit(); 
 	    
-	    // TODO .. test the declaration of a record by editing properties
+	    // Test the declaration of a record by editing properties
 
-//	    Map<String, Serializable> rmActionParameters = new HashMap<String, Serializable>(5);
-//	    rmActionParameters.put("recordFolder", recordFolder);
-//	    Map<String, Serializable> propValues = new HashMap<String, Serializable>(5);
+
+        
 //	    propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE.toString(), new Date());
 //	    
 //	    List<String> smList = new ArrayList<String>(2);
@@ -171,8 +184,6 @@ public class DODSystemTest extends BaseSpringTest
 //	    propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE.toString(), "mediaTypeValue"); 
 //	    propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
 //	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
-//	    rmActionParameters.put("recordProperties", (Serializable)propValues);
-//	    rmService.executeRecordAction(recordOne, "declareRecord", rmActionParameters);
 	    
 	}
 	
