@@ -19,6 +19,17 @@
       <description>Spring config file locations</description>
    </context-param>
    
+   <context-param>
+      <param-name>org.jboss.jbossfaces.WAR_BUNDLES_JSF_IMPL</param-name>
+      <param-value>true</param-value>
+   </context-param>
+
+   <context-param>
+      <param-name>contextClass</param-name>
+      <param-value>org.alfresco.config.JBossEnabledWebApplicationContext</param-value>
+      <description>Spring context class</description>
+   </context-param> 
+   
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
