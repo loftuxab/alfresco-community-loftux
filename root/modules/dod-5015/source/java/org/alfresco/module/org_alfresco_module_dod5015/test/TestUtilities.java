@@ -27,9 +27,6 @@ package org.alfresco.module.org_alfresco_module_dod5015.test;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -56,33 +53,6 @@ import org.alfresco.util.ISO9075;
 public class TestUtilities
 {
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-    
-    /**
-     * Loads a set of rma:dispositionAction objects into the repository as children
-     * of the given node.
-     * 
-     * @param parent Parent node for newly created actions
-     * @param nodeService NodeService to use to create nodes
-     */
-    public static void loadDispositionActions(NodeRef parent, NodeService nodeService)
-    {
-        // TODO: Replace these with actions actually required for the demo
-        
-        // destroy immediately
-        createDispositionAction(parent, "Destroy Immediately", "destroy", "immediately|0", nodeService);
-        
-        // destroy at end of quarter
-        createDispositionAction(parent, "Destroy At End Of Quarter", "destroy", "quarterend|1", nodeService);
-        
-        // transfer immediately
-        createDispositionAction(parent, "Transfer Immediately", "transfer", "immediately|0", nodeService);
-        
-        // review at end of financial year
-        createDispositionAction(parent, "Review At End of Financial Year", "review", "fyend|1", nodeService);
-        
-        // review every 2nd month
-        createDispositionAction(parent, "Review Every Other Month", "review", "monthend|2", nodeService);
-    }
     
     public static NodeRef loadFilePlanData(String siteName, NodeService nodeService,
             ImporterService importerService)
@@ -113,21 +83,6 @@ public class TestUtilities
         importerService.importView(viewReader, location, REPLACE_BINDING, null);
 
         return filePlan;
-    }
-
-    protected static void createDispositionAction(NodeRef parent, String name, String action, 
-                String period, NodeService nodeService)
-    {
-        NodeRef node = nodeService.createNode(parent, ContentModel.ASSOC_CONTAINS, 
-                    QName.createQName(RecordsManagementModel.RM_URI, QName.createValidLocalName(name)),
-                    RecordsManagementModel.TYPE_DISPOSITION_ACTION).getChildRef();
-        
-        Map<QName, Serializable> props = new HashMap<QName, Serializable>(4);
-        props.put(ContentModel.PROP_NAME, name);
-        props.put(RecordsManagementModel.PROP_DISPOSITION_ACTION, action);
-        props.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, period);
-        
-        nodeService.addProperties(node, props);
     }
     
     protected static NodeRef getRecordCategory(SearchService searchService, String seriesName, String categoryName)

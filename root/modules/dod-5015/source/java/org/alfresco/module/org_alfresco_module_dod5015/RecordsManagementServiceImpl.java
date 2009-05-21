@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -83,10 +84,10 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
         
         //TODO Fix this up after the demo.
         // Replace the noderef String in parameters with a ScriptNodeRef
-        Serializable existingString = parameters.get("recordFolder");
-        ScriptNode scrNode = new ScriptNode(new NodeRef(existingString.toString()), this.services);
-        parameters.put("recordFolder", scrNode);
-        logger.debug("    new parameters = " + parameters);
+//        Serializable existingString = parameters.get("recordFolder");
+//       ScriptNode scrNode = new ScriptNode(new NodeRef(existingString.toString()), this.services);
+//        parameters.put("recordFolder", scrNode);
+//        logger.debug("    new parameters = " + parameters);
         
         // Get the state
         RecordsManagementAction rmAction = rmActions.get(name);
@@ -100,12 +101,14 @@ public class RecordsManagementServiceImpl implements RecordsManagementService
         action.setParameterValues(parameters);
         
         // Execute the action
-        this.actionService.executeAction(action, filePlanComponent);        
+        this.actionService.executeAction(action, filePlanComponent);    
     }
 
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getRecordActions()
+     */
     public List<String> getRecordActions()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return new ArrayList<String>(this.rmActions.keySet());
     }
 }

@@ -96,51 +96,6 @@
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
-             
-            <!-- 
-                                       
-            <property name="rma:cutOffSchedulePeriod">
-               <title>Cut off schedule period</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-               <default>none|0</default>
-            </property>
-            
-            <property name="rma:retentionIndicator">
-               <title>Retention Indicator</title>
-               <type>d:boolean</type>
-               <mandatory>true</mandatory>
-               <default>false</default>
-            </property>
-            
-            <property name="rma:retentionSchedulePeriod">
-               <title>Retention schedule period</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-               <default>none|0</default>
-            </property>
-            
-            <property name="rma:accessionIndicator">
-               <title>Accession Indicator</title>
-               <type>d:boolean</type>
-               <mandatory>true</mandatory>
-               <default>false</default>
-            </property>
-            
-            <property name="rma:accessionLocation">
-               <title>Accession Location</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-               <default>NARA</default>
-            </property>
-                               
-            <property name="rma:accessionPeriod">
-               <title>Accession Period</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-               <default>year|25</default>
-            </property>
-            -->
     
          </properties>
          
@@ -176,7 +131,7 @@
          
          <properties>
                     
-            <property name="rma:dispositionAction">
+            <property name="rma:dispositionActionName">
                <title>Disposition Action Name</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
@@ -588,26 +543,24 @@
       
       <aspect name="rma:dispositionSchedule">
          <title>Next Disposition Action</title>         
-         <properties>                
-            <property name="rma:nextDispositionAction">
-               <title>Next Disposition Action</title> 
+         <properties>            
+            <property name="rma:dispositionActionId">
+               <title>Disposition Action Id</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>    
+            <property name="rma:dispositionAction">
+               <title>Disposition Action</title> 
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>              
-            <property name="rma:nextDispositionAsOf">
-               <title>Next Disposition Action</title>
+            <property name="rma:dispositionAsOf">
+               <title>Disposition Action</title>
                <type>d:date</type>
                <mandatory>true</mandatory>
             </property>
             
             <!-- TODO need to model events complete here -->
-            
-            <property name="rma:nextDispositionEligible">
-                <title>Next Disposition Eligible</title>
-                <type>d:boolean</type>
-                <mandatory>true</mandatory>
-                <default>true</default>
-            </property>
             
             <!-- TODO model previous action information -->
                         
@@ -628,30 +581,6 @@
             </property>
          </properties>
       </aspect>
-      
-      <!--
-      <aspect name="rma:pendingCutOff">
-         <title>Pending cut off</title>         
-         <properties>                
-            <property name="rma:cutOffAsOf">
-               <title>Cut off as of date</title>
-               <type>d:date</type>
-               <mandatory>false</mandatory>
-            </property>
-         </properties>
-      </aspect>    
-      
-      <aspect name="rma:retained">
-         <title>Retained</title>         
-         <properties>                
-            <property name="rma:endRetentionAsOf">
-               <title>End retention as of date</title>
-               <type>d:date</type>
-               <mandatory>false</mandatory>
-            </property>
-         </properties>
-      </aspect>      
-      -->
       
       <!-- Custom data marker aspect -->            
       <aspect name="rma:customRMData">
