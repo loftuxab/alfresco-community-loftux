@@ -56,8 +56,6 @@
         <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
     </bean>
 
-    <!-- This abstract base bean provides registration of action beans and some
-         service initialisation. -->
     <bean id="RecordsManagementAction" abstract="true" init-method="init">
         <property name="actionService" ref="ActionService"/>
         <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
