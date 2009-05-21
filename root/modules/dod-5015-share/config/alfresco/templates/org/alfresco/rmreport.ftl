@@ -1,6 +1,8 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-  <@link rel="stylesheet" type="text/css" href="${url.context}/templates/search/search.css" />
+  <@link rel="stylesheet" type="text/css" href="${url.context}/templates/rmreport/rmreport.css" />
+  <@script type="text/javascript" src="${url.context}/js/alfresco-resizer.js"></@script>
+  <@script type="text/javascript" src="${url.context}/templates/rmreport/rmreport.js"></@script>
 </@>
 
 <@templateBody>
@@ -10,10 +12,15 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <div class="yui-t1">
+      <div class="yui-t1" id="divReportWrapper">
          <div id="yui-main">
-            <@region id="report" scope="template" protected=true />
+            <div class="yui-b" id="divReportMain">
+               <@region id="report" scope="template" protected=true />
+            </div>
          </div>
+   		<div class="yui-b" id="divReportFilters">
+   			<@region id="filters" scope="template" protected=true />
+   		</div>
       </div>
    </div>
 </@>
