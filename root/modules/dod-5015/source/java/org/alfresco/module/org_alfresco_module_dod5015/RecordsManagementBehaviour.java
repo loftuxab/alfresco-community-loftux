@@ -140,13 +140,12 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
         // TODO need to take into consideration madatory properties found on applied custom record aspects
         //      calculate on demand for each aspect and cache
         
-        boolean recordDeclared = false;
+        boolean recordDeclared = true;
         
         // Check the properties
-        Map<QName, Serializable> recordProps = this.nodeService.getProperties(record);
         for (QName prop : this.mandatoryRecordProperties)
         {
-            Serializable value = recordProps.get(prop);
+            Serializable value = after.get(prop);
             if (value == null)
             {
                 recordDeclared = false;
