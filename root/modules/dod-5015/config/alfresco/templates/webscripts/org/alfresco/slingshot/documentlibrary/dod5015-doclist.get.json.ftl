@@ -26,12 +26,6 @@
       <#assign d = item.asset>
       <#assign version = "1.0">
       <#if d.hasAspect("cm:versionable") && d.versionHistory?size != 0><#assign version = d.versionHistory[0].versionLabel></#if>
-      <#if item.owner??>
-         <#assign lockedBy = (item.owner.properties.firstName + " " + item.owner.properties.lastName)?trim>
-         <#assign lockedByUser = item.owner.properties.userName>
-      <#else>
-         <#assign lockedBy="" lockedByUser="">
-      </#if>
       <#if item.createdBy??>
          <#assign createdBy = (item.createdBy.properties.firstName + " " + item.createdBy.properties.lastName)?trim>
          <#assign createdByUser = item.createdBy.properties.userName>
@@ -49,13 +43,10 @@
          "index": ${item_index},
          "nodeRef": "${d.nodeRef}",
          "type": "${item.type}",
-         "isLink": ${item.isLink?string},
          "mimetype": "${d.mimetype!""}",
-         "fileName": "<#if item.isLink>${item.linkAsset.name}<#else>${d.name}</#if>",
+         "fileName": "${d.name}",
          "displayName": "${d.name?replace(workingCopyLabel, "")}",
          "status": "<#list item.status as s>${s}<#if s_has_next>,</#if></#list>",
-         "lockedBy": "${lockedBy}",
-         "lockedByUser": "${lockedByUser}",
          "title": "${d.properties.title!""}",
          "description": "${d.properties.description!""}",
          "author": "${d.properties.author!""}",
@@ -70,7 +61,6 @@
          "contentUrl": "api/node/content/${d.storeType}/${d.storeId}/${d.id}/${d.name?url}",
          "actionSet": "${item.actionSet}",
          "tags": <#noescape>[${tags}]</#noescape>,
-         "activeWorkflows": "<#list item.activeWorkflows as aw>${aw}<#if aw_has_next>,</#if></#list>",
          "location":
          {
             "site": "${item.location.site!""}",
@@ -89,6 +79,9 @@
             ],
             "userAccess":
             {
+            <#list item.actionPermissions as actionPerm>
+               "${actionPerm?string}": true,
+            </#list>
                "create": ${d.hasPermission("CreateChildren")?string},
                "edit": ${d.hasPermission("Write")?string},
                "delete": ${d.hasPermission("Delete")?string},

@@ -1,42 +1,83 @@
 /* Actions: Icons */
-.doclist .onActionCutoff a
+.doclist .onActionAddReference a
 {
    background-image: url(images/generic-16.png);
 }
 
-.doclist .onActionUncutoff a
+.doclist .onActionCloseFolder a
+{
+   background-image: url(images/close-record-16.png);
+}
+
+.doclist .onActionCutoffFolder a
+{
+   background-image: url(images/generic-16.png);
+}
+.doclist .onActionCutoffRecord a
+{
+   background-image: url(images/cutoff-record-16.png);
+}
+
+.doclist .onActionDeclareRecord a
+{
+   background-image: url(images/declare-record-16.png);
+}
+
+.doclist .onActionDestroyRecord a
+{
+   background-image: url(images/destroy-record-16.png);
+}
+
+.doclist .onActionFreezeSeries a
+{
+   background-image: url(images/generic-16.png);
+}
+.doclist .onActionFreezeCategory a
+{
+   background-image: url(images/generic-16.png);
+}
+.doclist .onActionFreezeFolder a
+{
+   background-image: url(images/generic-16.png);
+}
+.doclist .onActionFreezeRecord a
+{
+   background-image: url(images/freeze-record-16.png);
+}
+
+.doclist .onActionReopenFolder a
+{
+   background-image: url(images/open-record-16.png);
+}
+.doclist .onActionReopenRecord a
+{
+   background-image: url(images/open-record-16.png);
+}
+
+.doclist .onActionReviewedRecord a
+{
+   background-image: url(images/reviewed-record-16.png);
+}
+
+.doclist .onActionTransferRecord a
+{
+   background-image: url(images/transfer-record-16.png);
+}
+
+.doclist .onActionUncutoffFolder a
+{
+   background-image: url(images/generic-16.png);
+}
+.doclist .onActionUncutoffRecord a
 {
    background-image: url(images/generic-16.png);
 }
 
-
-.doclist .onActionReview a
+.doclist .onActionUnfreezeFolder a
 {
    background-image: url(images/generic-16.png);
 }
-
-.doclist .onActionTransfer a
+.doclist .onActionUnfreezeRecord a
 {
-   background-image: url(images/generic-16.png);
-}
-
-
-.doclist .onActionAccession a
-{
-   background-image: url(images/generic-16.png);
-}
-
-.doclist .onActionDestroy a
-{
-   background-image: url(images/generic-16.png);
-}
-
-.doclist .onActionFreeze a
-{
-   background-image: url(images/generic-16.png);
-}
-
-.doclist .onActionUnfreeze a
-{
-   background-image: url(images/generic-16.png);
+   background-image: url(images/unfreeze-record-16.png);
 }
