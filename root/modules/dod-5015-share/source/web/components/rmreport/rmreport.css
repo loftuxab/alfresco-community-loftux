@@ -1,0 +1,104 @@
+.report
+{
+   color: #000;
+}
+
+.report .hidden
+{
+  display: none;
+}
+
+.report .title
+{
+   margin: 16px 10px 4px;
+   font-size: 123.1%;
+   font-weight: bold;
+   color: #515D6B;
+   padding-bottom: 0.5em;
+}
+
+.report .builder
+{
+   margin: 0 -10px;
+   background-color: #CCCCCC;
+   padding: 10px 24px 16px;
+   line-height: 2em;
+}
+
+.report .builder td
+{
+   vertical-align: top;
+}
+
+.report .header
+{
+   font-weight: bold;
+   font-size: 108%;
+}
+
+.report .designation
+{
+   border-right: 1px solid #AAAAAA;
+   padding-right: 4em;
+}
+
+.report .approved
+{
+   border-right: 1px solid #AAAAAA;
+   padding: 0 4em;
+}
+
+.report .reviewed
+{
+   padding-left: 4em;
+}
+
+.report .create-report
+{
+   border-top: 1px solid #AAAAAA;
+}
+
+.report label
+{
+   padding-left: 4px;
+   vertical-align: 5%;
+}
+
+.report .results
+{
+   margin: 16px 10px 10px;
+}
+
+.report .yui-dt table
+{
+	border: 1px solid #C0C0C0;
+}
+
+.report .yui-dt td
+{
+   border-bottom: 1px solid #D7D7D7;
+   border-right: medium none;
+}
+
+.report .yui-dt-last td
+{
+   border-bottom: medium none;
+}
+
+.report tr.yui-dt-odd,
+.report tr.yui-dt-even
+{
+   background-color: #ffffff;
+   cursor: auto;
+}
+
+.report td.yui-dt-asc,
+.report td.yui-dt-desc
+{
+   background-color: #ffffff !important;
+}
+
+.report tr.yui-dt-odd, tr.yui-dt-even
+{
+   background-color: #ffffff !important;
+}

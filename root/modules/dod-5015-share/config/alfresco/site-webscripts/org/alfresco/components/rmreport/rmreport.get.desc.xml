@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Records Management Report</shortname>
+  <description>Records Management Report Component</description>
+  <url>/components/rmreport/rmreport</url>
+</webscript>
