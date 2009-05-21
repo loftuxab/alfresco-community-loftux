@@ -21,26 +21,26 @@
 {
    margin: 0 -10px;
    background-color: #CCCCCC;
-   padding: 10px 24px;
+   padding: 10px 24px 16px;
    line-height: 2em;
-}
-
-.search .search-button
-{
-   float: right;
-   margin-top: -3.5em;
 }
 
 .search textarea
 {
-   width: 90%;
+   width: 56em;
+   height: 4em;
    border: 1px solid #AAAAAA;
 }
 
-.search label
+.search .search-button
 {
-   padding-left: 4px;
-   vertical-align: 5%;
+   margin-top: -3.5em;
+   margin-left: 57em;
+}
+
+.search .query
+{
+   height: 5em;
 }
 
 .search .metadata
@@ -49,16 +49,39 @@
    background-color: #D7D7D7;
    line-height: 1.5em;
    padding: 6px 6px 4px 8px;
-   float: left;
    height: 6.2em;
    min-width: 20em;
    overflow-y: auto;
    overflow-x: hidden;
 }
 
+.search label
+{
+   padding-left: 4px;
+   vertical-align: 5%;
+}
+
 .search .sortlabel
 {
    vertical-align: 15%;
+}
+
+.search .separator
+{
+   background: transparent url(images/expanded.png) no-repeat 4px 8px;
+   cursor: pointer;
+}
+
+.search .options
+{
+   margin-left: 20px;
+   margin-right: 8px;
+   display: block;
+}
+
+.search .sort
+{
+   padding-left: 10em;
 }
 
 .search .results
