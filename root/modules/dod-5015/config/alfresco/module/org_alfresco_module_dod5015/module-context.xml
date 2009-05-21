@@ -15,26 +15,15 @@
     
     <!-- Records Management Service -->
     
-    <bean id="recordsManagementService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceImpl">
+    <bean   id="recordsManagementService" 
+            class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceImpl">
         <property name="actionService" ref="ActionService"/>
         <property name="serviceRegistry" ref="ServiceRegistry"/>
     	<property name="recordsManagementActions">
     		<list>
     			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">
-    				<property name="name" value="declareRecord"/>
-    				<property name="actionName" value="declareRecordAction"/>
-    			</bean>
-    			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">
-    				<property name="name" value="cutOff"/>
-    				<property name="actionName" value="cutOffAction"/>
-    			</bean>
-    			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">
-    				<property name="name" value="retain"/>
-    				<property name="actionName" value="retainAction"/>
-    			</bean>
-    			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">
-    				<property name="name" value="reviewed"/>
-    				<property name="actionName" value="reviewedAction"/>
+    				<property name="name" value="file"/>
+    				<property name="actionName" value="fileAction"/>
     			</bean>
     		</list>    		
     	</property>
@@ -80,83 +69,18 @@
     
     <!-- Actions -->
     
-    <bean id="declareRecordAction" parent="script">
-        <property name="scriptLocation">
-        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
-            	<constructor-arg>
-            		<value>alfresco/module/org_alfresco_module_dod5015/script/action/declareRecordAction.js</value>
-            	</constructor-arg>
-            </bean>
-		</property>
-	    <property name="publicAction">
-	         <value>false</value>
-	     </property>
-    </bean>
-    
-    <bean id="cutOffAction" parent="script">
-        <property name="scriptLocation">
-        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
-            	<constructor-arg>
-            		<value>alfresco/module/org_alfresco_module_dod5015/script/action/cutOffAction.js</value>
-            	</constructor-arg>
-            </bean>
-		</property>
-	    <property name="publicAction">
-	         <value>false</value>
-	     </property>
-    </bean>
-    
-    <bean id="retainAction" parent="script">
-        <property name="scriptLocation">
-        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
-            	<constructor-arg>
-            		<value>alfresco/module/org_alfresco_module_dod5015/script/action/retainAction.js</value>
-            	</constructor-arg>
-            </bean>
-		</property>
-	    <property name="publicAction">
-	         <value>false</value>
-	     </property>
-    </bean>
-    
-    <bean id="reviewAction" parent="script">
-        <property name="scriptLocation">
-        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
-            	<constructor-arg>
-            		<value>alfresco/module/org_alfresco_module_dod5015/script/action/reviewAction.js</value>
-            	</constructor-arg>
-            </bean>
-		</property>
-	    <property name="publicAction">
-	         <value>false</value>
-	     </property>
+    <bean id="fileAction" class="org.alfresco.module.org_alfresco_module_dod5015.action.FileAction" parent="action-executer">
+        <property name="nodeService" ref="NodeService"/>
+        <property name="dictionaryService" ref="DictionaryService"/>
+        <property name="publicAction" value="false"/>
     </bean>
         
-    <!-- Behaviors -->
-    <bean id="org_alfresco_module_dod5015_onCreateChildAssociation_rmaRecordFolder_cmContains" class="org.alfresco.repo.policy.registration.AssociationPolicyRegistration" parent="policyRegistration">   
-        <property name="policyNames">
-           <list>
-        	  <value>{http://www.alfresco.org}onCreateChildAssociation</value>
-              <value>{http://www.alfresco.org}onCreateNodeAssociation</value>
-           </list>
-        </property>  	   
-        <property name="className">
-            <value>{http://www.alfresco.org/model/recordsmanagement/1.0}recordFolder</value>
-        </property> 	        	   
-        <property name="associationType">
-            <value>{http://www.alfresco.org/model/content/1.0}contains</value>
-        </property>    
-        <property name="behaviour">
-           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
-		        <property name="location">
-		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
-		            	<constructor-arg>
-		            		<value>alfresco/module/org_alfresco_module_dod5015/script/behavior/onCreateNode.js</value>
-		            	</constructor-arg>
-		            </bean>
-				</property>
-			</bean>        
-        </property> 
+    <!-- Behaviours -->
+    
+    <bean id="recordManagementBehaviours" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementBehaviour" init-method="init">
+        <property name="nodeService" ref="NodeService"/>
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
     </bean>
     
 </beans>

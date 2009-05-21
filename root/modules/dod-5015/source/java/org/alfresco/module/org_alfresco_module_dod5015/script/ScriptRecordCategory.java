@@ -104,46 +104,7 @@ public class ScriptRecordCategory implements Serializable, Scopeable
         return this.recordCategoryNodeRefs.get(0);
     }
     
-    /**
-     * 
-     * @return
-     */
-    public boolean getHasRetention()
-    {
-        return ((Boolean)this.services.getNodeService().getProperty(
-                                            getRecordCategory(), 
-                                            RecordsManagementModel.PROP_RETENTION_INDICATOR)).booleanValue();
-    }
-    
-    /**
-     * 
-     * @param fromDate
-     * @return
-     */
-    public Serializable getCutOffDate(Serializable fromDate)
-    {
-        return calculatePropertyAsOfDate(RecordsManagementModel.PROP_CUT_OFF_SCHEDULE_PERIOD, fromDate);
-    }
-    
-    /**
-     * 
-     * @param fromDate
-     * @return
-     */
-    public Serializable getNextReviewDate(Serializable fromDate)
-    {
-        return calculatePropertyAsOfDate(RecordsManagementModel.PROP_REVIEW_PERIOD, fromDate);
-    }
-    
-    /**
-     * 
-     * @param fromDate
-     * @return
-     */
-    public Serializable getEndRetentionDate(Serializable fromDate)
-    {
-        return calculatePropertyAsOfDate(RecordsManagementModel.PROP_RETENTION_SCHEDULE_PERIOD, fromDate);
-    }   
+     
     
     /**
      * 

@@ -110,6 +110,11 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 		this.scope = scope;
 	}
 	
+	public void executeRecordAction(ScriptNode node, String actionName)
+	{
+	    rmService.executeRecordAction(node.getNodeRef(), actionName, null);
+	}
+	
 	/**
 	 * Determines whether a node is a record or not
 	 * 
@@ -157,6 +162,12 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	    
 	    return record;
 	}
+	
+	public boolean isRecordFolder(ScriptNode node)
+    {
+	   QName nodeType = services.getNodeService().getType(node.getNodeRef()); 
+       return this.services.getDictionaryService().isSubClass(nodeType, RecordsManagementModel.TYPE_RECORD_FOLDER); 
+    }
 	
 	/**
 	 * 

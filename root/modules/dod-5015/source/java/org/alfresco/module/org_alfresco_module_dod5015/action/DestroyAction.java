@@ -22,23 +22,38 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.module.org_alfresco_module_dod5015;
+package org.alfresco.module.org_alfresco_module_dod5015.action;
 
-import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 
-
 /**
- * TODO record marker?
- * 
  * @author Roy Wetherall
  */
-public interface RecordsManagementService
-{   
-    List<String> getRecordActions();
-    
-    void executeRecordAction(NodeRef filePlanComponent, String name, Map<String, Serializable> parameters);   
+public class DestroyAction extends RMActionExecuterAbstractBase
+{
+
+    /**
+     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
+     */
+    @Override
+    protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefinitions(java.util.List)
+     */
+    @Override
+    protected void addParameterDefinitions(List<ParameterDefinition> paramList)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
 }

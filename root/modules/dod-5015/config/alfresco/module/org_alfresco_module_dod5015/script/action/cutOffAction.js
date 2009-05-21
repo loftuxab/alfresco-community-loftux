@@ -1,7 +1,7 @@
 function doCutOff(recordCategory, record, cutOffDate)
 {
 	// Apply cut off aspect
-	record.addAspect(rmService.APSECT_CUT_OFF);
+	record.addAspect(rmService.ASPECT_CUT_OFF);
 			
 	// Set the cut off date
 	record.properties[rmService.PROP_CUT_OFF_DATE] = cutOffDate;
@@ -11,7 +11,7 @@ function doCutOff(recordCategory, record, cutOffDate)
 
 function main(record)
 {
-	if (record.hasAspect(rmService.ASPECT_CUT_OFF == false)
+	if (record.hasAspect(rmService.ASPECT_CUT_OFF) == false)
 	{
 		// Confirm we have a record (is it a record folder?)
 		if ((rmService.isRecord(record) == true) ||
@@ -31,9 +31,9 @@ function main(record)
 			if (rmService.isRecordFolder(record) == true)
 			{
 				var recordFolder = rmService.getRecordFolder(record);
-				for (record in recordFolder.records)
+				for (childRecord in recordFolder.records)
 				{
-					doCutOff(recordCategory, record, cutOffDate);
+					doCutOff(recordCategory, childRecord, cutOffDate);
 				}
 			}
 				
@@ -41,7 +41,7 @@ function main(record)
 			if (recordCategory.hasRetention == true)
 			{
 			  	// Retain 
-			  	// TODO call retention ...
+			  	rmService.executeRecordAction(record, "retain");
 			}			  			
 		}
 		else
@@ -51,4 +51,4 @@ function main(record)
 	}
 }
   	
-main(record);
+main(document);

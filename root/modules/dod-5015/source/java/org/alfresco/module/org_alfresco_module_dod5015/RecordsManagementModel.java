@@ -43,10 +43,16 @@ public interface RecordsManagementModel
     
     // Record Category
     public static QName TYPE_RECORD_CATEGORY = QName.createQName(RM_URI, "recordCategory");
-    public static QName PROP_CUT_OFF_SCHEDULE_PERIOD = QName.createQName(RM_URI, "cutOffSchedulePeriod");
-    public static QName PROP_RETENTION_INDICATOR = QName.createQName(RM_URI, "retentionIndicator");
-    public static QName PROP_RETENTION_SCHEDULE_PERIOD = QName.createQName(RM_URI, "retentionSchedulePeriod");    
+    public static QName ASSOC_DISPOSITION_ACTIONS = QName.createQName(RM_URI, "dispositionActions");
     
+    // Disposition actions
+    public static QName PROP_TYPE = QName.createQName(RM_URI, "dispositionAction");
+    public static QName PROP_DISPOSITION_ACTION_NAME = QName.createQName(RM_URI, "dispositionActionName");
+    public static QName PROP_DISPOSITION_DESCRIPTION = QName.createQName(RM_URI, "dispositionDescription");
+    public static QName PROP_DISPOSITION_PERIOD = QName.createQName(RM_URI, "dispositionPeriod");
+    public static QName PROP_DISPOSITION_PERIOD_PROPERTY = QName.createQName(RM_URI, "dispositionPeriodProperty");
+    
+    // Records folder
     public static QName TYPE_RECORD_FOLDER = QName.createQName(RM_URI, "recordFolder");
     
     // Undeclared record aspect
@@ -55,6 +61,8 @@ public interface RecordsManagementModel
     // Record aspect
     public static QName ASPECT_RECORD = QName.createQName(RM_URI, "record");
     public static QName PROP_DATE_FILED = QName.createQName(RM_URI, "dateFiled");
+    public static QName PROP_ORIGINATOR = QName.createQName(RM_URI, "originator");
+    public static QName PROP_ORIGINATING_ORGANIZATION = QName.createQName(RM_URI, "originatingOrganization");
     public static QName PROP_PUBLICATION_DATE = QName.createQName(RM_URI, "publicationDate");
     public static QName PROP_SUPPLEMENTAL_MARKING_LIST = QName.createQName(RM_URI, "supplementalMarkingList");
     public static QName PROP_MEDIA_TYPE = QName.createQName(RM_URI, "mediaType");
@@ -70,29 +78,19 @@ public interface RecordsManagementModel
     
     // Review details aspect
     public static QName PROP_REVIEW_PERIOD = QName.createQName(RM_URI, "reviewPeriod");
-    
-    // Disposition action
-    public static QName TYPE_DISPOSITION_ACTION = QName.createQName(RM_URI, "dispositionAction");
-    public static QName PROP_DISPOSITION_ACTION = QName.createQName(RM_URI, "dispositionAction");
-    public static QName PROP_DISPOSITION_PERIOD = QName.createQName(RM_URI, "dispositionPeriod");
-    
-    /** State management aspects */
-    
+     
     // Pending review aspect
-    public static QName ASPECT_PENDING_REVIEW = QName.createQName(RM_URI, "pendingReview");
-    public static QName PROP_REVIEW_AS_OF = QName.createQName(RM_URI, "reviewAsOf");
-    
-    // Pending cut off aspect
-    public static QName ASPECT_PENDING_CUT_OFF = QName.createQName(RM_URI, "pendingCutOff"); 
-    public static QName PROP_CUT_OFF_AS_OF = QName.createQName(RM_URI, "cutOffAsOf");        
+    public static QName ASPECT_REVIEW_SCHEDULE = QName.createQName(RM_URI, "reviewSchedule");
+    public static QName PROP_REVIEW_AS_OF = QName.createQName(RM_URI, "reviewAsOf");        
     
     // Cut off aspect
     public static QName ASPECT_CUT_OFF = QName.createQName(RM_URI, "cutOff");
     public static QName PROP_CUT_OFF_DATE = QName.createQName(RM_URI, "cutOffDate");
     
-    // Retention aspect
-    public static QName ASPECT_RETENTION = QName.createQName(RM_URI, "retention");
-    public static QName PROP_END_RETENTION_AS_OF = QName.createQName(RM_URI, "endRetentionAsOf");
+    public static QName ASPECT_DISPOSITION_SCHEDULE = QName.createQName(RM_URI, "dispositionSchedule");
+    public static QName PROP_DISPOSITION_ACTION_ID = QName.createQName(RM_URI, "dispositionActionId");
+    public static QName PROP_DISPOSITION_ACTION = QName.createQName(RM_URI, "dispositionAction");
+    public static QName PROP_DISPOSITION_AS_OF = QName.createQName(RM_URI, "dispositionAsOf");
     
     // Custom RM data aspect
     public static QName ASPECT_CUSTOM_RM_DATA = QName.createQName(RM_URI, "customRMData");
