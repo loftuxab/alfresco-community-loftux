@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,35 +24,20 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
+import java.io.Serializable;
+import java.util.Map;
+
+import org.alfresco.service.cmr.repository.NodeRef;
+
 
 /**
  * Record Management Action
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementAction
+public interface RecordsManagementAction
 {
-    private String name;
+    public String getName();
     
-    private String actionName;
-            
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-    
-    public String getName()
-    {
-        return this.name;
-    }
-    
-    public void setActionName(String actionName)
-    {
-        this.actionName = actionName;
-    }
-    
-    public String getActionName()
-    {
-        return this.actionName;
-    }
+    public void execute(NodeRef filePlanComponent, Map<String, Serializable> parameters);
 }

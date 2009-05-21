@@ -25,8 +25,6 @@
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,8 +32,8 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -69,7 +67,7 @@ public class DODSystemTest extends BaseSpringTest
 	private SearchService searchService;
 	private ImporterService importService;
 	private ContentService contentService;
-	private RecordsManagementService rmService;
+	private RecordsManagementActionService rmService;
 	private TransactionService transactionService;
 	
 	private AuthenticationComponent authenticationComponent;
@@ -90,7 +88,7 @@ public class DODSystemTest extends BaseSpringTest
 		this.searchService = (SearchService)this.applicationContext.getBean("searchService");
 		this.importService = (ImporterService)this.applicationContext.getBean("ImporterService");
 		this.contentService = (ContentService)this.applicationContext.getBean("ContentService");
-		this.rmService = (RecordsManagementService)this.applicationContext.getBean("RecordsManagementService");
+		this.rmService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		
 		// Set the current security context as admin
@@ -219,50 +217,6 @@ public class DODSystemTest extends BaseSpringTest
         // NodeRef recordCategory = this.getRecordCategory("Miscellaneous Files", "Civilian Employee Training Program Records");
     }
     
-    public void xxtestFileRecordInAFolder()
-    {
-        // The below recordFolder is in a category with a review-period.
-        NodeRef recordFolder = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");     
-        assertNotNull(recordFolder);
-        
-        // Create the document
-        NodeRef newRecord = this.nodeService.createNode(recordFolder, 
-                                                        ContentModel.ASSOC_CONTAINS, 
-                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "TestRecord.txt"), 
-                                                        ContentModel.TYPE_CONTENT).getChildRef();
-        
-        // Set the content
-        ContentWriter writer = this.contentService.getWriter(newRecord, ContentModel.PROP_CONTENT, true);
-        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        writer.setEncoding("UTF-8");
-        writer.putContent("There is some content in this record");
-        
-        // Checked that the document has been marked as incomplete
-        assertTrue(this.nodeService.hasAspect(newRecord, RecordsManagementModel.ASPECT_UNDECLARED_RECORD));       
-        
-        // File a document in the record category
-        Map<String, Serializable> parameters = new HashMap<String, Serializable>(5);
-        parameters.put("recordFolder", recordFolder);
-        Map<String, Serializable> propValues = new HashMap<String, Serializable>(5);
-        propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE.toString(), new Date());
-        
-        List<String> smList = new ArrayList<String>(3);
-        smList.add(FOUO);
-        smList.add(NOFORN);
-        smList.add(NOCONTRACT);
-        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString(), (Serializable)smList);
-        
-        propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE.toString(), "mediaTypeValue"); 
-        propValues.put(RecordsManagementModel.PROP_FORMAT.toString(), "formatValue"); 
-        propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED.toString(), new Date());
-
-        parameters.put("recordProperties", (Serializable)propValues);
-        rmService.executeRecordAction(newRecord, "declareRecord", parameters);
-        
-        // Check the values of the filed record
-        assertNotNull(this.nodeService.getProperty(newRecord, RecordsManagementModel.PROP_REVIEW_AS_OF));        
-    }
-    
     /**
      * Gets all Record Categories under the SPACES_STORE.
      * @return
@@ -289,4 +243,4 @@ public class DODSystemTest extends BaseSpringTest
         
         return rs.getNodeRef(0);
     }
- }
+}

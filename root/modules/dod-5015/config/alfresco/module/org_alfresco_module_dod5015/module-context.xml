@@ -3,8 +3,7 @@
 
 <beans>
 
-	<!-- Bootstrap Records Management Model -->
-	
+    <!-- Bootstrap Records Management Model -->
     <bean id="org_alfresco_module_dod5015_dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
         <property name="models">
             <list>
@@ -13,40 +12,30 @@
         </property>
     </bean>
     
-    <!-- Records Management Service -->
-    
-    <bean   id="recordsManagementService" 
-            class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceImpl">
+    <!-- Records Management Action Service -->
+    <bean id="recordsManagementActionService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionServiceImpl">
         <property name="actionService" ref="ActionService"/>
         <property name="serviceRegistry" ref="ServiceRegistry"/>
-    	<property name="recordsManagementActions">
-    		<list>
-    			<bean class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction">
-    				<property name="name" value="file"/>
-    				<property name="actionName" value="fileAction"/>
-    			</bean>
-    		</list>    		
-    	</property>
     </bean>
     
-    <bean id="RecordsManagementService" class="org.springframework.aop.framework.ProxyFactoryBean">
+    <bean id="RecordsManagementActionService" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="proxyInterfaces">
-            <value>org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService</value>
+            <value>org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService</value>
         </property>
         <property name="target">
-            <ref bean="recordsManagementService"/>
+            <ref bean="recordsManagementActionService"/>
         </property>
         <property name="interceptorNames">
             <list>
-                <idref local="RecordsManagementService_transaction"/>
+                <idref local="RecordsManagementActionService_transaction"/>
                 <idref bean="AuditMethodInterceptor"/>
                 <idref bean="exceptionTranslator"/>
-                <idref local="RecordsManagementService_security"/>
+                <idref local="RecordsManagementActionService_security"/>
             </list>
         </property>
     </bean>
 
-    <bean id="RecordsManagementService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+    <bean id="RecordsManagementActionService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
         <property name="transactionManager">
             <ref bean="transactionManager"/>
         </property>
@@ -57,14 +46,25 @@
         </property>
     </bean>
 
-    <bean id="RecordsManagementService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    <bean id="RecordsManagementActionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
     
     <!-- Script Beans -->
     
     <bean id="org_alfresco_module_dod5015_Script_RMService" parent="baseJavaScriptExtension" class="org.alfresco.module.org_alfresco_module_dod5015.script.RecordsManagementScript">
         <property name="extensionName" value="rmService"/>               
         <property name="serviceRegistry" ref="ServiceRegistry"/>
-        <property name="recordsManagementService" ref="RecordsManagementService"/>
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
+    </bean>
+
+    <!-- This abstract base bean provides registration of action beans and some
+         service initialisation. -->
+    <bean id="RecordsManagementAction" abstract="true" init-method="init">
+        <property name="actionService" ref="ActionService"/>
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
+    </bean>
+    
+    <bean id="file" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionImpl" parent="RecordsManagementAction">
+        <property name="actionName" value="fileAction"/>
     </bean>
     
     <!-- Actions -->
@@ -80,7 +80,7 @@
     <bean id="recordManagementBehaviours" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementBehaviour" init-method="init">
         <property name="nodeService" ref="NodeService"/>
         <property name="policyComponent" ref="policyComponent"/>
-        <property name="recordsManagementService" ref="RecordsManagementService"/>
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
     </bean>
     
 </beans>

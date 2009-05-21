@@ -33,8 +33,8 @@ import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.jscript.Scopeable;
 import org.alfresco.repo.jscript.ScriptNode;
 import org.alfresco.repo.processor.BaseProcessorExtension;
@@ -73,7 +73,7 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	private ServiceRegistry services;
 	
 	/** Records management service */
-	private RecordsManagementService rmService;
+	private RecordsManagementActionService rmService;
     	
 	/**
 	 * Set the service registry
@@ -95,7 +95,7 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	 * 
 	 * @param rmService    records management service
 	 */
-	public void setRecordsManagementService(RecordsManagementService rmService)
+	public void setRecordsManagementActionService(RecordsManagementActionService rmService)
 	{
 	    this.rmService = rmService;
 	}
