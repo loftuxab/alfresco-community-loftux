@@ -153,7 +153,7 @@ ProjectID
 CB2C8E57-4826-4821-B9A1-7191DEB3B6CD
 
 ProjectVersion
-1.2.9.0
+1.2.12.0
 
 RMIPORT
 44100
@@ -231,25 +231,26 @@ test
 
 }
 FileGroup ::9C895371-373A-4923-840C-4F98632E4A99 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive} -name {Program Files} -parent FileGroups
-File ::D9F4C8FD-8ABF-4A83-89F9-53899BB3D24C -name W:/V21/root/projects/deployment/build/assemble/alfresco-core.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::B4F13A48-B7CB-432F-A5F2-88B942CBEF28 -name W:/V21/root/projects/deployment/build/assemble/alfresco-deployment.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::4237A356-22D6-4A34-9C61-9071508A7267 -name W:/V21/root/projects/deployment/build/assemble/readme.txt -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::F8C990F8-7588-42FB-8C8F-CB58E33D03E6 -name W:/V21/root/projects/installer/deployment.properties -location ../../projects/installer -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::5A5F76C5-7F49-4F69-B473-95096A76F43F -name W:/V21/root/projects/installer/application-context.xml -location ../../projects/installer -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::A07BFF00-FA26-415F-93CB-3C9003EAD050 -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/jug-lgpl-2.0.0.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::C7D50BBF-E90A-4F6D-8C87-71D2E1434A7D -name W:/HEAD/root/projects/deployment/build/assemble/commons-logging-1.1.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::DA8CA081-6BF7-4A85-8606-533A9D3199CA -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/shutdown-context.xml -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::A7F375FF-8C37-43E2-B948-1362422257B8 -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/log4j.properties -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::E08CBB53-49A4-4BFD-A113-6B7AA6BF6D27 -name C:/work/alfresco/HEAD/root/projects/deployment/build/assemble/log4j-1.2.15.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::97E7DF8D-0F81-40B7-9DB8-976729831894 -name W:/V3.1/root/projects/deployment/build/assemble/spring-2.0.8.jar -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27 -type dir -directory <%InstallDir%> -name W:/HEAD/root/projects/deployment/build/assemble -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::5B9B1393-ED55-4BF8-9F59-350FAB441A69 -name alfresco-core-3.2_Preview2.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::A43068D3-051A-4EC9-9F93-AE26024E953C -name alfresco-deployment-3.2_Preview2.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::C7342068-63FE-4996-BCE4-44CD0C160FC9 -name application-context.xml -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::9332B944-282A-4054-A32C-05C0B344E3AD -name commons-logging-1.1.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::3E62D3B3-7213-4496-AC4D-27EFA25CFF3C -name deploy_start.bat -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::6A92FF53-2C9E-4F80-A6AC-D5AF9EC7F265 -name deploy_start.sh -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::D756A317-E689-4B91-8A00-5FA3AB50D7E4 -name deploy_stop.bat -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::C8031DEC-6411-47AC-9435-55D038322DF9 -name deploy_stop.sh -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::4F6D4B42-E47F-4514-B425-373BA31B8BFE -name deployment.properties -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::3CF06863-240C-455B-9167-88330761A5FC -name jug-lgpl-2.0.0.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::BE561FCC-460C-4BC2-9F02-57C9A4C2DA19 -name log4j-1.2.15.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::2D030E00-66F1-48E3-81E1-F6BC667700DF -name log4j.properties -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::6FEF9DE5-5656-4FCF-A2C9-2BE2C981D367 -name readme.txt -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::7A500141-192D-4094-A46A-97F17BA0F65A -name shutdown-context.xml -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::6E531ACC-8C7D-4E45-8982-F10541E8C16C -name spring-2.0.8.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
 FileGroup ::03791E78-4713-45B0-8559-C66EA67DB28A -setup Install -active Yes -platforms Windows -name {Windows scripts} -parent FileGroups
-File ::D6EBA3BA-8849-4530-AF11-6B6B1BD0A40D -name W:/V21/root/projects/deployment/build/assemble/deploy_start.bat -location ../../projects/deployment/build/assemble -parent 03791E78-4713-45B0-8559-C66EA67DB28A
 File ::E1A99665-AF17-41BF-A38B-31FA8EA7631E -name W:/V21/root/installer/resources/alfresco.ico -location ../resources -parent 03791E78-4713-45B0-8559-C66EA67DB28A
-File ::B6805DD0-98F6-4DA6-B614-FCF98E46B36E -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/deploy_stop.bat -location ../../projects/deployment/build/assemble -parent 03791E78-4713-45B0-8559-C66EA67DB28A
 FileGroup ::C3FE0508-0773-40D6-97C4-1FE52205D032 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc TarArchive} -name {Linux scripts} -parent FileGroups
-File ::AB5D0DE2-7EE0-48D2-918E-7C6FBDA170E4 -name W:/V21/root/projects/deployment/build/assemble/deploy_start.sh -location ../../projects/deployment/build/assemble -parent C3FE0508-0773-40D6-97C4-1FE52205D032
 File ::3732B8FA-85C7-4A5B-AE7F-5E51AB3765F5 -name W:/V21/root/installer/resources/AlfrescoLogo32.gif -location ../resources -parent C3FE0508-0773-40D6-97C4-1FE52205D032
-File ::00F58278-BEE8-4ED2-8165-EBE3A1BFFE25 -name C:/work/alfresco/V2.2/root/projects/deployment/build/assemble/deploy_stop.sh -location ../../projects/deployment/build/assemble -parent C3FE0508-0773-40D6-97C4-1FE52205D032
 Component ::A92DA43F-C102-49A4-89FB-F2A2B18949D1 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name {Default Component} -parent Components
 SetupType ::F6005EED-F116-409B-82E7-662D4A7065E8 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Typical -parent SetupTypes
 SetupType ::840E153B-F29E-4184-8941-3C26F456EB0D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Custom -parent SetupTypes
@@ -1053,6 +1054,9 @@ ADBC8B6B-4BA4-4D31-9056-AC20948CD4D2,String
 AIX-ppc,Active
 No
 
+AIX-ppc,BuildSeparateArchives
+No
+
 AIX-ppc,DefaultDirectoryPermission
 0755
 
@@ -1153,7 +1157,7 @@ C3FE0508-0773-40D6-97C4-1FE52205D032,Destination
 <%InstallDir%>
 
 C3FE0508-0773-40D6-97C4-1FE52205D032,FileSize
-4668
+4736
 
 C3FE0508-0773-40D6-97C4-1FE52205D032,Name
 {Linux scripts}
@@ -1350,6 +1354,9 @@ FFD2219F-EE00-42D2-9AAC-6BBF1EFA38E1,Conditions
 FreeBSD-4-x86,Active
 No
 
+FreeBSD-4-x86,BuildSeparateArchives
+No
+
 FreeBSD-4-x86,DefaultDirectoryPermission
 0755
 
@@ -1399,6 +1406,9 @@ FreeBSD-4-x86,RootInstallDir
 /usr/local/<%ShortAppName%>
 
 FreeBSD-x86,Active
+No
+
+FreeBSD-x86,BuildSeparateArchives
 No
 
 FreeBSD-x86,DefaultDirectoryPermission
@@ -1452,6 +1462,9 @@ FreeBSD-x86,RootInstallDir
 HPUX-hppa,Active
 No
 
+HPUX-hppa,BuildSeparateArchives
+No
+
 HPUX-hppa,DefaultDirectoryPermission
 0755
 
@@ -1502,6 +1515,9 @@ HPUX-hppa,RootInstallDir
 
 Linux-x86,Active
 Yes
+
+Linux-x86,BuildSeparateArchives
+No
 
 Linux-x86,DefaultDirectoryPermission
 0755
@@ -1554,6 +1570,9 @@ Linux-x86,RootInstallDir
 Solaris-sparc,Active
 No
 
+Solaris-sparc,BuildSeparateArchives
+No
+
 Solaris-sparc,DefaultDirectoryPermission
 0755
 
@@ -1603,6 +1622,9 @@ Solaris-sparc,RootInstallDir
 /usr/local/<%ShortAppName%>
 
 TarArchive,Active
+No
+
+TarArchive,BuildSeparateArchives
 No
 
 TarArchive,CompressionLevel
@@ -1665,8 +1687,14 @@ TarArchive,VirtualTextMap
 Windows,Active
 Yes
 
+Windows,BuildSeparateArchives
+No
+
 Windows,Executable
 <%ShortAppName%><%Codeline%>-<%Version%>-Setup<%Ext%>
+
+Windows,FileDescription
+{<%AppName%> <%Version%> Setup}
 
 Windows,IncludeTWAPI
 No
@@ -1702,6 +1730,9 @@ Windows,WindowsIcon
 {Setup Blue Screen.ico}
 
 ZipArchive,Active
+No
+
+ZipArchive,BuildSeparateArchives
 No
 
 ZipArchive,CompressionLevel
