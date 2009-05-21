@@ -147,6 +147,7 @@
          <associations>
             
             <child-association name="rma:dispositionActions">
+                <title>Disposition Actions</title>
                 <source>
                     <mandatory>false</mandatory>
                     <many>false</many>
@@ -191,6 +192,7 @@
                <title>Disposition Period</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <default>none|0</default>
             </property> 
             
             <property name="rma:dispositionPeriodProperty">
@@ -620,7 +622,7 @@
          <title>Cut Off</title>         
          <properties>                
             <property name="rma:cutOffDate">
-               <title>Cut Of Date</title>
+               <title>Cut Off Date</title>
                <type>d:date</type>
                <mandatory>true</mandatory>
             </property>

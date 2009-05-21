@@ -3,7 +3,9 @@
    <config>
       <forms>
          <dependencies>
+            <js src="/components/form/disposition-actions.js" />
             <css src="/components/form/period.css" />
+            <css src="/components/form/disposition-actions.css" />
          </dependencies>
       </forms>
    </config>
@@ -24,9 +26,9 @@
          <form>
             <field-visibility>
                <show id="cm:name" />
-               <show id="rma:identifier" />
                <show id="cm:title" />
                <show id="cm:description" />
+               <show id="rma:identifier" />
             </field-visibility>
          </form>
       </forms>
@@ -37,29 +39,20 @@
          <form>
             <field-visibility>
                <show id="cm:name" />
-               <show id="rma:identifier" />
                <show id="cm:title" />
                <show id="cm:description" />
+               <show id="rma:identifier" />
                <show id="rma:dispositionAuthority" />
                <show id="rma:dispositionInstructions" />
-               <show id="rma:cutOffSchedulePeriod" />
-               <show id="rma:retentionSchedulePeriod" />
-               <show id="rma:accessionIndicator" />
-               <show id="rma:accessionLocation" />
-               <show id="rma:accessionPeriod" />
                <show id="rma:reviewPeriod" />
                <show id="rma:dispositionActions" />
             </field-visibility>
             <appearance>
-               <field id="rma:dispositionActions" label="Disposition Actions" />
-               <field id="rma:cutOffSchedulePeriod">
-                  <control template="controls/period.ftl" />
+               <field id="rma:dispositionInstructions">
+                  <control template="controls/textarea.ftl" />
                </field>
-               <field id="rma:retentionSchedulePeriod">
-                  <control template="controls/period.ftl" />
-               </field>
-               <field id="rma:accessionPeriod">
-                  <control template="controls/period.ftl" />
+               <field id="rma:dispositionActions">
+                  <control template="controls/disposition-actions.ftl" />
                </field>
                <field id="rma:reviewPeriod">
                   <control template="controls/period.ftl" />
@@ -74,9 +67,9 @@
          <form>
             <field-visibility>
                <show id="cm:name" />
-               <show id="rma:identifier" />
                <show id="cm:title" />
                <show id="cm:description" />
+               <show id="rma:identifier" />
                <show id="rma:recordFolderLocation" />
                <show id="rma:recordFolderSupplementalMarkingList" />
                <show id="rma:isClosed" />
@@ -96,6 +89,7 @@
          <form>
             <field-visibility>
                <!-- Record Aspect -->
+               <show id="rma:identifier" />
                <show id="rma:dateFiled" />
                <show id="rma:publicationDate" />
                <show id="rma:originator" />
