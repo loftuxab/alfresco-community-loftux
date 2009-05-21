@@ -21,7 +21,7 @@
 {
    margin: 0 -10px;
    background-color: #CCCCCC;
-   padding: 10px 24px 16px;
+   padding: 10px 24px 12px;
    line-height: 2em;
 }
 
@@ -38,30 +38,60 @@
 
 .report .designation
 {
+   height: 12em;
    border-right: 1px solid #AAAAAA;
-   padding-right: 4em;
+   padding: 0 4em 0 1em;
 }
 
 .report .approved
 {
+   height: 12em;
    border-right: 1px solid #AAAAAA;
    padding: 0 4em;
 }
 
 .report .reviewed
 {
-   padding-left: 4em;
+   height: 12em;
+   padding: 0 1em 0 4em;
+}
+
+.report .calendar
+{
+   display: none;
 }
 
 .report .create-report
 {
    border-top: 1px solid #AAAAAA;
+   padding-top: 12px;
+}
+
+.report .datelabel
+{
+   float: left;
+}
+
+.report .dateview
+{
+   margin-left: 4em;
+}
+
+.report .dateview img
+{
+   cursor: pointer;
 }
 
 .report label
 {
    padding-left: 4px;
    vertical-align: 5%;
+}
+
+.report .date input
+{
+   width: 12em;
+   border: 1px solid #AAAAAA;
 }
 
 .report .results

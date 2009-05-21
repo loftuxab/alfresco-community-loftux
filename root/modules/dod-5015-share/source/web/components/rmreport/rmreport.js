@@ -59,7 +59,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "calendar", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
       
       return this;
    };
@@ -164,6 +164,30 @@
       onReady: function Search_onReady()
       {
          var me = this;
+         
+         // function to setup calendar localisation properties
+         var calendarSetup = function calendarSetup(cal)
+         {
+            cal.cfg.setProperty("MONTHS_SHORT", me._msg("months.short").split(","));
+            cal.cfg.setProperty("MONTHS_LONG", me._msg("months.long").split(","));
+            cal.cfg.setProperty("WEEKDAYS_1CHAR", me._msg("days.initial").split(","));
+            cal.cfg.setProperty("WEEKDAYS_SHORT", me._msg("days.short").split(","));
+            cal.cfg.setProperty("WEEKDAYS_MEDIUM", me._msg("days.medium").split(","));
+            cal.cfg.setProperty("WEEKDAYS_LONG", me._msg("days.long").split(","));
+            cal.render();
+         };
+         
+         // Generate calendar controls
+         this.widgets.approvedFromCalendar = new YAHOO.widget.Calendar(this.id + "-approved-from");
+         calendarSetup(this.widgets.approvedFromCalendar);
+         this.widgets.approvedToCalendar = new YAHOO.widget.Calendar(this.id + "-approved-to");
+         calendarSetup(this.widgets.approvedToCalendar);
+         this.widgets.reviewedFromCalendar = new YAHOO.widget.Calendar(this.id + "-reviewed-from");
+         calendarSetup(this.widgets.reviewedFromCalendar);
+         this.widgets.reviewedToCalendar = new YAHOO.widget.Calendar(this.id + "-reviewed-to");
+         calendarSetup(this.widgets.reviewedToCalendar);
+         // TODO: bind events
+         //this.widgets.approvedFromCalendar.selectEvent.subscribe(this.onDateSelected, this, true);
          
          // DataSource definition
          var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/rmsearch?";
