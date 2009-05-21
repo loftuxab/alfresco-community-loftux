@@ -49,14 +49,14 @@
                        <rma:dispositionActions>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionPeriod>month|1</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}dateFiled</rma:dispositionPeriodProperty>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>month|1</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                 </view:properties>                              
@@ -94,14 +94,14 @@
                        <rma:dispositionActions>                        
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionPeriod>month|3</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}dateFiled</rma:dispositionPeriodProperty>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>month|3</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                 </view:properties>                              
@@ -137,14 +137,14 @@
                        <rma:dispositionActions>                        
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionPeriod>fyend|1</rma:dispositionPeriod>                                    
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}dateFiled</rma:dispositionPeriodProperty>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>year|3</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                 </view:properties>                              
@@ -180,14 +180,14 @@
                        <rma:dispositionActions>                        
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionPeriod>yearend|1</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}dateFiled</rma:dispositionPeriodProperty>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>year|2</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                 </view:properties>                              
@@ -240,13 +240,13 @@
                        <rma:dispositionActions>                        
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionEvent>Superseded</rma:dispositionEvent>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>year|5</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                 </view:properties>                              
@@ -274,13 +274,13 @@
                        <rma:dispositionActions>                        
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionEvent>No longer needed</rma:dispositionEvent>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>immediate|0</rma:dispositionPeriod>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
@@ -322,13 +322,13 @@
                        <rma:dispositionActions>                        
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionEvent>Position is abolished, re-designated or no londer needed.</rma:dispositionEvent>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>immediately|0</rma:dispositionPeriod>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
@@ -387,13 +387,13 @@
                        <rma:dispositionActions>                        
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionEvent>Superseded</rma:dispositionEvent>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>immediately|0</rma:dispositionPeriod>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
@@ -422,13 +422,13 @@
                         <rma:dispositionActions>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionEvent>Completion of case</rma:dispositionEvent>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>transfer</rma:dispositionAction>
+                                    <rma:dispositionActionName>transfer</rma:dispositionActionName>
                                     <rma:dispositionDescription>Retire to offline storage.</rma:dispositionDescription>
                                     <rma:dispositionPeriod>year|2</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
@@ -436,7 +436,7 @@
                             </rma:dispositionAction>                         
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>transfer</rma:dispositionAction>
+                                    <rma:dispositionActionName>transfer</rma:dispositionActionName>
                                     <rma:dispositionDescription>Transfer to federal records holding area.</rma:dispositionDescription>
                                     <rma:dispositionPeriod>year|5</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}previousActionDate</rma:dispositionPeriodProperty>
@@ -444,7 +444,7 @@
                             </rma:dispositionAction>                         
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>transferNARA</rma:dispositionAction>
+                                    <rma:dispositionActionName>transferNARA</rma:dispositionActionName>
                                     <rma:dispositionDescription>Transfer to NARA.</rma:dispositionDescription>
                                     <rma:dispositionPeriod>year|25</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
@@ -514,13 +514,13 @@
                                                    
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionEvent>Completion of WGI action or on separation, whichever is earlier</rma:dispositionEvent>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>year|3</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                 </view:properties>                              
@@ -556,20 +556,20 @@
                        <rma:dispositionActions>  
                             <rma:dispositionAction view:childName="rma:dispositionAction">                            
                                 <view:properties>
-                                    <rma:dispositionAction>retain</rma:dispositionAction>
+                                    <rma:dispositionActionName>retain</rma:dispositionActionName>
                                     <rma:dispositionEvent>All allowances granted are terminated</rma:dispositionEvent>
                                 </view:properties>                              
                             </rma:dispositionAction>                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionPeriod>fyend|1</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}previousActionDate</rma:dispositionPeriodProperty>
                                 </view:properties>                               
                             </rma:dispositionAction>                                                     
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>year|3</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                 </view:properties>                              
@@ -622,14 +622,14 @@
                        <rma:dispositionActions>                                                                          
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionPeriod>year|1</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}dateFiled</rma:dispositionPeriodProperty>
                                 </view:properties>                              
                             </rma:dispositionAction>                                                      
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>year|5</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                     <rma:dispositionEvent>Obsolete</rma:dispositionEvent>
@@ -680,13 +680,13 @@
                        <rma:dispositionActions>                                                       
                             <rma:dispositionAction view:childName="rma:dispositionAction">                            
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionEvent>Related record is transferred to inactive storage</rma:dispositionEvent>
                                 </view:properties>                              
                             </rma:dispositionAction>                                                                           
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>year|1</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                 </view:properties>                              
@@ -713,13 +713,13 @@
                        <rma:dispositionActions>                                                      
                             <rma:dispositionAction view:childName="rma:dispositionAction">                            
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionEvent>Training complete</rma:dispositionEvent>
                                 </view:properties>                              
                             </rma:dispositionAction>                                                                           
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>destroy</rma:dispositionAction>
+                                    <rma:dispositionActionName>destroy</rma:dispositionActionName>
                                     <rma:dispositionPeriod>year|1</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                 </view:properties>                              
@@ -765,13 +765,13 @@
                        <rma:dispositionActions>                                                      
                             <rma:dispositionAction view:childName="rma:dispositionAction">                            
                                 <view:properties>
-                                    <rma:dispositionAction>cutoff</rma:dispositionAction>
+                                    <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionEvent>Study complete</rma:dispositionEvent>
                                 </view:properties>                              
                             </rma:dispositionAction>                                                                           
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>transfer</rma:dispositionAction>
+                                    <rma:dispositionActionName>transfer</rma:dispositionActionName>
                                     <rma:dispositionDescription>Transfer to inactive storage.</rma:dispositionDescription>
                                     <rma:dispositionPeriod>year|5</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
@@ -779,7 +779,7 @@
                             </rma:dispositionAction>                                                                           
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
                                 <view:properties>
-                                    <rma:dispositionAction>transferNARA</rma:dispositionAction>
+                                    <rma:dispositionActionName>transferNARA</rma:dispositionActionName>
                                     <rma:dispositionDescription>Transfer to NARA.</rma:dispositionDescription>
                                     <rma:dispositionPeriod>year|25</rma:dispositionPeriod>
                                     <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
