@@ -128,7 +128,7 @@
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Search} returns 'this' for method chaining
+       * @return {Alfresco.RecordsSearch} returns 'this' for method chaining
        */
       setOptions: function Search_setOptions(obj)
       {
@@ -141,7 +141,7 @@
        *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Search} returns 'this' for method chaining
+       * @return {Alfresco.RecordsSearch} returns 'this' for method chaining
        */
       setMessages: function Search_setMessages(obj)
       {
@@ -437,24 +437,6 @@
       },
 
       /**
-       * Constructs the browse url for a given record.
-       */
-      _getBrowseUrlForRecord: function (oRecord)
-      {
-         var url = "#";
-         if (oRecord.getData("browseUrl") !== undefined)
-         {
-            // browse urls always go to a page. We assume that the url contains the page name and all
-            // parameters. What we have to add is the absolute path and the site param
-            // PENDING: could we somehow make use of Alfresco.constants.URI_TEMPLATES and pass
-            //          the pageid and param list separately?
-            var site = oRecord.getData("site");
-            url = Alfresco.constants.URL_PAGECONTEXT + "site/" + site.shortName + "/" + oRecord.getData("browseUrl");
-         }
-         return url;
-      },
-
-      /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
        * Disconnected event handlers for inter-component event notification
        */
@@ -469,8 +451,8 @@
       _setDefaultDataTableErrors: function Search__setDefaultDataTableErrors(dataTable)
       {
          var msg = Alfresco.util.message;
-         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.Search"));
-         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.Search"));
+         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.RecordsSearch"));
+         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.RecordsSearch"));
       },
       
       /**
