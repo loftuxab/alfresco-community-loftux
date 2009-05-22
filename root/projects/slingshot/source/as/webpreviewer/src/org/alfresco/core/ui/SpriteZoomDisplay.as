@@ -191,7 +191,7 @@ package org.alfresco.core.ui
 				// Add drag n drop event listeners		
 	   			sprite.addEventListener(MouseEvent.MOUSE_DOWN, startSpriteDrag);
 				
-				// Show mouse cursor as hand if		
+				// Show mouse cursor as hand if	dragging is enabled	
 				sprite.addEventListener(MouseEvent.ROLL_OVER, function (event:Event):void
 				{				
 					if (draggingEnabled)
@@ -340,8 +340,7 @@ package org.alfresco.core.ui
 		{	
 			// Make sure sprite is moved in relation to the new scrollbar position		
 			vsbUpdated = true;
-			invalidateDisplayList();
-			trace(this._sprite.y);	
+			invalidateDisplayList();			
 		}		
 
 
@@ -615,27 +614,21 @@ package org.alfresco.core.ui
         	_sprite.scaleX = spriteNewZoom;
         	_sprite.scaleY = spriteNewZoom;
         	
-        	// Get screen context after updating objects dimensions
+        	// Get screen context after updating objects dimensions 
         	var ctx:SpriteZoomDisplayContext = getZoomSpriteDisplayContext();
-        		            	
-    		/**
-    		 * The content is higher than the screen height, 
-    		 * let the user of this component decide if it shall be 
-    		 * vertically centered (suitable for an images) or 
-    		 * aligned to the top (suitable for a documents).
-    		 */
-        	if (ctx.overflowY)
+        		            	    		
+    		if (this.verticalDefaultPosition == "top")
         	{
-        		if (this.verticalDefaultPosition == "top")
-	        	{
-	        		_sprite.y = 0;
-	        	}
-	        	else
-	        	{
-	            	_sprite.y = (ctx.screenHeight / 2) - (_sprite.height / 2)	            			            		            	
-	        	}
-	        }
-        	// Center the object on the screen
+        		// Place object on top of screen
+        		_sprite.y = 0;
+        	}
+        	else
+        	{
+        		// Center object vertically 
+            	_sprite.y = (ctx.screenHeight / 2) - (_sprite.height / 2)	            			            		            	
+        	}
+
+        	// Center the object horizontally on the screen
 			_sprite.x = (ctx.screenWidth / 2) - (_sprite.width / 2);										
         }
 
