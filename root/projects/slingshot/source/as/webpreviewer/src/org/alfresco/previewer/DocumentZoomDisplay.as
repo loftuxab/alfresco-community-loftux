@@ -191,6 +191,7 @@ package org.alfresco.previewer
     	    {	    	        	        	   
     	    	preloader = MovieClipAsset(new Preloader());
     	    }
+    	    this.verticalDefaultPosition
     	    sprite = preloader;										
 		}
 		
