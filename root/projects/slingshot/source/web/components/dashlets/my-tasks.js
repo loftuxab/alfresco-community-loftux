@@ -57,6 +57,7 @@
 
       // Initialise prototype properties
       this.widgets = {};
+      this.activeTaskTransitions = {};
 
       // Register this component
       Alfresco.util.ComponentManager.register(this);
@@ -69,6 +70,7 @@
 
    Alfresco.MyTasks.prototype =
    {
+
       /**
        * Object container for initialization options
        *
@@ -102,6 +104,14 @@
        * @type object
        */
       taskList: null,
+
+      /**
+       *
+       *
+       * @property: activeTaskTransitions
+       * @type: object
+       */
+      activeTaskTransitions: null,
 
       /**
        * Set messages for this component.
@@ -227,6 +237,8 @@
        */
       onTasksLoaded: function MyTasks_onTasksLoaded(p_response, p_obj)
       {
+         // Reset transition so we don't stop any transitions from being sent
+         this.activeTaskTransitions = {};
          this.options.activeFilter = p_obj;
          this.taskList.innerHTML = p_response.serverResponse.responseText;
       },
@@ -237,6 +249,8 @@
        */
       onTasksLoadFailed: function MyTasks_onTasksLoadFailed()
       {
+         // Reset transition so we don't stop any transitions from being sent
+         this.activeTaskTransitions = {};
          this.taskList.innerHTML = '<div class="detail-list-item first-item last-item"><span>' + this._msg("label.load-failed") + '</span></div>';
       },
       
@@ -270,13 +284,12 @@
       
       /**
        * Task transitioned successfully
-       * @method onTaskTransitioned
+       * @method onTaskTransitionSuccess
        */
-      onTaskTransitioned: function MyTasks_onTaskTransitioned()
+      onTaskTransitionSuccess: function MyTasks_onTaskTransitionSuccess()
       {
          this.populateTaskList(this.options.activeFilter);
       },
-
 
       /**
        * YUI WIDGET EVENT HANDLERS
@@ -373,9 +386,12 @@
             }
 
          }
-         
-         if (taskId !== null)
+
+         if (taskId !== null && !this.activeTaskTransitions[taskId])
          {
+            // Set this taskId to true so we don't send multiple calls for the same task
+            this.activeTaskTransitions[taskId] = true;
+
             var url = YAHOO.lang.substitute("api/workflow/task/end/{taskId}{transitionId}",
             {
                taskId: taskId,
@@ -389,10 +405,21 @@
                method: "post",
                successCallback:
                {
-                  fn: this.onTaskTransitioned,
+                  fn: function()
+                  {
+                     this.onTaskTransitionSuccess();
+                  },
                   scope: this
                },
                successMessage: this._msg("transition.success"),
+               failureCallback:
+               {
+                  fn: function()
+                  {
+                     this.activeTaskTransitions[taskId] = false
+                  },
+                  scope: this
+               },
                failureMessage: this._msg("transition.failure"),
                scope: this
             });
