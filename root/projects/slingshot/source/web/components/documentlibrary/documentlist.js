@@ -67,6 +67,10 @@
 
       // Initialise prototype properties
       this.widgets = {};
+      this.state =
+      {
+         actionEditOfflineActive: false
+      };
       this.currentFilter =
       {
          filterId: "path",
@@ -269,7 +273,23 @@
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document": true 
          }
       },
-      
+
+
+      /**
+       * Keeps track of different states
+       */
+      state: {
+
+         /**
+          * True if an an edit offline ajax call is in process
+          *
+          * @property: actionEditOfflineActive
+          * @type: boolean
+          * @default: false
+          */
+         actionEditOfflineActive: false
+      },
+
       /**
        * Current path being browsed.
        * 
@@ -1721,86 +1741,101 @@
        */
       onActionEditOffline: function DL_onActionEditOffline(row)
       {
-         var record = this.widgets.dataTable.getRecord(row),
-            path = record.getData("location").path,
-            fileName = record.getData("fileName"),
-            displayName = record.getData("displayName");
-
-         this.modules.actions.genericAction(
+         if(!this.state.actionEditOfflineActive)
          {
-            success:
+            // Make sure we don't call edit offline twice
+            this.state.actionEditOfflineActive = true;
+
+            var record = this.widgets.dataTable.getRecord(row),
+               path = record.getData("location").path,
+               fileName = record.getData("fileName"),
+               displayName = record.getData("displayName");
+            var me = this;
+            this.modules.actions.genericAction(
             {
-               event:
+               success:
                {
-                  name: "filterChanged",
-                  obj:
+                  event:
                   {
-                     filterId: "editingMe",
-                     filterOwner: "Alfresco.DocListFilter"
+                     name: "filterChanged",
+                     obj:
+                     {
+                        filterId: "editingMe",
+                        filterOwner: "Alfresco.DocListFilter"
+                     }
+                  },
+                  callback:
+                  {
+                     fn: function DL_oAEO_success(data)
+                     {
+                        me.state.actionEditOfflineActive = false;
+
+                        // The filterChanged event causes the DocList to update, so we need to run these functions afterwards
+                        var fnAfterUpdate = function DL_oAEO_success_afterUpdate()
+                        {
+                           var downloadUrl = Alfresco.constants.PROXY_URI + data.json.results[0].downloadUrl;
+                           if (YAHOO.env.ua.ie > 6)
+                           {
+                              // MSIE7 blocks the download and gets the wrong URL in the "manual download bar"
+                              Alfresco.util.PopupManager.displayPrompt(
+                              {
+                                 title: this._msg("message.edit-offline.success", displayName),
+                                 text: this._msg("message.edit-offline.success.ie7"),
+                                 buttons: [
+                                 {
+                                    text: this._msg("button.download"),
+                                    handler: function DL_oAEO_success_download()
+                                    {
+                                       window.location = downloadUrl;
+                                       this.destroy();
+                                    },
+                                    isDefault: true
+                                 },
+                                 {
+                                    text: this._msg("button.close"),
+                                    handler: function DL_oAEO_success_close()
+                                    {
+                                       this.destroy();
+                                    }
+                                 }]
+                              });
+                           }
+                           else
+                           {
+                              Alfresco.util.PopupManager.displayMessage(
+                              {
+                                 text: this._msg("message.edit-offline.success", displayName)
+                              });
+                              // Kick off the download 3 seconds after the confirmation message
+                              YAHOO.lang.later(3000, this, function()
+                              {
+                                 window.location = downloadUrl;
+                              });
+                           }
+                        };
+                        this.afterDocListUpdate.push(fnAfterUpdate);
+                     },
+                     scope: this
                   }
                },
-               callback:
+               failure:
                {
-                  fn: function DL_oAEO_success(data)
+                  callback:
                   {
-                     // The filterChanged event causes the DocList to update, so we need to run these functions afterwards
-                     var fnAfterUpdate = function DL_oAEO_success_afterUpdate()
+                     fn: function DL_oAEO_failure()
                      {
-                        var downloadUrl = Alfresco.constants.PROXY_URI + data.json.results[0].downloadUrl;
-                        if (YAHOO.env.ua.ie > 6)
-                        {
-                           // MSIE7 blocks the download and gets the wrong URL in the "manual download bar"
-                           Alfresco.util.PopupManager.displayPrompt(
-                           {
-                              title: this._msg("message.edit-offline.success", displayName),
-                              text: this._msg("message.edit-offline.success.ie7"),
-                              buttons: [
-                              {
-                                 text: this._msg("button.download"),
-                                 handler: function DL_oAEO_success_download()
-                                 {
-                                    window.location = downloadUrl;
-                                    this.destroy();
-                                 },
-                                 isDefault: true
-                              },
-                              {
-                                 text: this._msg("button.close"),
-                                 handler: function DL_oAEO_success_close()
-                                 {
-                                    this.destroy();
-                                 }
-                              }]
-                           });
-                        }
-                        else
-                        {
-                           Alfresco.util.PopupManager.displayMessage(
-                           {
-                              text: this._msg("message.edit-offline.success", displayName)
-                           });
-                           // Kick off the download 3 seconds after the confirmation message
-                           YAHOO.lang.later(3000, this, function()
-                           {
-                              window.location = downloadUrl;
-                           });
-                        }
-                     };
-                     this.afterDocListUpdate.push(fnAfterUpdate);
+                        me.state.actionEditOfflineActive = false;
+                     }
                   },
-                  scope: this
+                  message: this._msg("message.edit-offline.failure", displayName)
+               },
+               webscript:
+               {
+                  name: $combine("checkout/site", this.options.siteId, this.options.containerId, path, fileName),
+                  method: Alfresco.util.Ajax.POST
                }
-            },
-            failure:
-            {
-               message: this._msg("message.edit-offline.failure", displayName)
-            },
-            webscript:
-            {
-               name: $combine("checkout/site", this.options.siteId, this.options.containerId, path, fileName),
-               method: Alfresco.util.Ajax.POST
-            }
-         });
+            });
+         }
       },
       
       /**
@@ -2049,7 +2084,7 @@
             });
          }
          else
-         {
+         {            
             this.modules.permissions.setOptions(
             {
                path: this.currentPath,

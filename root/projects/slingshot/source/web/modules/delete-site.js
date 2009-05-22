@@ -59,6 +59,9 @@
          throw new Error("An instance of Alfresco.module.DeleteSite already exists.");
       }
 
+      // Set prototype properties
+      this.deletePromptActive = false;
+
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
 
@@ -70,7 +73,16 @@
 
    Alfresco.module.DeleteSite.prototype =
    {
+      /**
+       * Will become true when the template (that sets the i18n messages)
+       * to this module has been loaded.
+       */
       localized: false,
+
+      /**
+       * Makes sure the dialog isn't displayed twice at the same time
+       */
+      deletePromptActive: false,
 
       /**
        * Fired by YUILoaderHelper when required component script files have
@@ -139,34 +151,39 @@
 
       _showDialog: function DS__showDialog(config)
       {
-         var me = this;
-         var c = config;
-         Alfresco.util.PopupManager.displayPrompt(
+         if(!this.deletePromptActive)
          {
-            title: Alfresco.util.message("title.deleteSite", this.name),
-            text: Alfresco.util.message("label.deleteSite", this.name,
+            this.deletePromptActive = true;
+            var me = this;
+            var c = config;
+            Alfresco.util.PopupManager.displayPrompt(
             {
-               "0": Alfresco.util.encodeHTML(c.site.title)
-            }),
-            noEscape: true,
-            buttons: [
+               title: Alfresco.util.message("title.deleteSite", this.name),
+               text: Alfresco.util.message("label.deleteSite", this.name,
                {
-                  text: Alfresco.util.message("button.delete", this.name),
-                  handler: function DS_delete()
+                  "0": Alfresco.util.encodeHTML(c.site.title)
+               }),
+               noEscape: true,
+               buttons: [
                   {
-                     this.destroy();
-                     me._onDeleteClick.call(me, c);
-                  }
-               },
-               {
-                  text: Alfresco.util.message("button.cancel", this.name),
-                  handler: function DL_cancel()
-                  {
-                     this.destroy();
+                     text: Alfresco.util.message("button.delete", this.name),
+                     handler: function DS_delete()
+                     {                        
+                        this.destroy();
+                        me._onDeleteClick.call(me, c);
+                     }
                   },
-                  isDefault: true
-               }]
-         });
+                  {
+                     text: Alfresco.util.message("button.cancel", this.name),
+                     handler: function DL_cancel()
+                     {
+                        me.deletePromptActive = false;
+                        this.destroy();
+                     },
+                     isDefault: true
+                  }]
+            });
+         }
       },
       
       _onDeleteClick: function DS__onDeleteClick(config)
@@ -191,6 +208,7 @@
                   text: Alfresco.util.message("button.no", this.name),
                   handler: function DL_cancel()
                   {
+                     me.deletePromptActive = false;
                      this.destroy();
                   },
                   isDefault: true
@@ -209,6 +227,7 @@
          });
          
          // user has confirmed, perform the actual delete
+         var me = this;
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.URL_SERVICECONTEXT + "modules/delete-site",
@@ -223,6 +242,7 @@
             {
                fn: function(response)
                {
+                  me.deletePromptActive = false;
                   feedbackMessage.destroy();
                   if (response.json && response.json.success)
                   {
@@ -251,6 +271,7 @@
             {
                fn: function(response)
                {
+                  me.deletePromptActive = false;
                   feedbackMessage.destroy();
                   Alfresco.util.PopupManager.displayMessage(
                   {

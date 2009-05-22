@@ -57,6 +57,9 @@
          throw new Error("An instance of Alfresco.module.EditSite already exists.");
       }
 
+      // Set protype variables
+      this.editPanelActive = false;
+
       // Register this component
       Alfresco.util.ComponentManager.register(this);
 
@@ -68,6 +71,15 @@
 
    Alfresco.module.EditSite.prototype =
    {
+
+      /**
+       * True if the delete prompt is shown
+       *
+       * @property: visible
+       * @type: boolean
+       */
+      editPanelActive: false,
+
       /**
        * Object container for storing YUI widget instances.
        * 
@@ -130,39 +142,46 @@
        */
       show: function CS_show(config)
       {
-         // Merge the supplied config with default config and check mandatory properties
-         this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
-         if (this.showConfig.shortName === undefined)
+         if(!this.editPanelActive)
          {
-            throw new Error("A shortName must be provided");
-         }
+            // Set editPanelActive to true so we don't open multiple dialogs
+            this.editPanelActive = true;
 
-         if (this.widgets.panel)
-         {
-            this.widgets.panel.destroy();
-            this.widgets = {};
-         }
+            // Merge the supplied config with default config and check mandatory properties
+            this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
+            if (this.showConfig.shortName === undefined)
+            {
+               this.editPanelActive = false;
+               throw new Error("A shortName must be provided");
+            }
 
-         /**
-          * Load the gui and site info from the server and let the templateLoaded() method
-          * handle the rest.
-          */
-         Alfresco.util.Ajax.request(
-         {
-            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/edit-site",
-            dataObj:
+            if (this.widgets.panel)
             {
-               htmlid: this.id,
-               shortName: this.showConfig.shortName
-            },
-            successCallback:
+               this.widgets.panel.destroy();
+               this.widgets = {};
+            }
+
+            /**
+             * Load the gui and site info from the server and let the templateLoaded() method
+             * handle the rest.
+             */
+            Alfresco.util.Ajax.request(
             {
-               fn: this.onTemplateLoaded,
-               scope: this
-            },
-            execScripts: true,
-            failureMessage: "Could not load edit site template"
-         });
+               url: Alfresco.constants.URL_SERVICECONTEXT + "modules/edit-site",
+               dataObj:
+               {
+                  htmlid: this.id,
+                  shortName: this.showConfig.shortName
+               },
+               successCallback:
+               {
+                  fn: this.onTemplateLoaded,
+                  scope: this
+               },
+               execScripts: true,
+               failureMessage: "Could not load edit site template"
+            });
+         }
       },
 
       /**
@@ -296,6 +315,7 @@
       onCancelButtonClick: function CS_onCancelButtonClick(type, args)
       {
          this.widgets.panel.hide();
+         this.editPanelActive = false;
       },
 
       /**
