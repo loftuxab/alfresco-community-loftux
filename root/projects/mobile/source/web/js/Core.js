@@ -55,6 +55,27 @@ Mobile.util.extend = function extend(subc, superc, overrides) {
     return subc;
 };
 /**
+ * Substitutes named tokens within specified string.
+ * 
+ * @param {String} s String to substitute tokens within
+ * @param {Object} o Object with keys containing values that should replace tokens in specified string
+ * 
+ * @returns {Object} Object literal with new string (s) and a flag (isFullyResolved) denoting whether all tokens in string was replaced
+ */ 
+Mobile.util.substitute = function substitute(s,o)
+{
+  var token = new RegExp('{(.*?)}','g');
+  s.replace(token,function(token,key,pos,string) {
+    if (o[key]!==undefined) {
+      s = s.replace(token,o[key]);
+    }
+  });
+  return {
+    s:s,
+    isFullyResolved : (s.match(token)==null)
+  };
+};
+/**
  * Provides AOP style functionality (before,after,around)
  *  
  */

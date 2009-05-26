@@ -145,9 +145,10 @@ function(){
           (window.orientation ==0 | window.orientation==180) ? bodyEl.removeClass('landscape').addClass('portrait') : bodyEl.removeClass('portrait').addClass('landscape');
           App.hideBrowserNavBar();
         },
-        hideBrowserNavBar : function hideBrowserNavBar()
+        hideBrowserNavBar : function hideBrowserNavBar(timeout)
         {
-          window.scrollTo(0,1);
+          var timeout = timeout || 100;
+          setTimeout(function() { window.scrollTo(0, 1) }, timeout);
           return this;
         },
         registerBehaviour : function registerBehaviour(name,behaviour)

@@ -19,9 +19,9 @@
               <div id="ShareUser" class="active">
                 <form action="${url.context}/p/home" method="post">
                   <label for="name">${msg('label.name')}:</label>
-                  <input type="text" id="name" name="name" value=""/>
+                  <input type="text" id="name" name="name" value="" class="typeAhead"/>
                   <label for="role">${msg('label.role')}:</label>
-                    <select name="role" id="role" size="1">
+                    <select name="role" id="role" size="1" class="typeAheadTrigger">
                       <option value="SiteManager">${msg('label.manager')}</option>
                       <option value="SiteCollaborator">${msg('label.collaborator')}</option>
                       <option value="SiteContributer">${msg('label.contributer')}</option>

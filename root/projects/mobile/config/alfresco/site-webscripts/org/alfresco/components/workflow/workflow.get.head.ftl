@@ -1,7 +1,12 @@
-<script type="text/javascript" src="${url.context}/js/spinningwheel.js"></script>
+<script type="text/javascript" src="${url.context}/js/thirdparty/spinningwheel.js"></script>
+<script type="text/javascript" charset="utf-8" src="${url.context}/js/typeahead.js"></script>
+<script type="text/javascript" charset="utf-8" src="${url.context}/js/finder.js"></script>
+<script type="text/javascript" charset="utf-8" src="${url.context}/js/thirdparty/iscroll.js"></script>
+<link rel="stylesheet" href="${url.context}/themes/${theme}/typeahead.css" type="text/css" charset="utf-8">
 <script type="text/javascript" charset="utf-8">//<![CDATA[
    window.addEventListener('DOMContentLoaded',function()
       {
+         App.initBehaviour(Mobile.util.TypeAhead.BEHAVIOUR_NAME);            
          App.registerBehaviour('datePicker',function(rootNode)
             {
                x$(rootNode).find('.datepicker').each(function(el) {
@@ -18,7 +23,7 @@
                    for( i = date.getFullYear(),end=date.getFullYear()+5; i < end; i++ ) {
                      years[i] = i;
                    }
-
+                   var SpinningWheel = Mobile.thirdparty.SpinningWheel;
                    SpinningWheel.addSlot(years, 'right', date.getFullYear());
                    SpinningWheel.addSlot(months, '', date.getMonth());
                    SpinningWheel.addSlot(days, 'right', date.getDate());

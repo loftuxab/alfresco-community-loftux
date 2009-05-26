@@ -19,7 +19,7 @@
            <h2>${msg('Description')}</h2>
            <textarea name="description" rows="4" cols="40"></textarea>
            <h2>${msg('User')}</h2>
-           <input type="text" value="" name="user"/>
+           <input type="text" value="" name="user" class="typeAhead"/>
            <h2>${msg('Due Date')}</h2>
            <input name="datePicker" id="datePicker" value="${msg('Pick Due Date')}" type="button" class="datepicker"/>
            <div>
