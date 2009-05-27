@@ -304,4 +304,23 @@ public class CMISObject extends ExtensibleElementWrapper
         return getProperties().find(CMISConstants.PROP_CONTENT_STREAM_URI);
     }
     
+    /**
+     * Source Id (Relationship)
+     * 
+     * @return  source id property
+     */
+    public CMISProperty getSourceId()
+    {
+        return getProperties().find(CMISConstants.PROP_SOURCE_ID);
+    }
+    
+    /**
+     * Target Id (Relationship)
+     * 
+     * @return  target id property
+     */
+    public CMISProperty getTargetId()
+    {
+        return getProperties().find(CMISConstants.PROP_TARGET_ID);
+    }
 }

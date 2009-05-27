@@ -136,6 +136,8 @@ public interface CMISConstants
     public static final String PROP_CONTENT_STREAM_MIMETYPE = "ContentStreamMimetype";
     public static final String PROP_CONTENT_STREAM_FILENAME = "ContentStreamFilename";
     public static final String PROP_CONTENT_STREAM_URI = "ContentStreamUri";
+    public static final String PROP_SOURCE_ID = "SourceId";
+    public static final String PROP_TARGET_ID = "TargetId";
 
     // CMIS Property Types
     public static final String PROP_TYPE_STRING = "string";
