@@ -224,6 +224,9 @@ Alfresco.widget.DashletResizer.prototype =
       {
          this.onEndResize(eventTarget.height);
       }, this, true);
+
+      // Clear the fixed-pixel width the dashlet has been given
+      Dom.setStyle(this.dashlet, "width", "");
    },
 
    /**
@@ -245,6 +248,9 @@ Alfresco.widget.DashletResizer.prototype =
     */
    onEndResize: function DashletResizer_onEndResize(h)
    {
+      // Clear the fixed-pixel width the dashlet has been given
+      Dom.setStyle(this.dashlet, "width", "");
+      
       Alfresco.util.Ajax.jsonRequest(
       {
          method: "POST",
