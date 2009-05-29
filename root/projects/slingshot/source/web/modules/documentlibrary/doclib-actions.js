@@ -197,10 +197,6 @@
                      YAHOO.Bubbling.fire(obj.events[i].name, obj.events[i].obj);
                   }
                }
-               else
-               {
-                  YAHOO.Bubbling.fire(obj.event.name, obj.event.obj);
-               }
                
                // Please wait pop-up active?
                if (obj.popup)
