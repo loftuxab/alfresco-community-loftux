@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -186,27 +186,30 @@
             // Edit metadata action missing from config
          }
          
-          // Disable actions not accessible to current user
+         // Disable actions not accessible to current user
          var actionsContainer = Dom.get(this.id + "-actionSet-folder");
          if (this.folderData.permissions && this.folderData.permissions.userAccess)
          {
             var userAccess = this.folderData.permissions.userAccess;
             var actions = YAHOO.util.Selector.query("div", actionsContainer);
-            var actionPermissions, i, ii, j, jj;
+            var action, actionPermissions, i, ii, j, jj, actionAllowed;
             for (i = 0, ii = actions.length; i < ii; i++)
             {
-               if (actions[i].firstChild.rel !== "")
+               action = actions[i];
+               actionAllowed = true;
+               if (action.firstChild.rel !== "")
                {
-                  actionPermissions = actions[i].firstChild.rel.split(",");
+                  actionPermissions = action.firstChild.rel.split(",");
                   for (j = 0, jj = actionPermissions.length; j < jj; j++)
                   {
                      if (!userAccess[actionPermissions[j]])
                      {
-                        actionsContainer.removeChild(actions[i]);
+                        actionAllowed = false;
                         break;
                      }
                   }
                }
+               Dom.setStyle(action, "display", actionAllowed ? "block" : "none");
             }
          }
          Dom.setStyle(actionsContainer, "visibility", "visible");

@@ -14,9 +14,9 @@
          "userRole": "${user.role!""}",
          "userAccess":
          {
-            "create" : ${user.permissions.create?string},
-            "edit" : ${user.permissions.edit?string},
-            "delete" : ${user.permissions.delete?string}
+         <#list user.permissions as perm>
+            "${perm?string}": true<#if perm_has_next>,</#if>
+         </#list>
          }
       }
    },
@@ -82,12 +82,9 @@
             <#list item.actionPermissions as actionPerm>
                "${actionPerm?string}": true,
             </#list>
-               "create": ${d.hasPermission("CreateChildren")?string},
-               "edit": ${d.hasPermission("Write")?string},
-               "delete": ${d.hasPermission("Delete")?string},
-               "permissions": ${d.hasPermission("ChangePermissions")?string}
             }
-         }
+         },
+         "dod5015": <#noescape>${item.dod5015}</#noescape>
       }<#if item_has_next>,</#if>
    </#list>
    ]

@@ -394,8 +394,8 @@
             text: this._msg("message.details.success")
          });
          
-         // Fire doclistRefresh event
-         YAHOO.Bubbling.fire("doclistRefresh");
+         // Fire metadataRefresh event
+         YAHOO.Bubbling.fire("metadataRefresh");
          
          this._hideDialog();
       },

@@ -4,6 +4,7 @@
 <beans>
 
     <!-- Bootstrap Records Management Model -->
+    
     <bean id="org_alfresco_module_dod5015_dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
         <property name="models">
             <list>
@@ -13,10 +14,8 @@
     </bean>
     
     <!-- Records Management Action Service -->
-    <bean id="recordsManagementActionService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionServiceImpl">
-        <property name="actionService" ref="ActionService"/>
-        <property name="serviceRegistry" ref="ServiceRegistry"/>
-    </bean>
+    
+    <bean id="recordsManagementActionService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionServiceImpl"/>
     
     <bean id="RecordsManagementActionService" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="proxyInterfaces">
@@ -55,30 +54,65 @@
         <property name="serviceRegistry" ref="ServiceRegistry"/>
         <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
     </bean>
-
-    <bean id="RecordsManagementAction" abstract="true" init-method="init">
-        <property name="actionService" ref="ActionService"/>
-        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
-    </bean>
-    
-    <bean id="file" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionImpl" parent="RecordsManagementAction">
-        <property name="actionName" value="fileAction"/>
-    </bean>
-    
+  
     <!-- Actions -->
     
-    <bean id="fileAction" class="org.alfresco.module.org_alfresco_module_dod5015.action.FileAction" parent="action-executer">
+    <bean id="rmAction" parent="action-executer" abstract="true">
         <property name="nodeService" ref="NodeService"/>
         <property name="dictionaryService" ref="DictionaryService"/>
+        <property name="actionService" ref="ActionService"/>
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
         <property name="publicAction" value="false"/>
     </bean>
-        
+    
+    <bean id="file" class="org.alfresco.module.org_alfresco_module_dod5015.action.FileAction" parent="rmAction"/>    
+    <bean id="cutoff" class="org.alfresco.module.org_alfresco_module_dod5015.action.CutOffAction" parent="rmAction"/>
+    <bean id="destroy" class="org.alfresco.module.org_alfresco_module_dod5015.action.DestroyAction" parent="rmAction"/>
+    <bean id="openRecordFolder" class="org.alfresco.module.org_alfresco_module_dod5015.action.OpenRecordFolderAction" parent="rmAction"/>
+    <bean id="closeRecordFolder" class="org.alfresco.module.org_alfresco_module_dod5015.action.CloseRecordFolderAction" parent="rmAction"/>
+    <bean id="reviewed" class="org.alfresco.module.org_alfresco_module_dod5015.action.ReviewedAction" parent="rmAction"/>
+
     <!-- Behaviours -->
     
     <bean id="recordManagementBehaviours" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementBehaviour" init-method="init">
         <property name="nodeService" ref="NodeService"/>
+        <property name="dictionaryService" ref="DictionaryService"/>
         <property name="policyComponent" ref="policyComponent"/>
         <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
     </bean>
+
+    <!-- Scheduled actions -->
     
+    <!--
+    <bean id="scheduledDispositionJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass">
+            <value>org.alfresco.module.org_alfresco_module_dod5015.action.ScheduledDispositionJob</value>
+        </property>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="nodeService">
+                    <ref bean="nodeService" />
+                </entry>
+                <entry key="searchService">
+                    <ref bean="searchService"/>
+                </entry>
+                <entry key="recordsManagementActionService">
+                    <ref bean="recordsManagementActionService" />
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="scheduledDispositionTrigger" class="org.alfresco.util.CronTriggerBean">
+        <property name="jobDetail">
+            <ref bean="scheduledDispositionJobDetail" />
+        </property>
+        <property name="scheduler">
+            <ref bean="schedulerFactory" />
+        </property>
+        <property name="cronExpression">
+            <value>0,30 * * ? * *</value>
+        </property>
+    </bean>
+    -->
 </beans>

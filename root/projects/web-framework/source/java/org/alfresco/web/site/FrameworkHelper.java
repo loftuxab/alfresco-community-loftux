@@ -60,6 +60,9 @@ import org.springframework.context.ApplicationContext;
  */
 public final class FrameworkHelper
 {
+    public static final String FRAMEWORK_SCRIPT_PROCESSOR = "webframework.scriptprocessor";
+    public static final String FRAMEWORK_TEMPLATE_PROCESSOR = "webframework.templateprocessor"; 
+    
     private static final String WEB_CONFIG_ID = "web.config";
     private static final String WEBFRAMEWORK_MANAGER_ID = "webframework.manager";
     private static final String CONNECTOR_SERVICE_ID = "connector.service";

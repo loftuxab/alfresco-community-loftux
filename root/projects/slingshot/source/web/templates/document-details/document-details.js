@@ -39,8 +39,11 @@
     */
    Alfresco.DocumentDetails = function DocumentDetails_constructor()
    {
-      // Load YUI Components
+      /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["editor"], this.onComponentsLoaded, this);
+
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("metadataRefresh", this.onReady, this);
             
       return this;
    };

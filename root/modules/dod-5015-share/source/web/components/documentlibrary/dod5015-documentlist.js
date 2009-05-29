@@ -42,7 +42,8 @@
     */
    var $html = Alfresco.util.encodeHTML,
       $links = Alfresco.util.activateLinks,
-      $combine = Alfresco.util.combinePaths;
+      $combine = Alfresco.util.combinePaths,
+      $jsonDate = Alfresco.util.fromExplodedISO8601;
 
    /**
     * Preferences
@@ -60,28 +61,11 @@
     */
    Alfresco.RecordsDocumentList = function(htmlId)
    {
-      Alfresco.RecordsDocumentList.superclass.constructor.call(this, htmlId);
-
-      // Unregister the superclass component and register this one
-      Alfresco.util.ComponentManager.unregister(Alfresco.DocumentLibrary.superclass);
-      Alfresco.util.ComponentManager.register(this);
-
-      return this;
+      return Alfresco.RecordsDocumentList.superclass.constructor.call(this, htmlId);
    };
    
    YAHOO.extend(Alfresco.RecordsDocumentList, Alfresco.DocumentList,
    {
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DL_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-
       /**
        * Fired by YUI when parent element is available for scripting.
        * Initial History Manager event registration
@@ -202,9 +186,9 @@
             resultsList: "items",
             fields:
             [
-               "index", "nodeRef", "type", "isLink", "mimetype", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
-               "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "size", "contentUrl", "actionSet", "tags",
-               "activeWorkflows", "location", "permissions", "onlineEditUrl"
+               "index", "nodeRef", "type", "mimetype", "fileName", "displayName", "status", "title", "description", "author",
+               "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "size", "version", "contentUrl", "actionSet", "tags",
+               "location", "permissions", "dod5015"
             ],
             metaFields:
             {
@@ -373,6 +357,10 @@
                   case "non-electronic-record":
                      elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span></span>' : '') + '<img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/generic-file-32.png" />';
                      break;
+                  
+                  case "folder":
+                     elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span></span>' : '') + '<a href="" onclick="' + generatePathOnClick(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-32.png" /></a>';
+                     break;
 
                   default:
                      var id = me.id + '-preview-' + oRecord.getId();
@@ -405,6 +393,10 @@
                      elCell.innerHTML = '<span class="folder">' + (isLink ? '<span></span>' : '') + '<img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/nonElectronicRecord.png" />';
                      break;
 
+                  case "folder":
+                     elCell.innerHTML = '<span class="folder">' + (isLink ? '<span></span>' : '') + '<a href="" onclick="' + generatePathOnClick(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-48.png" /></a>';
+                     break;
+
                   default:
                      docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
                      elCell.innerHTML = '<span class="thumbnail">' + (isLink ? '<span></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + generateThumbnailUrl(oRecord) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
@@ -427,7 +419,8 @@
             var desc = "", description, docDetailsUrl, i, j;
             var type = oRecord.getData("type"),
                isLink = oRecord.getData("isLink"),
-               locn = oRecord.getData("location");
+               locn = oRecord.getData("location"),
+               dod5015 = oRecord.getData("dod5015");
             
             // Link handling
             if (isLink)
@@ -438,7 +431,64 @@
             switch (type)
             {
                /**
-                * Folders
+                * Record Series
+                */
+               case "record-series":
+                  desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(locn) + '">';
+                  desc += $html(oRecord.getData("displayName")) + '</a></h3>';
+
+                  if (me.options.simpleView)
+                  {
+                     /**
+                      * Simple View
+                      */
+                     desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.series.identifier") + '</em> ' + $html(dod5015["rma:identifier"]) + '</span></div>';
+                  }
+                  else
+                  {
+                     /**
+                      * Detailed View
+                      */
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.series.identifier") + '</em> ' + $html(dod5015["rma:identifier"]) + '</span></div>';
+                     description = oRecord.getData("description");
+                     if (description === "")
+                     {
+                        description = me._msg("details.description.none");
+                     }
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
+                  }
+                  break;
+               
+               /**
+                * Record Category
+                */
+               case "record-category":
+                  desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(locn) + '">';
+                  desc += $html(oRecord.getData("displayName")) + '</a></h3>';
+
+                  if (me.options.simpleView)
+                  {
+                     /**
+                      * Simple View
+                      */
+                     desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.category.identifier") + '</em> ' + $html(dod5015["rma:identifier"]) + '</span></div>';
+                  }
+                  else
+                  {
+                     /**
+                      * Detailed View
+                      */
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.category.identifier") + '</em> ' + $html(dod5015["rma:identifier"]) + '</span></div>';
+                     // Disposition Details
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.category.disposition-authority") + '</em> ' + $html(dod5015["rma:dispositionAuthority"]) + '</span></div>';
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.category.disposition-instructions") + '</em> ' + $html(dod5015["rma:dispositionInstructions"]) + '</span></div>';
+                     // Vital Record Indicator
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.category.vital-record-indicator") + '</em> ' + me._msg(dod5015["rma:vitalRecordIndicator"] ? "label.yes" : "label.no") + '</span></div>';
+                  }
+                  break;
+               
+               /**
+                * Record Folder
                 */
                case "record-folder":
                   desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(locn) + '">';
@@ -449,87 +499,126 @@
                      /**
                       * Simple View
                       */
-                     desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
-                     desc += '<span class="item-simple"><em>' + me._msg("details.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
+                     desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.folder.identifier") + '</em> ' + $html(dod5015["rma:identifier"]) + '</span></div>';
                   }
                   else
                   {
                      /**
                       * Detailed View
                       */
-                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                     desc += '<span class="item"><em>' + me._msg("details.modified.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
-                     description = oRecord.getData("description");
-                     if (description === "")
-                     {
-                        description = me._msg("details.description.none");
-                     }
-                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
-                     desc += '</span></div><div class="detail">&nbsp;</div>';
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.folder.identifier") + '</em> ' + $html(dod5015["rma:identifier"]) + '</span></div>';
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.folder.vital-record-indicator") + '</em> ' + me._msg(dod5015["rma:vitalRecordIndicator"] ? "label.yes" : "label.no") + '</span></div>';
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.created.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("createdByUser")) + '">' + $html(oRecord.getData("createdBy")) + '</a></span></div>';
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span></div>';
+                     desc += '<div class="detail">&nbsp;</div>';
                   }
                   break;
 
-               case "record-series":
-                  desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(locn) + '">';
-                  desc += $html(oRecord.getData("displayName")) + '</a></h3>';
+               /**
+                * Record
+                */
+               case "record":
+                  docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
 
+                  desc = '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(oRecord.getData("displayName")) + '</a></span></h3>';
                   if (me.options.simpleView)
                   {
                      /**
                       * Simple View
                       */
-                     desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
-                     desc += '<span class="item-simple"><em>' + me._msg("details.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
+                     desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.record.identifier") + '</em> ' + $html(dod5015["rma:identifier"]) + '</span></div>';
                   }
                   else
                   {
                      /**
                       * Detailed View
                       */
-                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                     desc += '<span class="item"><em>' + me._msg("details.modified.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
-                     description = oRecord.getData("description");
-                     if (description === "")
-                     {
-                        description = me._msg("details.description.none");
-                     }
-                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
-                     desc += '</span></div><div class="detail">&nbsp;</div>';
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.record.identifier") + '</em> ' + $html(dod5015["rma:identifier"]) + '</span></div>';
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.record.date-filed") + '</em> ' + Alfresco.util.formatDate($jsonDate(dod5015["rma:dateFiled"])) + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.record.publication-date") + '</em> ' + Alfresco.util.formatDate($jsonDate(dod5015["rma:publicationDate"])) + '</span></div>';
+                     desc += '<div class="detail">';
+                     desc +=    '<span class="item"><em>' + me._msg("details.record.originator") + '</em> ' + $html(dod5015["rma:originator"]) + '</span>';
+                     desc +=    '<span class="item"><em>' + me._msg("details.record.originating-organisation") + '</em> ' + $html(dod5015["rma:originatingOrganization"]) + '</span>';
+                     desc += '</div>';
                   }
                   break;
-               
-               case "record-category":
-                  desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(locn) + '">';
-                  desc += $html(oRecord.getData("displayName")) + '</a></h3>';
 
-                  if (me.options.simpleView)
-                  {
-                     /**
-                      * Simple View
-                      */
-                     desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
-                     desc += '<span class="item-simple"><em>' + me._msg("details.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
-                  }
-                  else
-                  {
-                     /**
-                      * Detailed View
-                      */
-                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                     desc += '<span class="item"><em>' + me._msg("details.modified.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
-                     description = oRecord.getData("description");
-                     if (description === "")
-                     {
-                        description = me._msg("details.description.none");
-                     }
-                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
-                     desc += '</span></div><div class="detail">&nbsp;</div>';
-                  }
-                  break;
-               
+               /**
+                * Non-Electronic Record
+                */
                case "non-electronic-record":
                   break;
 
+               /**
+                * Undeclared Record
+                */
+               case "undeclared-record":
+                  docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
+
+                  desc = '<div class="undeclared-record-info">' + me._msg("details.undeclared-record.info") + '</div>';
+                  desc += '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(oRecord.getData("displayName")) + '</a></span></h3>';
+                  if (me.options.simpleView)
+                  {
+                     /**
+                      * Simple View
+                      */
+                     desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
+                     desc += '<span class="item-simple"><em>' + me._msg("details.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
+                  }
+                  else
+                  {
+                     /**
+                      * Detailed View
+                      */
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.record.identifier") + '</em> ' + $html(dod5015["rma:identifier"]) + '</span></div>';
+                     desc += '<div class="detail">';
+                     desc +=    '<span class="item"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                     desc +=    '<span class="item"><em>' + me._msg("details.modified.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span>';
+                     desc +=    '<span class="item"><em>' + me._msg("details.version") + '</em> ' + oRecord.getData("version") + '</span>';
+                     desc +=    '<span class="item"><em>' + me._msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
+                     desc += '</div>';
+                     description = oRecord.getData("description");
+                     if (description === "")
+                     {
+                        description = me._msg("details.description.none");
+                     }
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
+                  }
+                  break;
+
+
+               /**
+                * "Normal" Folder
+                */
+               case "folder":
+                  desc = '<h3 class="filename"><a href="" onclick="' + generatePathOnClick(locn) + '">';
+                  desc += $html(oRecord.getData("displayName")) + '</a></h3>';
+
+                  if (me.options.simpleView)
+                  {
+                     /**
+                      * Simple View
+                      */
+                     desc += '<div class="detail"><span class="item-simple"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
+                     desc += '<span class="item-simple"><em>' + me._msg("details.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
+                  }
+                  else
+                  {
+                     /**
+                      * Detailed View
+                      */
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                     desc += '<span class="item"><em>' + me._msg("details.modified.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
+                     description = oRecord.getData("description");
+                     if (description === "")
+                     {
+                        description = me._msg("details.description.none");
+                     }
+                     desc += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
+                     desc += '</div><div class="detail">&nbsp;</div>';
+                  }
+                  break;
+               
                /**
                 * Documents and Links
                 */
@@ -550,18 +639,17 @@
                      /**
                       * Detailed View
                       */
-                     description = oRecord.getData("description");
-                     if (description === "")
-                     {
-                        description = me._msg("details.description.none");
-                     }
-
                      desc += '<div class="detail">';
                      desc += '<span class="item"><em>' + me._msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
                      desc += '<span class="item"><em>' + me._msg("details.modified.by") + '</em> <a href="' + generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span>';
                      desc += '<span class="item"><em>' + me._msg("details.version") + '</em> ' + oRecord.getData("version") + '</span>';
                      desc += '<span class="item"><em>' + me._msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
                      desc += '</div><div class="detail">';
+                     description = oRecord.getData("description");
+                     if (description === "")
+                     {
+                        description = me._msg("details.description.none");
+                     }
                      desc += '<span class="item"><em>' + me._msg("details.description") + '</em> ' + $links($html(description)) + '</span>';
                      desc += '</div>';
                      desc += '</span></div>';
@@ -598,6 +686,7 @@
             }
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            Dom.addClass(elCell.parentNode, oRecord.getData("type"));
 
             elCell.innerHTML = '<div id="' + me.id + '-actions-' + oRecord.getId() + '" class="hidden"></div>';
          };
@@ -812,6 +901,7 @@
 
       /**
        * Freeze action.
+       * NOTE: Placeholder action which needs to pop-up a dialog to collect metadata from the user
        *
        * @method onActionFreeze
        * @param row {object} DataTable row representing file to be actioned
@@ -830,12 +920,70 @@
       },
 
       /**
+       * Close Record Folder action.
+       *
+       * @method onActionClose
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionClose: function DL_onActionClose(row)
+      {
+         this._dod5015Action(row, "closeRecordFolder", "message.close");
+      },
+
+      /**
        * Cut Off action.
        *
        * @method onActionCutoff
        * @param row {object} DataTable row representing file to be actioned
        */
       onActionCutoff: function DL_onActionCutoff(row)
+      {
+         this._dod5015Action(row, "cutoff", "message.cutoff");
+      },
+
+      /**
+       * Destroy action.
+       *
+       * @method onActionDestroy
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionDestroy: function DL_onActionDestroy(row)
+      {
+         this._dod5015Action(row, "destroy", "message.destroy");
+      },
+
+      /**
+       * Re-open Record Folder action.
+       *
+       * @method onActionReopen
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionReopen: function DL_onActionReopen(row)
+      {
+         this._dod5015Action(row, "openRecordFolder", "message.open");
+      },
+
+      /**
+       * Reviewed action.
+       *
+       * @method onActionReviewed
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionReviewed: function DL_onActionReviewed(row)
+      {
+         this._dod5015Action(row, "reviewed", "message.review");
+      },
+
+      /**
+       * DOD5015 action.
+       *
+       * @method _dod5015Action
+       * @param row {object} DataTable row representing file to be actioned
+       * @param actionName {string} Name of repository action to run
+       * @param i18n {string} Will be appended with ".success" or ".failure" depending on action outcome
+       * @private
+       */
+      _dod5015Action: function DL__dod5015Action(row, actionName, i18n)
       {
          var record = this.widgets.dataTable.getRecord(row),
             displayName = record.getData("displayName"),
@@ -849,11 +997,11 @@
                {
                   name: "doclistRefresh"
                },
-               message: this._msg("message.cutoff.success", displayName)
+               message: this._msg(i18n + ".success", displayName)
             },
             failure:
             {
-               message: this._msg("message.cutoff.failure", displayName)
+               message: this._msg(i18n + ".failure", displayName)
             },
             webscript:
             {
@@ -861,10 +1009,14 @@
                name: "ExecutionQueue",
                method: Alfresco.util.Ajax.POST
             },
-            params:
+            config:
             {
-               name: "cutoff",
-               nodeRef: nodeRef.replace(":/", "")
+               requestContentType: Alfresco.util.Ajax.JSON,
+               dataObj:
+               {
+                  name: actionName,
+                  nodeRef: nodeRef
+               }
             }
          });
       }

@@ -5,7 +5,7 @@
 
 .report .hidden
 {
-  display: none;
+   visibility: hidden;
 }
 
 .report .title
@@ -20,7 +20,7 @@
 .report .builder
 {
    margin: 0 -10px;
-   background-color: #CCCCCC;
+   background-color: #DDDDDD;
    padding: 10px 24px 12px;
    line-height: 2em;
 }
@@ -36,23 +36,23 @@
    font-size: 108%;
 }
 
-.report .designation
+.report .records
 {
-   height: 12em;
+   height: 7em;
    border-right: 1px solid #AAAAAA;
    padding: 0 4em 0 1em;
 }
 
 .report .approved
 {
-   height: 12em;
+   height: 7em;
    border-right: 1px solid #AAAAAA;
    padding: 0 4em;
 }
 
 .report .reviewed
 {
-   height: 12em;
+   height: 7em;
    padding: 0 1em 0 4em;
 }
 
@@ -94,41 +94,18 @@
    border: 1px solid #AAAAAA;
 }
 
-.report .results
+.report .summary
 {
-   margin: 16px 10px 10px;
+   padding: 12px 0 0 8px;
 }
 
-.report .yui-dt table
+.report .summary-title
 {
-	border: 1px solid #C0C0C0;
+   font-size: 123.1%;
+   font-weight: bold;
 }
 
-.report .yui-dt td
+.report .summary-buttons
 {
-   border-bottom: 1px solid #D7D7D7;
-   border-right: medium none;
-}
-
-.report .yui-dt-last td
-{
-   border-bottom: medium none;
-}
-
-.report tr.yui-dt-odd,
-.report tr.yui-dt-even
-{
-   background-color: #ffffff;
-   cursor: auto;
-}
-
-.report td.yui-dt-asc,
-.report td.yui-dt-desc
-{
-   background-color: #ffffff !important;
-}
-
-.report tr.yui-dt-odd, tr.yui-dt-even
-{
-   background-color: #ffffff !important;
+   float: right;
 }

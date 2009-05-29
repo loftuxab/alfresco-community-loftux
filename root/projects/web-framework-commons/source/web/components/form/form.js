@@ -45,16 +45,20 @@
     * @return {Alfresco.FormUI} The new FormUI instance
     * @constructor
     */
-   Alfresco.FormUI = function FormUI_consructor(htmlId)
+   Alfresco.FormUI = function FormUI_consructor(htmlId, parentId)
    {
       this.name = "Alfresco.FormUI";
       this.id = htmlId;
+      this.parentId = parentId;
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "menu", "container"], this.onComponentsLoaded, this);
+
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("metadataRefresh", this.onFormRefresh, this);
 
       return this;
    };
@@ -92,7 +96,16 @@
           * @property fieldConstraints
           * @type array[object]
           */
-         fieldConstraints: []
+         fieldConstraints: [],
+
+         /**
+          * Arguments used to build the form.
+          * Used to Ajax-rebuild the form when in "view" mode
+          * 
+          * @property arguments
+          * @type object
+          */
+         arguments: {}
       },
       
       /**
@@ -148,42 +161,42 @@
        */
       onReady: function FormUI_onReady()
       {
-         // make buttons YUI buttons
-         this.buttons.submit = Alfresco.util.createYUIButton(this, "submit", null,
-         {
-            type: "submit"
-         });
-         
-         // force the generated button to have a name of "-" so it gets ignored in
-         // JSON submit. TODO: remove this when JSON submit behaviour is configurable
-         Dom.get(this.id + "-submit-button").name = "-";
-         
-         if (Dom.get(this.id + "-reset") !== null)
-         {
-            this.buttons.reset = Alfresco.util.createYUIButton(this, "reset", null,
-            {
-               type: "reset"
-            });
-            
-            // force the generated button to have a name of "-" so it gets ignored in
-            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
-            Dom.get(this.id + "-reset-button").name = "-";
-         }
-         
-         if (Dom.get(this.id + "-cancel") !== null)
-         {
-            this.buttons.cancel = Alfresco.util.createYUIButton(this, "cancel", null);
-            
-            // force the generated button to have a name of "-" so it gets ignored in
-            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
-            Dom.get(this.id + "-cancel-button").name = "-";
-         }
-         
          // fire event to inform any listening components that the form HTML is ready
          YAHOO.Bubbling.fire("formContentReady", this);
             
          if (this.options.mode !== "view")
          {
+            // make buttons YUI buttons
+            this.buttons.submit = Alfresco.util.createYUIButton(this, "submit", null,
+            {
+               type: "submit"
+            });
+
+            // force the generated button to have a name of "-" so it gets ignored in
+            // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+            Dom.get(this.id + "-submit-button").name = "-";
+
+            if (Dom.get(this.id + "-reset") !== null)
+            {
+               this.buttons.reset = Alfresco.util.createYUIButton(this, "reset", null,
+               {
+                  type: "reset"
+               });
+
+               // force the generated button to have a name of "-" so it gets ignored in
+               // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+               Dom.get(this.id + "-reset-button").name = "-";
+            }
+
+            if (Dom.get(this.id + "-cancel") !== null)
+            {
+               this.buttons.cancel = Alfresco.util.createYUIButton(this, "cancel", null);
+
+               // force the generated button to have a name of "-" so it gets ignored in
+               // JSON submit. TODO: remove this when JSON submit behaviour is configurable
+               Dom.get(this.id + "-cancel-button").name = "-";
+            }
+
             var formsRuntime = new Alfresco.forms.Form(this.id);
             formsRuntime.setShowSubmitStateDynamically(true, false);
             formsRuntime.setSubmitElements(this.buttons.submit);
@@ -262,6 +275,54 @@
          {
             text: this._msg("form.jsonsubmit.failed")
          });
+      },
+      
+      /**
+       * Form refresh event handler
+       *
+       * @method onFormRefresh
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onFormRefresh: function FormUI_onFormRefresh(layer, args)
+      {
+         // Can't do anything if basic arguments weren't set
+         if (this.options.arguments)
+         {
+            var itemKind = this.options.arguments.itemKind,
+               itemId = this.options.arguments.itemId;
+            
+            if (itemKind && itemId)
+            {
+               var fnFormLoaded = function(response, p_formUI)
+               {
+                  Dom.get(p_formUI.parentId).innerHTML = response.serverResponse.responseText;
+               };
+               
+               var data =
+               {
+                  htmlid: this.id,
+                  formUI: false,
+                  mode: this.options.mode,
+                  itemKind: itemKind,
+                  itemId: itemId
+               };
+
+               Alfresco.util.Ajax.request(
+               {
+                  url: Alfresco.constants.URL_SERVICECONTEXT + "components/form",
+                  dataObj: data,
+                  successCallback:
+                  {
+                     fn: fnFormLoaded,
+                     obj: this,
+                     scope: this
+                  },
+                  scope: this,
+                  execScripts: true
+               });
+            }
+         }
       },
       
       /**

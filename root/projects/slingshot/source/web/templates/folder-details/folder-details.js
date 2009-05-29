@@ -42,6 +42,8 @@
       // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["editor"], this.onComponentsLoaded, this);
       
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("metadataRefresh", this.onReady, this);
       YAHOO.Bubbling.on("filesPermissionsUpdated", this.onReady, this);
       YAHOO.Bubbling.on("filesMoved", this.onReady, this);
             

@@ -176,7 +176,14 @@
          
          // update the href for the download link
          var url = Alfresco.constants.PROXY_URI + this.docData.contentUrl;
-         Dom.get(this.id + "-download-action").href = url + "?a=true";
+         try
+         {
+            Dom.get(this.id + "-download-action").href = url + "?a=true";
+         }
+         catch (e)
+         {
+            // Action must be missing
+         }
          
          // update the href for the edit metadata link
          var metadataUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
@@ -190,31 +197,29 @@
             // Action must be missing
          }
          
-         /**
-          * NOTE: If linefeeds exist between the <div> and <a> tags, the firstChild property
-          *       in the outer loop will return a text node "\n" instead of the <a> tag.
-          */
-          // Disable actions not accessible to current user
-          var actionsContainer = Dom.get(this.id + "-actionSet-document");
+         var actionsContainer = Dom.get(this.id + "-actionSet-document");
          if (this.docData.permissions && this.docData.permissions.userAccess)
          {
             var userAccess = this.docData.permissions.userAccess;
             var actions = YAHOO.util.Selector.query("div", actionsContainer);
-            var actionPermissions, i, ii, j, jj;
+            var action, actionPermissions, i, ii, j, jj, actionAllowed;
             for (i = 0, ii = actions.length; i < ii; i++)
             {
-               if (actions[i].firstChild.rel != "")
+               action = actions[i];
+               actionAllowed = true;
+               if (action.firstChild.rel != "")
                {
-                  actionPermissions = actions[i].firstChild.rel.split(",");
+                  actionPermissions = action.firstChild.rel.split(",");
                   for (j = 0, jj = actionPermissions.length; j < jj; j++)
                   {
                      if (!userAccess[actionPermissions[j]])
                      {
-                        actionsContainer.removeChild(actions[i]);
+                        actionAllowed = false;
                         break;
                      }
                   }
                }
+               Dom.setStyle(action, "display", actionAllowed ? "block" : "none");
             }
          }
          Dom.setStyle(actionsContainer, "visibility", "visible");

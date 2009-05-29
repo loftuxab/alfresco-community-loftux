@@ -28,13 +28,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -42,17 +46,38 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.springframework.beans.factory.BeanNameAware;
 
 /**
+ * Records management action executer base class
+ * 
  * @author Roy Wetherall
  */
 public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstractBase
-                                                    implements RecordsManagementModel
+                                                    implements RecordsManagementAction,
+                                                               RecordsManagementModel,
+                                                               BeanNameAware
 {
+    /** Action name */
+    protected String name;
+    
+    /** Node service */
     protected NodeService nodeService;
     
+    /** Dictionary service */
     protected DictionaryService dictionaryService;
     
+    /** Action service */
+    private ActionService actionService;
+    
+    /** Records management action service */
+    private RecordsManagementActionService recordsManagementActionService;
+    
+    /**
+     * Set node service
+     * 
+     * @param nodeService   node service
+     */
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
@@ -69,6 +94,67 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     }
     
     /**
+     * Set action service 
+     * 
+     * @param actionService
+     */
+    public void setActionService(ActionService actionService)
+    {
+        this.actionService = actionService;
+    }
+    
+    /**
+     * Set records managment service
+     * 
+     * @param recordsManagementActionService
+     */
+    public void setRecordsManagementActionService(RecordsManagementActionService recordsManagementActionService)
+    {
+        this.recordsManagementActionService = recordsManagementActionService;
+    }
+    
+    /**
+     * Init method
+     */
+    @Override
+    public void init()
+    {
+        super.init();
+        
+        // Do the RM action registration
+        this.recordsManagementActionService.register(this);
+    }
+    
+    /**
+     * @see org.alfresco.repo.action.CommonResourceAbstractBase#setBeanName(java.lang.String)
+     */
+    public void setBeanName(String name)
+    {
+        this.name = name;
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction#getName()
+     */
+    public String getName()
+    {
+        return this.name;
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction#execute(org.alfresco.service.cmr.repository.NodeRef, java.util.Map)
+     */
+    public void execute(NodeRef filePlanComponent, Map<String, Serializable> parameters)
+    {
+        // Create the action
+        Action action = this.actionService.createAction(name);
+        action.setParameterValues(parameters);
+        
+        // Execute the action
+        this.actionService.executeAction(action, filePlanComponent);          
+    }
+        
+    /**
      * Get the record categories for a given file plan component
      * 
      * @param nodeRef
@@ -78,23 +164,38 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     {
         // Get the record categories for this node
         List<NodeRef> recordCategories = new ArrayList<NodeRef>(1);
-        getRecordCategories(nodeRef, recordCategories);
+        getAncestorsOfType(nodeRef, recordCategories, TYPE_RECORD_CATEGORY);
         return recordCategories;
-    }
+    }    
     
     /**
-     * Gets the record categories for a given file plan component
+     * Get the record folders for a given file plan component
      * 
      * @param nodeRef
-     * @param recordCategories
+     * @return
      */
-    private void getRecordCategories(NodeRef nodeRef, List<NodeRef> recordCategories)
+    protected List<NodeRef> getRecordFolders(NodeRef nodeRef)
+    {
+        // Get the record folders for this node
+        List<NodeRef> recordFolders = new ArrayList<NodeRef>(1);
+        getAncestorsOfType(nodeRef, recordFolders, TYPE_RECORD_FOLDER);
+        return recordFolders;
+    }
+
+    /**
+     * Gets the ancestors of the specified type for a given file plan component
+     * 
+     * @param nodeRef
+     * @param results
+     * @param typeToMatch
+     */
+    private void getAncestorsOfType(NodeRef nodeRef, List<NodeRef> results, QName typeToMatch)
     {
         if (nodeRef != null)
         {
-            if (TYPE_RECORD_CATEGORY.equals(nodeService.getType(nodeRef)) == true)
+            if (typeToMatch.equals(nodeService.getType(nodeRef)) == true)
             {
-                recordCategories.add(nodeRef);
+                results.add(nodeRef);
             }
             else
             {
@@ -102,10 +203,29 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
                 for (ChildAssociationRef assoc : assocs)
                 {
                     NodeRef parent = assoc.getParentRef();
-                    getRecordCategories(parent, recordCategories);
+                    getAncestorsOfType(parent, results, typeToMatch);
                 }
             }
         }
+    }
+    
+    /**
+     * TODO Tempory helper method to help since we are currently presuming only one record category
+     * @param nodeRef
+     * @return
+     */
+    protected NodeRef getRecordCategory(NodeRef nodeRef)
+    {
+        List<NodeRef> recordCategories = getRecordCategories(nodeRef);
+        if (recordCategories.size() == 0)
+        {
+            throw new AlfrescoRuntimeException("The record being declared has no associated record category.");
+        }
+        else if (recordCategories.size() != 1)
+        {
+            throw new AlfrescoRuntimeException("Multiple record categories when declaring a record is not yet supported.");
+        }
+        return recordCategories.get(0); 
     }
     
     /**
@@ -128,34 +248,38 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     
     protected NodeRef getNextDispositionAction(NodeRef recordCategory, NodeRef record)
     {
+        NodeRef dispositionAction = null;
+        
         String actionId = (String)this.nodeService.getProperty(record, RecordsManagementModel.PROP_DISPOSITION_ACTION_ID);
         List<ChildAssociationRef> dispositionActions = this.nodeService.getChildAssocs(recordCategory, RecordsManagementModel.ASSOC_DISPOSITION_ACTIONS, RegexQNamePattern.MATCH_ALL);
-        
-        NodeRef dispositionAction = null;
-        if (actionId == null)
-        {
-            dispositionAction = dispositionActions.get(0).getChildRef();
-        }
-        else
-        {
-            int index = 0;
-            for (ChildAssociationRef assoc : dispositionActions)
-            {
-                NodeRef temp = assoc.getChildRef();
-                if (actionId.equals(temp.getId()) == true)
-                {
-                    break;
-                }         
-                index++;
-            }
-            
-            index++;
-            if (index != dispositionActions.size())
-            {
-                dispositionAction = dispositionActions.get(index).getChildRef();
-            }
-        }
 
+        if (dispositionActions.size() != 0)
+        {
+            if (actionId == null)
+            {
+                dispositionAction = dispositionActions.get(0).getChildRef();
+            }
+            else
+            {
+                int index = 0;
+                for (ChildAssociationRef assoc : dispositionActions)
+                {
+                    NodeRef temp = assoc.getChildRef();
+                    if (actionId.equals(temp.getId()) == true)
+                    {
+                        break;
+                    }         
+                    index++;
+                }
+                
+                index++;
+                if (index != dispositionActions.size())
+                {
+                    dispositionAction = dispositionActions.get(index).getChildRef();
+                }
+            }
+        }
+        
         return dispositionAction;
     }
     
@@ -170,12 +294,33 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
         return dispositionAction;
     }
     
+    /**
+     * 
+     * @param recordCategory
+     * @param record
+     */
     protected void setNextDispositionAction(NodeRef recordCategory, NodeRef record)
     {
         // Set up the details of the first disposition action
         NodeRef dispositionAction = getNextDispositionAction(recordCategory, record);
         if (dispositionAction != null)
         {
+            // Get the properties of the record
+            Map<QName, Serializable> recordProps = this.nodeService.getProperties(record);
+            
+            // Check for the disposition schedule aspect
+            if (this.nodeService.hasAspect(record, ASPECT_DISPOSITION_SCHEDULE) == false)
+            {
+                // Add the disposition schedule aspect
+                this.nodeService.addAspect(record, ASPECT_DISPOSITION_SCHEDULE, null);
+            }
+            else
+            {
+                // Set the previous action details
+                recordProps.put(PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION, recordProps.get(PROP_DISPOSITION_ACTION));
+                recordProps.put(PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE, new Date());
+            }
+            
             // Calculate the asOf date
             Date asOfDate = null;
             String period = (String)this.nodeService.getProperty(dispositionAction, RecordsManagementModel.PROP_DISPOSITION_PERIOD);
@@ -193,26 +338,23 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
                 
                 // Calculate the asof date
                 asOfDate = calculateAsOfDate(period, contextDate);
-            }
+            }            
             
             // Get the name of the action
-            String dispositionActionName = (String)this.nodeService.getProperty(dispositionAction, RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME);
+            String dispositionActionName = (String)this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_ACTION_NAME);
             
             // Set the property values
-            Map<QName, Serializable> dispositionProps = new HashMap<QName, Serializable>(4);
-            dispositionProps.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_ID, dispositionAction.getId());
-            dispositionProps.put(RecordsManagementModel.PROP_DISPOSITION_ACTION, dispositionActionName);
+            recordProps.put(PROP_DISPOSITION_ACTION_ID, dispositionAction.getId());
+            recordProps.put(PROP_DISPOSITION_ACTION, dispositionActionName);
             if (asOfDate != null)
             {
-                dispositionProps.put(RecordsManagementModel.PROP_DISPOSITION_AS_OF, asOfDate);
+                recordProps.put(PROP_DISPOSITION_AS_OF, asOfDate);
             }
             
-            // TODO all the event stuff ...
-                    
-            // TODO set up all the historical stuff
+            // TODO all the event stuff ...                    
             
-            // Apply the aspect
-            this.nodeService.addAspect(record, RecordsManagementModel.ASPECT_DISPOSITION_SCHEDULE, dispositionProps);
+            // Set the properties of the record
+            this.nodeService.setProperties(record, recordProps);            
         }
     }
     
@@ -273,9 +415,10 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
             calendar.set(Calendar.HOUR_OF_DAY, 23);
             calendar.set(Calendar.MINUTE, 59);
         } 
+        //TODO Should this be 'quarterend'?
         else if (unit.equals("quaterend") == true) 
         {
-            // Quater end calculation
+            // Quarter end calculation
             calendar.add(Calendar.MONTH, value*3);
             int currentMonth = calendar.get(Calendar.MONTH);
             if (currentMonth >= 0 && currentMonth <= 2)

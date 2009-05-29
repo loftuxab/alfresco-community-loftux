@@ -91,7 +91,7 @@
           */
          siteId: null
       },
-
+      
       /**
        * Set multiple initialization options at once.
        *
@@ -160,7 +160,7 @@
        */
       onMetadataUpdateSuccess: function EditMetadataMgr_onMetadataUpdateSuccess(response)
       {
-         this._showDetailsPage();
+         this._navigateForward();
       },
       
       /**
@@ -187,21 +187,31 @@
        */
       onCancelButtonClick: function EditMetadataMgr_onCancel(type, args)
       {
-         this._showDetailsPage();
+         this._navigateForward();
       },
       
       /**
        * Displays the corresponding details page for the current node
        *
-       * @method _showDetailsPage
+       * @method _navigateForward
        * @private
        */
-      _showDetailsPage: function EditMetadataMgr__showDetailsPage()
+      _navigateForward: function EditMetadataMgr__navigateForward()
       {
-         // go back to the appropriate details page for the node
-         var detailsPageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
-            "/" + this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
-         window.location.href = detailsPageUrl;
+         /* Did we come from the document library? If so, then direct the user back there */
+         if (document.referrer.match(/documentlibrary([?]|$)/))
+         {
+            // go back to the referrer page
+            history.go(-1);
+         }
+         else
+         {
+            // go back to the appropriate details page for the node
+            var pageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
+               "/" + this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
+
+            window.location.href = pageUrl;
+         }
       },
       
       /**

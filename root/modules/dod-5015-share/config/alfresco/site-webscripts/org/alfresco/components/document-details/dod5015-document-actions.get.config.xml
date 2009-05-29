@@ -1,0 +1,25 @@
+<documentList>
+   <actionSets>
+      <actionSet id="empty"></actionSet>
+
+      <actionSet id="record">
+         <action id="onActionEditDetails" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action id="onActionReviewed" permission="reviewed" type="action-link" label="actions.reviewed" />
+         <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
+         <action id="onActionTransfer" permission="transfer" type="action-link" label="actions.transfer" />
+         <action id="onActionAddReference" permission="add-reference" type="action-link" label="actions.add-reference" />
+         <action id="onActionFreeze" permission="freeze" type="action-link" label="actions.freeze" />
+         <action id="onActionUnfreeze" permission="unfreeze" type="action-link" label="actions.unfreeze" />
+         <action id="onActionDestroy" permission="destroy" type="action-link" label="actions.destroy" />
+      </actionSet>
+
+      <actionSet id="undeclaredRecord">
+         <action id="onActionDeclare" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.declare" />
+         <action id="onActionUploadNewVersion" permission="create,edit,HIDDEN" type="action-link" label="actions.upload-new-version" />
+         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
+      </actionSet>
+
+      <actionSet id="nonElectronicRecord">
+      </actionSet>
+   </actionSets>
+</documentList>

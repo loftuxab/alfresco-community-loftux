@@ -112,36 +112,67 @@ function processResults(nodes, maxResults, siteId)
  * 
  * AND, OR and NOT are supported - as their Lucene equivalent.
  */
-function getSearchResults(query, maxResults, siteId)
+function getSearchResults(query, terms, maxResults, siteId)
 {
    // rm doclib fileplan site path
-   // TODO: is this rma:documentLibrary?
    var path = SITES_SPACE_QNAME_PATH + "cm:" + search.ISO9075Encode(siteId) + "/cm:documentLibrary/";
 	
-   var luceneQuery = "";
-   // TODO: add query built from supplied info and query itself
-   // TODO: temp!
-   luceneQuery = 'ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}record"';
-   /*if (query !== null && query.length !== 0)
+   // query for records only
+   var alfQuery = "";
+   if (terms !== null && terms.length !== 0)
    {
-      luceneQuery += "TEXT:\"" + t + "\"" +        // full text
-                     " @cm\\:name:\"" + t + "\"";
-   }*/
+      var tokens = terms.split(/\s/), i, j, t;
+      
+      for (i = 0, j = tokens.length; i < j; i++)
+      {
+         t = tokens[i];
+         // TODO: add support for quoted terms later
+         // remove quotes
+         t = t.replace(/\"/g, "");
+         if (t.length !== 0)
+         {
+            switch (t.toLowerCase())
+            {
+               case "and":
+                  if (i < j - 1 && terms[i + 1].length !== 0)
+                  {
+                     alfQuery += "AND ";
+                  }
+                  break;
+               
+               case "or":
+                  break;
+               
+               case "not":
+                  if (i < j - 1 && terms[i + 1].length !== 0)
+                  {
+                     alfQuery += "NOT ";
+                  }
+                  break;
+               
+               default:
+                  alfQuery += '(TEXT:"' + t + '" @cm\\:name:"*' + t + '*")';
+            }
+         }
+      }
+   }
    
    var nodes;
    
-   // if we processed the search terms, then suffix the PATH query
-   if (luceneQuery.length !== 0)
+   // suffix the PATH query and the ASPECT clause
+   if (alfQuery.length !== 0)
    {
-      luceneQuery = "+PATH:\"" + path + "/*\" +(" + luceneQuery + ") ";
-      luceneQuery += " -TYPE:\"{http://www.alfresco.org/model/content/1.0}thumbnail\"";
-      nodes = search.luceneSearch(luceneQuery);
+      alfQuery = '+(' + alfQuery + ') ';
    }
-   else
+   if (query != null)
    {
-      // failed to process the search string - empty list returned
-      nodes = [];
+      alfQuery += query;
    }
+   alfQuery += ' +ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}record"';
+   alfQuery += ' +PATH:"' + path + '/*"';
+   alfQuery += ' -TYPE:"{http://www.alfresco.org/model/content/1.0}thumbnail"';
+   
+   nodes = search.query({query: alfQuery, language: "lucene"});
    
    return processResults(nodes, maxResults, siteId);
 }
@@ -150,10 +181,17 @@ function getSearchResults(query, maxResults, siteId)
 function main()
 {
    var siteId = args.site;
+   
+   // query is direct lucene format
    var query = args.query;
+   
+   // terms are full text search terms
+   var terms = args.terms;
+   
+   // maximum results to return - or use default
    var maxResults = (args.maxResults !== null) ? parseInt(args.maxResults) : DEFAULT_MAX_RESULTS;
    
-   model.data = getSearchResults(query, maxResults, siteId);
+   model.data = getSearchResults(query, terms, maxResults, siteId);
 }
 
 main();

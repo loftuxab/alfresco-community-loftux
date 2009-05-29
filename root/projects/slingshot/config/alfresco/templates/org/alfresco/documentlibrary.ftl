@@ -37,7 +37,6 @@
 </@>
 
 <@templateBody>
-   <!-- doclibType = ${doclibType} -->
    <div id="alf-hd">
       <@region id="header" scope="global" protected=true />
       <@region id="title" scope="template" protected=true />

@@ -165,15 +165,15 @@
        */
       genericAction: function DLA_genericAction(action)
       {
-         var path = "";
-         var success = action.success;
-         var failure = action.failure;
-         var webscript = action.webscript;
-         var params = action.params;
-         var overrideConfig = action.config;
-         var wait = action.wait;
-         var configObj = null;
-         var doclibActions = this;
+         var path = "",
+            success = action.success,
+            failure = action.failure,
+            webscript = action.webscript,
+            params = action.params,
+            overrideConfig = action.config,
+            wait = action.wait,
+            configObj = null,
+            doclibActions = this;
 
          var fnCallback = function DLA_genericAction_callback(data, obj)
          {
@@ -185,11 +185,23 @@
                {
                   doclibActions.postActivity(obj.activity.siteId, obj.activity.activityType, obj.activity.page, obj.activity.activityData);
                }
-               // Event specified?
+               // Event(s) specified?
                if (obj.event && obj.event.name)
                {
                   YAHOO.Bubbling.fire(obj.event.name, obj.event.obj);
                }
+               if (YAHOO.lang.isArray(obj.events))
+               {
+                  for (var i = 0, ii = obj.events.length; i < ii; i++)
+                  {
+                     YAHOO.Bubbling.fire(obj.events[i].name, obj.events[i].obj);
+                  }
+               }
+               else
+               {
+                  YAHOO.Bubbling.fire(obj.event.name, obj.event.obj);
+               }
+               
                // Please wait pop-up active?
                if (obj.popup)
                {

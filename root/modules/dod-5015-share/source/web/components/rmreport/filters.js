@@ -92,6 +92,19 @@
       controlsDeactivated: false,
 
       /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.ReportFilter} returns 'this' for method chaining
+       */
+      setMessages: function ReportFilter_setMessages(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
+         return this;
+      },
+
+      /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        *
@@ -122,7 +135,7 @@
                {
                   filterId: filterId,
                   filterOwner: me.name,
-                  filterData: ""
+                  filterData: owner.childNodes[0].childNodes[0].nodeValue  // text label in the span of the filter
                });
                
                // If a function has been provided which corresponds to the filter name, then call it
@@ -131,8 +144,16 @@
                   me[filterId].call(me);
                }
             }
-      		 
+      		
             return true;
+         });
+         
+         // TEMP - preselect Cut Off filter for demo
+         YAHOO.Bubbling.fire("filterChanged",
+         {
+            filterId: "cutoff",
+            filterOwner: this.name,
+            filterData: this._msg("link.dueForCutOff")
          });
       },
 
@@ -192,6 +213,19 @@
          {
             Dom.addClass(filters[i], "disabled");
          }
+      },
+      
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function ReportFilter__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, "Alfresco.ReportFilter", Array.prototype.slice.call(arguments).slice(1));
       }
    };
 })();

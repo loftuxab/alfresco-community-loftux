@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.web.framework.exception.RendererExecutionException;
 import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.framework.render.RenderHelper;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.exception.RequestContextException;
@@ -64,6 +65,24 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
     protected RenderContext getRenderContext()
     {
         return renderContext.get();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.AbstractRuntimeContainer#reset()
+     */
+    @Override
+    public void reset()
+    {
+        super.reset();
+        
+        // called early when WSF initialises - can safely ignore until we have a WF app context
+        if (FrameworkHelper.getApplicationContext() != null)
+        {
+            ((ScriptProcessor)FrameworkHelper.getApplicationContext().getBean(
+                    FrameworkHelper.FRAMEWORK_SCRIPT_PROCESSOR)).reset();
+            ((TemplateProcessor)FrameworkHelper.getApplicationContext().getBean(
+                    FrameworkHelper.FRAMEWORK_TEMPLATE_PROCESSOR)).reset();
+        }
     }
 
     @Override

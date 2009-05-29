@@ -95,7 +95,11 @@
    };
 
    // setup data
+   <#if field.value?? && field.value != "">
    var ${dpVar}_date = Alfresco.util.fromISO8601("${field.value}");
+   <#else>
+   var ${dpVar}_date = new Date();
+   </#if>
    var ${dpVar}_page = (${dpVar}_date.getMonth() + 1) + "/" + ${dpVar}_date.getFullYear();
    var ${dpVar}_sel = (${dpVar}_date.getMonth() + 1) + "/" + ${dpVar}_date.getDate() + "/" + ${dpVar}_date.getFullYear();   
    var ${dpVar}_dev = ${dpVar}_date.toString("${msg("form.entry.date.format")}");

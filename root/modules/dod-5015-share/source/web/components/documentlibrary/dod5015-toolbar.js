@@ -60,28 +60,11 @@
     */
    Alfresco.RecordsDocListToolbar = function(htmlId)
    {
-      Alfresco.RecordsDocListToolbar.superclass.constructor.call(this, htmlId);
-
-      // Unregister the superclass component and register this one
-      Alfresco.util.ComponentManager.unregister(Alfresco.DocListToolbar.superclass);
-      Alfresco.util.ComponentManager.register(this);
-
-      return this;
+      return Alfresco.RecordsDocListToolbar.superclass.constructor.call(this, htmlId);
    };
    
    YAHOO.extend(Alfresco.RecordsDocListToolbar, Alfresco.DocListToolbar,
    {
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DLTB_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -90,18 +73,32 @@
        */
       onReady: function DLTB_onReady()
       {
-         // New Folder button: user needs "create" access
-         this.widgets.newFolder = Alfresco.util.createYUIButton(this, "newFolder-button", this.onNewFolder,
+         // New Series button: user needs "create,series" access
+         this.widgets.newSeries = Alfresco.util.createYUIButton(this, "newSeries-button", this.onNewContainer,
          {
             disabled: true,
-            value: "create"
+            value: "create,new-series"
+         });
+
+         // New Category button: user needs "create,category" access
+         this.widgets.newCategory = Alfresco.util.createYUIButton(this, "newCategory-button", this.onNewContainer,
+         {
+            disabled: true,
+            value: "create,new-category"
+         });
+
+         // New Folder button: user needs "create,folder" access
+         this.widgets.newFolder = Alfresco.util.createYUIButton(this, "newFolder-button", this.onNewContainer,
+         {
+            disabled: true,
+            value: "create,new-folder"
          });
          
-         // File Upload button: user needs  "create" access
+         // File Upload button: user needs "file" access
          this.widgets.fileUpload = Alfresco.util.createYUIButton(this, "fileUpload-button", this.onFileUpload,
          {
             disabled: true,
-            value: "create"
+            value: "file"
          });
 
          // Selected Items menu button
@@ -150,16 +147,24 @@
        */
 
       /**
-       * New Folder button click handler
+       * New Container button click handler
        *
-       * @method onNewFolder
+       * Look at the event source to work out what type of container to create
+       *
+       * @method onNewContainer
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onNewFolder: function DLTB_onNewFolder(e, p_obj)
+      onNewContainer: function DLTB_onNewContainer(e, p_obj)
       {
-         var actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/action/folder/site", this.options.siteId, this.options.containerId, this.currentPath);
+         var actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/dod5015/action/folder/site", this.options.siteId, this.options.containerId, this.currentPath);
 
+         var folderType = p_obj.get("name"),
+            label = "label.new-" + p_obj.get("name"),
+            msgTitle = this._msg(label + ".title"),
+            msgHeader = this._msg(label + ".header");
+
+         // Inject forms validation
          var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
          {
             // Validation
@@ -183,47 +188,69 @@
             p_form.setShowSubmitStateDynamically(true, false);
          };
 
+         // Intercept before dialog show
+         var doBeforeDialogShow = function DLTB_oNF_doBeforeDialogShow(p_form, p_dialog)
+         {
+            Dom.get(p_dialog.id + "-dialogTitle").innerHTML = msgTitle;
+            Dom.get(p_dialog.id + "-dialogHeader").innerHTML = msgHeader;
+         };
+         
+         // Intercept before ajax request
+         var doBeforeAjaxRequest = function DLTB_oNF_doBeforeAjaxRequest(p_config, p_obj)
+         {
+            p_config.dataObj.type = p_obj.folderType;
+            return true;
+         };
+
          if (!this.modules.createFolder)
          {
-            this.modules.createFolder = new Alfresco.module.SimpleDialog(this.id + "-createFolder").setOptions(
-            {
-               width: "30em",
-               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/create-folder",
-               actionUrl: actionUrl,
-               doSetupFormsValidation:
-               {
-                  fn: doSetupFormsValidation,
-                  scope: this
-               },
-               firstFocus: this.id + "-createFolder-name",
-               onSuccess:
-               {
-                  fn: function DLTB_onNewFolder_callback(response)
-                  {
-                     var folder = response.json.results[0];
-                     YAHOO.Bubbling.fire("folderCreated",
-                     {
-                        name: folder.name,
-                        parentPath: folder.parentPath,
-                        nodeRef: folder.nodeRef
-                     });
-                     Alfresco.util.PopupManager.displayMessage(
-                     {
-                        text: this._msg("message.new-folder.success", folder.name)
-                     });
-                  },
-                  scope: this
-               }
-            });
+            this.modules.createFolder = new Alfresco.module.SimpleDialog(this.id + "-createFolder");
          }
-         else
+         this.modules.createFolder.setOptions(
          {
-            this.modules.createFolder.setOptions(
+            width: "30em",
+            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/create-folder",
+            actionUrl: actionUrl,
+            doSetupFormsValidation:
             {
-               actionUrl: actionUrl,
-               clearForm: true
-            });
-         }
+               fn: doSetupFormsValidation,
+               scope: this
+            },
+            doBeforeDialogShow:
+            {
+               fn: doBeforeDialogShow,
+               scope: this
+            },
+            doBeforeAjaxRequest:
+            {
+               fn: doBeforeAjaxRequest,
+               obj:
+               {
+                  folderType: folderType
+               },
+               scope: this
+            },
+            clearForm: true,
+            firstFocus: this.id + "-createFolder-name",
+            onSuccess:
+            {
+               fn: function DLTB_onNewFolder_callback(response)
+               {
+                  var folder = response.json.results[0];
+                  YAHOO.Bubbling.fire("folderCreated",
+                  {
+                     name: folder.name,
+                     parentPath: folder.parentPath,
+                     nodeRef: folder.nodeRef
+                  });
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this._msg("message.new-folder.success", folder.name)
+                  });
+               },
+               scope: this
+            }
+         });
          this.modules.createFolder.show();
       },
 

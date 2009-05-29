@@ -83,7 +83,7 @@
          <properties>
             
             <!-- cm:name used for the Record Category Name -->
-            <!-- cm:description used for Record Category Decription --> 
+            <!-- cm:description used for Record Category Description --> 
             
             <property name="rma:dispositionAuthority">
                <title>Disposition Authority</title>
@@ -119,7 +119,7 @@
          <mandatory-aspects>         
             <aspect>cm:titled</aspect>            
             <aspect>rma:recordComponentIdentifier</aspect>
-            <aspect>rma:reviewDetails</aspect>
+            <aspect>rma:vitalRecordDetails</aspect>
          </mandatory-aspects>
          
       </type>      
@@ -212,6 +212,7 @@
                <title>Record Folder Closed</title>
                <description>Indicates whether the folder is closed</description>
                <type>d:boolean</type>
+               <protected>true</protected>
                <mandatory>true</mandatory>
                <default>false</default>
             </property>
@@ -221,7 +222,7 @@
          <mandatory-aspects>         
             <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
-            <aspect>rma:reviewDetails</aspect>
+            <aspect>rma:vitalRecordDetails</aspect>
          </mandatory-aspects>
          
       </type>
@@ -256,14 +257,20 @@
          </properties>
       </aspect>
       
-      <aspect name="rma:reviewDetails">
+      <aspect name="rma:vitalRecordDetails">
          <title>Review Indicator</title>                  
-         <properties>                                  
+         <properties>
             <property name="rma:reviewPeriod">
                <title>Review Period</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
                <default>none|0</default>
+            </property>            
+            <property name="rma:vitalRecordIndicator">
+               <title>Vital Record Indicator</title>
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+               <default>false</default>
             </property>            
          </properties>         
       </aspect>
@@ -530,8 +537,8 @@
    
       <!-- State management aspects -->   
    
-      <aspect name="rma:reviewSchedule">
-         <title>Review Schedule</title>         
+      <aspect name="rma:vitalRecord">
+         <title>Vital Record</title>         
          <properties>                
             <property name="rma:reviewAsOf">
                <title>Review as of date</title>
@@ -555,7 +562,7 @@
                <mandatory>true</mandatory>
             </property>              
             <property name="rma:dispositionAsOf">
-               <title>Disposition Action</title>
+               <title>Disposition Action Date</title>
                <type>d:date</type>
                <mandatory>true</mandatory>
             </property>
@@ -563,6 +570,19 @@
             <!-- TODO need to model events complete here -->
             
             <!-- TODO model previous action information -->
+            
+            <property name="rma:previousDispositionAction">
+               <title>Previous Disposition Action</title> 
+               <type>d:text</type>
+               <protected>true</protected>
+               <mandatory>false</mandatory>
+            </property>            
+            <property name="rma:previousDispositionDate">
+               <title>Previous Disposition Date</title> 
+               <type>d:date</type>
+               <protected>true</protected>
+               <mandatory>false</mandatory>
+            </property>
                         
          </properties>
          

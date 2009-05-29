@@ -29,21 +29,35 @@ import java.util.List;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
+ * Destroy action
+ * 
  * @author Roy Wetherall
  */
 public class DestroyAction extends RMActionExecuterAbstractBase
 {
-
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {
-        // TODO Auto-generated method stub
-
+        QName recordType = this.nodeService.getType(actionedUponNodeRef);
+        if ((this.dictionaryService.isSubClass(recordType, TYPE_RECORD_FOLDER) == true) ||
+            ((this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_RECORD) == true) &&
+             (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_UNDECLARED_RECORD) == false)))
+        {        
+            // TODO can not destroy if this is a record folder and it contains some undeclared records
+            
+            // Destroy
+            this.nodeService.deleteNode(actionedUponNodeRef);
+        }
+        else
+        {
+            // TODO do we want to throw an exception here or just carry on regardless??
+        }
     }
 
     /**
@@ -52,8 +66,7 @@ public class DestroyAction extends RMActionExecuterAbstractBase
     @Override
     protected void addParameterDefinitions(List<ParameterDefinition> paramList)
     {
-        // TODO Auto-generated method stub
-
+        // No parameters
     }
 
 }

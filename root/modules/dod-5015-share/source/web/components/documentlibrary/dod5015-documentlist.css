@@ -1,83 +1,74 @@
 /* Actions: Icons */
-.doclist .onActionAddReference a
+.doclist .record .onActionAddReference a
 {
-   background-image: url(images/generic-16.png);
+   background-image: url(images/record-add-ref-16.png);
 }
 
-.doclist .onActionCloseFolder a
+.doclist .record-folder .onActionClose a
 {
-   background-image: url(images/close-record-16.png);
+   background-image: url(images/record-folder-close-16.png);
 }
 
-.doclist .onActionCutoffFolder a
-{
-   background-image: url(images/generic-16.png);
-}
-.doclist .onActionCutoffRecord a
+.doclist .record .onActionCutoff a
 {
    background-image: url(images/cutoff-record-16.png);
 }
 
-.doclist .onActionDeclareRecord a
+.doclist .undeclared-record .onActionDeclare a
 {
    background-image: url(images/declare-record-16.png);
 }
 
-.doclist .onActionDestroyRecord a
+.doclist .record .onActionDestroy a
 {
    background-image: url(images/destroy-record-16.png);
 }
 
-.doclist .onActionFreezeSeries a
+.doclist .onActionEditDetails a
 {
-   background-image: url(images/generic-16.png);
+   background-image: url(images/edit-metadata-16.png);
 }
-.doclist .onActionFreezeCategory a
-{
-   background-image: url(images/generic-16.png);
-}
-.doclist .onActionFreezeFolder a
-{
-   background-image: url(images/generic-16.png);
-}
-.doclist .onActionFreezeRecord a
+
+.doclist .record .onActionFreeze a
 {
    background-image: url(images/freeze-record-16.png);
 }
 
-.doclist .onActionReopenFolder a
+.doclist .record-folder .onActionReopen a
 {
-   background-image: url(images/open-record-16.png);
-}
-.doclist .onActionReopenRecord a
-{
-   background-image: url(images/open-record-16.png);
+   background-image: url(images/record-folder-open-16.png);
 }
 
-.doclist .onActionReviewedRecord a
+.doclist .record .onActionReviewed a
 {
    background-image: url(images/reviewed-record-16.png);
 }
 
-.doclist .onActionTransferRecord a
+.doclist .record .onActionTransfer a
 {
    background-image: url(images/transfer-record-16.png);
 }
 
-.doclist .onActionUncutoffFolder a
-{
-   background-image: url(images/generic-16.png);
-}
-.doclist .onActionUncutoffRecord a
-{
-   background-image: url(images/generic-16.png);
-}
-
-.doclist .onActionUnfreezeFolder a
-{
-   background-image: url(images/generic-16.png);
-}
-.doclist .onActionUnfreezeRecord a
+.doclist .record .onActionUnfreeze a
 {
    background-image: url(images/unfreeze-record-16.png);
+}
+
+.doclist .onActionViewDetails a
+{
+   background-image: url(images/metadata-16.png);
+}
+
+
+.doclist .undeclared-record-info
+{
+   background-color: #ffffc0;
+   background-image: url(images/warning-16.png);
+   background-position: 6px 4px;
+   background-repeat: no-repeat;
+   border: 1px dotted #888;
+   color: #888;
+   font-weight: bold;
+   margin-bottom: 4px;
+   padding: 5px 0px 3px 28px;
 }

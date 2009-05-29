@@ -3,7 +3,7 @@
 <#if activePage = "blog-postview" || activePage = "blog-postedit"><#assign activePage="blog-postlist"></#if>
 <#if activePage = "links-linkedit" || activePage = "links-view"><#assign activePage="links"></#if>
 <#if activePage = "discussions-topicview" || activePage = "discussions-createtopic"><#assign activePage="discussions-topiclist"></#if>
-<#if activePage = "document-details" || activePage = "folder-details"><#assign activePage="documentlibrary"></#if>
+<#if activePage = "document-details" || activePage = "folder-details" || activePage = "edit-metadata"><#assign activePage="documentlibrary"></#if>
 <#if activePage = "wiki-create"><#assign activePage="wiki"></#if>
 <div class="site-navigation">
 <#if siteExists??>

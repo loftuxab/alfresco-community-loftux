@@ -1,0 +1,40 @@
+.rmoptions .metadata
+{
+   border: 1px solid #AAAAAA;
+   background-color: #FFFFFF;
+   line-height: 1.5em;
+   padding: 6px 6px 4px 8px;
+   height: 6em;
+   min-width: 20em;
+   overflow-y: auto;
+   overflow-x: hidden;
+}
+
+.rmoptions label
+{
+   padding-left: 4px;
+   vertical-align: 5%;
+}
+
+.rmoptions .sortlabel
+{
+   vertical-align: 15%;
+}
+
+.rmoptions .separator
+{
+   background: transparent url(../rmresults-common/images/expanded.png) no-repeat 4px 8px;
+   cursor: pointer;
+}
+
+.rmoptions .options
+{
+   margin-left: 20px;
+   margin-right: 8px;
+   display: block;
+}
+
+.rmoptions .sort
+{
+   padding-left: 10em;
+}

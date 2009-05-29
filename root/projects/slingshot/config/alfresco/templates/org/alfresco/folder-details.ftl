@@ -7,6 +7,7 @@
    <@script type="text/javascript" src="${page.url.context}/components/blog/blog-common.js"></@script>
    <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/templates/folder-details/folder-details.js"></@script>   
+   <#if doclibType != ""><@script type="text/javascript" src="${page.url.context}/templates/folder-details/${doclibType}folder-details.js"></@script></#if>
    <@templateHtmlEditorAssets />
 </@>
 
@@ -18,10 +19,22 @@
    </div>
    <div id="bd">
       <@region id="path" scope="template" protected=true />
-      
+
+   <#if doclibType?starts_with("dod5015")>
+      <div class="yui-g"> 
+         <div class="yui-u first">
+            <@region id=doclibType + "folder-metadata-header" scope="template" protected=true />
+            <@region id=doclibType + "folder-metadata" scope="template" protected=true />
+            <@region id=doclibType + "folder-info" scope="template" protected=true />
+         </div>
+         <div class="yui-u">
+            <@region id=doclibType + "folder-actions" scope="template" protected=true />
+            <@region id=doclibType + "folder-links" scope="template" protected=true />
+         </div>
+      </div>
+   <#else>   
       <div class="yui-g">
          <div class="yui-g first">
-            <@region id="web-preview" scope="template" protected=true />
             <div class="folder-details-comments">
                <@region id="comments" scope="template" protected=true />
                <@region id="createcomment" scope="template" protected=true />
@@ -39,10 +52,12 @@
             </div>
          </div>
       </div>
+   </#if>
+
    </div>
    
    <script type="text/javascript">//<![CDATA[
-   new Alfresco.FolderDetails().setOptions(
+   new ${jsType}().setOptions(
    {
       nodeRef: "${url.args.nodeRef}",
       siteId: "${page.url.templateArgs.site!""}"

@@ -32,36 +32,26 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Records Management Service Implementation
+ * Records Management Action Service Implementation
  * 
  * @author Roy Wetherall
  */
 public class RecordsManagementActionServiceImpl implements RecordsManagementActionService
 {
+    /** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementActionServiceImpl.class);
 
+    /** Registered records management actions */
     private Map<String, RecordsManagementAction> rmActions = new HashMap<String, RecordsManagementAction>();
     
-    private ActionService actionService;
-    private ServiceRegistry services;
-
-    public void setActionService(ActionService actionService)
-    {
-        this.actionService = actionService;
-    }
-    
-    public void setServiceRegistry(ServiceRegistry services)
-    {
-        this.services = services;
-    }
-    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#register(org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction)
+     */
     public void register(RecordsManagementAction rmAction)
     {
         if (logger.isDebugEnabled())
@@ -71,7 +61,18 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
         this.rmActions.put(rmAction.getName(), rmAction);
     }
 
-    public void executeRecordAction(NodeRef filePlanComponent, String name, Map<String, Serializable> parameters)
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#executeRecordsManagementAction(org.alfresco.service.cmr.repository.NodeRef, java.lang.String)
+     */
+    public void executeRecordsManagementAction(NodeRef filePlanComponent, String name)
+    {
+        executeRecordsManagementAction(filePlanComponent, name, null);
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#executeRecordsManagementAction(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.util.Map)
+     */
+    public void executeRecordsManagementAction(NodeRef filePlanComponent, String name, Map<String, Serializable> parameters)
     {
         if (logger.isDebugEnabled())
         {
@@ -97,7 +98,10 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
         rmAction.execute(filePlanComponent, parameters);
     }
 
-    public List<String> getRecordActions()
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#getRecordsManagementActions()
+     */
+    public List<String> getRecordsManagementActions()
     {
         List<String> result = new ArrayList<String>(this.rmActions.size());
         result.addAll(this.rmActions.keySet());

@@ -879,7 +879,7 @@
             }
 
             // Tell the document list to refresh itself if present
-            YAHOO.Bubbling.fire("doclistRefresh",
+            YAHOO.Bubbling.fire("metadataRefresh",
             {
                currentPath: this.showConfig.path
             });
@@ -900,7 +900,7 @@
             }
             if (fileName)
             {
-               YAHOO.Bubbling.fire("doclistRefresh",
+               YAHOO.Bubbling.fire("metadataRefresh",
                {
                   currentPath: this.showConfig.path,
                   highlightFile: fileName
@@ -908,7 +908,7 @@
             }
             else
             {
-               YAHOO.Bubbling.fire("doclistRefresh",
+               YAHOO.Bubbling.fire("metadataRefresh",
                {
                   currentPath: this.showConfig.path
                });
