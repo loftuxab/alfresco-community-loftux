@@ -647,7 +647,7 @@
                   var parentNode = nodeSrc.parent;
                   // Node found, so delete it
                   this.widgets.treeview.removeNode(nodeSrc, true);
-                  // Have all the parent child nodes been removed now?
+                  // Have all the parent's child nodes been removed now?
                   if (parentNode !== null)
                   {
                      if (!parentNode.hasChildren())
@@ -659,18 +659,21 @@
                   var nodeDest = this.widgets.treeview.getNodeByProperty("path", $combine("/", obj.destination));
                   if (nodeDest)
                   {
-                     if (nodeDest.isLeaf)
+                     // The node may already be loading if this was a multiple-folder move
+                     if (!nodeDest.isLoading)
                      {
-                        nodeDest.isLeaf = false;
-                     }
-                     else if (nodeDest.expanded)
-                     {
-                        this._sortNodeChildren(nodeDest);
+                        if (nodeDest.isLeaf)
+                        {
+                           nodeDest.isLeaf = false;
+                        }
+                        else if (nodeDest.expanded)
+                        {
+                           this._sortNodeChildren(nodeDest);
+                        }
+                        this.widgets.treeview.render();
+                        this._showHighlight(true);
                      }
                   }
-                  
-                  this.widgets.treeview.render();
-                  this._showHighlight(true);
                }
             }
          }
