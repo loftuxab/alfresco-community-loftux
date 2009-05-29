@@ -177,3 +177,36 @@
 {
    display: none;
 }
+.profile .sites
+{
+   margin:0 2.5em;
+}
+.profile .sites li 
+{
+   clear:both;
+   width:100%;
+   overflow:auto;
+}
+.profile .sites li a.thmb 
+{
+   padding:8px 0 16px;
+}
+
+.profile .sites li a 
+{
+   float:left;
+}
+.profile .sites li p a 
+{
+   display:block;
+   float:none;
+}
+.profile .sites p 
+{
+   float:left;
+   margin:0.5em 1em;
+}
+.profile .sites li p span
+{
+  display:block;  
+}
