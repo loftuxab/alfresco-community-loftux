@@ -161,9 +161,6 @@
        */
       onReady: function FormUI_onReady()
       {
-         // fire event to inform any listening components that the form HTML is ready
-         YAHOO.Bubbling.fire("formContentReady", this);
-            
          if (this.options.mode !== "view")
          {
             // make buttons YUI buttons
@@ -196,6 +193,9 @@
                // JSON submit. TODO: remove this when JSON submit behaviour is configurable
                Dom.get(this.id + "-cancel-button").name = "-";
             }
+
+            // fire event to inform any listening components that the form HTML is ready
+            YAHOO.Bubbling.fire("formContentReady", this);
 
             var formsRuntime = new Alfresco.forms.Form(this.id);
             formsRuntime.setShowSubmitStateDynamically(true, false);
