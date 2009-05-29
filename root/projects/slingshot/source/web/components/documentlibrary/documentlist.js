@@ -101,7 +101,7 @@
        */
       // Specific event handlers
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
-      YAHOO.Bubbling.on("doclistRefresh", this.onDocListRefresh, this);
+      YAHOO.Bubbling.on("metadataRefresh", this.onDocListRefresh, this);
       YAHOO.Bubbling.on("fileRenamed", this.onFileRenamed, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("folderCreated", this.onDocListRefresh, this);
@@ -1365,7 +1365,7 @@
          
          this.services.preferences.set(PREF_SHOW_FOLDERS, this.options.showFolders);
 
-         YAHOO.Bubbling.fire("doclistRefresh");
+         YAHOO.Bubbling.fire("metadataRefresh");
          Event.preventDefault(e);
       },
       
@@ -1383,7 +1383,7 @@
 
          this.services.preferences.set(PREF_SIMPLE_VIEW, this.options.simpleView);
 
-         YAHOO.Bubbling.fire("doclistRefresh");
+         YAHOO.Bubbling.fire("metadataRefresh");
          Event.preventDefault(e);
       },
       
@@ -1440,7 +1440,9 @@
             clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML),
             {
                downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
-               folderDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + record.getData("nodeRef")
+               documentDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/document-details?nodeRef=" + record.getData("nodeRef"),
+               folderDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + record.getData("nodeRef"),
+               editMetadataUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + record.getData("nodeRef")
             });
             
             // Generate an id
@@ -1849,7 +1851,7 @@
          var record = this.widgets.dataTable.getRecord(row);
          window.open(record.getData("onlineEditUrl"), "_blank");
          // Really, we'd need to refresh after the document has been opened, but we dn't know when/if this occurs
-         YAHOO.Bubbling.fire("doclistRefresh");
+         YAHOO.Bubbling.fire("metadataRefresh");
       },
 
       /**
@@ -1950,7 +1952,7 @@
             {
                event:
                {
-                  name: "doclistRefresh"
+                  name: "metadataRefresh"
                },
                message: this._msg("message.edit-cancel.success", displayName)
             },

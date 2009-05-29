@@ -3,41 +3,51 @@
       <actionSet id="empty"></actionSet>
 
       <actionSet id="recordSeries">
-         <action id="onActionMetadata" type="simple-link" href="{folderDetailsUrl}" label="actions.series.metadata" />
-         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.series.delete" />
+         <action id="onActionViewDetails" type="simple-link" href="{folderDetailsUrl}" label="actions.view-details" />
+         <action id="onActionEditDetails" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 
       <actionSet id="recordCategory">
-         <action id="onActionMetadata" type="simple-link" href="{folderDetailsUrl}" label="actions.category.metadata" />
-         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.category.delete" />
+         <action id="onActionViewDetails" type="simple-link" href="{folderDetailsUrl}" label="actions.view-details" />
+         <action id="onActionEditDetails" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 
       <actionSet id="recordFolder">
-         <action id="onActionCloseFolder" permission="close" type="action-link" label="actions.folder.close" />
-         <action id="onActionReopenFolder" permission="reopen" type="action-link" label="actions.folder.reopen" />
-         <action id="onActionCutoffFolder" permission="cutoff" type="action-link" label="actions.folder.cutoff" />
-         <action id="onActionUncutoffFolder" permission="uncutoff" type="action-link" label="actions.folder.uncutoff" />
-         <action id="onActionMetadata" type="simple-link" href="{folderDetailsUrl}" label="actions.folder.metadata" />
-         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.folder.delete" />
+         <action id="onActionViewDetails" type="simple-link" href="{folderDetailsUrl}" label="actions.view-details" />
+         <action id="onActionEditDetails" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action id="onActionClose" permission="close" type="action-link" label="actions.close" />
+         <action id="onActionReopen" permission="reopen" type="action-link" label="actions.reopen" />
+         <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
+         <action id="onActionUncutoff" permission="uncutoff" type="action-link" label="actions.uncutoff" />
+         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 
       <actionSet id="record">
-         <action id="onActionReviewedRecord" permission="reviewed" type="action-link" label="actions.record.reviewed" />
-         <action id="onActionCutoffRecord" permission="cutoff" type="action-link" label="actions.record.cutoff" />
-         <action id="onActionTransferRecord" permission="transfer" type="action-link" label="actions.record.transfer" />
-         <action id="onActionAddReference" permission="add-reference" type="action-link" label="actions.record.add-reference" />
-         <action id="onActionFreezeRecord" permission="freeze" type="action-link" label="actions.record.freeze" />
-         <action id="onActionUnfreezeRecord" permission="unfreeze" type="action-link" label="actions.record.unfreeze" />
-         <action id="onActionDestroyRecord" permission="destroy" type="action-link" label="actions.record.destroy" />
+         <action id="onActionEditDetails" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action id="onActionReviewed" permission="reviewed" type="action-link" label="actions.reviewed" />
+         <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
+         <action id="onActionTransfer" permission="transfer" type="action-link" label="actions.transfer" />
+         <action id="onActionTransferNARA" permission="transferNARA" type="action-link" label="actions.transferNARA" />
+         <action id="onActionAddReference" permission="add-reference" type="action-link" label="actions.add-reference" />
+         <action id="onActionFreeze" permission="freeze" type="action-link" label="actions.freeze" />
+         <action id="onActionUnfreeze" permission="unfreeze" type="action-link" label="actions.unfreeze" />
+         <action id="onActionDestroy" permission="destroy" type="action-link" label="actions.destroy" />
       </actionSet>
 
       <actionSet id="undeclaredRecord">
-         <action id="onActionDeclareRecord" permission="" type="action-link" label="actions.undeclared.declare" />
-         <action id="onActionUploadNewVersion" permission="create,edit" type="action-link" label="actions.undeclared.upload-new-version" />
-         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.undeclared.delete" />
+         <action id="onActionDeclare" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.declare" />
+         <action id="onActionUploadNewVersion" permission="create,edit" type="action-link" label="actions.upload-new-version" />
+         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 
       <actionSet id="nonElectronicRecord">
+      </actionSet>
+
+      <actionSet id="folder">
+         <action id="onActionViewDetails" type="simple-link" href="{folderDetailsUrl}" label="actions.view-details" />
+         <action id="onActionDelete" permission="delete" type="action-link" label="actions.delete" />
       </actionSet>
 
       <actionSet id="link">

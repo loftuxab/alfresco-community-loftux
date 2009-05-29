@@ -158,10 +158,27 @@
           onFailureMessage: "",
           
           /**
+           * Object literal representing function to intercept dialog just before shown.
+           *   fn: function(formsRuntime, Alfresco.module.SimpleDialog), // The handler to call when the event fires.
+           *   obj: object, // An object to pass back to the handler.
+           *   scope: object // The object to use for the scope of the handler. SimpleDialog instance if unset.
+           *
+           * @property doBeforeDialogShow
+           * @type object
+           * @default null
+           */
+          doBeforeDialogShow:
+          {
+             fn: null,
+             obj: null,
+             scope: null
+          },
+          
+          /**
            * Object literal representing function to set forms validation.
            *   fn: function, // The handler to call when the event fires.
            *   obj: object, // An object to pass back to the handler.
-           *   scope: object // The object to use for the scope of the handler.
+           *   scope: object // The object to use for the scope of the handler. SimpleDialog instance if unset.
            *
            * @property doSetupFormsValidation
            * @type object
@@ -171,7 +188,7 @@
           {
              fn: null,
              obj: null,
-             scope: window
+             scope: null
           },
           
           /**
@@ -267,8 +284,9 @@
          }
          else
          {
-            var data = {
-                htmlid : this.id
+            var data =
+            {
+               htmlid: this.id
             };
             if (this.options.templateRequestParams)
             {
@@ -301,6 +319,40 @@
       {
          var form = Dom.get(this.id + "-form");
 
+         // Custom forms validation setup interest registered?
+         var doSetupFormsValidation = this.options.doSetupFormsValidation;
+         if (typeof doSetupFormsValidation.fn == "function")
+         {
+            doSetupFormsValidation.fn.call(doSetupFormsValidation.scope || this, this.form, doSetupFormsValidation.obj);
+         }
+         
+         // Custom forms before-submit interest registered?
+         var doBeforeFormSubmit = this.options.doBeforeFormSubmit;
+         if (typeof doBeforeFormSubmit.fn == "function")
+         {
+            this.form.doBeforeFormSubmit = doBeforeFormSubmit;
+         }
+         else
+         {
+            // If no specific handler disable buttons before submit to avoid double submits
+            this.form.doBeforeFormSubmit =
+            {
+               fn: function AmSD__defaultDoBeforeSubmit()
+               {
+                  this.widgets.okButton.set("disabled", true);
+                  this.widgets.cancelButton.set("disabled", true);
+               },
+               scope: this
+            }
+         }
+
+         // Custom ajax before-request interest registered?
+         var doBeforeAjaxRequest = this.options.doBeforeAjaxRequest;
+         if (typeof doBeforeAjaxRequest.fn == "function")
+         {
+            this.form.doBeforeAjaxRequest = doBeforeAjaxRequest;
+         }
+
          if (this.options.actionUrl !== null)
          {
             form.attributes.action.nodeValue = this.options.actionUrl;
@@ -315,12 +367,13 @@
                inputs[i].value = "";
             }
          }
-         //Carry out code before showing dialog if specified
+         // Custom before show event interest registered?
          var doBeforeDialogShow = this.options.doBeforeDialogShow;
          if (doBeforeDialogShow && typeof doBeforeDialogShow.fn == "function")
          {
-             doBeforeDialogShow.fn.call(doBeforeDialogShow.scope || this, this.form, doBeforeDialogShow.obj);
+             doBeforeDialogShow.fn.call(doBeforeDialogShow.scope || this, this.form, this, doBeforeDialogShow.obj);
          }
+         
          // Make sure ok button is in the correct state if dialog is reused  
          this.widgets.okButton.set("disabled", false);
          this.widgets.cancelButton.set("disabled", false);
@@ -379,7 +432,6 @@
       onTemplateLoaded: function AmSD_onTemplateLoaded(response)
       {
          // Inject the template from the XHR request into a new DIV element
-
          var containerDiv = document.createElement("div");
          containerDiv.innerHTML = response.serverResponse.responseText;
 

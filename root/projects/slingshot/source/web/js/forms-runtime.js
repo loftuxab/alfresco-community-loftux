@@ -770,7 +770,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      if (this.doBeforeAjaxRequest.fn.call(this.doBeforeAjaxRequest.scope, config, this.doBeforeAjaxRequest.obj))
                      {
                         if (Alfresco.logger.isDebugEnabled())
-                           Alfresco.logger.debug("Submitting JSON data: ", jsonData);
+                           Alfresco.logger.debug("Submitting JSON data: ", config.dataObj);
 
                         Alfresco.util.Ajax.jsonRequest(config);
                      }

@@ -32,15 +32,40 @@ import org.alfresco.service.cmr.repository.NodeRef;
 
 
 /**
- * TODO record marker?
+ * Records management action service interface
  * 
  * @author Roy Wetherall
  */
 public interface RecordsManagementActionService
 {
-    List<String> getRecordActions();
+    /**
+     * Get a list of the available records management actions
+     * 
+     * @return  List<String>    records management actions
+     */
+    List<String> getRecordsManagementActions();
 
-    void executeRecordAction(NodeRef filePlanComponent, String name, Map<String, Serializable> parameters);
+    /**
+     * Execute a records management action
+     * 
+     * @param filePlanComponent
+     * @param name
+     */
+    void executeRecordsManagementAction(NodeRef filePlanComponent, String name);
     
-    public void register(RecordsManagementAction rmAction);
+    /**
+     * Execute a records management action
+     * 
+     * @param filePlanComponent
+     * @param name
+     * @param parameters
+     */
+    void executeRecordsManagementAction(NodeRef filePlanComponent, String name, Map<String, Serializable> parameters);
+    
+    /**
+     * Register records managment action
+     * 
+     * @param rmAction
+     */
+    void register(RecordsManagementAction rmAction);
 }

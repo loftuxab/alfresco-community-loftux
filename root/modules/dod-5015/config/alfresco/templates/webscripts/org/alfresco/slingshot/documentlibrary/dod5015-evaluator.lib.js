@@ -1,7 +1,71 @@
+/**
+ * Asset type evaluator
+ */
+function getAssetType(asset)
+{
+   var assetType = "";
+   // More detailed asset type
+   switch (String(asset.typeShort))
+   {
+      case "rma:filePlan":
+         assetType = "fileplan";
+         break;
+      case "rma:recordSeries":
+         assetType = "record-series";
+         break;
+      case "rma:recordCategory":
+         assetType = "record-category";
+         break;
+      case "rma:recordFolder":
+         assetType = "record-folder";
+         break;
+      case "rma:nonElectronicRecord":
+         assetType = "non-electronic-record";
+         break;
+      case "cm:content":
+         if (asset.hasAspect("rma:record"))
+         {
+            assetType = "record";
+            if (asset.hasAspect("rma:undeclaredRecord"))
+            {
+               assetType = "undeclared-record";
+            }
+         }
+         break;
+      default:
+         assetType = asset.isContainer ? "folder" : "document";
+         break;
+   }
+
+   return assetType;
+}
+
+/**
+ * Records Management metadata extracter
+ */
+function getMetadata(asset)
+{
+   var metadata = {},
+      index;
+      
+   for (index in asset.properties)
+   {
+      if (index.indexOf("{http://www.alfresco.org/model/recordsmanagement/1.0}") == 0)
+      {
+         metadata[index.replace("{http://www.alfresco.org/model/recordsmanagement/1.0}", "rma:")] = asset.properties[index];
+      }
+   }
+   return metadata;
+}
+
+
+/**
+ * Asset Evaluator
+ */
 function runEvaluator(asset, assetType)
 {
    var actionSet = "empty",
-      actionPerms = [],
+      permissions = [],
       status = [];
    
    var now = new Date();
@@ -9,38 +73,44 @@ function runEvaluator(asset, assetType)
    /**
     * COMMON FOR ALL TYPES
     */
+
+   /**
+    * Basic permissions
+    */
+   if (asset.hasPermission("CreateChildren"))
+   {
+      permissions.push("create");
+   }
+   if (asset.hasPermission("Write"))
+   {
+      permissions.push("edit");
+   }
+   if (asset.hasPermission("Delete"))
+   {
+      permissions.push("delete");
+   }
+   if (asset.hasPermission("ChangePermissions"))
+   {
+      permissions.push("permissions");
+   }
    
-   /**
-    * Review
-    * Rules: Has rma:pendingReview aspect and rma:reviewAsOf date exists and is before now
-    */
-   if (asset.hasAspect("rma:pendingReview"))
-   {
-      if (asset.properties["rma:reviewAsOf"] !== null && asset.properties["rma:reviewAsOf"] < now)
-      {
-         actionPerms.push("reviewed");
-      }
-   }
-
-   /**
-    * Cutoff
-    * Rules: Has rma:pendingCutOff aspect and rma:cutOffAsOf date exists and is before now
-    */
-   if (asset.hasAspect("rma:pendingCutOff"))
-   {
-      if (asset.properties["rma:cutOffAsOf"] !== null && asset.properties["rma:cutOffAsOf"] < now)
-      {
-         actionPerms.push("cutoff");
-      }
-   }
-
    switch (assetType)
    {
+      /**
+       * SPECIFIC TO: FILEPLAN
+       */
+      case "fileplan":
+         permissions.push("new-series");
+         permissions.push("new-category");
+         break;
+
+
       /**
        * SPECIFIC TO: RECORD SERIES
        */
       case "record-series":
          actionSet = "recordSeries";
+         permissions.push("new-category");
          break;
 
 
@@ -49,6 +119,7 @@ function runEvaluator(asset, assetType)
        */
       case "record-category":
          actionSet = "recordCategory";
+         permissions.push("new-folder");
          break;
  
 
@@ -57,12 +128,17 @@ function runEvaluator(asset, assetType)
        */
       case "record-folder":
          actionSet = "recordFolder";
-         /**
-          * Open or Closed?
-          * Rules: rma:isClosed flag
-          */
-         actionPerms.push(asset.properties["rma:isClosed"] ? "reopen" : "close");
-         status.push(asset.properties["rma:isClosed"] ? "closed" : "open");
+         if (asset.properties["rma:isClosed"])
+         {
+            permissions.push("reopen");
+            status.push("closed");
+         }
+         else
+         {
+            permissions.push("file");
+            permissions.push("close");
+            status.push("open");
+         }
          break;
  
 
@@ -77,27 +153,57 @@ function runEvaluator(asset, assetType)
       /**
        * SPECIFIC TO: RECORD
        */
-      case "document":
+      case "record":
+         actionSet = "record";
          /**
-          * Test values for demo - add these to "rma:record" only
+          * Reviewed
+          * Rules: Has rma:vitalRecord aspect and rma:reviewAsOf date exists and is before now
           */
-         if (asset.hasAspect("rma:record"))
+         if (asset.hasAspect("rma:vitalRecord"))
          {
-            actionSet = "record";
-            actionPerms.push("transfer");
-            actionPerms.push("add-reference");
+            if (asset.properties["rma:reviewAsOf"] != null && asset.properties["rma:reviewAsOf"] < now)
+            {
+               permissions.push("reviewed");
+            }
          }
-         else
+         /**
+          * Disposition Actions
+          */
+         if (asset.hasAspect("rma:dispositionSchedule"))
          {
-            actionSet = "undeclaredRecord";
+            if (asset.properties["rma:dispositionAsOf"] != null && asset.properties["rma:dispositionAsOf"] < now)
+            {
+               permissions.push(asset.properties["rma:dispositionAction"]);
+            }
          }
+         /**
+          * Test values for demo
+          */
+         permissions.push("add-reference");
+         break;
+
+
+      /**
+       * SPECIFIC TO: UNDECLARED RECORD
+       */
+      case "undeclared-record":
+         actionSet = "undeclaredRecord";
+         break;
+
+
+      /**
+       * SPECIFIC TO: LEGACY TYPES
+       */
+      default:
+         actionSet = assetType;
          break;
    }
    
    return (
    {
       actionSet: actionSet,
-      actionPermissions: actionPerms,
-      status: status
+      permissions: permissions,
+      status: status,
+      metadata: getMetadata(asset)
    });
 }

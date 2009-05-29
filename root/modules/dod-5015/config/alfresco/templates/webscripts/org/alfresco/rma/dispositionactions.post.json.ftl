@@ -5,7 +5,7 @@
       [
       <#list results as row>
          {
-            "action": "${row.item.properties["rma:dispositionAction"]!""}",
+            "action": "${row.item.properties["rma:dispositionActionName"]!""}",
             "description": "${row.item.properties["rma:dispositionDescription"]!""}",
             "period": "${row.item.properties["rma:dispositionPeriod"]!""}",
             "periodproperty": "${row.item.properties["rma:dispositionPeriodProperty"]!""}",

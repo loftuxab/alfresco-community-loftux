@@ -323,6 +323,10 @@
             {
                ppDisplay = "Cut Off Date";
             }
+            else if (ppData === "{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAsOf")
+            {
+               ppDisplay = "Disposition Action Date";
+            }
             
             elCell.innerHTML = ppDisplay;
          };

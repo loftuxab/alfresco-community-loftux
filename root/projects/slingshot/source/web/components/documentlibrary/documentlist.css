@@ -416,6 +416,11 @@
 
 
 /* Actions: Icons */
+.doclist .yui-dt-col-actions a
+{
+   background-image: url(images/generic-16.png);
+}
+
 .doclist .onActionShowMore a
 {
    background-image: url(images/plus-sign-16.png);

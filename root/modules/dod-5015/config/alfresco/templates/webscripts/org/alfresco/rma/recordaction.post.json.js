@@ -24,7 +24,7 @@ function main()
     }
 
     // extract optional data from request body (if present)
-    //TODO NEIL Are the params optional or mandatory?
+    //TODO Are the params optional or mandatory?
     var params = null; 
     if (json.has("params"))
     {
@@ -37,8 +37,6 @@ function main()
     
     try
     {
-    	//TODO NEIL This call is currently leading to a NOT_SUPPORTED error message
-    	//     from within Rhino - see class Context, line 2353.
     	rmService.executeRecordAction(nodeRef, actionName, params);
     }
     catch (error)

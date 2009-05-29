@@ -445,6 +445,48 @@ Alfresco.util.fromISO8601 = function(date)
 };
 
 /**
+ * Convert an ISO8601 date exploded into an object literal into a JavaScript native Date object
+ *
+ * @method Alfresco.util.fromExplodedISO8601
+ * @param date {object} object literal of the following example format (UTC):
+ * <pre>
+ *    date = 
+ *    {
+ *       year: 2009
+ *       month: 4
+ *       date: 22
+ *       hours: 14
+ *       minutes: 27
+ *       seconds: 42
+ *       milliseconds: 390
+ *    }
+ * </pre>
+ * @return {Date|null} JavaScript native Date object
+ * @static
+ */
+Alfresco.util.fromExplodedISO8601 = function(date)
+{
+   try
+   {
+      var isoDate = YAHOO.lang.substitute("{year 4}-{month 2}-{date 2}T{hours 2}:{minutes 2}:{seconds 2}.{milliseconds 3}Z", date, function(p_key, p_value, p_meta)
+      {
+			p_value = String(p_value);
+			var length = parseInt(p_meta, 10) || 2;
+			while (p_value.length < length)
+			{
+				p_value = "0" + p_value;
+			}
+			return p_value;
+      });
+      return Alfresco.thirdparty.fromISO8601.apply(this, [isoDate, Array.prototype.slice.call(arguments).slice(1)]);
+   }
+   catch(e)
+   {
+      return null;
+   }
+};
+
+/**
  * Convert a JavaScript native Date object into an ISO8601 date string
  *
  * @method Alfresco.util.toISO8601

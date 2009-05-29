@@ -1,32 +1,35 @@
-function doclibType(containerType)
+function toRepoType(appType)
 {
    var type = "";
-   switch (String(containerType))
+   switch (String(appType))
    {
-      case "rma:filePlan":
-         type = "dod5015-";
+      case "dod5015":
+         type = "rma:filePlan";
          break;
    }
    return type;
 }
 
-function main()
+function fromRepoType(repoType)
+{
+   var type = "";
+   switch (String(repoType))
+   {
+      case "rma:filePlan":
+         type = "dod5015";
+         break;
+   }
+   return type;
+}
+
+function getContainerType()
 {
    // Need to know what type of node the container is
    var siteId = page.url.templateArgs.site,
-      containerId = template.properties.container;
+      containerId = template.properties.container,
+      containerType = "cm:folder",
+      appType = "";
    
-   // Assume regular cm:folder type
-   var containerType = "cm:folder";
-
-   var connector = remote.connect("alfresco");
-   result = connector.get("/slingshot/doclib/container/" + siteId + "/" + containerId);
-   if (result.status == 200)
-   {
-      var data = eval('(' + result + ')');
-      containerType = data.container.type;
-   }
-
    var p = sitedata.getPage("site/" + siteId + "/dashboard");
    if (p != null)
    {
@@ -38,10 +41,22 @@ function main()
          // Save the overridden page title into the request context
          context.setValue("page-titleId", doclibMeta.titleId);
       }
+      appType = doclibMeta.type;
    }
 
-   model.containerType = containerType;
-   model.doclibType = doclibType(containerType);
+   var connector = remote.connect("alfresco");
+   result = connector.get("/slingshot/doclib/container/" + siteId + "/" + containerId + "?type=" + toRepoType(appType));
+   if (result.status == 200)
+   {
+      var data = eval('(' + result + ')');
+      containerType = data.container.type;
+   }
+
+   return containerType;
 }
 
-main();
+var containerType = getContainerType(),
+   doclibType = fromRepoType(containerType);
+
+model.containerType = containerType;
+model.doclibType = doclibType == "" ? doclibType : doclibType + "-";

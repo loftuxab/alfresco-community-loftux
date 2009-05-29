@@ -181,7 +181,9 @@
    <!--                                              -->
    <!-- Configuration of the WebFramework Processors -->
    <!--                                              -->
-
+   
+   <!-- NOTE: do not change the IDs of these Processors - they are referenced by the FrameworkHelper class -->
+   
    <bean id="webframework.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
       <property name="searchPath" ref="webframework.templates.searchpath" />
       <property name="defaultEncoding"><value>UTF-8</value></property>

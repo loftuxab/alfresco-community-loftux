@@ -75,7 +75,6 @@ function getDocList(filter)
       documentAssetsCount = documentAssets.length;
    
    var assets;
-   
    if (url.templateArgs.type === "documents")
    {
       assets = documentAssets;
@@ -89,16 +88,17 @@ function getDocList(filter)
    var totalRecords = assets.length;
 
    // Pagination
-   var pageSize = args["size"] || assets.length;
-   var pagePos = args["pos"] || "1";
-   var startIndex = (pagePos - 1) * pageSize;
+   var pageSize = args["size"] || assets.length,
+      pagePos = args["pos"] || "1",
+      startIndex = (pagePos - 1) * pageSize;
+
    assets = assets.slice(startIndex, pagePos * pageSize);
    
-   var thumbnail, createdBy, modifiedBy, activeWorkflows, assetType, evaluated;
-   var defaultLocation, location, qnamePaths, displayPaths, locationAsset;
+   var thumbnail, createdBy, modifiedBy, activeWorkflows, assetType, assetEvaluator,
+      defaultLocation, location, qnamePaths, displayPaths, locationAsset;
 
    // Location if we're in a site
-   var defaultLocation =
+   defaultLocation =
    {
       site: parsedArgs.location.site,
       container: parsedArgs.location.container,
@@ -109,12 +109,7 @@ function getDocList(filter)
    // User permissions and role
    var user =
    {
-      permissions:
-      {
-   	   create: parsedArgs.parentNode.hasPermission("CreateChildren"),
-   	   edit: parsedArgs.parentNode.hasPermission("Write"),
-   	   "delete": parsedArgs.parentNode.hasPermission("Delete")
-      }
+      permissions: runEvaluator(parsedArgs.parentNode, getAssetType(parsedArgs.parentNode)).permissions
    };
    if (defaultLocation.site !== null)
    {
@@ -128,31 +123,15 @@ function getDocList(filter)
    {
       createdBy = null;
       modifiedBy = null;
-      evaluated = {};
+      assetEvaluator = {};
       activeWorkflows = [];
 
       // Get users
       createdBy = people.getPerson(asset.properties["cm:creator"]);
       modifiedBy = people.getPerson(asset.properties["cm:modifier"]);
       
-      // Asset type - basic UI type
-      assetType = asset.isContainer ? "record-folder" : "document";
-      // More detailed asset type
-      switch (String(asset.typeShort))
-      {
-         case "rma:recordSeries":
-            assetType = "record-series";
-            break;
-         case "rma:recordCategory":
-            assetType = "record-category";
-            break;
-         case "rma:recordFolder":
-            assetType = "record-folder";
-            break;
-         case "rma:nonElectronicRecord":
-            assetType = "non-electronic-record";
-            break;
-      }
+      // Asset type
+      assetType = getAssetType(asset);
 
       // Does this collection of assets have potentially differering paths?
       if (filterParams.variablePath)
@@ -205,7 +184,7 @@ function getDocList(filter)
       }
       
       // Get evaluated properties
-      evaluated = runEvaluator(asset, assetType);
+      assetEvaluator = runEvaluator(asset, assetType);
       
       items.push(
       {
@@ -213,9 +192,10 @@ function getDocList(filter)
          type: assetType,
          createdBy: createdBy,
          modifiedBy: modifiedBy,
-         status: evaluated.status,
-         actionSet: evaluated.actionSet,
-         actionPermissions: evaluated.actionPermissions,
+         status: assetEvaluator.status,
+         actionSet: assetEvaluator.actionSet,
+         actionPermissions: assetEvaluator.permissions,
+         dod5015: jsonUtils.toJSONString(assetEvaluator.metadata),
          tags: asset.tags,
          location: location
       });

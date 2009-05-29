@@ -33,6 +33,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -56,6 +57,9 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
     /** Policy component */
     private PolicyComponent policyComponent;
     
+    /** Dictionary service */
+    private DictionaryService dictionaryService;
+    
     /** Records management action service */
     private RecordsManagementActionService rmService;
     
@@ -70,6 +74,16 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
+    }
+    
+    /**
+     * Set the dictionary service
+     * 
+     * @param dictionaryService     dictionary service
+     */
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
     }
     
     /**
@@ -111,12 +125,16 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
         this.policyComponent.bindAssociationBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"), 
                                                       TYPE_RECORD_FOLDER, 
                                                       ContentModel.ASSOC_CONTAINS, 
-                                                      new JavaBehaviour(this, "onCreateNodeAssociation", NotificationFrequency.TRANSACTION_COMMIT));        
+                                                      new JavaBehaviour(this, "onFileContent", NotificationFrequency.TRANSACTION_COMMIT));
+        this.policyComponent.bindAssociationBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"), 
+                TYPE_RECORD_CATEGORY, 
+                ContentModel.ASSOC_CONTAINS, 
+                new JavaBehaviour(this, "onCreateRecordFolder", NotificationFrequency.TRANSACTION_COMMIT));        
         
         // Register the class behaviours
         this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"), 
                                                 ASPECT_UNDECLARED_RECORD, 
-                                                new JavaBehaviour(this, "onUpdateProperties", NotificationFrequency.TRANSACTION_COMMIT));
+                                                new JavaBehaviour(this, "onUpdateUndeclaredRecord", NotificationFrequency.TRANSACTION_COMMIT));
     }
 
     /**
@@ -124,10 +142,35 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
      * 
      * @see org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy#onCreateChildAssociation(org.alfresco.service.cmr.repository.ChildAssociationRef, boolean)
      */
-    public void onCreateNodeAssociation(ChildAssociationRef childAssocRef, boolean random)
+    public void onFileContent(ChildAssociationRef childAssocRef, boolean bNew)
     {
         // File the document
-        rmService.executeRecordAction(childAssocRef.getChildRef(), "file", null);
+        rmService.executeRecordsManagementAction(childAssocRef.getChildRef(), "file", null);
+    }
+    
+    /**
+     * Set's up the record folder upon creation
+     * 
+     * @param childAssocRef
+     * @param bNew
+     */
+    public void onCreateRecordFolder(ChildAssociationRef childAssocRef, boolean bNew)
+    {
+        // Get the record category
+        NodeRef recordCategory = childAssocRef.getParentRef();
+        
+        // Get the child node and check that it is a record folder
+        NodeRef recordFolder = childAssocRef.getChildRef();
+        QName recordFolderType = this.nodeService.getType(recordFolder);
+        if (this.dictionaryService.isSubClass(recordFolderType, TYPE_RECORD_FOLDER) == true)
+        {
+            // Inherit the vital record details
+            this.nodeService.setProperty(recordFolder, PROP_VITAL_RECORD_INDICATOR, this.nodeService.getProperty(recordCategory, PROP_VITAL_RECORD_INDICATOR));
+            this.nodeService.setProperty(recordFolder, PROP_REVIEW_PERIOD, this.nodeService.getProperty(recordCategory, PROP_REVIEW_PERIOD));
+            
+            // TODO do I need to now set up the review schedule and next disposition action for the 
+            //      record folder?
+        }
     }
 
     /**
@@ -135,9 +178,9 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
      * 
      * @see org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy#onUpdateProperties(org.alfresco.service.cmr.repository.NodeRef, java.util.Map, java.util.Map)
      */
-    public void onUpdateProperties(NodeRef record, Map<QName, Serializable> before, Map<QName, Serializable> after)
+    public void onUpdateUndeclaredRecord(NodeRef record, Map<QName, Serializable> before, Map<QName, Serializable> after)
     {
-        // TODO need to take into consideration madatory properties found on applied custom record aspects
+        // TODO need to take into consideration mandatory properties found on applied custom record aspects
         //      calculate on demand for each aspect and cache
         
         boolean recordDeclared = true;
@@ -157,7 +200,6 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
         if (recordDeclared == true)
         {
             this.nodeService.removeAspect(record, ASPECT_UNDECLARED_RECORD);
-        }
-        
+        }        
     }
 }

@@ -25,7 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.IOException;
-import java.util.Date;
+import java.io.Serializable;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
@@ -42,7 +42,6 @@ import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
-import org.alfresco.web.scripts.TestWebScriptServer.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -52,9 +51,9 @@ import org.json.JSONStringer;
  * 
  * @author Neil McErlean
  */
-public class RmRestApiSystemTest extends BaseWebScriptTest
+public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsManagementModel
 {
-    private static final String REST_URL = "/api/rma/actions/ExecutionQueue";
+    private static final String RMA_REST_URL = "/api/rma/actions/ExecutionQueue";
     protected static final String APPLICATION_JSON = "application/json";
     protected NodeService nodeService;
     protected ContentService contentService;
@@ -87,27 +86,29 @@ public class RmRestApiSystemTest extends BaseWebScriptTest
      * 
      * @throws Exception
      */
-    public void testPost_RecordAction_ToNonExistentNode() throws Exception
+    public void testPostActionToNonExistentNode() throws Exception
     {
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");     
         assertNotNull(recordCategory);
 
         NodeRef nonExistentNode = new NodeRef("workspace://SpacesStore/09ca1e02-1c87-4a53-97e7-xxxxxxxxxxxx");
         
-        // Construct the JSON request for declareRecord.
+        // Construct the JSON request.
         JSONObject jsonPostData = new JSONObject();
         jsonPostData.put("nodeRef", nonExistentNode.toString());
-        jsonPostData.put("name", "declareRecord");
+        // Although the request specifies a 'reviewed' action, it does not matter what
+        // action is specified here, as the non-existent Node should trigger a 404
+        // before the action is executed.
+        jsonPostData.put("name", "reviewed");
         
         // Submit the JSON request.
         String jsonPostString = jsonPostData.toString();
         
         final int expectedStatus = 404;
-        sendRequest(new PostRequest(REST_URL, jsonPostString, APPLICATION_JSON), expectedStatus);
+        sendRequest(new PostRequest(RMA_REST_URL, jsonPostString, APPLICATION_JSON), expectedStatus);
     }
 
-    //TODO NEIL Switch this back on and get it passing.
-    public void off_testPost_DeclareRecord() throws IOException, JSONException
+    public void testPost_ReviewedAction() throws IOException, JSONException
     {
         // Get the recordCategory under which we will create the testNode.
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");     
@@ -117,43 +118,49 @@ public class RmRestApiSystemTest extends BaseWebScriptTest
         assertNotNull(recordFolder);
 
         // Create a testNode/file which is to be declared as a record.
-        NodeRef nodeToBeDeclared = this.nodeService.createNode(recordFolder, 
+        NodeRef testRecord = this.nodeService.createNode(recordFolder, 
                 ContentModel.ASSOC_CONTAINS, 
-                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
                 ContentModel.TYPE_CONTENT).getChildRef();
 
         // Set some dummy content.
-        ContentWriter writer = this.contentService.getWriter(nodeToBeDeclared, ContentModel.PROP_CONTENT, true);
+        ContentWriter writer = this.contentService.getWriter(testRecord, ContentModel.PROP_CONTENT, true);
         writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         writer.setEncoding("UTF-8");
         writer.putContent("There is some content in this record");
         
-        // Construct the JSON request for declareRecord.
+        // In this test, this property has a date-value equal to the model import time.
+        Serializable pristineReviewAsOf = this.nodeService.getProperty(testRecord, PROP_REVIEW_AS_OF);
+        
+        // Construct the JSON request for 'reviewed'.
         String jsonString = new JSONStringer().object()
-            .key("name").value("declareRecord")
-            .key("nodeRef").value(nodeToBeDeclared.toString())
-            .key("params").object()
-                .key("recordFolder").value(recordFolder)
-                .key("recordProperties").object()
-                    .key(RecordsManagementModel.PROP_PUBLICATION_DATE.toString()).value(new Date())
-                    .key(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString()).array()
-                        .value(DODSystemTest.FOUO)
-                        .value(DODSystemTest.NOFORN)
-                    .endArray()
-                    .key(RecordsManagementModel.PROP_MEDIA_TYPE.toString()).value("mediaTypeValue")
-                    .key(RecordsManagementModel.PROP_FORMAT.toString()).value("formatValue")
-                    .key(RecordsManagementModel.PROP_DATE_RECEIVED.toString()).value(new Date())
-                .endObject()
-            .endObject()
+            .key("name").value("reviewed")
+            .key("nodeRef").value(testRecord.toString())
+            
+            // These old JSON params were for an out-of-date TC. Keeping for comparison.
+//            .key("params").object()
+//                .key("recordFolder").value(recordFolder)
+//                .key("recordProperties").object()
+//                    .key(RecordsManagementModel.PROP_PUBLICATION_DATE.toString()).value(new Date())
+//                    .key(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString()).array()
+//                        .value(DODSystemTest.FOUO)
+//                        .value(DODSystemTest.NOFORN)
+//                    .endArray()
+//                    .key(RecordsManagementModel.PROP_MEDIA_TYPE.toString()).value("mediaTypeValue")
+//                    .key(RecordsManagementModel.PROP_FORMAT.toString()).value("formatValue")
+//                    .key(RecordsManagementModel.PROP_DATE_RECEIVED.toString()).value(new Date())
+//                .endObject()
+//            .endObject()
         .endObject()
         .toString();
         
         // Submit the JSON request.
         final int expectedStatus = 200;
-        Response rsp = sendRequest(new PostRequest(REST_URL,
-                                      jsonString, APPLICATION_JSON), expectedStatus);
+        sendRequest(new PostRequest(RMA_REST_URL,
+                                 jsonString, APPLICATION_JSON), expectedStatus);
         
-        System.out.println(rsp.getContentAsString());
-        //TODO NEIL Assert something about the rsp contents.
+        Serializable newReviewAsOfDate = this.nodeService.getProperty(testRecord, PROP_REVIEW_AS_OF);
+        assertFalse("The reviewAsOf property should have changed. Was " + pristineReviewAsOf,
+        		pristineReviewAsOf.equals(newReviewAsOfDate));
     }
 }

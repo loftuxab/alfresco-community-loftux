@@ -54,6 +54,7 @@ public interface RecordsManagementModel
     
     // Records folder
     public static QName TYPE_RECORD_FOLDER = QName.createQName(RM_URI, "recordFolder");
+    public static QName PROP_IS_CLOSED = QName.createQName(RM_URI, "isClosed");
     
     // Undeclared record aspect
     public static QName ASPECT_UNDECLARED_RECORD = QName.createQName(RM_URI, "undeclaredRecord");
@@ -76,21 +77,26 @@ public interface RecordsManagementModel
     public static QName ASPECT_RECORD_COMPONENT_ID = QName.createQName(RM_URI, "recordComponentIdentifier");
     public static QName PROP_IDENTIFIER = QName.createQName(RM_URI, "identifier");
     
-    // Review details aspect
+    // Vital record details aspect
+    public static QName ASPECT_VITAL_RECORD_DETAILS = QName.createQName(RM_URI, "vitalRecordDetails");
+    public static QName PROP_VITAL_RECORD_INDICATOR = QName.createQName(RM_URI, "vitalRecordIndicator");
     public static QName PROP_REVIEW_PERIOD = QName.createQName(RM_URI, "reviewPeriod");
      
-    // Pending review aspect
-    public static QName ASPECT_REVIEW_SCHEDULE = QName.createQName(RM_URI, "reviewSchedule");
+    // Vital record aspect
+    public static QName ASPECT_VITAL_RECORD = QName.createQName(RM_URI, "vitalRecord");
     public static QName PROP_REVIEW_AS_OF = QName.createQName(RM_URI, "reviewAsOf");        
     
     // Cut off aspect
     public static QName ASPECT_CUT_OFF = QName.createQName(RM_URI, "cutOff");
     public static QName PROP_CUT_OFF_DATE = QName.createQName(RM_URI, "cutOffDate");
     
+    // Disposition schedule aspect
     public static QName ASPECT_DISPOSITION_SCHEDULE = QName.createQName(RM_URI, "dispositionSchedule");
     public static QName PROP_DISPOSITION_ACTION_ID = QName.createQName(RM_URI, "dispositionActionId");
     public static QName PROP_DISPOSITION_ACTION = QName.createQName(RM_URI, "dispositionAction");
     public static QName PROP_DISPOSITION_AS_OF = QName.createQName(RM_URI, "dispositionAsOf");
+    public static QName PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION = QName.createQName(RM_URI, "previousDispositionAction");
+    public static QName PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE = QName.createQName(RM_URI, "previousDispositionDate");
     
     // Custom RM data aspect
     public static QName ASPECT_CUSTOM_RM_DATA = QName.createQName(RM_URI, "customRMData");

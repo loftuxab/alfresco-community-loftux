@@ -53,13 +53,7 @@
     */
    Alfresco.RecordsDocListTree = function DLT_constructor(htmlId)
    {
-      Alfresco.RecordsDocListTree.superclass.constructor.call(this, htmlId);
-
-      // Unregister the superclass component and register this one
-      Alfresco.util.ComponentManager.unregister(Alfresco.DocListTree.superclass);
-      Alfresco.util.ComponentManager.register(this);
-
-      return this;
+      return Alfresco.RecordsDocListTree.superclass.constructor.call(this, htmlId);
    };
    
    YAHOO.extend(Alfresco.RecordsDocListTree, Alfresco.DocListTree,

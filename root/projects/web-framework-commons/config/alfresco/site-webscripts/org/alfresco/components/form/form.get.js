@@ -70,6 +70,13 @@ function main()
          // constraints were built during form items construction, add 
          // them to the form ui model
          formUIModel.constraints = formUIConstraints;
+         
+         // add the item kind and id arguments
+         formUIModel.arguments =
+         {
+            itemKind: itemKind,
+            itemId: itemId
+         };
       }
       else
       {
@@ -97,7 +104,15 @@ function getArgument(argName, defValue)
 {
    var result = null;
    
-   var argValue = instance.properties[argName];
+   var argValue = null;
+   try
+   {
+      argValue = instance.properties[argName];
+   }
+   catch (e)
+   {
+      argValue = null;
+   }
    if (argValue !== null)
    {
       if (argValue.length > 0)
@@ -390,15 +405,17 @@ function setupFormUIModel(mode, formModel, formConfig)
    var showResetButton = getArgument("showResetButton", "false");
    
    // create and setup form ui model basics
-   var formUIModel = {};
-   formUIModel.mode = mode;
-   formUIModel.method = mthd;
-   formUIModel.enctype = enctype;
-   formUIModel.submissionUrl = submissionUrl;
-   formUIModel.showCaption = (showCaption === "true") ? true : false;
-   formUIModel.showCancelButton = (showCancelButton === "true") ? true : false;
-   formUIModel.showResetButton = (showResetButton === "true") ? true : false;
-   formUIModel.data = formModel.data.formData;
+   var formUIModel =
+   {
+      mode: mode,
+      method: mthd,
+      enctype: enctype,
+      submissionUrl: submissionUrl,
+      showCaption: (showCaption === "true") ? true : false,
+      showCancelButton: (showCancelButton === "true") ? true : false,
+      showResetButton: (showResetButton === "true") ? true : false,
+      data: formModel.data.formData
+   };
    
    return formUIModel;
 }

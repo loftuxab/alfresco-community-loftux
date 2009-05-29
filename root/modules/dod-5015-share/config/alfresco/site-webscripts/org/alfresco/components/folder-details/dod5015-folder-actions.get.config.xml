@@ -1,0 +1,24 @@
+<documentList>
+   <actionSets>
+      <actionSet id="empty"></actionSet>
+
+      <actionSet id="recordSeries">
+         <action id="onActionDetails" type="simple-link" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
+      </actionSet>
+
+      <actionSet id="recordCategory">
+         <action id="onActionDetails" type="simple-link" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
+      </actionSet>
+
+      <actionSet id="recordFolder">
+         <action id="onActionDetails" type="simple-link" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action id="onActionClose" permission="close" type="action-link" label="actions.close" />
+         <action id="onActionReopen" permission="reopen" type="action-link" label="actions.reopen" />
+         <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
+         <action id="onActionUncutoff" permission="uncutoff" type="action-link" label="actions.uncutoff" />
+         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
+      </actionSet>
+   </actionSets>
+</documentList>

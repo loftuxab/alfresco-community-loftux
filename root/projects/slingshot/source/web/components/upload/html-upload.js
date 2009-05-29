@@ -320,7 +320,7 @@
 
          // Tell the document list to refresh itself if present
          var fileName = response.fileName ? response.fileName : this.widgets.filedata.value;
-         YAHOO.Bubbling.fire("doclistRefresh",
+         YAHOO.Bubbling.fire("metadataRefresh",
          {
             currentPath: this.showConfig.path,
             highlightFile: fileName

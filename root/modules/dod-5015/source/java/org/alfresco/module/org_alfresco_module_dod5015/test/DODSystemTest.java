@@ -108,10 +108,25 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
     @Override
     protected void onTearDownInTransaction() throws Exception
     {
-        UserTransaction txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        this.nodeService.deleteNode(filePlan);
-        txn.commit();
+        try
+        {
+            UserTransaction txn = transactionService.getUserTransaction(false);
+            txn.begin();
+            this.nodeService.deleteNode(filePlan);
+            txn.commit();
+        }
+        catch (Exception e)
+        {
+            // Nothing
+            //System.out.println("DID NOT DELETE FILE PLAN!");
+        }
+    }
+    
+    @Override
+    protected void onTearDownAfterTransaction() throws Exception
+    {
+        // TODO Auto-generated method stub
+        super.onTearDownAfterTransaction();
     }
     
     public void testSetup()
@@ -120,14 +135,30 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
     }
     
 	public void testBasicFilingTest() throws Exception
-	{
-	    // Get a record category to file into
-	    NodeRef recordFolder = getRecordFolder("Reports", "AIS Audit Records", "January AIS Audit Records");    
+	{	    
+	    NodeRef recordCategory = getRecordCategory("Reports", "AIS Audit Records");    
+	    assertNotNull(recordCategory);
+	    assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+        	    
+	    Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
+	    folderProps.put(ContentModel.PROP_NAME, "March AIS Audit Records");
+	    NodeRef recordFolder = this.nodeService.createNode(recordCategory, 
+	                                                       ContentModel.ASSOC_CONTAINS, 
+	                                                       QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "March AIS Audit Records"), 
+	                                                       TYPE_RECORD_FOLDER).getChildRef();
 	    
-	    assertNotNull(recordFolder);
-	    System.out.println(this.nodeService.getProperty(recordFolder, ContentModel.PROP_NAME));
+	    setComplete();
+        endTransaction();
 	    
-	    // Create the document
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Check the folder to ensure everything has been inherited correctly
+        assertTrue(((Boolean)this.nodeService.getProperty(recordFolder, PROP_VITAL_RECORD_INDICATOR)).booleanValue());
+        assertEquals(this.nodeService.getProperty(recordCategory, PROP_REVIEW_PERIOD),
+                     this.nodeService.getProperty(recordFolder, PROP_REVIEW_PERIOD));
+	    
+        // Create the document
 	    Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
 	    props.put(ContentModel.PROP_NAME, "MyRecord.txt");
 	    NodeRef recordOne = this.nodeService.createNode(recordFolder, 
@@ -141,10 +172,8 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
 	    writer.setEncoding("UTF-8");
 	    writer.putContent("There is some content in this record");
 	    
-	    setComplete();
-        endTransaction();
-        
-        UserTransaction txn = transactionService.getUserTransaction(false);
+	    txn.commit();
+        txn = transactionService.getUserTransaction(false);
         txn.begin();
         
 	    // Checked that the document has been marked as incomplete
@@ -157,7 +186,7 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         System.out.println("Date filed: " + this.nodeService.getProperty(recordOne, PROP_DATE_FILED));
         
         // Check the review schedule
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_REVIEW_SCHEDULE));
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_VITAL_RECORD));
         assertNotNull(this.nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
         System.out.println("Review as of: " + this.nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
 
@@ -198,7 +227,31 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         txn = transactionService.getUserTransaction(false);
         txn.begin();
         
+        // Assert that the record is no longer undeclared
         assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_UNDECLARED_RECORD));
+        
+        // Execute the cutoff action
+        this.rmService.executeRecordsManagementAction(recordOne, "cutoff", null);
+        
+        // Check the disposition action
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_SCHEDULE));
+        assertNotNull(this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION_ID));
+        System.out.println("Disposition action id: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION_ID));
+        assertEquals("destroy", this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION));
+        System.out.println("Disposition action: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION));
+        assertNotNull(this.nodeService.getProperty(recordOne, PROP_DISPOSITION_AS_OF));
+        System.out.println("Disposition as of: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_AS_OF));
+        
+        // Check the previous action details
+        assertEquals("cutoff", this.nodeService.getProperty(recordOne, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
+        assertNotNull(this.nodeService.getProperty(recordOne, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
+        System.out.println("Previous aciont date: " + this.nodeService.getProperty(recordOne, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE).toString());
+        
+        // Execute the destroy action
+        this.rmService.executeRecordsManagementAction(recordOne, "destroy", null);
+        
+        // Check that the node has been destroyed
+        assertFalse(this.nodeService.exists(recordOne));
         
         txn.commit();
 	}
@@ -256,6 +309,21 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         return types.getNodeRefs();
     }
 
+    private NodeRef getRecordCategory(String seriesName, String categoryName)
+    {
+        SearchParameters searchParameters = new SearchParameters();
+        searchParameters.addStore(SPACES_STORE);
+        String query = "PATH:\"rma:filePlan/cm:" + ISO9075.encode(seriesName)
+            + "/cm:" + ISO9075.encode(categoryName) + "\"";
+        System.out.println("Query: " + query);
+        searchParameters.setQuery(query);
+        searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
+        ResultSet rs = this.searchService.query(searchParameters);
+        
+        return rs.getNodeRef(0);
+    }
+    
+    @SuppressWarnings("unused")
     private NodeRef getRecordFolder(String seriesName, String categoryName, String folderName)
     {
         SearchParameters searchParameters = new SearchParameters();

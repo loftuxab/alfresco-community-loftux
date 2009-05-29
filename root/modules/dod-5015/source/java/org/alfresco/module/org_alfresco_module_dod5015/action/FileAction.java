@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
@@ -40,33 +39,27 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
 /**
+ * Files a record into a particular record folder
+ * 
  * @author Roy Wetherall
  */
 public class FileAction extends RMActionExecuterAbstractBase
 {
-
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {
-        // TODO check the record is wihin a folder?                
+        // TODO check the record is within a folder?     
         
-        // TODO if this is a declared record already .. what do we do? .. it's a refile!
+        // TODO check that the folder we are filing into is not closed
+        
+        // TODO if this is a declared record already .. what do we do? .. it's a re-file!
         
         // Get the record categories
         // TODO for now assume only one record category
-        List<NodeRef> recordCategories = getRecordCategories(actionedUponNodeRef);
-        if (recordCategories.size() == 0)
-        {
-            throw new AlfrescoRuntimeException("The record being declared has no associated record category.");
-        }
-        else if (recordCategories.size() != 1)
-        {
-            throw new AlfrescoRuntimeException("Multiple record categories when declaring a record is not yet supported.");
-        }
-        NodeRef recordCategory = recordCategories.get(0);        
+        NodeRef recordCategory = getRecordCategory(actionedUponNodeRef);
         
         // Add the record and undeclared aspect
         nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_RECORD, null);
@@ -93,53 +86,11 @@ public class FileAction extends RMActionExecuterAbstractBase
         {
             Map<QName, Serializable> reviewProps = new HashMap<QName, Serializable>(1);
             reviewProps.put(RecordsManagementModel.PROP_REVIEW_AS_OF, reviewAsOf);
-            this.nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_REVIEW_SCHEDULE, reviewProps);
+            this.nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_VITAL_RECORD, reviewProps);
         }
         
-        // TODO move this into a generic method we can reuse
-        
-        // Set up the details of the first disposition action
-        NodeRef dispositionAction = getNextDispositionAction(recordCategory, actionedUponNodeRef);
-        if (dispositionAction != null)
-        {
-            // Calculate the asOf date
-            Date asOfDate = null;
-            String period = (String)this.nodeService.getProperty(dispositionAction, RecordsManagementModel.PROP_DISPOSITION_PERIOD);
-            if (period != null)
-            {
-                // Use NOW as the default context date
-                Date contextDate = new Date();
-                
-                // Get the period properties value
-                String periodPropertyValue = (String)this.nodeService.getProperty(dispositionAction, RecordsManagementModel.PROP_DISPOSITION_PERIOD_PROPERTY);
-                if (periodPropertyValue != null)
-                {
-                    contextDate = (Date)this.nodeService.getProperty(actionedUponNodeRef, QName.createQName(periodPropertyValue));
-                }
-                
-                // Calculate the asof date
-                asOfDate = calculateAsOfDate(period, contextDate);
-            }
-            
-            // Get the name of the action
-            String dispositionActionName = (String)this.nodeService.getProperty(dispositionAction, RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME);
-            
-            // Set the property values
-            Map<QName, Serializable> dispositionProps = new HashMap<QName, Serializable>(4);
-            dispositionProps.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_ID, dispositionAction.getId());
-            dispositionProps.put(RecordsManagementModel.PROP_DISPOSITION_ACTION, dispositionActionName);
-            if (asOfDate != null)
-            {
-                dispositionProps.put(RecordsManagementModel.PROP_DISPOSITION_AS_OF, asOfDate);
-            }
-            
-            // TODO all the event stuff ...
-                    
-            // TODO set up all the historical stuff
-            
-            // Apply the aspect
-            this.nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_DISPOSITION_SCHEDULE, dispositionProps);
-        }
+        // Set the next disposition action
+        setNextDispositionAction(recordCategory, actionedUponNodeRef);
     }
 
     /**
@@ -148,6 +99,7 @@ public class FileAction extends RMActionExecuterAbstractBase
     @Override
     protected void addParameterDefinitions(List<ParameterDefinition> paramList)
     {              
+        // No parameters
     }
 
 }

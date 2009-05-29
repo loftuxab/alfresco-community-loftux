@@ -1299,6 +1299,7 @@ public final class ScriptSiteData extends ScriptBase
     
     private static ScriptProcessor getScriptProcessor()
     {
-        return (ScriptProcessor)FrameworkHelper.getApplicationContext().getBean("webframework.scriptprocessor");
+        return (ScriptProcessor)FrameworkHelper.getApplicationContext().getBean(
+                FrameworkHelper.FRAMEWORK_SCRIPT_PROCESSOR);
     }
 }

@@ -13,27 +13,11 @@
       <table cellspacing="0" cellpadding="0" border="0">
          <tr>
             <td>
-               <div class="designation">
-                  <span class="header">${msg("label.designation")}</span>
+               <div class="records">
+                  <span class="header">${msg("label.records")}</span>
                   <div>
-                     <ul>
-                        <li>
-                           <input type="checkbox" id="${el}-designation-freeze" />
-                           <label for="${el}-designation-freeze">${msg("label.freeze")}</label>
-                        </li>
-                        <li>
-                           <input type="checkbox" id="${el}-designation-hold" />
-                           <label for="${el}-designation-hold">${msg("label.hold")}</label>
-                        </li>
-                        <li>
-                           <input type="checkbox" id="${el}-designation-permanent" />
-                           <label for="${el}-designation-permanent">${msg("label.permanent")}</label>
-                        </li>
-                        <li>
-                           <input type="checkbox" id="${el}-designation-review" />
-                           <label for="${el}-designation-review">${msg("label.review")}</label>
-                        </li>
-                     </ul>
+                     <input type="checkbox" id="${el}-undeclared" />
+                     <label for="${el}-undeclared">${msg("label.undeclared")}</label>
                   </div>
                </div>
             </td>
@@ -80,7 +64,7 @@
             <td colspan="3">
                <div class="create-report">
                   <div class="create-report-button">
-                     <span class="yui-button yui-push-button" id="${el}-report-button">
+                     <span class="yui-button yui-push-button" id="${el}-create-report-button">
                         <span class="first-child"><button>${msg("button.createReport")}</button></span>
                      </span>
                   </div>
@@ -88,7 +72,24 @@
             </td>
          </tr>
       </table>
+      <#include "../rmresults-common/rmoptions.ftl" />
    </div>
    
-   <div id="${el}-results" class="results"></div>
+   <div id="${el}-summary" class="summary hidden">
+      <div class="summary-buttons">
+         <span class="export-report-button">
+            <span class="yui-button yui-push-button" id="${el}-export-report-button">
+               <span class="first-child"><button>${msg("button.exportReport")}</button></span>
+            </span>
+         </span>
+         <span class="print-report-button">
+            <span class="yui-button yui-push-button" id="${el}-print-report-button">
+               <span class="first-child"><button>${msg("button.printReport")}</button></span>
+            </span>
+         </span>
+      </div>
+      <div id="${el}-summary-title" class="summary-title"></div>
+   </div>
+   
+   <div id="${el}-results" class="results hidden"></div>
 </div>

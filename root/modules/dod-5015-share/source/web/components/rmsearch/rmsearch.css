@@ -20,22 +20,16 @@
 .search .builder
 {
    margin: 0 -10px;
-   background-color: #CCCCCC;
+   background-color: #DDDDDD;
    padding: 10px 24px 16px;
    line-height: 2em;
 }
 
 .search textarea
 {
-   width: 56em;
+   width: 40em;
    height: 4em;
    border: 1px solid #AAAAAA;
-}
-
-.search .search-button
-{
-   margin-top: -3.5em;
-   margin-left: 57em;
 }
 
 .search .query
@@ -43,82 +37,27 @@
    height: 5em;
 }
 
-.search .metadata
+.search .header
 {
-   border: 1px solid #ffffff;
-   background-color: #D7D7D7;
-   line-height: 1.5em;
-   padding: 6px 6px 4px 8px;
-   height: 6em;
-   min-width: 20em;
-   overflow-y: auto;
-   overflow-x: hidden;
+   font-weight: bold;
+   font-size: 108%;
 }
 
-.search label
+.search .records
 {
-   padding-left: 4px;
-   vertical-align: 5%;
+   height: 7em;
+   border-right: 1px solid #AAAAAA;
+   padding: 0 4em 0 1em;
 }
 
-.search .sortlabel
+.search .terms
 {
-   vertical-align: 15%;
+   height: 7em;
+   padding: 0 1em 0 4em;
 }
 
-.search .separator
+.search .execute-search
 {
-   background: transparent url(images/expanded.png) no-repeat 4px 8px;
-   cursor: pointer;
-}
-
-.search .options
-{
-   margin-left: 20px;
-   margin-right: 8px;
-   display: block;
-}
-
-.search .sort
-{
-   padding-left: 10em;
-}
-
-.search .results
-{
-   margin: 16px 10px 10px;
-}
-
-.search .yui-dt table
-{
-	border: 1px solid #C0C0C0;
-}
-
-.search .yui-dt td
-{
-   border-bottom: 1px solid #D7D7D7;
-   border-right: medium none;
-}
-
-.search .yui-dt-last td
-{
-   border-bottom: medium none;
-}
-
-.search tr.yui-dt-odd,
-.search tr.yui-dt-even
-{
-   background-color: #ffffff;
-   cursor: auto;
-}
-
-.search td.yui-dt-asc,
-.search td.yui-dt-desc
-{
-   background-color: #ffffff !important;
-}
-
-.search tr.yui-dt-odd, tr.yui-dt-even
-{
-   background-color: #ffffff !important;
+   border-top: 1px solid #AAAAAA;
+   padding-top: 12px;
 }

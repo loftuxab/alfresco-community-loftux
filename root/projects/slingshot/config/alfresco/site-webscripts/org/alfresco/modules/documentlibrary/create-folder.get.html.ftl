@@ -1,9 +1,9 @@
 <div id="${args.htmlid}-dialog" class="create-folder">
-   <div class="hd">${msg("title")}</div>
+   <div id="${args.htmlid}-dialogTitle" class="hd">${msg("title")}</div>
    <div class="bd">
       <form id="${args.htmlid}-form" action="" method="post">
          <div class="yui-g">
-            <h2>${msg("header")}:</h2>
+            <h2 id="${args.htmlid}-dialogHeader">${msg("header")}:</h2>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-name">${msg("label.name")}:</label></div>

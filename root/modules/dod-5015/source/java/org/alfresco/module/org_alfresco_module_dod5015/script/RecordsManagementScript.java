@@ -112,7 +112,7 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	
 	public void executeRecordAction(ScriptNode node, String actionName)
 	{
-	    rmService.executeRecordAction(node.getNodeRef(), actionName, null);
+	    rmService.executeRecordsManagementAction(node.getNodeRef(), actionName, null);
 	}
 	
 	/**
@@ -281,7 +281,7 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
 	        logger.debug(buf.toString());
 	    }
 	    
-	    this.rmService.executeRecordAction(node, name, paramsMap);
+	    this.rmService.executeRecordsManagementAction(node, name, paramsMap);
 	}
 
 	/**

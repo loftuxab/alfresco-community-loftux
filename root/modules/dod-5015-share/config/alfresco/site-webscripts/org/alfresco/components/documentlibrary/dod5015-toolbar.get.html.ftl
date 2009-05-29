@@ -11,7 +11,11 @@
 
    <div id="${args.htmlid}-headerBar" class="header-bar flat-button theme-bg-2">
       <div class="left">
-         <div class="new-folder hideable DocListTree"><button id="${args.htmlid}-newFolder-button" name="newFolder">${msg("button.new-folder")}</button></div>
+         <div class="new-series hideable DocListTree"><button id="${args.htmlid}-newSeries-button" name="record-series">${msg("button.new-series")}</button></div>
+         <div class="separator hideable DocListTree">&nbsp;</div>
+         <div class="new-category hideable DocListTree"><button id="${args.htmlid}-newCategory-button" name="record-category">${msg("button.new-category")}</button></div>
+         <div class="separator hideable DocListTree">&nbsp;</div>
+         <div class="new-folder hideable DocListTree"><button id="${args.htmlid}-newFolder-button" name="record-folder">${msg("button.new-folder")}</button></div>
          <div class="separator hideable DocListTree">&nbsp;</div>
          <div class="file-upload hideable DocListTree"><button id="${args.htmlid}-fileUpload-button" name="fileUpload">${msg("button.upload")}</button></div>
          <div class="separator hideable DocListTree">&nbsp;</div>

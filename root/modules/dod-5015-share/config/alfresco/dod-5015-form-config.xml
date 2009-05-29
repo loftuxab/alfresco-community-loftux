@@ -44,6 +44,7 @@
                <show id="rma:identifier" />
                <show id="rma:dispositionAuthority" />
                <show id="rma:dispositionInstructions" />
+               <show id="rma:vitalRecordIndicator" />
                <show id="rma:reviewPeriod" />
                <show id="rma:dispositionActions" />
             </field-visibility>
@@ -53,6 +54,9 @@
                </field>
                <field id="rma:dispositionActions">
                   <control template="controls/disposition-actions.ftl" />
+               </field>
+               <field id="rma:vitalRecordIndicator">
+                  <control template="controls/checkbox.ftl" />
                </field>
                <field id="rma:reviewPeriod">
                   <control template="controls/period.ftl" />
@@ -73,12 +77,32 @@
                <show id="rma:recordFolderLocation" />
                <show id="rma:recordFolderSupplementalMarkingList" />
                <show id="rma:isClosed" />
+               <show id="rma:vitalRecordIndicator" />
                <show id="rma:reviewPeriod" />
+               
+               <!-- rma:vitalRecord aspect -->
+               <show id="rma:reviewAsOf" />
+               
+               <!-- rma:dispositionSchedule aspect -->
+               <show id="rma:dispositionActionId" />
+               <show id="rma:dispositionAction" />
+               <show id="rma:dispositionAsOf" />
+               
+               <!-- rma:cutOff aspect -->
+               <show id="rma:cutOffDate" />
             </field-visibility>
             <appearance>
+               <field id="rma:vitalRecordIndicator">
+                  <control template="controls/checkbox.ftl" />
+               </field>
                <field id="rma:reviewPeriod">
                   <control template="controls/period.ftl" />
                </field>
+               <field id="rma:reviewAsOf" read-only="true" />
+               <field id="rma:dispositionActionId" read-only="true" />
+               <field id="rma:dispositionAction" read-only="true" />
+               <field id="rma:dispositionAsOf" read-only="true" />
+               <field id="rma:cutOffDate" read-only="true" />
             </appearance>
          </form>
       </forms>
@@ -88,7 +112,10 @@
       <forms>
          <form>
             <field-visibility>
-               <!-- Record Aspect -->
+               <!-- hide the author field (to mask an issue for the demo) -->
+               <hide id="cm:author" />
+               
+               <!-- rma:record aspect -->
                <show id="rma:identifier" />
                <show id="rma:dateFiled" />
                <show id="rma:publicationDate" />
@@ -101,7 +128,61 @@
                <show id="rma:address" />
                <show id="rma:otherAddress" />
                <show id="rma:location" />
+               
+               <!-- rma:scannedRecord aspect -->
+               <show id="rma:scannedFormat" />
+               <show id="rma:scannedFormatVersion" />
+               <show id="rma:resolutionX" />
+               <show id="rma:resolutionY" />
+               <show id="rma:scannedBitDepth" />
+               
+               <!-- rma:pdfRecord aspect -->
+               <show id="rma:producingApplication" />
+               <show id="rma:producingApplicationVersion" />
+               <show id="rma:pdfVersion" />
+               <show id="rma:creatingApplication" />
+               <show id="rma:documentSecuritySettings" />
+               
+               <!-- rma:digitalPhotographRecord aspect -->
+               <show id="rma:caption" />
+               <show id="rma:photographer" />
+               <show id="rma:copyright" />
+               <show id="rma:bitDepth" />
+               <show id="rma:imageSizeX" />
+               <show id="rma:imageSizeY" />
+               <show id="rma:imageSource" />
+               <show id="rma:compression" />
+               <show id="rma:iccIcmProfile" />
+               <show id="rma:exifInformation" />
+            
+               <!-- rma:webRecord aspect -->
+               <show id="rma:webFileName" />
+               <show id="rma:webPlatform" />
+               <show id="rma:webSiteName" />
+               <show id="rma:webSiteURL" />
+               <show id="rma:captureMethod" />
+               <show id="rma:captureDate" />
+               <show id="rma:contact" />
+               <show id="rma:contentManagementSystem" />
+               
+               <!-- rma:vitalRecord aspect -->
+               <show id="rma:reviewAsOf" />
+               
+               <!-- rma:dispositionSchedule aspect -->
+               <show id="rma:dispositionActionId" />
+               <show id="rma:dispositionAction" />
+               <show id="rma:dispositionAsOf" />
+               
+               <!-- rma:cutOff aspect -->
+               <show id="rma:cutOffDate" />
             </field-visibility>
+            <appearance>
+               <field id="rma:reviewAsOf" read-only="true" />
+               <field id="rma:dispositionActionId" read-only="true" />
+               <field id="rma:dispositionAction" read-only="true" />
+               <field id="rma:dispositionAsOf" read-only="true" />
+               <field id="rma:cutOffDate" read-only="true" />
+            </appearance>
          </form>
       </forms>
    </config>

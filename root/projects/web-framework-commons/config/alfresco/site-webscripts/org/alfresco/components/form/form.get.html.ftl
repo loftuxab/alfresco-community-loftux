@@ -3,12 +3,20 @@
 <#elseif form?exists>
 
    <#assign formId=args.htmlid + "-form">
-   
-   <#if form.mode != "view">
+   <#assign formUI><#if args.formUI??>${args.formUI}<#else>true</#if></#assign>
+
+   <#if formUI == "true">
       <script type="text/javascript">//<![CDATA[
-         new Alfresco.FormUI("${formId}").setOptions(
+         new Alfresco.FormUI("${formId}", "${args.htmlid}").setOptions(
          {
             mode: "${form.mode}",
+         <#if form.mode == "view">
+            arguments:
+            {
+               itemKind: "${form.arguments.itemKind!""}",
+               itemId: "${form.arguments.itemId!""}"
+            }
+         <#else>
             enctype: "${form.enctype}",
             fieldConstraints: 
             [
@@ -23,6 +31,7 @@
                <#if constraint_has_next>,</#if>
                </#list>
             ]
+         </#if>
          }).setMessages(
             ${messages}
          );

@@ -42,6 +42,7 @@
                         <rma:dispositionAuthority>N1-218-00-4 item 023</rma:dispositionAuthority>
                         <rma:dispositionInstructions>Cut off monthly, hold 1 month, then destroy.</rma:dispositionInstructions>
                         <rma:reviewPeriod>week|1</rma:reviewPeriod>
+                        <rma:vitalRecordIndicator>true</rma:vitalRecordIndicator>
                     </view:properties>
                     
                     <view:associations>
@@ -67,10 +68,10 @@
                             <rma:recordFolder view:childName="cm:January AIS Audit Records">
                                 <view:properties>
                                     <cm:name>January AIS Audit Records</cm:name>
-                                    <rma:identifier>0318-01</rma:identifier>
                                     <cm:title>January AIS Audit Records</cm:title>
-                                    <!-- Vital Records Review and Update Cycle Period should
-                                         be inherited from the Record Category level -->
+                                    <rma:identifier>0318-01</rma:identifier>
+                                    <rma:reviewPeriod>week|1</rma:reviewPeriod>
+                                    <rma:vitalRecordIndicator>true</rma:vitalRecordIndicator>
                                 </view:properties>
                             </rma:recordFolder>
                         </cm:contains>
@@ -439,7 +440,7 @@
                                     <rma:dispositionActionName>transfer</rma:dispositionActionName>
                                     <rma:dispositionDescription>Transfer to federal records holding area.</rma:dispositionDescription>
                                     <rma:dispositionPeriod>year|5</rma:dispositionPeriod>
-                                    <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}previousActionDate</rma:dispositionPeriodProperty>
+                                    <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAsOf</rma:dispositionPeriodProperty>
                                 </view:properties>                              
                             </rma:dispositionAction>                         
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
@@ -564,7 +565,7 @@
                                 <view:properties>
                                     <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                     <rma:dispositionPeriod>fyend|1</rma:dispositionPeriod>
-                                    <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}previousActionDate</rma:dispositionPeriodProperty>
+                                    <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAsOf</rma:dispositionPeriodProperty>
                                 </view:properties>                               
                             </rma:dispositionAction>                                                     
                             <rma:dispositionAction view:childName="rma:dispositionAction">                              
