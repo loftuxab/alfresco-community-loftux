@@ -35,8 +35,8 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+       Event = YAHOO.util.Event,
+       Element = YAHOO.util.Element;
    
    /**
     * Alfresco Slingshot aliases
@@ -53,7 +53,7 @@
    Alfresco.ConsoleUsers = function(htmlId)
    {
       this.name = "Alfresco.ConsoleUsers";
-      this.id = htmlId;
+      Alfresco.ConsoleUsers.superclass.constructor.call(this, htmlId);
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -64,64 +64,8 @@
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("viewUserClick", this.onViewUserClick, this);
       
-      /* History navigation event */
-      YAHOO.Bubbling.on("stateChanged", this.onStateChanged, this);
-      
       /* Define panel handlers */
       var parent = this;
-      Alfresco.ConsolePanelHandler = function(id)
-      {
-         this.id = id;
-         
-         // register the panel with the parent object
-         parent.panels.push(this);
-      };
-      
-      /** Alfresco.ConsolePanelHandler prototype */
-      Alfresco.ConsolePanelHandler.prototype =
-      {
-         id : null,
-         
-         /**
-          * Event handler - called once only when panel first initialised
-          * @method onLoad
-          */
-         onLoad: function onLoad()
-         {
-         },
-         
-         /**
-          * Event handler - called just before panel is going to be made visible
-          * @method onBeforeShow
-          */
-         onBeforeShow: function onBeforeShow()
-         {
-         },
-         
-         /**
-          * Event handler - called after the panel has been made visible
-          * @method onShow
-          */
-         onShow: function onShow()
-         {
-         },
-         
-         /**
-          * Event handler - called to request the panel update it's current state
-          * @method onUpdate
-          */
-         onUpdate: function onUpdate()
-         {
-         },
-         
-         /**
-          * Event handler - called after the panel has been made invisible
-          * @method onHide
-          */
-         onHide: function onHide()
-         {
-         }
-      };
       
       // NOTE: the panel registered first is considered the "default" view and is displayed first
       
@@ -1112,7 +1056,7 @@
       return this;
    }
    
-   Alfresco.ConsoleUsers.prototype =
+   YAHOO.extend(Alfresco.ConsoleUsers, Alfresco.ConsoleTool,
    {
       /**
        * Object container for initialization options
@@ -1140,46 +1084,6 @@
           */
          maxSearchResults: 100
       },
-
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: {},
-      
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: {},
-      
-      /**
-       * Object container for storing YUI pop dialog instances.
-       * 
-       * @property popups
-       * @type object
-       */
-      popups: {},
-      
-      /**
-       * List of the available UI panel handler objects; such as Search, View, Edit etc.
-       * 
-       * @property panels
-       * @type array
-       */
-      panels: [],
-      
-      /**
-       * The current UI panel ID on display
-       * 
-       * @property currentPanelId
-       * @type string
-       */
-      currentPanelId: "",
       
       /**
        * Current user id for an action.
@@ -1198,32 +1102,6 @@
       searchTerm: "",
       
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.ConsoleUsers} returns 'this' for method chaining
-       */
-      setOptions: function ConsoleUsers_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.ConsoleUsers} returns 'this' for method chaining
-       */
-      setMessages: function ConsoleUsers_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        *
@@ -1233,7 +1111,7 @@
       {
          Event.onContentReady(this.id, this.onReady, this, true);
       },
-   
+      
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -1276,58 +1154,8 @@
          this.popups.deleteDialog.setHeader(this._msg("panel.delete.header"));
          this.popups.deleteDialog.render(document.body);
          
-         // YUI History
-         var bookmarkedState = YAHOO.util.History.getBookmarkedState("state") || this.encodeHistoryState({"panel": this.panels[0].id});
-         
-         // Register History Manager callbacks
-         YAHOO.util.History.register("state", bookmarkedState, function CU_onHistoryManagerStateChanged(newState)
-         {
-            YAHOO.Bubbling.fire("stateChanged",
-            {
-               state: newState
-            });
-         });
-         
-         // Continue only when History Manager fires its onReady event
-         YAHOO.util.History.onReady(this.onHistoryManagerReady, this, true);
-         
-         // Initialize the browser history management library
-         try
-         {
-             YAHOO.util.History.initialize("yui-history-field", "yui-history-iframe");
-         }
-         catch(e)
-         {
-            /*
-             * The only exception that gets thrown here is when the browser is
-             * not supported (Opera, or not A-grade)
-             */
-            Alfresco.logger.debug("Alfresco.ConsoleUsers: Couldn't initialize HistoryManager.", e.toString());
-            this.onHistoryManagerReady();
-         }
-      },
-      
-      /**
-       * Fired by YUI when History Manager is initialised and available for scripting.
-       * Component initialisation, including instantiation of YUI widgets and event listener binding.
-       *
-       * @method onHistoryManagerReady
-       */
-      onHistoryManagerReady: function ConsoleUsers_onHistoryManagerReady()
-      {
-         // Fire the onLoad() panel lifecycle event for each registered panel
-         // To perform one-off setup of contained widgets and internal event handlers
-         for (var i in this.panels)
-         {
-            this.panels[i].onLoad();
-         }
-         
-         // display the initial panel based on history state or default
-         var bookmarkedState = YAHOO.util.History.getBookmarkedState("state") || this.encodeHistoryState({"panel": this.panels[0].id});
-         YAHOO.Bubbling.fire("stateChanged",
-         {
-            state: bookmarkedState
-         });
+         // Call super-class onReady() method
+         Alfresco.ConsoleUsers.superclass.onReady.call(this);
       },
       
       /**
@@ -1336,7 +1164,7 @@
        */
       
       /**
-       * History manager state change event handler
+       * History manager state change event handler (override base class)
        *
        * @method onStateChanged
        * @param e {object} DomEvent
@@ -1349,7 +1177,7 @@
          // test if panel has actually changed?
          if (state.panel)
          {
-            this._showPanel(state.panel);
+            this.showPanel(state.panel);
          }
          
          if (state.search && this.currentPanelId === "search")
@@ -1358,7 +1186,7 @@
             var searchTerm = state.search;
             this.searchTerm = searchTerm;
             
-            this._updateCurrentPanel();
+            this.updateCurrentPanel();
          }
          
          if (state.userid &&
@@ -1368,7 +1196,7 @@
          {
             this.currentUserId = state.userid;
             
-            this._updateCurrentPanel();
+            this.updateCurrentPanel();
          }
       },
       
@@ -1394,7 +1222,7 @@
             return;
          }
          
-         this._refreshUIState({"search": searchTerm});
+         this.refreshUIState({"search": searchTerm});
       },
       
       /**
@@ -1406,7 +1234,7 @@
        */
       onNewUserClick: function ConsoleUsers_onNewUserClick(e, args)
       {
-         this._refreshUIState({"panel": "create"});
+         this.refreshUIState({"panel": "create"});
       },
       
       /**
@@ -1418,7 +1246,7 @@
        */
       onEditUserClick: function ConsoleUsers_onEditUserClick(e, args)
       {
-         this._refreshUIState({"panel": "update"});
+         this.refreshUIState({"panel": "update"});
       },
       
       /**
@@ -1431,7 +1259,7 @@
       onViewUserClick: function ConsoleUsers_onViewUserClick(e, args)
       {
          var userid = args[1].username;
-         this._refreshUIState({"panel": "view", "userid": userid});
+         this.refreshUIState({"panel": "view", "userid": userid});
       },
       
       /**
@@ -1481,7 +1309,7 @@
          {
             text: this._msg("message.delete-success")
          });
-         this._refreshUIState({"panel": "search"});
+         this.refreshUIState({"panel": "search"});
       },
       
       /**
@@ -1511,7 +1339,7 @@
             {
                text: this._msg("message.create-success")
             });
-            this._refreshUIState({"panel": "search"});
+            this.refreshUIState({"panel": "search"});
          };
          this._createUser(handler);
       },
@@ -1550,7 +1378,7 @@
        */
       onCreateUserCancelClick: function ConsoleUsers_onCreateUserCancelClick(e, args)
       {
-         this._refreshUIState({"panel": "search"});
+         this.refreshUIState({"panel": "search"});
       },
       
       /**
@@ -1570,7 +1398,7 @@
             {
                text: me._msg("message.update-success")
             });
-            me._refreshUIState({"panel": "view"});
+            me.refreshUIState({"panel": "view"});
          };
          this._updateUser(handler);
       },
@@ -1584,34 +1412,12 @@
        */
       onUpdateUserCancelClick: function ConsoleUsers_onUpdateUserCancelClick(e, args)
       {
-         this._refreshUIState({"panel": "view"});
-      },
-      
-      /**
-       * PRIVATE FUNCTIONS
-       */
-      
-      /**
-       * Decode packed URL state into its component name value pairs.
-       * 
-       * @method decodeHistoryState
-       * @param state {string} packed state from the url history
-       * @private
-       */
-      decodeHistoryState: function ConsoleUsers_decodeHistoryState(state)
-      {
-         var obj = {};
-         var pairs = state.split("&");
-         for (var i=0; i<pairs.length; i++)
-         {
-            var pair = pairs[i].split("=");
-            obj[pair[0]] = decodeURIComponent(pair[1]);
-         }
-         return obj;
+         this.refreshUIState({"panel": "view"});
       },
       
       /**
        * Encode state object into a packed string for use as url history value.
+       * Override base class.
        * 
        * @method encodeHistoryState
        * @param obj {object} state object
@@ -1658,6 +1464,10 @@
          }
          return state;
       },
+      
+      /**
+       * PRIVATE FUNCTIONS
+       */
       
       /**
        * Create a user - returning true on success, false on any error.
@@ -1884,107 +1694,6 @@
       },
       
       /**
-       * Make the specified panel visible - hiding any others and firing
-       * the various Panel events as we go.
-       * 
-       * @method _showPanel
-       * @param panelId {string} ID of the panel to make visible
-       * @private
-       */
-      _showPanel: function ConsoleUsers__showPanel(panelId)
-      {
-         if (this.currentPanelId !== panelId)
-         {
-            this.currentPanelId = panelId;
-            var newPanel = null;
-            for (var index in this.panels)
-            {
-               var panel = this.panels[index];
-               if (panel.id === panelId)
-               {
-                  newPanel = panel;
-               }
-               else
-               {
-                  Dom.setStyle(this.id + "-" + panel.id, "display", "none");
-                  
-                  // Fire the onHide() panel lifecycle event
-                  panel.onHide();
-               }
-            }
-            
-            if (newPanel != null)
-            {
-               // Fire the onBeforeShow() panel lifecycle event
-               newPanel.onBeforeShow();
-               
-               // Display the specified panel to the user
-               Dom.setStyle(this.id + "-" + panelId, "display", "block");
-               
-               // Fire the onShow() panel lifecycle event
-               newPanel.onShow();
-            }
-         }
-      },
-      
-      /**
-       * Return the object representing the currently visible panel.
-       * 
-       * @method _getCurrentPanel
-       * @return the currently visible panel object
-       * @private
-       */
-      _getCurrentPanel: function ConsoleUsers__getCurrentPanel()
-      {
-         var panel = null;
-         for (var index in this.panels)
-         {
-            if (this.panels[index].id === this.currentPanelId)
-            {
-               panel = this.panels[index];
-               break;
-            }
-         }
-         return panel;
-      },
-      
-      /**
-       * Fire an onUpdate() event to the currently visible panel.
-       * 
-       * @method _updateCurrentPanel
-       * @private
-       */
-      _updateCurrentPanel: function ConsoleUsers__updateCurrentPanel()
-      {
-         for (var i in this.panels)
-         {
-            if (this.panels[i].id === this.currentPanelId)
-            {
-               this.panels[i].onUpdate();
-               break;
-            }
-         }
-      },
-      
-      /**
-       * Refresh the UI based on the given state object, can contain any or all of the
-       * following state properties:
-       * {
-       *    panel: thepanelid,
-       *    userid: theuserid,
-       *    search: thesearchterm
-       * }
-       * 
-       * @method _refreshUIState
-       * @param state {object} UI state object, see above
-       * @private
-       */
-      _refreshUIState: function ConsoleUsers__refreshUIState(state)
-      {
-         YAHOO.util.History.navigate("state", this.encodeHistoryState(state));
-      },
-      
-      /**
        * Gets a custom message
        *
        * @method _msg
@@ -1996,5 +1705,5 @@
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.ConsoleUsers", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();
