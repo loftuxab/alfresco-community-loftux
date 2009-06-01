@@ -194,9 +194,12 @@
    width:100%;
    overflow:auto;
    border-top:1px dashed #CBCBCB;
-   padding-bottom:0.5em;
 }
-
+.profile .sites li.first,
+.profile .content li.first 
+{
+   border-top:0;
+}
 .profile .sites li a.thmb
 {
    padding:8px;
@@ -215,6 +218,7 @@
 {
    font-weight:bold;
    float:none;
+   font-size:108%;
 }
 .profile .sites p,
 .profile .content p
