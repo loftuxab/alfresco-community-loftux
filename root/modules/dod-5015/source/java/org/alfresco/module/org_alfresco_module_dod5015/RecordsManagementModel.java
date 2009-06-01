@@ -65,10 +65,13 @@ public interface RecordsManagementModel
     public static QName PROP_ORIGINATOR = QName.createQName(RM_URI, "originator");
     public static QName PROP_ORIGINATING_ORGANIZATION = QName.createQName(RM_URI, "originatingOrganization");
     public static QName PROP_PUBLICATION_DATE = QName.createQName(RM_URI, "publicationDate");
-    public static QName PROP_SUPPLEMENTAL_MARKING_LIST = QName.createQName(RM_URI, "supplementalMarkingList");
     public static QName PROP_MEDIA_TYPE = QName.createQName(RM_URI, "mediaType");
     public static QName PROP_FORMAT = QName.createQName(RM_URI, "format");
     public static QName PROP_DATE_RECEIVED = QName.createQName(RM_URI, "dateReceived");  
+    
+    // Common record details
+    public static QName PROP_SUPPLEMENTAL_MARKING_LIST = QName.createQName(RM_URI, "supplementalMarkingList");
+    public static QName PROP_LOCATION = QName.createQName(RM_URI, "location");
     
     // Fileable aspect
     public static QName ASPECT_FILABLE = QName.createQName(RM_URI, "fileable");
