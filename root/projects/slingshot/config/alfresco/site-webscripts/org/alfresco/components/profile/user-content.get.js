@@ -1,12 +1,12 @@
 
 
-var result = remote.call("/slingshot/profile/usercontents?user=" + stringUtils.urlEncode(page.url.templateArgs["userid"]));
+var result = remote.call("/slingshot/profile/usercontents?user=" + stringUtils.urlEncode(page.url.templateArgs["userid"])+"&maxResults=3");
+
 model.addedContent = [];
 model.modifiedContent = [];
 var numContentToShow = 3;
 if (result.status == 200)
 {
-
    // Create javascript objects from the server response
    var data = eval('(' + result + ')');
    ['created','modified'].forEach(function(type){

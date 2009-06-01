@@ -12,7 +12,7 @@
 {
    height: 1.1em;
    padding: 0.3em;
-   margin: 1.5em 1em 1em 1em;
+   margin: 1.5em 1em 0em 1em;
    background-color: #e3eaec;
    border-bottom: 2px solid #f0f3f4;
    font-weight: bold;
@@ -142,7 +142,10 @@
    padding-left: 1.5em;
 }
 
-.profile p
+.profile p {
+   margin-left:1.5em;
+}
+.profile li p
 {
    line-height: 1.5em;
    margin-left: 9.5em;
@@ -177,36 +180,57 @@
 {
    display: none;
 }
-.profile .sites
+.profile .sites,
+.profile .content
 {
-   margin:0 2.5em;
+   margin:0 1.15em;
+   border:1px solid #CBCBCB;
+   border-width:0 1px 1px 1px;
 }
-.profile .sites li 
+.profile .sites li,
+.profile .content li  
 {
    clear:both;
    width:100%;
    overflow:auto;
-}
-.profile .sites li a.thmb 
-{
-   padding:8px 0 16px;
+   border-top:1px dashed #CBCBCB;
+   padding-bottom:0.5em;
 }
 
-.profile .sites li a 
+.profile .sites li a.thmb
+{
+   padding:8px;
+}
+.profile .content li a.thmb  
+{
+   padding:16px;
+}
+.profile .sites li a,
+.profile .content li a.thmb 
 {
    float:left;
 }
-.profile .sites li p a 
+.profile .sites li p a,
+.profile .content li p a  
 {
-   display:block;
+   font-weight:bold;
    float:none;
 }
-.profile .sites p 
+.profile .sites p,
+.profile .content p
 {
    float:left;
-   margin:0.5em 1em;
 }
-.profile .sites li p span
+.profile .sites p
+{
+   margin:1.5em 0;
+}
+.profile .content p
+{
+   margin:1em 0;
+}
+.profile .sites li p span,
+.profile .content li p span
 {
   display:block;  
 }
