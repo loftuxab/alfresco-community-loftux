@@ -6,7 +6,11 @@
          <#if (numSites >0)>
          <ul class="sites">
          <#list sites as site>
+            <#if (site_index == 0)>
+            <li class="first">
+            <#else>
             <li>
+            </#if>
                <a href="${url.context}/page/site/${site.shortName}/dashboard" class="thmb"><img src="${url.context}/components/site-finder/images/site-64.png"/></a>
                <p><a href="${url.context}/page/site/${site.shortName}/dashboard" class="theme-color-1">${site.title?html!""}</a>
                <span>${site.description?html!""}</span></p>

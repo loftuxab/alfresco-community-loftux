@@ -1,6 +1,10 @@
 <#macro dateFormat date>${date?string("EEE d MMM yyyy HH:mm:ss")}</#macro>
-<#macro formatContent content date type>
-   <li>
+<#macro formatContent content date type index>
+      <#if (index == 0)>
+      <li class="first">
+      <#else>
+      <li>
+      </#if>
       <a href="${url.context}/page/site/${content.site.shortName}/${content.browseUrl}" class="thmb"><img src="${url.context}/components/images/generic-file-32.png"/></a>
       <p><a href="${url.context}/page/site/${content.site.shortName}/${content.browseUrl}" class="theme-color-1">${content.displayName?html!""}</a>
       ${content.description}
@@ -16,7 +20,7 @@
          <#if (numAddedContent >0)>
          <ul class="content">
          <#list addedContent as content>
-            <@formatContent content content.createdOn msg("label.createdOn")/>
+            <@formatContent content content.createdOn msg("label.createdOn") content_index/>
          </#list>
          </ul>
          <#else>
@@ -26,7 +30,7 @@
          <#if (numModifiedContent >0)>
          <ul class="content">
          <#list modifiedContent as content>
-            <@formatContent content content.modifiedOn msg("label.modifiedOn")/>
+            <@formatContent content content.modifiedOn msg("label.modifiedOn") content_index/>
          </#list>
          </ul>
          <#else>
