@@ -44,8 +44,11 @@
 {
    float: right;
    line-height: 2.2em;
+   visibility:hidden;
 }
-
+.my-sites .detail-list-item.over div.actions{
+   visibility:visible;
+}
 .my-sites div.actions span.delete
 {
    background-image: url(../images/remove-icon-16.png);
