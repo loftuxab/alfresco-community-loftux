@@ -1,6 +1,3 @@
-<script type="text/javascript">//<![CDATA[
-   new Alfresco.widget.DashletResizer("${args.htmlid}", "${instance.object.id}");
-//]]></script>
 <div class="dashlet">
    <div class="title">${msg("header.network")}</div>
    <div class="body" id="alfresco-network">
