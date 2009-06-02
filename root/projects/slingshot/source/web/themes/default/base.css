@@ -164,7 +164,6 @@ hr
 .page-title div.title
 {
    float: left;
-   padding-top: 2px;
 }
 .page-title div.links
 {
@@ -176,6 +175,8 @@ hr
 .page-title h1
 {
    display: inline;
+   position: relative;
+   top: 2px;
 }
 
 .site-navigation

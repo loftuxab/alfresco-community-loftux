@@ -1,6 +1,6 @@
 <div class="page-title theme-bg-color-1 theme-border-1">
    <div class="title">
-      <h1><span>${msg("header.title")}</span></h1>
+      <h1 class="theme-color-3"><span>${msg("header.title")}</span></h1>
    </div>
 </div>
 
