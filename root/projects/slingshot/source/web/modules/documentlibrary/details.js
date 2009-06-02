@@ -233,6 +233,12 @@
          });
          this.widgets.dialog.render(document.body);
          
+         // Edit metadata link button
+         this.widgets.editMetadata = Alfresco.util.createYUIButton(this, "editMetadata", null, 
+         {
+            type: "link"
+         });
+
          // OK button
          this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok", null,
          {
@@ -273,6 +279,7 @@
          {
             fn: function()
             {
+               this.widgets.editMetadata.set("disabled", true);
                this.widgets.okButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
                this.widgets.dialog.hide();
@@ -342,6 +349,7 @@
       onFailure: function DLD_onFailure(response)
       {
          this.widgets.feedbackMessage.destroy();
+         this.widgets.editMetadata.set("disabled", false);
          this.widgets.okButton.set("disabled", false);
          this.widgets.cancelButton.set("disabled", false);
          this.widgets.dialog.show();
@@ -451,23 +459,12 @@
          Dom.get(this.id + "-fileTitle").value = file.title ? file.title : "";
          Dom.get(this.id + "-description").value = file.description ? file.description : "";
          Dom.get(this.id + "-tags").value = file.tags.join(" ");
-         if (file.type == "document")
-         {
-            var option = YAHOO.util.Selector.query("option[value=\"" + file.mimetype + "\"]", this.id + "-mimetype")[0];
-            if (option)
-            {
-               Dom.get(this.id + "-mimetype").selectedIndex = option.index;
-               Dom.get(this.id + "-mimetype").name = "mimetype";
-            }
-            Dom.removeClass(this.id + "-mimetype-field", "hidden");
-         }
-         else
-         {
-            Dom.addClass(this.id + "-mimetype-field", "hidden");
-            Dom.get(this.id + "-mimetype").name = "-";
-         }
-
+         
+         // Edit Metadata link
+         this.widgets.editMetadata.set("href", "edit-metadata?nodeRef=" + file.nodeRef);
+         
          // Enable buttons
+         this.widgets.editMetadata.set("disabled", false);
          this.widgets.okButton.set("disabled", false);
          this.widgets.cancelButton.set("disabled", false);
 
