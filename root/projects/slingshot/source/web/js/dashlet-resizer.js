@@ -83,7 +83,7 @@ Alfresco.widget.DashletResizer.prototype =
        * @type int
        * @default 100
        */
-      minDashletHeight: 100,
+      minDashletHeight: 80,
 
       /**
        * Maximum Dashlet height.
@@ -209,8 +209,8 @@ Alfresco.widget.DashletResizer.prototype =
       this.widgets.resizer = new YAHOO.util.Resize(this.dashlet,
       {
          handles: ["b"],
-         minHeight: this.minDashletHeight,
-         maxWidth: this.maxDashletHeight
+         minHeight: this.options.minDashletHeight,
+         maxHeight: this.options.maxDashletHeight
       });
       
       // During resize event handler
