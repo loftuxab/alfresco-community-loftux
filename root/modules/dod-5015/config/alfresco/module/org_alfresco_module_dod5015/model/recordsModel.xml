@@ -5,12 +5,12 @@
 <!-- Note: the rma: namespace is defined further on in the document -->
 <model name="rma:recordsmanagement" xmlns="http://www.alfresco.org/model/dictionary/1.0">
 
-   <!-- Meta-data about the model -->   
+   <!-- Meta-data about the model -->
    <description>Records Management Model</description>
    <author>Roy Wetherall</author>
    <version>1.0</version>
 
-   <!-- Imports are required to allow references to definitions in other models -->   
+   <!-- Imports are required to allow references to definitions in other models -->
    <imports>
       <!-- Import Alfresco Dictionary Definitions -->
       <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
@@ -24,9 +24,13 @@
    <namespaces>
       <namespace uri="http://www.alfresco.org/model/recordsmanagement/1.0" prefix="rma"/>
    </namespaces>
-   
+
    <constraints>
-      <constraint name="rma:smList" type="LIST">
+   
+      <!-- Pre-defined caveat (Supplemental Markings List) -->
+      
+      <!-- TODO - remove the list of allowed values (test example only) prior to release and fix-up associated unit tests-->
+      <constraint name="rma:smList" type="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
          <parameter name="allowedValues">
             <list>
                <value>NOFORN</value>      <!-- Not Releasable to Foreign Nationals/Governments/Non-US Citizens -->
@@ -36,12 +40,33 @@
          </parameter>
          <parameter name="caseSensitive"><value>true</value></parameter>
       </constraint>
+      
+      <!--  User-defined caveats (if any) -->
+      
+      <!-- TODO - remove this constraint (test example only) prior to release and fix-up associated unit tests -->
+      <constraint name="rma:prjList" type="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
+         <parameter name="allowedValues">
+            <list>
+               <value>Project A</value>
+               <value>Project B</value>
+               <value>Project C</value>
+            </list>
+         </parameter>
+         <parameter name="caseSensitive"><value>true</value></parameter>
+      </constraint>
+      
    </constraints>
    
    <types>
-   
-      <type name="rma:filePlan">
       
+      <!-- Caveat config - allowed values for users/groups for supplemental markings and/or user-defined fields -->
+      <type name="rma:caveatConfig">
+         <title>Caveat Config</title>
+         <parent>cm:content</parent>
+      </type>
+      
+      <type name="rma:filePlan">
+         
          <title>File Plan</title>
          <parent>cm:folder</parent>
          
@@ -68,12 +93,12 @@
          <title>Record Series</title>
          <parent>cm:folder</parent>
          
-         <mandatory-aspects>               
-            <aspect>cm:titled</aspect>               
+         <mandatory-aspects>
+            <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
-         </mandatory-aspects>         
+         </mandatory-aspects>
          
-      </type>      
+      </type>
       
       <type name="rma:recordCategory">
       
@@ -116,13 +141,13 @@
          
          </associations>
          
-         <mandatory-aspects>         
-            <aspect>cm:titled</aspect>            
+         <mandatory-aspects>
+            <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
             <aspect>rma:vitalRecordDetails</aspect>
          </mandatory-aspects>
          
-      </type>      
+      </type>
             
       <type name="rma:dispositionAction">
          
@@ -130,19 +155,19 @@
          <parent>cm:cmobject</parent>
          
          <properties>
-                    
+            
             <property name="rma:dispositionActionName">
                <title>Disposition Action Name</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
-            </property>        
+            </property>
             
             <property name="rma:dispositionDescription">
                 <title>Disposition Description</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
-            </property>                       
-                                   
+            </property>
+            
             <property name="rma:dispositionPeriod">
                <title>Disposition Period</title>
                <type>d:text</type>
@@ -257,7 +282,7 @@
                <mandatory>true</mandatory>
                <default>false</default>
             </property>            
-         </properties>         
+         </properties>
       </aspect>
       
       <!-- Record Meta-data -->
@@ -315,7 +340,7 @@
             <!-- TODO
                  Do we need to model this as broken up address?  
                  Should we have a separate property for other address or just a multivalue property?
-            -->           
+            -->
             <property name="rma:address">
                <title>Address</title>
                <type>d:text</type>
@@ -326,18 +351,29 @@
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>    
-                                             
-         </properties>         
+            
+            <!-- TODO - remove this user-defined property (test example only) prior to release and fix-up associated unit tests -->
+            <property name="rma:projectNameList">
+               <title>Project Name</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+               <multiple>true</multiple>
+               <constraints>
+                  <constraint ref="rma:prjList"/>
+               </constraints>
+            </property>
+            
+         </properties>
          
-         <mandatory-aspects>         
-            <aspect>cm:titled</aspect>           
+         <mandatory-aspects>
+            <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
             <aspect>rma:commonRecordDetails</aspect>
          </mandatory-aspects>
          
       </aspect>
       
-      <aspect name="rma:commonRecordDetails">                                                
+      <aspect name="rma:commonRecordDetails">
         <properties>
             
             <property name="rma:location">
@@ -345,7 +381,7 @@
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property> 
-                                   
+            
             <property name="rma:supplementalMarkingList">
                <title>Supplemental Marking List</title>
                <type>d:text</type>
@@ -356,7 +392,7 @@
                </constraints>
             </property>
             
-        </properties>     
+        </properties>
       </aspect>
    
       <aspect name="rma:scannedRecord">
@@ -594,9 +630,27 @@
          </properties>
       </aspect>
       
-      <!-- Custom data marker aspect -->            
+      <!-- Custom data marker aspect -->
       <aspect name="rma:customRMData">
          <title>Custom Records Management Data</title>
+      </aspect>
+      
+      <aspect name="rma:caveatConfigRoot">
+         <title>Caveat Config Root</title>
+         <associations>
+            <child-association name="rma:caveatConfigAssoc">
+               <source>
+                  <mandatory>true</mandatory>
+                  <many>false</many>
+               </source>
+               <target>
+                  <class>rma:caveatConfig</class>
+                  <mandatory>false</mandatory>
+                  <many>false</many>
+               </target>
+               <duplicate>false</duplicate>
+            </child-association>
+         </associations>
       </aspect>
       
    </aspects>

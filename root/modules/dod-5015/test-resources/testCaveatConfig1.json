@@ -1,0 +1,5 @@
+{
+   "rma:smList": {
+        "admin"    : ["NOFORN", "NOCONTRACT", "FOUO", "FGI"]
+    }
+}

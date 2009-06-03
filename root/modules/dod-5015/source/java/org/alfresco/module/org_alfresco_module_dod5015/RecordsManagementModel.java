@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -37,6 +37,15 @@ public interface RecordsManagementModel
 	// Namespace details
 	public static String RM_URI = "http://www.alfresco.org/model/recordsmanagement/1.0";
 	public static String RM_PREFIX = "rma";
+    
+    // Model
+    public static QName RM_MODEL = QName.createQName(RM_URI, "recordsmanagement");
+    
+    // Caveat config
+    public static QName TYPE_CAVEAT_CONFIG = QName.createQName(RM_URI, "caveatConfig");
+    
+    public static QName ASPECT_CAVEAT_CONFIG_ROOT = QName.createQName(RM_URI, "caveatConfigRoot");
+    public static QName ASSOC_CAVEAT_CONFIG = QName.createQName(RM_URI, "caveatConfigAssoc");
     
     // File plan type 
     public static QName TYPE_FILE_PLAN = QName.createQName(RM_URI, "filePlan");
