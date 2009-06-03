@@ -24,7 +24,9 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
+import java.io.File;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,9 +38,16 @@ import javax.transaction.UserTransaction;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
+import org.alfresco.repo.node.integrity.IntegrityException;
+import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -47,12 +56,18 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.ISO9075;
+import org.alfresco.util.PropertyMap;
 
 /**
  * 
@@ -71,13 +86,18 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
 	private ContentService contentService;
 	private RecordsManagementActionService rmService;
 	private TransactionService transactionService;
+	private RMCaveatConfigImpl caveatConfigImpl;
 	
-	private AuthenticationComponent authenticationComponent;
+	private AuthenticationService authenticationService;
+	private PersonService personService;
+	private AuthorityService authorityService;
+	private PermissionService permissionService;
 	
-	// base test data for supplemental markings list (see also recordsModel.xml)
+	// example base test data for supplemental markings list (see also recordsModel.xml)
 	protected final static String NOFORN     = "NOFORN";     // Not Releasable to Foreign Nationals/Governments/Non-US Citizens
 	protected final static String NOCONTRACT = "NOCONTRACT"; // Not Releasable to Contractors or Contractor/Consultants
 	protected final static String FOUO       = "FOUO";       // For Official Use Only 
+	protected final static String FGI        = "FGI";        // Foreign Government Information
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -85,19 +105,33 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
 		super.onSetUpInTransaction();
 
 		// Get the service required in the tests
-		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService");
-		this.authenticationComponent = (AuthenticationComponent)this.applicationContext.getBean("authenticationComponent");
-		this.searchService = (SearchService)this.applicationContext.getBean("searchService");
+		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); // use upper 'N'odeService (to test access config interceptor)
+		
+		this.authenticationService = (AuthenticationService)this.applicationContext.getBean("AuthenticationService");
+		this.personService = (PersonService)this.applicationContext.getBean("PersonService");
+		this.authorityService = (AuthorityService)this.applicationContext.getBean("AuthorityService");
+		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
+		
+		this.searchService = (SearchService)this.applicationContext.getBean("SearchService"); // use upper 'S'earchService (to test access config interceptor)
 		this.importService = (ImporterService)this.applicationContext.getBean("ImporterService");
 		this.contentService = (ContentService)this.applicationContext.getBean("ContentService");
 		this.rmService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		
+		this.caveatConfigImpl = (RMCaveatConfigImpl)this.applicationContext.getBean("caveatConfigImpl");
+		
 		// Set the current security context as admin
-		this.authenticationComponent.setCurrentUser(AuthenticationUtil.getAdminUserName());	
+		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
 		
 		// Get the test data
 		setUpTestData();
+        
+        URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig1.json"); // from test-resources
+        assertNotNull(url);
+        File file = new File(url.getFile());
+        assertTrue(file.exists());
+        
+        caveatConfigImpl.updateOrCreateCaveatConfig(file);
 	}
 	
 	private void setUpTestData()
@@ -254,7 +288,383 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         assertFalse(this.nodeService.exists(recordOne));
         
         txn.commit();
-	}
+    }
+    
+    public void testCaveatConfig() throws Exception
+    {
+        setComplete();
+        endTransaction();
+        
+        // Switch to admin
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
+        startNewTransaction();
+        
+        // Create test users/groups (if they do not already exist)
+        
+        createUser("jrangel");
+        createUser("dmartinz");
+        createUser("jrogers");
+        createUser("hmcneil");
+        createUser("dfranco");
+        createUser("gsmith");
+        createUser("eharris");
+        createUser("bbayless");
+        createUser("mhouse");
+        createUser("aly");
+        createUser("dsandy");
+        createUser("driggs");
+        
+        createTopLevelGroup("Engineering");
+        createTopLevelGroup("Finance");
+        
+        
+        URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig2.json"); // from test-resources
+        assertNotNull(url);
+        File file = new File(url.getFile());
+        assertTrue(file.exists());
+        
+        caveatConfigImpl.updateOrCreateCaveatConfig(file);
+        
+        setComplete();
+        endTransaction();
+        
+        startNewTransaction();
+        
+        // Test list of allowed values for caveats
+        
+        List<String> allowedValues = AuthenticationUtil.runAs(new RunAsWork<List<String>>()
+        {
+            public List<String> doWork()
+            {
+                // get allowed values for given caveat (for current user)
+                return caveatConfigImpl.getRMAllowedValues("rma:smList");
+            }
+        }, "dfranco");
+        
+        assertEquals(2, allowedValues.size());
+        assertTrue(allowedValues.contains(NOFORN));
+        assertTrue(allowedValues.contains(FOUO));
+        
+        
+        allowedValues = AuthenticationUtil.runAs(new RunAsWork<List<String>>()
+        {
+            public List<String> doWork()
+            {
+                // get allowed values for given caveat (for current user)
+                return caveatConfigImpl.getRMAllowedValues("rma:smList");
+            }
+        }, "dmartinz");
+        
+        assertEquals(4, allowedValues.size());
+        assertTrue(allowedValues.contains(NOFORN));
+        assertTrue(allowedValues.contains(NOCONTRACT));
+        assertTrue(allowedValues.contains(FOUO));
+        assertTrue(allowedValues.contains(FGI));
+        
+        
+        // Create record category / record folder
+        
+        NodeRef recordCategory = getRecordCategory("Reports", "AIS Audit Records");
+        assertNotNull(recordCategory);
+        assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+        
+        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
+        folderProps.put(ContentModel.PROP_NAME, "March AIS Audit Records");
+        NodeRef recordFolder = this.nodeService.createNode(recordCategory, 
+                                                           ContentModel.ASSOC_CONTAINS, 
+                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "March AIS Audit Records"), 
+                                                           TYPE_RECORD_FOLDER).getChildRef();
+        
+        // temp
+        permissionService.setPermission(recordFolder, PermissionService.ALL_AUTHORITIES, PermissionService.ADD_CHILDREN, true);
+        
+        setComplete();
+        endTransaction();
+        
+        startNewTransaction();
+        
+        final String SOME_CONTENT = "There is some content in this record";
+        
+        AuthenticationUtil.setFullyAuthenticatedUser("dfranco");
+        
+        // Create the document
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+        NodeRef recordOne = this.nodeService.createNode(recordFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                        ContentModel.TYPE_CONTENT,
+                                                        props).getChildRef();
+        
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent(SOME_CONTENT);
+        
+        setComplete();
+        endTransaction();
+        
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_RECORD));
+        
+        //
+        // Test caveats (security interceptors) BEFORE setting properties
+        //
+        
+        // Sanity check search service - eg. query
+        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
+        
+        String query = "ID:"+LuceneQueryParser.escape(recordOne.toString());
+        System.out.println("Query: " + query);
+        ResultSet rs = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, query);
+        assertEquals(1, rs.length());
+        assertEquals(recordOne.toString(), rs.getNodeRef(0).toString());
+        
+        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
+        
+        rs = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, query);
+        assertEquals(1, rs.length());
+        assertEquals(recordOne.toString(), rs.getNodeRef(0).toString());
+        
+        // Sanity check node service - eg. getProperty, getChildAssocs
+        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
+        
+        Serializable value = this.nodeService.getProperty(recordOne, ContentModel.PROP_NAME);
+        assertNotNull(value);
+        assertEquals("MyRecord.txt", (String)value);
+        
+        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(recordFolder);
+        assertEquals(1, childAssocs.size());
+        assertEquals(recordOne.toString(), childAssocs.get(0).getChildRef().toString());
+        
+        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
+        
+        value = this.nodeService.getProperty(recordOne, ContentModel.PROP_NAME);
+        assertNotNull(value);
+        assertEquals("MyRecord.txt", (String)value);
+        
+        childAssocs = nodeService.getChildAssocs(recordFolder);
+        assertEquals(1, childAssocs.size());
+        assertEquals(recordOne.toString(), childAssocs.get(0).getChildRef().toString());
+        
+        // Sanity check content service - eg. getReader
+        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
+        
+        ContentReader reader = this.contentService.getReader(recordOne, ContentModel.PROP_CONTENT);
+        assertNotNull(reader);
+        assertEquals(SOME_CONTENT, reader.getContentString());
+        
+        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
+        
+        reader = this.contentService.getReader(recordOne, ContentModel.PROP_CONTENT);
+        assertNotNull(reader);
+        assertEquals(SOME_CONTENT, reader.getContentString());
+        
+        
+        
+        // Test setting properties (with restricted set of allowed values)
+        
+        // Set supplemental markings list (on record)
+        // TODO - set supplemental markings list (on record folder)
+        
+        AuthenticationUtil.setFullyAuthenticatedUser("dfranco");
+        
+        try
+        {
+            startNewTransaction();
+            
+            // Set smList
+            
+            Map<QName, Serializable> propValues = new HashMap<QName, Serializable>(1);
+            List<String> smList = new ArrayList<String>(3);
+            smList.add(FOUO);
+            smList.add(NOFORN);
+            smList.add(NOCONTRACT);
+            propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);
+            this.nodeService.addProperties(recordOne, propValues);
+            
+            setComplete();
+            endTransaction();
+            
+            fail("Should fail with integrity exception"); // user 'dfranco' not allowed 'NOCONTRACT'
+        }
+        catch (IntegrityException ie)
+        {
+            // expected
+        }
+        
+        try
+        {
+            startNewTransaction();
+            
+            // Set smList
+            
+            Map<QName, Serializable> propValues = new HashMap<QName, Serializable>(1);
+            List<String> smList = new ArrayList<String>(2);
+            smList.add(FOUO);
+            smList.add(NOFORN);
+            propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);
+            this.nodeService.addProperties(recordOne, propValues);
+            
+            setComplete();
+            endTransaction();
+        }
+        catch (IntegrityException ie)
+        {
+            fail(""+ie);
+        }
+        
+        @SuppressWarnings("unchecked")
+        List<String> smList = (List<String>)this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST);
+        assertEquals(2, smList.size());
+        assertTrue(smList.contains(NOFORN));
+        assertTrue(smList.contains(FOUO));
+        
+        
+        
+        // Set user-defined field (in this case, "prjList" on record)
+        
+        try
+        {
+            startNewTransaction();
+            
+            // Set prjList
+            
+            Map<QName, Serializable> propValues = new HashMap<QName, Serializable>(1);
+            List<String> prjList = new ArrayList<String>(3);
+            prjList.add("Project A");
+            prjList.add("Project B");
+            propValues.put(QName.createQName(RecordsManagementModel.RM_URI, "projectNameList"), (Serializable)prjList);
+            this.nodeService.addProperties(recordOne, propValues);
+            
+            setComplete();
+            endTransaction();
+            
+            fail("Should fail with integrity exception"); // user 'dfranco' not allowed 'Project Z'
+        }
+        catch (IntegrityException ie)
+        {
+            // expected
+        }
+        
+        try
+        {
+            startNewTransaction();
+            
+            // Set prjList
+            
+            Map<QName, Serializable> propValues = new HashMap<QName, Serializable>(1);
+            List<String> prjList = new ArrayList<String>(3);
+            prjList.add("Project A");
+            prjList.add("Project C");
+            propValues.put(QName.createQName(RecordsManagementModel.RM_URI, "projectNameList"), (Serializable)prjList);
+            this.nodeService.addProperties(recordOne, propValues);
+            
+            setComplete();
+            endTransaction();
+        }
+        catch (IntegrityException ie)
+        {
+            fail(""+ie);
+        }
+        
+        @SuppressWarnings("unchecked")
+        List<String> prjList = (List<String>)this.nodeService.getProperty(recordOne, QName.createQName(RecordsManagementModel.RM_URI, "projectNameList"));
+        assertEquals(2, prjList.size());
+        assertTrue(prjList.contains("Project A"));
+        assertTrue(prjList.contains("Project C"));
+        
+        
+        //
+        // Test caveats (security interceptors) AFTER setting properties
+        //
+        
+        // Sanity check search service - eg. query
+        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
+        
+        query = "ID:"+LuceneQueryParser.escape(recordOne.toString());
+        System.out.println("Query: " + query);
+        rs = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, query);
+        assertEquals(1, rs.length());
+        assertEquals(recordOne.toString(), rs.getNodeRef(0).toString());
+        
+        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
+        
+        rs = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, query);
+        assertEquals(0, rs.length());
+        
+        // Sanity check node service - eg. getProperty, getChildAssocs
+        
+        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
+        
+        value = this.nodeService.getProperty(recordOne, ContentModel.PROP_NAME);
+        assertNotNull(value);
+        assertEquals("MyRecord.txt", (String)value);
+        
+        childAssocs = nodeService.getChildAssocs(recordFolder);
+        assertEquals(1, childAssocs.size());
+        assertEquals(recordOne.toString(), childAssocs.get(0).getChildRef().toString());
+        
+        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
+        
+        try
+        {
+            value = this.nodeService.getProperty(recordOne, ContentModel.PROP_NAME);
+            fail("Unexpected - access should be denied by caveat");
+        }
+        catch (AccessDeniedException ade)
+        {
+            // expected
+        }
+        
+        childAssocs = nodeService.getChildAssocs(recordFolder);
+        assertEquals(0, childAssocs.size());
+        
+        // Sanity check content service - eg. getReader
+        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
+        
+        reader = this.contentService.getReader(recordOne, ContentModel.PROP_CONTENT);
+        assertNotNull(reader);
+        assertEquals(SOME_CONTENT, reader.getContentString());
+        
+        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
+        
+        try
+        {
+            reader = this.contentService.getReader(recordOne, ContentModel.PROP_CONTENT);
+            fail("Unexpected - access should be denied by caveat");
+        }
+        catch (AccessDeniedException ade)
+        {
+            // expected
+        }
+    }
+	
+	protected void createUser(String userName)
+    {
+        if (authenticationService.authenticationExists(userName) == false)
+        {
+            authenticationService.createAuthentication(userName, "PWD".toCharArray());
+            
+            PropertyMap ppOne = new PropertyMap(4);
+            ppOne.put(ContentModel.PROP_USERNAME, userName);
+            ppOne.put(ContentModel.PROP_FIRSTNAME, "firstName");
+            ppOne.put(ContentModel.PROP_LASTNAME, "lastName");
+            ppOne.put(ContentModel.PROP_EMAIL, "email@email.com");
+            ppOne.put(ContentModel.PROP_JOBTITLE, "jobTitle");
+            
+            personService.createPerson(ppOne);
+        }
+    }
+	
+	protected void createTopLevelGroup(String groupName)
+    {
+        if (authorityService.authorityExists(groupName) == false)
+        {
+            authorityService.createAuthority(AuthorityType.GROUP, null, groupName);
+        }
+    }
 	
 	/**
 	 * This test case reads several sample Record Folders from the filePlan to ensure

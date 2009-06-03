@@ -115,4 +115,103 @@
         </property>
     </bean>
     -->
+    
+    <!-- RM caveats -->
+    
+    <bean id="RMModuleComponent" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModuleComponent" parent="module.baseComponent">
+        <!-- init caveatConfig behaviours  -->
+        <property name="executeOnceOnly" value="false"/>
+        
+        <property name="moduleId" value="org_alfresco_module_dod5015"/>
+        <property name="caveatConfigImpl" ref="caveatConfigImpl"/>
+        
+    </bean>
+    
+    <bean id="caveatConfigImpl" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl">
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="contentService" ref="contentService"/>
+        <property name="dictionaryService" ref="dictionaryService"/>
+        <property name="namespaceService" ref="namespaceService"/>
+        <property name="authorityService" ref="authorityService"/>
+        <property name="personService" ref="personService"/>
+        <property name="nodeService" ref="nodeService"/>
+    </bean>
+    
+    <bean id="rmListOfValuesContraintInit" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
+        <property name="caveatConfigImpl" ref="caveatConfigImpl"/>
+    </bean>
+    
+    <bean id="rmBaseMethodInterceptor" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMAbstractMethodInterceptor" abstract="true">
+        <property name="caveatConfigImpl" ref="caveatConfigImpl"/>
+    </bean>
+    
+    <!-- Override Node Service (add rmNodeMethodInterceptor to caveat/veto access) -->
+    
+    <bean id="rmNodeMethodInterceptor" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMNodeMethodInterceptor" parent="rmBaseMethodInterceptor"/>
+    
+    <bean id="NodeService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.service.cmr.repository.NodeService</value>
+            </list>
+        </property>
+        <property name="target">
+            <ref bean="nodeService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="NodeService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref bean="NodeService_security"/>
+                <idref bean="rmNodeMethodInterceptor"/>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- Override Search Service (add rmSearchMethodInterceptor to caveat/veto access) -->
+    
+    <bean id="rmSearchMethodInterceptor" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMSearchMethodInterceptor" parent="rmBaseMethodInterceptor"/>
+    
+    <bean id="SearchService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.service.cmr.search.SearchService</value>
+        </property>
+        <property name="target">
+            <ref bean="searchService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="SearchService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref bean="SearchService_security"/>
+                <idref bean="rmSearchMethodInterceptor"/>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- Override Content Service (add rmContentMethodInterceptor to caveat/veto access) -->
+    
+    <bean id="rmContentMethodInterceptor" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMContentMethodInterceptor" parent="rmBaseMethodInterceptor"/>
+    
+    <bean id="ContentService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.service.cmr.repository.ContentService</value>
+        </property>
+        <property name="target">
+            <ref bean="contentService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="ContentService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref bean="mlContentInterceptor"/>
+                <idref bean="ContentService_security"/>
+                <idref bean="rmContentMethodInterceptor"/>
+            </list>
+        </property>
+    </bean>
+    
 </beans>
