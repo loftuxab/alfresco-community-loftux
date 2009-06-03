@@ -1,8 +1,8 @@
 (function ()
 {
-	var Lang = YAHOO.lang,
-	   Dom = YAHOO.util.Dom,
-		_FIRST_OF_TYPE = "first-of-type";
+   var Lang = YAHOO.lang,
+      Dom = YAHOO.util.Dom,
+      _FIRST_OF_TYPE = "first-of-type";
 
    YAHOO.widget.Menu.prototype._removeItemFromGroupByIndex = function (p_nGroupIndex, p_nItemIndex, p_keepEmptyGroup) {
 

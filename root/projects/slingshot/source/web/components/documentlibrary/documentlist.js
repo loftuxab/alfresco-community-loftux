@@ -1221,7 +1221,7 @@
              * The only exception that gets thrown here is when the browser is
              * not supported (Opera, or not A-grade)
              */
-            Alfresco.logger.debug("Alfresco.DocumentList: Couldn't initialize HistoryManager.", e.toString());
+            Alfresco.logger.error("Alfresco.DocumentList: Couldn't initialize HistoryManager.", e);
             this.onHistoryManagerReady();
          }
          
@@ -2096,6 +2096,25 @@
          this.modules.permissions.showDialog();
       },
 
+      /**
+       * Manage aspects.
+       *
+       * @method onActionManageAspects
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionManageAspects: function DL_onActionManageAspects(row)
+      {
+         if (!this.modules.aspects)
+         {
+            this.modules.aspects = new Alfresco.module.DoclibAspects(this.id + "-aspects");
+         }
+
+         this.modules.aspects.setOptions(
+         {
+            file: this.widgets.dataTable.getRecord(row).getData()
+         }).show();
+      },
+
       
       /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
@@ -2353,18 +2372,23 @@
          Alfresco.logger.debug("DL__updateDocList: ", p_obj);
          var successPath = (p_obj && (p_obj.path !== undefined)) ? p_obj.path : this.currentPath,
             successPage = (p_obj && (p_obj.page !== undefined)) ? p_obj.page : this.currentPage,
-            loadingMessage = null;
+            loadingMessage = null,
+            timerShowLoadingMessage = null;
 
          // Clear the current document list if the data webscript is taking too long
          var fnShowLoadingMessage = function DL_fnShowLoadingMessage()
          {
-            Alfresco.logger.debug("DL_fnShowLoadingMessage: slow data webscript detected.");
-            loadingMessage = Alfresco.util.PopupManager.displayMessage(
+            Alfresco.logger.debug("DL__uDL_fnShowLoadingMessage: slow data webscript detected.");
+            // Check the timer still exists. This is to prevent IE firing the event after we cancelled it. Which is "useful".
+            if (timerShowLoadingMessage)
             {
-               displayTime: 0,
-               text: '<span class="wait">' + $html(this._msg("message.loading")) + '</span>',
-               noEscape: true
-            });
+               loadingMessage = Alfresco.util.PopupManager.displayMessage(
+               {
+                  displayTime: 0,
+                  text: '<span class="wait">' + $html(this._msg("message.loading")) + '</span>',
+                  noEscape: true
+               });
+            }
          };
          
          // Reset the custom error messages
@@ -2377,17 +2401,20 @@
          this.showingMoreActions = false;
          
          // Slow data webscript message
-         var timerShowLoadingMessage = YAHOO.lang.later(this.options.loadingMessageDelay, this, fnShowLoadingMessage);
+         timerShowLoadingMessage = YAHOO.lang.later(this.options.loadingMessageDelay, this, fnShowLoadingMessage);
          
          var successHandler = function DL__uDL_successHandler(sRequest, oResponse, oPayload)
          {
             if (timerShowLoadingMessage)
             {
-               // Stop the timed function from clearing the document list
+               // Stop the "slow loading" timed function
+               Alfresco.logger.debug("DL__uDL_successHandler: Cancelling loading message timer.");
                timerShowLoadingMessage.cancel();
+               timerShowLoadingMessage = null;
             }
-            if (loadingMessage)
+            if (loadingMessage !== null)
             {
+               Alfresco.logger.debug("DL__uDL_successHandler: Destroying loading message pop-up.");
                loadingMessage.destroy();
             }
 
@@ -2409,7 +2436,7 @@
          {
             if (timerShowLoadingMessage)
             {
-               // Stop the timed function from clearing the document list
+               // Stop the "slow loading" timed function
                timerShowLoadingMessage.cancel();
             }
             if (loadingMessage !== null)

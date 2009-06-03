@@ -104,6 +104,11 @@ textarea
    background-position: left center;
 }
 
+.doclist .align-right
+{
+   margin-right: -1px;
+}
+
 .doclist .documents .detail
 {
    width: 100%;
