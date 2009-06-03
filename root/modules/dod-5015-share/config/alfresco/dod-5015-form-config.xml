@@ -112,9 +112,6 @@
       <forms>
          <form>
             <field-visibility>
-               <!-- hide the author field (to mask an issue for the demo) -->
-               <hide id="cm:author" />
-               
                <!-- rma:record aspect -->
                <show id="rma:identifier" />
                <show id="rma:dateFiled" />
