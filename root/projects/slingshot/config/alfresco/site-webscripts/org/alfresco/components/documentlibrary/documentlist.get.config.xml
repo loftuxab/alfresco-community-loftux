@@ -6,7 +6,7 @@
 
       <actionSet id="document">
          <action id="onActionDownload" type="simple-link" href="{downloadUrl}" label="actions.document.download" />
-         <action id="onActionDetails" type="action-link" permission="edit" label="actions.document.details" />
+         <action id="onActionDetails" type="action-link" permission="edit" label="actions.document.edit-metadata" />
          <action id="onActionUploadNewVersion" type="action-link" label="actions.document.upload-new-version" />
          <action id="onActionEditOnline" type="action-link" permission="edit,online-edit" label="actions.document.edit-online" />
          <action id="onActionEditOffline" type="action-link" permission="edit" label="actions.document.edit-offline" />
@@ -32,8 +32,8 @@
       </actionSet>
 
       <actionSet id="folder">
-         <action id="onActionDetails" permission="edit" type="action-link" label="actions.folder.details" />
-         <action id="onActionMetadata" type="simple-link" href="{folderDetailsUrl}" label="actions.folder.metadata" />
+         <action id="onActionDetails" permission="edit" type="action-link" label="actions.folder.edit-metadata" />
+         <action id="onActionMetadata" type="simple-link" href="{folderDetailsUrl}" label="actions.folder.view-metadata" />
          <action id="onActionCopyTo" type="action-link" label="actions.folder.copy-to" />
          <action id="onActionMoveTo" permission="delete" type="action-link" label="actions.folder.move-to" />
          <action id="onActionDelete" permission="delete" type="action-link" label="actions.folder.delete" />
