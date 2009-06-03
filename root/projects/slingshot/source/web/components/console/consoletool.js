@@ -213,7 +213,7 @@
              * The only exception that gets thrown here is when the browser is
              * not supported (Opera, or not A-grade)
              */
-            Alfresco.logger.debug("Alfresco.ConsoleTool: Couldn't initialize HistoryManager.", e.toString());
+            Alfresco.logger.error("Alfresco.ConsoleTool: Couldn't initialize HistoryManager.", e);
             this.onHistoryManagerReady();
          }
       },

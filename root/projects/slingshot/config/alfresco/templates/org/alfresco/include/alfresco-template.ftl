@@ -54,6 +54,8 @@
    </#if>
 <#-- Selected components preloaded here for better UI experience. -->
 <#if DEBUG>
+<!-- log4javascript -->
+   <script type="text/javascript" src="${url.context}/js/log4javascript.v1.4.1.js"></script>
 <!-- Common YUI components: DEBUG -->
    <script type="text/javascript" src="${url.context}/yui/yahoo/yahoo-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/event/event-debug.js"></script>
@@ -79,6 +81,8 @@
    <script type="text/javascript" src="${url.context}/yui/json/json-min.js"></script>
    <script type="text/javascript" src="${url.context}/yui/selector/selector-min.js"></script>
 </#if>
+<!-- YUI Patches -->
+   <script type="text/javascript" src="${url.context}/yui/menu/menu-patch.js"></script>
 
 <!-- Site-wide Common Assets -->
    <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
@@ -87,9 +91,8 @@
    <@script type="text/javascript" src="${url.context}/js/flash/AC_OETags.js"></@script>
    <#-- NOTE: Do not attempt to load -min.js version of messages.js -->
    <script type="text/javascript" src="${url.context}/service/messages.js?locale=${locale}"></script>
-   <@script type="text/javascript" src="${url.context}/js/alfresco.js"></@script>
-   <@script type="text/javascript" src="${url.context}/js/forms-runtime.js"></@script>
    <script type="text/javascript">//<![CDATA[
+      Alfresco.constants = Alfresco.constants || {};
       Alfresco.constants.DEBUG = ${DEBUG?string};
       Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/";
       Alfresco.constants.PROXY_URI_RELATIVE = "${url.context}/proxy/alfresco/";
@@ -101,6 +104,8 @@
       Alfresco.constants.URL_FEEDSERVICECONTEXT = "${url.context}/feedservice/";
       Alfresco.constants.USERNAME = "${user.name!""}";
    //]]></script>
+   <@script type="text/javascript" src="${url.context}/js/alfresco.js"></@script>
+   <@script type="text/javascript" src="${url.context}/js/forms-runtime.js"></@script>
    <@common.uriTemplate />
    <@common.htmlEditor htmlEditor="tinyMCE"/>
 

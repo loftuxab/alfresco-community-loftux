@@ -870,7 +870,7 @@
             // If the XHR call is not successful, no further processing - tree may not be sorted correctly
             failure: function DLT_sNC_failure(oResponse)
             {
-               Alfresco.logger.debug("DLT_sNC_failure");
+               Alfresco.logger.error("DLT_sNC_failure", oResponse);
             },
 
             // XHR response argument information

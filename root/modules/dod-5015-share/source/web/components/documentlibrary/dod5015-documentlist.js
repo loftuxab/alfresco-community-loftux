@@ -888,7 +888,7 @@
              * The only exception that gets thrown here is when the browser is
              * not supported (Opera, or not A-grade)
              */
-            Alfresco.logger.debug("Alfresco.RecordsDocumentList: Couldn't initialize HistoryManager.", e.toString());
+            Alfresco.logger.error("Alfresco.RecordsDocumentList: Couldn't initialize HistoryManager.", e);
             this.onHistoryManagerReady();
          }
          

@@ -712,6 +712,22 @@ Alfresco.util.getDomId = function(p_prefix)
 Alfresco.util.getDomId._nId = 0;
 
 /**
+ * Converts "rel" attributes on <a> tags to "target" attributes.
+ * "target" isn't supported in XHTML, so we use "rel" as a placeholder and replace at runtime.
+ *
+ * @method relToTarget
+ * @param rootNode {HTMLElement|String} An id or HTMLElement to start the query from
+*/
+Alfresco.util.relToTarget = function(p_rootNode)
+{
+   var elements = YAHOO.util.Selector.query("a[rel]", p_rootNode);
+   for (var i = 0, ii = elements.length; i < ii; i++)
+   {
+      elements[i].setAttribute("target", elements[i].getAttribute("rel"));
+   }
+},
+
+/**
  * Wrapper to create a YUI Button with common attributes.
  * All supplied object parameters are passed to the button constructor
  * e.g. Alfresco.util.createYUIButton(this, "OK", this.onOK, {type: "submit"});
@@ -2504,57 +2520,40 @@ Alfresco.util.Anim = function()
 
 
 /**
- * @method Alfresco.logger.isDebugEnabled
- * @return {boolean}
- * @static
+ * Logging makes use of the log4javascript framework.
+ *
+ * Original code:
+ *    Author: Tim Down <tim@log4javascript.org>
+ *    Version: 1.4.1
+ *    Edition: log4javascript
+ *    Build date: 24 March 2009
+ *    Website: http://log4javascript.org
  */
-Alfresco.logger.isDebugEnabled = function()
+if (Alfresco.constants.DEBUG && log4javascript)
 {
-   return Alfresco.constants.DEBUG;
-};
-
-/**
- * @method Alfresco.logger.debug
- * @param p1 {object|string} Object or string for debug output
- * @param p2 {object} Optional: object to be dumped if p1 is a string
- * @return {boolean}
- * @static
- */
-Alfresco.logger.debug = function(p1, p2)
+   Alfresco.logger = log4javascript.getDefaultLogger();
+   Alfresco.logger.isDebugEnabled = function()
+   {
+      return true;
+   };
+   Alfresco.logger.info("Alfresco Share DEBUG mode enabled.");
+}
+else
 {
-   if (!Alfresco.constants.DEBUG)
+   Alfresco.logger =
    {
-      return;
+      trace: function() {},
+      debug: function() {},
+      info: function() {},
+      warn: function() {},
+      error: function() {},
+      fatal: function() {},
+      isDebugEnabled: function()
+      {
+         return false;
+      }
    }
-   
-   var msg;
-   
-   if (typeof p1 == "string" && p2 !== null && p2 !== undefined)
-   {
-      msg = p1 + " " + YAHOO.lang.dump(p2);
-   }
-   else
-   {
-      msg = YAHOO.lang.dump(p1);
-   }
-   
-   /**
-    * TODO: use an inline div first, then support the YUI logger and
-    *       log to that if possible.
-    */
-   
-   // if console.log is available use it otherwise use alert for now
-   if (window.console)
-   {
-      window.console.log(msg);
-   }
-   else
-   {
-      /* Too annoying!
-      alert(msg);
-      */
-   }
-};
+}
 
 
 /**
