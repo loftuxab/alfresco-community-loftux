@@ -996,7 +996,7 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
       {
          // if the constraint is the list of values constraint, force the control
          // template to be select.ftl and setup the options
-         fieldDef.control.template = "controls/select.ftl";
+         fieldDef.control.template = "controls/selectone.ftl";
          
          // setup the options string and set as control params
          fieldDef.control.params.options = constraintParams.allowedValues;
