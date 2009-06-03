@@ -193,6 +193,7 @@
 
          // Save references to hidden fields so we can set them later
          this.widgets.filedata = Dom.get(this.id + "-filedata-file");
+         this.widgets.filedata.contentEditable = false;
          this.widgets.siteId = Dom.get(this.id + "-siteId-hidden");
          this.widgets.containerId = Dom.get(this.id + "-containerId-hidden");
          this.widgets.username = Dom.get(this.id + "-username-hidden");

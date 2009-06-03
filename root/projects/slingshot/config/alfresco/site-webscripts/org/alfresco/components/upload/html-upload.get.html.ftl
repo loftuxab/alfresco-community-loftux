@@ -47,7 +47,7 @@
                   <label for="${args.htmlid}-filedata-file">${msg("label.file")}</label>
                </div>
                <div class="yui-u">
-                  <input type="file" contentEditable="false" id="${args.htmlid}-filedata-file" name="filedata" />
+                  <input type="file" id="${args.htmlid}-filedata-file" name="filedata" />
                </div>
             </div>
          </div>
@@ -95,4 +95,5 @@
 new Alfresco.HtmlUpload("${args.htmlid}").setMessages(
    ${messages}
 );
+Alfresco.util.relToTarget("${args.htmlid}-singleUploadTip-span");
 //]]></script>

@@ -7,19 +7,17 @@
          <p>${profile.description?html}</p>
 </#if>
 <#if profile.customProperties??>
-	<#list profile.customProperties?keys as prop>
-	   <#assign customValue=profile.customProperties[prop].value>	
-	   <#if customValue?starts_with('alfresco-php://') == true>
-			<p>
-				<a href="${url.context}/proxy/alfresco-php/${customValue?substring(15)}" target="_blank" class="theme-color-1">${profile.customProperties[prop].title}</a>
-			</p>
-	   <#else>	
-		 <p>
+   <#list profile.customProperties?keys as prop>
+      <#assign customValue=profile.customProperties[prop].value>	
+      <#if customValue?starts_with('alfresco-php://') == true>
+         <p><a href="${url.context}/proxy/alfresco-php/${customValue?substring(15)}" target="_blank" class="theme-color-1">${profile.customProperties[prop].title}</a></p>
+      <#else>
+         <p>
             <span class="label">${profile.customProperties[prop].title}</span>
             <span>${customValue}</span>
          </p>
-       </#if>  
-	</#list>		
+       </#if>
+   </#list>
 </#if>
 <#if (sitemanagers?exists && sitemanagers?size &gt; 0)>
          <p>
@@ -30,7 +28,6 @@
          </p>
 </#if>
          <p><span class="label">${msg("label.visibility")}</span>&nbsp;${msg("text." + (profile.visibility!"unknown")?lower_case)}</p>
-         </p>
       </div>
       <div class="clear"></div>
    </div>

@@ -22,9 +22,8 @@
 .profile .editcolumn
 {
    float: right;
-   text-align: center;
-   padding-top: 24px;
-   padding-right: 24px;
+   padding-right: 1em;
+   padding-top: 3em;
 }
 
 .profile .viewcolumn
