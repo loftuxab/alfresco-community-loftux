@@ -42,7 +42,7 @@
                     <#if (id<viewArgs.view.startDay_month | id>(viewArgs.view.num_daysInMonth+viewArgs.view.startDay_month-1) ) >
                     <#assign tdclass = 'class="disabled"'>
                     </#if>
-                    <td id="cal-${viewArgs.view.dates[id].id}" ${tdclass} width="12.5%">
+                    <td id="cal-${viewArgs.view.dates[id].id}" ${tdclass} style="width: 12.5%">
                        <#if (tdclass != '')>
                         <div class="day theme-bg-color-3">                       
                        <#else>
@@ -122,7 +122,7 @@
         </thead>
         <tbody>
             <tr class="alldayRow">
-               <th scope="row" width="105"><h2>${msg("label.all-day")}</h2></th>
+               <th scope="row" style="width: 105px"><h2>${msg("label.all-day")}</h2></th>
               
                <#list 0..6 as day>
                  <#assign tdclass = ''>
@@ -132,11 +132,11 @@
                 <#if (day==6)>
                     <#assign tdclass = tdclass + ' last'>
                 </#if> 
-                <td class="${tdclass}"><div class="target" width="12.5%"> </div></td>
+                <td class="${tdclass}"><div class="target" style="width: 12.5%"> </div></td>
                </#list>
             </tr>
             <tr id="collapseTrigger">
-                <td colspan="8" width="100%"><a href="" id="collapseTriggerLink">${msg("label.click-for-early-hours")}</a></td>
+                <td colspan="8" style="width: 100%"><a href="" id="collapseTriggerLink">${msg("label.click-for-early-hours")}</a></td>
             </tr>
             <#assign cellcount = 0  />
                 <#list 0..23 as i>
@@ -150,14 +150,14 @@
                     <#assign time = "0" + time>
                  </#if>
                  <tr id="hour-${time}" class="${class}">   
-                 <th scope="row" width="105"><h2>${time}:00</h2></th>
+                 <th scope="row" style="width: 105px"><h2>${time}:00</h2></th>
                  <#list 0..6 as day>
                   <#assign id = viewArgs.view.dates[day].id>
                   <#assign divclass = ''>
                   <#if (viewArgs.view.dayOfWeek == day)>
                       <#assign divclass = 'current'>
                   </#if>
-                    <td id="cal-${id}T${time}:00" width="12.5%">
+                    <td id="cal-${id}T${time}:00" style="width: 12.5%">
                         <div class="day ${divclass}">
                             <div class="hourSegment">
                             </div>
@@ -200,8 +200,8 @@
               <#assign class = 'early'>
              </#if>
             <tr class="${class}">
-                <th scope="row" width="52px"><h2>${time}:00</h2></th>
-                <td id="cal-${viewArgs.view.startDate}T${time}:00" width="95%">
+                <th scope="row" style="width: 52px"><h2>${time}:00</h2></th>
+                <td id="cal-${viewArgs.view.startDate}T${time}:00" style="width: 95%">
                     <div class="day">
                         <div class="hourSegment">
                         </div>

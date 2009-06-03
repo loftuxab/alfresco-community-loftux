@@ -32,10 +32,6 @@
 <script type="text/javascript">//<![CDATA[
 (function()
 {
-   var links = YAHOO.util.Selector.query("a[rel]", "${args.htmlid}-body");
-   for (var i = 0, ii = links.length; i < ii; i++)
-   {
-      links[i].setAttribute("target", links[i].getAttribute("rel"));
-   }
+   Alfresco.util.relToTarget("${args.htmlid}-body");
 })();
 //]]></script>
