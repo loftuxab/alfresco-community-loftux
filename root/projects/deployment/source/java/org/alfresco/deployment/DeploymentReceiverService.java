@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,7 +26,10 @@
 package org.alfresco.deployment;
 
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -38,17 +41,24 @@ public interface DeploymentReceiverService
 {
     /**
      * Start a deployment. 
+     * @param storeName - the name of the store being deployed.
      * @param target The target to deploy to. A target is simply a key
      * to a receiver side deployment configuration.  
+     * @param version - the version being deployed.
      * @param user The user name for authentication.
      * @param password The password for the user.
-     * @return A transaction ticket.
+     * @return information on the new deployment.
      */
-    public String begin(String target, String user, String password);
+    public DeploymentToken begin(String target, String storeName, int version, String user, String password);
     
     /**
-     * Signals that the deployment is finished and should
-     * commit.  
+     * Signals that the deployment should prepare
+     * @param ticket The transaction ticket.
+     */
+    public void prepare(String ticket);
+    
+    /**
+     * Signals that the deployment should commit.  
      * @param ticket The transaction ticket.
      */
     public void commit(String ticket);
@@ -64,33 +74,31 @@ public interface DeploymentReceiverService
      * Send a file to a path.
      * @param ticket
      * @param path
-     * @return
+     * @param guid
+     * @param encoding
+     * @param mimeType
+     * @param aspects - full qualified names of the aspects that this file is associated with.
+     * @param props - map of full qualified names and property values.
+     * 
+     * @return an open output steam for writing content
      */
-    public OutputStream send(String ticket, String path, String guid);
-    
+    public OutputStream send(String ticket, String path, String guid, String encoding, String mimeType, Set<String> aspects, Map<String, Serializable> properties);
+        
     /**
-     * Tell the deployment receiver that a particular send is done.
-     * This closes the output stream.
-     * @param ticket
-     * @param out
-     */
-    public void finishSend(String ticket, OutputStream out);
-    
-    /**
-     * Create a directory.
+     * Create a new directory.
      * @param ticket
      * @param path
-     * @param guid The GUID of the directory to be created.
+     * @param guid The GUID (Version) of the directory to be created.
      */
-    public void mkdir(String ticket, String path, String guid);
+    public void createDirectory(String ticket, String path, String guid, Set<String> aspects, Map<String, Serializable> properties);
     
     /**
-     * Set the Guid on a directory.
+     * Set the Guid (Version) on a directory.
      * @param ticket
      * @param path
      * @param guid
      */
-    public void setGuid(String ticket, String path, String guid);
+    public void updateDirectory(String ticket, String path, String guid, Set<String> aspects, Map<String, Serializable> properties);
     
     /**
      * Delete a file or directory.
@@ -107,10 +115,5 @@ public interface DeploymentReceiverService
      */
     public List<FileDescriptor> getListing(String ticket, String path);
     
-    /**
-     * Shut down the Deployment Receiver.
-     * @param user
-     * @param password
-     */
-    public void shutDown(String user, String password);
+          
 }

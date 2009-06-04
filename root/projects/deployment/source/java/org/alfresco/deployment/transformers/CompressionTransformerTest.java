@@ -50,6 +50,7 @@ public class CompressionTransformerTest extends TestCase {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
@@ -57,6 +58,7 @@ public class CompressionTransformerTest extends TestCase {
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
@@ -74,7 +76,7 @@ public class CompressionTransformerTest extends TestCase {
 		// A sender should compress the stream
 		OutputStream out = null;
 		//out = (OutputStream)transformer.addFilter(compressed, Direction.SENDER, path);
-		out = (OutputStream)transformer.addFilter(compressed, path);
+		out = (OutputStream)transformer.addFilter(compressed, path, null, null);
 		
 		assertNotNull("null output stream returned", compressed);
 		
@@ -102,7 +104,7 @@ public class CompressionTransformerTest extends TestCase {
 		
 		ByteArrayOutputStream result = new ByteArrayOutputStream();
 		
-		decompress = (InputStream)transformer.addFilter(compressedStream, "wibble");
+		decompress = (InputStream)transformer.addFilter(compressedStream, "wibble", null, null);
 		
 		try {
 			byte[] readBuffer = new byte[1002];
@@ -142,7 +144,7 @@ public class CompressionTransformerTest extends TestCase {
 		ByteArrayOutputStream compressed = new ByteArrayOutputStream();
 		
 		// A sender should compress the stream
-		OutputStream out = (OutputStream)transformer.addFilter(compressed, path);	
+		OutputStream out = (OutputStream)transformer.addFilter(compressed, path, null, null);	
 		assertNotNull("null output stream returned", out);
 		
 		StringBuffer clearText= new StringBuffer();
@@ -172,7 +174,7 @@ public class CompressionTransformerTest extends TestCase {
 		
 		ByteArrayOutputStream result = new ByteArrayOutputStream();
 		
-		decompress = (InputStream)transformer.addFilter(compressedStream, "wibble");
+		decompress = (InputStream)transformer.addFilter(compressedStream, "wibble", null, null);
 		
 		try {
 			byte[] readBuffer = new byte[1002];
@@ -215,7 +217,7 @@ public class CompressionTransformerTest extends TestCase {
 		
 		// A sender should compress the stream
 		ByteArrayOutputStream compressed = new ByteArrayOutputStream();		
-		OutputStream out = (OutputStream)transformer.addFilter(compressed, path);
+		OutputStream out = (OutputStream)transformer.addFilter(compressed, path, null, null);
 		
 		assertNotNull("null output stream returned", out);
 		
@@ -250,7 +252,7 @@ public class CompressionTransformerTest extends TestCase {
 		
 		ByteArrayOutputStream result = new ByteArrayOutputStream();
 		
-		InputStream decompress = (InputStream)transformer.addFilter(compressedStream, "wibble");
+		InputStream decompress = (InputStream)transformer.addFilter(compressedStream, "wibble", null, null);
 		
 		try {
 			byte[] readBuffer = new byte[509];

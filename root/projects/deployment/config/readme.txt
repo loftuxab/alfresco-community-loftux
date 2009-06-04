@@ -1,5 +1,8 @@
-Setting up the Alfresco File System Receiver
---------------------------------------------
+Setting up the Alfresco Stand-alone Deployment Receiver
+------------------------------------------------------------------------
+The automatic installer will install a stand alone deployment receiver.
+
+Here are instructions for manual install.
 
 1. Unzip the deployment zip file into a convenient location. (It does not
    make it's own directory.) For discussion's sake let's say that the zip file
@@ -8,50 +11,43 @@ Setting up the Alfresco File System Receiver
 2. Configure deployment.properties. Open deployment.properties in your
    text editor of choice.  Choose locations for each of the following:
    
-   A. dep.datadir - This is the location that the deployment receiver stores
+   A. deployment.filesystem.datadir - This is the location that the filesystem deployment receiver stores
       deployed files during a deployment, before committing them to their final
       locations. For example:
         
-        dep.datadir=/opt/deployment/depdata
+        deployment.filesystem.datadir =/opt/deployment/depdata
    
-   B. dep.logdir - This is the location in which the deployment receiver stores
+   B. deployment.filesystem.logdir - This is the location in which the filesystem deployment receiver stores
       deployment time log data. For example:
         
-        dep.logdir=/opt/deployment/deplog
+        deployment.filesystem.logdir=/opt/deployment/deplog
         
-   C. dep.metadatadir - This is the location in which the deployment receiver stores
+   C. deployment.filesystem.metadatadir - This is the location in which the filesystem deployment receiver stores
       metadata about deployed content. For example:
       
         dep.metadatadir=/opt/deployment/depmetadata
         
-   D. dep.rmi.port - The port number to use for the RMI registry. Choose this so as not to
+   D. deployment.rmi.port - If you are using RMI as your transport protocol.  The port number to use for the RMI registry. Choose this so as not to
+      conflict with any other services.   By default the standalone deployment receiver uses 44100
+      
+   E. deployment.rmi.service.port - If you are using RMI as your transport protocol. The port number to use for RMI service. Choose this so as not to
       conflict with any other services.
       
-   E. dep.rmi.service.port - The port number to use for RMI service. Choose this so as not to
-      conflict with any other services.
+	Please note for windows
+    	for directory locations windows backslashes need to be escaped e.g. c:\\dir1\\dir2
+    	or you can use the UNIX '/' character as a directory separator e.g c:/dir1/dir2
       
-3. Configure application-context.xml. Open the file in a text editor and modify
-   the Target Configuration section. 
+3. Configure your deployment targets.
 
-   You'll want to modify this section:
-    <entry key="default">
-        <map>
-            <entry key="root"><value>target</value></entry>
-            <entry key="user"><value>admin</value></entry>
-            <entry key="password"><value>admin</value></entry>
-        </map>
-    </entry>
-
-    Replace 'target' in the key="root" entry with the location of the top
-    level directory to deploy to. For example:
-
-            <entry key="root"><value>/opt/www</value></entry>
-    
-    Replace the "user" and "password" entries with a user name and password of 
-    your choosing. (Note: The user name and password does not need to be an os or alfresco
-    user and password.)
+	Deployment targets are placed in the "deployment" folder with the filename "deployment/*target.xml".
+	
+	By default a single filesystem receiver is defined with simple configuration via deployment.properties.
+	
+	To define more targets follow the pattern of default-target.xml.    There are two steps involved a) definition of your target and 
+	b) registration of your target with the deployment engine.
     
 4. Define your custom runnables for prepare and postCommit callbacks
+
    If you have any custom runnables, use the configuration of the sampleProgramRunnable as a template.
    
    Define your runnable bean

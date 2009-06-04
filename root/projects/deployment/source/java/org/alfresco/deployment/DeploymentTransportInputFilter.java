@@ -55,7 +55,9 @@ public interface DeploymentTransportInputFilter
 	 * 
 	 * @param in the input stream being filtered.
 	 * @param path the path of the file
+	 * @param encoding the encoding of the file
+	 * @param mimeType the mimeType of the file
 	 * @return the filtered input stream
 	 */
-	public InputStream addFilter(InputStream in, String path); 
+	public InputStream addFilter(InputStream in, String path, String encoding, String mimeType ); 
 }

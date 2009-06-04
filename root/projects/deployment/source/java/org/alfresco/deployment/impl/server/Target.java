@@ -50,8 +50,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This represents a target for a deployment.
+ * This class manages the metadata for a Target in the FSR.    
+ * 
  * @author britt
+ * @author mrogers
  */
 public class Target implements Serializable
 {
@@ -73,41 +75,9 @@ public class Target implements Serializable
     private String fTargetName;
 
     /**
-     * The root directory of the target deployment.
-     */
-    private String fRootDirectory;
-
-    /**
      * Where metadata is kept for this target.
      */
     private String fMetaDataDirectory;
-
-    /**
-     * The user name for authenticating to this target.
-     */
-    private String fUser;
-
-    /**
-     * The password for authenticating to this target.
-     */
-    private String fPassword;
-    
-    /**
-     * autoFix - does meta validation auto fix data
-     */
-    private boolean autoFix = true;
-   
-    /**
-     * Runnables that will be invoked after commit.
-     */
-    private List<FSDeploymentRunnable> postCommitRunnables;
-    
-    /**
-     * Runnables that will be invoked during prepare phase.
-     */
-    private List<FSDeploymentRunnable> prepareRunnables;
-    
-    
 
     /**
      * Make one up.
@@ -116,43 +86,25 @@ public class Target implements Serializable
      * @param metadata
      */
     public Target(String name,
-                  String root,
-                  String metadata,
-                  List<FSDeploymentRunnable> prepareRunnables,
-                  List<FSDeploymentRunnable> postCommitRunnables,
-                  String user,
-                  String password)
+                  String metadataDirectory)
     {
         fTargetName = name;
-        fRootDirectory = root;
-        fMetaDataDirectory = metadata;
-        this.prepareRunnables = prepareRunnables;
-        this.postCommitRunnables = postCommitRunnables;
-        fUser = user;
-        fPassword = password;
+        fMetaDataDirectory = metadataDirectory;
     
-        initialize();
-    }
-
-    /**
-     * Helper to initialize metadata for a new deployment Target.
-     */
-    private void initialize()
-    {
+   
         File meta = new File(fMetaDataDirectory);
         if (!meta.exists())
         {
         	logger.info("Initialised empty metadata for target:" + fTargetName);
         	meta.mkdir();
+
+        } 
+        File metaRoot = new File(fMetaDataDirectory + File.separatorChar + MD_NAME);
+        if(!metaRoot.exists())
+        {
             DirectoryMetaData md = new DirectoryMetaData();
             putDirectory(fMetaDataDirectory + File.separatorChar + MD_NAME, md);
-        } 
-        
-        File root = new File(fRootDirectory);
-        if(!root.exists())
-        {
-        	root.mkdir();
-    	}
+        }        
         
     }
     
@@ -168,10 +120,10 @@ public class Target implements Serializable
      * 
      * @return true meta data has had an error (the problem may have been fixed if fixit==true)
      */
-    public boolean validateMetaData() 
+    public boolean validateMetaData(String rootDir, boolean autoFix) 
     {
-		File dir = new File(fRootDirectory);
-        return validateMetaData(fMetaDataDirectory , dir, isAutoFix());
+		File dir = new File(rootDir);
+        return validateMetaData(fMetaDataDirectory , dir, autoFix);
     }
     
     /**
@@ -288,71 +240,12 @@ public class Target implements Serializable
     }
 
     /**
-     * Get the root directory.
-     * @return
-     */
-    public String getRootDirectory()
-    {
-        return fRootDirectory;
-    }
-
-    /**
      * Get the meta data directory.
      * @return
      */
     public String getMetaDataDirectory()
     {
         return fMetaDataDirectory;
-    }
-
-    /**
-     * Get the username for this target.
-     * @return
-     */
-    public String getUser()
-    {
-        return fUser;
-    }
-
-    /**
-     * Get the password for this target.
-     * @return
-     */
-    public String getPassword()
-    {
-        return fPassword;
-    }
-
-    /**
-     * Get a File object for the given path in this target.
-     * @param path
-     * @return
-     */
-    public File getFileForPath(String path)
-   {
-        return new File(fRootDirectory + normalizePath(path));
-    }
-    private static final String fgSeparatorReplacement;
-
-    static
-    {
-    	fgSeparatorReplacement = File.separator.equals("/") ? "/" : "\\\\";
-    }
-
-    /**
-     * Utility to normalize a path to platform specific form.
-     * @param path
-     * @return
-     */
-    private String normalizePath(String path)
-    {
-        path = path.replaceAll("/+", fgSeparatorReplacement);
-        path = path.replace("/$", "");
-        if (!path.startsWith(File.separator))
-        {
-            path = File.separator + path;
-        }
-        return path;
     }
 
     public SortedSet<FileDescriptor> getListing(String path)
@@ -601,58 +494,6 @@ public class Target implements Serializable
             }
         }
     }
-    
-    /**
-     * run prepare programs
-     * @param deployment the deployment that is being prepared.
-     * @throws DeploymentException
-     */
-    
-    public void runPrepare(Deployment deployment) throws DeploymentException
-    {
-        if (prepareRunnables != null && prepareRunnables.size() > 0)
-        {
-            for (FSDeploymentRunnable runnable : prepareRunnables)
-            {
-                try
-                {
-                    runnable.init(deployment);
-                    runnable.run();
-                }
-                catch (Throwable t)
-                {
-                	throw new DeploymentException("Error thrown in prepare", t);
-                }
-            }
-        }
-    }
-
-    /**
-     * Run post commit programs.
-     * 
-     * It is too late to throw exceptions to abort the deployment.
-     * 
-     * @param deployment the deployment that has just completed.
-     */
-    
-    public void runPostCommit(Deployment deployment)
-    {
-        if (postCommitRunnables != null && postCommitRunnables.size() > 0)
-        {
-            for (FSDeploymentRunnable runnable : postCommitRunnables)
-            {
-                try
-                {
-                    runnable.init(deployment);
-                    runnable.run();
-                }
-                catch (Throwable t)
-                {
-                	logger.error("Error from postCommit event t:" + t.toString(), t);
-                }
-            }
-        }
-    }
 
     /**
      * set that this target is busy
@@ -665,15 +506,4 @@ public class Target implements Serializable
 		return busy;
 	}
 
-	/**
-	 * tell this target to autofix data during validation
-	 * @param autoFix
-	 */
-	public void setAutoFix(boolean autoFix) {
-		this.autoFix = autoFix;
-	}
-
-	public boolean isAutoFix() {
-		return autoFix;
-	}
 }

@@ -51,12 +51,12 @@ public class CompressionTransformer implements DeploymentTransportInputFilter, D
 	private static Log log = LogFactory.getLog(CompressionTransformer.class);
     
     // This is the outgoing - compression transformation
-	public OutputStream addFilter(OutputStream out, String path) {
+	public OutputStream addFilter(OutputStream out, String path, String mimeType, String encoding) {
 		return new DeflaterOutputStream(out);
 	}
 
     // This is the incomming  - de-compression transformation
-	public InputStream addFilter(InputStream in, String path) {
+	public InputStream addFilter(InputStream in, String path, String mimeType, String encoding) {
 		return new InflaterInputStream(in);
 	}
 }

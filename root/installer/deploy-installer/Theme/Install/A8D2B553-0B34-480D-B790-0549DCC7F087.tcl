@@ -26,15 +26,11 @@ proc CreateWindow.A8D2B553-0B34-480D-B790-0549DCC7F087 {wizard id} {
     Separator $base.separator -relief groove -orient horizontal
     grid $base.separator -row 1 -column 0 -sticky ew 
 
-#    Label $base.caption -anchor nw -justify left -autowrap 1  -textvariable [$wizard variable $id -text3]
-#    grid $base.caption -row 2 -sticky nsew -padx 8 -pady [list 8 4]
-#    $id widget set Caption -widget $base.caption
-
     frame $base.clientarea
     grid  $base.clientarea -row 3 -sticky nsew -padx 8 -pady 4
     $id widget set ClientArea -widget $base.clientarea -type frame
 
-    grid rowconfigure    $base.clientarea 7 -weight 1
+    grid rowconfigure    $base.clientarea 9 -weight 1
     grid columnconfigure $base.clientarea 0 -weight 1
 
     ttk::label $base.clientarea.label -text "Temporary Data Location"
@@ -46,7 +42,7 @@ proc CreateWindow.A8D2B553-0B34-480D-B790-0549DCC7F087 {wizard id} {
     ttk::button $base.clientarea.browse -text "..." -width 3 -command [list ::InstallAPI::PromptForDirectory -virtualtext DEPDATA]
     grid $base.clientarea.browse -row 1 -column 1 -sticky nw -padx {0 10}
 
-    ttk::label $base.clientarea.label2 -text "Log Location"
+    ttk::label $base.clientarea.label2 -text "Log Location (Where to store log information)"
     grid $base.clientarea.label2 -row 2 -column 0 -sticky w -padx 10 -pady 2
 
     ttk::entry $base.clientarea.entry2 -textvariable ::info(DEPLOG)
@@ -55,7 +51,7 @@ proc CreateWindow.A8D2B553-0B34-480D-B790-0549DCC7F087 {wizard id} {
     ttk::button $base.clientarea.browse2 -text "..." -width 3 -command [list ::InstallAPI::PromptForDirectory -virtualtext DEPLOG]
     grid $base.clientarea.browse2 -row 3 -column 1 -sticky nw -padx {0 10}
 
-    ttk::label $base.clientarea.label3 -text "Metadata Location"
+    ttk::label $base.clientarea.label3 -text "Metadata Location (Where to store metadata)"
     grid $base.clientarea.label3 -row 4 -column 0 -sticky w -padx 10 -pady 2
 
     ttk::entry $base.clientarea.entry3 -textvariable ::info(DEPMETA)
@@ -64,17 +60,19 @@ proc CreateWindow.A8D2B553-0B34-480D-B790-0549DCC7F087 {wizard id} {
     ttk::button $base.clientarea.browse3 -text "..." -width 3 -command [list ::InstallAPI::PromptForDirectory -virtualtext DEPMETA]
     grid $base.clientarea.browse3 -row 5 -column 1 -sticky nw -padx {0 10}
 
-    ttk::label $base.clientarea.label4 -text "Target Location (where to deploy files)"
+    ttk::label $base.clientarea.label4 -text "Target Location (where to put deployed files)"
     grid $base.clientarea.label4 -row 6 -column 0 -sticky w -padx 10 -pady 2
 
-    ttk::entry $base.clientarea.entry4 -textvariable ::info(DEPTARGET)
+    ttk::entry $base.clientarea.entry4 -textvariable ::info(DEPROOTDIR)
     grid $base.clientarea.entry4 -row 7 -column 0 -sticky new -padx {10 0} -pady 1
 
-    ttk::button $base.clientarea.browse4 -text "..." -width 3 -command [list ::InstallAPI::PromptForDirectory -virtualtext DEPTARGET]
+    ttk::button $base.clientarea.browse4 -text "..." -width 3 -command [list ::InstallAPI::PromptForDirectory -virtualtext DEPROOTDIR]
     grid $base.clientarea.browse4 -row 7 -column 1 -sticky nw -padx {0 10}
 
-    Label $base.message -anchor nw -justify left -autowrap 1  -textvariable [$wizard variable $id -text4]
-    grid $base.message -row 4 -sticky nsew -padx 8 -pady [list 4 8]
-    $id widget set Message -widget $base.message
+    ttk::label $base.clientarea.label5 -text "Name of default file system target"
+    grid $base.clientarea.label5 -row 8 -column 0 -sticky w -padx 10 -pady 2
+
+    ttk::entry $base.clientarea.entry5 -textvariable ::info(DEPFSNAME)
+    grid $base.clientarea.entry5 -row 9 -column 0 -sticky new -padx {10 0} -pady 1
 }
 

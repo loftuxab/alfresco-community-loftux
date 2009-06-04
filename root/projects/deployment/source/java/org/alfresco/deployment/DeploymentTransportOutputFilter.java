@@ -54,10 +54,12 @@ public interface DeploymentTransportOutputFilter
 	 * If this transformation is not required then simply return <i>out</i>. Do not return null.
 	 * 
 	 * @param out the output stream being filtered.
-	 * @param direction is this a RECEIVER or SENDER
+	 * @param encoding the encoding of the file
+	 * @param mimeType the mimeType of the file
 	 * @param path the path of the file
+	 * 
 	 * @return the filtered output stream
 	 */
-	public OutputStream addFilter(OutputStream out, String path); 
+	public OutputStream addFilter(OutputStream out, String path, String encoding, String mimeType); 
 	
 }

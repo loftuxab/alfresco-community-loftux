@@ -46,6 +46,7 @@ public class TargetTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()
 	 */
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 	}
@@ -53,6 +54,7 @@ public class TargetTest extends TestCase
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#tearDown()
 	 */
+	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
@@ -67,23 +69,22 @@ public class TargetTest extends TestCase
 
 	}
 	
-	public void testConstructor()
-	{
-		String name="testTarget";
-		String root="hellmouth";
-		String metadata="metadata";
-		String user="Master";	
-		String password="vampire";
-		
-		Target t = new Target(name, root, metadata, null, null, user, password);
-		
-		assertTrue("name not equal", t.getName().equals(name));
-		assertTrue("root not equal", t.getRootDirectory().equals(root));
-		assertTrue("meta not equal", t.getMetaDataDirectory().equals(metadata));
-		assertTrue("user not equal", t.getUser().equals(user));
-		assertTrue("password not equal", t.getPassword().equals(password));
-			
-	}
+//	public void testConstructor()
+//	{
+//		String name="testTarget";
+//		String root="hellmouth";
+//		String metadata="metadata";
+//		String user="Master";	
+//		String password="vampire";
+//		
+//		Target t = new FileSystemDeploymentTarget(name, metadata);
+//		
+//		assertTrue("name not equal", t.getName().equals(name));
+//		assertTrue("meta not equal", t.getMetaDataDirectory().equals(metadata));
+////		assertTrue("user not equal", t.getUser().equals(user));
+////		assertTrue("password not equal", t.getPassword().equals(password));
+//			
+//	}
 	
 	public void testAutoFix()
 	{
@@ -95,131 +96,5 @@ public class TargetTest extends TestCase
 	
 	}
 	
-	/**
-	 * Test postCommitCallback
-	 * the exception should be swallowed and not thrown.
-	 */
 	
-	public void testPostCommit()
-	{
-		List<FSDeploymentRunnable> runnables = new ArrayList<FSDeploymentRunnable>(); 
-		
-		FSRunnableTester tester = new FSRunnableTester();
-		tester.throwException = true;
-		
-		String name="testTarget";
-		String root="hellmouth";
-		String metadata="metadata";
-		String user="Master";	
-		String password="vampire";
-		
-		Target t = new Target(name, root, metadata, null, runnables, user, password);
-		Deployment deployment = null;
-		try {
-			deployment = new Deployment(t, ".");
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail("unable to create deployment");
-		}
-		
-		// should do nothing
-		t.runPostCommit(deployment);
-		
-		runnables.add(tester);
-		t.runPostCommit(deployment);
-		
-		assertNotNull("init method not called", tester.getDeployment());
-		assertTrue("run called", tester.isRunCalled());
-		
-	}
-	
-	
-	/**
-	 * Test the prepare callback 
-	 */
-	public void testPrepare()
-	{
-		List<FSDeploymentRunnable> runnables = new ArrayList<FSDeploymentRunnable>(); 
-		
-		FSRunnableTester tester = new FSRunnableTester();
-		
-		
-		String name="testTarget";
-		String root="hellmouth";
-		String metadata="metadata";
-		String user="Master";	
-		String password="vampire";
-		
-		Target t = new Target(name, root, metadata, runnables, null, user, password);
-		Deployment deployment = null;
-		try {
-			deployment = new Deployment(t, ".");
-		} catch (IOException e) {
-			e.printStackTrace();
-			fail("unable to create deployment");
-		}
-		
-		// should do nothing
-		t.runPrepare(deployment);
-		
-		// add the tester
-		runnables.add(tester);
-		t.runPrepare(deployment);
-		
-		assertNotNull("init method not called", tester.getDeployment());
-		assertTrue("run called", tester.isRunCalled());
-		
-		// set the tester to throw and exception - this should not be swallowed
-		tester.throwException = true;
-		
-		try{
-			t.runPrepare(deployment);
-			fail("exception not thrown");
-		} catch (DeploymentException de) {
-		
-		}
-	}
-	
-	/**
-	 * Test class for 
-	 */
-	private class FSRunnableTester implements FSDeploymentRunnable
-	{
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -5780190885270319744L;
-		
-		Deployment deployment;
-		boolean runCalled = false;
-		boolean throwException;
-		
-		
-		public void init(Deployment deployment) 
-		{
-			this.deployment = deployment;	
-		}
-
-		public void run() 
-		{
-			System.out.println("called run");
-			runCalled = true;
-			
-			if(throwException)
-			{
-				throw new DeploymentException("test exception");
-			}
-		}
-		
-		public Deployment getDeployment()
-		{
-			return deployment;
-		}
-		
-		public boolean isRunCalled()
-		{
-			return runCalled;
-		}
-	}
 }

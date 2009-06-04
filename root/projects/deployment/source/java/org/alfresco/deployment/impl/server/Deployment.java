@@ -25,46 +25,48 @@
 
 package org.alfresco.deployment.impl.server;
 
-import java.io.File;
-
-
 import java.io.IOException;
-
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
 import java.util.Vector;
 
-import org.alfresco.deployment.FileDescriptor;
-import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.impl.DeploymentException;
-import org.alfresco.util.Deleter;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * This is a record of an ongoing deployment.
  * 
+ * A collection of Deployed Files
+ * 
  * @author britt
  */
 public class Deployment implements Iterable<DeployedFile>, Serializable
 {
-    private static final long serialVersionUID = 4752110479673700145L;
-    
-    private static Log logger = LogFactory.getLog(Deployment.class);
-    
-    private List<DeployedFile> deployedFiles = new Vector<DeployedFile>();
+	private static final long serialVersionUID = -4675002987994484069L;
 
+	private static Log logger = LogFactory.getLog(Deployment.class);
+    
+    /**
+     * Synchronised list of deployed files.
+     */
+    private List<DeployedFile> deployedFiles = new Vector<DeployedFile>();
+    
     /**
      * Timestamp of last time this deployment was talked to.
      */
     private long fLastActivity;
+    
+    /**
+     * ticket of this deployment
+     */
+    private String ticket;
+    
+    /**
+     * The name of the target
+     */
+    private String targetName;
 
     /**
      * Flag for whether this deployment is in a state to be timed out.
@@ -77,91 +79,38 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     private boolean metaError = false;
 
     /**
-     * The deployment target string.
-     */
-    private Target fTarget;
-
-    /**
-     * The path to the log file for this deployment.
-     */
-    private String fLogFile;
-
-    /**
-     * The location of the log directory.
-     */
-    private String fLogDir;
-
-//    /**
-//     * The underlying file output stream.  Used for forcing to disk.
-//     */
-//    private transient FileOutputStream fFileOut;
-//
-//    /**
-//     * The object output stream to which deployed files are written.
-//     */
-//    private transient ObjectOutputStream fOut;
-
-    /**
      * The state of this deployment with regards to the transaction.
      */
     private DeploymentState fState;
-
+    
     /**
-     * Keeps track of any open output streams.
+     * The snapshot version number from the authoring cluster.
      */
-    private transient Map<OutputStream, DeployedFile> fOutputStreams;
-
-    public Deployment(Target target,
-                      String logDir)
-        throws IOException
-    {
-        fTarget = target;
-        fLogDir = logDir;
-        fLogFile = logDir + File.separatorChar + "log";
-        fLastActivity = System.currentTimeMillis();
-//        File lDir = new File(logDir);
-//        lDir.mkdir();
-//        fFileOut = new FileOutputStream(fLogFile);
-//        fOut = new ObjectOutputStream(fFileOut);
-        fCanBeStale = true;
-        fState = DeploymentState.WORKING;
-        fOutputStreams =  Collections.synchronizedMap(new HashMap<OutputStream, DeployedFile>());
-    }
-
+    private int authoringVersion;
+    
     /**
-     * Tell the deployment about a file in transit.
-     * @param out
-     * @param file
+     * The name of the source store on the authoring cluster.
      */
-    public void addOutputStream(OutputStream out, DeployedFile file)
-    {
-        fOutputStreams.put(out, file);
-    }
-
+    private String authoringStoreName;
+    
     /**
-     * Get the deployed file record for the output stream.
-     * @param out
-     * @return the file being transmitted
-     */
-    public DeployedFile getDeployedFile(OutputStream out)
-    {
-    	return fOutputStreams.get(out);
-    }
-
-    /**
-     * close the output stream
-     * @param out
+     * Create a new Deployment record
+     * @param ticket the ticket for this deployment.
+     * @param targetName the name of the deployment target
+     * @param storeName the name of the source store on the authoring cluster.
+     * @param version the snapshot version (from the authoring cluster) being deployed.
      * @throws IOException
      */
-    public void closeOutputStream(OutputStream out)
+    public Deployment(String ticket, String targetName, String storeName, int version)
         throws IOException
     {
-        out.flush();
-        out.close();
-        if (fOutputStreams.remove(out) == null)
-        {
-            throw new DeploymentException("Closed unknown file.");
-        }
+    	this.targetName = targetName;
+    	this.ticket = ticket;
+        fLastActivity = System.currentTimeMillis();
+        fCanBeStale = true;
+        fState = DeploymentState.WORKING;
+        this.authoringStoreName = storeName;
+        this.authoringVersion = version;
     }
 
     /**
@@ -175,8 +124,6 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     	synchronized (this) 
     	{
     		deployedFiles.add(file);
-    		
-//   		fOut.writeObject(file);
     		fLastActivity = System.currentTimeMillis();
     	}
     }
@@ -188,12 +135,8 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     public void prepare()
         throws IOException, DeploymentException
     {
-
         fCanBeStale = false;
-        fTarget.cloneMetaData(this);
         fState = DeploymentState.PREPARING;
-        // Call the prepare callbacks.
-    	fTarget.runPrepare(this);
     }
 
     /**
@@ -203,8 +146,6 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     public void finishPrepare()
         throws IOException
     {
-
-    	
         fState = DeploymentState.COMMITTING;
     }
 
@@ -214,80 +155,9 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     public void abort()
         throws IOException
     {
-//        fOut.flush();
-//        fFileOut.getChannel().force(true);
-//        fOut.close();
+
         fCanBeStale = false;
         fState = DeploymentState.ABORTING;
-        for (OutputStream out : fOutputStreams.keySet())
-        {
-        	out.flush();
-            out.close();
-        }
-        fOutputStreams.clear();
-        
-        //TODO Need to gather reader threads here
-        for (DeployedFile file : this)
-        {
-            if (file.getType() == FileType.FILE)
-            {
-                File toDelete = new File(file.getPreLocation());
-                toDelete.delete();
-            }
-        }
-        File logDir = new File(fLogDir);
-        Deleter.Delete(logDir);
-    }
-
-    /**
-     * Get the Target of this deployment.
-     * @return
-     */
-    public Target getTarget()
-    {
-        return fTarget;
-    }
-
-    /**
-     * Signal that the commit phase is finished and clean up.
-     */
-    public void finishCommit()
-    {
-            fTarget.commitMetaData(this);
-
-            fTarget.runPostCommit(this);
-            File logDir = new File(fLogDir);
-            Deleter.Delete(logDir);
-    }
-
-    /**
-     * Rollback this deployment.
-     */
-    public void rollback()
-    {
-
-            fTarget.rollbackMetaData();
-            Deleter.Delete(fLogDir);
-    }
-
-    /**
-     * Get the target relative File.
-     * @param path
-     * @return
-     */
-    public File getFileForPath(String path)
-    {
-        return fTarget.getFileForPath(path);
-    }
-
-    /**
-     * Get a listing for a directory. This is the predeployment listing.
-     * @param path
-     * @return
-     */
-    public SortedSet<FileDescriptor> getListing(String path)
-    {
-        return fTarget.getListing(path);
     }
 
     /**
@@ -308,25 +178,13 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         return false;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Iterable#iterator()
+
+    /**
+     * get the iterator for the files contained within this deployment.
      */
     public Iterator<DeployedFile> iterator()
     {
     	return deployedFiles.iterator();
-        //return new DeployedFileIterator();
-    }
-
-    public void setGuid(String path, String guid)
-        throws IOException
-    {
-        DeployedFile file = new DeployedFile(FileType.SETGUID,
-                                             null,
-                                             path,
-                                             guid,
-                                             false);
-        //fOut.writeObject(file);
-        deployedFiles.add(file);
     }
 
     /**
@@ -337,100 +195,63 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
         return fState;
     }
+    
+    /**
+     * Set the state of a deployment
+     * @param state
+     */
+    public void setDeploymentState(DeploymentState state)
+    {
+    	this.fState = state;
+    }
 
-    public void setMetaError(boolean metaError) {
+    public void setMetaError(boolean metaError) 
+    {
 		this.metaError = metaError;
 	}
 
-	public boolean isMetaError() {
+    /**
+     * Has there been an error detected with meta-data?
+     * @return
+     */
+	public boolean isMetaError() 
+	{
 		return metaError;
 	}
 
-//	/**
-//     * Iterator for reading back the log.
-//     * @author britt
-//     */
-//    private class DeployedFileIterator implements Iterator<DeployedFile>
-//    {
-//        private DeployedFile fNext = null;
-//        
-//        private ObjectInputStream fIn;
-//
-//        public DeployedFileIterator()
-//        {
-//        	try {
-//				fIn = new ObjectInputStream(new FileInputStream(fLogFile));
-//			} catch (FileNotFoundException e) {
-//				throw new DeploymentException("FileNotFound. logFile:" + fLogFile, e);
-//			} catch (IOException e) {
-//			    throw new DeploymentException("I/O error.", e);
-//			}
-//            
-//            fNext = getNext();
-//        }
-//
-//        /* (non-Javadoc)
-//         * @see java.util.Iterator#hasNext()
-//         */
-//        public boolean hasNext()
-//        {
-//        	return fNext != null;
-//        }
-//
-//        /* (non-Javadoc)
-//         * @see java.util.Iterator#next()
-//         */
-//        public DeployedFile next()
-//        {
-//            DeployedFile next = fNext;
-//            
-//            fNext = getNext();
-//            
-//            return next;    
-//        }
-//
-//        /* (non-Javadoc)
-//         * @see java.util.Iterator#remove()
-//         */
-//        public void remove()
-//        {
-//            throw new RuntimeException("Not Implemented.");
-//        }
-//        
-//        private DeployedFile getNext() 
-//        {
-//           try
-//           {
-//        	   DeployedFile next = (DeployedFile)fIn.readObject();
-//               return next;
-//           }
-//           catch (EOFException eofe)
-//           {
-//                return null;
-//
-//           }
-//           catch (IOException e)
-//           {
-//                throw new DeploymentException("I/O error.", e);
-//           }
-//           catch (ClassNotFoundException nfe)
-//           {
-//                throw new DeploymentException("Unable to read deployed file:" + nfe.toString(), nfe);
-//           }
-//        }
-//        
-//        public void finalize() {
-//        	try {
-//        		if(fIn != null)
-//        		{
-//        			fIn.close();
-//        			fIn = null;
-//        		}
-//        	}
-//        	catch (Throwable t)
-//        	{
-//        		logger.error("Unable to finalize", t);
-//        	}
-//        }
-//    }
+	/**
+	 * Set the authoring version (of the deployment from the authoring server)
+	 * @param authoring version
+	 */
+	public void setAuthoringVersion(int version) 
+	{
+		this.authoringVersion = version;
+	}
+
+	/**
+	 * Get the version being deployed.   The version relates to the authoring cluster.
+	 * @return
+	 */
+	public int getAuthoringVersion() 
+	{
+		return authoringVersion;
+	}
+
+	/**
+	 * Get the store name being deployed.   The store name is from the authoring cluster.
+	 * @param storeName
+	 */
+	public void setAuthoringStoreName(String storeName) 
+	{
+		this.authoringStoreName = storeName;
+	}
+
+	/**
+	 * Get the name of the store being deployed.   The store name is from the authoring cluster.
+	 * @return the name of the store on the authoring cluster
+	 */
+	public String getAuthoringStoreName() 
+	{
+		return authoringStoreName;
+	}
 }

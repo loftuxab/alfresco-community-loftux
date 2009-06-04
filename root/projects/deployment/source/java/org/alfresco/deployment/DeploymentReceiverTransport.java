@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,6 +25,10 @@
 
 package org.alfresco.deployment;
 
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * This is the interface that is implemented for the transport between client 
  * and server of the File System Receiver (FSR)
@@ -33,7 +37,7 @@ package org.alfresco.deployment;
  * 
  * @author britt
  */
-public interface DeploymentReceiverTransport extends DeploymentReceiverService
+public interface DeploymentReceiverTransport extends DeploymentReceiverService 
 {
     /**
      * Get an OutputStream token.
@@ -42,7 +46,7 @@ public interface DeploymentReceiverTransport extends DeploymentReceiverService
      * @param guid
      * @return the token to identify this file.
      */
-    public String getSendToken(String ticket, String path, String guid);
+    public String getSendToken(String ticket, String path, String guid, String encoding, String mimeType, Set<String>aspects, Map<String, Serializable> props);
     
     /**
      * Tell the deployment receiver that a send is finished.
@@ -58,4 +62,24 @@ public interface DeploymentReceiverTransport extends DeploymentReceiverService
      * @param offset
      */
     public void write(String ticket, String outputToken, byte[] data, int offset, int count);
+    
+    // Management part of the interface below   
+    
+    /**
+     * Shut down the Deployment Receiver.
+     * @param user
+     * @param password
+     */
+    public void shutDown(String user, String password);
+    
+//    /**
+//     * Get the target status for all targets
+//     */
+//    public TargetStatus[] getTargetStatus(String user, String password);
+//    
+//    /**
+//     * Get the target status
+//     */
+//    public TargetStatus getTargetStatus(String user, String password, String targetName);
+    
 }

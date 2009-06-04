@@ -36,5 +36,6 @@ public enum DeploymentState implements Serializable
     WORKING,
     PREPARING,
     COMMITTING,
-    ABORTING
+    ABORTING,
+    COMMITTED
 }

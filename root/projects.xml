@@ -132,7 +132,7 @@
             <include name="${file.name.jar.deployment}" />
          </fileset>
          <fileset dir="${dir.project.deployment}/config">
-            <include name="*" />
+            <include name="**/*" />
          </fileset>
          <fileset dir="${dir.project.3rdparty.lib}">
             <include name="spring-*.jar" />
@@ -161,6 +161,57 @@
                          windowtitle="Alfresco Deployment Receiver" 
                          projectdir="${dir.project.deployment}" />
    </target>
+	
+	   <!-- **************************** -->
+	   <!-- ** WDR Deployment Project ** -->
+	   <!-- **************************** -->
+	  
+	   <target name="incremental-wdrdeployment" 
+	           depends="package-wdrdeployment" />
+	      
+	   <target name="build-wdrdeployment" 
+	           depends="clean-wdrdeployment, 
+	           incremental-wdrdeployment" />
+	   
+	   <target name="clean-wdrdeployment" 
+	           depends="init">
+	      <clean projectdir="${dir.project.wdrdeployment}" />
+	   </target>
+	   
+	   <target name="compile-wdrdeployment" 
+	           depends="init">
+	      <compile-java projectdir="${dir.project.wdrdeployment}" />
+	   </target>
+	   
+	   <target name="package-wdrdeployment"
+	           depends="package-wdrdeployment-jar">
+	   </target>
+	         
+	   <target name="package-wdrdeployment-jar"
+	           depends="compile-wdrdeployment">
+	    
+	    <copy todir="${dir.project.wdrdeployment.classes}">
+	          <fileset dir="${dir.project.wdrdeployment.config}" 
+	                   includes="**/*" />
+	    </copy>
+	   	
+	   	<mkdir dir="${dir.project.wdrdeployment.dist}" />
+	   	
+	      <jar jarfile="${dir.project.wdrdeployment.dist}/${file.name.jar.wdrdeployment}" 
+	                 basedir="${dir.project.wdrdeployment.classes}" />
+	   </target>
+	   	   
+	   <target name="test-wdrdeployment" 
+	           depends="compile-wdrdeployment">
+	      <run-tests projectdir="${dir.project.wdrdeployment}" />
+	   </target>
+	   
+	   <target name="generate-javadocs-wdrdeployment" 
+	           depends="init">
+	      <generate-javadocs documenttitle="Alfresco Web Development Runtime Deployment Receivers" 
+	                         windowtitle="Alfresco Web Development Runtime Deployment Receiver" 
+	                         projectdir="${dir.project.wdrdeployment}" />
+	   </target>
       
    <!-- ************************ -->
    <!-- ** Repository Project ** -->
@@ -1891,6 +1942,8 @@
                   includes="${file.name.jar.mbeans}" />
          <fileset dir="${dir.project.deployment.dist}"
                   includes="${file.name.jar.deployment}"/>
+        <fileset dir="${dir.project.wdrdeployment.dist}"
+                 includes="${file.name.jar.wdrdeployment}"/>
          <fileset dir="${dir.project.remoteapi.dist}" 
                   includes="${file.name.jar.remoteapi}" />
          <fileset dir="${dir.project.jlan.dist}" 

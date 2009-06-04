@@ -113,7 +113,7 @@ public class SampleEncryptionTransformer implements DeploymentTransportInputFilt
 	 *  @param out the stream to encrypt
 	 *  @param path the path of the file to encrypt 
 	 */
-	public OutputStream addFilter(OutputStream out, String path) 
+	public OutputStream addFilter(OutputStream out, String path, String mimeType, String encoding) 
 	{	
 		Cipher ecipher;
 		
@@ -136,7 +136,7 @@ public class SampleEncryptionTransformer implements DeploymentTransportInputFilt
 	 *  @param out the stream to decrypt
 	 *  @param path the path of the file to decrypt 
 	 */
-	public InputStream addFilter(InputStream in, String path) 
+	public InputStream addFilter(InputStream in, String path, String mimeType, String encoding) 
 	{
 		Cipher dcipher;
 		

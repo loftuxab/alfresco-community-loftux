@@ -3,7 +3,7 @@ AllowLanguageSelection
 Yes
 
 AppName
-{Alfresco File System Receiver}
+{Alfresco Standalone Deployment Receiver}
 
 ApplicationID
 15d54dc2-562d-11dc-8314-0800200c9a66
@@ -47,6 +47,9 @@ Copyright
 DEPDATA
 <%InstallDir%>/depdata
 
+DEPFSNAME
+default
+
 DEPLOG
 <%InstallDir%>/deplog
 
@@ -56,7 +59,7 @@ DEPMETA
 DEPPWD
 admin
 
-DEPTARGET
+DEPROOTDIR
 <%InstallDir%>/www
 
 DEPUSER
@@ -168,7 +171,7 @@ ScriptExt
 .bat
 
 ShortAppName
-AlfrescoDeploy
+{Alfresco  Deployment}
 
 SkipUnusedFileGroups
 Yes
@@ -189,7 +192,7 @@ UpgradeApplicationID
 {}
 
 Version
-3.0
+3.2
 
 ViewReadme
 Yes
@@ -247,6 +250,12 @@ File ::2D030E00-66F1-48E3-81E1-F6BC667700DF -name log4j.properties -parent BE5AE
 File ::6FEF9DE5-5656-4FCF-A2C9-2BE2C981D367 -name readme.txt -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
 File ::7A500141-192D-4094-A46A-97F17BA0F65A -name shutdown-context.xml -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
 File ::6E531ACC-8C7D-4E45-8982-F10541E8C16C -name spring-2.0.8.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::9B767244-AA33-4E3F-9594-BA60294995AE -type dir -name C:/work/alfresco/WCM_WDR/root/projects/deployment/build/assemble/deployment -location ../../projects/deployment/build/assemble/deployment -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::DFDB1DBD-D9C0-4F4A-8476-322652B30715 -name default-target.xml -location ../../projects/deployment/build/assemble/deployment -parent 9B767244-AA33-4E3F-9594-BA60294995AE
+File ::A558D897-5624-492A-9863-5C2971B48CA2 -name deployment-receiver-context.xml -location ../../projects/deployment/build/assemble/deployment -parent 9B767244-AA33-4E3F-9594-BA60294995AE
+File ::18A6E351-5AC6-453B-8996-5838A5DD9F53 -name extras-context-sample.xml -location ../../projects/deployment/build/assemble/deployment -parent 9B767244-AA33-4E3F-9594-BA60294995AE
+File ::FA76A842-709E-4FD0-875A-8013235CF6D8 -name filesystem-target-sample.xml -location ../../projects/deployment/build/assemble/deployment -parent 9B767244-AA33-4E3F-9594-BA60294995AE
+File ::103BD13D-6699-475B-AC9E-68FDD82F0732 -name sample-target.xml -location ../../projects/deployment/build/assemble/deployment -parent 9B767244-AA33-4E3F-9594-BA60294995AE
 FileGroup ::03791E78-4713-45B0-8559-C66EA67DB28A -setup Install -active Yes -platforms Windows -name {Windows scripts} -parent FileGroups
 File ::E1A99665-AF17-41BF-A38B-31FA8EA7631E -name W:/V21/root/installer/resources/alfresco.ico -location ../resources -parent 03791E78-4713-45B0-8559-C66EA67DB28A
 FileGroup ::C3FE0508-0773-40D6-97C4-1FE52205D032 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc TarArchive} -name {Linux scripts} -parent FileGroups
@@ -260,6 +269,10 @@ InstallComponent D700B54B-CEAC-48E9-8AC8-94D982B73406 -setup Install -type pane 
 Condition 3FB18EB1-8713-42CF-AF1C-26756FA05D10 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {Script Condition} -component ScriptCondition -TreeObject::id 3FB18EB1-8713-42CF-AF1C-26756FA05D10
 Condition 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Permission Condition} -component FilePermissionCondition -TreeObject::id 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B
 InstallComponent A8D2B553-0B34-480D-B790-0549DCC7F087 -setup Install -type pane -title {Set Data} -component CustomBlankPane2 -active Yes -parent StandardInstall
+InstallComponent 95B433FA-3092-4796-A883-9F01AD3415D8 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -command reorder -active Yes -parent A8D2B553-0B34-480D-B790-0549DCC7F087
+InstallComponent 2D981F73-A2A4-463F-BC29-4E1F32067483 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent A8D2B553-0B34-480D-B790-0549DCC7F087
+InstallComponent B47DFD55-5BE5-4E4B-9500-1112138AAF97 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent A8D2B553-0B34-480D-B790-0549DCC7F087
+InstallComponent F269AA6D-39D0-4AFF-8B9C-C8AFF183E85E -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent A8D2B553-0B34-480D-B790-0549DCC7F087
 InstallComponent 3EBCE7AF-8686-4F6B-9108-693D8F5F97F1 -setup Install -type pane -title {Set User} -component CustomBlankPane2 -active Yes -parent StandardInstall
 InstallComponent 8C17EC92-75DA-4CD3-97F0-CB38691B9FCB -setup Install -type pane -title {Set Port} -component CustomBlankPane2 -active Yes -parent StandardInstall
 InstallComponent 349F9BC3-104C-4982-A1AF-5353A02DE035 -setup Install -type pane -title {Start Copying Files} -component StartCopyingFiles -active Yes -parent StandardInstall
@@ -417,7 +430,7 @@ array set Properties {
 <%InstallDir%>/alfresco.ico
 
 0C9D77AA-E5A2-4E5E-A47D-1094A62A6C68,ShortcutName
-{Stop File System Receiver}
+{Stop <%AppName%>}
 
 0C9D77AA-E5A2-4E5E-A47D-1094A62A6C68,TargetFileName
 <%InstallDir%>/deploy_stop.bat
@@ -501,7 +514,7 @@ Yes
 <%InstallDir%>/alfresco.ico
 
 27951917-16C4-4604-BC60-F67560355F36,ShortcutName
-{Start File System Receiver}
+{Start <%AppName%>}
 
 27951917-16C4-4604-BC60-F67560355F36,TargetFileName
 <%InstallDir%>/deploy_start.bat
@@ -527,6 +540,9 @@ false
 28C9FDFC-2566-4AB8-8C2A-C47501C48BFF,Alias
 {Cancel Actions}
 
+28C9FDFC-2566-4AB8-8C2A-C47501C48BFF,Conditions
+{0 conditions}
+
 2C9998AE-3A35-4709-8148-E361FCC88B70,CheckCondition
 {Before Action is Executed}
 
@@ -538,6 +554,18 @@ false
 
 2C9998AE-3A35-4709-8148-E361FCC88B70,TrueValue
 No
+
+2D981F73-A2A4-463F-BC29-4E1F32067483,Conditions
+{0 conditions}
+
+2D981F73-A2A4-463F-BC29-4E1F32067483,SubstituteValue
+Yes
+
+2D981F73-A2A4-463F-BC29-4E1F32067483,Value
+{<%Dir <%InstallDir%>/deplog %>}
+
+2D981F73-A2A4-463F-BC29-4E1F32067483,VirtualText
+DEPLOG
 
 349F9BC3-104C-4982-A1AF-5353A02DE035,BackButton,subst
 1
@@ -732,14 +760,15 @@ ViewReadme
 {<%InstallDir%>/application-context.xml;<%InstallDir%>/deployment.properties}
 
 679A07B2-4D09-4796-8F0F-BC470030E967,StringMap
-{"@@DEPDATA@@" "<%DEPDATA%>"
-"@@DEPLOG@@" "<%DEPLOG%>"
-"@@DEPMETA@@" "<%DEPMETA%>"
-"@@RMIPORT@@" "<%RMIPORT%>"
-"@@RMISERVICEPORT@@" "<%RMISERVICEPORT%>"
-"@@DEPTARGET@@" "<%DEPTARGET%>"
+{"@@DEPDATA@@" "<%Dir <%DEPDATA%> forwardslash %>"
+"@@DEPLOG@@" "<%Dir <%DEPLOG%> forwardslash %>"
+"@@DEPMETA@@" "<%Dir <%DEPMETA%> forwardslash %>"
+"@@DEPROOTDIR@@" "<%Dir <%DEPROOTDIR%> forwardslash %>"
 "@@DEPUSER@@" "<%DEPUSER%>"
 "@@DEPPWD@@" "<%DEPPWD%>"
+"@@RMIPORT@@" "<%RMIPORT%>"
+"@@RMISERVICEPORT@@" "<%RMISERVICEPORT%>"
+"@@DEPFSNAME@@" "<%DEPFSNAME%>"
 }
 
 6C00D61A-BAED-436E-B4A0-21849D61BD47,CheckCondition
@@ -803,7 +832,7 @@ Yes
 <%InstallDir%>/AlfrescoLogo32.gif
 
 776A577D-90EB-4CDA-A881-BAA643FD698D,ShortcutName
-{Stop File System Receiver}
+{Stop <%AppName%>}
 
 776A577D-90EB-4CDA-A881-BAA643FD698D,TargetFileName
 <%InstallDir%>/deploy_stop.sh
@@ -828,6 +857,9 @@ Finish
 
 7EEE05F1-15DE-49A8-9F99-7A58EB6279F8,Alias
 {Finish Actions}
+
+7EEE05F1-15DE-49A8-9F99-7A58EB6279F8,Conditions
+{0 conditions}
 
 82626A44-8DF9-4D53-8460-5DC03E855581,CheckCondition
 {Before Action is Executed}
@@ -866,7 +898,7 @@ No
 <%InstallDir%>/AlfrescoLogo32.gif
 
 866731A5-0954-4EFC-8A47-20EFC1398504,ShortcutName
-{Start File System Receiver}
+{Start <%AppName%>}
 
 866731A5-0954-4EFC-8A47-20EFC1398504,TargetFileName
 <%InstallDir%>/deploy_start.sh
@@ -916,6 +948,21 @@ Yes
 9357639A-760D-4BDB-AE1C-863ACFDBAEE5,Action
 {Uninstall Actions}
 
+95B433FA-3092-4796-A883-9F01AD3415D8,AutoUpdate
+No
+
+95B433FA-3092-4796-A883-9F01AD3415D8,Conditions
+{0 conditions}
+
+95B433FA-3092-4796-A883-9F01AD3415D8,SubstituteValue
+Yes
+
+95B433FA-3092-4796-A883-9F01AD3415D8,Value
+{<%Dir <%InstallDir%>/depdata %>}
+
+95B433FA-3092-4796-A883-9F01AD3415D8,VirtualText
+DEPDATA
+
 97BCC0F7-92F0-4962-8E8E-C6D1654BCF5A,Action
 {Install Actions}
 
@@ -941,7 +988,7 @@ Finish
 <%InstallDir%>
 
 9C895371-373A-4923-840C-4F98632E4A99,FileSize
-3204248
+3476939
 
 9C895371-373A-4923-840C-4F98632E4A99,Name
 {Program Files}
@@ -956,7 +1003,7 @@ A633CA65-3F99-48B7-BA6D-FA4E85696100,Value
 {<%Dir <%InstallDir%>/www%>}
 
 A633CA65-3F99-48B7-BA6D-FA4E85696100,VirtualText
-DEPTARGET
+DEPROOTDIR
 
 A6A56774-42B3-4BA4-A026-726EEB98383F,CheckCondition
 {Before Action is Executed}
@@ -1104,6 +1151,18 @@ No
 
 AIX-ppc,RootInstallDir
 /usr/local/<%ShortAppName%>
+
+B47DFD55-5BE5-4E4B-9500-1112138AAF97,Conditions
+{0 conditions}
+
+B47DFD55-5BE5-4E4B-9500-1112138AAF97,SubstituteValue
+Yes
+
+B47DFD55-5BE5-4E4B-9500-1112138AAF97,Value
+{<%Dir <%InstallDir%>/depmeta %>}
+
+B47DFD55-5BE5-4E4B-9500-1112138AAF97,VirtualText
+DEPMETA
 
 B8789CBA-5346-4622-B110-5C07D63D8D1B,BackButton,subst
 1
@@ -1320,6 +1379,18 @@ F1ED9DB6-9D7E-47E3-8506-7045AB9B0265,Value
 
 F1ED9DB6-9D7E-47E3-8506-7045AB9B0265,VirtualText
 DEPDATA
+
+F269AA6D-39D0-4AFF-8B9C-C8AFF183E85E,Conditions
+{0 conditions}
+
+F269AA6D-39D0-4AFF-8B9C-C8AFF183E85E,SubstituteValue
+Yes
+
+F269AA6D-39D0-4AFF-8B9C-C8AFF183E85E,Value
+{<%Dir <%InstallDir%>/www %>}
+
+F269AA6D-39D0-4AFF-8B9C-C8AFF183E85E,VirtualText
+DEPROOTDIR
 
 F46C9198-80E1-466C-9034-9BC1AA83A5C6,Action
 {Install Actions}
@@ -1821,6 +1892,23 @@ C0127B2B-279D-41E9-B5BF-E8C61362F845,Message
 2C9998AE-3A35-4709-8148-E361FCC88B70,Title
 <%InstallApplicationText%>
 
+349F9BC3-104C-4982-A1AF-5353A02DE035,Text
+{Install Directory:
+            <%InstallDir%>
+
+Setup Type:
+            <%InstallType%>
+
+Standalone Deployment receiver:
+	User <%DEPUSER%>, Password <%DEPPWD%>
+	RMI Registry port <%RMIPORT%> , service port <%RMISERVICEPORT%> 
+
+Default file system receiver target:
+	temporary data <%DEPDATA%>
+	log folder <%DEPLOG%>
+	metadata folder <%DEPMETA%>
+	destination folder <%DEPROOTDIR%>}
+
 3AD5798F-A12B-4033-81BE-280FE617C152,Message
 <%InstallingApplicationText%>
 
@@ -1828,10 +1916,10 @@ C0127B2B-279D-41E9-B5BF-E8C61362F845,Message
 {User Account}
 
 3EBCE7AF-8686-4F6B-9108-693D8F5F97F1,Message
-{Please enter the details of the user account that should be used to secure this file system receiver}
+{Please enter the details of the user account that should be used to secure this deployment receiver}
 
 3EBCE7AF-8686-4F6B-9108-693D8F5F97F1,Subtitle
-{Details of user account to secure this file system receiver}
+{Details of user account to secure this deployment receiver}
 
 3EBCE7AF-8686-4F6B-9108-693D8F5F97F1,Title
 {User Account}
@@ -1876,10 +1964,10 @@ A8D2B553-0B34-480D-B790-0549DCC7F087,Caption
 {Set Deployment Locations}
 
 A8D2B553-0B34-480D-B790-0549DCC7F087,Message
-{Enter the locations you wish to use for the File System Receiver data}
+{Enter the locations you wish to use for the default File System Receiver target}
 
 A8D2B553-0B34-480D-B790-0549DCC7F087,Subtitle
-{Provide file locations for deployment data}
+{Provide file locations for the default file system receiver}
 
 A8D2B553-0B34-480D-B790-0549DCC7F087,Title
 {Deployment settings}
@@ -1906,12 +1994,12 @@ D48D5141-FE42-4E9F-94A0-B318959410E7,Title
 <%UninstallApplicationText%>
 
 D700B54B-CEAC-48E9-8AC8-94D982B73406,Caption
-{Please locate where you would like to install the Alfresco File System Receiver.
+{Please locate where you would like to install the <%AppName%>.
 
 Use the Browse... button to navigate to find an existing Alfresco File System Receiver installation.}
 
 D700B54B-CEAC-48E9-8AC8-94D982B73406,Subtitle
-{Where do you want to install the Alfresco File System Receiver ?}
+{Where do you want to install the <%AppName%> ?}
 
 D700B54B-CEAC-48E9-8AC8-94D982B73406,Title
 {Choose installation location}

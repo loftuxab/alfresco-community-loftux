@@ -26,7 +26,6 @@
 package org.alfresco.deployment;
 
 import org.springframework.context.support.FileSystemXmlApplicationContext;
-import org.alfresco.deployment.impl.server.DeploymentReceiverServiceImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,15 +49,15 @@ public class Main
 
         try 
         {
-        	logger.info("Alfresco File System Receiver Starting");
+        	logger.info("Alfresco Deployment Receiver Starting");
         	@SuppressWarnings("unused")
         	FileSystemXmlApplicationContext context =
         		new FileSystemXmlApplicationContext(args[0]);
         }
         catch (Exception e)
         {
-        	logger.error("Unable to start file system receiver", e);
-        	System.err.println("Unable to start file system receiver");
+        	logger.error("Unable to start deployment receiver", e);
+        	System.err.println("Unable to start deployment receiver");
         	e.printStackTrace();
         }
     }
