@@ -72,7 +72,8 @@
          componentId: "",
          webviewURI: "",
          webviewTitle: "",
-         webviewHeight: 600
+         webviewHeight: 600,
+         isDefault: 'true'
       },
       
       /**
@@ -155,18 +156,21 @@
                         {
                            if (iframe.attributes["name"])
                            {
-                              var titleLink = Dom.get(this.id + "-title-link"),
-                                 linkHref = iframe.attributes["name"].value;
-                              titleLink.attributes["href"].value = linkHref;
-                              titleLink.innerHTML = $html(linkHref);
+                              var titleLink = Dom.get(this.id + "-title-link");
+                              //update iframe and internal config
+                              titleLink.href.value = this.options.webviewURI = iframe.attributes["src"].value;
+                              titleLink.innerHTML = this.options.webviewTitle = $html(iframe.attributes["name"].value);
+                              
                            }
                            if (iframe.attributes["theHeight"])
                            {
-                              var theHeight = iframe.attributes["theHeight"].value;
+                              var theHeight = this.options.webviewHeight = iframe.attributes["theHeight"].value;
                               Dom.setStyle(div, "height", theHeight + "px");
                            }
+                           this.options.isDefault = 'false';
                         }
                      }
+                     
                   },
                   scope: this
                },
@@ -189,7 +193,7 @@
                      elem = Dom.get(this.configDialog.id + "-url");
                      if (elem)
                      {
-                        elem.value = this.options.webviewURI;
+                        elem.value = (this.options.isDefault=='false') ? this.options.webviewURI : 'http://';
                      }
 
                      /* Get the height value */
