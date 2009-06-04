@@ -48,6 +48,14 @@ public class DeployedFile implements Serializable
     
     private boolean fCreate;
     
+    /**
+     * 
+     * @param type
+     * @param preLocation where the temporary file is stored
+     * @param path the final destination of the file.
+     * @param guid
+     * @param create true if this is a new file.
+     */
     public DeployedFile(FileType type,
                         String preLocation,
                         String path,

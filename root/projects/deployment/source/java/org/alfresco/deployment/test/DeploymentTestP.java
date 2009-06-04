@@ -60,44 +60,44 @@ public class DeploymentTestP extends TestCase
     {
     }
     
-    public void testSimple()
-    {
-        try
-        {
-            String ticket = fService.begin("sampleTarget", "Giles", "Watcher");
-            System.out.println(fService.getListing(ticket, "/"));
-            OutputStream out = fService.send(ticket, "/foo.dat", GUID.generate());
-            out.write("I'm naming all the stars.\n".getBytes());
-            fService.finishSend(ticket, out);
-            fService.commit(ticket);
-            ticket = fService.begin("sampleTarget", "Giles", "Watcher");
-            fService.delete(ticket, "/build.xml");
-            fService.delete(ticket, "/lib");
-            out = fService.send(ticket, "/src", GUID.generate());
-            out.write("I used to be a directory.\n".getBytes());
-            fService.finishSend(ticket, out);
-            fService.commit(ticket);
-            ticket = fService.begin("sampleTarget", "Giles", "Watcher");
-            out = fService.send(ticket, "/test/glory.txt", GUID.generate());
-            out.write("This town has too many vampires and not enough retail outlets.\n".getBytes());
-            fService.finishSend(ticket, out);
-            fService.delete(ticket, "/example_run.xml");
-            fService.abort(ticket);
-            ticket = fService.begin("sampleTarget", "Giles", "Watcher");
-            try
-            {
-                fService.getListing(ticket, "/foo/bar");
-                fail();
-            }
-            catch (DeploymentException e)
-            {
-                // This should happen.
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            fail();
-        }
-    }
+//    public void testSimple()
+//    {
+//        try
+//        {
+//            String ticket = fService.begin("sampleTarget", "Giles", "Watcher");
+//            System.out.println(fService.getListing(ticket, "/"));
+//            OutputStream out = fService.send(ticket, "/foo.dat", GUID.generate());
+//            out.write("I'm naming all the stars.\n".getBytes());
+//            fService.finishSend(ticket, out);
+//            fService.commit(ticket);
+//            ticket = fService.begin("sampleTarget", "Giles", "Watcher");
+//            fService.delete(ticket, "/build.xml");
+//            fService.delete(ticket, "/lib");
+//            out = fService.send(ticket, "/src", GUID.generate());
+//            out.write("I used to be a directory.\n".getBytes());
+//            fService.finishSend(ticket, out);
+//            fService.commit(ticket);
+//            ticket = fService.begin("sampleTarget", "Giles", "Watcher");
+//            out = fService.send(ticket, "/test/glory.txt", GUID.generate());
+//            out.write("This town has too many vampires and not enough retail outlets.\n".getBytes());
+//            fService.finishSend(ticket, out);
+//            fService.delete(ticket, "/example_run.xml");
+//            fService.abort(ticket);
+//            ticket = fService.begin("sampleTarget", "Giles", "Watcher");
+//            try
+//            {
+//                fService.getListing(ticket, "/foo/bar");
+//                fail();
+//            }
+//            catch (DeploymentException e)
+//            {
+//                // This should happen.
+//            }
+//        }
+//        catch (Exception e)
+//        {
+//            e.printStackTrace();
+//            fail();
+//        }
+//    }
 }

@@ -24,14 +24,14 @@ public class TestDeploymentTransportTransformer implements DeploymentTransportIn
     /**
      * Outgoing filter
      */
-	public OutputStream addFilter(OutputStream out, String path) {
+	public OutputStream addFilter(OutputStream out, String path, String encoding, String mimeType) {
 		return new TestOutFilter(out);
 	}
 
 	/**
 	 * In-bound filter
 	 */
-	public InputStream addFilter(InputStream in, String path) {
+	public InputStream addFilter(InputStream in, String path, String encoding, String mimeType) {
 
 		return new TestInFilter(in);
 	}

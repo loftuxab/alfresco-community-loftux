@@ -82,6 +82,7 @@
          <pathelement location="${dir.project.linkvalidation.classes}" />
          <pathelement location="${dir.project.remoteapi.classes}" />
          <pathelement location="${dir.project.repository.classes}" />
+         <pathelement location="${dir.project.wdrdeployment.classes}" />
          <pathelement location="${dir.project.webframework.classes}" />
          <pathelement location="${dir.project.webframeworkcommons.classes}" />
          <pathelement location="${dir.project.webscriptframework.classes}" />
@@ -309,6 +310,7 @@
                     incremental-mbeans,
                     incremental-deployment,
                     incremental-repository,
+					incremental-wdrdeployment,
                     incremental-remoteapi,
                     incremental-jndi,
                     incremental-catalinavirtual, 
@@ -432,8 +434,9 @@
            description="Compiles all documentation for all projects"
            depends="generate-javadocs-core, 
                     generate-javadocs-mbeans,
-                    generate-javadocs-deployment, 
+                    generate-javadocs-deployment,
                     generate-javadocs-repository, 
+					generate-javadocs-wdrdeployment,
                     generate-javadocs-remoteapi, 
                     generate-javadocs-jndi,
                     generate-javadocs-catalinavirtual, 
@@ -470,6 +473,7 @@
                     clean-mbeans,
                     clean-deployment, 
                     clean-repository, 
+					clean-wdrdeployment,
                     clean-remoteapi, 
                     clean-jndi, 
                     clean-catalinavirtual, 
@@ -630,6 +634,7 @@
          <fileset dir="${dir.project.deployment.classes}" />
          <fileset dir="${dir.project.repository.classes}" 
                   excludes="**/extension/**" />
+         <fileset dir="${dir.project.wdrdeployment.classes}" />
          <fileset dir="${dir.project.remoteapi.classes}" />
          <fileset dir="${dir.project.catalinavirtual.classes}" />
          <fileset dir="${dir.project.linkvalidation.classes}" />

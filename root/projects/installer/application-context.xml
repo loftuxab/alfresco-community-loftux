@@ -1,14 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+<!-- Stand alone deployment server -->
 
-<!--  FSR DEPLOYMENT SERVER CONFIGURATION -->
 <beans>
-
-     <!-- Sample FSDeploymentRunnable implementation - add your program definitions here
-     <bean id="sampleRunnable" class="org.alfresco.deployment.SampleRunnable"/>
-     -->     
-
-    <bean id="properties" 
+     <bean id="properties" 
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="ignoreUnresolvablePlaceholders">
             <value>true</value>
@@ -18,90 +13,9 @@
                 <value>classpath:deployment.properties</value>
             </list>
         </property>
-    </bean>    
-    
-    <bean id="configuration" class="org.alfresco.deployment.config.Configuration"
-          init-method="init">
-        <property name="dataDirectory">
-            <value>${dep.datadir}</value>
-        </property>
-        <property name="logDirectory">
-            <value>${dep.logdir}</value>
-        </property>
-        <property name="metaDataDirectory">
-            <value>${dep.metadatadir}</value>
-        </property>  
-        
-        <!-- Target Configuration. Modify for your site. -->
-        <property name="targetData">
-            <map>
-                <!-- Default target -->
-            	<entry key="default">
-            	    <map>
-            	    	<entry key="root"><value>@@DEPTARGET@@</value></entry>
-            	    	<entry key="user"><value>@@DEPUSER@@</value></entry>
-            	    	<entry key="password"><value>@@DEPPWD@@</value></entry>
-            	    	<entry key="autoFix"><value>true</value></entry>
-            	    	
-            	    	<!-- Add references to post commit callbacks here 
-            	    	<entry key="postCommit">
-                            <list>
-                               <ref bean="sampleRunnable"/>
-                            </list>
-                     	</entry>
-                     	-->
-                        <!-- Add references to prepare callbacks here
-                        <entry key="prepare">
-                         <list>
-                             <ref bean="sampleRunnable"/>
-                         </list>
-                         </entry>
-                        -->
-            	    </map>
-            	</entry>
-            </map>
-        </property>
     </bean>
     
-    <bean id="deploymentReceiverService" class="org.alfresco.deployment.impl.server.DeploymentReceiverServiceImpl" 
-          init-method="init">
-        <property name="configuration">
-            <ref bean="configuration"/>
-        </property>
-        
-        <!-- Will an error be thrown if the FSR overwrites files outside its control -->
-        <property name="errorOnOverwrite"><value>false</value></property>
-        
-        <!-- Define your content transformers here
-        <property name="transformers"> 
-            <list>
-            </list>
-        </property>
-        -->
-        
-    </bean>
+    <import resource="classpath*:deployment/*-context.xml" />   
+    <import resource="classpath*:deployment/*-target.xml" /> 
     
-    <bean id="deploymentReceiverTransport" class="org.alfresco.deployment.impl.server.DeploymentReceiverTransportImpl">
-    	<property name="deploymentReceiverService">
-    	    <ref bean="deploymentReceiverService"/>
-    	</property>
-    </bean>
-    
-	<bean id="deploymentReceiverTransportRMI" class="org.springframework.remoting.rmi.RmiServiceExporter">
-		<property name="service">
-			<ref bean="deploymentReceiverTransport"/>
-		</property>
-		<property name="serviceInterface">
-			<value>org.alfresco.deployment.DeploymentReceiverTransport</value>
-		</property>
-		<property name="serviceName">
-			<value>deployment</value>
-		</property>
-		<property name="registryPort">
-			<value>${dep.rmi.port}</value>
-		</property>
-		<property name="servicePort">
-			<value>${dep.rmi.service.port}</value>
-		</property>
-	</bean>
 </beans>

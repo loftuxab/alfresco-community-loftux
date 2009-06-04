@@ -1,7 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
+<!-- This file enables Alfresco WCM it should be placed in shared/classes/extension -->
 <beans>
+
+    <!--  Patch in the WCM folders -->
     <bean id="patch.wcmFolders" class="org.alfresco.repo.admin.patch.impl.WCMFoldersPatch" parent="basePatch" >
         <property name="id"><value>patch.wcmFolders</value></property>
         <property name="description"><value>patch.wcmFolders.description</value></property>
@@ -16,5 +19,12 @@
             <ref bean="spacesBootstrap" />
         </property>
     </bean>
+    
+    <!--  Bootstrap the WCM Deployment Receiver Subsystem -->
+    <bean id="wcmDeploymentReceiver" class="org.alfresco.repo.management.DefaultManagedApplicationContextFactory">
+        <property name="autoStart">
+            <value>true</value>
+        </property>
+    </bean>   
 
 </beans>
