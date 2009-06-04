@@ -1,12 +1,22 @@
 var activityFeed = getActivities();
 var activities = [], activity, item, summary, fullName, date;
-var filter = args["filter"], oldestDate = getOldestDate(filter);
+var dateFilter = args["dateFilter"], oldestDate = getOldestDate(dateFilter);
 
 if (activityFeed != null)
 {
+   var mode = args['mode'];
+   var site = (mode=='site') ? args['site'] : null;
    for (var i = 0, ii = activityFeed.length; i < ii; i++)
    {
       activity = activityFeed[i];
+      //filter by site
+      if (mode=='site' && site)
+      {
+         if (activity.siteNetwork!=site)
+         {
+            continue;
+         }
+      }      
       if (activity.activitySummaryFormat == "json")
       {
          summary = eval("(" + activity.activitySummary + ")");
@@ -76,7 +86,7 @@ function specialize(item, activity, summary)
 function getActivities()
 {
    // Call the correct repo script depending on the mode
-   var mode = args["mode"], site = args["site"], connector, result =
+   var mode = args["mode"], site = args["site"], userFilter = args['userFilter'], connector, result =
    {
       status: 0
    };
@@ -91,14 +101,19 @@ function getActivities()
       connector = remote.connect("alfresco-feed");
    }
 
-   if (mode == "site")
+   //filter by user
+   var excl = '';
+   switch(userFilter)
    {
-      result = connector.get("/api/activities/feed/site/" + site + "?format=json");
+      case 'others':
+         excl = '&exclUser=true';
+         break; 
+      case 'mine':
+         excl = '&exclOthers=true';
+         break; 
+
    }
-   else if (mode == "user")
-   {
-      result = connector.get("/api/activities/feed/user?format=json");
-   }
+   result = connector.get("/api/activities/feed/user?format=json" + excl);
 
    if (result.status == 200)
    {
@@ -140,7 +155,7 @@ function sitePageUrl(activity, summary)
 function getOldestDate(filter)
 {
    var date = new Date();
-   date.setHours(0, 0, 0, 0)
+   date.setHours(0, 0, 0, 0);
    
    switch (filter)
    {
