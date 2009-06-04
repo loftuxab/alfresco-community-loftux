@@ -64,7 +64,7 @@
       Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
 
       return this;
-   }
+   };
 
    Alfresco.Activities.prototype =
    {
@@ -163,15 +163,6 @@
       {
          var me = this;
 
-         // "Today" filter
-         this.widgets.today = new YAHOO.widget.Button(this.id + "-today",
-         {
-            type: "checkbox",
-            value: "today",
-            checked: true
-         });
-         this.widgets.today.on("checkedChange", this.onTodayCheckedChanged, this.widgets.today, this);
-         
          // Dropdown filter
          this.widgets.range = new YAHOO.widget.Button(this.id + "-range",
          {
@@ -188,20 +179,39 @@
                me.onDateFilterChanged.call(me, p_aArgs[1]);
             }
          });
-         this.widgets.range.value = "7";
-         
+         this.widgets.range.value = "today";
+         // Dropdown filter
+         this.widgets.user = new YAHOO.widget.Button(this.id + "-user",
+         {
+            type: "split",
+            menu: this.id + "-user-menu"
+         });
+         //exclusion filter
+         this.widgets.user.on("click", this.onExclusionFilterClicked, this, true);
+         this.widgets.user.getMenu().subscribe("click", function (p_sType, p_aArgs)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
+            {
+               me.widgets.user.set("label", menuItem.cfg.getProperty("text"));
+               me.onExclusionFilterChanged.call(me, p_aArgs[1]);
+
+            }
+         });
+         this.widgets.user.value = "others";
+
          // The activity list container
          this.activityList = Dom.get(this.id + "-activityList");
          
          // Populate the activity list
-         this.populateActivityList("today");
+         this.populateActivityList(this.widgets.range.value,this.widgets.user.value);
       },
       
       /**
        * Populate the activity list via Ajax request
        * @method populateActivityList
        */
-      populateActivityList: function Activities_populateActivityList(filter)
+      populateActivityList: function Activities_populateActivityList(dateFilter,userFilter)
       {
          // Load the activity list
          Alfresco.util.Ajax.request(
@@ -211,13 +221,14 @@
             {
                site: this.options.siteId,
                mode: this.options.mode,
-               filter: filter
+               dateFilter: dateFilter,
+               userFilter: userFilter
             },
             successCallback:
             {
                fn: this.onListLoaded,
                scope: this,
-               obj: filter
+               obj: dateFilter
             },
             failureCallback:
             {
@@ -238,7 +249,7 @@
       {
          this.options.activeFilter = p_obj;
          this.activityList.innerHTML = p_response.serverResponse.responseText;
-         this.updateFeedLink();
+         this.updateFeedLink(this.widgets.range.value,this.widgets.user.value);
       },
 
       /**
@@ -250,32 +261,12 @@
          this.activityList.innerHTML = '<div class="detail-list-item first-item last-item">' + this._msg("label.load-failed") + '</div>';
       },
       
-      /**
-       * Sets the active filter highlight in the UI
-       * @method setActiveFilter
-       * @param filter {string} The current filter
-       */
-      setActiveFilter: function Activities_setActiveFilter(filter)
-      {
-         switch (filter)
-         {
-            case "today":
-               Dom.removeClass(this.widgets.range.get("element"), "yui-checkbox-button-checked");
-               break;
-            
-            default:
-               this.widgets.today.set("checked", false, true);
-               Dom.addClass(this.widgets.range.get("element"), "yui-checkbox-button-checked");
-               break;
-         }
-         
-      },
       
       /**
        * Updates the href attribute on the feed link
        * @method updateFeedLink
        */
-      updateFeedLink: function Activities_updateFeedLink(filter)
+      updateFeedLink: function Activities_updateFeedLink(dateFilter,userFilter)
       {
          var link = Dom.get(this.id + "-feedLink");
          if (link)
@@ -286,8 +277,9 @@
                format: "atomfeed",
                mode: this.options.mode,
                site: this.options.siteId,
-               filter: this.options.activeFilter
-            }
+               dateFilter: dateFilter,
+               userFilter: userFilter
+            };
             url += Alfresco.util.Ajax.jsonToParamString(dataObj, true);
             link.setAttribute("href", url);
          }
@@ -299,18 +291,6 @@
        * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
 
-      /**
-       * Today only
-       * @method onTodayCheckedChanged
-       * @param p_oEvent {object} Button event
-       * @param p_obj {object} Button
-       */
-      onTodayCheckedChanged: function Activities_onTodayCheckedChanged(p_oEvent, p_obj)
-      {
-         this.setActiveFilter("today");
-         this.populateActivityList("today");
-         p_obj.set("checked", true, true);
-      },
 
       /**
        * Date button clicked event handler
@@ -319,9 +299,7 @@
        */
       onDateFilterClicked: function Activities_onDateFilterClicked(p_oEvent)
       {
-         var filter = this.widgets.range.value;
-         this.setActiveFilter(filter);
-         this.populateActivityList(filter);
+         this.populateActivityList(this.widgets.range.value,this.widgets.user.value);
       },
       
       /**
@@ -331,12 +309,30 @@
        */
       onDateFilterChanged: function Activities_onDateFilterChanged(p_oMenuItem)
       {
-         var filter = p_oMenuItem.value;
-         this.widgets.range.value = filter;
-         this.setActiveFilter(filter);
-         this.populateActivityList(filter);
+         this.widgets.range.value = p_oMenuItem.value;
+         // this.setActiveFilter(dateFilter,Alfresco.Activities.FILTER_BYDATE);
+         this.populateActivityList(this.widgets.range.value,this.widgets.user.value);
       },
+      /**
+       * Exclusion drop-down changed event handler
+       * @method onExclusionFilterChanged
+       * @param p_oMenuItem {object} Selected menu item
+       */
+      onExclusionFilterChanged: function Activities_onExclusionFilterChanged(p_oMenuItem)
+      {
+         this.widgets.user.value = p_oMenuItem.value;
+         this.populateActivityList(this.widgets.range.value, this.widgets.user.value);
+      },      
+      /**
+       * Exclusion button clicked event handler
+       * @method onExclusionFilterClicked
+       * @param p_oEvent {object} Dom event
+       */
+      onExclusionFilterClicked: function Activities_onExclusionFilterClicked(p_oEvent)
+      {
+         this.populateActivityList(this.widgets.range.value,this.widgets.user.value);
 
+      },
 
       /**
        * Gets a custom message
@@ -351,4 +347,6 @@
          return Alfresco.util.message.call(this, messageId, "Alfresco.Activities", Array.prototype.slice.call(arguments).slice(1));
       }
    };
+   Alfresco.Activities.FILTER_BYDATE = 'byDate';
+   Alfresco.Activities.FILTER_BYUSER = 'byUser';
 })();
