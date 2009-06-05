@@ -170,6 +170,15 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
     {
         return fTargetName;
     }
+    
+    /**
+     * Set the target name.
+     * @return
+     */
+    public void setName(String name)
+    {
+        this.fTargetName = name;
+    }
 
     /**
      * Get the root directory.
