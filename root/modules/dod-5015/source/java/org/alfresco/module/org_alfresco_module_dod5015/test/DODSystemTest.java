@@ -295,39 +295,8 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         setComplete();
         endTransaction();
         
-        // Switch to admin
-        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
-        
-        startNewTransaction();
-        
-        // Create test users/groups (if they do not already exist)
-        
-        createUser("jrangel");
-        createUser("dmartinz");
-        createUser("jrogers");
-        createUser("hmcneil");
-        createUser("dfranco");
-        createUser("gsmith");
-        createUser("eharris");
-        createUser("bbayless");
-        createUser("mhouse");
-        createUser("aly");
-        createUser("dsandy");
-        createUser("driggs");
-        
-        createTopLevelGroup("Engineering");
-        createTopLevelGroup("Finance");
-        
-        
-        URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig2.json"); // from test-resources
-        assertNotNull(url);
-        File file = new File(url.getFile());
-        assertTrue(file.exists());
-        
-        caveatConfigImpl.updateOrCreateCaveatConfig(file);
-        
-        setComplete();
-        endTransaction();
+        cleanCaveatConfigData();
+        setupCaveatConfigData();
         
         startNewTransaction();
         
@@ -384,16 +353,17 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         
         startNewTransaction();
         
+        final String RECORD_NAME = "MyRecord.txt";
         final String SOME_CONTENT = "There is some content in this record";
         
         AuthenticationUtil.setFullyAuthenticatedUser("dfranco");
         
         // Create the document
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
-        props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+        props.put(ContentModel.PROP_NAME, RECORD_NAME);
         NodeRef recordOne = this.nodeService.createNode(recordFolder, 
                                                         ContentModel.ASSOC_CONTAINS, 
-                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, RECORD_NAME), 
                                                         ContentModel.TYPE_CONTENT,
                                                         props).getChildRef();
         
@@ -403,65 +373,24 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         writer.setEncoding("UTF-8");
         writer.putContent(SOME_CONTENT);
         
+        // force behaviours
         setComplete();
         endTransaction();
         
+        startNewTransaction();
+        
         assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_RECORD));
+        
+        setComplete();
+        endTransaction();
         
         //
         // Test caveats (security interceptors) BEFORE setting properties
         //
         
-        // Sanity check search service - eg. query
-        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
-        
-        String query = "ID:"+LuceneQueryParser.escape(recordOne.toString());
-        System.out.println("Query: " + query);
-        ResultSet rs = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, query);
-        assertEquals(1, rs.length());
-        assertEquals(recordOne.toString(), rs.getNodeRef(0).toString());
-        
-        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
-        
-        rs = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, query);
-        assertEquals(1, rs.length());
-        assertEquals(recordOne.toString(), rs.getNodeRef(0).toString());
-        
-        // Sanity check node service - eg. getProperty, getChildAssocs
-        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
-        
-        Serializable value = this.nodeService.getProperty(recordOne, ContentModel.PROP_NAME);
-        assertNotNull(value);
-        assertEquals("MyRecord.txt", (String)value);
-        
-        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(recordFolder);
-        assertEquals(1, childAssocs.size());
-        assertEquals(recordOne.toString(), childAssocs.get(0).getChildRef().toString());
-        
-        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
-        
-        value = this.nodeService.getProperty(recordOne, ContentModel.PROP_NAME);
-        assertNotNull(value);
-        assertEquals("MyRecord.txt", (String)value);
-        
-        childAssocs = nodeService.getChildAssocs(recordFolder);
-        assertEquals(1, childAssocs.size());
-        assertEquals(recordOne.toString(), childAssocs.get(0).getChildRef().toString());
-        
-        // Sanity check content service - eg. getReader
-        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
-        
-        ContentReader reader = this.contentService.getReader(recordOne, ContentModel.PROP_CONTENT);
-        assertNotNull(reader);
-        assertEquals(SOME_CONTENT, reader.getContentString());
-        
-        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
-        
-        reader = this.contentService.getReader(recordOne, ContentModel.PROP_CONTENT);
-        assertNotNull(reader);
-        assertEquals(SOME_CONTENT, reader.getContentString());
-        
-        
+        sanityCheckAccess("dmartinz", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
+        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
+        sanityCheckAccess("dsandy", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
         
         // Test setting properties (with restricted set of allowed values)
         
@@ -484,6 +413,7 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
             propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);
             this.nodeService.addProperties(recordOne, propValues);
             
+            // force integrity checking
             setComplete();
             endTransaction();
             
@@ -507,6 +437,7 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
             propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);
             this.nodeService.addProperties(recordOne, propValues);
             
+            // force integrity checking
             setComplete();
             endTransaction();
         }
@@ -515,13 +446,16 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
             fail(""+ie);
         }
         
+        startNewTransaction();
+        
         @SuppressWarnings("unchecked")
         List<String> smList = (List<String>)this.nodeService.getProperty(recordOne, RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST);
         assertEquals(2, smList.size());
         assertTrue(smList.contains(NOFORN));
         assertTrue(smList.contains(FOUO));
         
-        
+        setComplete();
+        endTransaction();
         
         // Set user-defined field (in this case, "prjList" on record)
         
@@ -538,10 +472,11 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
             propValues.put(QName.createQName(RecordsManagementModel.RM_URI, "projectNameList"), (Serializable)prjList);
             this.nodeService.addProperties(recordOne, propValues);
             
+            // force integrity checking
             setComplete();
             endTransaction();
             
-            fail("Should fail with integrity exception"); // user 'dfranco' not allowed 'Project Z'
+            fail("Should fail with integrity exception"); // user 'dfranco' not allowed 'Project B'
         }
         catch (IntegrityException ie)
         {
@@ -557,10 +492,10 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
             Map<QName, Serializable> propValues = new HashMap<QName, Serializable>(1);
             List<String> prjList = new ArrayList<String>(3);
             prjList.add("Project A");
-            prjList.add("Project C");
             propValues.put(QName.createQName(RecordsManagementModel.RM_URI, "projectNameList"), (Serializable)prjList);
             this.nodeService.addProperties(recordOne, propValues);
             
+            // force integrity checking
             setComplete();
             endTransaction();
         }
@@ -569,84 +504,110 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
             fail(""+ie);
         }
         
+        startNewTransaction();
+        
         @SuppressWarnings("unchecked")
         List<String> prjList = (List<String>)this.nodeService.getProperty(recordOne, QName.createQName(RecordsManagementModel.RM_URI, "projectNameList"));
-        assertEquals(2, prjList.size());
+        assertEquals(1, prjList.size());
         assertTrue(prjList.contains("Project A"));
-        assertTrue(prjList.contains("Project C"));
         
+        setComplete();
+        endTransaction();
         
         //
         // Test caveats (security interceptors) AFTER setting properties
         //
         
-        // Sanity check search service - eg. query
-        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
+        sanityCheckAccess("dmartinz", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
+        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
         
-        query = "ID:"+LuceneQueryParser.escape(recordOne.toString());
-        System.out.println("Query: " + query);
-        rs = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, query);
-        assertEquals(1, rs.length());
-        assertEquals(recordOne.toString(), rs.getNodeRef(0).toString());
+        sanityCheckAccess("dsandy", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, false); // denied by rma:smList  ("NOFORN", "FOUO")
         
-        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
-        
-        rs = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, query);
-        assertEquals(0, rs.length());
-        
-        // Sanity check node service - eg. getProperty, getChildAssocs
-        
-        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
-        
-        value = this.nodeService.getProperty(recordOne, ContentModel.PROP_NAME);
-        assertNotNull(value);
-        assertEquals("MyRecord.txt", (String)value);
-        
-        childAssocs = nodeService.getChildAssocs(recordFolder);
-        assertEquals(1, childAssocs.size());
-        assertEquals(recordOne.toString(), childAssocs.get(0).getChildRef().toString());
-        
-        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
-        
-        try
-        {
-            value = this.nodeService.getProperty(recordOne, ContentModel.PROP_NAME);
-            fail("Unexpected - access should be denied by caveat");
-        }
-        catch (AccessDeniedException ade)
-        {
-            // expected
-        }
-        
-        childAssocs = nodeService.getChildAssocs(recordFolder);
-        assertEquals(0, childAssocs.size());
-        
-        // Sanity check content service - eg. getReader
-        AuthenticationUtil.setFullyAuthenticatedUser("dmartinz");
-        
-        reader = this.contentService.getReader(recordOne, ContentModel.PROP_CONTENT);
-        assertNotNull(reader);
-        assertEquals(SOME_CONTENT, reader.getContentString());
-        
-        AuthenticationUtil.setFullyAuthenticatedUser("dsandy");
-        
-        try
-        {
-            reader = this.contentService.getReader(recordOne, ContentModel.PROP_CONTENT);
-            fail("Unexpected - access should be denied by caveat");
-        }
-        catch (AccessDeniedException ade)
-        {
-            // expected
-        }
+        cleanCaveatConfigData();
     }
-	
-	protected void createUser(String userName)
+    
+    private void cleanCaveatConfigData()
     {
-        if (authenticationService.authenticationExists(userName) == false)
+        startNewTransaction();
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
+        deleteUser("jrangel");
+        deleteUser("dmartinz");
+        deleteUser("jrogers");
+        deleteUser("hmcneil");
+        deleteUser("dfranco");
+        deleteUser("gsmith");
+        deleteUser("eharris");
+        deleteUser("bbayless");
+        deleteUser("mhouse");
+        deleteUser("aly");
+        deleteUser("dsandy");
+        deleteUser("driggs");
+        deleteUser("test1");
+        
+        deleteGroup("Engineering");
+        deleteGroup("Finance");
+        deleteGroup("test1");
+        
+        caveatConfigImpl.updateOrCreateCaveatConfig("{}"); // empty config !
+        
+        setComplete();
+        endTransaction();
+    }
+    
+    private void setupCaveatConfigData()
+    {
+        startNewTransaction();
+        
+        // Switch to admin
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
+        // Create test users/groups (if they do not already exist)
+        
+        createUser("jrangel");
+        createUser("dmartinz");
+        createUser("jrogers");
+        createUser("hmcneil");
+        createUser("dfranco");
+        createUser("gsmith");
+        createUser("eharris");
+        createUser("bbayless");
+        createUser("mhouse");
+        createUser("aly");
+        createUser("dsandy");
+        createUser("driggs");
+        createUser("test1");
+        
+        createGroup("Engineering");
+        createGroup("Finance");
+        createGroup("test1");
+        
+        addToGroup("jrogers", "Engineering");
+        addToGroup("dfranco", "Finance");
+        addToGroup("gsmith", "Engineering");
+        
+        
+        URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig2.json"); // from test-resources
+        assertNotNull(url);
+        File file = new File(url.getFile());
+        assertTrue(file.exists());
+        
+        caveatConfigImpl.updateOrCreateCaveatConfig(file);
+        
+        setComplete();
+        endTransaction();
+    }
+    
+    protected void createUser(String userName)
+    {
+        if (! authenticationService.authenticationExists(userName))
         {
             authenticationService.createAuthentication(userName, "PWD".toCharArray());
-            
+        }
+        
+        if (! personService.personExists(userName))
+        {
             PropertyMap ppOne = new PropertyMap(4);
             ppOne.put(ContentModel.PROP_USERNAME, userName);
             ppOne.put(ContentModel.PROP_FIRSTNAME, "firstName");
@@ -657,13 +618,147 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
             personService.createPerson(ppOne);
         }
     }
-	
-	protected void createTopLevelGroup(String groupName)
+    
+    protected void deleteUser(String userName)
     {
-        if (authorityService.authorityExists(groupName) == false)
+        if (personService.personExists(userName))
         {
-            authorityService.createAuthority(AuthorityType.GROUP, null, groupName);
+            personService.deletePerson(userName);
         }
+        
+        if (authenticationService.authenticationExists(userName))
+        {
+            authenticationService.deleteAuthentication(userName);
+        }
+    }
+    
+    protected void createGroup(String groupShortName)
+    {
+        createGroup(null, groupShortName);
+    }
+    
+    protected void createGroup(String parentGroupShortName, String groupShortName)
+    {
+        if (parentGroupShortName != null)
+        {
+            String parentGroupFullName = authorityService.getName(AuthorityType.GROUP, parentGroupShortName);
+            if (authorityService.authorityExists(parentGroupFullName) == false)
+            {
+                authorityService.createAuthority(AuthorityType.GROUP, parentGroupFullName, groupShortName);
+            }
+        }
+        else
+        {
+            authorityService.createAuthority(AuthorityType.GROUP, null, groupShortName);
+        }
+    }
+    
+    protected void deleteGroup(String groupShortName)
+    {
+        String groupFullName = authorityService.getName(AuthorityType.GROUP, groupShortName);
+        if (authorityService.authorityExists(groupFullName) == true)
+        {
+            authorityService.deleteAuthority(groupFullName);
+        }
+    }
+    
+    protected void addToGroup(String authorityName, String groupShortName)
+    {
+        authorityService.addAuthority(authorityService.getName(AuthorityType.GROUP, groupShortName), authorityName);
+    }
+    
+    protected void removeFromGroup(String authorityName, String groupShortName)
+    {
+        authorityService.removeAuthority(authorityService.getName(AuthorityType.GROUP, groupShortName), authorityName);
+    }
+    
+    private void sanityCheckAccess(String user, NodeRef recordFolder, NodeRef record, String expectedName, String expectedContent, boolean expectedAllowed)
+    {
+        //startNewTransaction();
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(user);
+        
+        // Sanity check search service - eg. query
+        
+        String query = "ID:"+LuceneQueryParser.escape(record.toString());
+        ResultSet rs = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, query);
+        
+        if (expectedAllowed)
+        {
+            assertEquals(1, rs.length());
+            assertEquals(record.toString(), rs.getNodeRef(0).toString());
+        }
+        else
+        {
+            assertEquals(0, rs.length());
+        }
+        
+        // Sanity check node service - eg. getProperty, getChildAssocs
+        
+        try
+        {
+            Serializable value = this.nodeService.getProperty(record, ContentModel.PROP_NAME);
+            
+            if (expectedAllowed)
+            {
+                assertNotNull(value);
+                assertEquals(expectedName, (String)value);
+            }
+            else
+            {
+                fail("Unexpected - access should be denied by caveats");
+            }
+        }
+        catch (AccessDeniedException ade)
+        {
+            if (expectedAllowed)
+            {
+                fail("Unexpected - access should be allowed by caveats");
+            }
+            
+            // expected
+        }
+        
+        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(recordFolder);
+        
+        if (expectedAllowed)
+        {
+            assertEquals(1, childAssocs.size());
+            assertEquals(record.toString(), childAssocs.get(0).getChildRef().toString());
+        }
+        else
+        {
+            assertEquals(0, childAssocs.size());
+        }
+        
+        // Sanity check content service - eg. getReader
+        
+        try
+        {
+            ContentReader reader = this.contentService.getReader(record, ContentModel.PROP_CONTENT);
+            
+            if (expectedAllowed)
+            {
+                assertNotNull(reader);
+                assertEquals(expectedContent, reader.getContentString());
+            }
+            else
+            {
+                fail("Unexpected - access should be denied by caveats");
+            }
+        }
+        catch (AccessDeniedException ade)
+        {
+            if (expectedAllowed)
+            {
+                fail("Unexpected - access should be allowed by caveats");
+            }
+            
+            // expected
+        }
+        
+        //setComplete();
+        //endTransaction();
     }
 	
 	/**
