@@ -1183,4 +1183,8 @@
       </copy>
    </target>
 
+   <!--- Stub target get overridden in other build scripts -->
+   <target name="distribute-extras" description="Build distribution targets for enterprise projects" />
+
+
 </project>
