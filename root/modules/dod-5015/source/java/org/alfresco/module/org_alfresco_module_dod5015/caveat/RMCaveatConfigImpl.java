@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015.caveat;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,7 +58,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AuthorityService;
-import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -287,8 +287,8 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
                                 String authorityName = caveatEntry.getKey();
                                 List<String> caveatList = caveatEntry.getValue();
                                 
-                                // validate authority (user or group)
-                                if ((! authorityService.authorityExists(authorityService.getName(AuthorityType.GROUP, authorityName)) && ! personService.personExists(authorityName)))
+                                // validate authority (user or group) - note: groups are configured with fullname (ie. GROUP_xxx)
+                                if ((! authorityService.authorityExists(authorityName) && ! personService.personExists(authorityName)))
                                 {
                                     // TODO - review warnings (& I18N)
                                     String msg = "User/group does not exist: "+authorityName+" (constraint="+conStr+")";
@@ -339,10 +339,48 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
         return nodeService.getChildByName(rootNode, RecordsManagementModel.ASSOC_CAVEAT_CONFIG, CAVEAT_CONFIG_NAME);
     }
     
-    public NodeRef updateOrCreateCaveatConfig(File file)
+    public NodeRef updateOrCreateCaveatConfig(InputStream is)
+    {
+        NodeRef caveatConfig = updateOrCreateCaveatConfig();
+        
+        // Update the content
+        ContentWriter writer = this.contentService.getWriter(caveatConfig, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent(is);
+        
+        return caveatConfig;
+    }
+    
+    public NodeRef updateOrCreateCaveatConfig(File jsonFile)
+    {
+        NodeRef caveatConfig = updateOrCreateCaveatConfig();
+        
+        // Update the content
+        ContentWriter writer = this.contentService.getWriter(caveatConfig, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent(jsonFile);
+        
+        return caveatConfig;
+    }
+    
+    public NodeRef updateOrCreateCaveatConfig(String jsonString)
+    {
+        NodeRef caveatConfig = updateOrCreateCaveatConfig();
+        
+        // Update the content
+        ContentWriter writer = this.contentService.getWriter(caveatConfig, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent(jsonString);
+        
+        return caveatConfig;
+    }
+    
+    private NodeRef updateOrCreateCaveatConfig()
     {
         NodeRef caveatConfig = getCaveatConfig();
-        
         if (caveatConfig == null)
         {
             NodeRef rootNode = nodeService.getRootNode(storeRef);
@@ -356,11 +394,6 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
             
             nodeService.setProperty(caveatConfig, ContentModel.PROP_NAME, CAVEAT_CONFIG_NAME);
         }
-        // Update the content
-        ContentWriter writer = this.contentService.getWriter(caveatConfig, ContentModel.PROP_CONTENT, true);
-        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        writer.setEncoding("UTF-8");
-        writer.putContent(file);
         
         return caveatConfig;
     }
@@ -379,14 +412,14 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
         String userName = AuthenticationUtil.getRunAsUser();
         if (userName != null)
         {
-            Set<String> userGroupNames = authorityService.getAuthoritiesForUser(userName);
-            allowedValues = getRMAllowedValues(userName, userGroupNames, constraintName);
+            Set<String> userGroupFullNames = authorityService.getAuthoritiesForUser(userName);
+            allowedValues = getRMAllowedValues(userName, userGroupFullNames, constraintName);
         }
         
         return allowedValues;
     }
     
-    private List<String> getRMAllowedValues(String userName, Set<String> userGroupNames, String constraintName)
+    private List<String> getRMAllowedValues(String userName, Set<String> userGroupFullNames, String constraintName)
     {
         // note: userName and userGroupNames must not be null
         List<String> allowedValues = new ArrayList<String>(5);
@@ -398,7 +431,7 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
             for (Map.Entry<String, List<String>> entry : caveatConstraintDef.entrySet())
             {
                 String authorityName = entry.getKey();
-                if (userName.equals(authorityName) || userGroupNames.contains(authorityName))
+                if (userName.equals(authorityName) || userGroupFullNames.contains(authorityName))
                 {
                     // union of allowed values
                     allowedValues.addAll(entry.getValue());
