@@ -1294,7 +1294,7 @@ Alfresco.util.YUILoaderHelper = function()
                },
                scope: this
             });
-            // Add Alfresco YUI components to YUI loader -->
+            // Add Alfresco YUI components to YUI loader
 
             // SWFPlayer
             yuiLoader.addModule(
@@ -1305,6 +1305,18 @@ Alfresco.util.YUILoaderHelper = function()
                varName: "SWFPlayer",
                requires: ['uploader'] // The FlashAdapter class is located in uploader.js
             });
+
+            // ColumnBrowser - js
+            yuiLoader.addModule(
+            {
+               name: "columnbrowser",
+               type: "js",
+               path: "columnbrowser/columnbrowser.js", //can use a path instead, extending base path
+               varName: "ColumnBrowser",
+               requires: ['json', 'carousel'],
+               skinnable: true
+            });
+
          }
          
          if (p_aComponents.length > 0)

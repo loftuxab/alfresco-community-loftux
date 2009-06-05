@@ -46,7 +46,7 @@
    /**
     * ConsoleUsers constructor.
     * 
-    * @param {String} htmlId The HTML id of the parent element
+    * @param {String} htmlId The HTML id üof the parent element
     * @return {Alfresco.ConsoleUsers} The new ConsoleUsers instance
     * @constructor
     */
@@ -54,7 +54,7 @@
    {
       this.name = "Alfresco.ConsoleUsers";
       Alfresco.ConsoleUsers.superclass.constructor.call(this, htmlId);
-      
+
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
       
@@ -63,7 +63,7 @@
       
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("viewUserClick", this.onViewUserClick, this);
-      
+
       /* Define panel handlers */
       var parent = this;
       
@@ -1054,7 +1054,7 @@
       new UpdatePanelHandler();
       
       return this;
-   }
+   };
    
    YAHOO.extend(Alfresco.ConsoleUsers, Alfresco.ConsoleTool,
    {
