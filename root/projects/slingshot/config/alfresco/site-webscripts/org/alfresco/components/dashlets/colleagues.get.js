@@ -6,7 +6,7 @@ function sortByName(membership1, membership2)
 }
 
 // Call the repo for the site memberships
-var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?size=100&amp;authorityType='USER'");
+var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?size=100&authorityType=USER");
 
 var memberships = [];
 
