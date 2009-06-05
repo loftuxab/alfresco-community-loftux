@@ -15,7 +15,7 @@
 
 <#assign el=args.htmlid>
 <div id="${el}-body" class="users">
-   
+
    <!-- Search panel -->
    <div id="${el}-search" class="hidden">
       <div class="yui-g">
@@ -51,7 +51,7 @@
          <div class="results" id="${el}-datatable"></div>
       </div>
    </div>
-   
+
    <!-- View User panel -->
    <div id="${el}-view" class="hidden">
       <div class="yui-g separator">
