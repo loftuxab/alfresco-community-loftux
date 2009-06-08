@@ -24,6 +24,7 @@
  */
 package org.alfresco.deployment.impl.server;
 
+import org.alfresco.deployment.DeploymentTarget;
 import org.alfresco.util.PropertyCheck;
 
 /**

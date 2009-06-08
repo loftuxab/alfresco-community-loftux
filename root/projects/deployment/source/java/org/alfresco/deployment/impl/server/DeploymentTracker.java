@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Date;
 
+import org.alfresco.deployment.DeploymentTarget;
+
 /**
  * Class to track a deployment.
  * 

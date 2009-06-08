@@ -42,6 +42,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.alfresco.deployment.DeploymentReceiverTransport;
+import org.alfresco.deployment.DeploymentTarget;
 import org.alfresco.deployment.DeploymentToken;
 import org.alfresco.deployment.DeploymentTokenImpl;
 import org.alfresco.deployment.DeploymentTransportInputFilter;

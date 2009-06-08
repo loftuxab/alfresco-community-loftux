@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.deployment.impl.server;
+package org.alfresco.deployment;
 
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.impl.DeploymentException;
 
 /**

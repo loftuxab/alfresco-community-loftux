@@ -2,6 +2,8 @@ package org.alfresco.deployment.impl.server;
 
 import java.util.Map;
 
+import org.alfresco.deployment.DeploymentTarget;
+
 public interface DeploymentTargetRegistry 
 {
 	/**
