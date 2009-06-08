@@ -44,6 +44,7 @@ import org.alfresco.module.vti.metadata.model.LinkBean;
 import org.alfresco.module.vti.metadata.model.MemberBean;
 import org.alfresco.module.vti.metadata.model.SchemaBean;
 import org.alfresco.module.vti.metadata.model.SchemaFieldBean;
+import org.alfresco.repo.SessionUser;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -270,18 +271,17 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     }
 
     /**
-     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doDeleteDws(org.alfresco.service.cmr.model.FileInfo, java.lang.String, java.lang.String)
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doDeleteDws(org.alfresco.service.cmr.model.FileInfo, org.alfresco.repo.SessionUser)
      */
-    protected void doDeleteDws(FileInfo dwsFileInfo, String username, String password) throws HttpException, IOException
+    protected void doDeleteDws(FileInfo dwsFileInfo, SessionUser user) throws HttpException, IOException
     {
         fileFolderService.delete(dwsFileInfo.getNodeRef());
     }
 
     /**
-     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doCreateDws(org.alfresco.service.cmr.model.FileInfo, java.lang.String, java.lang.String,
-     *      java.lang.String)
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doCreateDws(org.alfresco.service.cmr.model.FileInfo, java.lang.String, org.alfresco.repo.SessionUser)
      */
-    protected String doCreateDws(FileInfo parentFileInfo, String title, String username, String password) throws HttpException, IOException
+    protected String doCreateDws(FileInfo parentFileInfo, String title, SessionUser user) throws HttpException, IOException
     {
         fileFolderService.create(parentFileInfo.getNodeRef(), title, ContentModel.TYPE_FOLDER);
         return title;

@@ -174,7 +174,7 @@ public class VtiBaseAction extends HttpServlet implements VtiAction
         VtiFpRequest vtiRequest = new VtiFpRequest(request);
         VtiFpResponse vtiResponse = new VtiFpResponse(response);
         
-        if ("application/x-vermeer-urlencoded".equals(request.getContentType())) 
+        if ("application/x-vermeer-urlencoded".equals(request.getContentType()) && request.getContentLength() > 0) 
         {
             StringBuffer formString = new StringBuffer();
             InputStream inputStream = request.getInputStream();

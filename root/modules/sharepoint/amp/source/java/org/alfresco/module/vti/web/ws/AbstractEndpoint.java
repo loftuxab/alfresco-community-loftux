@@ -31,8 +31,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpSession;
-
 import org.alfresco.module.vti.metadata.dic.Permission;
 import org.alfresco.module.vti.metadata.model.AssigneeBean;
 import org.alfresco.module.vti.metadata.model.DocumentBean;
@@ -46,9 +44,7 @@ import org.alfresco.module.vti.metadata.model.SchemaBean;
 import org.alfresco.module.vti.metadata.model.SchemaFieldBean;
 import org.alfresco.module.vti.metadata.model.TaskBean;
 import org.alfresco.module.vti.metadata.model.UserBean;
-import org.alfresco.module.vti.web.VtiFilter;
 import org.alfresco.module.vti.web.VtiRequestDispatcher;
-import org.alfresco.util.Pair;
 
 /**
  * Abstract base class for all the {@link VtiEndpoint} realizations.
@@ -195,35 +191,6 @@ public abstract class AbstractEndpoint implements VtiEndpoint
     public static String getDwsForCreationFromUri(VtiSoapRequest request)
     {
         return "";
-    }
-    
-    /**
-     * Get current user credentials 
-     * 
-     * @param request Vti Soap Request ({@link VtiSoapRequest})      
-     */
-    public static Pair<String, String> getCredentials(VtiSoapRequest request)
-    {
-        Pair<String, String> result = null;
-
-        HttpSession session = request.getSession(false);
-
-        if (session == null)
-        {
-            return result;
-        }
-
-        String username = (String) session.getAttribute(VtiFilter.AUTHENTICATION_USERNAME);
-        String password = (String) session.getAttribute(VtiFilter.AUTHENTICATION_PASSWORD);
-
-        if (username == null || password == null)
-        {
-            return result;
-        }
-
-        result = new Pair<String, String>(username, password);
-
-        return result;
     }
     
     /**

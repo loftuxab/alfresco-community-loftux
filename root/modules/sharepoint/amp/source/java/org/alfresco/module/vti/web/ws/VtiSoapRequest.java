@@ -60,7 +60,7 @@ public class VtiSoapRequest extends HttpServletRequestWrapper
         }
         catch (Exception e)
         {
-            throw new RuntimeException(e);
+            document = null;
         }
     }
 

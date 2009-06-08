@@ -52,6 +52,7 @@ import org.alfresco.module.vti.metadata.model.LinkBean;
 import org.alfresco.module.vti.metadata.model.MemberBean;
 import org.alfresco.module.vti.metadata.model.SchemaBean;
 import org.alfresco.module.vti.metadata.model.SchemaFieldBean;
+import org.alfresco.repo.SessionUser;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -354,18 +355,17 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     }
 
     /**
-     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doDeleteDws(org.alfresco.service.cmr.model.FileInfo, java.lang.String, java.lang.String)
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doDeleteDws(org.alfresco.service.cmr.model.FileInfo, org.alfresco.repo.SessionUser)
      */
-    protected void doDeleteDws(FileInfo dwsFileInfo, String username, String password) throws HttpException, IOException
+    protected void doDeleteDws(FileInfo dwsFileInfo, SessionUser user) throws HttpException, IOException
     {
-        shareUtils.deleteSite(username, password, dwsFileInfo.getName());
+        shareUtils.deleteSite(user, dwsFileInfo.getName());
     }
 
     /**
-     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doCreateDws(org.alfresco.service.cmr.model.FileInfo, java.lang.String, java.lang.String,
-     *      java.lang.String)
+     * @see org.alfresco.module.vti.handler.alfresco.AbstractAlfrescoDwsServiceHandler#doCreateDws(org.alfresco.service.cmr.model.FileInfo, org.alfresco.repo.SessionUser)
      */
-    protected String doCreateDws(FileInfo parentFileInfo, String title, String username, String password) throws HttpException, IOException
+    protected String doCreateDws(FileInfo parentFileInfo, String title, SessionUser user) throws HttpException, IOException
     {
         SiteInfo siteInfo = null;
         String newTitle = null;
@@ -376,7 +376,7 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
             i++;
         } while (siteInfo != null);
         
-        shareUtils.createSite(username, password, "document-workspace", newTitle, newTitle, "", true);
+        shareUtils.createSite(user, "document-workspace", newTitle, newTitle, "", true);
         return newTitle;
     }
 

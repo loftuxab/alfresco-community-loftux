@@ -25,7 +25,8 @@
 package org.alfresco.module.vti.web.ws;
 
 import org.alfresco.module.vti.handler.DwsServiceHandler;
-import org.alfresco.util.Pair;
+import org.alfresco.module.vti.handler.alfresco.AbstractAuthenticationHandler;
+import org.alfresco.repo.SessionUser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Element;
@@ -65,9 +66,7 @@ public class DeleteDwsEndpoint extends AbstractEndpoint
     		logger.debug("SOAP method with name " + getName() + " is started.");
     	}       
         
-        Pair<String, String> credentials = getCredentials(soapRequest);
-        
-        handler.deleteDws(getDwsFromUri(soapRequest), credentials.getFirst(), credentials.getSecond());      
+        handler.deleteDws(getDwsFromUri(soapRequest), (SessionUser) soapRequest.getSession().getAttribute(AbstractAuthenticationHandler.AUTHENTICATION_USER));      
         
         // creating soap response
         Element root = soapResponse.getDocument().addElement("DeleteDwsResponse");
