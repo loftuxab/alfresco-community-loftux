@@ -43,6 +43,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 
+import org.alfresco.deployment.DeploymentTarget;
 import org.alfresco.deployment.FSDeploymentRunnable;
 import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.FileType;
@@ -52,7 +53,6 @@ import org.alfresco.deployment.impl.server.DeployedFile;
 import org.alfresco.deployment.impl.server.Deployment;
 import org.alfresco.deployment.impl.server.DeploymentReceiverAuthenticator;
 import org.alfresco.deployment.impl.server.DeploymentState;
-import org.alfresco.deployment.impl.server.DeploymentTarget;
 import org.alfresco.deployment.impl.server.Target;
 import org.alfresco.util.Deleter;
 import org.alfresco.util.GUID;
