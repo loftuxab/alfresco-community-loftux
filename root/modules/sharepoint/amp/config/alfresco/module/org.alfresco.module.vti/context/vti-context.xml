@@ -41,9 +41,8 @@
     </bean>
     
     <bean id="vtiFilter" class="org.alfresco.module.vti.web.VtiFilter">
-    	<property name="authenticationService" ref="AuthenticationService"/>
+    	<property name="authenticationHandler" ref="vtiAuthenticationHandler"/>
     	<property name="vtiHandler" ref="vtiHandler"/>
-    	<property name="vtiUserGroupServiceHandler" ref="userGroupServiceHandler" />
     	<property name="alfrescoContext">
 			<value>${vti.alfresco.deployment.context}</value>
 		</property>    	

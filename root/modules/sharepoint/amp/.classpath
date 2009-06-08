@@ -9,5 +9,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Slingshot"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Repository"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Remote API"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Alfresco JLAN"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Web-Client"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

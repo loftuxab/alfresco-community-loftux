@@ -218,6 +218,11 @@ public class VtiIfHeaderAction extends HttpServlet implements VtiAction
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
+        if (req.getContentLength() == 0)
+        {
+            return;
+        }
+        
         String if_header_value = req.getHeader("If");
         String guid = null;
 

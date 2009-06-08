@@ -50,6 +50,7 @@ import org.alfresco.module.vti.metadata.model.MemberBean;
 import org.alfresco.module.vti.metadata.model.SchemaBean;
 import org.alfresco.module.vti.metadata.model.SchemaFieldBean;
 import org.alfresco.module.vti.metadata.model.UserBean;
+import org.alfresco.repo.SessionUser;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
@@ -356,10 +357,9 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
 
     /**
      * @see org.alfresco.module.vti.handler.DwsServiceHandler#createDws(java.lang.String, java.lang.String, java.util.List, java.lang.String, java.util.List, java.lang.String,
-     *      java.lang.String, java.lang.String, java.lang.String)
+     *      java.lang.String, org.alfresco.repo.SessionUser)
      */
-    public DwsBean createDws(String parentDwsUrl, String name, List<UserBean> users, String title, List<DocumentBean> documents, String host, String context, String username,
-            String password)
+    public DwsBean createDws(String parentDwsUrl, String name, List<UserBean> users, String title, List<DocumentBean> documents, String host, String context, SessionUser user)
     {
         String dwsUrl = doGetDwsCreationUrl(parentDwsUrl, title);
         String createdDwsUrl = "";
@@ -384,7 +384,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
         {
             tx.begin();
 
-            String createdDwsName = doCreateDws(parentFileInfo, dwsName, username, password);
+            String createdDwsName = doCreateDws(parentFileInfo, dwsName, user);
             createdDwsUrl = doGetDwsCreationUrl(parentDwsUrl, createdDwsName);
 
             tx.commit();
@@ -416,9 +416,9 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
     }
 
     /**
-     * @see org.alfresco.module.vti.handler.DwsServiceHandler#deleteDws(java.lang.String, java.lang.String, java.lang.String)
+     * @see org.alfresco.module.vti.handler.DwsServiceHandler#deleteDws(java.lang.String, org.alfresco.repo.SessionUser)
      */
-    public void deleteDws(String dwsUrl, String username, String password)
+    public void deleteDws(String dwsUrl, SessionUser user)
     {
         FileInfo dwsFileInfo = pathHelper.resolvePathFileInfo(dwsUrl);
 
@@ -437,7 +437,7 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
         {
             tx.begin();
 
-            doDeleteDws(dwsFileInfo, username, password);
+            doDeleteDws(dwsFileInfo, user);
 
             tx.commit();
         }
@@ -687,12 +687,11 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
      * 
      * @param parentFileInfo file info of the parent dws ({@link FileInfo})
      * @param title the title of the new document workspace site
-     * @param username user name
-     * @param password user password
+     * @param user current user
      * @throws HttpException
      * @throws IOException
      */
-    protected abstract String doCreateDws(FileInfo parentFileInfo, String title, String username, String password) throws HttpException, IOException;
+    protected abstract String doCreateDws(FileInfo parentFileInfo, String title, SessionUser user) throws HttpException, IOException;
 
     /**
      * Get new document workspace site description
@@ -709,12 +708,11 @@ public abstract class AbstractAlfrescoDwsServiceHandler implements DwsServiceHan
      * Deletes the current document workspace site and its contents
      * 
      * @param dwsFileInfo document workspace site file info ({@link FileInfo})
-     * @param username user name
-     * @param password user password
+     * @param user current user
      * @throws HttpException
      * @throws IOException
      */
-    protected abstract void doDeleteDws(FileInfo dwsFileInfo, String username, String password) throws HttpException, IOException;
+    protected abstract void doDeleteDws(FileInfo dwsFileInfo, SessionUser user) throws HttpException, IOException;
 
     /**
      * Removes the specified user from the list of users for the current document workspace site

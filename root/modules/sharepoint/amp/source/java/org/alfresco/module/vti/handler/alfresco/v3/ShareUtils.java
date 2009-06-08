@@ -27,12 +27,11 @@ package org.alfresco.module.vti.handler.alfresco.v3;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import javax.servlet.http.HttpServletResponse;
-
+import org.alfresco.repo.SessionUser;
 import org.alfresco.util.URLEncoder;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
@@ -66,20 +65,11 @@ public class ShareUtils
     // context of Share application
     private String shareContext;
 
-    // default page of Share application
-    private String shareWelcomeUri;
+    // context of alfresco application
+    private String alfrescoContext;
 
-    // login uri of Share application
-    private String shareLoginUri;
-
-    // create site uri of Share application
-    private String shareCreateSiteUri;
-
-    // site dashboard uri
-    private String shareSiteDashboardUri;
-
-    // delete site uri of Share application
-    private String shareDeleteSiteUri;
+    // host and port of alfresco application
+    private String alfrescoHostWithPort;
 
     public ShareUtils()
     {
@@ -88,7 +78,7 @@ public class ShareUtils
     /**
      * Set share host with port
      * 
-     * @param shareHostWithPort the share host with ort to set
+     * @param shareHostWithPort the share host with port to set
      */
     public void setShareHostWithPort(String shareHostWithPort)
     {
@@ -116,99 +106,29 @@ public class ShareUtils
     }
 
     /**
-     * Set share welcome page uri
+     * Set alfresco context
      * 
-     * @param shareWelcomeUri shareWelcomeUri to set
+     * @param alfrescoContext shareContext to set
      */
-    public void setShareWelcomeUri(String shareWelcomeUri)
+    public void setAlfrescoContext(String alfrescoContext)
     {
-        this.shareWelcomeUri = shareWelcomeUri;
+        this.alfrescoContext = alfrescoContext;
     }
 
     /**
-     * Set share login page uri
+     * Set alfresco host with port
      * 
-     * @param shareLoginUri shareLoginUri to set
+     * @param alfrescoHostWithPort the share host with port to set
      */
-    public void setShareLoginUri(String shareLoginUri)
+    public void setAlfrescoHostWithPort(String alfrescoHostWithPort)
     {
-        this.shareLoginUri = shareLoginUri;
-    }
-
-    /**
-     * Set share create site page uri
-     * 
-     * @param shareCreateSiteUri shareCreateSiteUri to set
-     */
-    public void setShareCreateSiteUri(String shareCreateSiteUri)
-    {
-        this.shareCreateSiteUri = shareCreateSiteUri;
-    }
-
-    /**
-     * Set share site dashboard page uri
-     * 
-     * @param shareSiteDashboardUri shareSiteDashboardUri to set
-     */
-    public void setShareSiteDashboardUri(String shareSiteDashboardUri)
-    {
-        this.shareSiteDashboardUri = shareSiteDashboardUri;
-    }
-
-    /**
-     * Set share delete site page uri
-     * 
-     * @param shareDeleteSiteUri shareDeleteSiteUri to set
-     */
-    public void setShareDeleteSiteUri(String shareDeleteSiteUri)
-    {
-        this.shareDeleteSiteUri = shareDeleteSiteUri;
-    }
-
-    /**
-     * Create http method that is ready to sent to Share application
-     * 
-     * @param login login that used to login into share
-     * @param password password that used to login into share
-     * @return correct http method for login into Share application
-     * @throws HttpException
-     * @throws IOException
-     */
-    public PostMethod createLoginMethod(String login, String password) throws HttpException, IOException
-    {
-        PostMethod loginMethod = new PostMethod(shareHostWithPort + shareContext + shareLoginUri);
-
-        loginMethod.setRequestHeader(HEADER_REFERER, shareHostWithPort + shareContext + shareWelcomeUri);
-
-        loginMethod.setRequestHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_FORM_URLENCODED);
-
-        // we assume that user have already login into vti server through MS Office and userName and password are valid
-        NameValuePair[] parametres = new NameValuePair[] { new NameValuePair("username", login), new NameValuePair("password", password),
-                new NameValuePair("success", "/share/page/site-index"), new NameValuePair("failure", "/share/page?f=default&pt=login&error=true") };
-
-        loginMethod.setRequestBody(parametres);
-        return loginMethod;
-    }
-
-    /**
-     * Create site dashboard
-     * 
-     * @param siteShortName site name
-     * @return http method to site dashboard
-     */
-
-    private GetMethod createSiteDashboardMethod(String siteShortName)
-    {
-        GetMethod siteDashboardMethod = new GetMethod(shareHostWithPort + shareContext + shareSiteDashboardUri.replace("...", siteShortName));
-
-        return siteDashboardMethod;
+        this.alfrescoHostWithPort = alfrescoHostWithPort;
     }
 
     /**
      * Creates new site using REST API, http method is sent to appropriate web script
      * 
-     * @param login login that used to login into share
-     * @param password password that used to login into share
+     * @param user current user
      * @param sitePreset sitePreset for new site
      * @param shortName shortName for new site
      * @param title title for new site
@@ -217,155 +137,380 @@ public class ShareUtils
      * @throws HttpException
      * @throws IOException
      */
-    public void createSite(String login, String password, String sitePreset, String shortName, String title, String description, boolean isPublic) throws HttpException,
-            IOException
+    public void createSite(SessionUser user, String sitePreset, String shortName, String title, String description, boolean isPublic) throws HttpException, IOException
     {
         HttpClient httpClient = new HttpClient();
-        PostMethod createSiteMethod = new PostMethod(shareHostWithPort + shareContext + shareCreateSiteUri);
 
-        createSiteMethod.setRequestHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON);
-        // generate valid request body
         String createSiteBody = "{\"isPublic\":\"" + isPublic + "\",\"title\":\"" + title + "\",\"shortName\":\"" + shortName + "\"," + "\"description\":\"" + description
                 + "\",\"sitePreset\":\"" + sitePreset + "\"" + (isPublic ? ",\"alfresco-createSite-instance-isPublic-checkbox\":\"on\"}" : "}");
-        createSiteMethod.setRequestEntity(new StringRequestEntity(createSiteBody, CONTENT_TYPE_TEXT_PLAIN, UTF_8));
-        PostMethod loginMethod = createLoginMethod(login, password);
+        PostMethod createSiteMethod = createPostMethod(alfrescoHostWithPort + alfrescoContext + "/s/api/sites?alf_ticket=" + user.getTicket(), createSiteBody, CONTENT_TYPE_JSON);
         try
         {
             if (logger.isDebugEnabled())
-                logger.debug("Trying to login into Share. URL: " + loginMethod.getURI());
-
-            int loginStatus = httpClient.executeMethod(loginMethod);
-            loginMethod.getResponseBody();
-
-            if (logger.isDebugEnabled())
-                logger.debug("Login method returned status: " + loginStatus);
-            
-            if (loginStatus >= HttpServletResponse.SC_BAD_REQUEST)
-            {
-               logger.error("Unexpected response code from share login method (" + loginMethod.getURI() + "): " + loginStatus);
-            }
-        }
-        catch (Exception e)
-        {
-            loginMethod.releaseConnection();
-            logger.error("Login into share using URL " + loginMethod.getURI() + " failed. Message: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        try
-        {
-            if (logger.isDebugEnabled())
-                logger.debug("Trying to create Site with name: " + shortName + ". URL: " + createSiteMethod.getURI());
+                logger.debug("Trying to create site with name: " + shortName + ". URL: " + createSiteMethod.getURI());
 
             int createSiteStatus = httpClient.executeMethod(createSiteMethod);
             createSiteMethod.getResponseBody();
 
             if (logger.isDebugEnabled())
-                logger.debug("Create method returned status: " + createSiteStatus);
-            
-            if (createSiteStatus != HttpServletResponse.SC_OK)
-            {
-               logger.error("Unexpected response code from create site method (" + createSiteMethod.getURI() + "): " + createSiteStatus);
-            }
-        }
+                logger.debug("Create site method returned status: " + createSiteStatus);
+    }
         catch (Exception e)
-        {
-            createSiteMethod.releaseConnection();
-            logger.error("Failed to create the site with name: " + shortName + ". Message: " + e.getMessage());
+    {
+            if (logger.isDebugEnabled())
+                logger.debug("Fail to create site with name: " + shortName + ". Message: " + e.getMessage());
             throw new RuntimeException(e);
-        }
+    }
+        finally
+    {
+            createSiteMethod.releaseConnection();
+    }
 
-        GetMethod dashboard = createSiteDashboardMethod(shortName);
+        // create title sites component
+        createComponent(httpClient, shortName, user, "title", "title/collaboration-title");
+
+        // create navigation sites component
+        createComponent(httpClient, shortName, user, "navigation", "navigation/collaboration-navigation");
+
+        // create component-1-1 sites component
+        createComponent(httpClient, shortName, user, "component-1-1", "dashlets/site-welcome");
+
+        // create component-1-2 sites component
+        createComponent(httpClient, shortName, user, "component-1-2", "dashlets/docsummary");
+
+        // create component-2-1 sites component
+        createComponent(httpClient, shortName, user, "component-2-1", "dashlets/site-profile");
+
+        // create component-2-2 sites component
+        createComponent(httpClient, shortName, user, "component-2-2", "dashlets/colleagues");
+
+        // create sites dashboard
+        createSiteDashboard(httpClient, shortName, user);
+
+        // create documetnLibrary folder
+        createDocumentLibrary(httpClient, shortName, user);
+
+        // create links folder
+        createLinks(httpClient, shortName, user);
+    }
+
+    /**
+     * Creates site component
+     * 
+     * @param httpClient HTTP client
+     * @param siteName name of the site
+     * @param user current user
+     * @param componentName name of the component
+     * @param componentURL URL of the component
+     * @throws UnsupportedEncodingException
+     */
+    private void createComponent(HttpClient httpClient, String siteName, SessionUser user, String componentName, String componentURL) throws UnsupportedEncodingException
+    {
+        String url = alfrescoHostWithPort + alfrescoContext + "/s/remotestore/create/alfresco/site-data/components/page." + componentName + ".site~" + siteName
+                + "~dashboard.xml?s=sitestore&alf_ticket=" + user.getTicket();
+        
+        String body = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                        "<component>\n" +
+                            "<guid>page." + componentName + ".site~" + siteName + "~dashboard</guid>\n" +
+                            "<scope>page</scope>\n" +
+                            "<region-id>" + componentName + "</region-id>\n" +
+                            "<source-id>site/" + siteName + "/dashboard</source-id>\n" +
+                            "<url>/components/" + componentURL + "</url>\n" +
+                        "</component>";
+
+        PostMethod postMethod = createPostMethod(url, body, "application/octet-stream");
         try
-        {
+    {
             if (logger.isDebugEnabled())
-                logger.debug("Trying to initialize dashboard for Site with name: " + shortName + ". URL: " + dashboard.getURI());
+                logger.debug("Trying to create site component with name: " + componentName + ". URL: " + postMethod.getURI());
 
-            int dashboardStatus = httpClient.executeMethod(dashboard);
-            dashboard.getResponseBody();
+            int status = httpClient.executeMethod(postMethod);
+            postMethod.getResponseBody();
 
             if (logger.isDebugEnabled())
-                logger.debug("Dashboard initialyzing finished with status: " + dashboardStatus);
-            
-            if (dashboardStatus != HttpServletResponse.SC_OK)
-            {
-               logger.error("Unexpected response code from initialise dashboard method (" + dashboard.getURI() + "): " + dashboardStatus);
-            }
+                logger.debug("Create component with name: " + componentName + ". Method returned status: " + status);
         }
         catch (Exception e)
         {
-            logger.error("Dashboard initialising failed. Message: " + e.getMessage());
+            if (logger.isDebugEnabled())
+                logger.debug("Fail to create site component with name: " + componentName + ". Message: " + e.getMessage());
             throw new RuntimeException(e);
         }
         finally
         {
-            dashboard.releaseConnection();
+            postMethod.releaseConnection();
         }
+    }
+
+    /**
+     * Creates site dashboard
+     * 
+     * @param httpClient HTTP client
+     * @param siteName name of the site
+     * @param user current user
+     * @throws UnsupportedEncodingException
+     */
+    public void createSiteDashboard(HttpClient httpClient, String siteName, SessionUser user) throws UnsupportedEncodingException
+    {
+        String createSiteDashboardBody = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+        "<page>\n" +
+            "<title>Document Workspace Dashboard</title>\n" +
+            "<title-id>page.workspace.title</title-id>\n" +
+            "<description>Document Workspace dashboard page</description>\n" +
+            "<description-id>page.workspace.description</description-id>\n" +
+            "<template-instance>dashboard-2-columns-wide-left</template-instance>\n" +
+            "<authentication>user</authentication>\n" + 
+            "<properties>\n" +
+                "<sitePages>[{\"pageId\":\"documentlibrary\"}, {\"pageId\":\"links\"}]</sitePages>\n" +
+            "</properties>\n" +
+         "</page>";
+
+        PostMethod createSiteDashboardMethod = createPostMethod(alfrescoHostWithPort + alfrescoContext + "/s/remotestore/create/alfresco/site-data/pages/site/" + siteName
+                + "/dashboard.xml?s=sitestore&alf_ticket=" + user.getTicket(), createSiteDashboardBody, "application/octet-stream");
+        try
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Trying to create site dashboard. URL: " + createSiteDashboardMethod.getURI());
+
+            int status = httpClient.executeMethod(createSiteDashboardMethod);
+            createSiteDashboardMethod.getResponseBody();
+
+            if (logger.isDebugEnabled())
+                logger.debug("Create site dashboard method returned status: " + status);
+        }
+        catch (Exception e)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Fail to create site dashboard. Message: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            createSiteDashboardMethod.releaseConnection();
+        }
+    }
+
+    /**
+     * Creates documentLibrary folder in site
+     * 
+     * @param httpClient HTTP client
+     * @param siteName short name of site
+     * @param user current user
+     */
+    private void createDocumentLibrary(HttpClient httpClient, String siteName, SessionUser user)
+    {
+        GetMethod createDocumentLibraryFolderMethod = createGetMethod(alfrescoHostWithPort + alfrescoContext + "/s/slingshot/doclib/doclist/documents/site/" + siteName
+                + "/documentLibrary?filter=recentlyModified&max=10&alf_ticket=" + user.getTicket());
+        try
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Trying to create sites documentLibrary folder. URL: " + createDocumentLibraryFolderMethod.getURI());
+
+            int status = httpClient.executeMethod(createDocumentLibraryFolderMethod);
+            createDocumentLibraryFolderMethod.getResponseBody();
+
+            if (logger.isDebugEnabled())
+                logger.debug("Create sites documentLibrary folder method returned status: " + status);
+        }
+        catch (Exception e)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Fail to create sites documentLibrary folder. Message: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            createDocumentLibraryFolderMethod.releaseConnection();
+        }
+    }
+
+    /**
+     * Creates links folder in site
+     * 
+     * @param httpClient HTTP client
+     * @param siteName short name of site
+     * @param user current user
+     */
+    private void createLinks(HttpClient httpClient, String siteName, SessionUser user)
+    {
+
+        GetMethod createLinksFolderMethod = createGetMethod(alfrescoHostWithPort + alfrescoContext + "/s/api/links/site/" + siteName + "/links?page=1&pageSize=512&alf_ticket="
+                + user.getTicket());
+        try
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Trying to create site links folder. URL: " + createLinksFolderMethod.getURI());
+
+            int status = httpClient.executeMethod(createLinksFolderMethod);
+            createLinksFolderMethod.getResponseBody();
+
+            if (logger.isDebugEnabled())
+                logger.debug("Create site links folder method returned status: " + status);
+        }
+        catch (Exception e)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Fail to create site links folder. Message: " + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            createLinksFolderMethod.releaseConnection();
+        }
+    }
+
+    /**
+     * Creates POST method
+     * 
+     * @param url URL for request
+     * @param body body of request
+     * @param contentType content type of request
+     * @return POST method
+     * @throws UnsupportedEncodingException
+     */
+    private PostMethod createPostMethod(String url, String body, String contentType) throws UnsupportedEncodingException
+    {
+        PostMethod postMethod = new PostMethod(url);
+        postMethod.setRequestHeader(HEADER_CONTENT_TYPE, contentType);
+        postMethod.setRequestEntity(new StringRequestEntity(body, CONTENT_TYPE_TEXT_PLAIN, UTF_8));
+
+        return postMethod;
+    }
+
+    /**
+     * Creates GET method
+     * 
+     * @param url URL for request
+     * @return GET method
+     */
+    private GetMethod createGetMethod(String url)
+    {
+        GetMethod getMethod = new GetMethod(url);
+        return getMethod;
     }
 
     /**
      * Deletes site using REST API, http method is sent to appropriate web script
      * 
-     * @param login login that used to login into share
-     * @param password password that used to login into share
+     * @param user current user
      * @param shortName shortName of site we are going to delete
      * @throws HttpException
      * @throws IOException
      */
-    public void deleteSite(String login, String password, String shortName) throws HttpException, IOException
+    public void deleteSite(SessionUser user, String shortName) throws HttpException, IOException
     {
         HttpClient httpClient = new HttpClient();
-        PostMethod deleteSiteMethod = new PostMethod(shareHostWithPort + shareContext + shareDeleteSiteUri);
-
-        deleteSiteMethod.setRequestHeader(HEADER_CONTENT_TYPE, CONTENT_TYPE_JSON);
-        // generate valid request body
-        String deleteSiteBody = "{\"shortName\":\"" + shortName + "\"}";
-        deleteSiteMethod.setRequestEntity(new StringRequestEntity(deleteSiteBody, CONTENT_TYPE_TEXT_PLAIN, UTF_8));
-        PostMethod loginMethod = createLoginMethod(login, password);
+        DeleteMethod deleteSiteMethod = new DeleteMethod(alfrescoHostWithPort + alfrescoContext + "/s/api/sites/" + shortName + "?alf_ticket=" + user.getTicket());
         try
         {
             if (logger.isDebugEnabled())
-                logger.debug("Trying to login into Share. URL: " + loginMethod.getURI());
+                logger.debug("Trying to delete site with name: " + shortName);
 
-            int loginStatus = httpClient.executeMethod(loginMethod);
+            int status = httpClient.executeMethod(deleteSiteMethod);
+            deleteSiteMethod.getResponseBody();
 
             if (logger.isDebugEnabled())
-                logger.debug("Login method returned status: " + loginStatus);
-            
-            if (loginStatus >= HttpServletResponse.SC_BAD_REQUEST)
-            {
-               logger.error("Unexpected response code from share login method (" + loginMethod.getURI() + "): " + loginStatus);
-            }
+                logger.debug("Delete site method returned status: " + status);
         }
         catch (Exception e)
         {
-            loginMethod.releaseConnection();
-            logger.error("Login into share using URL " + loginMethod.getURI() + " failed. Message: " + e.getMessage());
-            throw new RuntimeException(e);
-        }
-        try
-        {
             if (logger.isDebugEnabled())
-                logger.debug("Trying to delete Site with name: " + shortName + ". URL: " + deleteSiteMethod.getURI());
-
-            int deleteSiteStatus = httpClient.executeMethod(deleteSiteMethod);
-
-            if (logger.isDebugEnabled())
-                logger.debug("Delete method returned status: " + deleteSiteStatus);
-            
-            if (deleteSiteStatus != HttpServletResponse.SC_OK)
-            {
-               logger.error("Unexpected response code from share delete method (" + deleteSiteMethod.getURI() + "): " + deleteSiteStatus);
-            }
-        }
-        catch (Exception e)
-        {
-            logger.error("Failed to delete the Site with name: " + shortName + ". Message: " + e.getMessage());
+                logger.debug("Fail to delete site with name: " + shortName);
             throw new RuntimeException(e);
         }
         finally
         {
             deleteSiteMethod.releaseConnection();
+        }
+
+        // deletes site dashboard
+        deleteSiteDashboard(httpClient, shortName, user);
+
+        // deletes title component
+        deleteSiteComponent(httpClient, shortName, user, "title");
+
+        // deletes navigation component
+        deleteSiteComponent(httpClient, shortName, user, "navigation");
+            
+        // deletes component-2-2 component
+        deleteSiteComponent(httpClient, shortName, user, "component-2-2");
+
+        // deletes component-1-1 component
+        deleteSiteComponent(httpClient, shortName, user, "component-1-1");
+
+        // deletes component-2-1 component
+        deleteSiteComponent(httpClient, shortName, user, "component-2-1");
+
+        // deletes component-1-2 component
+        deleteSiteComponent(httpClient, shortName, user, "component-1-2");
+    }
+    
+    /**
+     * Deletes component from site
+     * 
+     * @param httpClient HTTP client
+     * @param siteName name of the site
+     * @param user current user
+     * @param componentName name of the component
+     */
+    private void deleteSiteComponent(HttpClient httpClient, String siteName, SessionUser user, String componentName)
+            {
+        DeleteMethod deleteTitleMethod = new DeleteMethod(alfrescoHostWithPort + alfrescoContext + "/s/remotestore/delete/alfresco/site-data/components/page." + componentName
+                + ".site~" + siteName + "~dashboard.xml?s=sitestore&alf_ticket=" + user.getTicket());
+        try
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Trying to delete site component with name: " + siteName);
+
+            int status = httpClient.executeMethod(deleteTitleMethod);
+            deleteTitleMethod.getResponseBody();
+
+            if (logger.isDebugEnabled())
+                logger.debug("Delete site component method returned status: " + status);
+        }
+        catch (Exception e)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Fail to delete component from site with name: " + siteName);
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            deleteTitleMethod.releaseConnection();
+        }
+    }
+    
+    /**
+     * Deletes site dashboard
+     * 
+     * @param httpClient HTTP client
+     * @param siteName name of the site
+     * @param user current user
+     */
+    private void deleteSiteDashboard(HttpClient httpClient, String siteName, SessionUser user)
+    {
+        DeleteMethod deleteDashboardMethod = new DeleteMethod(alfrescoHostWithPort + alfrescoContext + "/s/remotestore/delete/alfresco/site-data/pages/site/" + siteName
+                + "/dashboard.xml?s=sitestore&alf_ticket=" + user.getTicket());
+        try
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Trying to delete dashboard from site with name: " + siteName);
+
+            int status = httpClient.executeMethod(deleteDashboardMethod);
+            deleteDashboardMethod.getResponseBody();
+
+            if (logger.isDebugEnabled())
+                logger.debug("Delete dashboard from site method returned status: " + status);
+        }
+        catch (Exception e)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Fail to delete dashboard from site with name: " + siteName);
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            deleteDashboardMethod.releaseConnection();
         }
     }
 
@@ -380,7 +525,9 @@ public class ShareUtils
     }
 
     /**
-     * <p>encode string to share specific manner (all characters with code > 127 will be encoded in %u0... format)</p>
+     * <p>
+     * encode string to share specific manner (all characters with code > 127 will be encoded in %u0... format)
+     * </p>
      * 
      * @param value to encode
      * @return encoded value

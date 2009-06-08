@@ -290,8 +290,8 @@ public abstract class AbstractAlfrescoVersionsServiceHandler implements Versions
         docVersion.setId(id);
         docVersion.setUrl(generateDownloadURL(documentFileInfo.getNodeRef(), documentFileInfo.getName()));
         docVersion.setVersion(version.getVersionLabel());
-        docVersion.setCreatedBy(version.getCreator());
-        docVersion.setCreatedTime(VtiUtils.formatVersionDate(version.getCreatedDate()));
+        docVersion.setCreatedBy(version.getFrozenModifier());
+        docVersion.setCreatedTime(VtiUtils.formatVersionDate(version.getFrozenModifiedDate()));
         ContentData content = (ContentData) nodeService.getProperty(version.getFrozenStateNodeRef(), ContentModel.PROP_CONTENT);
         docVersion.setSize(content.getSize());
 

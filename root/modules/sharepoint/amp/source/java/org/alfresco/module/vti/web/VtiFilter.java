@@ -27,7 +27,6 @@ package org.alfresco.module.vti.web;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Enumeration;
 
 import javax.servlet.Filter;
@@ -40,14 +39,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.alfresco.module.vti.handler.AuthenticationHandler;
 import org.alfresco.module.vti.handler.MethodHandler;
-import org.alfresco.module.vti.handler.UserGroupServiceHandler;
 import org.alfresco.module.vti.handler.VtiHandlerException;
+import org.alfresco.module.vti.handler.alfresco.AbstractAuthenticationHandler;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
-import org.alfresco.repo.security.authentication.AuthenticationException;
-import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.repo.SessionUser;
 import org.alfresco.util.URLDecoder;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -70,15 +68,8 @@ public class VtiFilter implements Filter
     public static final String METHOD_TRACE = "TRACE";
     public static final String METHOD_PROPFIND = "PROPFIND";
 
-    public final static String AUTHENTICATION_USER = "_vtiAuthTicket";
-    public final static String AUTHENTICATION_USERNAME = "_vtiUserName";
-    public final static String AUTHENTICATION_PASSWORD = "_vtiPassword";
-
+    private AuthenticationHandler authenticationHandler;
     private MethodHandler vtiHandler;
-
-    private UserGroupServiceHandler vtiUserGroupServiceHandler;
-
-    private AuthenticationService authenticationService;
 
     private String alfrescoContext;
 
@@ -127,19 +118,21 @@ public class VtiFilter implements Filter
             logger.debug("Check authentication");
         }
 
-        VtiUser user = null;
+        SessionUser user = null;
 
         if (session != null)
-            user = (VtiUser) session.getAttribute(AUTHENTICATION_USER);
+            user = (SessionUser) session.getAttribute(AbstractAuthenticationHandler.AUTHENTICATION_USER);
 
-        if (user == null)
+        String authHeader = httpRequest.getHeader(AbstractAuthenticationHandler.HEADER_AUTHORIZATION);
+        
+        if (user == null || (authHeader != null && authHeader.startsWith(AbstractAuthenticationHandler.NTLM_START)))
         {
             if (logger.isDebugEnabled())
                 logger.debug("Session user is null. Authenticate user.");
 
             try
             {
-                user = checkAuthorizationHeader(httpRequest, session, user);
+                user = authenticationHandler.authenticateRequest(httpRequest, httpResponse, alfrescoContext);
             }
             catch (VtiHandlerException e)
             {
@@ -153,7 +146,7 @@ public class VtiFilter implements Filter
 
             if (user == null)
             {
-                forceClientToPromptLogonDetails(httpResponse);
+                authenticationHandler.forceClientToPromptLogonDetails(httpResponse);
                 return;
             }
             else
@@ -166,7 +159,7 @@ public class VtiFilter implements Filter
         {
             if (logger.isDebugEnabled())
                 logger.debug("Checking user ticket");
-            checkUserTicket(httpRequest, httpResponse, user);
+            authenticationHandler.checkUserTicket(httpRequest, httpResponse, alfrescoContext, user);
 
         }
 
@@ -188,92 +181,8 @@ public class VtiFilter implements Filter
      */
     public void destroy()
     {
+        authenticationHandler = null;
         vtiHandler = null;
-    }
-
-    private VtiUser checkAuthorizationHeader(HttpServletRequest httpRequest, HttpSession session, VtiUser user) throws FileNotFoundException
-    {
-        String authHdr = httpRequest.getHeader("Authorization");
-
-        if (authHdr != null && authHdr.length() > 5 && authHdr.substring(0, 5).equalsIgnoreCase("BASIC"))
-        {
-            String basicAuth = new String(Base64.decodeBase64(authHdr.substring(5).getBytes()));
-            String username = null;
-            String password = null;
-
-            int pos = basicAuth.indexOf(":");
-            if (pos != -1)
-            {
-                username = basicAuth.substring(0, pos);
-                password = basicAuth.substring(pos + 1);
-                if (session != null)
-                {
-                    session.setAttribute(AUTHENTICATION_USERNAME, username);
-                    session.setAttribute(AUTHENTICATION_PASSWORD, password);
-                }
-            }
-            else
-            {
-                username = basicAuth;
-                password = "";
-            }
-
-            try
-            {
-                if (logger.isDebugEnabled())
-                    logger.debug("Authenticate the user '" + username + "'");
-                if (isSiteMember(httpRequest, username))
-                {
-                    authenticationService.authenticate(username, password.toCharArray());
-                    user = new VtiUser(username, authenticationService.getCurrentTicket());
-                    if (session != null)
-                        session.setAttribute(AUTHENTICATION_USER, user);
-                }
-            }
-            catch (AuthenticationException ex)
-            {
-                // Do nothing, user object will be null
-            }
-        }
-
-        return user;
-    }
-
-    @SuppressWarnings("unchecked")
-    private void checkUserTicket(HttpServletRequest httpRequest, HttpServletResponse httpResponse, VtiUser vtiUser)
-    {
-        try
-        {
-            authenticationService.validate(vtiUser.getTicket());
-
-            if (!isSiteMember(httpRequest, vtiUser.getName()))
-            {
-                Enumeration<String> attributes = httpRequest.getSession().getAttributeNames();
-                while (attributes.hasMoreElements())
-                {
-                    String name = (String) attributes.nextElement();
-                    httpRequest.getSession().removeAttribute(name);
-                }
-                throw new Exception("Not a member!!!!");
-            }
-
-            if (logger.isDebugEnabled())
-                logger.debug("Ticket was validated");
-        }
-        catch (Exception ex)
-        {
-            forceClientToPromptLogonDetails(httpResponse);
-            return;
-        }
-    }
-
-    private void forceClientToPromptLogonDetails(HttpServletResponse httpResponse)
-    {
-        if (logger.isDebugEnabled())
-            logger.debug("Force the client to prompt for logon details");
-
-        httpResponse.setHeader("WWW-Authenticate", "BASIC realm=\"Alfresco Server\"");
-        httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @SuppressWarnings("unchecked")
@@ -305,11 +214,11 @@ public class VtiFilter implements Filter
 
             try
             {
-                VtiUser user = (VtiUser) httpRequest.getSession().getAttribute(AUTHENTICATION_USER);
+                SessionUser user = (SessionUser) httpRequest.getSession().getAttribute(AbstractAuthenticationHandler.AUTHENTICATION_USER);
 
-                user = checkAuthorizationHeader(httpRequest, httpRequest.getSession(), user);
+                user = authenticationHandler.authenticateRequest(httpRequest, httpResponse, alfrescoContext);
 
-                if (!isSiteMember(httpRequest, user.getName()))
+                if (!authenticationHandler.isSiteMember(httpRequest, alfrescoContext, user.getUserName()))
                 {
                     Enumeration<String> attributes = httpRequest.getSession().getAttributeNames();
                     while (attributes.hasMoreElements())
@@ -333,9 +242,7 @@ public class VtiFilter implements Filter
             }
             catch (Exception e)
             {
-                httpResponse.setHeader("WWW-Authenticate", "BASIC realm=\"Alfresco Server\"");
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                httpResponse.getOutputStream().close();
+                authenticationHandler.forceClientToPromptLogonDetails(httpResponse);
                 return false;
             }
         }
@@ -397,38 +304,17 @@ public class VtiFilter implements Filter
         else if (METHOD_POST.equals(httpMethod))
         {
             httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
-            httpResponse.setContentType("application/x-vermeer-rpc");
             httpResponse.setHeader("Cache-Control", "no-cache");
+            String auth = httpRequest.getHeader(AbstractAuthenticationHandler.HEADER_AUTHORIZATION);
+            if (auth == null || !auth.startsWith(AbstractAuthenticationHandler.NTLM_START))
+            {
             httpResponse.setHeader("Connection", "close");
-        }
-    }
-
-    private boolean isSiteMember(HttpServletRequest request, String userName) throws FileNotFoundException
-    {
-        String uri = request.getRequestURI();
-
-        if (request.getMethod().equalsIgnoreCase("OPTIONS"))
-            return true;
-
-        String targetUri = uri.startsWith(alfrescoContext) ? uri.substring(alfrescoContext.length()) : uri;
-
-        if (targetUri.startsWith("/_vti_inf.html") || targetUri.startsWith("/_vti_bin/") || targetUri.startsWith("/resources/"))
-            return true;
-
-        String dwsName = null;
-
-        try
-        {
-            String[] decompsedUrls = vtiHandler.decomposeURL(uri, alfrescoContext);
-            dwsName = decompsedUrls[0].substring(decompsedUrls[0].lastIndexOf("/") + 1);
-            return vtiUserGroupServiceHandler.isUserMember(dwsName, userName);
-        }
-        catch (Exception e)
-        {
-            if (dwsName == null)
-                throw new VtiHandlerException(VtiHandlerException.DOESNOT_EXIST);
+                httpResponse.setContentType("application/x-vermeer-rpc");
+            }
             else
-                return false;
+            {
+                httpResponse.setContentType("text/html");
+            }
         }
     }
 
@@ -465,30 +351,6 @@ public class VtiFilter implements Filter
         }
     }
 
-    private static class VtiUser implements Serializable
-    {
-        private static final long serialVersionUID = -6556393995426663549L;
-
-        private String name;
-        private String ticket;
-
-        public VtiUser(String name, String ticket)
-        {
-            this.name = name;
-            this.ticket = ticket;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public String getTicket()
-        {
-            return ticket;
-        }
-    }
-
     public MethodHandler getVtiHandler()
     {
         return vtiHandler;
@@ -497,16 +359,6 @@ public class VtiFilter implements Filter
     public void setVtiHandler(MethodHandler vtiHandler)
     {
         this.vtiHandler = vtiHandler;
-    }
-
-    public AuthenticationService getAuthenticationService()
-    {
-        return authenticationService;
-    }
-
-    public void setAuthenticationService(AuthenticationService authenticationService)
-    {
-        this.authenticationService = authenticationService;
     }
 
     public String getAlfrescoContext()
@@ -519,9 +371,14 @@ public class VtiFilter implements Filter
         this.alfrescoContext = alfrescoContext;
     }
 
-    public void setVtiUserGroupServiceHandler(UserGroupServiceHandler vtiUserGroupServiceHandler)
+    public void setAuthenticationHandler(AuthenticationHandler authenticationHandler)
     {
-        this.vtiUserGroupServiceHandler = vtiUserGroupServiceHandler;
+        this.authenticationHandler = authenticationHandler;
+    }
+    
+    public AuthenticationHandler getAuthenticationHandler()
+    {
+        return authenticationHandler;
     }
 
 }

@@ -37,6 +37,7 @@ import org.alfresco.module.vti.metadata.model.DwsData;
 import org.alfresco.module.vti.metadata.model.DwsMetadata;
 import org.alfresco.module.vti.metadata.model.LinkBean;
 import org.alfresco.module.vti.metadata.model.UserBean;
+import org.alfresco.repo.SessionUser;
 import org.apache.commons.httpclient.HttpException;
 
 /**
@@ -76,12 +77,10 @@ public interface DwsServiceHandler
      * @param documents an optional list of documents. Used by Microsoft Office Outlook 2003 when adding shared attachments to a new document workspace site
      * @param host application host
      * @param context application context
-     * @param username user name
-     * @param password user password
+     * @param user current user
      * @return DwsBean information about a new document workspace site DwsData ({@link DwsBean})
      */
-    public DwsBean createDws(String parentDwsUrl, String name, List<UserBean> users, String title, List<DocumentBean> documents, String host, String context, String username,
-            String password);
+    public DwsBean createDws(String parentDwsUrl, String name, List<UserBean> users, String title, List<DocumentBean> documents, String host, String context, SessionUser user);
 
     /**
      * Creates a subfolder in a document library of the current document workspace site
@@ -101,10 +100,9 @@ public interface DwsServiceHandler
      * Deletes the current document workspace site and its contents
      * 
      * @param dwsUrl url of dws to delete
-     * @param username user name
-     * @param password user password
+     * @param user current user
      */
-    public void deleteDws(String dwsUrl, String username, String password);
+    public void deleteDws(String dwsUrl, SessionUser user);
 
     /**
      * Changes the title of the current document workspace site
