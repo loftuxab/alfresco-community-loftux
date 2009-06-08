@@ -49,7 +49,7 @@ import org.alfresco.deployment.impl.server.DeployedFile;
 import org.alfresco.deployment.impl.server.Deployment;
 import org.alfresco.deployment.impl.server.DeploymentReceiverAuthenticator;
 import org.alfresco.deployment.impl.server.DeploymentState;
-import org.alfresco.deployment.impl.server.DeploymentTarget;
+import org.alfresco.deployment.DeploymentTarget;
 import org.alfresco.repo.avm.AVMNodeConverter;
 import org.alfresco.repo.avm.AVMNodeType;
 import org.alfresco.repo.avm.util.SimplePath;
