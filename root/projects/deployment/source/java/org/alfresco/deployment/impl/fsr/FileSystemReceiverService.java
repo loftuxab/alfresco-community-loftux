@@ -28,12 +28,6 @@ package org.alfresco.deployment.impl.fsr;
 public interface FileSystemReceiverService 
 {
 	/**
-	 * Get the directory in which metadata is stored
-	 * @return the metaData directory
-	 */
-	public String getMetaDataDirectory();
-
-	/**
 	 * Get the directory to which log (as in journal) files will be written.
 	 * @return the logDirectory
 	 */

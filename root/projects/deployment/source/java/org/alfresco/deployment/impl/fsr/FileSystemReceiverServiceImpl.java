@@ -37,7 +37,7 @@ public class FileSystemReceiverServiceImpl implements FileSystemReceiverService
 {
     private boolean errorOnOverwrite = false;
     
-	private String fMetaDataDirectory;
+
 
 	private String fLogDirectory;
 
@@ -47,10 +47,7 @@ public class FileSystemReceiverServiceImpl implements FileSystemReceiverService
 
 	private static Log logger = LogFactory.getLog(FileSystemReceiverServiceImpl.class);
 
-	public void setMetaDataDirectory(String dir)
-	{
-		fMetaDataDirectory = dir;
-	}
+
 
 	public void setLogDirectory(String logDirectory)
 	{
@@ -65,18 +62,12 @@ public class FileSystemReceiverServiceImpl implements FileSystemReceiverService
 	@SuppressWarnings("unchecked")
 	public void init()
 	{
-		PropertyCheck.mandatory(this, "metaDataDirectory", fMetaDataDirectory);
+
 		PropertyCheck.mandatory(this, "dataDirectory", fDataDirectory);
 		PropertyCheck.mandatory(this, "logDirectory", fLogDirectory);
 		PropertyCheck.mandatory(this, "commandQueue", commandQueue);
 
-		// Create the various necessary directories if they don't already exits.
-		File meta = new File(fMetaDataDirectory);
-		if (!meta.exists())
-		{
-			logger.info("creating meta data directory:" + meta.toString());
-			meta.mkdirs();
-		}
+
 		File log = new File(fLogDirectory);
 		if (!log.exists())
 		{
@@ -89,15 +80,6 @@ public class FileSystemReceiverServiceImpl implements FileSystemReceiverService
 			logger.info("creating data directory:" + data.toString());
 			data.mkdirs();
 		}
-	}
-
-	/**
-	 * Get the directory in which metadata 
-	 * @return
-	 */
-	public String getMetaDataDirectory()
-	{
-		return fMetaDataDirectory;
 	}
 
 	/**

@@ -28,9 +28,16 @@
 			<bean
 				class="org.alfresco.deployment.impl.fsr.FileSystemDeploymentTarget"
 				init-method="init">
+				
+				<!--  Where to store the deployed content -->
 				<property name="rootDirectory">
 					<value>sampleTarget</value>
 				</property>
+				
+				<!--  where to store meta data for sampleTarget-->
+        		<property name="metaDataDirectory">
+            		<value>${deployment.filesystem.metadatadir}/sampleTarget</value>
+        		</property>
 				<property name="autoFix">
 					<value>${deployment.filesystem.autofix}</value>
 				</property>
@@ -42,6 +49,7 @@
 				<property name="fileSystemReceiverService">
 					<ref bean="fileSystemReceiverService" />
 				</property>
+				<property name="name"><value>sampleTarget</value></property>
 				<property name="authenticator">
 					<bean
 						class="org.alfresco.deployment.impl.server.DeploymentReceiverAuthenticatorSimple">
