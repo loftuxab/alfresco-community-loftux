@@ -16,6 +16,7 @@
 		<property name="name">
 			<value>filesystem</value>
 		</property>
+	
 		<property name="registry">
 			<ref bean="deploymentReceiverEngine" />
 		</property>
@@ -28,6 +29,11 @@
 				<property name="rootDirectory">
 					<value>filesystem</value>
 				</property>
+				
+				<!--  where to store meta data for sampleTarget-->
+        		<property name="metaDataDirectory">
+            		<value>metadata/filesystem</value>
+        		</property>	
 				
 				<property name="autoFix">
 					<value>true</value>

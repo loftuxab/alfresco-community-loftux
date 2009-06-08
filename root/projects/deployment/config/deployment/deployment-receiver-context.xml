@@ -31,11 +31,6 @@
             <value>${deployment.filesystem.logdir}</value>
         </property>
         
-        <!--  where to store meta data -->
-        <property name="metaDataDirectory">
-            <value>${deployment.filesystem.metadatadir}</value>
-        </property>
-        
         <property name="commandQueue"><ref bean="deploymentReceiverCommandQueue" /></property>
         
     </bean>

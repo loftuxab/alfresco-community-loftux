@@ -105,6 +105,13 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
     private String fRootDirectory;
     
     /**
+	 * Get the directory in which metadata is stored
+	 * @return the metaData directory
+	 */   
+	private String fMetaDataDirectory;
+
+    
+    /**
      * The authenticator for this target
      */
     private DeploymentReceiverAuthenticator authenticator;
@@ -147,6 +154,7 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
     {
         PropertyCheck.mandatory(this, "authenticator", authenticator);
         PropertyCheck.mandatory(this, "rootDirectory", fRootDirectory);
+		PropertyCheck.mandatory(this, "metaDataDirectory", fMetaDataDirectory);
         PropertyCheck.mandatory(this, "fileSystemReceiverService", fileSystemReceiverService);
         
         // Create the root directory if it does not already exist
@@ -156,7 +164,15 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
         	rootFile.mkdirs(); 
         }
         
-    	metaDataTarget = new Target(fTargetName, fileSystemReceiverService.getMetaDataDirectory());
+		// Create the various necessary directories if they don't already exits.
+		File meta = new File(fMetaDataDirectory);
+		if (!meta.exists())
+		{
+			logger.info("creating meta data directory:" + meta.toString());
+			meta.mkdirs();
+		}
+        
+    	metaDataTarget = new Target(fTargetName, fMetaDataDirectory);
     	
     	// validate properties
     	fileSystemReceiverService.queueCommand(validateMeCommand);
@@ -852,4 +868,18 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
 		// Not implemented -- yet 
 		return -1;
 	}	
+	
+	public void setMetaDataDirectory(String dir)
+	{
+		fMetaDataDirectory = dir;
+	}
+	
+	/**
+	 * Get the directory in which metadata 
+	 * @return
+	 */
+	public String getMetaDataDirectory()
+	{
+		return fMetaDataDirectory;
+	}
 }

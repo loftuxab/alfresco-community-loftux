@@ -218,7 +218,7 @@ public class Target implements Serializable
     		error = true; // failure
     		if(fixit)
     		{
-    			logger.warn("metadata is unreadable.  Replaced metadata for metaDir:" + metaDir, de);
+    			logger.warn("metadata is unreadable.  Replaced metadata for target: " + fTargetName + ", metaDir:" + metaDir, de);
     			putDirectory(metaFileName, new DirectoryMetaData());
     			
     		}
