@@ -25,9 +25,12 @@
 
 package org.alfresco.deployment;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,6 +124,12 @@ public class ProgramRunnable implements FSDeploymentRunnable
                 env[off++] = entry.getKey() + '=' + entry.getValue();
             }
             Process process = runTime.exec(command, env, new File(fDirectory));
+            
+            StreamDigester errorDigester = new StreamDigester(process.getErrorStream());
+            StreamDigester outputDigester = new StreamDigester(process.getInputStream());
+            errorDigester.start();
+            outputDigester.start();
+            
             process.waitFor();
             tempFile.delete();
         }
@@ -133,4 +142,28 @@ public class ProgramRunnable implements FSDeploymentRunnable
             // Do nothing for now.
         }
     }
+}
+
+class StreamDigester extends Thread 
+{
+	  private InputStream is;
+
+	  StreamDigester(InputStream is) 
+	  {
+	    this.is = is;
+	  }
+
+	  public void run() 
+	  {
+	    try 
+	    {
+	      InputStreamReader isr = new InputStreamReader(is);
+	      BufferedReader br = new BufferedReader(isr);
+	      String line = null;
+	      while ((line = br.readLine()) != null) 
+	      {}
+	    } catch (IOException ioe) {
+	    	ioe.printStackTrace();
+	    }
+	  }
 }
