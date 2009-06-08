@@ -245,8 +245,8 @@ public class MediaWikiService implements Constants,
         this.nodeService.addAspect(mediawiki, ContentModel.ASPECT_WEBSCRIPTABLE, props);
         
         // Create the user groups for this wiki
-        String wikiAdminsGroup = this.authorityService.createAuthority(AuthorityType.GROUP, null, wikiName + "_WikiAdmins");
-        String wikiUsersGroup = this.authorityService.createAuthority(AuthorityType.GROUP, null, wikiName + "_WikiUsers");
+        String wikiAdminsGroup = this.authorityService.createAuthority(AuthorityType.GROUP, wikiName + "_WikiAdmins");
+        String wikiUsersGroup = this.authorityService.createAuthority(AuthorityType.GROUP, wikiName + "_WikiUsers");
         
         // Set the permissions on the space and the configuration node
         this.permissionService.setInheritParentPermissions(mediawiki, false);
