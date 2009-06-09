@@ -65,16 +65,16 @@ public class DomainAccessControlParser extends AccessControlParser {
 		
 		//	Get the domain name to check for
 		
-		ConfigElement val = params.getChild("name");
-		if ( val == null || val.getValue().length() == 0)
+		String val = params.getAttribute("name");
+		if ( val == null || val.length() == 0)
 			throw new ACLParseException("Domain name not specified");
 			
-		String domainName = val.getValue().trim();
+		String domainName = val.trim();
 		if ( domainName.length() == 0)
 			throw new ACLParseException("Domain name not valid");
 			
 		//	Create the domain access control
 		
-		return new DomainAccessControl(val.getValue(), getType(), access);
+		return new DomainAccessControl(domainName, getType(), access);
 	}
 }

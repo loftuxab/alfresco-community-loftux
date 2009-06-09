@@ -65,13 +65,13 @@ public class UidAccessControlParser extends AccessControlParser {
 		
 		//	Get the user id to check for
 		
-		ConfigElement val = params.getChild("id");
-		if ( val == null || val.getValue().length() == 0)
+		String val = params.getAttribute("id");
+		if ( val == null || val.length() == 0)
 			throw new ACLParseException("User id not specified");
 		
 		//	Validate the user id
 		
-		String userId = val.getValue().trim();
+		String userId = val.trim();
 		int uid = -1;
 		
 		try {

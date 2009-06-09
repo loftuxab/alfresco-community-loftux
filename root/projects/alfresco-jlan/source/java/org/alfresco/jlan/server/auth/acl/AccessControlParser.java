@@ -80,14 +80,13 @@ public abstract class AccessControlParser {
 			
 		//	Find the access type parameter
 		
-		ConfigElement accessParam = params.getChild(ParameterAccess);
-		if ( accessParam == null || accessParam.getValue() == null || accessParam.getValue().length() == 0)
+		String accessParam = params.getAttribute(ParameterAccess);
+		if ( accessParam == null || accessParam.length() == 0)
 			throw new ACLParseException("Required parameter 'access' missing");
 			
 		//	Parse the access type value
 		
-		String accessType = accessParam.getValue();
-		return parseAccessTypeString(accessType);
+		return parseAccessTypeString(accessParam);
 	}
 	
 	/**

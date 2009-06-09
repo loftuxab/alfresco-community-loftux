@@ -65,11 +65,11 @@ public class ProtocolAccessControlParser extends AccessControlParser {
 	
 		//	Get the list of protocols to check for
 	
-		ConfigElement val = params.getChild("type");
-		if ( val == null || val.getValue().length() == 0)
+		String val = params.getAttribute("type");
+		if ( val == null || val.length() == 0)
 			throw new ACLParseException("Protocol type not specified");
 		
-		String protList = val.getValue().trim();
+		String protList = val.trim();
 		if ( protList.length() == 0)
 			throw new ACLParseException("Protocol type not valid");
 		
