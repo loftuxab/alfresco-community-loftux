@@ -7,7 +7,7 @@
       <form id="${args.htmlid}-form" action="" method="post">
          <input type="hidden" name="date" id="${args.htmlid}-date" value="" />
          <div class="yui-g">
-            <h2>${msg("header.type")}:</h2>
+            <h2>${msg("header.type")}</h2>
          </div>
          <div class="field">
             <select id="${args.htmlid}-type" name="type" tabindex="4">
@@ -16,7 +16,7 @@
             </select>
          </div>
          <div class="yui-g">
-            <h2>${msg("header.people")}:</h2>
+            <h2>${msg("header.people")}</h2>
          </div>
          <div class="yui-ge field">
             <div class="yui-u first">
@@ -27,7 +27,7 @@
             </div>
          </div>
          <div class="yui-g">
-            <h2>${msg("header.date")}:</h2>
+            <h2>${msg("header.date")}</h2>
          </div>
          <div class="field">    
             <input id="${args.htmlid}-dueDate-checkbox" name="-" type="checkbox" value="${msg("label.due-date.none")}" tabindex="4"/>&nbsp;
@@ -39,7 +39,7 @@
             </div>
          </div>
          <div class="yui-g">
-            <h2>${msg("header.comment")}:</h2>
+            <h2>${msg("header.comment")}</h2>
          </div>
          <div class="field">
             <textarea id="${args.htmlid}-comment" name="description" rows="3" tabindex="5"></textarea>

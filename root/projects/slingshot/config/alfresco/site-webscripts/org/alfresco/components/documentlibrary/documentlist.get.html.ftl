@@ -86,7 +86,7 @@
       <div class="bd">
          <form id="${args.htmlid}-customize-form" action="#" method="post">
             <div class="yui-g">
-               <h2>${msg("customize.header.actions")}:</h2>
+               <h2>${msg("customize.header.actions")}</h2>
             </div>
             <div class="bdft">
                <input type="button" id="${args.htmlid}-customize-ok" value="${msg("button.ok")}" tabindex="1" />

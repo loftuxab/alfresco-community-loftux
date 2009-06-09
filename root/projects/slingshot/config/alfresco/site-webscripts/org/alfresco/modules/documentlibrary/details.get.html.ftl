@@ -19,7 +19,7 @@
             <button id="${args.htmlid}-editMetadata" tabindex="0">${msg("label.edit-metadata")}</button>
          </div>
          <div class="yui-g">
-            <h2>${msg("header.metadata")}:</h2>
+            <h2>${msg("header.metadata")}</h2>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-name">${msg("label.name")}:</label></div>
@@ -34,7 +34,7 @@
             <div class="yui-u"><textarea id="${args.htmlid}-description" name="properties.description" rows="5" cols="20" tabindex="3"></textarea></div>
          </div>
          <div class="yui-g">
-            <h2>${msg("header.tags")}:</h2>
+            <h2>${msg("header.tags")}</h2>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-tags">${msg("label.tags")}:</label></div>

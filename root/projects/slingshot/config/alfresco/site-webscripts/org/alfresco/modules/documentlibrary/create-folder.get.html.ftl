@@ -3,7 +3,7 @@
    <div class="bd">
       <form id="${args.htmlid}-form" action="" method="post">
          <div class="yui-g">
-            <h2 id="${args.htmlid}-dialogHeader">${msg("header")}:</h2>
+            <h2 id="${args.htmlid}-dialogHeader">${msg("header")}</h2>
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-name">${msg("label.name")}:</label></div>
