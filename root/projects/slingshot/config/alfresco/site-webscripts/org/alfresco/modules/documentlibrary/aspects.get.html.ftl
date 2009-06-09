@@ -8,7 +8,7 @@
          <input type="hidden" name="added" id="${args.htmlid}-added" value="" />
          <input type="hidden" name="removed" id="${args.htmlid}-removed" value="" />
          <div class="yui-g">
-            <h2>${msg("header.aspects")}:</h2>
+            <h2>${msg("header.aspects")}</h2>
          </div>
          <div class="yui-g">
             <div class="yui-u first">
