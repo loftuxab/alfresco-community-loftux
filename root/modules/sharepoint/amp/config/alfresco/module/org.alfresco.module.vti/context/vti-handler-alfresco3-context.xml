@@ -138,71 +138,7 @@
     	<property name="personService" ref="PersonService" />	
     </bean>
     
-    <!--
-    	BASIC authentication component (Default). 
-    	In case you want to use BASIC authentication just enable the following bean:
-    	vtiAuthenticationHandler with class="org.alfresco.module.vti.handler.alfresco.v3.BasicAuthenticationHandler"
-    	and comment all part that relates to ntlm.
-     -->
-    
     <bean id="vtiAuthenticationHandler" class="org.alfresco.module.vti.handler.alfresco.v3.BasicAuthenticationHandler" parent="authenticationHandler">
     </bean>
     
-    <!--
-    	 This part of context relates to ntlm authentication for vti-module.
-    	 If you want to use NTLM authentication just uncomment out next beans:
-    	  vtiAuthenticationHandler with class="org.alfresco.module.vti.handler.alfresco.v3.NtlmAuthenticationHandler"
-    	  VtiNtlmAuthenticationComponent
-    	  vtiNtlmAuthenticationComponent    	  
-    	  
-    	  and comment bean 
-    	  authenticationHandler with calss="org.alfresco.module.vti.handler.alfresco.v3.BasicAuthenticationHandler"
-     -->
-     <!--<bean id="vtiAuthenticationHandler" class="org.alfresco.module.vti.handler.alfresco.v3.NtlmAuthenticationHandler" parent="authenticationHandler">    	
-    	<property name="nodeService" ref="NodeService" />
-     	<property name="transactionService" ref="transactionService" />
-    	<property name="authenticationComponent" ref="VtiNtlmAuthenticationComponent" />
-    </bean>
-    
-    <bean id="VtiNtlmAuthenticationComponent" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
-        <property name="proxyInterfaces">
-        	<list>
-	        	<value>org.alfresco.repo.security.authentication.AuthenticationComponent</value>
-	            <value>org.alfresco.repo.security.authentication.ntlm.NLTMAuthenticator</value>
-            </list>
-    	</property>
-        <property name="transactionManager">
-            <ref bean="transactionManager" />
-    	</property>
-        <property name="target">
-            <ref bean="vtiNtlmAuthenticationComponent" />
-    	</property>
-        <property name="transactionAttributes">
-            <props>
-                <prop key="*">${server.transaction.mode.default}</prop>
-            </props>
-    	</property>
-    </bean>
-
-    <bean id="vtiNtlmAuthenticationComponent" class="org.alfresco.repo.security.authentication.AuthenticationComponentImpl" parent="authenticationComponentBase">
-        <property name="authenticationDao">
-            <ref bean="authenticationDao" />
-        </property>
-        <property name="authenticationManager">
-            <ref bean="authenticationManager" />
-        </property>
-        <property name="allowGuestLogin">
-            <value>false</value>
-        </property>
-        <property name="nodeService">
-            <ref bean="nodeService" />
-        </property>
-        <property name="personService">
-            <ref bean="personService" />
-        </property>
-        <property name="transactionService">
-            <ref bean="transactionService" />
-        </property>
-    </bean>-->
-	<!-- End of ntlm authentication context part. -->
 </beans>
