@@ -38,11 +38,11 @@ import org.alfresco.config.ConfigElement;
  *
  * @author gkspencer
  */
-public class LogFileDebug implements DebugInterface {
+public class LogFileDebug extends DebugInterfaceBase {
 
-  //	Output file stream
+	//	Output file stream
 
-  private PrintStream m_out;
+	private PrintStream m_out;
 
 	/**
 	 * Default constructor
@@ -54,7 +54,7 @@ public class LogFileDebug implements DebugInterface {
 	 * Create a log file debug object using the specified file name. Append to an existing file
 	 * if the append flag is true, else truncate the existing file.
 	 *
-	 * @param fname java.lang.String
+	 * @param fname String
 	 * @param append boolean
 	 */
 	public LogFileDebug(String fname, boolean append) throws IOException {
@@ -89,31 +89,31 @@ public class LogFileDebug implements DebugInterface {
 	  //  Close the debug file, if open
 
 	  if ( m_out != null) {
-      m_out.close();
-      m_out = null;
+        m_out.close();
+        m_out = null;
 	  }
 	}
 
 	/**
-	 * Output a debug string.
-	 *
-	 * @param str java.lang.String
+	 * Output a debug string with a specific logging level
+	 * 
+	 * @param str String
+	 * @param level int
 	 */
-	public final void debugPrint(String str) {
-	  if ( m_out != null) {
-      m_out.print(str);
-	  }
+	public void debugPrint(String str, int level) {
+	  if ( level <= getLogLevel())
+		m_out.print(str);
 	}
-
+	
 	/**
-	 * Output a debug string, and a newline.
+	 * Output a debug string, and a newline, with a specific logging level
 	 *
-	 * @param str java.lang.String
+	 * @param str String
 	 */
-	public final void debugPrintln(String str) {
-	  if ( m_out != null) {
-      m_out.println(str);
-      m_out.flush();
+	public void debugPrintln(String str, int level) {
+	  if ( level <= getLogLevel() && m_out != null) {
+        m_out.println(str);
+        m_out.flush();
 	  }
 	}
 
@@ -124,7 +124,11 @@ public class LogFileDebug implements DebugInterface {
 	 */
 	public void initialize(ConfigElement params)
 		throws Exception {
-	
+
+		// Call the base class
+		
+		super.initialize( params);
+		
 		//	Get the output file name and append flag settings
 
 		ConfigElement logFile = params.getChild( "logFile");
@@ -134,8 +138,8 @@ public class LogFileDebug implements DebugInterface {
 		
 		if ( logFile.getValue() == null || logFile.getValue().length() == 0)
 			throw new Exception("logFile parameter not specified");
-			
-	  //  Open the file
+		
+		//  Open the file
 
 		open(logFile.getValue(), append);
 	}

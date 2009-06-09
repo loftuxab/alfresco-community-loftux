@@ -25,8 +25,6 @@
 
 package org.alfresco.jlan.debug;
 
-import org.alfresco.config.ConfigElement;
-
 /**
  * Console Debug Output Class.
  *
@@ -34,42 +32,26 @@ import org.alfresco.config.ConfigElement;
  *
  * @author gkspencer
  */
-public class ConsoleDebug implements DebugInterface {
+public class ConsoleDebug extends DebugInterfaceBase {
 
 	/**
-	 * ConsoleDebug constructor comment.
+	 * Output a debug string with a specific logging level
+	 * 
+	 * @param str String
+	 * @param level int
 	 */
-	public ConsoleDebug() {
-	  super();
+	public void debugPrint(String str, int level) {
+	  if ( level <= getLogLevel())
+		System.out.print(str);
 	}
-
+	
 	/**
-	 * Close the debug output.
-	 */
-	public void close() {}
-
-	/**
-	 * Output a debug string.
+	 * Output a debug string, and a newline, with a specific logging level
 	 *
-	 * @param str java.lang.String
+	 * @param str String
 	 */
-	public final void debugPrint(String str) {
-	  System.out.print(str);
+	public void debugPrintln(String str, int level) {
+	  if ( level <= getLogLevel())
+		System.out.println(str);
 	}
-
-	/**
-	 * Output a debug string, and a newline.
-	 *
-	 * @param str java.lang.String
-	 */
-	public final void debugPrintln(String str) {
-	  System.out.println(str);
-	}
-
-	/**
-	 * Initialize the debug interface using the specified parameters.
-	 *
-	 * @param params ConfigElement
-	 */
-	public void initialize(ConfigElement params) {}
 }
