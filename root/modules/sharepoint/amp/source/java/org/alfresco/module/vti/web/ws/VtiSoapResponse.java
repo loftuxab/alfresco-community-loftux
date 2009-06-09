@@ -33,6 +33,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.dom4j.io.XMLWriter;
 
 
 /**
@@ -82,8 +83,8 @@ public class VtiSoapResponse extends HttpServletResponseWrapper
     {
         try
         {
-            getOutputStream().write(document.asXML().getBytes());
-            getOutputStream().close();
+            XMLWriter output = new XMLWriter(getOutputStream());
+            output.write(document);
         }
         catch (Exception e)
         {
