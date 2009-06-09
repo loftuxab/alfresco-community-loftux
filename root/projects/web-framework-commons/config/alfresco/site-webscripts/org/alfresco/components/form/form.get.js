@@ -468,7 +468,7 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
       //       config and list built above
       
       // for now return an error message
-      model.error = "Not enough configuration found for node type \"" + formModel.data.type + "\", at least one &lt;show&gt; element must be present.";
+      model.error = "Not enough configuration found for item \"" + formModel.data.type + "\", at least one &lt;show&gt; element must be present.";
    }
    
    return formUIItems;
