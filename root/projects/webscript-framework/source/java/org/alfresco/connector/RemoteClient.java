@@ -590,6 +590,24 @@ public class RemoteClient extends AbstractClient
                 if (debug) logger.debug("Setting content-type=" + this.requestContentType + " content-length=" + contentLength);
                 
                 ((EntityEnclosingMethod)method).setRequestEntity(new InputStreamRequestEntity(in, contentLength));
+                
+                // apply any supplied POST request parameters
+                if (req != null && method instanceof PostMethod)
+                {
+                    Map<String, String[]> postParams = req.getParameterMap();
+                    
+                    if (postParams != null)
+                    {
+                        for (String key : postParams.keySet())
+                        {
+                            String[] values = postParams.get(key);
+                            for (int i=0; i<values.length; i++)
+                            {
+                                ((PostMethod)method).addParameter(key, values[i]);
+                            }
+                        }
+                    }
+                }
             }
             
             // execute the method to get the response code and proxy over if required
