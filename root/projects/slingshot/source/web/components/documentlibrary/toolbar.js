@@ -698,8 +698,8 @@
             },
             webscript:
             {
-               name: "files",
-               method: Alfresco.util.Ajax.DELETE
+               method: Alfresco.util.Ajax.DELETE,
+               name: "files"
             },
             wait:
             {

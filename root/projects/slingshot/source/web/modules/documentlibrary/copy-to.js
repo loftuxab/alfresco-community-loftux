@@ -717,14 +717,14 @@
             },
             webscript:
             {
+               method: Alfresco.util.Ajax.POST,
                name: webscriptName,
-               method: Alfresco.util.Ajax.POST
+               params: params
             },
             wait:
             {
                message: this._msg("message.please-wait")
             },
-            params: params,
             config:
             {
                requestContentType: Alfresco.util.Ajax.JSON,

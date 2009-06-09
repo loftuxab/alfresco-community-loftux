@@ -387,6 +387,47 @@
       },
 
       /**
+       * Set permissions on a single document or folder.
+       *
+       * @method onActionManagePermissions
+       * @param obj {object} Not used
+       */
+      onActionManagePermissions: function DocumentActions_onActionManagePermissions(row)
+      {
+         if (!this.modules.permissions)
+         {
+            this.modules.permissions = new Alfresco.module.DoclibPermissions(this.id + "-permissions");
+         }            
+         this.modules.permissions.setOptions(
+         {
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: this.docData.location.path,
+            files: this.docData
+         });
+         this.modules.permissions.showDialog();
+      },
+
+      /**
+       * Manage aspects.
+       *
+       * @method onActionManageAspects
+       * @param obj {object} Not used
+       */
+      onActionManageAspects: function DocumentActions_onActionManageAspects(obj)
+      {
+         if (!this.modules.aspects)
+         {
+            this.modules.aspects = new Alfresco.module.DoclibAspects(this.id + "-aspects");
+         }
+
+         this.modules.aspects.setOptions(
+         {
+            file: this.docData
+         }).show();
+      },
+
+      /**
        * Delete Asset confirmed.
        *
        * @method _onActionDeleteConfirm
@@ -421,15 +462,15 @@
             },
             webscript:
             {
+               method: Alfresco.util.Ajax.DELETE,
                name: "file/site/{site}/{container}{path}/{file}",
-               method: Alfresco.util.Ajax.DELETE
-            },
-            params:
-            {
-               site: this.options.siteId,
-               container: this.options.containerId,
-               path: this.docData.location.path,
-               file: fileName
+               params:
+               {
+                  site: this.options.siteId,
+                  container: this.options.containerId,
+                  path: this.docData.location.path,
+                  file: fileName
+               }
             }
          });
       },

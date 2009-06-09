@@ -44,6 +44,7 @@
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("metadataRefresh", this.onReady, this);
+      YAHOO.Bubbling.on("filesPermissionsUpdated", this.onReady, this);
             
       return this;
    };

@@ -154,11 +154,11 @@
        * @param action.webscript.name {string} data webscript URL name
        * @param action.webscript.method {string} HTTP method to call the data webscript on
        * @param action.webscript.queryString {string} Optional queryString to append to the webscript URL
-       * @param action.params.siteId {string} current site
-       * @param action.params.containerId {string} component container
-       * @param action.params.path {string} path where file is located
-       * @param action.params.file {string} file to be deleted
-       * @param action.params.nodeRef {string} noderef instead of site, container, path, file
+       * @param action.webscript.params.siteId {string} current site
+       * @param action.webscript.params.containerId {string} component container
+       * @param action.webscript.params.path {string} path where file is located
+       * @param action.webscript.params.file {string} file to be deleted
+       * @param action.webscript.params.nodeRef {string} noderef instead of site, container, path, file
        * @param action.wait.message {string} if set, show a Please wait-style message during the operation
        * @param action.config {object} optional additional request configuration overrides
        * @return {boolean} false: module not ready
@@ -169,11 +169,16 @@
             success = action.success,
             failure = action.failure,
             webscript = action.webscript,
-            params = action.params,
+            params = action.params ? action.params : action.webscript.params,
             overrideConfig = action.config,
             wait = action.wait,
             configObj = null,
             doclibActions = this;
+
+         if (action.params)
+         {
+            Alfresco.logger.warn("genericAction()", "action.params now deprecated. Use action.webscript.params instead.");
+         }
 
          var fnCallback = function DLA_genericAction_callback(data, obj)
          {

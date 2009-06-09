@@ -145,6 +145,11 @@ textarea
  * Dashlets
  */
 
+div.dashlet .body
+{
+   width: 100%;
+}
+
 /* Some dashlets with css float in the body lost their border */
 div.dashlet .body .clear
 {
@@ -470,11 +475,17 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 div.dashlet.site-profile div.body,
 div.dashlet.wiki div.body,
 div.dashlet.cmis div.body div,
-div.dashlet.rssfeed div.body,
+div.dashlet.rssfeed div.body div.headline,
 div.dashlet.calendar div.body
 {                          
    padding-left: 8px;
    padding-right: 8px;
+}
+
+div.dashlet .toolbar
+{
+   padding-left: 2px;
+   padding-right: 2px;
 }
 
 .toolbar,

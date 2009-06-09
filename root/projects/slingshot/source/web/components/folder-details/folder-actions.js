@@ -380,15 +380,15 @@
             },
             webscript:
             {
+               method: Alfresco.util.Ajax.DELETE,
                name: "file/site/{site}/{container}{path}/{file}",
-               method: Alfresco.util.Ajax.DELETE
-            },
-            params:
-            {
-               site: this.options.siteId,
-               container: this.options.containerId,
-               path: this.folderData.location.path,
-               file: fileName
+               params:
+               {
+                  site: this.options.siteId,
+                  container: this.options.containerId,
+                  path: this.folderData.location.path,
+                  file: fileName
+               }
             }
          });
       },
@@ -397,29 +397,41 @@
        * Set permissions on a single document or folder.
        *
        * @method onActionManagePermissions
-       * @param row {object} DataTable row representing file to be actioned
+       * @param obj {object} Not used
        */
-      onActionManagePermissions: function FolderActions_onActionManagePermissions(row)
+      onActionManagePermissions: function FolderActions_onActionManagePermissions(obj)
       {
          if (!this.modules.permissions)
          {
-            this.modules.permissions = new Alfresco.module.DoclibPermissions(this.id + "-permissions").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.folderData.location.path,
-               files: this.folderData
-            });
+            this.modules.permissions = new Alfresco.module.DoclibPermissions(this.id + "-permissions");
          }
-         else
+         this.modules.permissions.setOptions(
          {
-            this.modules.permissions.setOptions(
-            {
-               path: this.folderData.location.path,
-               files: this.folderData
-            });
-         }
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: this.folderData.location.path,
+            files: this.folderData
+         });
          this.modules.permissions.showDialog();
+      },
+
+      /**
+       * Manage aspects.
+       *
+       * @method onActionManageAspects
+       * @param obj {object} Not used
+       */
+      onActionManageAspects: function DocumentActions_onActionManageAspects(obj)
+      {
+         if (!this.modules.aspects)
+         {
+            this.modules.aspects = new Alfresco.module.DoclibAspects(this.id + "-aspects");
+         }
+
+         this.modules.aspects.setOptions(
+         {
+            file: this.folderData
+         }).show();
       },
       
       /**

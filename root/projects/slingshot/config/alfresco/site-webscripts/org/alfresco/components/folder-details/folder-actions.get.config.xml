@@ -6,6 +6,7 @@
          <action id="onActionMoveTo" permission="delete" type="action-link" label="actions.folder.move-to" />
          <action id="onActionDelete" permission="delete" type="action-link" label="actions.folder.delete" />
          <action id="onActionManagePermissions" permission="permissions" type="action-link" label="actions.folder.manage-permissions" />
+         <action id="onActionManageAspects" permission="edit" type="action-link" label="actions.folder.manage-aspects" />
       </actionSet>
    </actionSets>
 </documentList>
