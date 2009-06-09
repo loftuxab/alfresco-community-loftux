@@ -280,8 +280,16 @@ public class Target implements Serializable
         {
         	Path path = new Path(file.getPath());
         	Path parent = path.getParent();
-        	String mdName = fMetaDataDirectory + File.separatorChar + parent.toString() + File.separatorChar + MD_NAME;        	
-
+        	
+        	String parentPath = "";
+        	if(parent != null)
+        	{
+        		parentPath = parent.toString() + File.separatorChar;
+        	}
+        	
+        	String mdName = fMetaDataDirectory + File.separatorChar + parentPath + MD_NAME;        	
+           		
+        	
         	if(! mdName.equals(currentmd))
         	{
         		if(md != null)
