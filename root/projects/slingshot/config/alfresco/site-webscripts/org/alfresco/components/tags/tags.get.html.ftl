@@ -16,7 +16,7 @@
 	   </li>   
       <#list tags as tag>
       <li class="onTagSelection nav-label" id="${args.htmlid}-onTagSelection-${tag.name}">
-         <a href="#" class="tag-link nav-link">${tag.name}</a> (${tag.count})
+         <a href="#" class="tag-link nav-link">${tag.name}</a>&nbsp;(${tag.count})
       </li>
       </#list>
 	<#else>
