@@ -20,3 +20,9 @@
 <!-- People Finder (req'd by Assign Workflow) -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/people-finder/people-finder.css" />
 <@script type="text/javascript" src="${page.url.context}/components/people-finder/people-finder.js"></@script>
+<!-- Manage Permissions -->
+<@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/permissions.css" />
+<@script type="text/javascript" src="${page.url.context}/modules/documentlibrary/permissions.js"></@script>
+<!-- Manage Aspects -->
+<@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/aspects.css" />
+<@script type="text/javascript" src="${page.url.context}/modules/documentlibrary/aspects.js"></@script>

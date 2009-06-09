@@ -1,3 +1,9 @@
+/**
+ * Patch to Menu to allow empty groups to remain in the menu structure.
+ * Required by: Sites dynamic drop-down menu.
+ * Patches: YUI 2.6.0, YUI 2.7.0
+ * Escalated: Yes, but closed as "by design"
+ */
 (function ()
 {
    var Lang = YAHOO.lang,

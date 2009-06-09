@@ -1,7 +1,8 @@
 <#import "../import/alfresco-common.ftl" as common />
 
-<#-- Global DEBUG flag retrieved from web-framework-config-application -->
+<#-- Global flags retrieved from web-framework-config-application -->
 <#assign DEBUG=(config.global.flags.childrenMap["client-debug"][0].value = "true")>
+<#assign AUTOLOGGING=(config.global.flags.childrenMap["client-debug-autologging"][0].value = "true")>
 <#-- allow theme to be specified in url args - helps debugging themes -->
 <#assign theme = (page.url.args.theme)!theme />
 
@@ -82,7 +83,7 @@
    <script type="text/javascript" src="${url.context}/yui/selector/selector-min.js"></script>
 </#if>
 <!-- YUI Patches -->
-   <script type="text/javascript" src="${url.context}/yui/menu/menu-patch.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/yui-patch.js"></script>
 
 <!-- Site-wide Common Assets -->
    <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
@@ -94,6 +95,7 @@
    <script type="text/javascript">//<![CDATA[
       Alfresco.constants = Alfresco.constants || {};
       Alfresco.constants.DEBUG = ${DEBUG?string};
+      Alfresco.constants.AUTOLOGGING = ${AUTOLOGGING?string};
       Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/";
       Alfresco.constants.PROXY_URI_RELATIVE = "${url.context}/proxy/alfresco/";
       Alfresco.constants.PROXY_FEED_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco-feed/";

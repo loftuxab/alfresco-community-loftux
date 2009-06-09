@@ -1729,8 +1729,8 @@
             },
             webscript:
             {
-               name: $combine("file/site", this.options.siteId, this.options.containerId, path, fileName),
-               method: Alfresco.util.Ajax.DELETE
+               method: Alfresco.util.Ajax.DELETE,
+               name: $combine("file/site", this.options.siteId, this.options.containerId, path, fileName)
             }
          });
       },
@@ -1752,7 +1752,9 @@
                path = record.getData("location").path,
                fileName = record.getData("fileName"),
                displayName = record.getData("displayName");
+
             var me = this;
+
             this.modules.actions.genericAction(
             {
                success:
@@ -1833,8 +1835,8 @@
                },
                webscript:
                {
-                  name: $combine("checkout/site", this.options.siteId, this.options.containerId, path, fileName),
-                  method: Alfresco.util.Ajax.POST
+                  method: Alfresco.util.Ajax.POST,
+                  name: $combine("checkout/site", this.options.siteId, this.options.containerId, path, fileName)
                }
             });
          }
@@ -1962,12 +1964,12 @@
             },
             webscript:
             {
+               method: Alfresco.util.Ajax.POST,
                name: "cancel-checkout/node/{nodeRef}",
-               method: Alfresco.util.Ajax.POST
-            },
-            params:
-            {
-               nodeRef: nodeRef.replace(":/", "")
+               params:
+               {
+                  nodeRef: nodeRef.replace(":/", "")
+               }
             }
          });
       },

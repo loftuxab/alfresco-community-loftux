@@ -43,6 +43,14 @@ if (typeof Alfresco == "undefined" || !Alfresco)
 Alfresco.constants = Alfresco.constants || {};
 
 /**
+ * Alfresco top-level component namespace.
+ * 
+ * @namespace Alfresco
+ * @class Alfresco.component
+ */
+Alfresco.component = Alfresco.component || {};
+
+/**
  * Alfresco top-level module namespace.
  * 
  * @namespace Alfresco
@@ -190,7 +198,7 @@ Alfresco.util.findValueByDotNotation = function(obj, property)
       for (var i = 0; i < props.length; i++)
       {
          currObj = currObj[props[i]];
-         if(currObj == undefined)
+         if (typeof currObj == "undefined")
          {
             return null;
          }
@@ -287,7 +295,7 @@ Alfresco.util.assertNotEmpty = function(param, message)
 Alfresco.util.combinePaths = function()
 {
    var path = "", i, ii;
-   for (var i = 0, ii = arguments.length; i < ii; i++)
+   for (i = 0, ii = arguments.length; i < ii; i++)
    {
       path += arguments[i] + "/";
    }
@@ -380,7 +388,7 @@ Alfresco.util.getFileIcon = function(p_fileName, p_fileType, p_iconSize)
          prefix = extns[extn];
       }
    }
-   else if (type == undefined)
+   else if (typeof type == "undefined")
    {
       type = "file";
    }
@@ -565,7 +573,7 @@ Alfresco.util.encodeHTML.div.appendChild(Alfresco.util.encodeHTML.text);
  */
 Alfresco.util.activateLinks = function(text)
 {
-   var re = new RegExp(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&:/~\+#]*[\w\-\@?^=%&/~\+#])?/g);
+   var re = new RegExp(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&:\/~\+#]*[\w\-\@?\^=%&\/~\+#])?/g);
    if (re.test(text))
    {
       var matches = text.match(re);
@@ -705,7 +713,7 @@ Alfresco.util.getDomId = function(p_prefix)
    do
    {
       domId = prefix + Alfresco.util.getDomId._nId++;
-   } while (YAHOO.util.Dom.get(domId) !== null)
+   } while (YAHOO.util.Dom.get(domId) !== null);
    
    return domId;
 };
@@ -725,7 +733,7 @@ Alfresco.util.relToTarget = function(p_rootNode)
    {
       elements[i].setAttribute("target", elements[i].getAttribute("rel"));
    }
-},
+};
 
 /**
  * Wrapper to create a YUI Button with common attributes.
@@ -812,7 +820,7 @@ Alfresco.util.disableYUIButton = function(p_button)
          p_button.removeStateCSSClasses("focus");
       }
    }
-}
+};
 
 /**
  * Find an event target's class name, ignoring YUI classes.
@@ -875,7 +883,7 @@ Alfresco.util.hasEventInterest = function(p_eventGroup, p_args)
       }
    }
    return hasInterest;
-},
+};
 
 /**
  * Check if flash is installed.
@@ -1227,17 +1235,83 @@ Alfresco.util.toQueryString = function(p_params)
 };
 
 /**
- * Checks the validity of a URL.
+ * Retrieves a JavaScript session variable.
+ * Variables are scoped to the current "location.host"
  *
- * @method isValidURL
- * @param url {string} The URL to validate
- * @return {boolean} Whether the URL passed the validity check
+ * @method getVar
+ * @param name {string} Variable name
+ * @param default {object} Default value to return if not set
+ * @return {object|null} Variable value or default if provided (null otherwise)
  * @static
  */
-Alfresco.util.isValidURL = function(url)
+Alfresco.util.getVar = function(p_name, p_default)
 {
-   var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-   return regexp.test(url);
+   var returnValue = typeof p_default != "undefined" ? p_default : null;
+   
+   try
+   {
+      if (window.name !== "" && YAHOO.lang.JSON.isValid(window.name))
+      {
+         var allVars = YAHOO.lang.JSON.parse(window.name),
+            scopedVars = allVars[location.host],
+            value = null;
+
+         if (typeof scopedVars == "object")
+         {
+            value = scopedVars[p_name];
+            if (typeof value !== "undefined" && value !== null)
+            {
+               returnValue = value;
+            }
+         }
+      }
+   }
+   catch (e)
+   {
+      Alfresco.logger.error("Alfresco.util.getVar()", p_name, p_default, e);
+   }
+   
+   return returnValue; 
+};
+
+/**
+ * Sets a JavaScript session variable.
+ * The variables are stored in window.name, so live for as long as the browser window does.
+ * Variables are scoped to the current "location.host"
+ *
+ * @method setVar
+ * @param name {string} Variable name
+ * @param value {object} Value to set
+ * @return {boolean} True for successful set
+ * @static
+ */
+Alfresco.util.setVar = function(p_name, p_value)
+{
+   var success = true;
+   
+   try
+   {
+      var allVars = {};
+      
+      if (window.name !== "" && YAHOO.lang.JSON.isValid(window.name))
+      {
+         allVars = YAHOO.lang.JSON.parse(window.name);
+      }
+      
+      if (typeof allVars[location.host] == "undefined")
+      {
+         allVars[location.host] = {};
+      }
+      allVars[location.host][p_name] = p_value;
+
+      window.name = YAHOO.lang.JSON.stringify(allVars);
+   }
+   catch (e)
+   {
+      Alfresco.logger.error("Alfresco.util.setVar()", p_name, p_value, e);
+      success = false;
+   }
+   return success;
 };
 
 
@@ -2541,14 +2615,70 @@ Alfresco.util.Anim = function()
  *    Build date: 24 March 2009
  *    Website: http://log4javascript.org
  */
-if (Alfresco.constants.DEBUG && log4javascript)
+if (log4javascript)
 {
+   /**
+    * Initial state on page load:
+    *    Always show if AUTOLOGGING flag is true
+    *    Show if AUTOLOGGING flag is false, but have enabled logger in this session
+    */
    Alfresco.logger = log4javascript.getDefaultLogger();
-   Alfresco.logger.isDebugEnabled = function()
+   if (Alfresco.constants.AUTOLOGGING)
    {
-      return true;
-   };
-   Alfresco.logger.info("Alfresco Share DEBUG mode enabled.");
+      Alfresco.logger.info("Alfresco Share LOGGING enabled.");
+   }
+   else
+   {
+      if (Alfresco.util.getVar("logging", false))
+      {
+         Alfresco.logger.info("Alfresco Share LOGGING re-enabled.");
+      }
+      else
+      {
+         log4javascript.setEnabled(false);
+      }
+   }
+
+   // Hook log window unload event
+   Alfresco.logger.getEffectiveAppenders()[0].addEventListener("unload", function()
+   {
+      log4javascript.setEnabled(false);
+      Alfresco.util.setVar("logging", false);
+   });
+
+   // Hook key sequence to enable log window
+   if (window.addEventListener)
+   {
+      var sequence = [],
+         logSequence = [17, 17, 16, 16], // Ctrl, Ctrl, Shift, Shift
+         logSequenceLen = logSequence.length,
+         logSequenceStr = logSequence.toString();
+      
+      window.addEventListener("keydown", function(e)
+      {
+         sequence.push(e.keyCode);
+         while (sequence.length > logSequenceLen)
+         {
+            sequence.shift();
+         }
+         if (sequence.toString().indexOf(logSequenceStr) >= 0)
+         {
+            sequence = [];
+            if (log4javascript.isEnabled())
+            {
+               log4javascript.setEnabled(false);
+               Alfresco.logger.getEffectiveAppenders()[0].hide();
+               Alfresco.util.setVar("logging", false);
+            }
+            else
+            {
+               log4javascript.setEnabled(true);
+               Alfresco.logger.getEffectiveAppenders()[0].show();
+               Alfresco.util.setVar("logging", true);
+            }
+         }
+      }, true);
+   }
 }
 else
 {
@@ -2564,7 +2694,7 @@ else
       {
          return false;
       }
-   }
+   };
 }
 
 
@@ -3000,13 +3130,13 @@ Alfresco.service.BaseService.prototype =
 
                // Get the value for the preference name
                var preferences = Alfresco.util.dotNotationToObject(n, null);
-               preferences = YAHOO.lang.merge(preferences, response.json)
+               preferences = YAHOO.lang.merge(preferences, response.json);
                var values = Alfresco.util.findValueByDotNotation(preferences, n);
 
                // Parse string to array, remove the value and convert to string again
-               var values = values ? values.split(",") : [];
-               values.push(v);
-               preferences = Alfresco.util.dotNotationToObject(n, values.join(","));
+               var arrValues = values ? values.split(",") : [];
+               arrValues.push(v);
+               preferences = Alfresco.util.dotNotationToObject(n, arrValues.join(","));
 
                // Save preference with the new value
                this.set(name, preferences, rc);
@@ -3039,13 +3169,13 @@ Alfresco.service.BaseService.prototype =
 
                // Get the value for the preference name
                var preferences = Alfresco.util.dotNotationToObject(n, null);
-               preferences = YAHOO.lang.merge(preferences, response.json)
+               preferences = YAHOO.lang.merge(preferences, response.json);
                var values = Alfresco.util.findValueByDotNotation(preferences, n);
 
                // Parse string to array, remove the value and convert to string again
-               var values = values ? values.split(",") : [];
-               values = Alfresco.util.arrayRemove(values, v);               
-               preferences = Alfresco.util.dotNotationToObject(n, values.join(","));
+               var arrValues = values ? values.split(",") : [];
+               arrValues = Alfresco.util.arrayRemove(arrValues, v);               
+               preferences = Alfresco.util.dotNotationToObject(n, arrValues.join(","));
 
                // Save preference without value
                this.set(name, preferences, rc);
@@ -3182,3 +3312,123 @@ Alfresco.util.RichEditor = function(editorName,id,config)
    }
    return null;
 };
+
+
+/**
+ * The Alfresco.component.Base class provides core component functions
+ * and is intended to be extended by other UI components, rather than
+ * instantiated on it's own.
+ */
+(function()
+{
+   /**
+    * Alfresco.component.Base constructor.
+    * 
+    * @param {String} htmlId The HTML id of the parent element
+    * @return {pbject} The new instance
+    * @constructor
+    */
+   Alfresco.component.Base = function(name, id, components)
+   {
+      // Mandatory properties
+      this.name = (typeof name == "undefined" || name === null) ? "Alfresco.component.Base" : name;
+      this.id = (typeof id == "undefined" || id === null) ? Alfresco.util.getDomId() : id;
+
+      // Initialise default prototype properties
+      this.widgets = {};
+      this.modules = {};
+      
+      // Register this component
+      Alfresco.util.ComponentManager.register(this);
+
+      // Load YUI Components if req'd
+      if (YAHOO.lang.isArray(components))
+      {
+         Alfresco.util.YUILoaderHelper.require(components, this.onComponentsLoaded, this);
+      }
+
+      return this;
+   };
+   
+   Alfresco.component.Base.prototype =
+   {
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       * @default {}
+       */
+      options: {},
+
+      /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       * @default null
+       */
+      widgets: null,
+
+      /**
+       * Object container for storing module instances.
+       * 
+       * @property modules
+       * @type object
+       * @default null
+       */
+      modules: null,
+
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       * @return {object} returns 'this' for method chaining
+       */
+      setOptions: function Base_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
+      
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {object} returns 'this' for method chaining
+       */
+      setMessages: function Base_setMessages(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
+         return this;
+      },
+      
+      /**
+       * Fired by YUILoaderHelper when required component script files have
+       * been loaded into the browser.
+       *
+       * @method onComponentsLoaded
+       */
+      onComponentsLoaded: function Base_onComponentsLoaded()
+      {
+         if (this.onReady && this.onReady.call)
+         {
+            YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+         }
+      },
+
+      /**
+       * Gets a custom message
+       *
+       * @method msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       */
+      msg: function Base_msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
+      }
+   };
+})();

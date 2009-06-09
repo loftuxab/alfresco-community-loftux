@@ -514,8 +514,8 @@
             },
             webscript:
             {
-               name: $combine("move-to/site", this.options.siteId, this.options.containerId, this.selectedNode.data.path),
-               method: Alfresco.util.Ajax.POST
+               method: Alfresco.util.Ajax.POST,
+               name: $combine("move-to/site", this.options.siteId, this.options.containerId, this.selectedNode.data.path)
             },
             wait:
             {

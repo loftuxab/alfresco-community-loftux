@@ -22,3 +22,6 @@
 <!-- Manage Permissions -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/permissions.css" />
 <@script type="text/javascript" src="${page.url.context}/modules/documentlibrary/permissions.js"></@script>
+<!-- Manage Aspects -->
+<@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/aspects.css" />
+<@script type="text/javascript" src="${page.url.context}/modules/documentlibrary/aspects.js"></@script>

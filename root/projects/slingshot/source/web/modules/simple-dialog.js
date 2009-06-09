@@ -31,23 +31,22 @@
  */
 (function()
 {
-   var Dom = YAHOO.util.Dom;
+   var Dom = YAHOO.util.Dom,
+      Selector = YAHOO.util.Selector,
+      KeyListener = YAHOO.util.KeyListener;
    
-   Alfresco.module.SimpleDialog = function(htmlId)
+   Alfresco.module.SimpleDialog = function(htmlId, components)
    {
-      this.name = "Alfresco.module.SimpleDialog";
-      this.id = htmlId;
+      components = YAHOO.lang.isArray(components) ? components : [];
       
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json", "selector"], this.onComponentsLoaded, this);
-
-      return this;
+      return Alfresco.module.SimpleDialog.superclass.constructor.call(
+         this,
+         "Alfresco.module.SimpleDialog",
+         htmlId,
+         ["button", "container", "connection", "json", "selector"].concat(components));
    };
 
-   Alfresco.module.SimpleDialog.prototype =
+   YAHOO.extend(Alfresco.module.SimpleDialog, Alfresco.component.Base,
    {
       /**
        * Dialog instance.
@@ -64,14 +63,6 @@
        * @type Alfresco.forms.Form
        */
       form: null,
-
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-       widgets: {},
 
        /**
         * Object container for initialization options
@@ -253,22 +244,10 @@
       onComponentsLoaded: function AmSD_onComponentsLoaded()
       {
          // Shortcut for dummy instance
-         if (this.id === null)
+         if (this.id === "null")
          {
             return;
          }
-      },
-      
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       */
-      setOptions: function AmSD_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
       },
       
       /**
@@ -290,7 +269,7 @@
             };
             if (this.options.templateRequestParams)
             {
-                data = YAHOO.lang.merge(this.options.templateRequestParams,data);
+                data = YAHOO.lang.merge(this.options.templateRequestParams, data);
             }
             Alfresco.util.Ajax.request(
             {
@@ -360,8 +339,8 @@
          
          if (this.options.clearForm)
          {
-            var inputs = YAHOO.util.Selector.query("input", form);
-            inputs = inputs.concat(YAHOO.util.Selector.query("textarea", form));
+            var inputs = Selector.query("input", form);
+            inputs = inputs.concat(Selector.query("textarea", form));
             for (var i = 0, j = inputs.length; i < j; i++)
             {
                inputs[i].value = "";
@@ -388,9 +367,9 @@
          this.form.applyTabFix();
          
          // Register the ESC key to close the dialog
-         var escapeListener = new YAHOO.util.KeyListener(document,
+         var escapeListener = new KeyListener(document,
          {
-            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+            keys: KeyListener.KEY.ESCAPE
          },
          {
             fn: function(id, keyEvent)
@@ -603,8 +582,11 @@
             }
          }
       }
-   };
+   });
 })();
 
-/* Dummy instance to load optional YUI components early */
-new Alfresco.module.SimpleDialog(null);
+/**
+ * Dummy instance to load optional YUI components early.
+ * Use fake "null" id, which is tested later in onComponentsLoaded()
+*/
+new Alfresco.module.SimpleDialog("null");

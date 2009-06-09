@@ -78,10 +78,14 @@ hr
    text-align: left;
 }
 
-.yui-skin-default .yui-panel .yui-g h2,
 .yui-skin-default .yui-panel .bd div.yui-gd,
 .yui-skin-default .yui-panel .bd div.yui-u,
 .yui-skin-default .yui-panel .bd div.bdft
+{
+   padding: 0.3em 0.3em 0.3em 0;
+}
+
+.yui-skin-default .yui-panel .yui-g h2
 {
    padding: 0.3em;
 }
@@ -104,6 +108,7 @@ hr
 
 .yui-skin-default .yui-panel .bd .yui-u.first
 {
+   padding: 0.3em 0 0.3em 0.3em;
    text-align: right;
 }
 

@@ -496,6 +496,11 @@
    background-image: url(images/permissions-16.png);
 }
 
+.doclist .onActionManageAspects a
+{
+   background-image: url(images/manage-aspects-16.png);
+}
+
 
 /* History Manager */
 

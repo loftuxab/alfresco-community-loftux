@@ -15,6 +15,7 @@
          <action id="onActionDelete" type="action-link" permission="delete" label="actions.document.delete" />
          <action id="onActionAssignWorkflow" type="action-link" label="actions.document.assign-workflow" />
          <action id="onActionManagePermissions" type="action-link" permission="permissions" label="actions.document.manage-permissions" />
+         <action id="onActionManageAspects" type="action-link" permission="edit" label="actions.document.manage-aspects" />
       </actionSet>
 
       <actionSet id="locked">
@@ -38,6 +39,7 @@
          <action id="onActionMoveTo" permission="delete" type="action-link" label="actions.folder.move-to" />
          <action id="onActionDelete" permission="delete" type="action-link" label="actions.folder.delete" />
          <action id="onActionManagePermissions" permission="permissions" type="action-link" label="actions.folder.manage-permissions" />
+         <action id="onActionManageAspects" type="action-link" permission="edit" label="actions.document.manage-aspects" />
       </actionSet>
 
       <actionSet id="link">

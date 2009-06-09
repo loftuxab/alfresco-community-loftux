@@ -414,13 +414,13 @@
             },
             webscript:
             {
+               method: Alfresco.util.Ajax.POST,
                name: "permissions/{operation}/site/{site}",
-               method: Alfresco.util.Ajax.POST
-            },
-            params:
-            {
-               site: this.options.siteId,
-               operation: operation
+               params:
+               {
+                  site: this.options.siteId,
+                  operation: operation
+               }
             },
             config:
             {
