@@ -41,7 +41,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $combine = Alfresco.util.combinePaths;
    
    /**
     * FolderActions constructor.
@@ -421,7 +422,7 @@
        * @method onActionManageAspects
        * @param obj {object} Not used
        */
-      onActionManageAspects: function DocumentActions_onActionManageAspects(obj)
+      onActionManageAspects: function FolderActions_onActionManageAspects(obj)
       {
          if (!this.modules.aspects)
          {
@@ -432,6 +433,71 @@
          {
             file: this.folderData
          }).show();
+      },
+
+      /**
+       * Change Type
+       *
+       * @method onActionChangeType
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionChangeType: function FolderActions_onActionChangeType(obj)
+      {
+         var data = this.folderData,
+            nodeRef = data.nodeRef,
+            displayName = data.displayName,
+            actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/type/node", nodeRef.replace(":/", ""));
+
+         var doSetupFormsValidation = function FolderActions_oACT_doSetupFormsValidation(p_form)
+         {
+            // Validation
+            p_form.addValidation(this.id + "-changeType-type", function fnValidateType(field, args, event, form, silent, message)
+            {
+               return field.options[field.selectedIndex].value !== "-";
+            }, null, "change");
+            p_form.setShowSubmitStateDynamically(true, false);
+         };
+
+         // Always create a new instance
+         this.modules.changeType = new Alfresco.module.SimpleDialog(this.id + "-changeType").setOptions(
+         {
+            width: "30em",
+            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/change-type?nodeRef=" + nodeRef,
+            actionUrl: actionUrl,
+            doSetupFormsValidation:
+            {
+               fn: doSetupFormsValidation,
+               scope: this
+            },
+            firstFocus: this.id + "-changeType-type",
+            onSuccess:
+            {
+               fn: function FolderActions_onActionChangeType_success(response)
+               {
+                  YAHOO.Bubbling.fire("metadataRefresh",
+                  {
+                     highlightFile: displayName
+                  });
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this._msg("folder-actions.change-type.success", displayName)
+                  });
+               },
+               scope: this
+            },
+            onFailure:
+            {
+               fn: function FolderActions_onActionChangeType_failure(response)
+               {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this._msg("folder-actions.change-type.failure", displayName)
+                  });
+               },
+               scope: this
+            }
+         });
+         this.modules.changeType.show();
       },
       
       /**
