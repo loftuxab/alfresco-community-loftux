@@ -66,25 +66,25 @@ public class IpAddressAccessControlParser extends AccessControlParser {
 	
 		//	Check if the single IP address format has been specified
 		
-		ConfigElement val = params.getChild("ip");
+		String val = params.getAttribute("ip");
 		if ( val != null) {
 			
 			//	Validate the parameters
 			
-			if ( val.getValue().length() == 0 || IPAddress.isNumericAddress(val.getValue()) == false)
-				throw new ACLParseException("Invalid IP address, " + val.getValue());
+			if ( val.length() == 0 || IPAddress.isNumericAddress(val) == false)
+				throw new ACLParseException("Invalid IP address, " + val);
 				
 			if ( params.getChildCount() != 2)
 				throw new ACLParseException("Invalid parameter(s) specified for address");
 				
 			//	Create a single TCP/IP address access control rule
 			
-			return new IpAddressAccessControl(val.getValue(), null, getType(), access);
+			return new IpAddressAccessControl(val, null, getType(), access);
 		}
 		
 		//	Check if a subnet address and mask have been specified
 		
-		val = params.getChild("subnet");
+		val = params.getAttribute("subnet");
 		if ( val != null) {
 			
 			//	Get the network mask parameter
@@ -93,18 +93,18 @@ public class IpAddressAccessControlParser extends AccessControlParser {
 			
 			//	Validate the parameters
 			
-			if ( val.getValue().length() == 0 || maskVal == null || maskVal.getValue().length() == 0)
+			if ( val.length() == 0 || maskVal == null || maskVal.getValue().length() == 0)
 				throw new ACLParseException("Invalid subnet/mask parameter");
 				
-			if ( IPAddress.isNumericAddress(val.getValue()) == false)
-				throw new ACLParseException("Invalid subnet parameter, " + val.getValue());
+			if ( IPAddress.isNumericAddress(val) == false)
+				throw new ACLParseException("Invalid subnet parameter, " + val);
 				
 			if ( IPAddress.isNumericAddress(maskVal.getValue()) == false)
 				throw new ACLParseException("Invalid mask parameter, " + maskVal.getValue());
 				
 			//	Create a subnet address access control rule
 			
-			return new IpAddressAccessControl(val.getValue(), maskVal.getValue(), getType(), access);
+			return new IpAddressAccessControl(val, maskVal.getValue(), getType(), access);
 		}
 		
 		//	Invalid parameters

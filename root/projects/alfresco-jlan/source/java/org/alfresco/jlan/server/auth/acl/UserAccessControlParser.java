@@ -65,16 +65,16 @@ public class UserAccessControlParser extends AccessControlParser {
 		
 		//	Get the user name to check for
 		
-		ConfigElement val = params.getChild("name");
-		if ( val == null || val.getValue().length() == 0)
+		String val = params.getAttribute("name");
+		if ( val == null || val.length() == 0)
 			throw new ACLParseException("User name not specified");
 			
-		String userName = val.getValue().trim();
+		String userName = val.trim();
 		if ( userName.length() == 0)
 			throw new ACLParseException("User name not valid");
 			
 		//	Create the user access control
 		
-		return new UserAccessControl(val.getValue(), getType(), access);
+		return new UserAccessControl(userName, getType(), access);
 	}
 }

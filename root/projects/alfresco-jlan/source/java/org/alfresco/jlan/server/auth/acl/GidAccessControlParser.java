@@ -65,13 +65,13 @@ public class GidAccessControlParser extends AccessControlParser {
 		
 		//	Get the group id to check for
 		
-		ConfigElement val = params.getChild("id");
-		if ( val == null || val.getValue().length() == 0)
+		String val = params.getAttribute("id");
+		if ( val == null || val.length() == 0)
 			throw new ACLParseException("Group id not specified");
 		
 		//	Validate the group id
 		
-		String groupId = val.getValue().trim();
+		String groupId = val.trim();
 		int gid = -1;
 		
 		try {
