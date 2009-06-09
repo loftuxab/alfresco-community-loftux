@@ -33,10 +33,11 @@ import java.util.Set;
 import org.alfresco.deployment.impl.DeploymentException;
 
 /**
- * The deployment receiver is the interface that is provided by 
- * deployment receivers 
+ * The deployment target is the interface that is provided by 
+ * deployment targets.
  * 
  * @see org.alfresco.deployment.impl.fsr.FileSystemDeploymentTarget
+ * @see org.alfresco.deployment.impl.asr.AVMDeploymentTarget
  *  
  * @author mrogers
  */
