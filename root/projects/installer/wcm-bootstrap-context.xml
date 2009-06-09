@@ -22,7 +22,7 @@
     </bean>
 
 	<!--  Bootstrap the WCM Deployment Receiver Subsystem -->
-	<bean id="wcmDeploymentReceiver"
+	<bean id="wcm_deployment_receiver"
 		class="org.alfresco.repo.management.subsystems.ChildApplicationContextFactory"
 		parent="abstractPropertyBackedBean">
 		<property name="autoStart">
