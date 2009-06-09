@@ -501,6 +501,11 @@
    background-image: url(images/manage-aspects-16.png);
 }
 
+.doclist .onActionChangeType a
+{
+   background-image: url(images/change-type-16.png);
+}
+
 
 /* History Manager */
 

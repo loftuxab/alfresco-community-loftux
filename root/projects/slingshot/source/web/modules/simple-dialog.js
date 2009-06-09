@@ -580,6 +580,13 @@
                   text: response.json.message
                });
             }
+            else
+            {
+               Alfresco.util.PopupManager.displayPrompt(
+               {
+                  text: this.msg("message.failure")
+               });
+            }
          }
       }
    });

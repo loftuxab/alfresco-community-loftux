@@ -51,20 +51,6 @@
       this.currentValues = [];
       this.selectedValues = {};
 
-      this.options.doBeforeDialogShow =
-      {
-         fn: this.doBeforeDialogShow,
-         obj: null,
-         scope: this
-      };
-
-      this.options.doBeforeAjaxRequest =
-      {
-         fn: this.doBeforeAjaxRequest,
-         obj: null,
-         scope: this
-      };
-      
       return this;
    };
    
@@ -129,7 +115,19 @@
          Alfresco.module.DoclibAspects.superclass.setOptions.call(this,
          {
             width: "50em",
-            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/aspects"
+            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/aspects",
+            doBeforeDialogShow:
+            {
+               fn: this.doBeforeDialogShow,
+               obj: null,
+               scope: this
+            },
+            doBeforeAjaxRequest:
+            {
+               fn: this.doBeforeAjaxRequest,
+               obj: null,
+               scope: this
+            }
          });
 
          this.options = YAHOO.lang.merge(this.options, obj);

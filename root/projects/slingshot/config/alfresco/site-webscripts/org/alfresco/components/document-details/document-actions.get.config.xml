@@ -11,6 +11,7 @@
          <action id="onActionDelete" type="action-link" permission="delete" label="document-actions.delete" />
          <action id="onActionManagePermissions" type="action-link" permission="permissions" label="document-actions.manage-permissions" />
          <action id="onActionManageAspects" type="action-link" permission="edit" label="document-actions.manage-aspects" />
+         <action id="onActionChangeType" type="action-link" permission="edit" label="document-actions.change-type" />
       </actionSet>
 
       <actionSet id="locked">

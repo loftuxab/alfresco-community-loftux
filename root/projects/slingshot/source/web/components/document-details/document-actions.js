@@ -41,7 +41,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $combine = Alfresco.util.combinePaths;
    
    /**
     * DocumentActions constructor.
@@ -425,6 +426,71 @@
          {
             file: this.docData
          }).show();
+      },
+
+      /**
+       * Change Type
+       *
+       * @method onActionChangeType
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionChangeType: function DocumentActions_onActionChangeType(obj)
+      {
+         var data = this.docData,
+            nodeRef = data.nodeRef,
+            displayName = data.displayName,
+            actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/type/node", nodeRef.replace(":/", ""));
+
+         var doSetupFormsValidation = function DocumentActions_oACT_doSetupFormsValidation(p_form)
+         {
+            // Validation
+            p_form.addValidation(this.id + "-changeType-type", function fnValidateType(field, args, event, form, silent, message)
+            {
+               return field.options[field.selectedIndex].value !== "-";
+            }, null, "change");
+            p_form.setShowSubmitStateDynamically(true, false);
+         };
+
+         // Always create a new instance
+         this.modules.changeType = new Alfresco.module.SimpleDialog(this.id + "-changeType").setOptions(
+         {
+            width: "30em",
+            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/change-type?nodeRef=" + nodeRef,
+            actionUrl: actionUrl,
+            doSetupFormsValidation:
+            {
+               fn: doSetupFormsValidation,
+               scope: this
+            },
+            firstFocus: this.id + "-changeType-type",
+            onSuccess:
+            {
+               fn: function DocumentActions_onActionChangeType_success(response)
+               {
+                  YAHOO.Bubbling.fire("metadataRefresh",
+                  {
+                     highlightFile: displayName
+                  });
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this._msg("document-actions.change-type.success", displayName)
+                  });
+               },
+               scope: this
+            },
+            onFailure:
+            {
+               fn: function DocumentActions_onActionChangeType_failure(response)
+               {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this._msg("document-actions.change-type.failure", displayName)
+                  });
+               },
+               scope: this
+            }
+         });
+         this.modules.changeType.show();
       },
 
       /**
