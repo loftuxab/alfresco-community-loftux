@@ -233,7 +233,7 @@
       _generateTagMarkup: function (tag)
       {
          var html = '<li class="onTagSelection nav-label">';
-         html += '<a href="#" class="tag-link nav-link">' + $html(tag.name) + '</a> (' + tag.count + ')';
+         html += '<a href="#" class="tag-link nav-link">' + $html(tag.name) + '</a>&nbsp;(' + tag.count + ')';
          html += '</li>';
          return html;
       }

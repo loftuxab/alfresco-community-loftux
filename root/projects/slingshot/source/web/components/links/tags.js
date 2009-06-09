@@ -339,7 +339,7 @@
       _generateTagMarkup: function LinkTags__generateTagMarkup(tag)
       {
          var html = '<li id="' + this._generateTagId(tag.name) + '"><span class="onTagSelection nav-label">';
-         html += '<a href="#" class="tag-link nav-link">' + $html(tag.name) + '</a> (' + tag.count + ')';
+         html += '<a href="#" class="tag-link nav-link">' + $html(tag.name) + '</a>&nbsp;(' + tag.count + ')';
          html += '</span></li>';
          return html;
       },
