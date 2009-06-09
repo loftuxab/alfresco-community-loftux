@@ -26,6 +26,7 @@
 package org.alfresco.jlan.debug;
 
 import java.io.FileInputStream;
+import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -38,7 +39,7 @@ import org.alfresco.config.ConfigElement;
  *
  * @author gkspencer
  */
-public class JDKLoggingDebug implements DebugInterface {
+public class JDKLoggingDebug extends DebugInterfaceBase {
 
   // Buffer for debugPrint() strings
   
@@ -52,54 +53,89 @@ public class JDKLoggingDebug implements DebugInterface {
   }
 
   /**
-   * Close the debug output.
-   */
-  public void close() {}
-
-  /**
    * Output a debug string.
    *
-   * @param str java.lang.String
+   * @param str String
    */
-  public final void debugPrint(String str) {
-    
-    // Allocate a holding buffer
-    
-    if ( m_printBuf == null) {
-      synchronized ( this) {
-        if ( m_printBuf == null)
-          m_printBuf = new StringBuilder();
-      }
-    }
+  public final void debugPrint(String str, int level) {
 
-    // Append the string to the holding buffer
-    
-    synchronized ( m_printBuf) {
-      m_printBuf.append( str);
-    }
+	// Check if the logging level is enabled
+	  
+	if ( level <= getLogLevel()) {
+		
+	  // Allocate a holding buffer
+	    
+	  if ( m_printBuf == null) {
+	    synchronized ( this) {
+	      if ( m_printBuf == null)
+	        m_printBuf = new StringBuilder();
+	    }
+	  }
+	
+	  // Append the string to the holding buffer
+	    
+	  synchronized ( m_printBuf) {
+	    m_printBuf.append( str);
+	  }
+	}
   }
 
   /**
    * Output a debug string, and a newline.
    *
-   * @param str java.lang.String
+   * @param str String
    */
-  public final void debugPrintln(String str) {
+  public final void debugPrintln(String str, int level) {
     
-    // Check if there is a holding buffer
-    
-    if ( m_printBuf != null) {
-      
-      // Append the new string
-      
-      m_printBuf.append( str);
-      Logger.global.info( m_printBuf.toString());
-      m_printBuf = null;
-    }
-    else
-      Logger.global.info( str);
+	// Check if the logging level is enabled
+	  
+	if ( level <= getLogLevel()) {
+			
+	  // Check if there is a holding buffer
+	    
+	  if ( m_printBuf != null) {
+	      
+	    // Append the new string
+	      
+	    m_printBuf.append( str);
+	    logOutput( m_printBuf.toString(), level);
+	    m_printBuf = null;
+	  }
+	  else
+	    logOutput( str, level);
+	}
   }
 
+  /**
+   * Output to the logger at the appropriate log level
+   * 
+   * @param str String
+   * @param level int
+   */
+  protected void logOutput(String str, int level) {
+	  Level logLevel = Level.OFF;
+	  
+	  switch ( level) {
+		case Debug.Debug:
+		  logLevel = Level.FINEST;
+		  break;
+		case Debug.Info:
+		  logLevel = Level.INFO;
+		  break;
+		case Debug.Warn:
+		  logLevel = Level.WARNING;
+		  break;
+		case Debug.Fatal:
+		  logLevel = Level.SEVERE;
+		  break;
+		case Debug.Error:
+		  logLevel = Level.FINEST;
+		  break;
+	  }
+	  
+	  Logger.global.log(logLevel, str);
+  }
+  
   /**
    * Initialize the debug interface using the specified parameters.
    *

@@ -204,6 +204,11 @@ public class Win32NetBIOSPacketHandler extends PacketHandler {
 			}
 		}
 		
+		// Set the received packet length
+		
+		if ( pkt != null)
+			pkt.setReceivedLength( rxLen);
+		
 		// Return the received packet
 
 		return pkt;

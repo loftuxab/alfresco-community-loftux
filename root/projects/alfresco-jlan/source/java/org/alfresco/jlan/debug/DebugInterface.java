@@ -42,16 +42,31 @@ public interface DebugInterface {
 	/**
 	 * Output a debug string.
 	 *
-	 * @param str java.lang.String
+	 * @param str String
 	 */
 	public void debugPrint(String str);
 
 	/**
+	 * Output a debug string with a specific logging level
+	 * 
+	 * @param str String
+	 * @param level int
+	 */
+	public void debugPrint(String str, int level);
+	
+	/**
 	 * Output a debug string, and a newline.
 	 *
-	 * @param str java.lang.String
+	 * @param str String
 	 */
 	public void debugPrintln(String str);
+
+	/**
+	 * Output a debug string, and a newline, with a specific logging level
+	 *
+	 * @param str String
+	 */
+	public void debugPrintln(String str, int level);
 
 	/**
 	 * Initialize the debug interface using the specified named parameters.
@@ -61,4 +76,11 @@ public interface DebugInterface {
 	 */
 	public void initialize(ConfigElement params)
 		throws Exception;
+	
+	/**
+	 * Return the debug interface logging level
+	 * 
+	 * @return int
+	 */
+	public int getLogLevel();
 }

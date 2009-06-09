@@ -47,6 +47,16 @@ public final class Debug {
 	
 	private static final String LineSeperator	= System.getProperty("line.separator");
 
+	//  Debug output levels
+	//
+	//  Note: These should map to the standard Log4j levels
+	
+	public static final int Fatal   = 0;
+	public static final int Error   = 1;
+	public static final int Warn    = 2;
+	public static final int Info	= 3;
+	public static final int Debug   = 4;
+	
 	//	Global debug interface
 	
 	private static DebugInterface m_debug = new ConsoleDebug();
