@@ -20,7 +20,7 @@
                <img src="${url.context}${icon}" alt="${doc.displayName?html}" />
             </div>
             <div class="details">
-               <h4><a href="${url.context}/page/site/${doc.site.shortName}/${doc.browseUrl}" class="theme-color-1">${doc.displayName}</a></h4>
+               <h4><a href="${url.context}/page/site/${doc.site.shortName}/${doc.browseUrl?url}" class="theme-color-1">${doc.displayName?html}</a></h4>
                <div>
                   ${msg("text.edited-on", doc.modifiedOn?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("dd MMM, yyyy HH:mm"), doc.site.title)}
                </div>
@@ -66,7 +66,7 @@
    </#if>
    <#if content.error?exists>
       <div class="detail-list-item first-item last-item">
-         <span class="error">${msg(content.message)}</span>
+         <span class="error">${msg(content.message?html)}</span>
       </div>
    <#else>
       <div class="hdr">
