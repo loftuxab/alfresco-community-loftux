@@ -216,7 +216,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     {
         if (scope == RenderContextScope.REQUEST)
         {
-            this.getOriginalContext().setValue(key, value);
+            this.getRequestContext().setValue(key, value);
         }
         else
         {
@@ -233,7 +233,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
         
         if (scope == RenderContextScope.REQUEST)
         {
-            value = this.getOriginalContext().getValue(key);
+            value = this.getRequestContext().getValue(key);
         }
         else
         {
@@ -250,7 +250,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
     {
         if (scope == RenderContextScope.REQUEST)
         {
-            this.getOriginalContext().removeValue(key);
+            this.getRequestContext().removeValue(key);
         }
         else
         {
@@ -267,7 +267,7 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
         
         if (scope == RenderContextScope.REQUEST)
         {
-            has = this.getOriginalContext().hasValue(key);
+            has = this.getRequestContext().hasValue(key);
         }
         else
         {
@@ -275,6 +275,17 @@ public abstract class AbstractRenderContext extends WrappedRequestContext implem
         }        
         
         return has;
+    }
+    
+    final public RequestContext getRequestContext()
+    {
+        RequestContext rootContext = this.getOriginalContext();
+        while (rootContext instanceof RenderContext)
+        {
+            // unwrap until we find the real RequestContext object - not a RenderContext
+            rootContext = ((WrappedRequestContext)rootContext).getOriginalContext();
+        }
+        return rootContext;
     }
 }
     
