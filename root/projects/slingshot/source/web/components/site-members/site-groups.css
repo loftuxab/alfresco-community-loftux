@@ -105,6 +105,11 @@
    position: relative !important;
 }
 
+.site-groups h3
+{
+   padding-bottom: 0.2em;
+}
+
 .site-groups h3 a
 {
    color: #2b6eb5;

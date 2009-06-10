@@ -358,8 +358,11 @@
             var desc = '<h3 class="itemname">' + $html(displayName) + '</h3>';
             if (me.options.viewMode !== Alfresco.GroupFinder.VIEW_MODE_COMPACT)
             {
-               desc += '<div class="detail"><span>' + me._msg("label.users") + ":</span> " + $html(oRecord.getData("userCount")) + '</div>';
-               desc += '<div class="detail"><span>' + me._msg("label.subgroups") + ":</span> " + $html(oRecord.getData("groupCount")) + '</div>';
+               desc += '<div class="detail"><span>' + me._msg("label.name") + ":</span> " + $html(oRecord.getData("fullName")) + '</div>';
+               desc += '<div class="detail">';
+               desc += '<span class="item"><span>' + me._msg("label.users") + ":</span> " + $html(oRecord.getData("userCount")) + '</span>';
+               desc += '<span class="item"><span>' + me._msg("label.subgroups") + ":</span> " + $html(oRecord.getData("groupCount")) + '</span>';
+               desc += '</div>';
             }
             elCell.innerHTML = desc;
          };
@@ -599,6 +602,7 @@
          
          // Empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
+         this.widgets.dataTable.render();
          
          var successHandler = function GroupFinder__pS_successHandler(sRequest, oResponse, oPayload)
          {

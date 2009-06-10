@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -232,7 +232,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["userName", "firstName", "lastName", "role", "avatar", "jobtitle", "organization"]
+             fields: ["displayName", "fullName", "role"]
          };
          this.widgets.dataSource.doBeforeParseData = function SiteGroups_doBeforeParseData(oRequest , oFullResponse)
          {
@@ -243,34 +243,17 @@
                var items = [];
                
                // create a data format that the DataTable can use
-               for (var x = 0; x < oFullResponse.length; x++)
+               for (var x = 0, xx = oFullResponse.length; x < xx; x++)
                {
                   var memberData = oFullResponse[x];
                   
                   // create object to represent member
                   var member =
                   {
-                     "userName": memberData.person.userName,
-                     "firstName": memberData.person.firstName,
-                     "lastName": memberData.person.lastName,
+                     "displayName": memberData.authority.displayName,
+                     "fullName": memberData.authority.fullName,
                      "role": memberData.role
                   };
-                  
-                  // add optional metadata
-                  if (memberData.person.avatar !== undefined)
-                  {
-                     member.avatar = memberData.person.avatar;
-                  }
-                  
-                  if (memberData.person.jobtitle !== undefined)
-                  {
-                     member.jobtitle = memberData.person.jobtitle;
-                  }
-                  
-                  if (memberData.person.organization !== undefined)
-                  {
-                     member.organization = memberData.person.organization;
-                  }
                   
                   // add member to list
                   items.push(member);
@@ -279,8 +262,8 @@
                // Sort the memeber list by name
                items.sort(function (membership1, membership2)
                {
-                  var name1 = membership1.firstName + membership1.lastName;
-                  var name2 = membership2.firstName + membership2.lastName;
+                  var name1 = membership1.displayName,
+                     name2 = membership2.displayName;
                   return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
                });
                
@@ -312,8 +295,8 @@
          });
          
          // register the "enter" event on the search text field
-         var searchInput = Dom.get(this.id + "-term");
-         var enterListener = new YAHOO.util.KeyListener(searchInput,
+         var searchInput = Dom.get(this.id + "-term"),
+            enterListener = new YAHOO.util.KeyListener(searchInput,
          {
             keys:13
          },
@@ -335,6 +318,8 @@
             // Deactivate controls
             YAHOO.Bubbling.fire("deactivateAllControls");
          }
+
+         searchInput.focus();
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -351,27 +336,18 @@
          var me = this;
           
          /**
-          * User avatar custom datacell formatter
+          * Group icon custom datacell formatter
           *
-          * @method renderCellAvatar
+          * @method renderCellIcon
           * @param elCell {object}
           * @param oRecord {object}
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderCellAvatar = function SiteGroups_renderCellAvatar(elCell, oRecord, oColumn, oData)
+         var renderCellIcon = function SiteGroups_renderCellIcon(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-
-            var userName = oRecord.getData("userName");
-            var userUrl = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile";
-            var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
-            if (oRecord.getData("avatar") !== undefined)
-            {
-               avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
-            }
-
-            elCell.innerHTML = '<a href="' + userUrl + '"><img src="' + avatarUrl + '" alt="avatar" /></a>';
+            elCell.innerHTML = '<img src="' + Alfresco.constants.URL_CONTEXT + "components/images/group-64.png" + '" alt="group" />';
          };
 
          /**
@@ -386,28 +362,11 @@
          var renderCellDescription = function SiteGroups_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // Currently rendering all results the same way
-            var userName = oRecord.getData("userName");
-            var name = userName;
-            var firstName = oRecord.getData("firstName");
-            var lastName = oRecord.getData("lastName");
-            if ((firstName !== undefined) || (lastName !== undefined))
-            {
-               name = firstName ? firstName + " " : "";
-               name += lastName ? lastName : "";
-            }
+            var displayName = oRecord.getData("displayName"),
+               fullName = oRecord.getData("fullName");
 
-            var url = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile";
-            var title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "";
-            var organization = oRecord.getData("organization") ? oRecord.getData("organization") : "";
-            var desc = '<h3><a href="' + url + '">' + $html(name) + '</a></h3>';
-            if (title.length > 0)
-            {
-               desc += '<div><span class="attr-name">' + me._msg('title') + ': </span>&nbsp;<span class="attr-value">' + $html(title) + '</span></div>';
-            }
-            if (organization.length > 0)
-            {
-               desc += '<div><span class="attr-name">' + me._msg('company') + ':</span>&nbsp;<span class="attr-value">' + $html(organization) + '</span></div>';
-            }
+            var desc = '<h3>' + $html(displayName) + '</h3>';
+            desc += '<div><span class="attr-name">' + me._msg('label.name') + ': </span>&nbsp;<span class="attr-value">' + $html(fullName) + '</span></div>';
             
             elCell.innerHTML = desc;
          };
@@ -432,15 +391,16 @@
             if (me.isCurrentUserSiteAdmin)
             {
                // create HTML for representing buttons
-               var userName = oRecord.getData("userName");
-               elCell.innerHTML = '<span id="' + me.id + '-roleselector-' + userName + '"></span>';
+               var groupName = oRecord.getData("fullName");
+               elCell.innerHTML = '<span id="' + me.id + '-roleSelector-' + groupName + '"></span>';
                
                // create the roles menu
-               var rolesMenu = [];
-               for (var x=0; x < me.options.roles.length; x++)
+               var rolesMenu = [],
+                  role;
+               
+               for (var x = 0, xx = me.options.roles.length; x < xx; x++)
                {
-                  var role = me.options.roles[x];
-                  var recordIndex = x;
+                  role = me.options.roles[x];
                   rolesMenu.push(
                   {
                      text: me._msg("role." + role),
@@ -450,7 +410,7 @@
                         fn: me.onRoleSelect,
                         obj:
                         {
-                           user: userName,
+                           group: groupName,
                            currentRole: currentRole,
                            newRole: role,
                            recordId: oRecord.getId()
@@ -462,24 +422,24 @@
                }
                
                // create the role selector button
-               var roleselector = new YAHOO.widget.Button(
+               var roleSelector = new YAHOO.widget.Button(
                {
-                  container: me.id + '-roleselector-' + userName,
+                  container: me.id + '-roleSelector-' + groupName,
                   type: "menu",
                   label: me._msg("role." + currentRole),
                   menu: rolesMenu
                });
                
                // store a reference to the role selector button
-               me.listWidgets[userName] =
+               me.listWidgets[groupName] =
                {
-                  roleSelector: roleselector
+                  roleSelector: roleSelector
                };
                
                // store the buttons
-               me.buttons[userName + "-roleselector"] =
+               me.buttons[groupName + "-roleSelector"] =
                {
-                  roleselector: roleselector
+                  roleSelector: roleSelector
                };
             }
             else
@@ -505,24 +465,24 @@
             if (me.isCurrentUserSiteAdmin)
             {
                // create HTML for representing buttons
-               var userName = oRecord.getData("userName");
-               elCell.innerHTML = '<span id="' + me.id + '-button-' + userName + '"></span>';
+               var groupName = oRecord.getData("fullName");
+               elCell.innerHTML = '<span id="' + me.id + '-button-' + groupName + '"></span>';
                
                // create the uninvite button
                var button = new YAHOO.widget.Button(
                {
-                   container: me.id + '-button-' + userName,
+                   container: me.id + '-button-' + groupName,
                    label: me._msg("site-groups.remove"),
                    onclick:
                    {
                       fn: me.doRemove,
-                      obj: userName,
+                      obj: oRecord.getData(),
                       scope: me
                      }
                });
                
                // store the buttons
-               me.buttons[userName + "-button"] =
+               me.buttons[groupName + "-button"] =
                {
                   button: button
                };
@@ -537,10 +497,10 @@
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "userName", label: "User Name", sortable: false, formatter: renderCellAvatar, width: 64
+            key: "displayName", label: "Group Name", sortable: false, formatter: renderCellIcon, width: 64
          },
          {
-            key: "bio", label: "Bio", sortable: false, formatter: renderCellDescription
+            key: "fullName", label: "Details", sortable: false, formatter: renderCellDescription
          },
          {
             key: "role", label: "Select Role", formatter: renderCellRoleSelect, width: 140
@@ -608,13 +568,13 @@
       },
       
       /**
-       * Remove user event handler
+       * Remove group event handler
        * 
        * @method doRemove
        * @param event {object} The event object
-       * @param user {string} The userName to remove
+       * @param group {object} Object literal containing group details
        */
-      doRemove: function SiteGroups_doRemove(event, user)
+      doRemove: function SiteGroups_doRemove(event, group)
       {
          // show a wait message
          this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
@@ -625,7 +585,7 @@
          });
          
          // request success handler
-         var success = function SiteGroups_doRemove_success(response, user)
+         var success = function SiteGroups_doRemove_success(response, group)
          {
             // hide the wait message
             this.widgets.feedbackMessage.destroy();
@@ -633,7 +593,7 @@
             // show popup message to confirm
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("site-groups.remove-success", user)
+               text: this._msg("site-groups.remove-success", group.displayName)
             });
          
             // remove the entry
@@ -644,22 +604,22 @@
          // request failure handler
          var failure = function SiteGroups_doRemove_failure(response)
          {
-            // remove the message
+            // remove the wait message
             this.widgets.feedbackMessage.destroy();
          };
           
-         // make ajax call to site service to join user
+         // make ajax call to site service to remove group
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + user,
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + group.fullName,
             method: "DELETE",
             successCallback:
             {
                fn: success,
-               obj: user,
+               obj: group,
                scope: this
             },
-            failureMessage: this._msg("site-groups.remove-failure", user),
+            failureMessage: this._msg("site-groups.remove-failure", group.displayName),
             failureCallback:
             {
                fn: failure,
@@ -676,12 +636,13 @@
       onRoleSelect: function SiteGroups_onRoleSelect(type, event, args)
       {
          // fetch the current and new roles to see whether we have to change the role
-         var record = this.widgets.dataTable.getRecord(args.recordId)
-         var data = record.getData();
-         var recordIndex = this.widgets.dataTable.getRecordIndex(record);
-         var currentRole = data.role;
-         var selectedRole = args.newRole;
-         var user = args.user;
+         var record = this.widgets.dataTable.getRecord(args.recordId),
+            data = record.getData(),
+            recordIndex = this.widgets.dataTable.getRecordIndex(record),
+            currentRole = data.role,
+            selectedRole = args.newRole,
+            group = args.group;
+         
          if (selectedRole !== currentRole)
          {
             // show a wait message
@@ -693,7 +654,7 @@
             });
 
             // request success handler
-            var success = function SiteGroups_onRoleSelect_success(response, userRole)
+            var success = function SiteGroups_onRoleSelect_success(response, groupRole)
             {
                // hide the wait message
                this.widgets.feedbackMessage.destroy();
@@ -701,13 +662,13 @@
                // show popup message to confirm
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: this._msg("site-groups.change-role-success", userRole.user, userRole.role)
+                  text: this._msg("site-groups.change-role-success", groupRole.group, groupRole.role)
                });
 
                // update the data and table
-               var data = this.widgets.dataTable.getRecord(userRole.recordIndex).getData();
+               var data = this.widgets.dataTable.getRecord(groupRole.recordIndex).getData();
                data.role = args.newRole;
-               this.widgets.dataTable.updateRow(userRole.recordIndex, data);
+               this.widgets.dataTable.updateRow(groupRole.recordIndex, data);
             };
 
             // request failure handler
@@ -720,14 +681,14 @@
             // make ajax call to site service to change role
             Alfresco.util.Ajax.jsonRequest(
             {
-               url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + user,
+               url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + group,
                method: "PUT",
                dataObj:
                {
                   role: selectedRole,
-                  person:
+                  group:
                   {
-                     userName: user
+                     fullName: group
                   }
                },
                successCallback:
@@ -735,13 +696,13 @@
                   fn: success,
                   obj:
                   {
-                     user: user,
+                     group: group,
                      role: selectedRole,
                      recordIndex: recordIndex
                   },
                   scope: this
                },
-               failureMessage: this._msg("site-groups.change-role-failure", user),
+               failureMessage: this._msg("site-groups.change-role-failure", group),
                failureCallback:
                {
                   fn: failure,
@@ -805,6 +766,7 @@
          function successHandler(sRequest, oResponse, oPayload)
          {
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
+            this._setDefaultDataTableErrors(this.widgets.dataTable);
          }
          
          function failureHandler(sRequest, oResponse)
@@ -845,7 +807,7 @@
        */
       _buildSearchParams: function SiteGroups__buildSearchParams(searchTerm)
       {
-         var params = YAHOO.lang.substitute("size={maxResults}&nf={term}",
+         var params = YAHOO.lang.substitute("size={maxResults}&nf={term}&authorityType=GROUP",
          {
             maxResults: this.options.maxSearchResults,
             term: encodeURIComponent(searchTerm)
