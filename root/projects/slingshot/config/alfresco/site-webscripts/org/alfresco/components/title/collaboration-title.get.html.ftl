@@ -23,13 +23,7 @@
          </span>
       </span>
    </#if>
-   <#if userIsMember>
-      <span class="yui-button yui-link-button">
-         <span class="first-child">
-            <a id="${args.htmlid}-leave-link" href="#">${msg("link.leave")}</a>
-         </span>
-      </span>
-   <#else>
+   <#if !userIsMember>
       <span class="yui-button yui-link-button">
          <span class="first-child">
       <#if profile.visibility == "PUBLIC">
@@ -39,21 +33,7 @@
       </#if>
          </span>
       </span>
-   </#if>
-   <#if userIsSiteManager>
-      <#assign linkClass><#if "edit-site" == activePage>class="active-page"</#if></#assign>
-      <span class="yui-button yui-link-button">
-         <span class="first-child">
-            <a href="#" onclick="Alfresco.module.getEditSiteInstance().show({shortName: '${profile.shortName}'}); return false;" ${linkClass}>${msg("link.editSite")}</a>
-         </span>
-      </span>
-      <#assign linkClass><#if "customise-site" == activePage>class="active-page"</#if></#assign>
-      <span class="yui-button yui-link-button">
-         <span class="first-child">
-            <a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site" ${linkClass}>${msg("link.customiseSite")}</a>
-         </span>
-      </span>
-   </#if>
+   </#if>   
    <#assign siteDashboardUrl = page.url.context + "/page/site/" + page.url.templateArgs.site + "/dashboard">
    <#if userIsSiteManager && (page.url.uri == siteDashboardUrl || "customise-site-dashboard" == activePage) >
       <#assign linkClass><#if "customise-site-dashboard" == activePage>class="active-page"</#if></#assign>
@@ -63,5 +43,18 @@
          </span>
       </span>
    </#if>
+    <#if userIsSiteManager>
+      <input type="button" id="${args.htmlid}-more" name="${args.htmlid}-more" value="${msg("link.more")}">
+      <select id="${args.htmlid}-more-menu">
+         <option value="editSite">${msg("link.editSite")}</option>
+         <option value="customiseSite">${msg("link.customiseSite")}</option>
+      </select> 
+    <#elseif userIsMember>
+      <input type="button" id="${args.htmlid}-more" name="${args.htmlid}-more" value="${msg("link.actions")}">    
+      <select id="${args.htmlid}-more-menu">
+         <option value="leaveSite">${msg("link.leave")}</option>
+      </select> 
+    </#if>   
+ 
    </div>
 </div>

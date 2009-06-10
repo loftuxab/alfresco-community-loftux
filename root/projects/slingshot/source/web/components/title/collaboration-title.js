@@ -141,7 +141,7 @@
       onReady: function CollaborationTitle_onReady()
       {
          var link;
-         
+
          // Add event listener for join link if present
          link = document.getElementById(this.id + "-join-link");
          if (link)
@@ -170,18 +170,60 @@
             });
          }
 
-         // Add event listener for leave link if present
-         link = document.getElementById(this.id + "-leave-link");
-         if (link)
+         this.widgets = {};
+         // Create More menu
+         this.widgets.more = new YAHOO.widget.Button(this.id + "-more",
          {
-            Event.addListener(link, "click", function(e, obj)
+            type: "menu",
+            menu: this.id + "-more-menu"
+         });
+            if (this.widgets.more.getMenu())
             {
-              // Call leave site from a scope wokring in all browsers where we have all info
-              obj.thisComponent.leaveSite(obj.thisComponent.options.user, obj.thisComponent.options.site);
-            },
+            this.widgets.more.getMenu().subscribe("click", function (p_sType, p_aArgs)            
             {
-               thisComponent: this
-            });
+               var menuItem = p_aArgs[1];
+               if (menuItem)
+               {
+                  switch(menuItem.value)
+                  {
+                     case "editSite":
+                        Alfresco.module.getEditSiteInstance().show({shortName: this.options.site});
+                        break;
+                     case "customiseSite":
+                        window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.site + "/customise-site";;
+                        break;
+                     case "leaveSite":
+                        var me = this;
+                        Alfresco.util.PopupManager.displayPrompt(
+                        {
+                           title: me._msg("message.leave", me.options.site),
+                           text: me._msg("message.leave-site-prompt",  me.options.site),
+                           buttons: 
+                           [
+                              {
+                                 text: Alfresco.util.message("button.ok"),
+                                 handler: function leaveSite_onOk()
+                                 {
+                                    me.leaveSite(me.options.user, me.options.site);
+                                    this.destroy();
+                                 },
+                                 isDefault: true
+                              },
+                              {
+                                 text: Alfresco.util.message("button.cancel"),
+                                 handler: function leaveSite_onCancel()
+                                 {
+                                    this.destroy();
+                                 },
+                                 isDefault: false
+                              }                        
+                          ]
+                        });
+
+                        break;
+                  }
+               }
+            },this,true);
          }
       },
 
@@ -388,6 +430,22 @@
                text: message
             });
          }
+      },
+       /**
+       * PRIVATE FUNCTIONS
+       */
+
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function CollaborationTitle__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, "Alfresco.CollaborationTitle", Array.prototype.slice.call(arguments).slice(1));
       }
    };
 })();
