@@ -2615,7 +2615,7 @@ Alfresco.util.Anim = function()
  *    Build date: 24 March 2009
  *    Website: http://log4javascript.org
  */
-if (log4javascript)
+if (typeof log4javascript != "undefined")
 {
    /**
     * Initial state on page load:
