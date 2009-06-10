@@ -104,6 +104,10 @@ div.dashlet div.detail-list-item.first-item
    padding-top: 0;
 }
 
+div.dashlet div.hdr {
+   margin-bottom:5px;
+   padding-top:3px;
+}
 .dashlet .detail-list-item.last-item
 {
    border-bottom: none;

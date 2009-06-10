@@ -481,7 +481,10 @@ div.dashlet.calendar div.body
    padding-left: 8px;
    padding-right: 8px;
 }
-
+div.dashlet div.hdr
+{
+   padding-left:9px;
+}
 div.dashlet .toolbar
 {
    padding-left: 2px;
