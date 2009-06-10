@@ -1,5 +1,5 @@
 <#macro detailsUrl image label>
-   <a href="${url.context}/page/site/${image.location.site}/document-details?nodeRef=${image.nodeRef}" class="theme-color-1">${label}</a>
+   <a href="${url.context}/page/site/${page.url.templateArgs.site}/document-details?nodeRef=${image.nodeRef}" class="theme-color-1">${label}</a>
 </#macro>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.ImageSummary("${args.htmlid}");
@@ -19,10 +19,11 @@
 <#else>
    <#assign detailsmsg = msg("label.viewdetails")>
    <#list images.items as image>
+      <#assign nodeRefUrl=image.nodeRef?replace('://','/')>
       <div class="images">
          <div class="item">
             <div class="thumbnail">
-               <a href="${url.context}/proxy/alfresco/${image.contentUrl}" rel="lightbox" title="${image.displayName?html} - ${msg("text.modified-by", image.modifiedBy)} ${image.modifiedOn?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("dd MMM, yyyy HH:mm:ss")}"><img src="${url.context}/proxy/alfresco/api/node/${image.nodeRef?replace('://','/')}/content/thumbnails/doclib?c=force"/></a>
+               <a href="${url.context}/proxy/alfresco/api/node/content/${nodeRefUrl}/${image.name?url}" rel="lightbox" title="${image.title?html} - ${msg("text.modified-by", image.modifier)} ${image.modifiedOn?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("dd MMM, yyyy HH:mm:ss")}"><img src="${url.context}/proxy/alfresco/api/node/${nodeRefUrl}/content/thumbnails/doclib?c=force"/></a>
             </div>
             <div class="details">
                <@detailsUrl image detailsmsg />
