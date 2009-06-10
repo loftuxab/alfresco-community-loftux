@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.apache.abdera.factory.Factory;
 import org.apache.abdera.model.Element;
-import org.apache.abdera.model.ElementWrapper;
+import org.apache.abdera.model.ExtensibleElementWrapper;
 
 
 /**
@@ -39,7 +39,7 @@ import org.apache.abdera.model.ElementWrapper;
  * 
  * @author davidc
  */
-public class CMISProperties extends ElementWrapper
+public class CMISProperties extends ExtensibleElementWrapper
 {
     /**
      * @param internal
