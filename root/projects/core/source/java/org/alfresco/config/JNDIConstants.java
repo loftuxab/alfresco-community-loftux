@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -75,29 +75,32 @@ public final class JNDIConstants
                             "[^/]+"                           + "/"  +
                             "(?:WEB-INF|META-INF)"            + "(?:$|/)",
                             Pattern.CASE_INSENSITIVE);
-
-
-
-
-
-
+    
     /**
-     * Default virtualization server IP address 
+     * Default virtualization server IP address
+     * 
+     * @deprecated see VirtualisationServerPreviewURIService.DEFAULT_VSERVER_IP
      */
     public final static String DEFAULT_VSERVER_IP = "127-0-0-1.ip.alfrescodemo.net";
     
     /**
      * Default virtualization server port number
+     * 
+     * @deprecated see VirtualisationServerPreviewURIService.DEFAULT_VSERVER_PORT
      */
     public final static int DEFAULT_VSERVER_PORT = 8180;
     
     /**
      * Virtualization server sandbox URL pattern
+     * 
+     * @deprecated see VirtualisationServerPreviewURIService.PREVIEW_SANDBOX_URL
      */
     public final static String PREVIEW_SANDBOX_URL = "http://{0}.www--sandbox.{1}:{2}";
     
     /**
      * Virtualization server asset URL pattern
+     * 
+     * @deprecated see VirtualisationServerPreviewURIService.PREVIEW_ASSET_URL
      */
     public final static String PREVIEW_ASSET_URL   = "http://{0}.www--sandbox.{1}:{2}{3}";
 }
