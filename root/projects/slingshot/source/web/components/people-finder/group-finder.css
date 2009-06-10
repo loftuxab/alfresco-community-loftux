@@ -97,9 +97,19 @@
    line-height: 1.4em;
 }
 
+.group-finder h3.itemname
+{
+   padding-bottom: 0.2em;
+}
+
 .group-finder .detail span
 {
    color: #656565;
+}
+
+.group-finder .detail .item
+{
+   padding-right: 1em;
 }
 
 /* Compact Mode */

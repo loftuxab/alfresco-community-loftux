@@ -577,7 +577,10 @@
             responseContentType: "application/json",
             dataObj:
             {
-               group: record.getData('itemName'),
+               group:
+               {
+                  fullName: record.getData('itemName')
+               },
                role: record.getData('role')
             },
             successCallback:

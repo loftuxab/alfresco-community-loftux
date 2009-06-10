@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -243,33 +243,33 @@
                var items = [];
                
                // create a data format that the DataTable can use
-               for (var x = 0; x < oFullResponse.length; x++)
+               for (var x = 0, xx = oFullResponse.length; x < xx; x++)
                {
                   var memberData = oFullResponse[x];
                   
                   // create object to represent member
                   var member =
                   {
-                     "userName": memberData.person.userName,
-                     "firstName": memberData.person.firstName,
-                     "lastName": memberData.person.lastName,
+                     "userName": memberData.authority.userName,
+                     "firstName": memberData.authority.firstName,
+                     "lastName": memberData.authority.lastName,
                      "role": memberData.role
                   };
                   
                   // add optional metadata
-                  if (memberData.person.avatar !== undefined)
+                  if (memberData.authority.avatar !== undefined)
                   {
-                     member.avatar = memberData.person.avatar;
+                     member.avatar = memberData.authority.avatar;
                   }
                   
-                  if (memberData.person.jobtitle !== undefined)
+                  if (memberData.authority.jobtitle !== undefined)
                   {
-                     member.jobtitle = memberData.person.jobtitle;
+                     member.jobtitle = memberData.authority.jobtitle;
                   }
                   
-                  if (memberData.person.organization !== undefined)
+                  if (memberData.authority.organization !== undefined)
                   {
-                     member.organization = memberData.person.organization;
+                     member.organization = memberData.authority.organization;
                   }
                   
                   // add member to list
@@ -278,8 +278,8 @@
                
                // Sort the memeber list by name
                items.sort(function (membership1, membership2){
-                  var name1 = membership1.firstName + membership1.lastName;
-                  var name2 = membership2.firstName + membership2.lastName;
+                  var name1 = membership1.firstName + membership1.lastName,
+                     name2 = membership2.firstName + membership2.lastName;
                   return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
                });
                
@@ -311,8 +311,8 @@
          });
          
          // register the "enter" event on the search text field
-         var searchInput = Dom.get(this.id + "-term");
-         var enterListener = new YAHOO.util.KeyListener(searchInput,
+         var searchInput = Dom.get(this.id + "-term"),
+            enterListener = new YAHOO.util.KeyListener(searchInput,
          {
             keys:13
          },
@@ -364,9 +364,9 @@
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            var userName = oRecord.getData("userName");
-            var userUrl = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile";
-            var avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+            var userName = oRecord.getData("userName"),
+               userUrl = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile",
+               avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
             if (oRecord.getData("avatar") !== undefined)
             {
                avatarUrl = Alfresco.constants.PROXY_URI + oRecord.getData("avatar") + "?c=queue&ph=true";
@@ -387,27 +387,29 @@
          var renderCellDescription = function SiteMembers_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             // Currently rendering all results the same way
-            var userName = oRecord.getData("userName");
-            var name = userName;
-            var firstName = oRecord.getData("firstName");
-            var lastName = oRecord.getData("lastName");
+            var userName = oRecord.getData("userName"),
+               name = userName,
+               firstName = oRecord.getData("firstName"),
+               lastName = oRecord.getData("lastName");
+
             if ((firstName !== undefined) || (lastName !== undefined))
             {
                name = firstName ? firstName + " " : "";
                name += lastName ? lastName : "";
             }
 
-            var url = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile";
-            var title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "";
-            var organization = oRecord.getData("organization") ? oRecord.getData("organization") : "";
-            var desc = '<h3><a href="' + url + '">' + $html(name) + '</a></h3>';
+            var url = Alfresco.constants.URL_PAGECONTEXT + "user/" + userName + "/profile",
+               title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "",
+               organization = oRecord.getData("organization") ? oRecord.getData("organization") : "",
+               desc = '<h3><a href="' + url + '">' + $html(name) + '</a></h3>';
+            
             if (title.length > 0)
             {
-               desc += '<div><span class="attr-name">' + me._msg('title') + ': </span>&nbsp;<span class="attr-value">' + $html(title) + '</span></div>';
+               desc += '<div><span class="attr-name">' + me._msg('label.title') + ': </span>&nbsp;<span class="attr-value">' + $html(title) + '</span></div>';
             }
             if (organization.length > 0)
             {
-               desc += '<div><span class="attr-name">' + me._msg('company') + ':</span>&nbsp;<span class="attr-value">' + $html(organization) + '</span></div>';
+               desc += '<div><span class="attr-name">' + me._msg('label.company') + ':</span>&nbsp;<span class="attr-value">' + $html(organization) + '</span></div>';
             }
             
             elCell.innerHTML = desc;
@@ -434,14 +436,15 @@
             {
                // create HTML for representing buttons
                var userName = oRecord.getData("userName");
-               elCell.innerHTML = '<span id="' + me.id + '-roleselector-' + userName + '"></span>';
+               elCell.innerHTML = '<span id="' + me.id + '-roleSelector-' + userName + '"></span>';
                
                // create the roles menu
-               var rolesMenu = [];
-               for (var x=0; x < me.options.roles.length; x++)
+               var rolesMenu = [],
+                  role;
+               
+               for (var x = 0, xx = me.options.roles.length; x < xx; x++)
                {
-                  var role = me.options.roles[x];
-                  var recordIndex = x;
+                  role = me.options.roles[x];
                   rolesMenu.push(
                   {
                      text: me._msg("role." + role),
@@ -463,9 +466,9 @@
                }
                
                // create the role selector button
-               var roleselector = new YAHOO.widget.Button(
+               var roleSelector = new YAHOO.widget.Button(
                {
-                  container: me.id + '-roleselector-' + userName,
+                  container: me.id + '-roleSelector-' + userName,
                   type: "menu",
                   label: me._msg("role." + currentRole),
                   menu: rolesMenu
@@ -474,13 +477,13 @@
                // store a reference to the role selector button
                me.listWidgets[userName] =
                {
-                  roleSelector: roleselector
+                  roleSelector: roleSelector
                };
                
                // store the buttons
-               me.buttons[userName + "-roleselector"] =
+               me.buttons[userName + "-roleSelector"] =
                {
-                  roleselector: roleselector
+                  roleSelector: roleSelector
                };
             }
             else
@@ -649,7 +652,7 @@
             this.widgets.feedbackMessage.destroy();
          };
           
-         // make ajax call to site service to join user
+         // make ajax call to site service to remove user
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + user,
@@ -806,6 +809,7 @@
          function successHandler(sRequest, oResponse, oPayload)
          {
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
+            this._setDefaultDataTableErrors(this.widgets.dataTable);
          }
          
          function failureHandler(sRequest, oResponse)
@@ -846,7 +850,7 @@
        */
       _buildSearchParams: function SiteMembers__buildSearchParams(searchTerm)
       {
-         var params = YAHOO.lang.substitute("size={maxResults}&nf={term}",
+         var params = YAHOO.lang.substitute("size={maxResults}&nf={term}&authorityType=USER",
          {
             maxResults: this.options.maxSearchResults,
             term: encodeURIComponent(searchTerm)
