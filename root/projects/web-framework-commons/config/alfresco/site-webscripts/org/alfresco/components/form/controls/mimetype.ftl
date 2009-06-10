@@ -12,7 +12,7 @@
 </div>
 <#else>
 <label for="${fieldHtmlId}">${msg("form.control.mimetype.label")}:</label>
-<#-- TODO: Make this control make an AJAX callback to get list of mimetypes -->
+<#-- TODO: Make this control make an AJAX callback to get list of mimetypes OR use dataTypeParamters structure -->
 <select id="${fieldHtmlId}" name="${field.name}" 
         <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>>
    <option value="">${msg("form.control.mimetype.unknown")}</option>
