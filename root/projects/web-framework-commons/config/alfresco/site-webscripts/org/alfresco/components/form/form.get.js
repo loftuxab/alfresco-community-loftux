@@ -778,6 +778,13 @@ function setupFieldControl(fieldDef, fieldConfig)
       }
    }
    
+   // send any type parameters returned from the server to the control
+   if (isPropertyField && typeof fieldDef.dataTypeParameters !== "undefined")
+   {
+      logger.log("dataTypeParameters = " + fieldDef.dataTypeParameters);
+      control.params.dataTypeParameters = fieldDef.dataTypeParameters;
+   }
+   
    // get control parameters for the default control (if there is one)
    if (defaultControlConfig !== null)
    {
