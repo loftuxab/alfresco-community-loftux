@@ -3,17 +3,17 @@ function getUserContent(contentType)
    var uri = "";
    switch (contentType)
    {
-      //docs in doclib
+      // docs in all site doclibs
       case "documents":
          uri = "/slingshot/doclib/doclist/documents/node/alfresco/sites/home?filter=editingMe&max=3";
-         
          break;
-      //wiki pages , blog and forum posts
+      
+      // wiki pages, blog and forum posts
       case "content":
          uri = "/slingshot/dashlets/my-contents";
          break;
    }
-
+   
    var json = remote.call(uri);   
    if (json.status == 200)
    {
@@ -24,6 +24,7 @@ function getUserContent(contentType)
    }
    else
    {
+      model[contentType] = new Object();
       model[contentType].error =
       {
          message: "label.error"

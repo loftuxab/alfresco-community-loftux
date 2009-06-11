@@ -1,32 +1,30 @@
-
 <#macro doclibUrl doc>
    <a href="${url.context}/page/site/${doc.location.site}/documentlibrary?file=${doc.fileName?url}&amp;filter=editingMe" class="theme-color-1">${doc.displayName?html}</a>
 </#macro>
 
 <#-- Render no items text -->
 <#macro renderNoItems>
-        <div class="detail-list-item first-item">
-           <span>${msg("label.noItems")}</span>
-        </div>
+   <div class="detail-list-item first-item">
+      <span>${msg("label.noItems")}</span>
+   </div>
 </#macro>
 <#macro renderItems contents icon>
-<#assign items=contents.items />
-<#list items?sort_by("modifiedOn") as doc>
-<#-- <#list contents.items as doc> -->
-   <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser?url}/profile">${doc.modifiedBy?html}</a></#assign>     
-      <div class="detail-list-item <#if doc_index = 0>first-item</#if>">
-         <div>
-            <div class="icon">
-               <img src="${url.context}${icon}" alt="${doc.displayName?html}" />
-            </div>
-            <div class="details">
-               <h4><a href="${url.context}/page/site/${doc.site.shortName}/${doc.browseUrl?url}" class="theme-color-1">${doc.displayName?html}</a></h4>
-               <div>
-                  ${msg("text.edited-on", doc.modifiedOn?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("dd MMM, yyyy HH:mm"), doc.site.title)}
-               </div>
+   <#assign items=contents.items />
+   <#list items?sort_by("modifiedOn") as doc>
+   <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser?url}/profile">${doc.modifiedBy?html}</a></#assign>
+   <div class="detail-list-item <#if doc_index = 0>first-item</#if>">
+      <div>
+         <div class="icon">
+            <img src="${url.context}${icon}" alt="${doc.displayName?html}" />
+         </div>
+         <div class="details">
+            <h4><a href="${url.context}/page/site/${doc.site.shortName}/${doc.browseUrl}" class="theme-color-1">${doc.displayName?html}</a></h4>
+            <div>
+               ${msg("text.edited-on", doc.modifiedOn?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("dd MMM, yyyy HH:mm"), doc.site.title)}
             </div>
          </div>
       </div>
+   </div>
    </#list>
 </#macro>
 <script type="text/javascript">//<![CDATA[
@@ -40,12 +38,12 @@
          <span class="error">${msg(documents.message)}</span>
       </div>
    <#else>
-         <div class="hdr">
-            <h3>${msg('text.documents')}</h3>
-         </div>
-         <#if documents.items?size != 0>
-         <#list documents.items?sort_by("modifiedOn") as doc>
-            <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser?url}/profile">${doc.modifiedBy?html}</a></#assign>
+      <div class="hdr">
+         <h3>${msg('text.documents')}</h3>
+      </div>
+      <#if documents.items?size != 0>
+      <#list documents.items?sort_by("modifiedOn") as doc>
+      <#assign modifiedBy><a href="${url.context}/page/user/${doc.modifiedByUser?url}/profile">${doc.modifiedBy?html}</a></#assign>
       <div class="detail-list-item <#if doc_index = 0>first-item</#if>">
          <div>
             <div class="icon">
@@ -59,10 +57,10 @@
             </div>
          </div>
       </div>
-         </#list>
-         <#else>
-            <@renderNoItems />
-         </#if>
+      </#list>
+      <#else>
+         <@renderNoItems />
+      </#if>
    </#if>
    <#if content.error?exists>
       <div class="detail-list-item first-item last-item">
@@ -80,10 +78,10 @@
       <div class="hdr">
          <h3>${msg('text.wikipages')}</h3>
       </div>
-      <#if content.wikiPages.items?size != 0>      
+      <#if content.wikiPages.items?size != 0>
          <@renderItems content.wikiPages '/components/images/wikipage-32.png' />
       <#else>
-            <@renderNoItems />
+         <@renderNoItems />
       </#if>
       <div class="hdr">
          <h3>${msg('text.forumposts')}</h3>
@@ -92,8 +90,7 @@
          <@renderItems content.forumPosts '/components/images/topicpost-32.png' />
       <#else>
          <@renderNoItems />
-      </#if>      
-
-   </#if>   
+      </#if>
+   </#if>
    </div>
 </div>
