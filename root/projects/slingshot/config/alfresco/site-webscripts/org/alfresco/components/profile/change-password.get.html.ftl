@@ -1,5 +1,8 @@
 <script type="text/javascript">//<![CDATA[
-   var userProfile = new Alfresco.ChangePassword("${args.htmlid}").setMessages(
+   var userProfile = new Alfresco.ChangePassword("${args.htmlid}").setOptions(
+   {
+      minPasswordLength: "${config.scoped['Users']['users'].getChildValue('password-min-length')}"
+   }).setMessages(
       ${messages}
    );
 //]]></script>

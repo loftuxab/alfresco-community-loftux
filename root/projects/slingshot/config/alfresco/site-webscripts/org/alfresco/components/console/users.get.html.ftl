@@ -8,8 +8,8 @@
    {
       minSearchTermLength: "${args.minSearchTermLength!'1'}",
       maxSearchResults: "${args.maxSearchResults!'100'}",
-      minUsernameLength: "${config.script['users']['username-min-length']}",
-      minPasswordLength: "${config.script['users']['password-min-length']}"
+      minUsernameLength: "${config.scoped['Users']['users'].getChildValue('username-min-length')}",
+      minPasswordLength: "${config.scoped['Users']['users'].getChildValue('password-min-length')}"
    }).setMessages(
       ${messages}
    );

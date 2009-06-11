@@ -61,12 +61,43 @@
    Alfresco.ChangePassword.prototype =
    {
       /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * Minimum length of a password
+          * 
+          * @property minPasswordLength
+          * @type int
+          * @default 3
+          */
+         minPasswordLength: 3
+      },
+      
+      /**
        * Object container for storing YUI widget instances.
        * 
        * @property widgets
        * @type object
        */
       widgets: {},
+      
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.UserProfile} returns 'this' for method chaining
+       */
+      setOptions: function DLTB_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
       
       /**
        * Set messages for this component.
@@ -126,8 +157,18 @@
          
          // Form field validation
          form.addValidation(this.id + "-oldpassword", Alfresco.forms.validation.mandatory, null, "keyup");
-         form.addValidation(this.id + "-newpassword1", Alfresco.forms.validation.mandatory, null, "keyup");
-         form.addValidation(this.id + "-newpassword2", Alfresco.forms.validation.mandatory, null, "keyup");
+         form.addValidation(this.id + "-newpassword1", Alfresco.forms.validation.length,
+         {
+            min: this.options.minPasswordLength,
+            max: 256,
+            crop: true
+         }, "keyup");
+         form.addValidation(this.id + "-newpassword2", Alfresco.forms.validation.length,
+         {
+            min: this.options.minPasswordLength,
+            max: 256,
+            crop: true
+         }, "keyup");
          
          // Initialise the form
          form.init();
