@@ -541,9 +541,23 @@
             YAHOO.Bubbling.on("removeGroupCreate", this.onRemoveGroupCreate, this);
             
             var validFields = [];
+            var fieldValidators = [];
+            
             var onFieldKeyUp = function onFieldKeyUp(e)
             {
-               validFields[this.id] = (this.value.length !== 0);
+               // run the validator for the modified field
+               var validator = fieldValidators[this.id];
+               if (validator)
+               {
+                  validFields[this.id] = validator.call(this, this);
+               }
+               else
+               {
+                  // default is simple mandatory field test
+                  validFields[this.id] = (YAHOO.lang.trim(this.value).length !== 0);
+               }
+               
+               // check to see if all fields are now valid
                var valid = true;
                for (var i in validFields)
                {
@@ -553,6 +567,8 @@
                      break;
                   }
                }
+               
+               // enable buttons as appropriate after validation test
                parent.widgets.createuserOkButton.set("disabled", !valid);
                parent.widgets.createuserAnotherButton.set("disabled", !valid);
             };
@@ -571,10 +587,22 @@
             Event.on(parent.id + "-create-lastname", "keyup", onFieldKeyUp);
             validFields[parent.id + "-create-email"] = false;
             Event.on(parent.id + "-create-email", "keyup", onFieldKeyUp);
+            fieldValidators[parent.id + "-create-username"] = function(field)
+            {
+               return (YAHOO.lang.trim(field.value).length >= parent.options.minUsernameLength);
+            };
             validFields[parent.id + "-create-username"] = false;
             Event.on(parent.id + "-create-username", "keyup", onFieldKeyUp);
+            fieldValidators[parent.id + "-create-password"] = function(field)
+            {
+               return (YAHOO.lang.trim(field.value).length >= parent.options.minPasswordLength);
+            };
             validFields[parent.id + "-create-password"] = false;
             Event.on(parent.id + "-create-password", "keyup", onFieldKeyUp);
+            fieldValidators[parent.id + "-create-verifypassword"] = function(field)
+            {
+               return (YAHOO.lang.trim(field.value).length >= parent.options.minPasswordLength);
+            };
             validFields[parent.id + "-create-verifypassword"] = false;
             Event.on(parent.id + "-create-verifypassword", "keyup", onFieldKeyUp);
             
@@ -761,7 +789,8 @@
             var validFields = [];
             var onFieldKeyUp = function onFieldKeyUp(e)
             {
-               validFields[this.id] = (this.value.length !== 0);
+               validFields[this.id] = (YAHOO.lang.trim(this.value).length !== 0);
+               
                var valid = true;
                for (var i in validFields)
                {
@@ -771,6 +800,7 @@
                      break;
                   }
                }
+               
                parent.widgets.updateuserSaveButton.set("disabled", !valid);
             };
             
@@ -779,11 +809,11 @@
             parent.widgets.updateuserCancelButton = Alfresco.util.createYUIButton(parent, "updateuser-cancel-button", parent.onUpdateUserCancelClick);
             
             // Event handlers for mandatory fields
-            validFields[parent.id + "-update-firstname"] = false;
+            validFields[parent.id + "-update-firstname"] = true;
             Event.on(parent.id + "-update-firstname", "keyup", onFieldKeyUp);
-            validFields[parent.id + "-update-lastname"] = false;
+            validFields[parent.id + "-update-lastname"] = true;
             Event.on(parent.id + "-update-lastname", "keyup", onFieldKeyUp);
-            validFields[parent.id + "-update-email"] = false;
+            validFields[parent.id + "-update-email"] = true;
             Event.on(parent.id + "-update-email", "keyup", onFieldKeyUp);
             
             // Load in the Groups Finder component from the server
@@ -1082,7 +1112,25 @@
           * @type int
           * @default 100
           */
-         maxSearchResults: 100
+         maxSearchResults: 100,
+         
+         /**
+          * Minimum length of a username
+          * 
+          * @property minUsernameLength
+          * @type int
+          * @default 2
+          */
+         minUsernameLength: 2,
+         
+         /**
+          * Minimum length of a password
+          * 
+          * @property minPasswordLength
+          * @type int
+          * @default 3
+          */
+         minPasswordLength: 3
       },
       
       /**
@@ -1478,7 +1526,6 @@
        */
       _createUser: function ConsoleUsers__createUser(handler)
       {
-         // TODO: verify password against second field!
          // TODO: respect minimum field length for username/password
          
          var me = this;
@@ -1487,31 +1534,17 @@
             return Dom.get(me.id + id).value;
          };
          
-         var createSuccess = function(res)
+         // verify password against second field
+         var password = fnGetter("-create-password");
+         var verifypw = fnGetter("-create-verifypassword");
+         if (password !== verifypw)
          {
-            // get back username created (for multi-tenant)
-            username = res.json.userName;
-            
-            var passwordObj =
+            Alfresco.util.PopupManager.displayMessage(
             {
-               newpw: fnGetter("-create-password")
-            };
-            
-            // set the given password for the user
-            Alfresco.util.Ajax.request(
-            {
-               url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + username,
-               method: Alfresco.util.Ajax.POST,
-               dataObj: passwordObj,
-               requestContentType: Alfresco.util.Ajax.JSON,
-               successCallback:
-               {
-                  fn: handler,
-                  scope: me
-               },
-               failureMessage: me._msg("message.password-failure")   
+               text: this._msg("message.password-validate-failure")
             });
-         };
+            return;
+         }
          
          // gather up the data for our JSON PUT request
          var username = fnGetter("-create-username");
@@ -1523,6 +1556,7 @@
          var personObj =
          {
             userName: username,
+            password: password,
             firstName: fnGetter("-create-firstname"),
             lastName: fnGetter("-create-lastname"),
             email: fnGetter("-create-email"),
@@ -1539,7 +1573,7 @@
             requestContentType: Alfresco.util.Ajax.JSON,
             successCallback:
             {
-               fn: createSuccess,
+               fn: handler,
                scope: this
             },
             failureCallback:
@@ -1547,11 +1581,24 @@
                fn: function(res)
                {
                   var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
-                  Alfresco.util.PopupManager.displayPrompt(
+                  if (json.status.code === 409)
                   {
-                     title: this._msg("message.failure"),
-                     text: this._msg("message.create-failure", json.message)
-                  });
+                     // username already exists
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: this._msg("message.failure"),
+                        text: this._msg("message.create-user-exists")
+                     });
+                  }
+                  else
+                  {
+                     // generic error
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: this._msg("message.failure"),
+                        text: this._msg("message.create-failure", json.message)
+                     });
+                  }
                },
                scope: this
             }
@@ -1567,7 +1614,6 @@
        */
       _updateUser: function ConsoleUsers__updateUser(handler)
       {
-         // TODO: verify password against second field!
          // TODO: respect minimum field length for password
          
          var me = this;
@@ -1607,6 +1653,29 @@
                handler.call();
             }
          };
+         
+         // verify password against second field
+         var password = fnGetter("-update-password");
+         var verifypw = fnGetter("-update-verifypassword");
+         if (YAHOO.lang.trim(password).length !== 0)
+         {
+            if (YAHOO.lang.trim(password).length < this.options.minPasswordLength)
+            {
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: this._msg("message.password-validate-length", this.options.minPasswordLength)
+               });
+               return;
+            }
+            if (password !== verifypw)
+            {
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: this._msg("message.password-validate-failure")
+               });
+               return;
+            }
+         }
          
          // gather up the data for our JSON PUT request
          var quota = this._calculateQuota(me.id + "-update");

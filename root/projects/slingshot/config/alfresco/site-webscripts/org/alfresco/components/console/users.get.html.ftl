@@ -7,7 +7,9 @@
    new Alfresco.ConsoleUsers("${args.htmlid}").setOptions(
    {
       minSearchTermLength: "${args.minSearchTermLength!'1'}",
-      maxSearchResults: "${args.maxSearchResults!'100'}"
+      maxSearchResults: "${args.maxSearchResults!'100'}",
+      minUsernameLength: "${config.script['users']['username-min-length']}",
+      minPasswordLength: "${config.script['users']['password-min-length']}"
    }).setMessages(
       ${messages}
    );

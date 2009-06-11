@@ -1,0 +1,5 @@
+<users>
+   <!-- minimum length for username and password -->
+   <username-min-length>2</username-min-length>
+   <password-min-length>3</password-min-length>
+</users>
