@@ -417,6 +417,34 @@ function setupFormUIModel(mode, formModel, formConfig)
       data: formModel.data.formData
    };
    
+   // setup custom form templates to use if they are present
+   if (formConfig !== null)
+   {
+      if (formConfig.viewTemplate !== null)
+      {
+         formUIModel.viewTemplate = formConfig.viewTemplate;
+         
+         if (logger.isLoggingEnabled())
+            logger.log("Set viewTemplate to \"" + formUIModel.viewTemplate + "\"");
+      }
+      
+      if (formConfig.editTemplate !== null)
+      {
+         formUIModel.editTemplate = formConfig.editTemplate;
+         
+         if (logger.isLoggingEnabled())
+            logger.log("Set editTemplate to \"" + formUIModel.editTemplate + "\"");
+      }
+      
+      if (formConfig.createTemplate !== null)
+      {
+         formUIModel.createTemplate = formConfig.createTemplate;
+         
+         if (logger.isLoggingEnabled())
+            logger.log("Set createTemplate to \"" + formUIModel.createTemplate + "\"");
+      }
+   }
+   
    return formUIModel;
 }
 
