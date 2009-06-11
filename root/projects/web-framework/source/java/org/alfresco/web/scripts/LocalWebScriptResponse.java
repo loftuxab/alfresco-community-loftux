@@ -124,6 +124,11 @@ public class LocalWebScriptResponse extends WebScriptResponseImpl
         // not supported
     }
 
+    public void setContentEncoding(String contentEncoding)
+    {
+        // not supported
+    }
+
     public void setStatus(int status)
     {
         // not supported

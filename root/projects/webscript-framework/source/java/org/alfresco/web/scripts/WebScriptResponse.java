@@ -81,6 +81,13 @@ public interface WebScriptResponse
     public void setContentType(String contentType);
     
     /**
+     * Sets the Content Encoding
+     * 
+     * @param contentEncoding
+     */
+    public void setContentEncoding(String contentEncoding);
+    
+    /**
      * Sets the Cache control
      * 
      * @param  cache  cache control

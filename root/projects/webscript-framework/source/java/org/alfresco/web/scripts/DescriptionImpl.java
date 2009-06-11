@@ -51,6 +51,7 @@ public class DescriptionImpl implements Description
     private RequiredAuthentication requiredAuthentication;
     private String runAs;
     private RequiredTransaction requiredTransaction;
+    private TransactionCapability transactionCapability;
     private RequiredCache requiredCache;
     private FormatStyle formatStyle;
     private String httpMethod;
@@ -285,6 +286,25 @@ public class DescriptionImpl implements Description
     }
 
     /**
+     * Sets the transaction capability
+     * 
+     * @param transactionCapability
+     */
+    public void setTransactionCapability(TransactionCapability transactionCapability)
+    {
+        this.transactionCapability = transactionCapability;
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.web.scripts.Description#getTransactionCapability()
+     */
+    public TransactionCapability getTransactionCapability()
+    {
+        return this.transactionCapability;
+    }
+    
+    /**
      * Sets the required cache
      * 
      * @param requiredCache
@@ -410,17 +430,23 @@ public class DescriptionImpl implements Description
         return extensions;
     }
 
-    /**
-     * Gets the lifecycle attribute of this web script
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.web.scripts.Description#getLifecycle()
      */
-	public Lifecycle getLifecycle() 
-	{
-		return lifecycle;
-	}
-	
-	public void setLifecycle(Lifecycle lifecycle)
-	{
-		this.lifecycle = lifecycle;
-	}
+    public Lifecycle getLifecycle() 
+    {
+        return lifecycle;
+    }
+
+    /**
+     * Sets the lifecycle
+     * 
+     * @param lifecycle
+     */
+    public void setLifecycle(Lifecycle lifecycle)
+    {
+        this.lifecycle = lifecycle;
+    }
 
 }

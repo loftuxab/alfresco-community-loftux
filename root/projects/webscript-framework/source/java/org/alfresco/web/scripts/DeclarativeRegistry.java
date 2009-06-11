@@ -41,6 +41,7 @@ import org.alfresco.web.scripts.Description.FormatStyle;
 import org.alfresco.web.scripts.Description.Lifecycle;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.scripts.Description.RequiredTransaction;
+import org.alfresco.web.scripts.Description.TransactionCapability;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -606,27 +607,41 @@ public class DeclarativeRegistry
             
             // retrieve transaction
             RequiredTransaction reqTrx = (reqAuth == RequiredAuthentication.none) ? RequiredTransaction.none : RequiredTransaction.required;
+            TransactionCapability trxCapability = TransactionCapability.readwrite;
             Element trxElement = rootElement.element("transaction");
             if (trxElement != null)
             {
+                // requires...
                 String reqTrxStr = trxElement.getTextTrim();
-                if (reqTrxStr == null || reqTrxStr.length() == 0)
+                if (reqTrxStr != null && reqTrxStr.length() > 0)
                 {
-                    throw new WebScriptException("Expected <transaction> value");
+                    try
+                    {
+                        reqTrx = RequiredTransaction.valueOf(reqTrxStr);
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        throw new WebScriptException("Transaction '" + reqTrxStr + "' is not a valid value");
+                    }
                 }
-                try
+                
+                // capability...
+                String capabilityStr = trxElement.attributeValue("allow");
+                if (capabilityStr != null)
                 {
-                    reqTrx = RequiredTransaction.valueOf(reqTrxStr);
-                }
-                catch (IllegalArgumentException e)
-                {
-                    throw new WebScriptException("Transaction '" + reqTrxStr + "' is not a valid value");
+                    try
+                    {
+                        trxCapability = TransactionCapability.valueOf(capabilityStr);
+                    }
+                    catch (IllegalArgumentException e)
+                    {
+                        throw new WebScriptException("Transaction allow '" + capabilityStr + "' is not a valid value");
+                    }
                 }
             }
             
             // retrieve lifecycle
             Lifecycle lifecycle = Lifecycle.none;
-            
             Element lifecycleElement = rootElement.element("lifecycle");
             if (lifecycleElement != null)
             {
@@ -752,6 +767,7 @@ public class DeclarativeRegistry
             serviceDesc.setRequiredAuthentication(reqAuth);
             serviceDesc.setRunAs(runAs);
             serviceDesc.setRequiredTransaction(reqTrx);
+            serviceDesc.setTransactionCapability(trxCapability);
             serviceDesc.setRequiredCache(cache);
             serviceDesc.setMethod(method);
             serviceDesc.setUris(uris.toArray(new String[uris.size()]));
