@@ -55,7 +55,8 @@
 
       // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["event"], this.onComponentsLoaded, this);
-
+      // Initialise prototype properties
+      this.preferencesService = new Alfresco.service.Preferences();
       return this;
    };
 
@@ -219,8 +220,11 @@
                               }                        
                           ]
                         });
-
                         break;
+                     case "addToFav":
+                        this.addAsFav(this.options.site);
+                        break;
+                        
                   }
                }
             },this,true);
@@ -431,6 +435,63 @@
             });
          }
       },
+      /**
+       * Adds an event handler that adds or removes the site as favourite site
+       *
+       * @method _addImapFavouriteHandling
+       * @param site {string} The shortname of the site
+       * @private
+       */
+      addAsFav: function CollaborationTitle__addAsFav(site)
+      {
+         var me = this;
+            
+            /**
+             * We assume that the change of favourite site will work and therefore change
+             * the gui immediatly after the server call.
+             * If it doesn't we revoke the gui changes and display an error message
+             */
+            var responseConfig =
+            {
+               failureCallback:
+               {
+                  fn: function(event, obj)
+                  {
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        text: me._msg("message.siteFavourite.failure")
+                     });
+                  },
+                  scope: this,
+                  obj:
+                  {
+                      site: site,
+                      thisComponent: me
+                  }
+               }
+               ,
+               successCallback:
+               {
+                  fn: function(event, obj)
+                  {
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        text: me._msg("message.siteFavourite.success", site)
+                     });
+                  },
+                  scope: this,
+                  obj:
+                  {
+                     site: site,
+                     thisComponent: me
+                  }
+               }
+            };
+            me.preferencesService.set(
+               Alfresco.service.Preferences.FAVOURITE_SITES + "." + site,
+               true,
+               responseConfig);
+   },      
        /**
        * PRIVATE FUNCTIONS
        */
