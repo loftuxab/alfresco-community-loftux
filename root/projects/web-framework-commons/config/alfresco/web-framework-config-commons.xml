@@ -25,6 +25,7 @@
 	         <type name="d:datetime" template="controls/date.ftl">
 	            <control-param name="showTime">true</control-param>
 	         </type>
+             <type name="d:period" template="controls/period.ftl" />
 	         <type name="d:any" template="controls/textfield.ftl" />
 	         <type name="d:category" template="controls/category.ftl">
                <control-param name="compactMode">true</control-param>

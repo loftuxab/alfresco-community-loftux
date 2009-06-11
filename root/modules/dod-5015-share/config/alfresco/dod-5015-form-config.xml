@@ -4,7 +4,6 @@
       <forms>
          <dependencies>
             <js src="/components/form/disposition-actions.js" />
-            <css src="/components/form/period.css" />
             <css src="/components/form/disposition-actions.css" />
          </dependencies>
       </forms>
@@ -58,9 +57,6 @@
                <field id="rma:vitalRecordIndicator">
                   <control template="controls/checkbox.ftl" />
                </field>
-               <field id="rma:reviewPeriod">
-                  <control template="controls/period.ftl" />
-               </field>
             </appearance>
          </form>
       </forms>
@@ -94,9 +90,6 @@
             <appearance>
                <field id="rma:vitalRecordIndicator">
                   <control template="controls/checkbox.ftl" />
-               </field>
-               <field id="rma:reviewPeriod">
-                  <control template="controls/period.ftl" />
                </field>
                <field id="rma:reviewAsOf" read-only="true" />
                <field id="rma:dispositionActionId" read-only="true" />
