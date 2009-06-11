@@ -519,8 +519,18 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         //
         
         sanityCheckAccess("dmartinz", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
-        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
+        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, false); // denied by rma:prjList ("Project A")
         
+        startNewTransaction();
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
+        addToGroup("gsmith", "Engineering");
+        
+        setComplete();
+        endTransaction();
+        
+        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
         sanityCheckAccess("dsandy", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, false); // denied by rma:smList  ("NOFORN", "FOUO")
         
         cleanCaveatConfigData();
@@ -585,7 +595,9 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         
         addToGroup("jrogers", "Engineering");
         addToGroup("dfranco", "Finance");
-        addToGroup("gsmith", "Engineering");
+        
+        // not in grouo to start with - added later
+        //addToGroup("gsmith", "Engineering");
         
         
         URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig2.json"); // from test-resources
@@ -644,12 +656,13 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
             String parentGroupFullName = authorityService.getName(AuthorityType.GROUP, parentGroupShortName);
             if (authorityService.authorityExists(parentGroupFullName) == false)
             {
-                authorityService.createAuthority(AuthorityType.GROUP, parentGroupFullName, groupShortName);
+                authorityService.createAuthority(AuthorityType.GROUP, groupShortName, groupShortName, null);
+                authorityService.addAuthority(parentGroupFullName, groupShortName);
             }
         }
         else
         {
-            authorityService.createAuthority(AuthorityType.GROUP, null, groupShortName);
+            authorityService.createAuthority(AuthorityType.GROUP, groupShortName, groupShortName, null);
         }
     }
     
