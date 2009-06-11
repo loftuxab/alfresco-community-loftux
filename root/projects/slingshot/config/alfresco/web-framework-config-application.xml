@@ -219,5 +219,13 @@
          <share-tutorial>http://www.alfresco.com/help/32/labs/sharetutorial/</share-tutorial>
       </help-pages>
    </config>
+   
+   <config evaluator="string-compare" condition="Users" replace="true">
+      <users>
+         <!-- minimum length for username and password -->
+         <username-min-length>2</username-min-length>
+         <password-min-length>3</password-min-length>
+      </users>
+   </config>
 
 </alfresco-config>
