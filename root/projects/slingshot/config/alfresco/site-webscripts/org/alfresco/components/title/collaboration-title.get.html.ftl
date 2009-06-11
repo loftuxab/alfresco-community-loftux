@@ -46,12 +46,14 @@
     <#if userIsSiteManager>
       <input type="button" id="${args.htmlid}-more" name="${args.htmlid}-more" value="${msg("link.more")}">
       <select id="${args.htmlid}-more-menu">
+         <option value="addToFav">${msg("link.add-fav")}</option>         
          <option value="editSite">${msg("link.editSite")}</option>
          <option value="customiseSite">${msg("link.customiseSite")}</option>
       </select> 
     <#elseif userIsMember>
       <input type="button" id="${args.htmlid}-more" name="${args.htmlid}-more" value="${msg("link.actions")}">    
       <select id="${args.htmlid}-more-menu">
+         <option value="addToFav">${msg("link.add-fav")}</option>
          <option value="leaveSite">${msg("link.leave")}</option>
       </select> 
     </#if>   
