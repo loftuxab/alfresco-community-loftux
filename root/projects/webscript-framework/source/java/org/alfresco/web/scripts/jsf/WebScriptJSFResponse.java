@@ -164,7 +164,16 @@ public class WebScriptJSFResponse extends WebScriptResponseImpl implements WebSc
    {
       // Alfresco JSF framework only supports the default of text-html
    }
-   
+
+   /*
+    * (non-Javadoc)
+    * @see org.alfresco.web.scripts.WebScriptResponse#setContentEncoding(java.lang.String)
+    */
+   public void setContentEncoding(String contentEncoding)
+   {
+       // NOTE: not applicable
+   }
+
    /* (non-Javadoc)
     * @see org.alfresco.web.scripts.WebScriptResponse#getEncodeScriptUrlFunction(java.lang.String)
     */

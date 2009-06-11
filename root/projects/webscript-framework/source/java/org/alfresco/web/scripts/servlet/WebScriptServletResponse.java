@@ -106,6 +106,15 @@ public class WebScriptServletResponse extends WebScriptResponseImpl
         res.setContentType(contentType);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptResponse#setContentEncoding(java.lang.String)
+     */
+    public void setContentEncoding(String contentEncoding)
+    {
+        res.setCharacterEncoding(contentEncoding);
+    }
+
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebScriptResponse#setCache(org.alfresco.web.scripts.WebScriptCache)
      */

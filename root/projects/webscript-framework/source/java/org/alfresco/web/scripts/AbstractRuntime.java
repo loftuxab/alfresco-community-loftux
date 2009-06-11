@@ -334,5 +334,38 @@ public abstract class AbstractRuntime implements Runtime
      * @return  web script authenticator
      */
     protected abstract Authenticator createAuthenticator();
+    
+
+    /**
+     * Helper to retrieve real (last) Web Script Request in a stack of wrapped Web Script requests
+     * 
+     * @param request
+     * @return
+     */
+    protected static WebScriptRequest getRealWebScriptRequest(WebScriptRequest request)
+    {
+        WebScriptRequest real = request;
+        while(real instanceof WrappingWebScriptRequest)
+        {
+            real = ((WrappingWebScriptRequest)real).getNext();
+        }
+        return real;
+    }
+
+    /**
+     * Helper to retrieve real (last) Web Script Response in a stack of wrapped Web Script responses
+     * 
+     * @param response
+     * @return
+     */
+    protected static WebScriptResponse getRealWebScriptResponse(WebScriptResponse response)
+    {
+        WebScriptResponse real = response;
+        while(real instanceof WrappingWebScriptResponse)
+        {
+            real = ((WrappingWebScriptResponse)real).getNext();
+        }
+        return real;
+    }
 
 }

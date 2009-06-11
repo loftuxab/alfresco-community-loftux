@@ -158,4 +158,36 @@ public class WebScriptServletRuntime extends AbstractRuntime
         return "ServletRuntime";
     }
 
+    /**
+     * Helper to get HttpServletRequest from Web Script Request
+     * 
+     * @param request
+     * @return
+     */
+    public static HttpServletRequest getHttpServletRequest(WebScriptRequest request)
+    {
+        WebScriptRequest realRequest = getRealWebScriptRequest(request);
+        if (realRequest instanceof WebScriptServletRequest)
+        {
+            return ((WebScriptServletRequest)realRequest).getHttpServletRequest();
+        }
+        return null;
+    }
+
+    /**
+     * Helper to get HttpServletResponse from Web Script Response
+     * 
+     * @param response
+     * @return
+     */
+    public static HttpServletResponse getHttpServletResponse(WebScriptResponse response)
+    {
+        WebScriptResponse realResponse = getRealWebScriptResponse(response);
+        if (realResponse instanceof WebScriptServletResponse)
+        {
+            return ((WebScriptServletResponse)realResponse).getHttpServletResponse();
+        }
+        return null;
+    }
+
 }

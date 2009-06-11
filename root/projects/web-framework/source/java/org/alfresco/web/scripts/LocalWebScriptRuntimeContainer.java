@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.web.framework.exception.RendererExecutionException;
 import org.alfresco.web.framework.render.RenderContext;
 import org.alfresco.web.framework.render.RenderHelper;
+import org.alfresco.web.scripts.servlet.WebScriptServletRuntime;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
@@ -155,19 +156,16 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         {
             try
             {
-                if (scriptReq instanceof org.alfresco.web.scripts.servlet.WebScriptServletRequest)
+                HttpServletRequest request = WebScriptServletRuntime.getHttpServletRequest(scriptReq);
+                HttpServletResponse response = WebScriptServletRuntime.getHttpServletResponse(scriptRes);
+
+                if (request != null && response != null)
                 {
-                    if (scriptRes instanceof org.alfresco.web.scripts.servlet.WebScriptServletResponse)
-                    {
-                        HttpServletRequest request = ((org.alfresco.web.scripts.servlet.WebScriptServletRequest) scriptReq).getHttpServletRequest();
-                        HttpServletResponse response = ((org.alfresco.web.scripts.servlet.WebScriptServletResponse) scriptRes).getHttpServletResponse();
-                        
-                        RequestContext requestContext = RequestUtil.getRequestContext(request);
-                        context = RenderHelper.provideRenderContext(requestContext, request, response);
-                        
-                        // flag that we will manually handle the bindings
-                        handleBinding = true;
-                    }
+                    RequestContext requestContext = RequestUtil.getRequestContext(request);
+                    context = RenderHelper.provideRenderContext(requestContext, request, response);
+                    
+                    // flag that we will manually handle the bindings
+                    handleBinding = true;
                 }
             }
             catch (RequestContextException rce)

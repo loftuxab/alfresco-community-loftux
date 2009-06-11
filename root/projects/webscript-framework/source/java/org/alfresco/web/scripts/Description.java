@@ -60,6 +60,15 @@ public interface Description
     }
 
     /**
+     * Enumeration of transaction capability
+     */
+    public enum TransactionCapability
+    {
+        readonly,
+        readwrite
+    }
+    
+    /**
      * Caching requirements
      */
     public interface RequiredCache
@@ -190,6 +199,13 @@ public interface Description
      * @return  the required transaction level
      */
     public RequiredTransaction getRequiredTransaction();
+    
+    /**
+     * Gets the transaction capability
+     * 
+     * @return  the transaction capability
+     */
+    public TransactionCapability getTransactionCapability();
     
     /**
      * Gets the required level of caching
