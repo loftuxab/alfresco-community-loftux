@@ -1,9 +1,15 @@
-<#-- TODO: Allow other content properties to be used, configure via params -->
-<#-- <#assign content=form.data["prop_cm_content"]> -->
-<#-- <#assign sizeBegIdx=content?index_of("size=")+5> -->
-<#-- <#assign sizeEndIdx=content?index_of("|", sizeBegIdx)> -->
-<#-- <#assign size=content?substring(sizeBegIdx, sizeEndIdx)> -->
-<#assign size=field.value>
+<#if field.control.params.property??>
+   <#-- use the supplied property to retrieve the size value -->
+   <#assign size="0">
+   <#assign contentUrl=form.data["prop_" + field.control.params.property?replace(":", "_")]!"">
+   <#if contentUrl?? && contentUrl != "">
+      <#assign mtBegIdx=contentUrl?index_of("size=")+5>
+      <#assign mtEndIdx=contentUrl?index_of("|", mtBegIdx)>
+      <#assign size=contentUrl?substring(mtBegIdx, mtEndIdx)>
+   </#if>
+<#else>
+   <#assign size=field.value>
+</#if>
 
 <div class="viewmode-field">
    <span class="viewmode-label">${msg("form.control.size.label")}:</span>

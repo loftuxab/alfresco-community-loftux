@@ -103,9 +103,6 @@
                <!-- cm:attachable aspect -->
                <show id="cm:attachments" />
                
-               <!-- app:inlineeditable aspect -->
-               <show id="app:editInline" />
-               
                <!-- cm:emailed aspect -->
                <show id="cm:originator" />
                <show id="cm:addressee" />
