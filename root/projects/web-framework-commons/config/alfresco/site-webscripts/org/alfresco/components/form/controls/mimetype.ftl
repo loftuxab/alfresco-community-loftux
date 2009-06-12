@@ -1,9 +1,15 @@
-<#-- TODO: Allow other content properties to be used, configure via params -->
-<#-- <#assign content=form.data["prop_cm_content"]> -->
-<#-- <#assign mtBegIdx=content?index_of("mimetype=")+9> -->
-<#-- <#assign mtEndIdx=content?index_of("|", mtBegIdx)> -->
-<#-- <#assign mimetype=content?substring(mtBegIdx, mtEndIdx)> -->
-<#assign mimetype=field.value>
+<#if field.control.params.property??>
+   <#-- use the supplied property to retrieve the mimetype value -->
+   <#assign mimetype="">
+   <#assign contentUrl=form.data["prop_" + field.control.params.property?replace(":", "_")]!"">
+   <#if contentUrl?? && contentUrl != "">
+      <#assign mtBegIdx=contentUrl?index_of("mimetype=")+9>
+      <#assign mtEndIdx=contentUrl?index_of("|", mtBegIdx)>
+      <#assign mimetype=contentUrl?substring(mtBegIdx, mtEndIdx)>
+   </#if>
+<#else>
+   <#assign mimetype=field.value>
+</#if>
 
 <#if form.mode == "view">
 <div class="viewmode-field">
