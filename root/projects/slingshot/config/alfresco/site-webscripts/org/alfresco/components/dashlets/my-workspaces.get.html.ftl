@@ -20,7 +20,7 @@
 <div class="dashlet my-sites">
    <div class="title">${msg("header.myWorkspaces")}</div>    
    <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
-<#if sites??>
+<#if (numSites !=0)>
    <#list sites as site>
       <#if site.sitePreset == "document-workspace">
          <div id="${args.htmlid}-site-div-${site.shortName}" class="detail-list-item <#if site_index = 0>first-item<#elseif !site_has_next>last-item</#if>">
