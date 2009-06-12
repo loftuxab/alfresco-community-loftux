@@ -134,7 +134,16 @@
          /**
           * Set to an error string is an error occurred
           */
-         error: null
+         error: null,
+
+         /**
+          * Whether to set UI focus to this component or not
+          * 
+          * @property setFocus
+          * @type boolean
+          * @default false
+          */
+         setFocus: false
       },
 
       /**
@@ -319,7 +328,11 @@
             YAHOO.Bubbling.fire("deactivateAllControls");
          }
 
-         searchInput.focus();
+         // Set initial focus?
+         if (this.options.setFocus)
+         {
+            searchInput.focus();
+         }
          
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");

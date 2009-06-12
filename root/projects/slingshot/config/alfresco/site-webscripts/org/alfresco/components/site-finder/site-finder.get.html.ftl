@@ -10,7 +10,8 @@
          type: "${invite.invitationType}"
       }
    </#list>
-      ]
+      ],
+      setFocus: ${args.setFocus!'false'}
    }).setMessages(
       ${messages}
    );
