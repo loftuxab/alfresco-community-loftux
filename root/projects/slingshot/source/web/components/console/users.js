@@ -1740,18 +1740,25 @@
             try
             {
                quota = parseInt(quotaValue);
-               var quotaType = Dom.get(idPrefix + "-quotatype").value;
-               if (quotaType === "gb")
+               if (quota)
                {
-                  quota *= Alfresco.util.BYTES_GB;
+                  var quotaType = Dom.get(idPrefix + "-quotatype").value;
+                  if (quotaType === "gb")
+                  {
+                     quota *= Alfresco.util.BYTES_GB;
+                  }
+                  else if (quotaType === "mb")
+                  {
+                     quota *= Alfresco.util.BYTES_MB;
+                  }
+                  else if (quotaType === "kb")
+                  {
+                     quota *= Alfresco.util.BYTES_KB;
+                  }
                }
-               else if (quotaType === "mb")
+               else
                {
-                  quota *= Alfresco.util.BYTES_MB;
-               }
-               else if (quotaType === "kb")
-               {
-                  quota *= Alfresco.util.BYTES_KB;
+                  quota = -1;
                }
             }
             catch (e)
