@@ -327,7 +327,7 @@
          <div class="header-bar">${msg("label.photo")}</div>
          <div class="update-photo-row">
             <div class="photo">
-               <img class="update-photoimg left" src="${url.context}/components/images/no-user-photo-64.png" alt="" />
+               <img id="${el}-update-photoimg" class="update-photoimg left" src="${url.context}/components/images/no-user-photo-64.png" alt="" />
                <div class="updateuser-clearphoto-button">
                   <span class="yui-button yui-push-button" id="${el}-updateuser-clearphoto-button">
                      <span class="first-child"><button>${msg("button.usedefault")}</button></span>
