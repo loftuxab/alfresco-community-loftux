@@ -779,6 +779,7 @@
          _addedGroups: [],
          _originalGroups: [],
          _groups: [],
+         _photoReset: false,
          
          onLoad: function onLoad()
          {
@@ -807,6 +808,7 @@
             // Buttons
             parent.widgets.updateuserSaveButton = Alfresco.util.createYUIButton(parent, "updateuser-save-button", parent.onUpdateUserOKClick);
             parent.widgets.updateuserCancelButton = Alfresco.util.createYUIButton(parent, "updateuser-cancel-button", parent.onUpdateUserCancelClick);
+            parent.widgets.updateuserClearPhotoButton = Alfresco.util.createYUIButton(parent, "updateuser-clearphoto-button", parent.onUpdateUserClearPhotoClick);
             
             // Event handlers for mandatory fields
             validFields[parent.id + "-update-firstname"] = true;
@@ -970,6 +972,16 @@
             this._addedGroups = [];
             this._removedGroups = [];
             Dom.get(parent.id + "-update-groups").innerHTML = "";
+         },
+         
+         setPhotoReset: function setPhotoReset()
+         {
+            this._photoReset = true;
+         },
+         
+         getPhotoReset: function getPhotoReset()
+         {
+            return this._photoReset;
          },
          
          onBeforeShow: function onBeforeShow()
@@ -1464,6 +1476,19 @@
       },
       
       /**
+       * Fired when the Use Default button is clicked to clear user photo.
+       *
+       * @method onUpdateUserClearPhotoClick
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onUpdateUserClearPhotoClick: function ConsoleUsers_onUpdateUserClearPhotoClick(e, args)
+      {
+         Dom.get(this.id + "-update-photoimg").src = Alfresco.constants.URL_CONTEXT + "components/images/no-user-photo-64.png";
+         this._getCurrentPanel().setPhotoReset();
+      },
+      
+      /**
        * Encode state object into a packed string for use as url history value.
        * Override base class.
        * 
@@ -1624,33 +1649,67 @@
          
          var updateSuccess = function(res)
          {
-            // TODO: reset user photo if required
-            
-            if (fnGetter("-update-password") !== "")
+            var completed = function(res)
             {
-               var passwordObj =
+               if (fnGetter("-update-password") !== "")
                {
-                  newpw: fnGetter("-update-password")
-               };
-               
-               // update the password for the user
+                  var passwordObj =
+                  {
+                     newpw: fnGetter("-update-password")
+                  };
+                  
+                  // update the password for the user
+                  Alfresco.util.Ajax.request(
+                  {
+                     url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + this.currentUserId,
+                     method: Alfresco.util.Ajax.POST,
+                     dataObj: passwordObj,
+                     requestContentType: Alfresco.util.Ajax.JSON,
+                     successCallback:
+                     {
+                        fn: handler,
+                        scope: me
+                     },
+                     failureMessage: me._msg("message.password-failure")   
+                  });
+               }
+               else
+               {
+                  handler.call();
+               }
+            };
+            
+            if (this._getCurrentPanel().getPhotoReset())
+            {
                Alfresco.util.Ajax.request(
                {
-                  url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + this.currentUserId,
-                  method: Alfresco.util.Ajax.POST,
-                  dataObj: passwordObj,
+                  url: Alfresco.constants.PROXY_URI + "slingshot/profile/resetavatar/" + this.currentUserId,
+                  method: Alfresco.util.Ajax.PUT,
                   requestContentType: Alfresco.util.Ajax.JSON,
                   successCallback:
                   {
-                     fn: handler,
-                     scope: me
+                     fn: completed,
+                     scope: this
                   },
-                  failureMessage: me._msg("message.password-failure")   
+                  failureCallback:
+                  {
+                     fn: function(res)
+                     {
+                        // generic error
+                        Alfresco.util.PopupManager.displayPrompt(
+                        {
+                           title: this._msg("message.failure"),
+                           text: this._msg("message.clear-photo-failure")
+                        });
+                        completed.call();
+                     },
+                     scope: this
+                  }
                });
             }
             else
             {
-               handler.call();
+               completed.call();
             }
          };
          
