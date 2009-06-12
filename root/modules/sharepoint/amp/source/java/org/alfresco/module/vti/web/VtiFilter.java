@@ -39,13 +39,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.alfresco.module.vti.handler.AuthenticationHandler;
 import org.alfresco.module.vti.handler.MethodHandler;
 import org.alfresco.module.vti.handler.VtiHandlerException;
-import org.alfresco.module.vti.handler.alfresco.AbstractAuthenticationHandler;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
 import org.alfresco.repo.SessionUser;
 import org.alfresco.util.URLDecoder;
+import org.alfresco.web.sharepoint.auth.AuthenticationHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -68,7 +67,7 @@ public class VtiFilter implements Filter
     public static final String METHOD_TRACE = "TRACE";
     public static final String METHOD_PROPFIND = "PROPFIND";
 
-    private AuthenticationHandler authenticationHandler;
+    private org.alfresco.module.vti.handler.AuthenticationHandler authenticationHandler;
     private MethodHandler vtiHandler;
 
     private String alfrescoContext;
@@ -121,11 +120,11 @@ public class VtiFilter implements Filter
         SessionUser user = null;
 
         if (session != null)
-            user = (SessionUser) session.getAttribute(AbstractAuthenticationHandler.AUTHENTICATION_USER);
+            user = (SessionUser) session.getAttribute(AuthenticationHandler.USER_SESSION_ATTRIBUTE);
 
-        String authHeader = httpRequest.getHeader(AbstractAuthenticationHandler.HEADER_AUTHORIZATION);
+        String authHeader = httpRequest.getHeader(AuthenticationHandler.HEADER_AUTHORIZATION);
         
-        if (user == null || (authHeader != null && authHeader.startsWith(AbstractAuthenticationHandler.NTLM_START)))
+        if (user == null || (authHeader != null && authHeader.startsWith(AuthenticationHandler.NTLM_START)))
         {
             if (logger.isDebugEnabled())
                 logger.debug("Session user is null. Authenticate user.");
@@ -214,7 +213,7 @@ public class VtiFilter implements Filter
 
             try
             {
-                SessionUser user = (SessionUser) httpRequest.getSession().getAttribute(AbstractAuthenticationHandler.AUTHENTICATION_USER);
+                SessionUser user = (SessionUser) httpRequest.getSession().getAttribute(AuthenticationHandler.USER_SESSION_ATTRIBUTE);
 
                 user = authenticationHandler.authenticateRequest(httpRequest, httpResponse, alfrescoContext);
 
@@ -305,8 +304,8 @@ public class VtiFilter implements Filter
         {
             httpResponse.setHeader("MicrosoftSharePointTeamServices", "6.0.2.8117");
             httpResponse.setHeader("Cache-Control", "no-cache");
-            String auth = httpRequest.getHeader(AbstractAuthenticationHandler.HEADER_AUTHORIZATION);
-            if (auth == null || !auth.startsWith(AbstractAuthenticationHandler.NTLM_START))
+            String auth = httpRequest.getHeader(AuthenticationHandler.HEADER_AUTHORIZATION);
+            if (auth == null || !auth.startsWith(AuthenticationHandler.NTLM_START))
             {
             httpResponse.setHeader("Connection", "close");
                 httpResponse.setContentType("application/x-vermeer-rpc");
@@ -371,12 +370,12 @@ public class VtiFilter implements Filter
         this.alfrescoContext = alfrescoContext;
     }
 
-    public void setAuthenticationHandler(AuthenticationHandler authenticationHandler)
+    public void setAuthenticationHandler(org.alfresco.module.vti.handler.AuthenticationHandler authenticationHandler)
     {
         this.authenticationHandler = authenticationHandler;
     }
     
-    public AuthenticationHandler getAuthenticationHandler()
+    public org.alfresco.module.vti.handler.AuthenticationHandler getAuthenticationHandler()
     {
         return authenticationHandler;
     }

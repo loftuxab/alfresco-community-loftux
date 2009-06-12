@@ -1,4 +1,0 @@
-vti.server.port=7070
-vti.share.shareHostWithPort=http://your-share-host:8080
-vti.alfresco.alfresoHostWithPort=http://your-alfresco-host:8080
-vti.alfresco.deployment.context=/alfresco

@@ -22,19 +22,16 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.module.vti.handler.alfresco.v3;
+package org.alfresco.web.sharepoint.auth;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.alfresco.module.vti.handler.alfresco.AbstractAuthenticationHandler;
 import org.alfresco.repo.SessionUser;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.web.bean.repository.User;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>BASIC web authentication implementation.</p>
@@ -44,9 +41,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BasicAuthenticationHandler extends AbstractAuthenticationHandler
 {
-    private static Log logger = LogFactory.getLog(BasicAuthenticationHandler.class);
-
-    public SessionUser authenticateRequest(HttpServletRequest request, HttpServletResponse response, String alfrescoContext)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.vti.auth.AuthenticationHandler#authenticateRequest(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.alfresco.web.vti.auth.SiteMemberMapper, java.lang.String)
+     */
+    public SessionUser authenticateRequest(HttpServletRequest request, HttpServletResponse response,
+            SiteMemberMapper mapper, String alfrescoContext)
     {
         SessionUser user = null;
         
@@ -78,11 +77,11 @@ public class BasicAuthenticationHandler extends AbstractAuthenticationHandler
                 
                 authenticationService.authenticate(username, password.toCharArray());
                 
-                if (isSiteMember(request, alfrescoContext, username))
+                if (mapper.isSiteMember(request, alfrescoContext, username))
                 {
                     user = new User(username, authenticationService.getCurrentTicket(), personService.getPerson(username));
                     if (session != null)
-                        session.setAttribute(AUTHENTICATION_USER, user);
+                        session.setAttribute(USER_SESSION_ATTRIBUTE, user);
                 }
             }
             catch (AuthenticationException ex)
@@ -94,9 +93,10 @@ public class BasicAuthenticationHandler extends AbstractAuthenticationHandler
         return user;
     }
 
+    
     @Override
     public String getWWWAuthenticate()
-    {        
+    {
         return "BASIC realm=\"Alfresco Server\"";
-    }   
+    }
 }

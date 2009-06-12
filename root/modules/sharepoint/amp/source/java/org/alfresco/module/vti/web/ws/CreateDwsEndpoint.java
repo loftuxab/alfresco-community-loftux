@@ -25,9 +25,9 @@
 package org.alfresco.module.vti.web.ws;
 
 import org.alfresco.module.vti.handler.DwsServiceHandler;
-import org.alfresco.module.vti.handler.alfresco.AbstractAuthenticationHandler;
 import org.alfresco.module.vti.metadata.model.DwsBean;
 import org.alfresco.repo.SessionUser;
+import org.alfresco.web.sharepoint.auth.AuthenticationHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Element;
@@ -83,7 +83,7 @@ public class CreateDwsEndpoint extends AbstractEndpoint
         Element title = (Element) titlePath.selectSingleNode(soapRequest.getDocument().getRootElement());
 
         String parentDws = getDwsForCreationFromUri(soapRequest);           
-        DwsBean dws = handler.createDws(parentDws, null, null, title.getTextTrim(), null, getHost(soapRequest), getContext(soapRequest), (SessionUser) soapRequest.getSession().getAttribute(AbstractAuthenticationHandler.AUTHENTICATION_USER));
+        DwsBean dws = handler.createDws(parentDws, null, null, title.getTextTrim(), null, getHost(soapRequest), getContext(soapRequest), (SessionUser) soapRequest.getSession().getAttribute(AuthenticationHandler.USER_SESSION_ATTRIBUTE));
         
         // creating soap response
         Element root = soapResponse.getDocument().addElement("CreateDwsResponse", namespace);
