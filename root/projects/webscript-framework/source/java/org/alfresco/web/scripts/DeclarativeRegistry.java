@@ -41,6 +41,7 @@ import org.alfresco.web.scripts.Description.FormatStyle;
 import org.alfresco.web.scripts.Description.Lifecycle;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.scripts.Description.RequiredTransaction;
+import org.alfresco.web.scripts.Description.RequiredTransactionParameters;
 import org.alfresco.web.scripts.Description.TransactionCapability;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -606,8 +607,10 @@ public class DeclarativeRegistry
             }
             
             // retrieve transaction
+            TransactionParameters trxParams = new TransactionParameters();
             RequiredTransaction reqTrx = (reqAuth == RequiredAuthentication.none) ? RequiredTransaction.none : RequiredTransaction.required;
             TransactionCapability trxCapability = TransactionCapability.readwrite;
+            int bufferSize = 4096;
             Element trxElement = rootElement.element("transaction");
             if (trxElement != null)
             {
@@ -638,7 +641,24 @@ public class DeclarativeRegistry
                         throw new WebScriptException("Transaction allow '" + capabilityStr + "' is not a valid value");
                     }
                 }
+                
+                // buffer size
+                String bufferSizeStr = trxElement.attributeValue("buffersize");
+                if (bufferSizeStr != null)
+                {
+                    try
+                    {
+                        bufferSize = new Integer(bufferSizeStr);
+                    }
+                    catch(NumberFormatException e)
+                    {
+                        throw new WebScriptException("Buffer size '" + bufferSizeStr + "' is not a valid integer");
+                    }
+                }
             }
+            trxParams.setRequired(reqTrx);
+            trxParams.setCapability(trxCapability);
+            trxParams.setBufferSize(bufferSize);
             
             // retrieve lifecycle
             Lifecycle lifecycle = Lifecycle.none;
@@ -766,8 +786,7 @@ public class DeclarativeRegistry
             serviceDesc.setFamilys(familys);
             serviceDesc.setRequiredAuthentication(reqAuth);
             serviceDesc.setRunAs(runAs);
-            serviceDesc.setRequiredTransaction(reqTrx);
-            serviceDesc.setTransactionCapability(trxCapability);
+            serviceDesc.setRequiredTransactionParameters(trxParams);
             serviceDesc.setRequiredCache(cache);
             serviceDesc.setMethod(method);
             serviceDesc.setUris(uris.toArray(new String[uris.size()]));

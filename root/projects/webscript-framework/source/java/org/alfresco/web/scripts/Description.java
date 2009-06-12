@@ -69,6 +69,33 @@ public interface Description
     }
     
     /**
+     * Transaction Requirements
+     */
+    public interface RequiredTransactionParameters
+    {
+        /**
+         * Get required transaction semantics
+         * 
+         * @return  required transaction
+         */
+        public RequiredTransaction getRequired();
+        
+        /**
+         * Get transaction capability (readonly,readwrite)
+         * 
+         * @return
+         */
+        public TransactionCapability getCapability();
+        
+        /**
+         * Get buffer size (for caching transactional response)
+         * 
+         * @return
+         */
+        public int getBufferSize();
+    }
+    
+    /**
      * Caching requirements
      */
     public interface RequiredCache
@@ -201,11 +228,11 @@ public interface Description
     public RequiredTransaction getRequiredTransaction();
     
     /**
-     * Gets the transaction capability
+     * Gets the transaction parameters
      * 
-     * @return  the transaction capability
+     * @return  the transaction parameters
      */
-    public TransactionCapability getTransactionCapability();
+    public RequiredTransactionParameters getRequiredTransactionParameters();
     
     /**
      * Gets the required level of caching
