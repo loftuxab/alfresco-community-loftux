@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.module.vti.handler.alfresco.v3;
+package org.alfresco.web.sharepoint.auth.ntlm;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -48,8 +48,6 @@ import org.alfresco.jlan.server.auth.ntlm.Type2NTLMMessage;
 import org.alfresco.jlan.server.auth.ntlm.Type3NTLMMessage;
 import org.alfresco.jlan.util.DataPacker;
 import org.alfresco.model.ContentModel;
-import org.alfresco.module.vti.handler.VtiHandlerException;
-import org.alfresco.module.vti.handler.alfresco.AbstractAuthenticationHandler;
 import org.alfresco.repo.SessionUser;
 import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -61,76 +59,66 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.web.bean.repository.User;
+import org.alfresco.web.sharepoint.auth.AbstractAuthenticationHandler;
+import org.alfresco.web.sharepoint.auth.SiteMemberMapper;
+import org.alfresco.web.sharepoint.auth.SiteMemberMappingException;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
- * <p>NTLM SSO web authentication implementation.</p>
- * 
- * @author PavelYur
- *
+ * <p>
+ * NTLM SSO web authentication implementation.
+ * </p>
  */
 public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
 {
-    
-    private static Log logger = LogFactory.getLog(NtlmAuthenticationHandler.class);
-    
+    // NTLM authentication session object names
+    private static final String NTLM_AUTH_DETAILS = "_alfNTLMDetails";
+
     private MD4PasswordEncoder md4Encoder = new MD4PasswordEncoderImpl();
     private PasswordEncryptor encryptor = new PasswordEncryptor();
     private Random random = new Random(System.currentTimeMillis());
-    
+
     private NLTMAuthenticator authenticationComponent;
     private TransactionService transactionService;
     private NodeService nodeService;
-    
-
-    private static final int ntlmFlags =  NTLM.Flag56Bit +
-                                            NTLM.FlagLanManKey +
-                                            NTLM.FlagNegotiateNTLM +
-                                            NTLM.FlagNegotiateOEM +
-                                            NTLM.FlagNegotiateUnicode;
+    private static final int ntlmFlags = NTLM.Flag56Bit + NTLM.FlagLanManKey + NTLM.FlagNegotiateNTLM
+            + NTLM.FlagNegotiateOEM + NTLM.FlagNegotiateUnicode;
     
     public void setAuthenticationComponent(NLTMAuthenticator authenticationComponent)
     {
         this.authenticationComponent = authenticationComponent;
     }
-    
+
     public void setTransactionService(TransactionService transactionService)
     {
         this.transactionService = transactionService;
-    }    
-    
+    }
+
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
 
-    @Override
-    public String getWWWAuthenticate()
-    {        
-        return NTLM_START;
-    }
-
-    public SessionUser authenticateRequest(HttpServletRequest request, HttpServletResponse response, String alfrescoContext)
+    public SessionUser authenticateRequest(HttpServletRequest request, HttpServletResponse response,
+            SiteMemberMapper mapper, String alfrescoContext)
     {
         if (logger.isDebugEnabled())
         {
-            logger.debug("Start NTML authentication for request: " + request.getRequestURI());
+            logger.debug("Start NTLM authentication for request: " + request.getRequestURI());
         }
-        
+
         HttpSession session = request.getSession();
-        SessionUser user = (SessionUser)session.getAttribute(AUTHENTICATION_USER);
-        
+        SessionUser user = (SessionUser) session.getAttribute(USER_SESSION_ATTRIBUTE);
+
         String authHdr = request.getHeader(HEADER_AUTHORIZATION);
-        
+
         boolean needToAuthenticate = false;
 
         if (authHdr != null && authHdr.startsWith(NTLM_START))
-        {            
+        {
             needToAuthenticate = true;
         }
-        
+
         if (user != null && needToAuthenticate == false)
         {
             try
@@ -140,16 +128,17 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
             }
             catch (AuthenticationException e)
             {
-                session.removeAttribute(AUTHENTICATION_USER);
+                session.removeAttribute(USER_SESSION_ATTRIBUTE);
                 needToAuthenticate = true;
             }
         }
-        
+
         if (needToAuthenticate == false && user != null)
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("NTLM header doesn't presents. Authenticated by user from session. Username: " + user.getUserName());
+                logger.debug("NTLM header wasn't present. Authenticated by user from session. Username: "
+                        + user.getUserName());
             }
             return user;
         }
@@ -158,17 +147,17 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("NTLM header doesn't presents. No user was found in session. Return 401 status.");
+                logger.debug("NTLM header wasn't present. No user was found in session. Return 401 status.");
             }
             removeNtlmLogonDetailsFromSession(request);
-            forceClientToPromptLogonDetails(response); 
+            forceClientToPromptLogonDetails(response);
             return null;
         }
         else
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("NTLM header presents in request.");
+                logger.debug("NTLM header present in request.");
             }
             // Decode the received NTLM blob and validate
             final byte[] ntlmByts = Base64.decodeBase64(authHdr.substring(5).getBytes());
@@ -195,34 +184,34 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
                     {
                         logger.debug("Process type 1 message fail with error: " + e.getMessage());
                     }
-                    session.removeAttribute(AUTHENTICATION_USER);
+                    session.removeAttribute(USER_SESSION_ATTRIBUTE);
                     removeNtlmLogonDetailsFromSession(request);
                     return null;
                 }
-                
+
             }
             else if (ntlmTyp == NTLM.Type3)
             {
                 Type3NTLMMessage type3Msg = new Type3NTLMMessage(ntlmByts);
-                
+
                 try
                 {
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Start process message type 3.");
                     }
-                    user = processType3(type3Msg, request, response, session, alfrescoContext);
+                    user = processType3(type3Msg, mapper, request, response, session, alfrescoContext);
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Finish process message type 3.");
                     }
                 }
+                catch (SiteMemberMappingException e)
+                {
+                    throw e;
+                }
                 catch (Exception e)
                 {
-                    if (e instanceof VtiHandlerException)
-                    {
-                        throw (VtiHandlerException)e;                        
-                    }
                     if (user != null)
                     {
                         try
@@ -230,37 +219,44 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
                             authenticationService.validate(user.getTicket());
                             return user;
                         }
-                        catch(AuthenticationException ae)
-                        {                               
+                        catch (AuthenticationException ae)
+                        {
                         }
-                    }    
+                    }
                     if (logger.isDebugEnabled())
                     {
                         logger.debug("Process message type 3 fail with message: " + e.getMessage());
                     }
-                    session.removeAttribute(AUTHENTICATION_USER);
+                    session.removeAttribute(USER_SESSION_ATTRIBUTE);
                     removeNtlmLogonDetailsFromSession(request);
-                    return null;                    
+                    return null;
                 }
             }
-    
+
             return user;
         }
+    }       
+
+    @Override
+    public String getWWWAuthenticate()
+    {
+        return NTLM_START;
     }
-    
-    private void processType1(Type1NTLMMessage type1Msg, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException 
+
+    private void processType1(Type1NTLMMessage type1Msg, HttpServletRequest request, HttpServletResponse response,
+            HttpSession session) throws IOException
     {
         removeNtlmLogonDetailsFromSession(request);
-        
+
         NTLMLogonDetails ntlmDetails = new NTLMLogonDetails();
-            
+
         // Set the 8 byte challenge for the new logon request
-        byte[] challenge = null;                    
-            
-        // Generate a random 8 byte challenge        
+        byte[] challenge = null;
+
+        // Generate a random 8 byte challenge
         challenge = new byte[8];
-        DataPacker.putIntelLong(random.nextLong(), challenge, 0);            
-            
+        DataPacker.putIntelLong(random.nextLong(), challenge, 0);
+
         // Get the flags from the client request and mask out unsupported features
         int flags = type1Msg.getFlags() & ntlmFlags;
 
@@ -286,19 +282,22 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.flushBuffer();
         response.getOutputStream().close();
-        
+
     }
-    
-    private SessionUser processType3(Type3NTLMMessage type3Msg, HttpServletRequest request, HttpServletResponse response, HttpSession session, String alfrescoContext) throws IOException, ServletException {
-        
+
+    private SessionUser processType3(Type3NTLMMessage type3Msg, SiteMemberMapper callback, HttpServletRequest request,
+            HttpServletResponse response, HttpSession session, String alfrescoContext) throws IOException,
+            ServletException
+    {
+
         // Get the existing NTLM details
         NTLMLogonDetails ntlmDetails = null;
         SessionUser user = null;
 
         if (session != null)
         {
-            ntlmDetails = getNtlmLogonDetailsFromSession(request);    
-            user = (SessionUser) session.getAttribute(AUTHENTICATION_USER);
+            ntlmDetails = getNtlmLogonDetailsFromSession(request);
+            user = (SessionUser) session.getAttribute(USER_SESSION_ATTRIBUTE);
         }
 
         // Get the NTLM logon details
@@ -307,30 +306,30 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
         String domain = type3Msg.getDomain();
 
         boolean authenticated = false;
-        
+
         // Get the stored MD4 hashed password for the user, or null if the user does not exist
         String md4hash = getMD4Hash(userName);
-        
+
         if (md4hash != null)
         {
             authenticated = validateLocalHashedPassword(type3Msg, ntlmDetails, authenticated, md4hash);
         }
         else
-        {                
+        {
             authenticated = false;
-        }         
-        
+        }
+
         // Check if the user has been authenticated, if so then setup the user environment
-        if (authenticated == true && isSiteMember(request, alfrescoContext, userName))
-        {            
+        if (authenticated == true && callback.isSiteMember(request, alfrescoContext, userName))
+        {
             String uri = request.getRequestURI();
-            
+
             if (request.getMethod().equals("POST") && !uri.endsWith(".asmx"))
             {
-                response.setHeader("Connection", "Close");            
+                response.setHeader("Connection", "Close");
                 response.setContentType("application/x-vermeer-rpc");
             }
-            
+
             if (user == null)
             {
                 user = createUserEnvironment(session, userName);
@@ -339,74 +338,75 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
             {
                 // user already exists - revalidate ticket to authenticate the current user thread
                 try
-                {                    
+                {
                     authenticationService.validate(user.getTicket());
                 }
                 catch (AuthenticationException ex)
                 {
-                    session.removeAttribute(AUTHENTICATION_USER);
+                    session.removeAttribute(USER_SESSION_ATTRIBUTE);
                     removeNtlmLogonDetailsFromSession(request);
                     return null;
                 }
             }
-            
+
             // Update the NTLM logon details in the session
             String srvName = getServerName();
             if (ntlmDetails == null)
             {
                 // No cached NTLM details
-                ntlmDetails = new NTLMLogonDetails(userName, workstation, domain, false, srvName);                
+                ntlmDetails = new NTLMLogonDetails(userName, workstation, domain, false, srvName);
                 putNtlmLogonDetailsToSession(request, ntlmDetails);
             }
             else
             {
                 // Update the cached NTLM details
-                ntlmDetails.setDetails(userName, workstation, domain, false, srvName);                
+                ntlmDetails.setDetails(userName, workstation, domain, false, srvName);
                 putNtlmLogonDetailsToSession(request, ntlmDetails);
             }
         }
         else
         {
             removeNtlmLogonDetailsFromSession(request);
-            session.removeAttribute(AUTHENTICATION_USER);
+            session.removeAttribute(USER_SESSION_ATTRIBUTE);
             return null;
         }
         return user;
-    }    
-    
+    }
+
     /*
      * returns server name
      */
     private String getServerName()
     {
-        return "Alfresco Server";        
+        return "Alfresco Server";
     }
-    
+
     /*
      * Create the SessionUser object that represent currently authenticated user.
      */
-    private SessionUser createUserEnvironment(HttpSession session, final String userName)
-        throws IOException, ServletException
+    private SessionUser createUserEnvironment(HttpSession session, final String userName) throws IOException,
+            ServletException
     {
         SessionUser user = null;
-        
+
         UserTransaction tx = transactionService.getUserTransaction();
-        
+
         try
         {
             tx.begin();
-            
+
             RunAsWork<NodeRef> getUserNodeRefRunAsWork = new RunAsWork<NodeRef>()
             {
                 public NodeRef doWork() throws Exception
                 {
-                    
+
                     return personService.getPerson(userName);
                 }
             };
-            
-            NodeRef personNodeRef = AuthenticationUtil.runAs(getUserNodeRefRunAsWork, AuthenticationUtil.SYSTEM_USER_NAME);
-            
+
+            NodeRef personNodeRef = AuthenticationUtil.runAs(getUserNodeRefRunAsWork,
+                    AuthenticationUtil.SYSTEM_USER_NAME);
+
             // Use the system user context to do the user lookup
             RunAsWork<String> getUserNameRunAsWork = new RunAsWork<String>()
             {
@@ -417,14 +417,13 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
                 }
             };
             String username = AuthenticationUtil.runAs(getUserNameRunAsWork, AuthenticationUtil.SYSTEM_USER_NAME);
-            
+
             authenticationComponent.setCurrentUser(userName);
-            String currentTicket = authenticationService.getCurrentTicket();            
-            
-            
+            String currentTicket = authenticationService.getCurrentTicket();
+
             // Create the user object to be stored in the session
-            user = new User(username, currentTicket, personNodeRef);            
-            
+            user = new User(username, currentTicket, personNodeRef);
+
             tx.commit();
         }
         catch (Throwable ex)
@@ -439,44 +438,44 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
             }
             if (ex instanceof RuntimeException)
             {
-                throw (RuntimeException)ex;
+                throw (RuntimeException) ex;
             }
             else if (ex instanceof IOException)
             {
-                throw (IOException)ex;
+                throw (IOException) ex;
             }
             else if (ex instanceof ServletException)
             {
-                throw (ServletException)ex;
+                throw (ServletException) ex;
             }
             else
             {
                 throw new RuntimeException("Authentication setup failed", ex);
             }
         }
-        
+
         // Store the user on the session
-        session.setAttribute(AUTHENTICATION_USER, user);
-        
+        session.setAttribute(USER_SESSION_ATTRIBUTE, user);
+
         return user;
-    }    
-    
+    }
+
     /*
      * returns the hash of password
      */
     protected String getMD4Hash(String userName)
     {
         String md4hash = null;
-        
+
         // Wrap the auth component calls in a transaction
         UserTransaction tx = transactionService.getUserTransaction();
         try
         {
             tx.begin();
-            
+
             // Get the stored MD4 hashed password for the user, or null if the user does not exist
             md4hash = authenticationComponent.getMD4HashedPassword(userName);
-            
+
             tx.commit();
         }
         catch (Throwable ex)
@@ -487,27 +486,28 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
             }
             catch (Exception e)
             {
-            }           
-        }        
-        
+            }
+        }
+
         return md4hash;
     }
-    
+
     /*
      * Validate local hash for user password and hash that was sent by client
      */
-    private boolean validateLocalHashedPassword(Type3NTLMMessage type3Msg, NTLMLogonDetails ntlmDetails, boolean authenticated, String md4hash)
-    {   
-        if ( ntlmDetails == null || ntlmDetails.getType2Message() == null)
-        {   
+    private boolean validateLocalHashedPassword(Type3NTLMMessage type3Msg, NTLMLogonDetails ntlmDetails,
+            boolean authenticated, String md4hash)
+    {
+        if (ntlmDetails == null || ntlmDetails.getType2Message() == null)
+        {
             return false;
         }
-        
-        authenticated = checkNTLMv1(md4hash, ntlmDetails.getChallengeKey(), type3Msg, false);            
-        
+
+        authenticated = checkNTLMv1(md4hash, ntlmDetails.getChallengeKey(), type3Msg, false);
+
         return authenticated;
     }
-    
+
     private final boolean checkNTLMv1(String md4hash, byte[] challenge, Type3NTLMMessage type3Msg, boolean checkLMHash)
     {
         // Generate the local encrypted password using the challenge that was sent to the client
@@ -548,15 +548,15 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
         // Hashed passwords do not match
         return false;
     }
-    
+
     @SuppressWarnings("unchecked")
     private void putNtlmLogonDetailsToSession(HttpServletRequest request, NTLMLogonDetails details)
     {
         Object detailsMap = request.getSession().getAttribute(NTLM_AUTH_DETAILS);
-        
+
         if (detailsMap != null)
         {
-            ((Map<String, NTLMLogonDetails>)detailsMap).put(request.getRequestURI(), details);
+            ((Map<String, NTLMLogonDetails>) detailsMap).put(request.getRequestURI(), details);
             return;
         }
         else
@@ -566,25 +566,26 @@ public class NtlmAuthenticationHandler extends AbstractAuthenticationHandler
             request.getSession().setAttribute(NTLM_AUTH_DETAILS, newMap);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private NTLMLogonDetails getNtlmLogonDetailsFromSession(HttpServletRequest request)
     {
         Object detailsMap = request.getSession().getAttribute(NTLM_AUTH_DETAILS);
         if (detailsMap != null)
         {
-            return ((Map<String, NTLMLogonDetails>)detailsMap).get(request.getRequestURI());
+            return ((Map<String, NTLMLogonDetails>) detailsMap).get(request.getRequestURI());
         }
         return null;
     }
-    
+
     @SuppressWarnings("unchecked")
     private void removeNtlmLogonDetailsFromSession(HttpServletRequest request)
     {
         Object detailsMap = request.getSession().getAttribute(NTLM_AUTH_DETAILS);
         if (detailsMap != null)
         {
-            ((Map<String, NTLMLogonDetails>)detailsMap).remove(request.getRequestURI());
+            ((Map<String, NTLMLogonDetails>) detailsMap).remove(request.getRequestURI());
         }
     }
+
 }

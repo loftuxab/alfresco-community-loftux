@@ -131,14 +131,11 @@
     	</property>
     </bean>
     
-    <bean id="authenticationHandler" class="org.alfresco.module.vti.handler.alfresco.AbstractAuthenticationHandler" abstract="true">    	    	
-    	<property name="vtiHandler" ref="vtiHandler"/>
-    	<property name="vtiUserGroupServiceHandler" ref="userGroupServiceHandler"/>    
-    	<property name="authenticationService" ref="AuthenticationService" />
-    	<property name="personService" ref="PersonService" />	
-    </bean>
-    
-    <bean id="vtiAuthenticationHandler" class="org.alfresco.module.vti.handler.alfresco.v3.BasicAuthenticationHandler" parent="authenticationHandler">
+    <bean id="vtiAuthenticationHandler" class="org.alfresco.module.vti.handler.alfresco.DefaultAuthenticationHandler">
+        <property name="vtiHandler" ref="vtiHandler"/>
+        <property name="vtiUserGroupServiceHandler" ref="userGroupServiceHandler"/>    
+        <property name="authenticationService" ref="AuthenticationService" />
+        <property name="delegate" ref="SharepointAuthenticationHandler" />   
     </bean>
     
 </beans>

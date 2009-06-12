@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -37,47 +37,30 @@ import org.alfresco.repo.SessionUser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.web.sharepoint.auth.SiteMemberMapper;
+import org.alfresco.web.sharepoint.auth.SiteMemberMappingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * <p>Abstract implementation of web authentication.</p>
+ * Default implementation of web authentication. Delegates to a authentication handler in the core alfresco
+ * server authentication subsystem.
  * 
  * @author PavelYur
- *
  */
-public abstract class AbstractAuthenticationHandler implements AuthenticationHandler
+public class DefaultAuthenticationHandler implements AuthenticationHandler, SiteMemberMapper
 {
 
-    private static Log logger = LogFactory.getLog(AbstractAuthenticationHandler.class);
-    
-    public final static String AUTHENTICATION_USER = "_vtiAuthTicket";
-    
-    public final static String NTLM_START = "NTLM";
-    
-    public final static String BASIC_START = "BASIC";
-    
-    public final static String HEADER_AUTHORIZATION = "Authorization";
-    
-    public final static String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
-    
-    // NTLM authentication session object names    
-    public static final String NTLM_AUTH_DETAILS = "_alfNTLMDetails";
-    
-    
-    protected MethodHandler vtiHandler;
-    protected UserGroupServiceHandler vtiUserGroupServiceHandler;    
-    protected AuthenticationService authenticationService;
-    protected PersonService personService;
+    private static Log logger = LogFactory.getLog(DefaultAuthenticationHandler.class);
+        
+    private MethodHandler vtiHandler;
+    private UserGroupServiceHandler vtiUserGroupServiceHandler;
+    private AuthenticationService authenticationService;
+    private org.alfresco.web.sharepoint.auth.AuthenticationHandler delegate;
 
     public void forceClientToPromptLogonDetails(HttpServletResponse response)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("Force the client to prompt for logon details");
-
-        response.setHeader(HEADER_WWW_AUTHENTICATE, getWWWAuthenticate());
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);        
+        delegate.forceClientToPromptLogonDetails(response);
     }
 
     @SuppressWarnings("unchecked")
@@ -144,19 +127,23 @@ public abstract class AbstractAuthenticationHandler implements AuthenticationHan
         catch (Exception e)
         {
             if (dwsName == null)
-                throw new VtiHandlerException(VtiHandlerException.DOESNOT_EXIST);
+                throw new SiteMemberMappingException(VtiHandlerException.DOESNOT_EXIST);
             else
                 return false;
         }
     }
     
-    /**
-     * Returns the <i>value</i> of 'WWW-Authenticate' http header that determine what type of authentication to use by client.
-     * 
-     * @return value
-     */
-    public abstract String getWWWAuthenticate();
+    public SessionUser authenticateRequest(HttpServletRequest request, HttpServletResponse httpResponse,
+            String alfrescoContext)
+    {
+        return delegate.authenticateRequest(request, httpResponse, this, alfrescoContext);
+    }
     
+    public void setDelegate(org.alfresco.web.sharepoint.auth.AuthenticationHandler delegate)
+    {
+        this.delegate = delegate;
+    }
+
     public void setVtiHandler(MethodHandler vtiHandler)
     {
         this.vtiHandler = vtiHandler;
@@ -170,10 +157,5 @@ public abstract class AbstractAuthenticationHandler implements AuthenticationHan
     public void setAuthenticationService(AuthenticationService authenticationService)
     {
         this.authenticationService = authenticationService;
-    }
-    
-    public void setPersonService(PersonService personService)
-    {
-        this.personService = personService;
     }
 }
