@@ -266,9 +266,6 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                // make sure the submit elements start in the correct state
                this.updateSubmitElements();
             }
-            
-            if (Alfresco.logger.isDebugEnabled())
-               Alfresco.logger.debug("Initialised form: ", this);
          }
          else
          {
