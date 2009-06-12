@@ -85,7 +85,16 @@
           * @property siteId
           * @type string
           */
-         siteId: ""
+         siteId: "",
+
+         /**
+          * Whether to set UI focus to this component or not
+          * 
+          * @property setFocus
+          * @type boolean
+          * @default false
+          */
+         setFocus: false
       },
 
       /**
@@ -223,9 +232,11 @@
          // Setup the DataTable
          this._setupDataTable();
 
-         // Set initial focus
-         var searchText = Dom.get(this.id + "-search-text");
-         searchText.focus();
+         // Set initial focus?
+         if (this.options.setFocus)
+         {
+            Dom.get(this.id + "-search-text").focus();
+         }
 
          /*
           * Enter key listener function needs to be enclosed due to having "window" scope

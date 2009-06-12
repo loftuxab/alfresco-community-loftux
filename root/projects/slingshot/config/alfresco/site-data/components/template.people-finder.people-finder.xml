@@ -6,5 +6,6 @@
    <url>/components/people-finder/people-finder</url>
    <properties>
       <minSearchTermLength>3</minSearchTermLength>
+      <setFocus>true</setFocus>
    </properties>
 </component>

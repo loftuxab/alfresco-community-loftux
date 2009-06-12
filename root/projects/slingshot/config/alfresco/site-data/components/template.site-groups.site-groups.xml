@@ -4,4 +4,8 @@
    <region-id>site-groups</region-id>
    <source-id>site-groups</source-id>
    <url>/components/site-groups</url>
+   <properties>
+      <minSearchTermLength>3</minSearchTermLength>
+      <setFocus>true</setFocus>
+   </properties>
 </component>

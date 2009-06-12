@@ -10,7 +10,8 @@
          <#list siteRoles as siteRole>"${siteRole}"<#if siteRole_has_next>,</#if></#list>
       ],
       minSearchTermLength: ${args.minSearchTermLength!'3'},
-      maxSearchResults: ${args.maxSearchResults!'100'}
+      maxSearchResults: ${args.maxSearchResults!'100'},
+      setFocus: ${args.setFocus!'false'}
    }).setMessages(
       ${messages}
    );

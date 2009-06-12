@@ -4,4 +4,7 @@
    <region-id>site-finder</region-id>
    <source-id>site-finder</source-id>
    <url>/components/site-finder</url>
+   <properties>
+      <setFocus>true</setFocus>
+   </properties>
 </component>

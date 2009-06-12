@@ -144,7 +144,16 @@
           * @type int
           * @default 100
           */
-         maxSearchResults: 100
+         maxSearchResults: 100,
+
+         /**
+          * Whether to set UI focus to this component or not
+          * 
+          * @property setFocus
+          * @type boolean
+          * @default false
+          */
+         setFocus: false
       },
 
       /**
@@ -320,8 +329,11 @@
          }, "keydown");
          enterListener.enable();
          
-         // Set initial focus
-         searchText.focus();
+         // Set initial focus?
+         if (this.options.setFocus)
+         {
+            searchText.focus();
+         }
       },
       
       /**
