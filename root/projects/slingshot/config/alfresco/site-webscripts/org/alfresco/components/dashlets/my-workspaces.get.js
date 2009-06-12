@@ -34,7 +34,7 @@ function main()
             }
          }
       }
-      
+      model.numSites = sites.length
       // Prepare the model for the template
       model.sites = sites;
    }

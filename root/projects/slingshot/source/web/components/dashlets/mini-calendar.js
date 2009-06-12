@@ -38,6 +38,7 @@
       setSiteId: function(siteId)
       {
          this.siteId = siteId;
+         return this;
       },
       
       /**
@@ -84,7 +85,9 @@
        */
       onSuccess: function(o)
       {
-         var html = "";
+         var noEventHTML = '<div class="detail-list-item first-item last-item"><span>'+this._msg("label.no-items")+'</span></div>';
+         var eventHTML = '';
+         var hasEvents = false;
          try 
          {
             var eventList = YAHOO.lang.JSON.parse(o.responseText);
@@ -93,13 +96,17 @@
             
             for (var key in eventList)
             {
+
                if (eventList.hasOwnProperty(key))
                {
+                  
                   var dateParts = key.split("/");
                   var date = YAHOO.widget.DateMath.getDate(dateParts[2], (dateParts[0] - 1), dateParts[1]);
                   if (date >= now)
                   {
-                     html += this.renderDay(date, eventList);
+                     hasEvents = true;                     
+
+                     eventHTML += this.renderDay(date, eventList);
                   }
                }
             }
@@ -107,10 +114,9 @@
          catch (e)
          {
             // Do nothing
-            html = "Could not load calendar data";
+            eventHTML = "Could not load calendar data";
          }
-         
-         Dom.get(this.id + "-eventsContainer").innerHTML = html;
+         Dom.get(this.id + "-eventsContainer").innerHTML = (hasEvents) ? eventHTML : noEventHTML;
       },
       
       renderDay: function(date, eventData)
@@ -150,7 +156,30 @@
       {
          /* Failed */
          //alert("Failed to load calendar data.");
-      }  
+      },
+      /**
+       * Gets a custom message
+       *
+       * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
+       */
+      _msg: function Activities__msg(messageId)
+      {
+         return Alfresco.util.message.call(this, messageId, "Alfresco.MiniCalendar", Array.prototype.slice.call(arguments).slice(1));
+      },
+      /**
+       * Set messages for this component
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       */
+      setMessages: function setMessages(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
+         return this;
+      }      
    
    };
 })();

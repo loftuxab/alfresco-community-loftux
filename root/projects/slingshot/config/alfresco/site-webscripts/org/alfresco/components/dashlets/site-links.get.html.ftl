@@ -14,7 +14,7 @@
       <a id="${args.htmlid}-createLink-button" class="create-link" >${msg("link.createLink")}</a>
    </div>
    <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
-<#if links??>
+<#if numLinks!=0>
    <#list links as link>
       <#assign linkUrl=link.url >
       <div id="${args.htmlid}-link-div-${link.name}" class="detail-list-item <#if link_index = 0>first-item<#elseif !link_has_next>last-item</#if>">

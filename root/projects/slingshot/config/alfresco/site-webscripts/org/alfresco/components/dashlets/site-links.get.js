@@ -17,6 +17,7 @@ function main()
       links = eval('(' + result.response + ')').items;
       links.sort(sortByTitle);
       model.links = links;
+      model.numLinks = links.length;
    }
 }
 
