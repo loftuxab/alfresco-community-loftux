@@ -59,7 +59,8 @@
       // Notifications that the favourite sites have been updated
       YAHOO.Bubbling.on("favouriteSiteAdded", this.onFavouriteSiteAdded, this);
       YAHOO.Bubbling.on("favouriteSiteRemoved", this.onFavouriteSiteRemoved, this);
-      
+
+      this.preferencesService = new Alfresco.service.Preferences();
       return this;
    };
 
@@ -183,6 +184,7 @@
             type: "menu"
          });
          sitesButton.subscribe("click", this.onSitesMenuShow, this, true);
+         
       },
       
       /**
@@ -419,7 +421,70 @@
          
          sitesMenu.render();
       },
+      /**
+       * Adds an event handler that adds or removes the site as favourite site
+       *
+       * @method _addImapFavouriteHandling
+       * @param site {string} The shortname of the site
+       * @private
+       */
+      addAsFav: function Header__addAsFav(site)
+      {
+         var me = this;
+         var sitesMenu = this.widgets.sitesMenu;
 
+
+         if (site)
+         {
+            site = {
+               shortName : site,
+               title : site //must change to site.title once it's available
+            };
+         }
+         /**
+          * We assume that the change of favourite site will work and therefore change
+          * the gui immediatly after the server call.
+          * If it doesn't we revoke the gui changes and display an error message
+          */
+         var responseConfig =
+         {
+            failureCallback:
+            {
+               fn: function(event, obj)
+               {
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     text: me._msg("message.siteFavourite.failure")
+                  });
+               },
+               scope: this,
+               obj:
+               {
+                   site: site,
+                   thisComponent: me
+               }
+            }
+            ,
+            successCallback:
+            {
+               fn: function(event, obj)
+               {
+                  YAHOO.Bubbling.fire("favouriteSiteAdded", site);
+                  sitesMenu.removeItem(sitesMenu.activeItem.index,sitesMenu.activeItem.groupIndex);
+               },
+               scope: this,
+               obj:
+               {
+                  site: site,
+                  thisComponent: me
+               }
+            }
+         };
+         me.preferencesService.set(
+            Alfresco.service.Preferences.FAVOURITE_SITES + "." + site.shortName,
+            true,
+            responseConfig);
+      },      
       /**
        * Gets a custom message
        *

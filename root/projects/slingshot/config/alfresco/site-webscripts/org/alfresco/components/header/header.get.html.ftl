@@ -72,6 +72,13 @@
             </li>
          </#list>
          </ul>
+         <#if (page.url.templateArgs.site?? && !currentSiteIsFav)>
+         <ul class="separator">
+            <li>
+               <a href="#" onclick="thisHeader.addAsFav('${page.url.templateArgs.site}'); return false;">${msg("link.add-fav",page.url.templateArgs.site!"")}</a>
+            </li>
+         </ul>
+         </#if>
          <ul class="<#if !isGuest>separator</#if>">
             <li>
                <a href="${url.context}/page/site-finder">${msg("header.sites.findSites")}</a>

@@ -29,7 +29,7 @@ function main()
       {
          "shortName" :
          {
-            "match" : "exact-membership",
+            "match" : "exact",
             "values" : []
          }
       };
@@ -47,8 +47,9 @@ function main()
       
       if (result.status == 200)
       {
-         var i, ii;
-         
+         var i, ii,currentSiteIsFav;
+         currentSiteIsFav = false;
+         currentSite = page.url.templateArgs.site || "";
          // Create javascript objects from the server response
          // Each item is a favourite site that the user is a member of
          var sites = eval('(' + result + ')');
@@ -60,12 +61,16 @@ function main()
             
             for (i = 0, ii = sites.length; i < ii; i++)
             {
+               if (sites[i].shortName==currentSite)
+               {
+                  currentSiteIsFav=true;
+               }
                favouriteSites.push(sites[i]);
             }
          }
       }
    }
-   
+   model.currentSiteIsFav = currentSiteIsFav;
    // Prepare the model for the template
    model.favouriteSites = favouriteSites;
 }
