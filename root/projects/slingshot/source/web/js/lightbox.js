@@ -197,7 +197,8 @@ function showLightbox(objLink)
 		objLightbox.style.top = (lightboxTop < 0) ? "0px" : lightboxTop + "px";
 		objLightbox.style.left = (lightboxLeft < 0) ? "0px" : lightboxLeft + "px";
 
-
+      objLightbox.style.minWidth = '128px';
+      objLightboxDetails.style.minWidth = '128px';
 		objLightboxDetails.style.width = imgPreload.width + 'px';
 		
 		if(objLink.getAttribute('title')){
