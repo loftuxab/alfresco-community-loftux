@@ -50,8 +50,7 @@ public class DescriptionImpl implements Description
     private Set<String>familys;
     private RequiredAuthentication requiredAuthentication;
     private String runAs;
-    private RequiredTransaction requiredTransaction;
-    private TransactionCapability transactionCapability;
+    private RequiredTransactionParameters transactionParameters;
     private RequiredCache requiredCache;
     private FormatStyle formatStyle;
     private String httpMethod;
@@ -267,41 +266,31 @@ public class DescriptionImpl implements Description
         return this.runAs;
     }
 
-    /**
-     * Sets the required level of transaction
-     * 
-     * @param requiredTransaction
-     */
-    public void setRequiredTransaction(RequiredTransaction requiredTransaction)
-    {
-        this.requiredTransaction = requiredTransaction;
-    }
-
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Description#getRequiredTransaction()
      */
     public RequiredTransaction getRequiredTransaction()
     {
-        return this.requiredTransaction;
+        return this.transactionParameters.getRequired();
     }
 
     /**
-     * Sets the transaction capability
+     * Sets the transaction parameters
      * 
-     * @param transactionCapability
+     * @param transactionParameters
      */
-    public void setTransactionCapability(TransactionCapability transactionCapability)
+    public void setRequiredTransactionParameters(RequiredTransactionParameters transactionParameters)
     {
-        this.transactionCapability = transactionCapability;
+        this.transactionParameters = transactionParameters;
     }
 
     /*
      * (non-Javadoc)
-     * @see org.alfresco.web.scripts.Description#getTransactionCapability()
+     * @see org.alfresco.web.scripts.Description#getRequiredTransactionParameters()
      */
-    public TransactionCapability getTransactionCapability()
+    public RequiredTransactionParameters getRequiredTransactionParameters()
     {
-        return this.transactionCapability;
+        return this.transactionParameters;
     }
     
     /**
