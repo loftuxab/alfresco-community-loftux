@@ -3142,7 +3142,7 @@ Alfresco.service.BaseService.prototype =
                var values = Alfresco.util.findValueByDotNotation(preferences, n);
 
                // Parse string to array, add the value and convert to string again
-               if (typeof values == "string")
+               if (typeof values == "string" || values === null)
                {
                   var arrValues = values ? values.split(",") : [];
                   arrValues.push(v);
