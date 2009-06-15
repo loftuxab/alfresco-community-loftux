@@ -9,5 +9,6 @@
       <li><span class="editingOthers"><a href="#" onclick="return false;" class="filter-link">${msg("link.editingOthers")}</a></span></li>
       <li><span class="recentlyModified"><a href="#" onclick="return false;" class="filter-link">${msg("link.recentlyModified")}</a></span></li>
       <li><span class="recentlyAdded"><a href="#" onclick="return false;" class="filter-link">${msg("link.recentlyAdded")}</a></span></li>
+      <li><span class="favouriteDocuments"><a href="#" onclick="return false;" class="filter-link">${msg("link.favouriteDocuments")}</a></span></li>
    </ul>
 </div>

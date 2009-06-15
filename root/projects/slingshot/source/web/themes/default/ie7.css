@@ -87,6 +87,20 @@ textarea
    margin-top: -7px;
 }
 
+/**
+ * My Documents dashlet
+ * MSIE's inability to do anything properly
+ */
+.my-documents .scrollableList
+{
+   padding-right: 20px;
+}
+
+.my-documents table
+{
+   margin-right: -20px !important;
+}
+
 
 /**
  * Document Library

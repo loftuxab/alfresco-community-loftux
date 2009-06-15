@@ -47,9 +47,12 @@
    /**
     * Preferences
     */
-   var PREFERENCES_ROOT = "org.alfresco.share.documentList",
-      PREF_SHOW_FOLDERS = PREFERENCES_ROOT + ".showFolders",
-      PREF_SIMPLE_VIEW = PREFERENCES_ROOT + ".simpleView";
+   var PREFERENCES_DOCLIST = "org.alfresco.share.documentList",
+      PREF_SHOW_FOLDERS = PREFERENCES_DOCLIST + ".showFolders",
+      PREF_SIMPLE_VIEW = PREFERENCES_DOCLIST + ".simpleView";
+
+   var PREFERENCES_DOCUMENTS = "org.alfresco.share.documents",
+      PREF_FAVOURITES = PREFERENCES_DOCUMENTS + ".favourites";
 
    
    /**
@@ -274,12 +277,11 @@
          }
       },
 
-
       /**
        * Keeps track of different states
        */
-      state: {
-
+      state:
+      {
          /**
           * True if an an edit offline ajax call is in process
           *
@@ -597,7 +599,7 @@
             [
                "index", "nodeRef", "type", "isLink", "mimetype", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "size", "contentUrl", "actionSet", "tags",
-               "activeWorkflows", "location", "permissions", "onlineEditUrl"
+               "activeWorkflows", "isFavourite", "location", "permissions", "onlineEditUrl"
             ],
             metaFields:
             {
@@ -699,6 +701,23 @@
                id = tagId.tags[tagName] = tagId.id;
             }
             return scope.id + "-tagId-" + id;
+         };
+         
+         /**
+          * Generate favourite indicator
+          *
+          * @method generateFavourite
+          * @param scope {object} DocumentLibrary instance
+          * @param record {object} DataTable record
+          * @return {string} HTML mark-up for favourite indicator
+          */
+         var generateFavourite = function DL_generateFavourite(scope, record)
+         {
+            var id = scope.id + "-fav-" + record.getId(),
+               nodeRef = record.getData("nodeRef"),
+               isFavourite = record.getData("isFavourite");
+
+            return '<a id="' + id + '" class="favourite-document' + (isFavourite ? ' enabled' : '') + '" title="' + scope._msg("tip.favourite-document") + '">&nbsp;</a>';
          };
 
 
@@ -915,7 +934,7 @@
                 */
                docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
                 
-               desc = '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(oRecord.getData("displayName")) + '</a></span></h3>';
+               desc = '<h3 class="filename">' + generateFavourite(me, oRecord) + '<span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(oRecord.getData("displayName")) + '</a></span></h3>';
                if (me.options.simpleView)
                {
                   /**
@@ -1203,6 +1222,19 @@
          };
          YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler);
          YAHOO.Bubbling.addDefaultAction("show-more", fnActionHandler);
+         
+         // Hook favourite document events
+         var fnFavouriteHandler = function DL_fnFavouriteHandler(layer, args)
+         {
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
+            if (owner !== null)
+            {
+               me.onFavouriteDocument.call(me, args[1].target.offsetParent, owner);
+            }
+      		 
+            return true;
+         };
+         YAHOO.Bubbling.addDefaultAction("favourite-document", fnFavouriteHandler);
 
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
@@ -2328,6 +2360,45 @@
                fnDisable(this.widgets[index]);
             }
          }
+      },
+      
+      /**
+       * Favourite document event handler
+       *
+       * @method onFavouriteDocument
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onFavouriteDocument: function DL_onFavouriteDocument(row)
+      {
+         var record = this.widgets.dataTable.getRecord(row),
+            file = record.getData(),
+            nodeRef = file.nodeRef;
+         
+         file.isFavourite ^= true;
+         this.widgets.dataTable.updateRow(record, file);
+               
+         var responseConfig =
+         {
+            failureCallback:
+            {
+               fn: function DL_oFD_failure(event, p_oRecord)
+               {
+                  // Reset the flag to it's previous state
+                  var file = p_oRecord.getData();
+                  file.isFavourite ^= true;
+                  this.widgets.dataTable.updateRow(p_oRecord, file);
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     text: this._msg("message.favourite.failure", file.displayName)
+                  });
+               },
+               scope: this,
+               obj: record
+            }
+         };
+
+         var fnPref = file.isFavourite ? "add" : "remove";
+         this.services.preferences[fnPref].call(this.services.preferences, PREF_FAVOURITES, nodeRef, responseConfig);
       },
 
 

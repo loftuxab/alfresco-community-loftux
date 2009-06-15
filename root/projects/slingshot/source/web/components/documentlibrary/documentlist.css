@@ -254,6 +254,26 @@
    text-decoration: underline;
 }
 
+/* Favourite document indicator */
+.doclist .documents h3 a.favourite-document
+{
+   background-image: url(../images/star-deselected_16x16.png);
+   background-position: center;
+   background-repeat: no-repeat;
+   cursor: pointer;
+   margin-right: 0.5em;
+   padding: 0.5em;
+}
+.doclist .documents h3 a.favourite-document.enabled
+{
+   background-image: url(../images/star-selected_16x16.png);
+}
+.doclist .documents h3 a.favourite-document:active,
+.doclist .documents h3 a.favourite-document:hover
+{
+   text-decoration: none;
+}
+
 .doclist .documents .rename-file
 {
    background-color: #e8e8e8;
