@@ -455,7 +455,8 @@ namespace AlfrescoPowerPoint2003
 
       public bool docHasExtension()
       {
-         return (m_PowerPointApplication.ActivePresentation.Name.EndsWith(".ppt"));
+         string name = m_PowerPointApplication.ActivePresentation.Name;
+         return (name.EndsWith(".ppt") || name.EndsWith(".pptx"));
       }
 
       public void saveToAlfresco(string documentPath)

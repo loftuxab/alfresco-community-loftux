@@ -394,7 +394,8 @@ namespace AlfrescoWord2003
 
       public bool docHasExtension()
       {
-         return (m_WordApplication.ActiveDocument.Name.EndsWith(".doc"));
+         string name = m_WordApplication.ActiveDocument.Name;
+         return (name.EndsWith(".doc") || name.EndsWith(".docx"));
       }
 
       public void saveToAlfresco(string documentPath)
