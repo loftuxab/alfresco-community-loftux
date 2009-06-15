@@ -248,7 +248,7 @@ namespace AlfrescoWord2003
            this.txtWebDAVURL.Name = "txtWebDAVURL";
            this.txtWebDAVURL.Size = new System.Drawing.Size(251, 20);
            this.txtWebDAVURL.TabIndex = 7;
-           this.tipMandatory.SetToolTip(this.txtWebDAVURL, "The URL for the Alfresco Web Client.\r\ne.g. http://myserver:8080/alfresco/webdev/\r" +
+           this.tipMandatory.SetToolTip(this.txtWebDAVURL, "The URL for the Alfresco Web Client.\r\ne.g. http://myserver:8080/alfresco/webdav/\r" +
                    "\n");
            this.txtWebDAVURL.TextChanged += new System.EventHandler(this.txtWebDAVURL_TextChanged);
            // 

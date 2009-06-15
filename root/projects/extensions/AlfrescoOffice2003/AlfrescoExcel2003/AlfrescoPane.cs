@@ -445,7 +445,8 @@ namespace AlfrescoExcel2003
 
       public bool docHasExtension()
       {
-         return (m_ExcelApplication.ActiveWorkbook.Name.EndsWith(".xls"));
+         string name = m_ExcelApplication.ActiveWorkbook.Name;
+         return (name.EndsWith(".xls") || name.EndsWith(".xlsx"));
       }
 
       public void saveToAlfresco(string documentPath)
