@@ -1358,7 +1358,7 @@ Alfresco.forms.validation.repoRegexMatch = function repoRegexMatch(field, args, 
 {
    // convert parameters
    args.pattern = args.expression;
-   args.match = !args.requiresMatch;
+   args.match = args.requiresMatch;
 
    // call the standard regex handler
    return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
