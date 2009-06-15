@@ -51,6 +51,14 @@ Alfresco.constants = Alfresco.constants || {};
 Alfresco.component = Alfresco.component || {};
 
 /**
+ * Alfresco top-level dashlet namespace.
+ * 
+ * @namespace Alfresco
+ * @class Alfresco.dashlet
+ */
+Alfresco.dashlet = Alfresco.dashlet || {};
+
+/**
  * Alfresco top-level module namespace.
  * 
  * @namespace Alfresco
@@ -3133,13 +3141,15 @@ Alfresco.service.BaseService.prototype =
                preferences = YAHOO.lang.merge(preferences, response.json);
                var values = Alfresco.util.findValueByDotNotation(preferences, n);
 
-               // Parse string to array, remove the value and convert to string again
-               var arrValues = values ? values.split(",") : [];
-               arrValues.push(v);
-               preferences = Alfresco.util.dotNotationToObject(n, arrValues.join(","));
+               // Parse string to array, add the value and convert to string again
+               if (typeof values == "string")
+               {
+                  var arrValues = values ? values.split(",") : [];
+                  arrValues.push(v);
 
-               // Save preference with the new value
-               this.set(name, preferences, rc);
+                  // Save preference with the new value
+                  this.set(name, arrValues.join(","), rc);
+               }
             },
             scope: this
          };
@@ -3173,12 +3183,14 @@ Alfresco.service.BaseService.prototype =
                var values = Alfresco.util.findValueByDotNotation(preferences, n);
 
                // Parse string to array, remove the value and convert to string again
-               var arrValues = values ? values.split(",") : [];
-               arrValues = Alfresco.util.arrayRemove(arrValues, v);               
-               preferences = Alfresco.util.dotNotationToObject(n, arrValues.join(","));
+               if (typeof values == "string")
+               {
+                  var arrValues = values ? values.split(",") : [];
+                  arrValues = Alfresco.util.arrayRemove(arrValues, v);               
 
-               // Save preference without value
-               this.set(name, preferences, rc);
+                  // Save preference without value
+                  this.set(name, arrValues.join(","), rc);
+               }
             },
             scope: this
          };
@@ -3337,6 +3349,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
       // Initialise default prototype properties
       this.widgets = {};
       this.modules = {};
+      this.services = {};
       
       // Register this component
       Alfresco.util.ComponentManager.register(this);
@@ -3378,6 +3391,14 @@ Alfresco.util.RichEditor = function(editorName,id,config)
        * @default null
        */
       modules: null,
+
+      /**
+       * Object container for storing service instances.
+       * 
+       * @property services
+       * @type object
+       */
+      services: null,
 
       /**
        * Set multiple initialization options at once.
