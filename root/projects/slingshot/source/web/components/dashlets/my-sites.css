@@ -4,14 +4,15 @@
    float: left;
 }
 
-.my-sites div.my-actions span.favourite, .my-sites div.my-actions span.imap-favourite 
+.my-sites div.my-actions span.favourite,
+.my-sites div.my-actions span.imap-favourite 
 {
+   background-image: url(../images/star-deselected_16x16.png);
    background-repeat: no-repeat;
    background-position: center;
+   cursor: pointer;
    margin-right:0.5em;
    padding:0.5em;
-   cursor: pointer;
-   background-image: url(../images/star-deselected_16x16.png);
 }
 
 .my-sites div.my-actions span.favourite.enabled
@@ -31,10 +32,10 @@
 
 .my-sites div.site
 {
-   float: left;
    background-image: url(../images/site-24.png);
    background-repeat: no-repeat;
    background-position:0 2px;
+   float: left;
    line-height: 2em;
    max-width: 60%;
    padding-left: 32px;
@@ -44,18 +45,19 @@
 {
    float: right;
    line-height: 2.2em;
-   visibility:hidden;
+   visibility: hidden;
 }
-.my-sites .detail-list-item.over div.actions{
-   visibility:visible;
+.my-sites .detail-list-item.over div.actions
+{
+   visibility: visible;
 }
 .my-sites div.actions span.delete
 {
    background-image: url(../images/remove-icon-16.png);
    background-repeat: no-repeat;
    background-position: center;
-   padding: 1em;
    cursor: pointer;
+   padding: 1em;
 }
 
 .my-sites div.description
