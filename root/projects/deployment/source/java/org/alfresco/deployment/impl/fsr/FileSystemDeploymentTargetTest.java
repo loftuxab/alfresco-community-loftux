@@ -25,18 +25,34 @@ package org.alfresco.deployment.impl.fsr;
  * http://www.alfresco.com/legal/licensing
  */
 
-import java.io.IOException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.alfresco.deployment.DeploymentReceiverTransport;
 import org.alfresco.deployment.FSDeploymentRunnable;
 import org.alfresco.deployment.impl.DeploymentException;
 import org.alfresco.deployment.impl.server.Deployment;
+import org.alfresco.deployment.impl.server.DeploymentTargetRegistry;
+import org.alfresco.util.Deleter;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import junit.framework.TestCase;
 
 public class FileSystemDeploymentTargetTest extends TestCase 
 {
+    private File log = null;
+    private File metadata = null;
+    private File data = null;
+    private File target = null;
+    
+    private String TEST_USER = "Giles";
+    private String TEST_PASSWORD = "Watcher";
+    private String TEST_TARGET = "sampleTarget";
+    
+    private DeploymentTargetRegistry registry = null;
+    private DeploymentReceiverTransport transport = null; 
+
 	/**
 	 * @param name
 	 */
@@ -49,7 +65,27 @@ public class FileSystemDeploymentTargetTest extends TestCase
 	 */
 	@Override
 	protected void setUp() throws Exception {
-		super.setUp();
+
+
+	    super.setUp();
+	    log = new File("deplog");
+	    log.mkdir();
+	    metadata = new File("depmetadata");
+	    metadata.mkdir();
+	    data = new File("depdata");
+	    data.mkdir();
+	    target = new File("sampleTarget");
+	    target.mkdir();
+	        
+	    /**
+	      * Start the Standalone Deployment Engine
+	      */
+	    @SuppressWarnings("unused")
+	        FileSystemXmlApplicationContext receiverContext =
+	            new FileSystemXmlApplicationContext("./config/application-context.xml");
+	        
+	        transport = (DeploymentReceiverTransport)receiverContext.getBean("deploymentReceiverEngine");
+	        registry = (DeploymentTargetRegistry)receiverContext.getBean("deploymentReceiverEngine");    
 	}
 
 	/* (non-Javadoc)
@@ -58,6 +94,35 @@ public class FileSystemDeploymentTargetTest extends TestCase
 	@Override
 	protected void tearDown() throws Exception {
 		super.tearDown();
+    	super.tearDown();
+    	
+        if(log != null)
+        {
+        	Deleter.Delete(log);
+        }
+        if(data != null)
+        {
+        	Deleter.Delete(data);
+        }
+        if(metadata != null)
+        {
+        	Deleter.Delete(metadata);
+        }
+        if(target != null)
+        {
+        	Deleter.Delete(target);
+        }
+
+        File dot = new File(".");
+        String[] listing = dot.list();
+        for (String name : listing)
+        {
+             if (name.startsWith("dep-record-"))
+             {
+                 File file = new File(name);
+                 file.delete();
+             }
+        }
 	}
 	
 	
@@ -71,131 +136,121 @@ public class FileSystemDeploymentTargetTest extends TestCase
 	
 	}
 	
-//	/**
-//	 * Test postCommitCallback
-//	 * the exception should be swallowed and not thrown.
-//	 */
-//	
-//	public void testPostCommit()
-//	{
-//		List<FSDeploymentRunnable> runnables = new ArrayList<FSDeploymentRunnable>(); 
-//		
-//		FSRunnableTester tester = new FSRunnableTester();
-//		tester.throwException = true;
-//		
-//		String name="testTarget";
-//		String root="hellmouth";
-//		String metadata="metadata";
-//		String user="Master";	
-//		String password="vampire";
-//		
-//		Target t = new Target(name, root, metadata, null, runnables, user, password);
-//		Deployment deployment = null;
-//		try {
-//			deployment = new Deployment(t, ".");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			fail("unable to create deployment");
-//		}
-//		
-//		// should do nothing
-//		t.runPostCommit(deployment);
-//		
-//		runnables.add(tester);
-//		t.runPostCommit(deployment);
-//		
-//		assertNotNull("init method not called", tester.getDeployment());
-//		assertTrue("run called", tester.isRunCalled());
-//		
-//	}
-//	
-//	
-//	/**
-//	 * Test the prepare callback 
-//	 */
-//	public void testPrepare()
-//	{
-//		List<FSDeploymentRunnable> runnables = new ArrayList<FSDeploymentRunnable>(); 
-//		
-//		FSRunnableTester tester = new FSRunnableTester();
-//		
-//		
-//		String name="testTarget";
-//		String root="hellmouth";
-//		String metadata="metadata";
-//		String user="Master";	
-//		String password="vampire";
-//		
-//		Target t = new Target(name, root, metadata, runnables, null, user, password);
-//		Deployment deployment = null;
-//		try {
-//			deployment = new Deployment(t, ".");
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			fail("unable to create deployment");
-//		}
-//		
-//		// should do nothing
-//		t.runPrepare(deployment);
-//		
-//		// add the tester
-//		runnables.add(tester);
-//		t.runPrepare(deployment);
-//		
-//		assertNotNull("init method not called", tester.getDeployment());
-//		assertTrue("run called", tester.isRunCalled());
-//		
-//		// set the tester to throw and exception - this should not be swallowed
-//		tester.throwException = true;
-//		
-//		try{
-//			t.runPrepare(deployment);
-//			fail("exception not thrown");
-//		} catch (DeploymentException de) {
-//		
-//		}
-//	}
+	/**
+	 * Test postCommitCallback
+	 * the exception should be swallowed and not thrown.
+	 */
+	
+	public void testPostCommit()
+	{
+	
+		FSRunnableTester tester = new FSRunnableTester();
+		tester.setThrowException(true);
+		
+		FileSystemDeploymentTarget t = (FileSystemDeploymentTarget)registry.getTargets().get(TEST_TARGET);
+		assertNotNull("sampleTarget null", t);
+		List<FSDeploymentRunnable> postCommit = new ArrayList<FSDeploymentRunnable>();
+		postCommit.add(tester);
+		t.setPostCommit(postCommit);
+		String ticket = t.begin(TEST_TARGET, "wibble", 1, TEST_USER, TEST_PASSWORD);
+		t.prepare(ticket);
+		t.commit(ticket);
+		
+		assertTrue("isRunCalled", tester.isRunCalled());
+		
+	}
+	
 	
 	/**
-	 * Test class for 
+	 * Test the prepare callback 
 	 */
-	private class FSRunnableTester implements FSDeploymentRunnable
+	public void testPrepare()
 	{
-
+		FSRunnableTester tester = new FSRunnableTester();
+		tester.setThrowException(true);
+	
 		/**
-		 * 
+		 * Test with one callback that throws an exception
 		 */
-		private static final long serialVersionUID = -5780190885270319744L;
-		
-		Deployment deployment;
-		boolean runCalled = false;
-		boolean throwException;
-		
-		
-		public void init(Deployment deployment) 
-		{
-			this.deployment = deployment;	
-		}
-
-		public void run() 
-		{
-			System.out.println("called run");
-			runCalled = true;
+		FileSystemDeploymentTarget t = (FileSystemDeploymentTarget)registry.getTargets().get(TEST_TARGET);
+		assertNotNull("sampleTarget null", t);
+		List<FSDeploymentRunnable> prepare = new ArrayList<FSDeploymentRunnable>();
+		prepare.add(tester);
+		t.setPrepare(prepare);
 			
-			if(throwException)
-			{
-				throw new DeploymentException("test exception");
-			}
+		String ticket = t.begin(TEST_TARGET, "wibble", 1, TEST_USER, TEST_PASSWORD);
+		try 
+		{
+			t.prepare(ticket);
+			fail("deployment exception not thrown");
+		}
+		catch (DeploymentException de)
+		{
+			// Should go here
+		}
+		finally
+		{
+			t.abort(ticket);	
 		}
 		
-		public Deployment getDeployment()
-		{
-			return deployment;
-		}
 		
-		public boolean isRunCalled()
-		{
-			return runCalled;
-		}
+		
+		
 	}
+	public void testMultiplePrepare()
+	{
+		/**
+		 * Prepare with multiple callbacks one of which throws an exception
+		 */
+		FSRunnableTester bomb = new FSRunnableTester();
+		bomb.setThrowException(true);
+
+		FileSystemDeploymentTarget t = (FileSystemDeploymentTarget)registry.getTargets().get(TEST_TARGET);
+		assertNotNull("sampleTarget null", t);
+		List<FSDeploymentRunnable> prepare = new ArrayList<FSDeploymentRunnable>();
+		prepare.add(new FSRunnableTester());
+		prepare.add(new FSRunnableTester());
+		prepare.add(bomb);
+		prepare.add(new FSRunnableTester());
+		t.setPrepare(prepare);
+		
+		String ticket = t.begin(TEST_TARGET, "wibble", 1, TEST_USER, TEST_PASSWORD);
+		try 
+		{
+			t.prepare(ticket);
+			fail("deployment exception not thrown");
+		}
+		catch (DeploymentException de)
+		{
+			// Should go here
+			System.out.println(de.toString());
+			de.printStackTrace();
+		}
+		finally
+		{
+			t.abort(ticket);	
+		}
+		
+		/**
+		 * Now turn off the bomb and make sure that deployment works.
+		 */
+		bomb.setThrowException(false);
+		String ticket2 = t.begin(TEST_TARGET, "wibble", 1, TEST_USER, TEST_PASSWORD);
+		try 
+		{
+			t.prepare(ticket2);
+		}
+		catch (DeploymentException de)
+		{
+			fail("deployment exception thrown");
+		}
+		finally
+		{
+			t.abort(ticket2);	
+		}
+		
+		
+		
+	}
+
 }

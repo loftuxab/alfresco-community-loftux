@@ -274,7 +274,7 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
             }
         	
             // Mark the deployment as prepared
-            deployment.finishPrepare();
+            deployment.prepare();
             
             logger.debug("prepared successfully ticket:" + ticket);
         }
@@ -296,7 +296,7 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
         	// We are most likely to get here because we are aborting an already aborted ticket
         	return;
         }
-        if (deployment.getState() != DeploymentState.WORKING)
+        if (deployment.getState() != DeploymentState.WORKING && deployment.getState() != DeploymentState.PREPARED)
         {
             throw new DeploymentException("Deployment cannot be aborted: already aborting, or committing.");
         }
@@ -399,6 +399,9 @@ public class AVMDeploymentTarget implements Serializable, DeploymentTarget
 	            
     			logger.debug("finished copying, snapshot remote");
     			fAVMService.createSnapshot(localStoreName, tagPattern.format(objs), descriptionPattern.format(objs));
+    			
+	            // Mark the deployment as committed
+	            deployment.commit();
 	        	
 	            /**
 	             * Now run the post commit runnables.

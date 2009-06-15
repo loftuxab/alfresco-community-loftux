@@ -136,17 +136,16 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         throws IOException, DeploymentException
     {
         fCanBeStale = false;
-        fState = DeploymentState.PREPARING;
+        fState = DeploymentState.PREPARED;
     }
 
     /**
-     * Signal that the prepare phase of this deployment is finished.
      * And commit is now in progress.
      */
-    public void finishPrepare()
+    public void commit()
         throws IOException
     {
-        fState = DeploymentState.COMMITTING;
+        fState = DeploymentState.COMMITTED;
     }
 
     /**
@@ -157,7 +156,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
 
         fCanBeStale = false;
-        fState = DeploymentState.ABORTING;
+        fState = DeploymentState.ABORTED;
     }
 
     /**
