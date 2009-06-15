@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,31 +22,29 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.module.org_alfresco_module_dod5015.action;
+package org.alfresco.module.org_alfresco_module_dod5015;
 
-import org.alfresco.service.cmr.action.Action;
-import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
+
 
 /**
- * Destroy action
+ * Helper class containing DOD 5015 model qualified names
  * 
  * @author Roy Wetherall
  */
-public class DestroyAction extends RMDispositionActionExecuterAbstractBase
-{
-    @Override
-    protected void executeRecordFolderLevelDisposition(Action action, NodeRef recordFolder)
-    {
-        // Destroy
-        this.nodeService.deleteNode(recordFolder);        
-    }
-
-    @Override
-    protected void executeRecordLevelDisposition(Action action, NodeRef record)
-    {
-        // Destroy
-        this.nodeService.deleteNode(record);
-    }
+public interface DOD5015Model extends RecordsManagementModel
+{	
+	// Namespace details
+	public static String DOD_URI = "http://www.alfresco.org/model/dod5015/1.0";
+	public static String DOD_PREFIX = "dod";
+    
+	// File plan type 
+    public static QName TYPE_FILE_PLAN = QName.createQName(DOD_URI, "filePlan");
  
-
+    // Record series type
+    public static QName TYPE_RECORD_SERIES = QName.createQName(DOD_URI, "recordSeries");
+    
+    // Record Category
+    public static QName TYPE_RECORD_CATEGORY = QName.createQName(DOD_URI, "recordCategory");
+	
 }

@@ -24,19 +24,24 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionInstructions;
+import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Action to close the records folder
  * 
  * @author Roy Wetherall
  */
-public class CloseRecordFolderAction extends RMActionExecuterAbstractBase
+public class SetupRecordFolderAction extends RMActionExecuterAbstractBase
 {
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
@@ -44,19 +49,25 @@ public class CloseRecordFolderAction extends RMActionExecuterAbstractBase
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {
-        // TODO check that the user in question has the correct permissions to close a records folder
-        
         if (this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
         {
-            Boolean isClosed = (Boolean)this.nodeService.getProperty(actionedUponNodeRef, PROP_IS_CLOSED);
-            if (Boolean.FALSE.equals(isClosed) == true)
+            // Inherit the vital record details
+            VitalRecordDefinition vrDef = this.recordsManagementService.getVitalRecordDefinition(actionedUponNodeRef);
+            if (vrDef != null)
             {
-                this.nodeService.setProperty(actionedUponNodeRef, PROP_IS_CLOSED, true);
+                Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
+                props.put(PROP_VITAL_RECORD_INDICATOR, vrDef.isVitalRecord());
+                props.put(PROP_REVIEW_PERIOD, vrDef.getReviewPeriod());
+                this.nodeService.addAspect(actionedUponNodeRef, ASPECT_VITAL_RECORD_DEFINITION, props);
             }
-        }
-        else
-        {
-            throw new AlfrescoRuntimeException("Can not close a node unless it is a record folder. (" + actionedUponNodeRef.toString() + ")");
+                
+            // Set up the disposition schedule if the dispositions are being managed at the folder level
+            DispositionInstructions di = this.recordsManagementService.getDispositionInstructions(actionedUponNodeRef);
+            if (di != null && di.isRecordLevelDisposition() == false)
+            {
+                // Setup the next disposition action
+                this.recordsManagementService.updateNextDispositionAction(actionedUponNodeRef);                
+            }
         }
     }
 
@@ -67,7 +78,6 @@ public class CloseRecordFolderAction extends RMActionExecuterAbstractBase
     protected void addParameterDefinitions(List<ParameterDefinition> paramList)
     {
         // TODO Auto-generated method stub
-
     }
 
 }

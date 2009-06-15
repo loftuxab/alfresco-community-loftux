@@ -31,7 +31,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionInstructions;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -57,10 +59,9 @@ public class FileAction extends RMActionExecuterAbstractBase
         
         // TODO if this is a declared record already .. what do we do? .. it's a re-file!
         
-        // Get the record categories
-        // TODO for now assume only one record category
-        NodeRef recordCategory = getRecordCategory(actionedUponNodeRef);
-        
+        // Get the disposition instrcutions for the actioned upon record
+        DispositionInstructions di = this.recordsManagementService.getDispositionInstructions(actionedUponNodeRef);
+                
         // Add the record and undeclared aspect
         nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_RECORD, null);
         nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_UNDECLARED_RECORD, null);
@@ -68,7 +69,7 @@ public class FileAction extends RMActionExecuterAbstractBase
         // Get the records properties
         Map<QName, Serializable> recordProperties = this.nodeService.getProperties(actionedUponNodeRef);
         
-        // Calculate the filed date
+        // Calculate the filed date and record identifier
         Calendar fileCalendar = Calendar.getInstance();
         String year = Integer.toString(fileCalendar.get(Calendar.YEAR));
         QName nodeDbid = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "node-dbid");
@@ -80,8 +81,8 @@ public class FileAction extends RMActionExecuterAbstractBase
         this.nodeService.setProperties(actionedUponNodeRef, recordProperties);        
 
         // Calculate the review schedule
-        String reviewPeriod = (String)this.nodeService.getProperty(recordCategory, RecordsManagementModel.PROP_REVIEW_PERIOD);
-        Date reviewAsOf = calculateAsOfDate(reviewPeriod, fileCalendar.getTime());
+        VitalRecordDefinition viDef = this.recordsManagementService.getVitalRecordDefinition(actionedUponNodeRef);
+        Date reviewAsOf = viDef.getNextReviewDate();
         if (reviewAsOf != null)
         {
             Map<QName, Serializable> reviewProps = new HashMap<QName, Serializable>(1);
@@ -89,8 +90,12 @@ public class FileAction extends RMActionExecuterAbstractBase
             this.nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_VITAL_RECORD, reviewProps);
         }
         
-        // Set the next disposition action
-        setNextDispositionAction(recordCategory, actionedUponNodeRef);
+        // Set up the disposition schedule if the dispositions are being managed at the record level
+        if (di != null && di.isRecordLevelDisposition() == true)
+        {
+            // Setup the next disposition action
+            this.recordsManagementService.updateNextDispositionAction(actionedUponNodeRef);
+        }
     }
 
     /**

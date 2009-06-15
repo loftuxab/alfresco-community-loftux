@@ -31,71 +31,59 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.service.cmr.action.Action;
-import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
 /**
+ * Cut off disposition action
+ * 
  * @author Roy Wetherall
  */
-public class CutOffAction extends RMActionExecuterAbstractBase
+public class CutOffAction extends RMDispositionActionExecuterAbstractBase
 {
-
     /**
-     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase#executeRecordFolderLevelDisposition(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
-    protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
+    protected void executeRecordFolderLevelDisposition(Action action, NodeRef recordFolder)
     {
-        // TODO there are enough patterns in here to justify a "disposition" action that gave some
-        //      structure to these actions
+        // Close folder
+        this.recordsManagementActionService.executeRecordsManagementAction(recordFolder, "closeRecordFolder");
         
-        // TODO check that this in actually the next disposition action for the record in question AND
-        //            that it is eligiable for cut off 
+        // Mark the folder as cut off
+        doCutOff(recordFolder);
         
-        // Check whether the record already has the cutoff aspect or not
-        if (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_CUT_OFF) == false)
+        // Mark all the declared children of the folder as cut off
+        List<NodeRef> records = this.recordsManagementService.getRecords(recordFolder);
+        for (NodeRef record : records)
         {
-            QName recordType = this.nodeService.getType(actionedUponNodeRef);
-            if ((this.dictionaryService.isSubClass(recordType, TYPE_RECORD_FOLDER) == true) ||
-                ((this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_RECORD) == true) &&
-                 (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_UNDECLARED_RECORD) == false)))
-            {        
-                // TODO can not cut off if this is a record folder and it contains some undeclared records
-                
-                // Get the record categories
-                // TODO for now assume only one record category
-                NodeRef recordCategory = getRecordCategory(actionedUponNodeRef);
-                
-                // Apply the cut off aspect and set cut off date
-                Map<QName, Serializable> cutOffProps = new HashMap<QName, Serializable>(1);
-                cutOffProps.put(PROP_CUT_OFF_DATE, new Date());
-                this.nodeService.addAspect(actionedUponNodeRef, ASPECT_CUT_OFF, cutOffProps);
-                
-                // Set the next disposition action                
-                setNextDispositionAction(recordCategory, actionedUponNodeRef);
-                
-                // If it is a record folder cut off all the children
-                if (this.dictionaryService.isSubClass(recordType, TYPE_RECORD_FOLDER) == true)
-                {
-                    // TODO we need to iterate over the child records and do the cut off accordingly 
-                }
-            }
-            else
-            {
-                // TODO do we want to throw an exception here or just carry on regardless??
-            }
+            doCutOff(record);
         }
-        // TODO do we throw an exception because the record is already cut off?
     }
 
     /**
-     * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefinitions(java.util.List)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase#executeRecordLevelDisposition(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
-    protected void addParameterDefinitions(List<ParameterDefinition> paramList)
+    protected void executeRecordLevelDisposition(Action action, NodeRef record)
     {
-
+        // Mark the record as cut off
+        doCutOff(record);       
     }
-
-}
+    
+    /**
+     * Marks the record or record folder as cut off, calculating the cut off date.
+     * 
+     * @param nodeRef   node reference
+     */
+    private void doCutOff(NodeRef nodeRef)
+    {
+        if (this.nodeService.hasAspect(nodeRef, ASPECT_CUT_OFF) == false)
+        {
+            // Apply the cut off aspect and set cut off date
+            Map<QName, Serializable> cutOffProps = new HashMap<QName, Serializable>(1);
+            cutOffProps.put(PROP_CUT_OFF_DATE, new Date());
+            this.nodeService.addAspect(nodeRef, ASPECT_CUT_OFF, cutOffProps);
+        }
+    }
+ }

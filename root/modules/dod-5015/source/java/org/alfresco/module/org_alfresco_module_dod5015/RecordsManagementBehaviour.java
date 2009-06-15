@@ -49,7 +49,7 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementBehaviour implements RecordsManagementModel
+public class RecordsManagementBehaviour implements DOD5015Model
 {
     /** Node service */
     private NodeService nodeService;
@@ -145,7 +145,7 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
     public void onFileContent(ChildAssociationRef childAssocRef, boolean bNew)
     {
         // File the document
-        rmService.executeRecordsManagementAction(childAssocRef.getChildRef(), "file", null);
+        rmService.executeRecordsManagementAction(childAssocRef.getChildRef(), "file");
     }
     
     /**
@@ -155,22 +155,9 @@ public class RecordsManagementBehaviour implements RecordsManagementModel
      * @param bNew
      */
     public void onCreateRecordFolder(ChildAssociationRef childAssocRef, boolean bNew)
-    {
-        // Get the record category
-        NodeRef recordCategory = childAssocRef.getParentRef();
-        
-        // Get the child node and check that it is a record folder
-        NodeRef recordFolder = childAssocRef.getChildRef();
-        QName recordFolderType = this.nodeService.getType(recordFolder);
-        if (this.dictionaryService.isSubClass(recordFolderType, TYPE_RECORD_FOLDER) == true)
-        {
-            // Inherit the vital record details
-            this.nodeService.setProperty(recordFolder, PROP_VITAL_RECORD_INDICATOR, this.nodeService.getProperty(recordCategory, PROP_VITAL_RECORD_INDICATOR));
-            this.nodeService.setProperty(recordFolder, PROP_REVIEW_PERIOD, this.nodeService.getProperty(recordCategory, PROP_REVIEW_PERIOD));
-            
-            // TODO do I need to now set up the review schedule and next disposition action for the 
-            //      record folder?
-        }
+    {   
+        // Setup record folder
+        rmService.executeRecordsManagementAction(childAssocRef.getChildRef(), "setupRecordFolder");       
     }
 
     /**

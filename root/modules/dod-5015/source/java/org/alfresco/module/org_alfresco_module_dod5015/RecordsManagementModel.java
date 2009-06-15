@@ -46,15 +46,22 @@ public interface RecordsManagementModel
     
     public static QName ASPECT_CAVEAT_CONFIG_ROOT = QName.createQName(RM_URI, "caveatConfigRoot");
     public static QName ASSOC_CAVEAT_CONFIG = QName.createQName(RM_URI, "caveatConfigAssoc");
+
+    // Records management container
+    public static QName TYPE_RECORDS_MANAGEMENT_CONTAINER = QName.createQName(RM_URI, "recordsManagementContainer");
     
-    // File plan type 
-    public static QName TYPE_FILE_PLAN = QName.createQName(RM_URI, "filePlan");
+    // Disposition instructions aspect
+    public static QName ASPECT_DISPOSITION_INSTRUCTIONS = QName.createQName(RM_URI, "dispositionInstructions");
+    public static QName ASSOC_DISPOSITION_INSTRUCTIONS = QName.createQName(RM_URI, "dispositionInstructions");
     
-    // Record Category
-    public static QName TYPE_RECORD_CATEGORY = QName.createQName(RM_URI, "recordCategory");
-    public static QName ASSOC_DISPOSITION_ACTIONS = QName.createQName(RM_URI, "dispositionActions");
+    // Disposition definition type
+    public static QName TYPE_DISPOSITION_DEFINITION = QName.createQName(RM_URI, "dispositionDefinition");
+    public static QName PROP_DISPOSITION_AUTHORITY = QName.createQName(RM_URI, "dispositionAuthority");
+    public static QName PROP_DISPOITION_INSTRUCTIONS = QName.createQName(RM_URI, "dispositionInstructions");
+    public static QName PROP_RECORD_LEVEL_DISPOSITION = QName.createQName(RM_URI, "recordLevelDisposition");
+    public static QName ASSOC_DISPOSITION_ACTIONS = QName.createQName(RM_URI, "dispositionActions");    
     
-    // Disposition actions
+    // Disposition action type
     public static QName PROP_TYPE = QName.createQName(RM_URI, "dispositionAction");
     public static QName PROP_DISPOSITION_ACTION_NAME = QName.createQName(RM_URI, "dispositionActionName");
     public static QName PROP_DISPOSITION_DESCRIPTION = QName.createQName(RM_URI, "dispositionDescription");
@@ -89,8 +96,8 @@ public interface RecordsManagementModel
     public static QName ASPECT_RECORD_COMPONENT_ID = QName.createQName(RM_URI, "recordComponentIdentifier");
     public static QName PROP_IDENTIFIER = QName.createQName(RM_URI, "identifier");
     
-    // Vital record details aspect
-    public static QName ASPECT_VITAL_RECORD_DETAILS = QName.createQName(RM_URI, "vitalRecordDetails");
+    // Vital record definition aspect
+    public static QName ASPECT_VITAL_RECORD_DEFINITION = QName.createQName(RM_URI, "vitalRecordDefinition");
     public static QName PROP_VITAL_RECORD_INDICATOR = QName.createQName(RM_URI, "vitalRecordIndicator");
     public static QName PROP_REVIEW_PERIOD = QName.createQName(RM_URI, "reviewPeriod");
      

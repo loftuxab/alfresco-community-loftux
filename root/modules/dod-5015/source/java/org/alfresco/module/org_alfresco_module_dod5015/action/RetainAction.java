@@ -24,50 +24,25 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action;
 
-import java.util.List;
-
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.action.Action;
-import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
- * Action to close the records folder
+ * Retain action
  * 
  * @author Roy Wetherall
  */
-public class CloseRecordFolderAction extends RMActionExecuterAbstractBase
+public class RetainAction extends RMDispositionActionExecuterAbstractBase
 {
-    /**
-     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
-     */
     @Override
-    protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
+    protected void executeRecordFolderLevelDisposition(Action action, NodeRef recordFolder)
     {
-        // TODO check that the user in question has the correct permissions to close a records folder
-        
-        if (this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
-        {
-            Boolean isClosed = (Boolean)this.nodeService.getProperty(actionedUponNodeRef, PROP_IS_CLOSED);
-            if (Boolean.FALSE.equals(isClosed) == true)
-            {
-                this.nodeService.setProperty(actionedUponNodeRef, PROP_IS_CLOSED, true);
-            }
-        }
-        else
-        {
-            throw new AlfrescoRuntimeException("Can not close a node unless it is a record folder. (" + actionedUponNodeRef.toString() + ")");
-        }
+        // Do nothing      
     }
 
-    /**
-     * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefinitions(java.util.List)
-     */
     @Override
-    protected void addParameterDefinitions(List<ParameterDefinition> paramList)
+    protected void executeRecordLevelDisposition(Action action, NodeRef record)
     {
-        // TODO Auto-generated method stub
-
+        // Do nothing
     }
-
 }

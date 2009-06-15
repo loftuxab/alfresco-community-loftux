@@ -3,15 +3,53 @@
 
 <beans>
 
-    <!-- Bootstrap Records Management Model -->
+    <!-- Bootstrap Records Management Models -->
     
     <bean id="org_alfresco_module_dod5015_dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
         <property name="models">
             <list>
                 <value>alfresco/module/org_alfresco_module_dod5015/model/recordsModel.xml</value>
+                <value>alfresco/module/org_alfresco_module_dod5015/model/dod5015Model.xml</value>
             </list>
         </property>
     </bean>
+    
+    <!-- Records Management Service -->
+    
+    <bean id="recordsManagementService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceImpl">        
+        <property name="serviceRegistry" ref="ServiceRegistry"/>
+    </bean>
+    
+    <bean id="RecordsManagementService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService</value>
+        </property>
+        <property name="target">
+            <ref bean="recordsManagementService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="RecordsManagementService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref local="RecordsManagementService_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+  
     
     <!-- Records Management Action Service -->
     
@@ -46,14 +84,6 @@
     </bean>
 
     <bean id="RecordsManagementActionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
-    
-    <!-- Script Beans -->
-    
-    <bean id="org_alfresco_module_dod5015_Script_RMService" parent="baseJavaScriptExtension" class="org.alfresco.module.org_alfresco_module_dod5015.script.RecordsManagementScript">
-        <property name="extensionName" value="rmService"/>               
-        <property name="serviceRegistry" ref="ServiceRegistry"/>
-        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
-    </bean>
   
     <!-- Actions -->
     
@@ -62,15 +92,19 @@
         <property name="dictionaryService" ref="DictionaryService"/>
         <property name="actionService" ref="ActionService"/>
         <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
         <property name="publicAction" value="false"/>
     </bean>
     
     <bean id="file" class="org.alfresco.module.org_alfresco_module_dod5015.action.FileAction" parent="rmAction"/>    
     <bean id="cutoff" class="org.alfresco.module.org_alfresco_module_dod5015.action.CutOffAction" parent="rmAction"/>
     <bean id="destroy" class="org.alfresco.module.org_alfresco_module_dod5015.action.DestroyAction" parent="rmAction"/>
+    <bean id="retain" class="org.alfresco.module.org_alfresco_module_dod5015.action.RetainAction" parent="rmAction"/>
+    
     <bean id="openRecordFolder" class="org.alfresco.module.org_alfresco_module_dod5015.action.OpenRecordFolderAction" parent="rmAction"/>
     <bean id="closeRecordFolder" class="org.alfresco.module.org_alfresco_module_dod5015.action.CloseRecordFolderAction" parent="rmAction"/>
     <bean id="reviewed" class="org.alfresco.module.org_alfresco_module_dod5015.action.ReviewedAction" parent="rmAction"/>
+    <bean id="setupRecordFolder" class="org.alfresco.module.org_alfresco_module_dod5015.action.SetupRecordFolderAction" parent="rmAction"/>
 
     <!-- Behaviours -->
     
@@ -149,6 +183,7 @@
     
     <bean id="rmNodeMethodInterceptor" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMNodeMethodInterceptor" parent="rmBaseMethodInterceptor"/>
     
+    
     <bean id="NodeService" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="proxyInterfaces">
             <list>
@@ -169,9 +204,11 @@
         </property>
     </bean>
     
+    
     <!-- Override Search Service (add rmSearchMethodInterceptor to caveat/veto access) -->
     
     <bean id="rmSearchMethodInterceptor" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMSearchMethodInterceptor" parent="rmBaseMethodInterceptor"/>
+    
     
     <bean id="SearchService" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="proxyInterfaces">
@@ -191,9 +228,11 @@
         </property>
     </bean>
     
+    
     <!-- Override Content Service (add rmContentMethodInterceptor to caveat/veto access) -->
     
     <bean id="rmContentMethodInterceptor" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMContentMethodInterceptor" parent="rmBaseMethodInterceptor"/>
+    
     
     <bean id="ContentService" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="proxyInterfaces">
@@ -213,5 +252,6 @@
             </list>
         </property>
     </bean>
+    
     
 </beans>

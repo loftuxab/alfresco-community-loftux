@@ -24,36 +24,26 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action;
 
-import java.util.List;
-
 import org.alfresco.service.cmr.action.Action;
-import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * @author Roy Wetherall
  */
-public class TransferAction extends RMActionExecuterAbstractBase
+public class TransferAction extends RMDispositionActionExecuterAbstractBase
 {
-
-    /**
-     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
-     */
     @Override
-    protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
+    protected void executeRecordFolderLevelDisposition(Action action, NodeRef recordFolder)
     {
-        // TODO Auto-generated method stub
-
+        // TODO 
+        
     }
 
-    /**
-     * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefinitions(java.util.List)
-     */
     @Override
-    protected void addParameterDefinitions(List<ParameterDefinition> paramList)
+    protected void executeRecordLevelDisposition(Action action, NodeRef record)
     {
-        // TODO Auto-generated method stub
-
+        // TODO 
+        
     }
 
 }

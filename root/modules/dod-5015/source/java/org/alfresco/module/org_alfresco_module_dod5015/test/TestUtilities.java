@@ -31,6 +31,7 @@ import java.io.Reader;
 import junit.framework.Assert;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -50,7 +51,7 @@ import org.alfresco.util.ISO9075;
  * 
  * @author neilm
  */
-public class TestUtilities
+public class TestUtilities implements DOD5015Model
 {
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     
@@ -65,8 +66,8 @@ public class TestUtilities
             // For now creating the filePlan beneath the
             NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
             filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
-                    QName.createQName(RecordsManagementModel.RM_URI, "filePlan"),
-                    RecordsManagementModel.TYPE_FILE_PLAN).getChildRef();
+                    TYPE_FILE_PLAN,
+                    TYPE_FILE_PLAN).getChildRef();
         } else
         {
             // Find the file plan in the site provided
@@ -77,6 +78,7 @@ public class TestUtilities
         // TODO ...
         InputStream is = TestUtilities.class.getClassLoader().getResourceAsStream(
                 "alfresco/module/org_alfresco_module_dod5015/bootstrap/DODExampleFilePlan.xml");
+        //"alfresco/module/org_alfresco_module_dod5015/bootstrap/temp.xml");
         Assert.assertNotNull("The DODExampleFilePlan.xml import file could not be found", is);
         Reader viewReader = new InputStreamReader(is);
         Location location = new Location(filePlan);
@@ -90,7 +92,7 @@ public class TestUtilities
         SearchParameters searchParameters = new SearchParameters();
         searchParameters.addStore(SPACES_STORE);
         
-        String query = "PATH:\"rma:filePlan/cm:" + ISO9075.encode(seriesName) + "/cm:" + ISO9075.encode(categoryName) + "\"";
+        String query = "PATH:\"dod:filePlan/cm:" + ISO9075.encode(seriesName) + "/cm:" + ISO9075.encode(categoryName) + "\"";
 
         searchParameters.setQuery(query);
         searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
@@ -105,7 +107,7 @@ public class TestUtilities
     {
         SearchParameters searchParameters = new SearchParameters();
         searchParameters.addStore(SPACES_STORE);
-        String query = "PATH:\"rma:filePlan/cm:" + ISO9075.encode(seriesName)
+        String query = "PATH:\"dod:filePlan/cm:" + ISO9075.encode(seriesName)
             + "/cm:" + ISO9075.encode(categoryName)
             + "/cm:" + ISO9075.encode(folderName) + "\"";
         System.out.println("Query: " + query);

@@ -450,7 +450,8 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
      */
     public boolean hasAccess(NodeRef nodeRef)
     {
-        if (! nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_RECORD_COMPONENT_ID))
+        if (nodeService.exists(nodeRef) == false ||
+            nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_RECORD_COMPONENT_ID) == false)
         {
             return true;
         }
