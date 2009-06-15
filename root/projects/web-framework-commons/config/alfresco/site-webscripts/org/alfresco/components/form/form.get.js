@@ -943,7 +943,7 @@ function setupFieldConstraints(fieldDef, fieldConfig)
       for (var c = 0; c < fieldDef.constraints.length; c++)
       {
          var obj = fieldDef.constraints[c];
-         var constraint = createFieldConstraint(obj.type, obj.params, fieldDef, fieldConfig);
+         var constraint = createFieldConstraint(obj.type, obj.parameters, fieldDef, fieldConfig);
       
          if (constraint !== null)
          {
@@ -1030,11 +1030,11 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
       if (constraintId === "LIST")
       {
          // if the constraint is the list of values constraint, force the control
-         // template to be select.ftl and setup the options
+         // template to be selectone.ftl
          fieldDef.control.template = "controls/selectone.ftl";
          
          // setup the options string and set as control params
-         fieldDef.control.params.options = constraintParams.allowedValues;
+         fieldDef.control.params.options = constraintParams.allowedValues.join();
       }
       else if (constraintId === "LENGTH")
       {
