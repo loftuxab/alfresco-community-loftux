@@ -236,9 +236,10 @@
             initialLoad: true,
             initialRequest: this.currentFilter,
             dynamicData: true,
-            MSG_EMPTY: this.msg("message.loading")
+            MSG_EMPTY: this.msg("label.loading")
          });
 
+         // Add animation to row delete
          this.widgets.dataTable._deleteTrEl = function(row)
          { 
             var scope = this,
@@ -258,6 +259,36 @@
             changeColor.animate();
          };
          
+         // Override abstract function within DataTable to set custom error message
+         this.widgets.dataTable.doBeforeLoadData = function MD_doBeforeLoadData(sRequest, oResponse, oPayload)
+         {
+            if (oResponse.error)
+            {
+               try
+               {
+                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
+                  this.widgets.dataTable.set("MSG_ERROR", response.message);
+               }
+               catch(e)
+               {
+                  this.widgets.dataTable.set("MSG_EMPTY", this.msg("label.empty"));
+                  this.widgets.dataTable.set("MSG_ERROR", this.msg("label.error"));
+               }
+            }
+            
+            // We don't get an renderEvent for an empty recordSet, but we'd like one anyway
+            if (oResponse.results.length === 0)
+            {
+               this.fireEvent("renderEvent",
+               {
+                  type: "renderEvent"
+               });
+            }
+            
+            // Must return true to have the "Loading..." message replaced by the error message
+            return true;
+         };
+
          // Rendering complete event handler
          this.widgets.dataTable.subscribe("renderEvent", function()
          {
@@ -265,7 +296,7 @@
             this.widgets.previewTooltip.cfg.setProperty("context", this.previewTooltips);
             this.widgets.metadataTooltip.cfg.setProperty("context", this.metadataTooltips);
             
-            this.widgets.dataTable.MSG_EMPTY = this.msg("message.empty");
+            this.widgets.dataTable.set("MSG_EMPTY", this.msg("label.empty"));
          }, this, true);
          
          // Hook favourite document events
