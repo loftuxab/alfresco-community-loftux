@@ -306,7 +306,7 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
             }
         	
             // Mark the deployment as prepared
-            deployment.finishPrepare();
+            deployment.prepare();
             
             logger.debug("prepared successfully ticket:" + ticket);
         }
@@ -328,7 +328,7 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
         	// We are most likely to get here because we are aborting an already aborted ticket
         	return;
         }
-        if (deployment.getState() != DeploymentState.WORKING)
+        if (deployment.getState() != DeploymentState.WORKING && deployment.getState() != DeploymentState.PREPARED)
         {
             throw new DeploymentException("Deployment cannot be aborted: already aborting, or committing.");
         }
@@ -379,6 +379,11 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
 	        	logger.error(msg);
 	            throw new DeploymentException(msg);
 	        }
+	        if (deployment.getState() != DeploymentState.PREPARED)
+	        {
+	            throw new DeploymentException("Deployment cannot be committed: not prepared.");
+	        }
+	        
 	        logger.debug("commit ticket:" + ticket);
 	        try
 	        {
@@ -488,6 +493,10 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
 	            }
 	            File preLocation = new File(fileSystemReceiverService.getDataDirectory() + File.separatorChar + ticket);
 	            preLocation.delete();
+	            
+	            // Mark the deployment as committed
+	            
+	            deployment.commit();
 	            
 	            /**
 	             * Now run the post commit runnables.
