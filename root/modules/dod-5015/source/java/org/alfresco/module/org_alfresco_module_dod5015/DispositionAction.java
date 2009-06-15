@@ -22,31 +22,27 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.module.org_alfresco_module_dod5015.action;
+package org.alfresco.module.org_alfresco_module_dod5015;
 
-import org.alfresco.service.cmr.action.Action;
-import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.Period;
+import org.alfresco.service.namespace.QName;
 
 /**
- * Destroy action
- * 
  * @author Roy Wetherall
  */
-public class DestroyAction extends RMDispositionActionExecuterAbstractBase
+public interface DispositionAction
 {
-    @Override
-    protected void executeRecordFolderLevelDisposition(Action action, NodeRef recordFolder)
-    {
-        // Destroy
-        this.nodeService.deleteNode(recordFolder);        
-    }
-
-    @Override
-    protected void executeRecordLevelDisposition(Action action, NodeRef record)
-    {
-        // Destroy
-        this.nodeService.deleteNode(record);
-    }
- 
-
+    String getId();
+    
+    int getIndex();
+    
+    String getName();
+    
+    String getDescription();
+    
+    Period getPeriod();
+    
+    QName getPeriodProperty();
+    
+    // TODO event stuff ...
 }

@@ -24,7 +24,6 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action;
 
-import java.io.Serializable;
 import java.util.Calendar;
 import java.util.List;
 

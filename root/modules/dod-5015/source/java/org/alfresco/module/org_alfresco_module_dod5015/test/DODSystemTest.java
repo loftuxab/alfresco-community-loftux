@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
@@ -54,7 +56,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
@@ -66,7 +67,6 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
-import org.alfresco.util.ISO9075;
 import org.alfresco.util.PropertyMap;
 
 /**
@@ -74,7 +74,7 @@ import org.alfresco.util.PropertyMap;
  * 
  * @author Roy Wetherall
  */
-public class DODSystemTest extends BaseSpringTest implements RecordsManagementModel
+public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 {    
 	protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 	
@@ -113,7 +113,7 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
 		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
 		
 		this.searchService = (SearchService)this.applicationContext.getBean("SearchService"); // use upper 'S'earchService (to test access config interceptor)
-		this.importService = (ImporterService)this.applicationContext.getBean("ImporterService");
+		this.importService = (ImporterService)this.applicationContext.getBean("importerComponent");
 		this.contentService = (ContentService)this.applicationContext.getBean("ContentService");
 		this.rmService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
@@ -170,7 +170,7 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
     
 	public void testBasicFilingTest() throws Exception
 	{	    
-	    NodeRef recordCategory = getRecordCategory("Reports", "AIS Audit Records");    
+	    NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
 	    assertNotNull(recordCategory);
 	    assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
         	    
@@ -224,14 +224,17 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         assertNotNull(this.nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
         System.out.println("Review as of: " + this.nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
 
+        // NOTE the disposition is being managed at a folder level ...
+        
         // Check the disposition action
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_SCHEDULE));
-        assertNotNull(this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION_ID));
-        System.out.println("Disposition action id: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION_ID));
-        assertEquals("cutoff", this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION));
-        System.out.println("Disposition action: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION));
-        assertNotNull(this.nodeService.getProperty(recordOne, PROP_DISPOSITION_AS_OF));
-        System.out.println("Disposition as of: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_AS_OF));
+        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_SCHEDULE));
+        assertTrue(this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_SCHEDULE));
+        assertNotNull(this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION_ID));
+        System.out.println("Disposition action id: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION_ID));
+        assertEquals("cutoff", this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION));
+        System.out.println("Disposition action: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION));
+        assertNotNull(this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_AS_OF));
+        System.out.println("Disposition as of: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_AS_OF));
         
 	    // Test the declaration of a record by editing properties
         Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
@@ -264,30 +267,61 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         // Assert that the record is no longer undeclared
         assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_UNDECLARED_RECORD));
         
-        // Execute the cutoff action
-        this.rmService.executeRecordsManagementAction(recordOne, "cutoff", null);
+        // Execute the cutoff action (should fail becuase this is being done at the record level)
+        try
+        {
+            this.rmService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+            fail(("Shouldn't have been able to execute cut off at the record level"));
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
+        
+        // Execute the cutoff action (should fail becuase it is not yet eligiable)
+        try
+        {
+            this.rmService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+            fail(("Shouldn't have been able to execute because it is not yet eligiable"));
+        }
+        catch (Exception e)
+        {
+            // expected
+        }
+        
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        
+        // Clock the asOf date back to ensure eligibility
+        this.nodeService.setProperty(recordFolder, PROP_DISPOSITION_AS_OF, calendar.getTime());
+        this.rmService.executeRecordsManagementAction(recordFolder, "cutoff", null);
         
         // Check the disposition action
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_SCHEDULE));
-        assertNotNull(this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION_ID));
-        System.out.println("Disposition action id: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION_ID));
-        assertEquals("destroy", this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION));
-        System.out.println("Disposition action: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_ACTION));
-        assertNotNull(this.nodeService.getProperty(recordOne, PROP_DISPOSITION_AS_OF));
-        System.out.println("Disposition as of: " + this.nodeService.getProperty(recordOne, PROP_DISPOSITION_AS_OF));
+        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_SCHEDULE));
+        assertTrue(this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_SCHEDULE));
+        assertNotNull(this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION_ID));
+        System.out.println("Disposition action id: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION_ID));
+        assertEquals("destroy", this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION));
+        System.out.println("Disposition action: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION));
+        assertNotNull(this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_AS_OF));
+        System.out.println("Disposition as of: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_AS_OF));
         
         // Check the previous action details
-        assertEquals("cutoff", this.nodeService.getProperty(recordOne, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
-        assertNotNull(this.nodeService.getProperty(recordOne, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
-        System.out.println("Previous aciont date: " + this.nodeService.getProperty(recordOne, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE).toString());
+        assertEquals("cutoff", this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
+        assertNotNull(this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
+        System.out.println("Previous aciont date: " + this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE).toString());
         
         // Execute the destroy action
-        this.rmService.executeRecordsManagementAction(recordOne, "destroy", null);
+        this.nodeService.setProperty(recordFolder, PROP_DISPOSITION_AS_OF, calendar.getTime());
+        this.rmService.executeRecordsManagementAction(recordFolder, "destroy", null);
         
         // Check that the node has been destroyed
+        assertFalse(this.nodeService.exists(recordFolder));
         assertFalse(this.nodeService.exists(recordOne));
         
-        txn.commit();
+        //txn.commit();
     }
     
     public void testCaveatConfig() throws Exception
@@ -334,7 +368,7 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
         
         // Create record category / record folder
         
-        NodeRef recordCategory = getRecordCategory("Reports", "AIS Audit Records");
+        NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");
         assertNotNull(recordCategory);
         assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
         
@@ -821,39 +855,9 @@ public class DODSystemTest extends BaseSpringTest implements RecordsManagementMo
      */
     private List<NodeRef> getAllRecordCategories()
     {
-        String typeQuery = "TYPE:\"" + RecordsManagementModel.TYPE_RECORD_CATEGORY + "\"";
+        String typeQuery = "TYPE:\"" + TYPE_RECORD_CATEGORY + "\"";
         ResultSet types = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, typeQuery);
         
         return types.getNodeRefs();
-    }
-
-    private NodeRef getRecordCategory(String seriesName, String categoryName)
-    {
-        SearchParameters searchParameters = new SearchParameters();
-        searchParameters.addStore(SPACES_STORE);
-        String query = "PATH:\"rma:filePlan/cm:" + ISO9075.encode(seriesName)
-            + "/cm:" + ISO9075.encode(categoryName) + "\"";
-        System.out.println("Query: " + query);
-        searchParameters.setQuery(query);
-        searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
-        ResultSet rs = this.searchService.query(searchParameters);
-        
-        return rs.getNodeRef(0);
-    }
-    
-    @SuppressWarnings("unused")
-    private NodeRef getRecordFolder(String seriesName, String categoryName, String folderName)
-    {
-        SearchParameters searchParameters = new SearchParameters();
-        searchParameters.addStore(SPACES_STORE);
-        String query = "PATH:\"rma:filePlan/cm:" + ISO9075.encode(seriesName)
-            + "/cm:" + ISO9075.encode(categoryName)
-            + "/cm:" + ISO9075.encode(folderName) + "\"";
-        System.out.println("Query: " + query);
-        searchParameters.setQuery(query);
-        searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
-        ResultSet rs = this.searchService.query(searchParameters);
-        
-        return rs.getNodeRef(0);
     }
 }

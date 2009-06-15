@@ -26,10 +26,10 @@ package org.alfresco.module.org_alfresco_module_dod5015.action;
 
 import java.util.List;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.namespace.QName;
 
 /**
  * Action to re-open the records folder
@@ -47,14 +47,17 @@ public class OpenRecordFolderAction extends RMActionExecuterAbstractBase
     {
         // TODO check that the user in question has the correct permission to re-open a records folder
         
-        QName recordFolderType = this.nodeService.getType(actionedUponNodeRef);
-        if (this.dictionaryService.isSubClass(recordFolderType, TYPE_RECORD_FOLDER) == true)
+        if (this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
         {
             Boolean isClosed = (Boolean)this.nodeService.getProperty(actionedUponNodeRef, PROP_IS_CLOSED);
             if (Boolean.TRUE.equals(isClosed) == true)
             {
                 this.nodeService.setProperty(actionedUponNodeRef, PROP_IS_CLOSED, false);
             }
+        }
+        else
+        {
+            throw new AlfrescoRuntimeException("Can not perform the open record folder action on a node that is not a record folder. (" + actionedUponNodeRef.toString() + ")");
         }
     }
 

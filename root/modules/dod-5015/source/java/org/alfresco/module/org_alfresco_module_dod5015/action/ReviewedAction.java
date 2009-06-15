@@ -24,10 +24,10 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -50,47 +50,30 @@ public class ReviewedAction extends RMActionExecuterAbstractBase
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
-		//TODO Add type validation on the actionedUponNodeRef
-		//     e.g.
-		// QName recordType = this.nodeService.getType(actionedUponNodeRef);
-		// if (((this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_RECORD) == false) ||
-		//     (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_UNDECLARED_RECORD) == true)))
-		// {return; or throw Exception}
-
-		List<NodeRef> containingFolders = this.getRecordFolders(actionedUponNodeRef);
-		//TODO Note the (erroneous?) assumption here of a single containingFolder.
-		NodeRef firstContainingFolder = containingFolders.get(0);
-		Serializable period = this.nodeService.getProperty(firstContainingFolder, PROP_REVIEW_PERIOD);
-		
-		// Calculate the review schedule
-		Date newAsOfDate = this.calculateAsOfDate((String)period, new Date());
-		if (newAsOfDate != null)
-		{
-			if (logger.isDebugEnabled())
-			{
-				StringBuilder msg = new StringBuilder();
-				msg.append("Setting new reviewAsOf property [")
-				    .append(newAsOfDate)
-				    .append("] on ")
-				    .append(actionedUponNodeRef);
-				logger.debug(msg.toString());
-			}
-
-			this.nodeService.setProperty(actionedUponNodeRef, PROP_REVIEW_AS_OF, newAsOfDate);
-		}
-		else
-		{
-			if (logger.isDebugEnabled())
-			{
-				StringBuilder msg = new StringBuilder();
-				msg.append("New reviewAsOf property was null ")
-				    .append(" for ")
-				    .append(actionedUponNodeRef);
-				logger.debug(msg.toString());
-			}
-		}
-
-        // TODO .. should we mark all the children as reviewed?
+	    if (recordsManagementService.isRecord(actionedUponNodeRef) == true)
+	    {
+	        VitalRecordDefinition vrDef = this.recordsManagementService.getVitalRecordDefinition(actionedUponNodeRef);
+	        if (vrDef != null && vrDef.isVitalRecord() == true)
+	        {
+	            // Calculate the next review date
+	            Date reviewAsOf = vrDef.getNextReviewDate();
+	            if (reviewAsOf != null)
+	            {
+	                // Log
+	                if (logger.isDebugEnabled())
+                    {
+	                    StringBuilder msg = new StringBuilder();
+	                        msg.append("Setting new reviewAsOf property [")
+	                           .append(reviewAsOf)
+	                           .append("] on ")
+	                           .append(actionedUponNodeRef);
+	                     logger.debug(msg.toString());
+                    }
+	                
+	                this.nodeService.setProperty(actionedUponNodeRef, PROP_REVIEW_AS_OF, reviewAsOf);
+	            }
+	        }
+	    }
 	}
 
 	/**

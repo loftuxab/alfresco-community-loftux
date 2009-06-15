@@ -25,27 +25,18 @@
 package org.alfresco.module.org_alfresco_module_dod5015.action;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
-import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.namespace.QName;
-import org.alfresco.service.namespace.RegexQNamePattern;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
@@ -68,10 +59,13 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     protected DictionaryService dictionaryService;
     
     /** Action service */
-    private ActionService actionService;
+    protected ActionService actionService;
     
     /** Records management action service */
-    private RecordsManagementActionService recordsManagementActionService;
+    protected RecordsManagementActionService recordsManagementActionService;
+    
+    /** Records management service */
+    protected RecordsManagementService recordsManagementService;
     
     /**
      * Set node service
@@ -114,6 +108,16 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     }
     
     /**
+     * Set records management service
+     * 
+     * @param recordsManagementService      records management service
+     */
+    public void setRecordsManagementService(RecordsManagementService recordsManagementService)
+    {
+        this.recordsManagementService = recordsManagementService;
+    }    
+    
+    /**
      * Init method
      */
     @Override
@@ -153,80 +157,6 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
         // Execute the action
         this.actionService.executeAction(action, filePlanComponent);          
     }
-        
-    /**
-     * Get the record categories for a given file plan component
-     * 
-     * @param nodeRef
-     * @return
-     */
-    protected List<NodeRef> getRecordCategories(NodeRef nodeRef)
-    {
-        // Get the record categories for this node
-        List<NodeRef> recordCategories = new ArrayList<NodeRef>(1);
-        getAncestorsOfType(nodeRef, recordCategories, TYPE_RECORD_CATEGORY);
-        return recordCategories;
-    }    
-    
-    /**
-     * Get the record folders for a given file plan component
-     * 
-     * @param nodeRef
-     * @return
-     */
-    protected List<NodeRef> getRecordFolders(NodeRef nodeRef)
-    {
-        // Get the record folders for this node
-        List<NodeRef> recordFolders = new ArrayList<NodeRef>(1);
-        getAncestorsOfType(nodeRef, recordFolders, TYPE_RECORD_FOLDER);
-        return recordFolders;
-    }
-
-    /**
-     * Gets the ancestors of the specified type for a given file plan component
-     * 
-     * @param nodeRef
-     * @param results
-     * @param typeToMatch
-     */
-    private void getAncestorsOfType(NodeRef nodeRef, List<NodeRef> results, QName typeToMatch)
-    {
-        if (nodeRef != null)
-        {
-            if (typeToMatch.equals(nodeService.getType(nodeRef)) == true)
-            {
-                results.add(nodeRef);
-            }
-            else
-            {
-                List<ChildAssociationRef> assocs = nodeService.getParentAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
-                for (ChildAssociationRef assoc : assocs)
-                {
-                    NodeRef parent = assoc.getParentRef();
-                    getAncestorsOfType(parent, results, typeToMatch);
-                }
-            }
-        }
-    }
-    
-    /**
-     * TODO Tempory helper method to help since we are currently presuming only one record category
-     * @param nodeRef
-     * @return
-     */
-    protected NodeRef getRecordCategory(NodeRef nodeRef)
-    {
-        List<NodeRef> recordCategories = getRecordCategories(nodeRef);
-        if (recordCategories.size() == 0)
-        {
-            throw new AlfrescoRuntimeException("The record being declared has no associated record category.");
-        }
-        else if (recordCategories.size() != 1)
-        {
-            throw new AlfrescoRuntimeException("Multiple record categories when declaring a record is not yet supported.");
-        }
-        return recordCategories.get(0); 
-    }
     
     /**
      * Function to pad a string with zero '0' characters to the required length
@@ -244,229 +174,5 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
            result = "0" + result;
        }
        return result;
-    }
-    
-    protected NodeRef getNextDispositionAction(NodeRef recordCategory, NodeRef record)
-    {
-        NodeRef dispositionAction = null;
-        
-        String actionId = (String)this.nodeService.getProperty(record, RecordsManagementModel.PROP_DISPOSITION_ACTION_ID);
-        List<ChildAssociationRef> dispositionActions = this.nodeService.getChildAssocs(recordCategory, RecordsManagementModel.ASSOC_DISPOSITION_ACTIONS, RegexQNamePattern.MATCH_ALL);
-
-        if (dispositionActions.size() != 0)
-        {
-            if (actionId == null)
-            {
-                dispositionAction = dispositionActions.get(0).getChildRef();
-            }
-            else
-            {
-                int index = 0;
-                for (ChildAssociationRef assoc : dispositionActions)
-                {
-                    NodeRef temp = assoc.getChildRef();
-                    if (actionId.equals(temp.getId()) == true)
-                    {
-                        break;
-                    }         
-                    index++;
-                }
-                
-                index++;
-                if (index != dispositionActions.size())
-                {
-                    dispositionAction = dispositionActions.get(index).getChildRef();
-                }
-            }
-        }
-        
-        return dispositionAction;
-    }
-    
-    protected NodeRef getDispositionAction(NodeRef record)
-    {
-        NodeRef dispositionAction = null;
-        String actionId = (String)this.nodeService.getProperty(record, RecordsManagementModel.PROP_DISPOSITION_ACTION_ID);
-        if (actionId != null)
-        {
-            dispositionAction = new NodeRef(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore"), actionId);
-        }
-        return dispositionAction;
-    }
-    
-    /**
-     * 
-     * @param recordCategory
-     * @param record
-     */
-    protected void setNextDispositionAction(NodeRef recordCategory, NodeRef record)
-    {
-        // Set up the details of the first disposition action
-        NodeRef dispositionAction = getNextDispositionAction(recordCategory, record);
-        if (dispositionAction != null)
-        {
-            // Get the properties of the record
-            Map<QName, Serializable> recordProps = this.nodeService.getProperties(record);
-            
-            // Check for the disposition schedule aspect
-            if (this.nodeService.hasAspect(record, ASPECT_DISPOSITION_SCHEDULE) == false)
-            {
-                // Add the disposition schedule aspect
-                this.nodeService.addAspect(record, ASPECT_DISPOSITION_SCHEDULE, null);
-            }
-            else
-            {
-                // Set the previous action details
-                recordProps.put(PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION, recordProps.get(PROP_DISPOSITION_ACTION));
-                recordProps.put(PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE, new Date());
-            }
-            
-            // Calculate the asOf date
-            Date asOfDate = null;
-            String period = (String)this.nodeService.getProperty(dispositionAction, RecordsManagementModel.PROP_DISPOSITION_PERIOD);
-            if (period != null)
-            {
-                // Use NOW as the default context date
-                Date contextDate = new Date();
-                
-                // Get the period properties value
-                String periodPropertyValue = (String)this.nodeService.getProperty(dispositionAction, RecordsManagementModel.PROP_DISPOSITION_PERIOD_PROPERTY);
-                if (periodPropertyValue != null)
-                {
-                    contextDate = (Date)this.nodeService.getProperty(record, QName.createQName(periodPropertyValue));
-                }
-                
-                // Calculate the asof date
-                asOfDate = calculateAsOfDate(period, contextDate);
-            }            
-            
-            // Get the name of the action
-            String dispositionActionName = (String)this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_ACTION_NAME);
-            
-            // Set the property values
-            recordProps.put(PROP_DISPOSITION_ACTION_ID, dispositionAction.getId());
-            recordProps.put(PROP_DISPOSITION_ACTION, dispositionActionName);
-            if (asOfDate != null)
-            {
-                recordProps.put(PROP_DISPOSITION_AS_OF, asOfDate);
-            }
-            
-            // TODO all the event stuff ...                    
-            
-            // Set the properties of the record
-            this.nodeService.setProperties(record, recordProps);            
-        }
-    }
-    
-    /**
-     * TODO .. this code is in here for the demo 
-     *      .. should be moved into the period data type implementation
-     *      
-     * Calculates the next interval date for a given type of date interval.
-     * 
-     * @param period
-     * @param fromDate
-     * @return 
-     */
-    protected Date calculateAsOfDate(String period, Date date)
-    {
-        // Split the period value and retrieve the unit and value
-        String[] arr = period.split("\\|");
-        String unit = arr[0];
-        String valueString = arr[1];
-        int value = Integer.parseInt(valueString);
-        
-        Calendar calendar = Calendar.getInstance();     
-        calendar.setTime(date);
-        
-        if (unit.equals("none") == true)
-        {
-            // Return null as there is no period date to calculate
-            return null;
-        }
-        else if (unit.equals("day") == true) 
-        {
-            // Daily calculation
-            calendar.add(Calendar.DAY_OF_YEAR, value);
-        } 
-        else if (unit.equals("week") == true) 
-        {
-            // Weekly calculation
-            calendar.add(Calendar.WEEK_OF_YEAR, value);
-        } 
-        else if (unit.equals("month") == true) 
-        {
-            // Monthly calculation
-            calendar.add(Calendar.MONTH, value);
-        }
-        else if (unit.equals("year") == true) 
-        {
-            // Annual calculation
-            calendar.add(Calendar.YEAR, value);
-        }
-        else if (unit.equals("monthend") == true) 
-        {
-            // Month end calculation
-            calendar.add(Calendar.MONTH, value);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            calendar.add(Calendar.DAY_OF_YEAR, -1);
-            
-            // Set the time one minute to midnight
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MINUTE, 59);
-        } 
-        //TODO Should this be 'quarterend'?
-        else if (unit.equals("quaterend") == true) 
-        {
-            // Quarter end calculation
-            calendar.add(Calendar.MONTH, value*3);
-            int currentMonth = calendar.get(Calendar.MONTH);
-            if (currentMonth >= 0 && currentMonth <= 2)
-            {
-                calendar.set(Calendar.MONTH, 0);
-            }
-            else if (currentMonth >= 3 && currentMonth <= 5)
-            {
-                calendar.set(Calendar.MONTH, 3);
-            }
-            else if (currentMonth >= 6 && currentMonth <= 8)
-            {
-                calendar.set(Calendar.MONTH, 6);
-            }
-            else if (currentMonth >= 9 && currentMonth <= 11)
-            {
-                calendar.set(Calendar.MONTH, 9);
-            }
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            calendar.add(Calendar.DAY_OF_YEAR, -1);
-
-            // Set the time one minute to midnight
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MINUTE, 59);
-        } 
-        else if (unit.equals("yearend") == true) 
-        {
-            // Year end calculation
-            calendar.add(Calendar.YEAR, value);
-            calendar.set(Calendar.MONTH, 0);
-            calendar.set(Calendar.DAY_OF_MONTH, 1);
-            calendar.add(Calendar.DAY_OF_YEAR, -1);
-
-            // Set the time one minute to midnight
-            calendar.set(Calendar.HOUR_OF_DAY, 23);
-            calendar.set(Calendar.MINUTE, 59);
-        } 
-        else if (unit.equals("fyend") == true) 
-        {
-            // Financial year end calculation
-            throw new RuntimeException("Finacial year end is currently unsupported.");
-
-            // Set the time one minute to midnight 
-            //calendar.set(Calendar.HOUR_OF_DAY, 23);
-            //calendar.set(Calendar.MINUTE, 59);
-        } 
-                
-        return calendar.getTime();
-    } 
-
+    }    
 }
