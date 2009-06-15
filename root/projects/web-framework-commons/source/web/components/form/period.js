@@ -168,18 +168,6 @@
        */
       onReady: function Period_onReady()
       {
-         this._setupInitialState();
-         this._setupEventHandlers();
-      },
-      
-      /**
-       * Sets up the inital state of the UI.
-       * 
-       * @method _setupInitialState
-       * @private
-       */
-      _setupInitialState: function Period__setupInitialState()
-      {
          // create the period definition data structure
          for (var p = 0; p < this.options.data.length; p++)
          {
@@ -262,16 +250,7 @@
                Dom.get(this.id + "-expression").value = expression;
             }
          }
-      },
-      
-      /**
-       * Sets up the event handlers to handle change events.
-       * 
-       * @method _setupEventHandlers
-       * @private
-       */
-      _setupEventHandlers: function Period__setupEventHandlers()
-      {
+         
          // add an onchange event listener to the select drop down
          Event.addListener(this.id + "-type", "change", this._handleDataChange, this, true);
          

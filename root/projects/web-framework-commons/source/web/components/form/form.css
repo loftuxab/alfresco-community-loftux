@@ -87,6 +87,11 @@
    color: #333333;
 }
 
+.form-container .invalid
+{
+   background-color: #ff6666;
+}
+
 .form-container .viewmode-field .current-values div
 {
    padding: 0.5em;
