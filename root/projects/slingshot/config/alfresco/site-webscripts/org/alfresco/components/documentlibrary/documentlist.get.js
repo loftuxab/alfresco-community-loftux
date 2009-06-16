@@ -68,6 +68,16 @@ function main()
    
    model.actionSets = actionSets;
    
+   // Discover SharePoint (Vti) server port
+   var vtiServerJson = "{}";
+   
+   result = remote.call("/api/vti/serverDetails");
+   if (result.status == 200 && result != "")
+   {
+      vtiServerJson = result;
+   }
+   
+   model.vtiServer = vtiServerJson;
 }
 
 main();

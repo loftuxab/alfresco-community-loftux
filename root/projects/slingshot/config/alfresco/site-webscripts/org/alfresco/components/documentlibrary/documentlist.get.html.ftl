@@ -22,7 +22,8 @@
       highlightFile: "${page.url.args["file"]!""}",
       showFolders: ${(preferences.showFolders!false)?string},
       simpleView: ${(preferences.simpleView!false)?string},
-      highlightFile: "${page.url.args["file"]!""}"
+      highlightFile: "${page.url.args["file"]!""}",
+      vtiServer: ${vtiServer}
    }).setMessages(
       ${messages}
    );

@@ -274,7 +274,15 @@
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": true,
             "application/vnd.openxmlformats-officedocument.presentationml.presentation": true,
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document": true 
-         }
+         },
+         
+         /**
+          * SharePoint (Vti) Server Details
+          *
+          * @property vtiServer
+          * @type object
+          */
+         vtiServer: null
       },
 
       /**
@@ -612,6 +620,12 @@
          this.widgets.dataSource.doBeforeCallback = function DL_doBeforeCallback(oRequest, oFullResponse, oParsedResponse)
          {
             me.doclistMetadata = oFullResponse.metadata;
+            
+            // Reset onlineEdit flag if correct conditions not met
+            if ((YAHOO.env.ua.ie == 0) || (typeof me.options.vtiServer.port != "number"))
+            {
+               me.doclistMetadata.onlineEditing = false;
+            }
             
             // Container userAccess event
             var permissions = me.doclistMetadata.permissions;
@@ -1033,13 +1047,12 @@
             elCell.innerHTML = '<div id="' + me.id + '-actions-' + oRecord.getId() + '" class="hidden"></div>';
             
             /**
-             * Configure the Online Edit URL if conditions met
+             * Configure the Online Edit URL if enabled for this mimetype
              */
             if (me.doclistMetadata.onlineEditing && (oRecord.getData("mimetype") in me.options.onlineEditMimetypes))
             {
                var loc = oRecord.getData("location"), path;
-               
-               oRecord.setData("onlineEditUrl", window.location.protocol + "//" + window.location.hostname + ":7070/" + $combine("alfresco", loc.site, loc.container, loc.path, loc.file));
+               oRecord.setData("onlineEditUrl", window.location.protocol + "//" + window.location.hostname + ":" + me.options.vtiServer.port + "/" + $combine("alfresco", loc.site, loc.container, loc.path, loc.file));
             }
          };
 
@@ -1490,8 +1503,8 @@
             // Trim the items in the clone depending on the user's access
             var userAccess = record.getData("permissions").userAccess;
             
-            // Inject a special-case permission if online editing is configured, we've got a valid edit URL and the browser allows it
-            if (this.doclistMetadata.onlineEditing && record.getData("onlineEditUrl") && (YAHOO.env.ua.ie > 0))
+            // Inject a special-case permission if online editing is configured
+            if (record.getData("onlineEditUrl"))
             {
                userAccess["online-edit"] = true;
             }
