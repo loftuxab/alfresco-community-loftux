@@ -932,7 +932,7 @@
             {
                 var w = e.width;
                 Dom.setStyle(this.columns[0], "height", "");
-                Dom.setStyle(this.columns[1], "width", (size - w - 6) + "px");
+                Dom.setStyle(this.columns[1], "width", (size - w - 8) + "px");
             }, this, true);
 
             this.widgets.resizer.fireEvent("resize",
