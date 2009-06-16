@@ -176,7 +176,7 @@ public class AVMDeploymentTargetTest extends TestCase
             	ContentWriter writer = avmService.getContentWriter(storeName + ":/a/b/zander");
             
             	// Force a conversion
-            	writer.setEncoding("UTF-32");
+            	writer.setEncoding("ISO-8859-1");
             	writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
             	writer.putContent(zanderBuffer.toString());
             }
@@ -249,9 +249,9 @@ public class AVMDeploymentTargetTest extends TestCase
         		AVMNodeDescriptor zanderFile = avmService.lookup(-1, getDestPath(storeName, "/a/b/zander"));      
             	assertNotNull("zander file not created", zanderFile);
             	assertTrue("zander file is not a file", zanderFile.isFile());
-            	BufferedReader reader = new BufferedReader(new InputStreamReader(avmService.getFileInputStream(zanderFile), "UTF-32"));
+            	BufferedReader reader = new BufferedReader(new InputStreamReader(avmService.getFileInputStream(zanderFile), "ISO-8859-1"));
         		String text = reader.readLine();
-        		assertEquals("UTF-32 zander text is not correct", text, zanderBuffer.toString());
+        		assertEquals("ISO-8859-1 zander text format is not correct", text, zanderBuffer.toString());
         	}
      	
 
