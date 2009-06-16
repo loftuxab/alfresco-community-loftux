@@ -543,7 +543,7 @@ public class DeploymentReceiverEngineImpl implements
     		OutputStream out = tracker.getTarget().send(ticket, path, guid, encoding, mimeType, aspects, props);
     		
     		String token = getNextHandle(ticket);
-    		System.out.println("Open token " + token);
+    		logger.debug("Open token " + token);
     		
             // Need to kick off a reader thread to process input
     		// and drive transformation.
@@ -605,7 +605,7 @@ public class DeploymentReceiverEngineImpl implements
     	DeploymentTracker tracker = getDeploymentTracker(ticket);
     	try 
     	{
-    		System.out.println("finish token" + outputToken);
+    		logger.debug("finish token" + outputToken);
     		OutputStream out = fOutputs.get(outputToken);
     		if (out == null)
     		{
