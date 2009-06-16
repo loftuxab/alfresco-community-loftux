@@ -2312,7 +2312,10 @@
             // Ignore if it's the path, as we'll update on the pathChanged event
             if (obj.filterId != "path")
             {
-               this._updateDocList.call(this);
+               this._updateDocList.call(this,
+               {
+                  page: 1
+               });
             }
          }
       },
