@@ -11,5 +11,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Remote API"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Alfresco JLAN"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Web-Client"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/WebScript Framework"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

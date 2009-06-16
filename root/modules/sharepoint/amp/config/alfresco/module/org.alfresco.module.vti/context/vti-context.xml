@@ -414,4 +414,12 @@
         </property>
     </bean>
     
+    <!-- GET VTI SERVER DETAILS -->    
+    <bean id="webscript.org.alfresco.vti.vti-server.get" class="org.alfresco.module.vti.web.scripts.VtiServerWebScript" parent="webscript">
+    	<property name="port">
+        	<value>${vti.server.port}</value>
+    	</property>
+    </bean>
+    
+    
 </beans>
