@@ -19,6 +19,7 @@
 {
    display: none;
    margin-left: 2em;
+   margin-top: 0.3em;
    width: 60em;
 }
 
@@ -156,7 +157,6 @@
 .object-finder .panel-left,
 .object-finder .panel-right
 {
-   
 }
 
 .object-finder .panel-left .picker-items
@@ -169,7 +169,6 @@
 .object-finder .panel-right .picker-items
 {
    clear: left;
-   margin-left: -5px;
    margin-right: 0.5em;
 }
 
