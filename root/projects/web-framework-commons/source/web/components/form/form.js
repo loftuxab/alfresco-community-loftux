@@ -57,8 +57,13 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "menu", "container"], this.onComponentsLoaded, this);
 
+      // Initialise prototype properties
+      this.buttons = {};
+      this.formsRuntime = null;
+      
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("metadataRefresh", this.onFormRefresh, this);
+      YAHOO.Bubbling.on("mandatoryControlValueUpdated", this.onMandatoryControlValueUpdated, this);
 
       return this;
    };
@@ -114,7 +119,15 @@
        * @property buttons
        * @type object
        */
-       buttons: {},
+      buttons: null,
+       
+      /**
+       * The forms runtime instance.
+       * 
+       * @property
+       * @type object
+       */
+      formsRuntime: null, 
       
       /**
        * Set messages for this component.
@@ -197,14 +210,14 @@
             // fire event to inform any listening components that the form HTML is ready
             YAHOO.Bubbling.fire("formContentReady", this);
 
-            var formsRuntime = new Alfresco.forms.Form(this.id);
-            formsRuntime.setShowSubmitStateDynamically(true, false);
-            formsRuntime.setSubmitElements(this.buttons.submit);
+            this.formsRuntime = new Alfresco.forms.Form(this.id);
+            this.formsRuntime.setShowSubmitStateDynamically(true, false);
+            this.formsRuntime.setSubmitElements(this.buttons.submit);
             
             // setup JSON/AJAX mode if appropriate
             if (this.options.enctype === "application/json")
             {
-               formsRuntime.setAJAXSubmit(true,
+               this.formsRuntime.setAJAXSubmit(true,
                {
                   successCallback:
                   {
@@ -217,30 +230,30 @@
                      scope: this
                   }
                });
-               formsRuntime.setSubmitAsJSON(true);
+               this.formsRuntime.setSubmitAsJSON(true);
             }
             
             // add any field constraints present
             for (var c = 0; c < this.options.fieldConstraints.length; c++)
             {
                var fc = this.options.fieldConstraints[c];
-               formsRuntime.addValidation(fc.fieldId, fc.handler, fc.params, fc.event, fc.message);
+               this.formsRuntime.addValidation(fc.fieldId, fc.handler, fc.params, fc.event, fc.message);
             }
             
             // fire event to inform any listening components that the form is about to be initialised
             YAHOO.Bubbling.fire("beforeFormRuntimeInit", 
             {
                component: this,
-               runtime: formsRuntime 
+               runtime: this.formsRuntime 
             });
             
-            formsRuntime.init();
+            this.formsRuntime.init();
             
             // fire event to inform any listening components that the form has finished initialising
             YAHOO.Bubbling.fire("afterFormRuntimeInit",
             {
                component: this,
-               runtime: formsRuntime 
+               runtime: this.formsRuntime 
             });
          }
       },
@@ -323,6 +336,20 @@
                });
             }
          }
+      },
+      
+      /**
+       * Mandatory control value updated event handler
+       *
+       * @method onMandatoryControlValueUpdated
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onMandatoryControlValueUpdated: function FormUI_onMandatoryControlValueUpdated(layer, args)
+      {
+         // the value of a mandatory control on the page (usually represented by a hidden field)
+         // has been updated, force the forms runtime to check if form state is still valid
+         this.formsRuntime.updateSubmitElements();
       },
       
       /**

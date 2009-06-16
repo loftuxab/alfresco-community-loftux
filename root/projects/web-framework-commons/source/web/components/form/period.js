@@ -104,7 +104,16 @@
           * @type boolean
           * @default false
           */
-         disabled: false
+         disabled: false,
+         
+         /**
+          * Flag to indicate whether the field is mandatory
+          *
+          * @property mandatory
+          * @type boolean
+          * @default false
+          */
+         mandatory: false
       },
 
       /**
@@ -308,6 +317,12 @@
             
             if (Alfresco.logger.isDebugEnabled())
                Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' updated to '" + newValue + "'");
+            
+            // inform the forms runtime that the control value has been updated (if field is mandatory)
+            if (this.options.mandatory)
+            {
+               YAHOO.Bubbling.fire("mandatoryControlValueUpdated", this);
+            }
          }
       },
       
