@@ -133,6 +133,7 @@
          </fileset>
          <fileset dir="${dir.project.deployment}/config">
             <include name="**/*" />
+         	<exclude name= "**/sample*" />
          </fileset>
          <fileset dir="${dir.project.3rdparty.lib}">
             <include name="spring-*.jar" />
@@ -146,6 +147,9 @@
          </fileset>
          <fileset dir="${dir.project.core.dist}">
             <filename name="${file.name.jar.core}" />
+         </fileset>
+         <fileset dir="${dir.project.repository.dist}">
+           <filename name="${file.name.jar.repository}" />
          </fileset>
       </copy>
    </target>
