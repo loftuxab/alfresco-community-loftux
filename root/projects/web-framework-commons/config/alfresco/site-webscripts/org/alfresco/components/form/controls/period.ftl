@@ -7,6 +7,7 @@
    {
       <#if form.mode == "view" || field.disabled>disabled: true,</#if>
       currentValue: "${field.value}",
+      mandatory: ${field.mandatory?string},
       data : [
       <#list field.control.params.dataTypeParameters as period>
          { 

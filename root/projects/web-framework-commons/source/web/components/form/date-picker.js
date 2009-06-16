@@ -103,7 +103,16 @@
           * @type boolean
           * @default false
           */
-         disabled: false
+         disabled: false,
+         
+         /**
+          * Flag to indicate whether the field is mandatory
+          *
+          * @property mandatory
+          * @type boolean
+          * @default false
+          */
+         mandatory: false
       },
 
       /**
@@ -195,8 +204,8 @@
          
          // setup events
          this.widgets.calendar.selectEvent.subscribe(this._handlePickerChange, this, true);
-         Event.addListener(this.id + "-date", "change", this._handleFieldChange, this, true);
-         Event.addListener(this.id + "-time", "change", this._handleFieldChange, this, true);
+         Event.addListener(this.id + "-date", "keyup", this._handleFieldChange, this, true);
+         Event.addListener(this.id + "-time", "keyup", this._handleFieldChange, this, true);
          Event.addListener(this.id + "-icon", "click", this._showPicker, this, true);
          
          // render the calendar control
@@ -254,6 +263,12 @@
             
             if (Alfresco.logger.isDebugEnabled())
                Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' updated to '" + isoValue + "'");
+            
+            // inform the forms runtime that the control value has been updated (if field is mandatory)
+            if (this.options.mandatory)
+            {
+               YAHOO.Bubbling.fire("mandatoryControlValueUpdated", this);
+            }
          }
          else
          {
@@ -290,12 +305,28 @@
                   this.widgets.calendar.render();
                   
                   // NOTE: we don't need to check the time value in here as the _handlePickerChange
-                  //       function gets called as well as a result of rendering the picker above
+                  //       function gets called as well as a result of rendering the picker above,
+                  //       that's also why we don't update the hidden field in here either.
                }
             }
             else
             {
                Dom.addClass(this.id + "-date", "invalid");
+            }
+         }
+         else
+         {
+            // when the date is completely cleared remove the hidden field and remove the invalid class
+            Dom.removeClass(this.id + "-date", "invalid");
+            Dom.get(this.currentValueHtmlId).value = "";
+            
+            if (Alfresco.logger.isDebugEnabled())
+               Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' has been reset");
+            
+            // inform the forms runtime that the control value has been updated
+            if (this.options.mandatory)
+            {
+               YAHOO.Bubbling.fire("mandatoryControlValueUpdated", this);
             }
          }
       },

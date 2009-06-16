@@ -19,7 +19,8 @@
       {
          <#if form.mode == "view" || field.disabled>disabled: true,</#if>
          currentValue: "${field.value}",
-         showTime: ${showTime?string}
+         showTime: ${showTime?string},
+         mandatory: ${field.mandatory?string}
       }).setMessages(
          ${messages}
       );

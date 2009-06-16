@@ -200,7 +200,16 @@
           * @type boolean
           * @default false
           */
-         disabled: false
+         disabled: false,
+         
+         /**
+          * Flag to indicate whether the field is mandatory
+          *
+          * @property mandatory
+          * @type boolean
+          * @default false
+          */
+         mandatory: false
       },
 
       /**
@@ -375,6 +384,15 @@
          this.options.currentValue = this.getSelectedItems().toString();
          Dom.get(this.currentValueHtmlId).value = this.options.currentValue;
          this._getCurrentValueMeta();
+         
+         if (Alfresco.logger.isDebugEnabled())
+            Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' updated to '" + this.options.currentValue + "'");
+         
+         // inform the forms runtime that the control value has been updated (if field is mandatory)
+         if (this.options.mandatory)
+         {
+            YAHOO.Bubbling.fire("mandatoryControlValueUpdated", this);
+         }
          
          Dom.setStyle(this.pickerId, "display", "none");
          this.widgets.showPicker.set("disabled", false);
