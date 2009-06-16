@@ -38,18 +38,36 @@
         		<property name="metaDataDirectory">
             		<value>${deployment.filesystem.metadatadir}/sampleTarget</value>
         		</property>
+				
 				<property name="autoFix">
 					<value>${deployment.filesystem.autofix}</value>
 				</property>
+				
+				<!--  Prepare callbacks go here -->
+				<property name="prepare">
+					<list>
+						<bean class="org.alfresco.deployment.SampleRunnable" />
+						<bean class="org.alfresco.deployment.impl.fsr.FSRunnableTester">
+							<property name="throwException">
+								<value>false</value>
+							</property>
+						</bean>
+					</list>
+				</property>
+				
+				<!--  Post Commit Actions Go Here -->
 				<property name="postCommit">
 					<list>
 						<bean class="org.alfresco.deployment.SampleRunnable" />
 					</list>
 				</property>
+				
 				<property name="fileSystemReceiverService">
 					<ref bean="fileSystemReceiverService" />
 				</property>
+				
 				<property name="name"><value>sampleTarget</value></property>
+				
 				<property name="authenticator">
 					<bean
 						class="org.alfresco.deployment.impl.server.DeploymentReceiverAuthenticatorSimple">
