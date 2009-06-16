@@ -41,6 +41,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
    <title>Alfresco Share &raquo; ${pageTitle}</title>
+   <meta http-equiv="X-UA-Compatible" content="Edge" />
 
 <!-- Shortcut Icons -->
    <link rel="shortcut icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" /> 

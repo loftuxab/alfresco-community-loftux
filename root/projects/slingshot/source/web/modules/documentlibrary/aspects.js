@@ -381,7 +381,6 @@
           */
          var renderCellName = function renderCellName(elCell, oRecord, oColumn, oData)
          {
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             elCell.innerHTML = me.renderItem(oRecord.getData(), '<h3 class="name">{name}</h3>');
          };
 
