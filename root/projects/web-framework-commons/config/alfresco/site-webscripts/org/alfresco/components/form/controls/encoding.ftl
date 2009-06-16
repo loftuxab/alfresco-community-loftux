@@ -12,24 +12,24 @@
 </#if>
 
 <#if form.mode == "view">
-<div class="viewmode-field">
-   <span class="viewmode-label">${msg("form.control.encoding.label")}:</span>
-   <span class="viewmode-value">${getEncodingLabel("${encoding}")}</span>
-</div>
+   <div class="viewmode-field">
+      <span class="viewmode-label">${msg("form.control.encoding.label")}:</span>
+      <span class="viewmode-value">${getEncodingLabel("${encoding}")}</span>
+   </div>
 <#else>
-<label for="${fieldHtmlId}">${msg("form.control.encoding.label")}:</label>
-<#-- TODO: Make this control make an AJAX callback to get list of encodings OR use dataTypeParamters structure -->
-<select id="${fieldHtmlId}" name="${field.name}" 
-        <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>>
-   <option value="">${msg("form.control.encoding.unknown")}</option>
-   <@encodingOption enc="ISO-8859-1" />
-   <@encodingOption enc="MacRoman" />
-   <@encodingOption enc="Shift_JIS" />
-   <@encodingOption enc="US-ASCII" />
-   <@encodingOption enc="UTF-8" />
-   <@encodingOption enc="UTF-16" />
-   <@encodingOption enc="UTF-32" />
-</select>
+   <label for="${fieldHtmlId}">${msg("form.control.encoding.label")}:</label>
+   <#-- TODO: Make this control make an AJAX callback to get list of encodings OR use dataTypeParamters structure -->
+   <select id="${fieldHtmlId}" name="${field.name}" 
+           <#if field.control.params.styleClass?exists>class="${field.control.params.styleClass}"</#if>>
+      <option value="">${msg("form.control.encoding.unknown")}</option>
+      <@encodingOption enc="ISO-8859-1" />
+      <@encodingOption enc="MacRoman" />
+      <@encodingOption enc="Shift_JIS" />
+      <@encodingOption enc="US-ASCII" />
+      <@encodingOption enc="UTF-8" />
+      <@encodingOption enc="UTF-16" />
+      <@encodingOption enc="UTF-32" />
+   </select>
 </#if>
 
 <#function getEncodingLabel enc>
