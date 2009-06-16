@@ -1,0 +1,53 @@
+###############################
+## Common Alfresco Properties #
+###############################
+
+#
+# Sample custom content and index data location
+#
+dir.root=@@ALF_DATA@@
+dir.indexes=@@ALF_INDEXES@@
+
+#
+# Sample database connection properties
+#
+db.name=@@DB_NAME@@
+db.username=@@DB_USER@@
+db.password=@@DB_USERPWD@@
+
+#
+# External locations
+#
+ooo.exe=@@ALF_OO@@/program/soffice
+ooo.user=${dir.root}/oouser
+img.root=@@ALF_IMG@@
+swf.exe=@@ALF_SWF@@/pdf2swf
+
+#
+# Derby connection
+#
+#derby#db.driver=org.apache.derby.jdbc.EmbeddedDriver
+#derby#db.url=jdbc:derby:@@ALF_DATA@@/derby_data/alfresco;create=true
+#derby#hibernate.dialect=org.hibernate.dialect.DerbyDialect
+
+#
+# HSQL connection
+#
+#hsql#db.driver=org.hsqldb.jdbcDriver
+#hsql#db.url=jdbc:hsqldb:file:@@ALF_DATA@@/hsql_data/alfresco;ifexists=true;shutdown=true;
+#hsql#hibernate.dialect=org.hibernate.dialect.HSQLDialect
+
+#
+# MySQL connection
+#
+#mysql#db.driver=org.gjt.mm.mysql.Driver
+#mysql#db.url=jdbc:mysql://@@DB_HOST@@:@@DB_PORT@@/@@DB_NAME@@
+#mysql#hibernate.dialect=org.hibernate.dialect.MySQLInnoDBDialect
+
+#
+# PostgreSQL connection
+#
+#postgresql#db.driver=org.postgresql.Driver
+#postgresql#db.url=jdbc:postgresql://@@DB_HOST@@:@@DB_PORT@@/@@DB_NAME@@
+#postgresql#hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+#postgresql#hibernate.query.substitutions=true TRUE, false FALSE
