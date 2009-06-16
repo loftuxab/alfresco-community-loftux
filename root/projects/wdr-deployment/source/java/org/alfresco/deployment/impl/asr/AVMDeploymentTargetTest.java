@@ -409,13 +409,15 @@ public class AVMDeploymentTargetTest extends TestCase
         avmService.createFile(storeName + ":/scooby", "willow").close();
         
         AVMNodeDescriptor willowSrc = avmService.lookup(-1, getDestPath(storeName, "/scooby/willow"));  
-      
         
         String dirSubject = "The scooby gang";
         String fileSubject = "Willow ";
 
+
         avmService.setNodeProperty(storeName + ":/scooby", ContentModel.PROP_SUBJECT, new PropertyValue(null, dirSubject)); 
         avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_SUBJECT, new PropertyValue(null, fileSubject));
+        avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_TITLE, new PropertyValue(null, "title"));
+        avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_DESCRIPTION, new PropertyValue(null, "description"));
         
         service.deployDifferenceFS(-1, storeName + ":/", "default", "localhost", 50500, TEST_USER, TEST_PASSWORD, TEST_TARGET, matcher, false, false, false, callbacks);
         
@@ -423,13 +425,15 @@ public class AVMDeploymentTargetTest extends TestCase
 
         	AVMNodeDescriptor srcWillowFile = avmService.lookup(-1, storeName +":/scooby/willow"); 
         	AVMNodeDescriptor destWillowFile = avmService.lookup(-1, getDestPath(storeName, "/scooby/willow"));  
-        	Map<QName, PropertyValue> willowProps = avmService.getNodeProperties(srcWillowFile);
+        	Map<QName, PropertyValue> willowProps = avmService.getNodeProperties(destWillowFile);
     		assertTrue("Subject is null", willowProps.containsKey(ContentModel.PROP_SUBJECT)); 
     		assertEquals("Subject content is not correct", fileSubject, willowProps.get(ContentModel.PROP_SUBJECT).getStringValue());
     		
     		// check guid of willow file
     		assertNotNull("dest willow file is null", destWillowFile);
     		assertEquals("Willow guids mismatch", srcWillowFile.getGuid(), destWillowFile.getGuid());
+    		assertTrue("Title is missing", willowProps.containsKey(ContentModel.PROP_TITLE)); 
+    		assertTrue("Description is missing", willowProps.containsKey(ContentModel.PROP_DESCRIPTION)); 
     		
     		AVMNodeDescriptor srcScoobyDir = avmService.lookup(-1, storeName  +":/scooby"); 
         	AVMNodeDescriptor destScoobyDir = avmService.lookup(-1, getDestPath(storeName, "/scooby"));  
@@ -493,6 +497,52 @@ public class AVMDeploymentTargetTest extends TestCase
      */
     public void testCRUDAspect() throws Exception
     {
+       String storeName = GUID.generate();
+        
+        avmService.createStore(storeName);
+        
+        NameMatcher matcher = (NameMatcher)fContext.getBean("globalPathExcluder");
+        DeploymentReport report = new DeploymentReport();
+        List<DeploymentCallback> callbacks = new ArrayList<DeploymentCallback>();
+        callbacks.add(new DeploymentReportCallback(report));
+        
+        /**
+         *  set up our test tree
+         */
+        avmService.createDirectory(storeName + ":/", "scooby");
+        avmService.createFile(storeName + ":/scooby", "willow").close();
+        
+        AVMNodeDescriptor willowSrc = avmService.lookup(-1, getDestPath(storeName, "/scooby/willow"));  
+        avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_TITLE, new PropertyValue(null, "title"));
+        avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_DESCRIPTION, new PropertyValue(null, "description"));
+        service.deployDifferenceFS(-1, storeName + ":/", "default", "localhost", 50500, TEST_USER, TEST_PASSWORD, TEST_TARGET, matcher, false, false, false, callbacks);
+        
+        /**
+         * Now add an aspect
+         */
+        avmService.addAspect(storeName + ":/scooby/willow", ContentModel.ASPECT_TITLED);
+      	service.deployDifferenceFS(-1, storeName + ":/", "default", "localhost", 50500, TEST_USER, TEST_PASSWORD, TEST_TARGET, matcher, false, false, false, callbacks);
+        {
+
+        	AVMNodeDescriptor srcWillowFile = avmService.lookup(-1, storeName +":/scooby/willow"); 
+        	AVMNodeDescriptor destWillowFile = avmService.lookup(-1, getDestPath(storeName, "/scooby/willow")); 
+         	Set<QName> willowAspects = avmService.getAspects(-1, getDestPath(storeName, "/scooby/willow"));
+         	
+    		// check guid of willow file
+    		assertEquals("Willow guids mismatch", srcWillowFile.getGuid(), destWillowFile.getGuid());
+    		assertTrue("Titled aspect is missing", willowAspects.contains(ContentModel.ASPECT_TITLED)); 
+        }
+   	    
+   	    /**
+   	     * Now delete an aspect
+   	     */
+        avmService.removeAspect(storeName + ":/scooby/willow", ContentModel.ASPECT_TITLED);
+
+   	    service.deployDifferenceFS(-1, storeName + ":/", "default", "localhost", 50500, TEST_USER, TEST_PASSWORD, TEST_TARGET, matcher, false, false, false, callbacks);
+        {
+         	Set<QName> willowAspects = avmService.getAspects(-1, getDestPath(storeName, "/scooby/willow"));
+      		assertTrue("Titled aspect is still present", !willowAspects.contains(ContentModel.ASPECT_TITLED)); 
+        } 
     	
     }
 	
