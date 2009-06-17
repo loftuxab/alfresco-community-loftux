@@ -160,13 +160,13 @@
          form.addValidation(this.id + "-newpassword1", Alfresco.forms.validation.length,
          {
             min: this.options.minPasswordLength,
-            max: 256,
+            max: 255,
             crop: true
          }, "keyup");
          form.addValidation(this.id + "-newpassword2", Alfresco.forms.validation.length,
          {
             min: this.options.minPasswordLength,
-            max: 256,
+            max: 255,
             crop: true
          }, "keyup");
          
