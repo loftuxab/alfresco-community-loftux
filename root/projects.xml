@@ -101,7 +101,8 @@
    </target>
    
    <target name="compile-deployment" 
-           depends="init">
+           depends="init,
+   			compile-core">
       <compile-java projectdir="${dir.project.deployment}" />
    </target>
    
@@ -125,7 +126,10 @@
    </target>
    
    <target name="assemble-deployment" 
-           depends="package-deployment-jar">
+           depends="
+   				package-deployment-jar, 
+   				package-repository,
+   				package-core">
       <mkdir dir="${dir.project.deployment.assemble}" />
       <copy todir="${dir.project.deployment.assemble}">
          <fileset dir="${dir.project.deployment.dist}">
