@@ -8,7 +8,8 @@ function sortByTitle(site1, site2)
 function main()
 {
    var favouriteSites = [],
-      currentSiteIsFav = false;
+      currentSiteIsFav = false,
+      siteTitle = "";
    
    // Call the repo for the user's favourite sites
    // TODO: Clean-up old favourites here?
@@ -28,13 +29,16 @@ function main()
       // and ensure the current user is a member of each before adding to fav list
       var query =
       {
-         "shortName" :
+         shortName:
          {
-            "match" : "exact",
-            "values" : []
+            match: "exact",
+            values: []
          }
       };
-      var shortName;
+      var currentSite = page.url.templateArgs.site || "",
+         ignoreCurrentSite = false,
+         shortName;
+      
       for (shortName in favourites)
       {
          if (favourites[shortName])
@@ -43,16 +47,23 @@ function main()
          }
       }
       
+      // Also tack the current site onto the query, so we can pass the Site Title to header.js
+      if (currentSite !== "" && !favourites[currentSite])
+      {
+         query.shortName.values.push(currentSite);
+         ignoreCurrentSite = true;
+      }
+      
       var connector = remote.connect("alfresco");
       result = connector.post("/api/sites/query", jsonUtils.toJSONString(query), "application/json");
       
       if (result.status == 200)
       {
-         var i, ii, currentSite = page.url.templateArgs.site || "";
+         var i, ii;
          
          // Create javascript objects from the server response
          // Each item is a favourite site that the user is a member of
-         var sites = eval('(' + result + ')');
+         var sites = eval('(' + result + ')'), site;
          
          if (sites.length != 0)
          {
@@ -61,11 +72,18 @@ function main()
             
             for (i = 0, ii = sites.length; i < ii; i++)
             {
-               if (sites[i].shortName == currentSite)
+               site = sites[i];
+               if (site.shortName == currentSite)
                {
+                  siteTitle = site.title;
+                  if (ignoreCurrentSite)
+                  {
+                     // The current site was piggy-backing the query call; it's not a favourite
+                     continue;
+                  }
                   currentSiteIsFav = true;
                }
-               favouriteSites.push(sites[i]);
+               favouriteSites.push(site);
             }
          }
       }
@@ -73,6 +91,7 @@ function main()
    // Prepare the model for the template
    model.currentSiteIsFav = currentSiteIsFav;
    model.favouriteSites = favouriteSites;
+   model.siteTitle = siteTitle;
 }
 
 main();

@@ -11,11 +11,11 @@
    padding-top: 1em;
 }
 
-.activities div.first
+.activities div.first-item
 {
    padding-top: 0;
 }
-.activities div.last
+.activities div.last-item
 {
    padding-bottom: 1em;
 }

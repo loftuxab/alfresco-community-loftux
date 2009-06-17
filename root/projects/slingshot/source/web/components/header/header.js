@@ -84,6 +84,15 @@
          siteId: "",
 
          /**
+          * Current site title.
+          * 
+          * @property siteTitle
+          * @type string
+          * @default ""
+          */
+         siteTitle: "",
+
+         /**
           * Current search type.
           * 
           * @property searchType
@@ -419,33 +428,28 @@
             }, 1);
          }
          
+         // Show/hide "Add to favourites" menu item if we're in a site
+         if (this.options.siteId !== "")
+         {
+            Dom.setStyle(this.id + "-addFavourite", "display", this.options.siteId in this.options.favouriteSites ? "none" : "block");
+         }
+         
          sitesMenu.render();
       },
+
       /**
-       * Adds an event handler that adds or removes the site as favourite site
+       * Adds the current site as a favourite
        *
-       * @method _addImapFavouriteHandling
-       * @param site {string} The shortname of the site
-       * @private
+       * @method addAsFavourite
        */
-      addAsFav: function Header__addAsFav(site)
+      addAsFavourite: function Header_addAsFavourite()
       {
-         var me = this;
-         var sitesMenu = this.widgets.sitesMenu;
-
-
-         if (site)
+         var site =
          {
-            site = {
-               shortName : site,
-               title : site //must change to site.title once it's available
-            };
-         }
-         /**
-          * We assume that the change of favourite site will work and therefore change
-          * the gui immediatly after the server call.
-          * If it doesn't we revoke the gui changes and display an error message
-          */
+            shortName: this.options.siteId,
+            title: this.options.siteTitle
+         };
+
          var responseConfig =
          {
             failureCallback:
@@ -457,34 +461,29 @@
                      text: me._msg("message.siteFavourite.failure")
                   });
                },
-               scope: this,
-               obj:
-               {
-                   site: site,
-                   thisComponent: me
-               }
-            }
-            ,
+               scope: this
+            },
             successCallback:
             {
                fn: function(event, obj)
                {
-                  YAHOO.Bubbling.fire("favouriteSiteAdded", site);
-                  sitesMenu.removeItem(sitesMenu.activeItem.index,sitesMenu.activeItem.groupIndex);
+                  YAHOO.Bubbling.fire("favouriteSiteAdded", obj.site);
+                  // sitesMenu.removeItem(this.widgets.sitesMenu.activeItem.index, this.widgets.sitesMenu.activeItem.groupIndex, true);
                },
                scope: this,
                obj:
                {
-                  site: site,
-                  thisComponent: me
+                  site: site
                }
             }
          };
-         me.preferencesService.set(
+
+         this.preferencesService.set(
             Alfresco.service.Preferences.FAVOURITE_SITES + "." + site.shortName,
             true,
             responseConfig);
-      },      
+      },
+      
       /**
        * Gets a custom message
        *
