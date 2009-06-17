@@ -7,7 +7,8 @@
    var thisHeader = new Alfresco.Header("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      searchType: "${page.url.templateArgs.site!'all'}", // default search type
+      siteTitle: "${siteTitle?js_string}",
+      searchType: "${page.url.templateArgs.site!'all'}", // default search scope
       favouriteSites: {<#list favouriteSites as site>'${site.shortName}': '${site.title?js_string}'<#if site_has_next>,</#if></#list>}
    }).setMessages(
       ${messages}
@@ -72,13 +73,12 @@
             </li>
          </#list>
          </ul>
-         <#if (page.url.templateArgs.site?? && !currentSiteIsFav)>
-         <ul class="separator">
+         <#assign addFavDisplay><#if (page.url.templateArgs.site?? && !currentSiteIsFav)>block<#else>none</#if></#assign>
+         <ul id="${args.htmlid}-addFavourite" class="add-favourite separator" style="display: ${addFavDisplay}">
             <li>
-               <a href="#" onclick="thisHeader.addAsFav('${page.url.templateArgs.site}'); return false;">${msg("link.add-fav",page.url.templateArgs.site!"")}</a>
+               <a href="#" onclick="thisHeader.addAsFavourite(); return false;">${msg("link.add-favourite", siteTitle)}</a>
             </li>
          </ul>
-         </#if>
          <ul class="<#if !isGuest>separator</#if>">
             <li>
                <a href="${url.context}/page/site-finder">${msg("header.sites.findSites")}</a>

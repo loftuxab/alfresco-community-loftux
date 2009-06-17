@@ -219,6 +219,15 @@
    padding-left:22px;
 }
 
+.header .yuimenu .bd ul.add-favourite li.yuimenuitem a.yuimenuitemlabel
+{
+   background-image:url(../images/star-deselected_16x16.png);
+   background-repeat:no-repeat;
+   background-position:left 5px;
+   margin-left:15px;
+   padding-left:22px;
+}
+
 
 /* Menu: Selected state */
 

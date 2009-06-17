@@ -1,61 +1,79 @@
-var activityFeed = getActivities();
-var activities = [], activity, item, summary, fullName, date;
-var dateFilter = args["dateFilter"], oldestDate = getOldestDate(dateFilter);
+main();
 
-if (activityFeed != null)
+/**
+ * Main entrypoint
+ */
+function main()
 {
-   var mode = args['mode'];
-   var site = (mode=='site') ? args['site'] : null;
-   for (var i = 0, ii = activityFeed.length; i < ii; i++)
-   {
-      activity = activityFeed[i];
-      //filter by site
-      if (mode=='site' && site)
-      {
-         if (activity.siteNetwork!=site)
-         {
-            continue;
-         }
-      }      
-      if (activity.activitySummaryFormat == "json")
-      {
-         summary = eval("(" + activity.activitySummary + ")");
-         fullName = trim(summary.firstName + " " + summary.lastName);
-         date = fromISO8601(activity.postDate);
-         
-         // Outside oldest date?
-         if (date < oldestDate)
-         {
-            break;
-         }
-         
-         item =
-         {
-            id: activity.id,
-            type: activity.activityType,
-            siteId: activity.siteNetwork,
-            date:
-            {
-               isoDate: activity.postDate,
-               fullDate: date,
-               hour: date.getHours()
-            },
-            title: summary.title || "title.generic",
-            fullName: fullName,
-            itemPage: itemPageUrl(activity, summary),
-            sitePage: sitePageUrl(activity, summary),
-            userProfile: userProfileUrl(activity.postUserId),
-            custom0: summary.custom0 || "",
-            custom1: summary.custom1 || "",
-            suppressSite: false
-         };
-         // Run through specialize function for special cases
-         activities.push(specialize(item, activity, summary));
-      }
-   }
-}
+   var activityFeed = getActivities();
+   var activities = [], activity, item, summary, fullName, date, sites = {}, siteTitles = {};
+   var dateFilter = args.dateFilter, oldestDate = getOldestDate(dateFilter);
 
-model.activities = activities;
+   if (activityFeed != null)
+   {
+      var mode = args.mode,
+         site = (mode == "site") ? args.site : null;
+      
+      for (var i = 0, ii = activityFeed.length; i < ii; i++)
+      {
+         activity = activityFeed[i];
+
+         if (mode == "site" && site)
+         {
+            // Filter by site
+            if (activity.siteNetwork != site)
+            {
+               continue;
+            }
+         }
+
+         if (activity.activitySummaryFormat == "json")
+         {
+            summary = eval("(" + activity.activitySummary + ")");
+            fullName = trim(summary.firstName + " " + summary.lastName);
+            date = fromISO8601(activity.postDate);
+
+            // Outside oldest date?
+            if (date < oldestDate)
+            {
+               break;
+            }
+
+            item =
+            {
+               id: activity.id,
+               type: activity.activityType,
+               siteId: activity.siteNetwork,
+               date:
+               {
+                  isoDate: activity.postDate,
+                  fullDate: date,
+                  hour: date.getHours()
+               },
+               title: summary.title || "title.generic",
+               fullName: fullName,
+               itemPage: itemPageUrl(activity, summary),
+               sitePage: sitePageUrl(activity, summary),
+               userProfile: userProfileUrl(activity.postUserId),
+               custom0: summary.custom0 || "",
+               custom1: summary.custom1 || "",
+               suppressSite: false
+            };
+            
+            // Add to our list of unique sites
+            sites[activity.siteNetwork] = true;
+            
+            // Run through specialize function for special cases
+            activities.push(specialize(item, activity, summary));
+         }
+      }
+      
+      siteTitles = getSiteTitles(sites);
+   }
+
+   model.activities = activities;
+   model.siteTitles = siteTitles;
+}
 
 
 /**
@@ -69,7 +87,7 @@ function specialize(item, activity, summary)
       case "org.alfresco.site.user-left":
       case "org.alfresco.site.user-role-changed":
          item.title = activity.siteNetwork;
-         item.custom0 = summary.role;
+         item.custom0 = msg.get("role." + summary.role);
          item.fullName = trim(summary.memberFirstName + " " + summary.memberLastName);
          item.suppressSite = true;
          item.userProfile = userProfileUrl(summary.memberUserName);
@@ -86,10 +104,11 @@ function specialize(item, activity, summary)
 function getActivities()
 {
    // Call the correct repo script depending on the mode
-   var mode = args["mode"], site = args["site"], userFilter = args['userFilter'], connector, result =
-   {
-      status: 0
-   };
+   var mode = args.mode, site = args.site, userFilter = args.userFilter, connector,
+      result =
+      {
+         status: 0
+      };
 
    if (format.name == "html")
    {
@@ -101,17 +120,16 @@ function getActivities()
       connector = remote.connect("alfresco-feed");
    }
 
-   //filter by user
-   var excl = '';
+   // Filter by user
+   var excl = "";
    switch(userFilter)
    {
-      case 'others':
-         excl = '&exclUser=true';
+      case "others":
+         excl = "&exclUser=true";
          break; 
-      case 'mine':
-         excl = '&exclOthers=true';
+      case "mine":
+         excl = "&exclOthers=true";
          break; 
-
    }
    result = connector.get("/api/activities/feed/user?format=json" + excl);
 
@@ -123,6 +141,59 @@ function getActivities()
    
    status.setCode(result.status, result.response);
    return null;
+}
+
+/**
+ * Call remote Repo script to get site titles
+ */
+function getSiteTitles(p_sites)
+{
+   var connector, result, query, shortName, siteTitles = {};
+
+   if (format.name == "html")
+   {
+      connector = remote.connect("alfresco");
+   }
+   else
+   {
+      // Use alfresco-feed connector as a basic HTTP auth challenge will be issued
+      connector = remote.connect("alfresco-feed");
+   }
+
+   // Sites query template
+   query =
+   {
+      shortName:
+      {
+         match: "exact",
+         values: []
+      }
+   };
+
+   // Add our list of site names to the query
+   for (shortName in p_sites)
+   {
+      if (p_sites[shortName])
+      {
+         query.shortName.values.push(shortName);
+      }
+   }
+   
+   // Call the repo to return a specific list of site metadata
+   result = connector.post("/api/sites/query", jsonUtils.toJSONString(query), "application/json");
+   
+   if (result.status == 200)
+   {
+      var sites = eval('(' + result + ')'), site;
+
+      // Extract site titles
+      for (var i = 0, ii = sites.length; i < ii; i++)
+      {
+         site = sites[i];
+         siteTitles[site.shortName] = site.title;
+      }
+   }
+   return siteTitles;
 }
 
 /**
@@ -157,15 +228,11 @@ function getOldestDate(filter)
    var date = new Date();
    date.setHours(0, 0, 0, 0);
    
-   switch (filter)
+   if (filter != "today")
    {
-      case "today":
-         break;
-         
-      default:
-         date.setDate(date.getDate() - filter);
-         break;
+      date.setDate(date.getDate() - filter);
    }
+
    return date;
 }
 
@@ -180,8 +247,8 @@ function trim(str)
    }
    catch(e)
    {
-      return str;
    }
+   return str;
 }
 
 /**
@@ -192,36 +259,36 @@ function fromISO8601(formattedString)
 {
    var isoRegExp = /^(?:(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?)?(?:T(\d{2}):(\d{2})(?::(\d{2})(.\d+)?)?((?:[+-](\d{2}):(\d{2}))|Z)?)?$/;
 
-	var match = isoRegExp.exec(formattedString);
-	var result = null;
+   var match = isoRegExp.exec(formattedString);
+   var result = null;
 
-	if (match)
-	{
-		match.shift();
-		if (match[1]){match[1]--;} // Javascript Date months are 0-based
-		if (match[6]){match[6] *= 1000;} // Javascript Date expects fractional seconds as milliseconds
+   if (match)
+   {
+      match.shift();
+      if (match[1]){match[1]--;} // Javascript Date months are 0-based
+      if (match[6]){match[6] *= 1000;} // Javascript Date expects fractional seconds as milliseconds
 
-		result = new Date(match[0]||1970, match[1]||0, match[2]||1, match[3]||0, match[4]||0, match[5]||0, match[6]||0);
+      result = new Date(match[0]||1970, match[1]||0, match[2]||1, match[3]||0, match[4]||0, match[5]||0, match[6]||0);
 
-		var offset = 0;
-		var zoneSign = match[7] && match[7].charAt(0);
-		if (zoneSign != 'Z')
-		{
-			offset = ((match[8] || 0) * 60) + (Number(match[9]) || 0);
-			if (zoneSign != '-')
-			{
-			   offset *= -1;
-			}
-		}
-		if (zoneSign)
-		{
-			offset -= result.getTimezoneOffset();
-		}
-		if (offset)
-		{
-			result.setTime(result.getTime() + offset * 60000);
-		}
-	}
+      var offset = 0;
+      var zoneSign = match[7] && match[7].charAt(0);
+      if (zoneSign != 'Z')
+      {
+         offset = ((match[8] || 0) * 60) + (Number(match[9]) || 0);
+         if (zoneSign != '-')
+         {
+            offset *= -1;
+         }
+      }
+      if (zoneSign)
+      {
+         offset -= result.getTimezoneOffset();
+      }
+      if (offset)
+      {
+         result.setTime(result.getTime() + offset * 60000);
+      }
+   }
 
-	return result; // Date or null
+   return result; // Date or null
 }
