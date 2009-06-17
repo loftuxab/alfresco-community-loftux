@@ -312,7 +312,7 @@ public class I18NUtil
         if (props != null)
         {
             message = props.get(messageKey);
-        }                
+        }
         return message;
     }
     
