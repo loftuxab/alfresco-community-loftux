@@ -235,6 +235,31 @@ YAHOO.namespace('extension');
        */
       _request: null,
 
+      /**
+       * The urls that was requested from the server to display it in its current state
+       *
+       * @property _urlPath
+       * @private
+       */
+      _urlPath: [],
+
+      /**
+       * The urls that was requested by the user of this component by calling load.
+       *
+       * @property _loadUrls
+       * @private
+       */
+      _loadUrls: null,
+
+      /**
+       * The flag that tells this component to check for consistency or not in the urls
+       * that was requested by the user of this component by calling load.
+       *
+       * @property _checkUrlsConsistency
+       * @private
+       */
+      _checkLoadUrlsConsistency: null,
+
       /*
        * CSS classes used by the ColumnBrowser component
        */
@@ -267,14 +292,35 @@ YAHOO.namespace('extension');
 
 
       /**
+       * Clears the current columns and loads the following urls in order into columns instead.
+       *
+       * @param urls An array of hierarchial urls to load. (Note root url SHALL be included)
+       * @param checkUrlsConsistency If true it will check that the urlPaths follows a
+       *        logical order by making sure that the "next" url is present in the
+       *        url attribute in one of "previously" loaded children. If not the
+       *        loading will stop.
+       */
+      load: function ColumnBrowser_load(urls, checkUrlsConsistency)
+      {
+         // If a request is happening stop it
+         this._abortRequests();
+
+         this._loadUrls = urls;
+         this._checkLoadUrlsConsistency = checkUrlsConsistency;
+
+         this._removeColumns(0);
+         this._loadFromLoadUrls(null);
+      },
+
+      /**
        * Makes sure the column specified by columnIndex is shown
        *
        * @param columnIndex
        */
-      showColumn: function ColumnNav_showColumn(columnIndex)
+      showColumn: function ColumnBrowser_showColumn(columnIndex)
       {
          // If a request is happening stop it
-         this._abortRequest();
+         this._abortRequests();
 
          // Let the carousel display the correct column
          this._carousel.scrollTo(columnIndex, false);
@@ -444,6 +490,21 @@ YAHOO.namespace('extension');
             value     : attrs.url
          });
 
+         /**
+          * @attribute urlPath
+          * @description An array describing the path of urls that was requested
+          * to populate the ColumnBrowser in its current state
+          * @default []
+          * @type Array
+          */
+         columnBrowser.setAttributeConfig("urlPath", {
+            readOnly : true,
+            getter: this._getUrlPath,
+            setter: this._setUrlPath,
+            value     : attrs.urlPath || []
+         });
+
+
       },
 
       /**                                           
@@ -519,7 +580,10 @@ YAHOO.namespace('extension');
          // Make sure we know when the animation is finished so we know the carousel isn't moving
          columnBrowser._carousel.on("afterScroll", columnBrowser._animationCompleteHandler, null, columnBrowser);
 
-         // After a column has been added we must add click, hover listeners to all the items
+         /**
+          * After a column has been added we must add click, hover listeners to all the items
+          * (this also where the requests in load are chained)
+          */
          columnBrowser._carousel.on("itemAdded", columnBrowser._addClickListeners, null, columnBrowser);
 
          // Display the carousel
@@ -565,10 +629,11 @@ YAHOO.namespace('extension');
             argument:
             {
                itemInfo: itemInfo,
-               errorMessage: 'Ajax request failed'
+               errorMessage: 'Ajax request failed',
+               url: url
             }
          };
-         this._abortRequest();
+         //this._abortRequests();
          this._request = Con.asyncRequest('GET', url, callback);
       },
 
@@ -577,10 +642,12 @@ YAHOO.namespace('extension');
        *
        * @protected
        */
-      _abortRequest: function()
+      _abortRequests: function()
       {
          if (this._request && Con.isCallInProgress(this._request))
             Con.abort(this._request);
+         this._loadUrls = null;
+         this._checkLoadUrlsConsistency = false;
       },
 
       /**
@@ -604,7 +671,7 @@ YAHOO.namespace('extension');
             this._handleFailure(serverResponse);
             return;
          }
-         this._addColumn(columnInfo);
+         this._addColumn(columnInfo, serverResponse.argument.url);
       },
 
       /**
@@ -628,16 +695,17 @@ YAHOO.namespace('extension');
             }
          };
 
-         this._addColumn(errorColumn);
+         this._addColumn(errorColumn, serverResponse.argument.url);
       },
 
       /**
        * Add a column based on the columnInfo
        *
        * @param columnInfo
+       * @param url The url from where the columInfo was requested
        * @protected
        */
-      _addColumn: function(columnInfo) {
+      _addColumn: function(columnInfo, url) {
          var paneContent;
          try {
             // Create the column from the columnInfo object
@@ -648,8 +716,11 @@ YAHOO.namespace('extension');
          }
 
          // Add the column to the carousel
-         if(this._carousel.addItem(paneContent, undefined))
-         {
+         if(this._carousel.addItem(paneContent, undefined)) {
+            // Update the urlPath attribute
+            this._urlPath.push(url);
+            this.set("urlPath", this._urlPath);
+
             // It was added alright now lets see if the carousel needs to scroll or not
             var columnIndex = this._carousel.get("numItems") - 1;
             if (this._shouldScrollNext(this._carousel.getElementForItem(columnIndex))) {
@@ -658,8 +729,7 @@ YAHOO.namespace('extension');
                this._carousel.scrollForward();
                this._isMoving = true;
             } else {
-               if (columnIndex >= 0)
-               {
+               if (columnIndex >= 0) {
                   // todo set focus to newly created pane
                   var pane = Dom.get(this._carousel.getItem(columnIndex).id);
                   this._focus(pane);
@@ -702,12 +772,33 @@ YAHOO.namespace('extension');
 
          // Header
          var header = document.createElement('div');
-         if(columnInfo.header)
-         {
+         if(columnInfo.header) {
             Dom.addClass(header, "yui-columnbrowser-column-header");
-            var span = document.createElement('span');
-            span.appendChild(document.createTextNode(columnInfo.header.label));
-            header.appendChild(span);
+            if(columnInfo.header.label) {
+               // Create label
+               var span = document.createElement('span');
+               Dom.addClass(buttons, "yui-columnbrowser-column-header-label");
+               span.appendChild(document.createTextNode(columnInfo.header.label.text));
+               header.appendChild(span);
+            }
+            if(columnInfo.header.buttons) {
+               // Create buttons
+               var buttons = document.createElement('span');
+               Dom.addClass(buttons, "yui-columnbrowser-column-header-buttons");
+               for(var i = 0; i < columnInfo.header.buttons.length; i++)
+               {
+                  var button = document.createElement("span");
+                  var b = columnInfo.header.buttons[i];
+                  button.setAttribute("title", b.title);
+                  Dom.addClass(button, b.cssClass);
+                  button.innerHTML = "&nbsp;";
+                  Dom.setStyle(button, "width", "10px");
+                  Dom.setStyle(button, "height", "10px");
+                  buttons.appendChild(button);
+               }
+               header.appendChild(buttons);
+            }
+
          }
 
          // Footer
@@ -741,6 +832,10 @@ YAHOO.namespace('extension');
          // Create item
          var item = document.createElement('a');
          Dom.addClass(item, "yui-columnbrowser-item");
+         if(itemInfo.cssClass)
+         {
+            Dom.addClass(item, itemInfo.cssClass);
+         }
 
          // Create label
          var label = document.createElement('span');
@@ -749,8 +844,8 @@ YAHOO.namespace('extension');
          item.appendChild(label);
 
          item.next = itemInfo['next'];
-         if (itemInfo['next'] || (itemInfo['rel'] && itemInfo['rel'].match(/(?:^|\s+)ajax(?:\s+|$)/)))
-            Dom.addClass(item, 'yui-columnbrowser-has-next');
+         if (itemInfo['next'] || (itemInfo['hasNext']))
+            Dom.addClass(item, 'yui-columnbrowser-column-has-next');
 
          // Create buttons
          var buttons = document.createElement('span');
@@ -758,8 +853,9 @@ YAHOO.namespace('extension');
          for(var i = 0; i < itemInfo.buttons.length; i++)
          {
             var button = document.createElement("span");
-            button.setAttribute("title", itemInfo.buttons[i].title);
-            Dom.addClass(button, itemInfo.buttons[i].type);
+            var b = itemInfo.buttons[i];
+            button.setAttribute("title", b.title);
+            Dom.addClass(button, b.cssClass);
             button.innerHTML = "&nbsp;";
             Dom.setStyle(button, "width", "10px");
             Dom.setStyle(button, "height", "10px");
@@ -887,31 +983,32 @@ YAHOO.namespace('extension');
          }
 
          // Remove columns until this column
-         this._removeColumns(itemInfo.columnIndex);
+         this._removeColumns(itemInfo.columnIndex + 1);
 
          // Get some info about the item that was clicked
-         var href = itemInfo.href;
-         var rel = itemInfo.rel;
+         var url = itemInfo.url;
          var next = itemInfo.next;
-         if (href !== null){
-            // Highlight the item
-            this._highlight(target);
-         }
 
+         // Highlight the item
+         this._highlight(target);
+         
          // Decide how to display the child column items to this the item
          if (next) {
             // The column to th right has already been loaded form the server, use that information
-            this._addColumn(next);
+            this._addColumn(next, url);
          }
-         else if (rel && rel.match(/\bajax\b/)) {
+         else if (url) {
             // Call the server to get data about the column to display
-            this._doRequest(href, itemInfo);
+            this._doRequest(url, itemInfo);
          }
          else {
             // It is a leaf, create an empty column
             var emptyColumnInfoBuilder = this.get("emptyColumnInfoBuilder");
             if(emptyColumnInfoBuilder) {
-               this._addColumn(emptyColumnInfoBuilder.fn.call(emptyColumnInfoBuilder.scope ? emptyColumnInfoBuilder.scope : this, itemInfo));
+               var columnInfo = emptyColumnInfoBuilder.fn.call(emptyColumnInfoBuilder.scope ? emptyColumnInfoBuilder.scope : this, itemInfo);
+               if(columnInfo) {
+                  this._addColumn(columnInfo, null);
+               }
             }
          }
 
@@ -922,16 +1019,22 @@ YAHOO.namespace('extension');
       },
 
       /**
-       * Remove columns from the right to this index
+       * Remove columns from the right to this index, if removeIndexed
+       * is true the column with index columnIndex is removed otherwise
+       * it is left
        *
-       * @param columnIndex
+       * @param columnIndex       
        */
       _removeColumns: function(columnIndex) {
-         var numToRemove = this._carousel.get("numItems") - 1 - columnIndex;
-         while (numToRemove > 0) {
-            this._carousel.removeItem(columnIndex + numToRemove);
-            numToRemove--;
+         // Remove from the carousel
+         var lastIndex = this._carousel.get("numItems") - 1;
+         while (lastIndex >= columnIndex) {
+            this._carousel.removeItem(lastIndex);
+            lastIndex = this._carousel.get("numItems") - 1;
+            this._urlPath.pop();
          }
+         // Update the urlPath attribute
+         this.set("urlPath", this._urlPath);
       },
 
       /**
@@ -995,25 +1098,49 @@ YAHOO.namespace('extension');
          var columnInfo = this.get("columnInfos")[columnIndex];
          var column = Dom.get(this._carousel.getItem(columnIndex).id);
 
-         // Add click listener for header
-         var header = Dom.getElementsByClassName("yui-columnbrowser-column-header", "div", column);
-         if(columnInfo.header.click)
-         {
-            var h = columnInfo.header;
-            YAHOO.util.Event.addListener(header, "click", function(e, callback)
+         // Add click listener for header label
+         var labels = Dom.getElementsByClassName("yui-columnbrowser-column-header-label", "span", column);
+         var label = labels ? labels[0] : null;
+         if(label && columnInfo.header && columnInfo.header.label && columnInfo.header.label.click) {
+            var click = columnInfo.header.label;
+            YAHOO.util.Event.addListener(label, "click", function(e, callback)
             {
                callback.fn.call(callback.scope, callback.obj);
-            }, { fn: h.click.fn, scope: h.scope ? h.scope : this, obj: columnInfo}, this);
+            }, { fn: click.fn, scope: click.scope ? click.scope : this, obj: columnInfo}, this);
          }
+
+         // Add click listeners for header buttons
+         var buttons = Dom.getElementsByClassName("yui-columnbrowser-column-header-buttons", "span", column);
+         buttons = buttons && buttons.length > 0 ? buttons[0] : null;
+         if(buttons && columnInfo.header && columnInfo.header.buttons) {
+            for(var i = 0; i < columnInfo.header.buttons.length; i++) {
+               var b = columnInfo.header.buttons[i];
+               if(b.click)
+               {
+                  // Find all buttons and add a click listener to each
+                  var button = Dom.getElementsByClassName(b.cssClass, "span", buttons);
+                  YAHOO.util.Event.addListener(button, "click", function(e, callback)
+                  {
+                     callback.fn.call(callback.scope, callback.obj);
+                  },
+                  {
+                     fn: b.click.fn,
+                     scope: b.click.scope ? b.click.scope : this,
+                     obj: columnInfo
+                  }, this);
+               }
+            }
+         }
+
          // Add css classes mouseover
-         YAHOO.util.Event.addListener(header, "mouseover", function()
+         YAHOO.util.Event.addListener(label, "mouseover", function()
          {
-            Dom.addClass(this, "yui-columnbrowser-column-header-active");
+            Dom.addClass(this, "yui-columnbrowser-column-header-label-active");
          });
          // Remove css classes on mouseout
-         YAHOO.util.Event.addListener(header, "mouseout", function()
+         YAHOO.util.Event.addListener(label, "mouseout", function()
          {
-            Dom.removeClass(this, "yui-columnbrowser-column-header-active");
+            Dom.removeClass(this, "yui-columnbrowser-column-header-label-active");
          });
 
          // Add listeners for items
@@ -1042,28 +1169,77 @@ YAHOO.namespace('extension');
                Dom.removeClass(buttons, "yui-columnbrowser-item-buttons-active");
             });
             // Add button click listeners
-            var buttons = Dom.getElementsByClassName("yui-columnbrowser-item-buttons", "span", item)[0];
-            for(var j = 0; itemInfo.buttons && j < itemInfo.buttons.length; j++)
-            {
-               var b = itemInfo.buttons[j];
-               if(b.click)
+            var buttons = Dom.getElementsByClassName("yui-columnbrowser-item-buttons", "span", item);
+            buttons = buttons && buttons.length > 0 ? buttons[0] : null;
+            if(buttons && itemInfo.buttons) {
+               for(var j = 0; j < itemInfo.buttons.length; j++)
                {
-                  // Find all buttons and add a click listener to each
-                  var button = Dom.getElementsByClassName(b.type, "span", buttons);
-                  YAHOO.util.Event.addListener(button, "click", function(e, callback)
+                  var b = itemInfo.buttons[j];
+                  if(b.click)
                   {
-                     // Stop the event from bubbling so we don't open the columns children
-                     YAHOO.util.Event.stopEvent(e);
-                     callback.fn.call(callback.scope, callback.obj);
-                  },
-                  {
-                     fn: b.click.fn,
-                     scope: b.click.scope ? b.click.scope : this,
-                     obj: b.click.obj ? b.click.obj : itemInfo
-                  }, this);
+                     // Find all buttons and add a click listener to each
+                     var button = Dom.getElementsByClassName(b.cssClass, "span", buttons);
+                     YAHOO.util.Event.addListener(button, "click", function(e, callback)
+                     {
+                        // Stop the event from bubbling so we don't open the columns children
+                        YAHOO.util.Event.stopEvent(e);
+                        callback.fn.call(callback.scope, callback.obj);
+                     },
+                     {
+                        fn: b.click.fn,
+                        scope: b.click.scope ? b.click.scope : this,
+                        obj: { obj: b.click.obj, itemInfo: itemInfo, columnInfo: columnInfo }
+                     }, this);
+                  }
                }
             }
 
+         }
+         // If this column was created from a load() call make sure the rest of the urls are requested
+         this._loadFromLoadUrls(columnInfo);
+      },
+
+
+      /**
+       * Called after a click listeners has been added for the column so we can load more
+       * columns if it was requested in the load method.
+       *
+       * @param columnInfo
+       * @protected
+       */
+      _loadFromLoadUrls: function(columnInfo) {
+         var columnIndex = this._carousel.get("numItems") - 1;
+         var url = this._loadUrls ? this._loadUrls.shift() : null;
+         if(url) {
+            // Decide if children shall be loaded or not
+            var loadUrl = this._checkLoadUrlsConsistency ? false : true;
+            var itemInfo = null;
+            var items = columnInfo && columnInfo.body && columnInfo.body.items ? columnInfo.body.items : [];
+            for(var i = 0;  i < items.length; i++) {
+               if(items[i].url == url) {
+                  loadUrl = true;
+                  itemInfo = items[i];
+
+                  // Highligt parent
+                  var column = Dom.get(this._carousel.getItem(columnIndex).id);
+                  var itemEl = column.getElementsByTagName("a")[i];
+                  this._highlight(itemEl);
+
+                  // Tell other components that the item has been select
+                  this.fireEvent(itemSelectEvent, itemInfo);
+                  break;
+               }
+            }
+            if(loadUrl || columnIndex == -1) {
+               // Load if it is the root or if the url is ok/ignored
+               this._doRequest(url, itemInfo);
+            }
+            else {
+               this._abortRequests();
+            }
+         }
+         else {
+            this._abortRequests();
          }
       },
 
@@ -1117,7 +1293,42 @@ YAHOO.namespace('extension');
        */
       _getItems: function(node) {
          return (node.nodeType == 1 && node.tagName.toLowerCase() == 'a');
+      },
+
+      /**
+       * Clones the array when before the urlPath is returned so it can't be modified.
+       *
+       * @method _getUrlPath
+       * @param name the attribute name ("urlPath")
+       * @return {Array} The returned/cloned value for/of urlPath
+       * @protected
+       */
+      _getUrlPath: function (name) {
+         var copy = [];
+         for(var i = 0; this._urlPath && i < this._urlPath.length; i++) {
+            copy.push(this._urlPath[i]);
+         }
+         return copy;
+      },
+
+      /**
+       * Clones the array before the urlPath is is set so it can't be modified
+       *
+       * @method _setUrlPath
+       * @param val {Array} The value for urlPath
+       * @param name the attribute name ("urlPath")
+       * @return {Array} The returned/cloned value for/of urlPath
+       * @protected
+       */
+      _setUrlPath: function (val, name) {
+         var copy = [];
+         for(var i = 0; val && i < val.length; i++) {
+            copy.push(val[i]);
+         }
+         this._urlPath = copy;
+         return val;
       }
+
 
    });
 
@@ -1152,21 +1363,21 @@ YAHOO.namespace('extension');
          var me = this;
          this.columnBrowser.on("itemSelect", function (itemInfo)
          {            
-            me._addBreadCrumbItem(itemInfo.label, itemInfo.columnIndex);
+            me._addBreadCrumbItem(itemInfo.label, itemInfo.columnIndex, itemInfo.cssClass);
          }, null, this);
 
          this._addBreadCrumbRoot(this.root);
       },
 
       _addBreadCrumbRoot: function (label) {
-         this._addBreadCrumb(label, -1, "yui-columnbrowser-breadcrumb-root");
+         this._addBreadCrumb(label, -1, "yui-columnbrowser-breadcrumb-root", null);
       },
 
-      _addBreadCrumbItem: function (label, columnIndex) {
-         this._addBreadCrumb(label, columnIndex, "yui-columnbrowser-breadcrumb-item");
+      _addBreadCrumbItem: function (label, columnIndex, customCssClass) {
+         this._addBreadCrumb(label, columnIndex, "yui-columnbrowser-breadcrumb-item", customCssClass);
       },
 
-      _addBreadCrumb: function (label, columnIndex, cssClass) {
+      _addBreadCrumb: function (label, columnIndex, cssClass, customCssClass) {
          // Remove previous breadcrumbs
          var items = Dom.getElementsByClassName(cssClass, "span", this.breadcrumbsEl);
          if (items && items.length >= columnIndex && columnIndex >= 0) {
@@ -1179,6 +1390,10 @@ YAHOO.namespace('extension');
          // Create elements
          var item = document.createElement("span");
          Dom.addClass(item, cssClass);
+         if(customCssClass)
+         {
+            Dom.addClass(item, customCssClass);
+         }
          var items = Dom.getElementsByClassName(cssClass, "span", this.breadcrumbsEl);
          for(var i = 0; i < items.length; i++)
          {

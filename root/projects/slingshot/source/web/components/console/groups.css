@@ -1,4 +1,5 @@
 /* History Manager */
+
 #yui-history-iframe
 {
    position: absolute;
@@ -12,30 +13,36 @@
 /* Users Tool */
 
 
-.groups {
+.groups
+{
    color: #000000;
    margin:16px 10px 10px;
 }
 
-.groups .title {
+.groups.yui-panel
+{
+   margin: 0;
+}
+
+.groups .hidden,
+.remove-dialog .hidden
+{
+   display: none;
+}
+
+.groups .title
+{
    color:#515D6B;
    font-size:123.1%;
    font-weight:bold;
    margin-bottom:0.8em;
 }
 
-
 .groups .search-button
 {
    margin-top: -2.0em;
    padding-left: 16em;
 }
-
-.groups .hidden
-{
-   display: none;
-}
-
 
 .groups .separator
 {
@@ -65,8 +72,8 @@
    margin-top:-2.3em;
 }
 
-/* Data table styling */
 
+/* Data table styling */
 
 .groups .results table
 {
@@ -123,30 +130,59 @@
 
 /* Columnbrowser styling */
 
-.groups .yui-columnbrowser {
+.groups .yui-columnbrowser
+{
    border: 1px solid black;
 }
 
-.groups .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column {
-   width: 20em;
+.groups .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column
+{
+   width: 26em;
 }
 
-.groups .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a {
-   color: black;
+.groups .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a
+{
+   color: black;                     ü
    font-family: 'Lucida Grande', Helvetica, sans-serif;
    font-size: 12px;
    text-decoration: none;
+   line-height: 1.5em;
 }
 
-.groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-header span
+.yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-column-has-next
 {
-   background-image: url(../images/plus-16.png);
+   background-position: 99% center;
+}
+.groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-header
+{
+   padding-right:1.5em;
+   text-align:right;
+}
+
+.groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-header span span
+{
    padding-top:0.1em;
    padding-bottom:0.1em;
    background-repeat: no-repeat;
    background-position: 0 center;
-   padding-left: 1.9em;
+   padding-left: 1em;
    margin-left: 0.7em;
+   cursor: pointer;
+}
+
+.groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-header span span.groups-newgroup-button
+{
+   background-image: url(../images/new-group-16.png);
+}
+
+.groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-header span span.groups-addgroup-button
+{
+   background-image: url(../images/add-group-16.png);
+}
+
+.groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-header span span.groups-adduser-button
+{
+   background-image: url(../images/add-user-16.png);
 }
 
 .groups .yui-columnbrowser-breadcrumb .yui-columnbrowser-breadcrumb-item-text-active,
@@ -157,16 +193,25 @@
 
 .groups .yui-columnbrowser-breadcrumb .yui-columnbrowser-breadcrumb-item-text-active,
 .groups .yui-columnbrowser .yui-columnbrowser-column-header.yui-columnbrowser-column-header-active,
-.groups .yui-columnbrowser .yui-columnbrowser-column-body .yui-columnbrowser-item
+.groups .yui-columnbrowser .yui-columnbrowser-column-body .yui-columnbrowser-item-active
 {
    cursor: pointer;
-
 }
 
-
-.groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-body .yui-columnbrowser-item .yui-columnbrowser-item-label
+.groups .yui-columnbrowser .yui-columnbrowser-column-body .yui-columnbrowser-item-active
+{
+   background-color: #EFEFEF;
+}
+.groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-body .yui-columnbrowser-item.groups-item-group .yui-columnbrowser-item-label
 {
    background-image: url(../images/group-16.png);
+   padding-bottom: 0.2em;
+   padding-top: 0.1em;
+}
+
+.groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-body .yui-columnbrowser-item.groups-item-user .yui-columnbrowser-item-label
+{
+   background-image: url(../images/user-16.png);
    padding-bottom: 0.2em;
    padding-top: 0.1em;
 }
@@ -177,15 +222,24 @@
    border-top: 1px solid #D7D7D7;
    border-left: 1px solid #D7D7D7;
    border-right: 1px solid #D7D7D7;
-/*width:507px;*/
-   width:767px;
+   /*width:1001px;*/
+   width:77.2em;
    line-height: 2.5em;
 }
 
 .groups .yui-columnbrowser-breadcrumb .yui-columnbrowser-breadcrumb-item
 {
    padding-bottom:0.1em;
+}
+
+.groups .yui-columnbrowser-breadcrumb .yui-columnbrowser-breadcrumb-item.groups-item-group
+{
    background-image: url(../images/group-16.png);
+}
+
+.groups .yui-columnbrowser-breadcrumb .yui-columnbrowser-breadcrumb-item.groups-item-user
+{
+   background-image: url(../images/user-16.png);
 }
 
 .groups .yui-columnbrowser.yui-carousel,
@@ -194,13 +248,18 @@
    border: 1px solid #D7D7D7;
 }
 
+.groups .yui-columnbrowser .yui-columnbrowser-item .yui-columnbrowser-item-buttons
+{
+   margin-right:1.7em;
+}
+
 .groups .yui-columnbrowser .yui-columnbrowser-item .yui-columnbrowser-item-buttons span
 {
    background-repeat: no-repeat;
-   background-position: 0px center;
+   background-position: 0 0;
    padding-bottom:0.1em;
    padding-left:0.6em;
-   padding-right:0.7em;
+   padding-right:1.1em;
 }
 
 .groups .yui-columnbrowser .yui-columnbrowser-item .yui-columnbrowser-item-buttons span.groups-update-button
@@ -208,13 +267,13 @@
    background-image: url(../images/edit-16.png);
 }
 
-.groups .yui-columnbrowser .yui-columnbrowser-item .yui-columnbrowser-item-buttons span.groups-delete-button
+.groups .yui-columnbrowser .yui-columnbrowser-item .yui-columnbrowser-item-buttons span.groups-delete-button,
+.groups .yui-columnbrowser .yui-columnbrowser-item .yui-columnbrowser-item-buttons span.users-remove-button
 {
    background-image: url(../images/delete-16.png);
 }
 
-/* Create & Update */
-
+/* Create & Update Panels */
 
 .groups .header-bar
 {
@@ -303,3 +362,77 @@
    margin-left: 1.75em;
    font-size: 85%;
 }
+
+/* Remove Dialog */
+
+.remove-dialog div div div
+{
+   margin-top: 0.3em;
+}
+
+.remove-dialog .yui-gf div.first
+{
+   width:10%;
+}
+
+.remove-dialog .yui-gf .yui-u
+{
+   width:83%;
+}
+
+.remove-dialog .dialog-panel
+{
+   padding: 1em;
+}
+
+.remove-dialog .dialog-panel .parent-list
+{
+   color:#919DAB;
+   margin-bottom:1em;
+}
+
+
+/* People picker */
+
+.groups .people-finder .search-text
+{
+   padding:0 1em 0.3em 0.3em;
+}
+.groups .people-picker .people-finder
+{
+   margin: 0;
+}
+
+.groups.people-picker .people-finder.list
+{
+   margin-bottom: 0;
+}
+
+.groups.people-picker.yui-panel .bd
+{
+   padding:1em;
+}
+
+.groups.people-picker .search-button 
+{
+   margin-top: 0;
+}
+
+
+/* Group picker */
+
+.groups.group-picker .group-finder
+{
+   margin: 0;
+}
+
+.groups.group-picker .group-finder.list
+{
+   margin-bottom: 0;
+}
+
+.groups.group-picker.yui-panel .bd
+{
+   padding:1em;
+}
+

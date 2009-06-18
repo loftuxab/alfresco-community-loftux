@@ -63,12 +63,11 @@
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("newGroup", this.onNewGroup, this);
-      YAHOO.Bubbling.on("viewGroup", this.onViewGroup, this);
       YAHOO.Bubbling.on("updateGroup", this.onUpdateGroup, this);
-      YAHOO.Bubbling.on("deleteGroup", this.onDeleteGroup, this);
 
       /* Define panel handlers */
       var parent = this;
+      this.panelHandlers = {};
 
       // NOTE: the panel registered first is considered the "default" view and is displayed first
 
@@ -80,58 +79,78 @@
 
       YAHOO.extend(SearchPanelHandler, Alfresco.ConsolePanelHandler,
       {
-         BROWSE_PANEL: "browse-panel",
-         SEARCH_PANEL: "search-panel",
 
-         state: 1,
+         /**
+          * INSTANCE VARIABLES
+          */
 
-         onLoad: function onLoad()
+         /**
+          * Keeps track if this panel is visble or not
+          *
+          * @property _visible
+          * @type Boolean
+          */
+         _visible: false,
+
+         /**
+          * When the Add User dialog or the Add Group dialog is shown this variable keeps track
+          * of which group the selected user or group should be added to.
+          *
+          * @property _selectedParentGroupShortName
+          * @type String
+          */
+         _selectedParentGroupShortName: null,
+
+         /**
+          * PANEL LIFECYCLE CALLBACKS
+          */
+
+         /**
+          * Called by the ConsolePanelHandler when this panel shall be loaded
+          *
+          * @method onLoad
+          */
+         onLoad: function ConsoleGroups_SearchPanelHandler_onLoad()
          {
             var me = this;
 
             // Search Button
-            var searchButton = new YAHOO.widget.Button(parent.id + "-search-button",
-            {
-               type: "button",
-               disabled: false
-            });
+            var searchButton = new YAHOO.widget.Button(parent.id + "-search-button", {});
             searchButton.on("click", this.onSearchClick, searchButton, this);
 
             // ColumnBrowser
-            parent.widgets.columnbrowser = new YAHOO.extension.ColumnBrowser(parent.id + "-columnbrowser",
+            this.widgets.columnbrowser = new YAHOO.extension.ColumnBrowser(parent.id + "-columnbrowser",
             {
                url: Alfresco.constants.PROXY_URI + "/api/rootgroups",
                numVisible: 3,
-               columnInfoBuilder: {
+               columnInfoBuilder:
+               {
                   fn: this.onBuildColumnInfo,
                   scope: this
                },
-               emptyColumnInfoBuilder: {
+               emptyColumnInfoBuilder:
+               {
                   fn: this.onBuildEmptyColumnInfo,
                   scope: this
                }
             });
 
             // ColumnBrowser Breadcrumb
-            parent.widgets.breadcrumb = new YAHOO.extension.ColumnBrowserBreadCrumb(parent.id + "-breadcrumb",
+            this.widgets.breadcrumb = new YAHOO.extension.ColumnBrowserBreadCrumb(parent.id + "-breadcrumb",
             {
-               columnBrowser: parent.widgets.columnbrowser,
+               columnBrowser: this.widgets.columnbrowser,
                root: parent._msg("label.breadcrumb.root")
             });
 
             // Close search button            
-            var closeSearchButton = new YAHOO.widget.Button(parent.id + "-closesearch-button",
-            {
-               type: "button",
-               disabled: false
-            });
+            var closeSearchButton = new YAHOO.widget.Button(parent.id + "-closesearch-button", {});
             closeSearchButton.on("click", this.onCloseSearchClick, closeSearchButton, this);
 
                         
             // DataTable and DataSource setup
-            parent.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups");
-            parent.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
-            parent.widgets.dataSource.responseSchema =
+            this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups");
+            this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+            this.widgets.dataSource.responseSchema =
             {
                resultsList: "data",
                fields:
@@ -146,7 +165,7 @@
             };
 
             // Work to be performed after data has been queried but before display by the DataTable
-            parent.widgets.dataSource.doBeforeParseData = function ConsoleGroups_SearchPanel_doBeforeParseData(oRequest, oFullResponse)
+            this.widgets.dataSource.doBeforeParseData = function ConsoleGroups_SearchPanel_doBeforeParseData(oRequest, oFullResponse)
             {
                var updatedResponse = oFullResponse;
 
@@ -189,7 +208,6 @@
 
             // register the "enter" event on the search text field
             var searchText = Dom.get(parent.id + "-search-text");
-
             new YAHOO.util.KeyListener(searchText,
             {
                keys: YAHOO.util.KeyListener.KEY.ENTER
@@ -202,17 +220,85 @@
                scope: this,
                correctScope: true
             }, "keydown").enable();
+
+            // Load in the People Finder component from the server
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/people-finder",
+               dataObj:
+               {
+                  htmlid: parent.id + "-search-peoplefinder"
+               },
+               successCallback:
+               {
+                  fn: this.onPeopleFinderLoaded,
+                  scope: this
+               },
+               failureMessage: "Could not load People Finder component",
+               execScripts: true
+            });
+
+            // Load in the Group Finder component from the server
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/group-finder",
+               dataObj:
+               {
+                  htmlid: parent.id + "-search-groupfinder"
+               },
+               successCallback:
+               {
+                  fn: this.onGroupFinderLoaded,
+                  scope: this
+               },
+               failureMessage: "Could not load Group Finder component",
+               execScripts: true
+            });
+
+            // Create delete group panel
+            this.widgets.deleteGroupPanel = new YAHOO.widget.Panel(parent.id + "-deletegroupdialog",
+            {
+               modal: true,
+               draggable: false,
+               fixedcenter: true,
+               close: false,
+               visible: false
+            });
+            this.widgets.deleteGroupPanel.render(document.body);
+
+            // Add event listeners to buttons
+            this.widgets.deleteGroupCancelButton = new YAHOO.widget.Button(parent.id + "-cancel-button", {});
+            this.widgets.deleteGroupCancelButton.on("click", function ()
+            {               
+               this.widgets.deleteGroupPanel.hide();
+            }, null, this);
+            
+            this.widgets.deleteGroupOkButton = Alfresco.util.createYUIButton(parent, "remove-button", null);
          },
 
-         onShow: function onShow()
+         /**
+          * Called by the ConsolePanelHandler when this panel is shown
+          *
+          * @method onShow
+          */
+         onShow: function ConsoleGroups_SearchPanelHandler_onShow()
          {
+            this._visible = true;
+
+            // Set focus to the search input field
             Dom.get(parent.id + "-search-text").focus();
          },
 
-         onUpdate: function onUpdate()
+         /**
+          * Called by the ConsolePanelHandler when this panel shall update its appearance
+          *
+          * @method onUpdate
+          */
+         onUpdate: function ConsoleGroups_SearchPanelHandler_onUpdate()
          {
             if(parent.query)
             {
+               // Lets display the search list since the state indicates a query has been used
                Dom.addClass(parent.id + "-browse-panel", "hidden");
                Dom.removeClass(parent.id + "-search-panel", "hidden");
 
@@ -220,66 +306,46 @@
                var queryElem = Dom.get(parent.id + "-search-text");
                queryElem.value = parent.query;
 
-               // check search length again as we may have got here via history navigation
-               if (parent.query.length >= parent.options.minqueryLength)
-               {
-                  var me = this;
+               // Redo the search
+               this.doSearch();
 
-                  // Reset the custom error messages
-                  me._setDefaultDataTableErrors(parent.widgets.dataTable);
-
-                  // Don't display any message
-                  parent.widgets.dataTable.set("MSG_EMPTY", parent._msg("message.searching"));
-
-                  // Empty results table
-                  parent.widgets.dataTable.deleteRows(0, parent.widgets.dataTable.getRecordSet().getLength());
-
-                  var successHandler = function ConsoleGroups__ps_successHandler(sRequest, oResponse, oPayload)
-                  {
-                     me._setDefaultDataTableErrors(parent.widgets.dataTable);
-                     parent.widgets.dataTable.onDataReturnInitializeTable.call(parent.widgets.dataTable, sRequest, oResponse, oPayload);
-                  };
-
-                  var failureHandler = function ConsoleGroups__ps_failureHandler(sRequest, oResponse)
-                  {
-                     if (oResponse.status == 401)
-                     {
-                        // Our session has likely timed-out, so refresh to offer the login page
-                        window.location.reload();
-                     }
-                     else
-                     {
-                        try
-                        {
-                           var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                           parent.widgets.dataTable.set("MSG_ERROR", response.message);
-                           parent.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
-                           me._setResultsMessage("message.noresults");
-                        }
-                        catch(e)
-                        {
-                           me._setDefaultDataTableErrors(parent.widgets.dataTable);
-                        }
-                     }
-                  };
-
-                  parent.widgets.dataSource.sendRequest(me._buildSearchParams(parent.query),
-                  {
-                     success: successHandler,
-                     failure: failureHandler,
-                     scope: parent
-                  });
-               }
             }
             else
             {
+               // No query in the state then display the column browser
                Dom.addClass(parent.id + "-search-panel", "hidden");
                Dom.removeClass(parent.id + "-browse-panel", "hidden");
+
+               // Refresh the column browser
+               if(parent.refresh)
+               {
+                  var paths = this.widgets.columnbrowser.get("urlPath");
+                  this.widgets.columnbrowser.load(paths, true);
+               }
             }
 
          },
 
-         onSearchClick: function SearchPanel_onSearchClick()
+         /**
+          * Called by the ConsolePanelHandler when this panel is hidden
+          *
+          * @method onHide
+          */
+         onHide: function ConsoleGroups_SearchPanelHandler_onHide()
+         {
+            this._visible = false;
+         },
+
+         /**
+          * BUTTON EVENT HANDLERS
+          */
+
+         /**
+          * Called when the user clicks the search button
+          *
+          * @method onSearchClick
+          */
+         onSearchClick: function ConsoleGroups_SearchPanelHandler_onSearchClick()
          {
             var queryElem = Dom.get(parent.id + "-search-text");
             var query = queryElem.value;
@@ -297,112 +363,760 @@
             parent.refreshUIState({"query": query});
          },
 
-         onCloseSearchClick: function SearchPanel_onCloseSearchClick()
+         /**
+          * Called when the user clicks the close search button
+          *
+          * @method onCloseSearchClick
+          */
+         onCloseSearchClick: function ConsoleGroups_SearchPanelHandler_onCloseSearchClick()
          {
-            parent.refreshUIState({"query": undefined});
+            parent.refreshUIState({"query": undefined, "refresh": "false"});
          },
 
+         /**
+          * Called when the user clicks the delete button in the cofirm dialog.
+          * Deletes the group from the repository or simply removes is from a parent group.
+          *
+          * @param e The click event
+          * @param obj information about the group and its parent group
+          * shall be removed from parent group. If now present group will be deleted.
+          */
+         onConfirmedDeleteGroupClick: function ConsoleGroups_SearchPanelHandler_onConfirmedDeleteGroupClick(e, obj)
+         {
+            // Hide the confirm dialog
+            this.widgets.deleteGroupPanel.hide();
+
+            if(obj.multiParentMode && Dom.get(parent.id + "-remove").checked)
+            {
+               // Just remove the group from the parent group
+               this._removeGroup(obj.fullName, obj.parentShortName, obj.displayName);
+            }
+            else
+            {
+               // Delete the group form the repository
+               this._deleteGroup(obj.shortName, obj.displayName);
+            }
+
+         },
+
+         /**
+          * Group selected event handler.
+          * This event is fired from Group picker - so we much ensure
+          * the event is for the current panel by checking panel visibility.
+          *
+          * @method onGroupSelected
+          * @param e DomEvent
+          * @param args Event parameters (depends on event type)
+          */
+         onGroupSelected: function ConsoleGroups_SearchPanelHandler_onGroupSelected(e, args)
+         {
+            // This is a "global" event so we ensure the event is for the current panel by checking panel visibility.
+            if (this._visible)
+            {
+               var name = args[1].displayName;
+               this.widgets.addGroupPanel.hide();
+               this._addToGroup(
+                     args[1].itemName,
+                     this._selectedParentGroupShortName,
+                     parent._msg("message.addgroup-success", name),
+                     parent._msg("message.addgroup-failure", name));
+            }
+         },
+
+         /**
+          * Called when the user has selected a person from the add user dialog.
+          *
+          * @method onPersonSelected
+          * @param e DomEvent
+          * @param args Event parameters (depends on event type)
+          */
+         onPersonSelected: function ConsoleGroups_SearchPanelHandler_onPersonSelected(e, args)
+         {
+            // This is a "global" event so we ensure the event is for the current panel by checking panel visibility.
+            if (this._visible)
+            {
+               var name = args[1].firstName + " " + args[1].lastName;
+               this.widgets.addUserPanel.hide();
+               this._addToGroup(
+                     args[1].userName,
+                     this._selectedParentGroupShortName,
+                     parent._msg("message.adduser-success", name),
+                     parent._msg("message.adduser-failure", name));
+            }
+         },
+
+         /**
+          * Called when the user clicks the new group icon in the column browser header
+          *
+          * @method onNewGroupClick
+          * @param columnInfo
+          */
+         onNewGroupClick: function ConsoleGroups_SearchPanelHandler__onNewGroupClick(columnInfo)
+         {
+            // Send avenet so the create panel will be displayed
+            YAHOO.Bubbling.fire('newGroup',
+            {
+               group: columnInfo.parent ? columnInfo.parent.shortName : undefined,
+               groupDisplayName: columnInfo.parent ? columnInfo.parent.label : parent._msg("label.theroot")
+            });
+         },
+
+         /**
+          * Called when the user clicks the add gorup icon in the column browser header
+          *
+          * @method onAddGroupClick
+          * @param columnInfo
+          */
+         onAddGroupClick: function ConsoleGroups_SearchPanelHandler__onAddGroupClick(columnInfo)
+         {
+            this._selectedParentGroupShortName = columnInfo.parent.shortName;
+            this.modules.searchGroupFinder.clearResults();
+            this.widgets.addGroupPanel.show();
+         },
+
+         /**
+          * Called when the user clicks the add user icon in the column browser header
+          *
+          * @method onAddUserClick
+          * @param columnInfo
+          */
+         onAddUserClick: function ConsoleGroups_SearchPanelHandler_onAddUserClick(columnInfo)
+         {
+            this._selectedParentGroupShortName = columnInfo.parent.shortName;
+            this.modules.searchPeopleFinder.clearResults();
+            this.widgets.addUserPanel.show();
+         },
+
+         /**
+          * Called when the user clicks a groups delete icon in the column browser
+          *
+          * @method onDeleteClick
+          * @param ctx An object describing the group and its parent group
+          *        ctx.columnInfo describes the clicked groups column (and its parent group)
+          *        ctx.itemInfo describes the clicked group
+          */
+         onDeleteClick: function ConsoleGroups_SearchPanelHandler_onDeleteClick(ctx)
+         {
+            this._confirmDeleteGroup(
+                  ctx.itemInfo.shortName,
+                  ctx.itemInfo.fullName,
+                  ctx.itemInfo.label,
+                  ctx.columnInfo.parent ? ctx.columnInfo.parent.shortName : null,
+                  ctx.columnInfo.parent ? ctx.columnInfo.parent.label : parent._msg("label.theroot"));
+         },
+
+         /**
+          * Called when the user clicks a users delete icon in the column browser
+          *
+          * @method onUserRemoveClick
+          * @param ctx An object describing the group and its parent group
+          *        ctx.columnInfo describes the clicked groups column (and its parent group)
+          *        ctx.itemInfo describes the clicked group
+          */
+         onUserRemoveClick: function ConsoleGroups_SearchPanelHandler_onUserRemoveClick(ctx)
+         {
+            this._confirmRemoveUser(ctx.columnInfo.parent.shortName, ctx.itemInfo.shortName, ctx.itemInfo.label);
+         },
+
+         /**
+          * Called when the user clicks a groups update icon in the column browser
+          *
+          * @method onUpdateClick
+          * @param ctx An object describing the group and its parent group
+          *        ctx.columnInfo describes the clicked groups column (and its parent group)
+          *        ctx.itemInfo describes the clicked group
+          */
+         onUpdateClick: function ConsoleGroups_SearchPanelHandler_onUpdateClick(ctx)
+         {
+            YAHOO.Bubbling.fire('updateGroup', {group: ctx.itemInfo.shortName, groupDisplayName: ctx.itemInfo.label});
+         },
+
+         /**
+          * MODULE TEMPLATE LOAD HANDLERS
+          */
+
+         /**
+          * Called when the people finder template has been loaded.
+          * Creates a dialog and inserts the people finder for choosing users to add.
+          *
+          * @method onPeopleFinderLoaded
+          * @param response The server response
+          */
+         onPeopleFinderLoaded: function ConsoleGroups_SearchPanelHandler_onPeopleFinderLoaded(response)
+         {
+            // Inject the component from the XHR request into it's placeholder DIV element
+            var finderDiv = Dom.get(parent.id + "-search-peoplefinder");
+            finderDiv.innerHTML = response.serverResponse.responseText;
+
+            // Create the Add User dialog
+            this.widgets.addUserPanel = new YAHOO.widget.Panel(parent.id + "-peoplepicker",
+            {
+               modal: true,
+               draggable: false,
+               fixedcenter: true,
+               close: true,
+               visible: false
+            });
+
+            // Add it to the Dom
+            this.widgets.addUserPanel.render(document.body);
+
+
+            // Find the People Finder by container ID
+            this.modules.searchPeopleFinder = Alfresco.util.ComponentManager.find(
+            {
+               id: parent.id + "-search-peoplefinder"
+            })[0];
+
+            // Set the correct options for our use
+            this.modules.searchPeopleFinder.setOptions(
+            {
+               singleSelectMode: true,
+               minSearchTermLength: 3
+            });
+
+            // Make sure we listen for events when the user selects a person
+            YAHOO.Bubbling.on("personSelected", this.onPersonSelected, this);
+         },
+
+         /**
+          * Called when the group finder template has been loaded.
+          * Creates a dialog and inserts the group finder for choosing groups to add.
+          *
+          * @method onGroupFinderLoaded
+          * @param response The server response
+          */
+         onGroupFinderLoaded: function ConsoleGroups_SearchPanelHandler_onGroupFinderLoaded(response)
+         {
+            // Inject the component from the XHR request into it's placeholder DIV element
+            var finderDiv = Dom.get(parent.id + "-search-groupfinder");
+            finderDiv.innerHTML = response.serverResponse.responseText;
+
+            // Create the Add Group dialog
+            this.widgets.addGroupPanel = new YAHOO.widget.Panel(parent.id + "-grouppicker",
+            {
+               modal: true,
+               draggable: false,
+               fixedcenter: true,
+               close: true,
+               visible: false
+            });
+
+            // Add it to the Dom
+            this.widgets.addGroupPanel.render(document.body);
+
+            // Find the Group Finder by container ID
+            this.modules.searchGroupFinder = Alfresco.util.ComponentManager.find(
+            {
+               id: parent.id + "-search-groupfinder"
+            })[0];
+
+            // Set the correct options for our use
+            this.modules.searchGroupFinder.setOptions(
+            {
+               singleSelectMode: true,
+               minSearchTermLength: 3
+            });
+
+            // Make sure we listen for events when the user selects a group
+            YAHOO.Bubbling.on("itemSelected", this.onGroupSelected, this);
+
+         },
+
+         /**
+          * COLUMN BROWSER CALLBACKS
+          */
+
+
+         /**
+          * Called by the column browser to let this component decide what data to display inside an empty column.
+          *
+          * @method onBuildEmptyColumnInfo
+          */
          onBuildEmptyColumnInfo: function ConsoleGroups_onBuildEmptyColumnInfo(itemInfo)
          {
-            return {
-               parent: itemInfo,
-               header: {
-                  label: parent._msg("button.newgroup"),
-                  click: {
-                     fn: this.onHeaderClick,
-                     scope: this
+            if(itemInfo.cssClass == 'groups-item-group')
+            {
+               return {
+                  parent: itemInfo,
+                  header: {
+                     buttons: this._buildHeaderButtons(itemInfo)
+                  },
+                  body: {},
+                  footer: {
+                     label: parent._msg("label.nogroups")
                   }
-               },
-               body: {},
-               footer: {
-                  label: parent._msg("label.nogroups")
-               }
-            };
+               };
+            }
+            else
+            {
+               return null;
+            }
          },
 
-         onBuildColumnInfo: function ConsoleGroups_onBuildColumnInfo(serverResponse, itemInfo)
+         /**
+          * Called by the Column Browser to let this component transform the custom server reponse to a
+          * columnInfo object that the Column Browser understands
+          *
+          * @method onBuildColumnInfo
+          */
+         onBuildColumnInfo: function ConsoleGroups_SearchPanelHandler_onBuildColumnInfo(serverResponse, itemInfo)
          {
+            // Get data from request
             var obj = YAHOO.lang.JSON.parse(serverResponse.responseText);
+
+            // Create columnInfo and its header
             var column = {
                parent: itemInfo,
                header: {
-                  label: parent._msg("button.newgroup"),
-                  click: {
-                     fn: this.onHeaderClick,
-                     scope: this
-                  }
+                  buttons: this._buildHeaderButtons(itemInfo)
                },
                body: {
                   items: []
                }
             };
 
+            // Create item buttons for users and groups
+            var groupCount = 0, userCount = 0;
+            var groupButtons = [
+               {
+                  title: parent._msg("button.updategroup"),
+                  cssClass: "groups-update-button",
+                  click: {
+                     fn: this.onUpdateClick,
+                     scope: this
+                  }
+               },
+               {
+                  title: parent._msg("button.deletegroup"),
+                  cssClass: "groups-delete-button",
+                  click: {
+                     fn: this.onDeleteClick,
+                     scope: this
+                  }
+               }
+            ];
+            var usersButtons = [
+               {
+                  title: parent._msg("button.removegroup"),
+                  cssClass: "users-remove-button",
+                  click: {
+                     fn: this.onUserRemoveClick,
+                     scope: this
+                  }
+               }
+            ];
+
+            // Transform server respons to itemInfos and add them to the columnInfo's body
             for(var i = 0; i < obj.data.length; i++)
             {
                var o = obj.data[i];
+               var item = {
+                  shortName: o.shortName,
+                  fullName: o.fullName,
+                  url: o.authorityType == 'GROUP' ? Alfresco.constants.PROXY_URI + o.url + "/children" : null,
+                  hasNext: o.groupCount > 0 || o.userCount > 0,
+                  label: o.displayName,
+                  next : null,
+                  cssClass: o.authorityType == 'GROUP' ? "groups-item-group" : "groups-item-user",
+                  buttons: o.authorityType == 'GROUP' ? groupButtons : usersButtons
+               };
+               column.body.items.push(item);
                if(o.authorityType == 'GROUP')
                {
-                  var item = {
-                     shortName: o.shortName,
-                     href: Alfresco.constants.PROXY_URI + o.url + "/children",
-                     label: o.displayName,
-                     rel : o.groupCount > 0 ? "ajax" : null,
-                     next : null,
-                     buttons: [
-                        {
-                           title: parent._msg("button.updategroup"),
-                           type: "groups-update-button",
-                           click: {
-                              fn: this.onUpdateClick,
-                              scope: this
-                           }
-                        },
-                        {
-                           title: parent._msg("button.deletegroup"),
-                           type: "groups-delete-button",
-                           click: {
-                              fn: this.onDeleteClick,
-                              scope: this
-                           }
-                        }
-
-                     ]
-                  };
-                  column.body.items.push(item);
+                  groupCount++;
+               }
+               else
+               {
+                  userCount++;
                }
             }
-            // Sort the groups
+
+            // Sort the groups & items
             column.body.items = column.body.items.sort(function(a, b)
             {
                return (a.label.toLowerCase() > b.label.toLowerCase());
             });
 
+            // Footer
+            var footerLabel = groupCount > 0 ? parent._msg("label.noofgroups", groupCount) : parent._msg("label.nogroups");
+            footerLabel += "  ";
+            footerLabel += userCount > 0 ? parent._msg("label.noofusers", userCount) : parent._msg("label.nousers");
             column.footer =
             {
-               label: (column.body.items.length ? parent._msg("label.noofgroups", column.body.items.length) : parent._msg("label.nogroups"))
+               label: (footerLabel)
             };
 
             return column;
          },
 
-         onHeaderClick: function ConsoleGroups_onHeaderClick(columnInfo)
+         /**
+          * PUBLIC METHODS
+          */
+
+         /**
+          * Invoke search based on the "state", use the state-query parameter that is stored in the parent object
+          * each time a state is set.
+          *
+          * @method doSearch
+          */
+         doSearch: function ConsoleGroups_SearchPanelHandler_doSearch()
          {
-            // Send avenet so the create panel will be displayed
-            YAHOO.Bubbling.fire('newGroup',
+            // check search length again as we may have got here via history navigation
+            if (parent.query && parent.query.length >= parent.options.minqueryLength)
             {
-               group: columnInfo.parent ? columnInfo.parent.shortName : undefined,
-               groupDisplayName: columnInfo.parent ? columnInfo.parent.displayName : parent._msg("label.theroot")
+               var me = this;
+
+               // Reset the custom error messages
+               me._setDefaultDataTableErrors(me.widgets.dataTable);
+
+               // Don't display any message
+               me.widgets.dataTable.set("MSG_EMPTY", parent._msg("message.searching"));
+
+               // Empty results table
+               me.widgets.dataTable.deleteRows(0, me.widgets.dataTable.getRecordSet().getLength());
+
+               var successHandler = function ConsoleGroups__ps_successHandler(sRequest, oResponse, oPayload)
+               {
+                  me._setDefaultDataTableErrors(me.widgets.dataTable);
+                  me.widgets.dataTable.onDataReturnInitializeTable.call(me.widgets.dataTable, sRequest, oResponse, oPayload);
+               };
+
+               var failureHandler = function ConsoleGroups__ps_failureHandler(sRequest, oResponse)
+               {
+                  if (oResponse.status == 401)
+                  {
+                     // Our session has likely timed-out, so refresh to offer the login page
+                     window.location.reload();
+                  }
+                  else
+                  {
+                     try
+                     {
+                        var response = YAHOO.lang.JSON.parse(oResponse.responseText);
+                        me.widgets.dataTable.set("MSG_ERROR", response.message);
+                        me.widgets.dataTable.showTableMessage(response.message, YAHOO.widget.DataTable.CLASS_ERROR);
+                        me._setResultsMessage("message.noresults");
+                     }
+                     catch(e)
+                     {
+                        me._setDefaultDataTableErrors(me.widgets.dataTable);
+                     }
+                  }
+               };
+
+               // Send the query to the server
+               me.widgets.dataSource.sendRequest(me._buildSearchParams(parent.query),
+               {
+                  success: successHandler,
+                  failure: failureHandler,
+                  scope: parent
+               });
+            }
+         },
+
+         /**
+          * PRIVATE METHODS
+          */
+
+         /**
+          * Asks the users if he is sure he wants to delete the group
+          *
+          * @param shortName shortName The id of the group to delete
+          * @param fullName The fullName of the group to delete (needed only if removing group from parent group)
+          * @param displayName The displayName of the group to delete
+          * @param parentShortName The shortName of the parent group to remove group from (needed only if removing group from parent group)
+          * @param parentDisplayName The displayName of the parent group to remove group from (needed only if removing group from parent group)
+          */
+         _confirmDeleteGroup: function ConsoleGroups_SearchPanelHandler_confirmDeleteGroup(shortName, fullName, displayName, parentShortName, parentDisplayName)
+         {
+            var me = this;
+            parent.getParentGroups(shortName,
+            {
+               fn: function(groups)
+               {
+                  // Remove previous listeners so we don't make duplicate calls and add a new one later
+                  this.widgets.deleteGroupOkButton.removeListener("click", this.onConfirmedDeleteGroupClick);
+                  var callbackObj = {
+                     shortName: shortName,
+                     fullName: fullName,
+                     displayName: displayName,
+                     parentShortName: parentShortName,
+                     parentDisplayName: parentDisplayName
+                  };
+
+                  // Make sure the dialog is displayed correctly
+                  if(!groups || groups.length == 0 || groups.length == 1)
+                  {
+                     // Group is root group or has only 1 parent
+                     Dom.addClass(parent.id + "-multiparent", "hidden");
+                     Dom.removeClass(parent.id + "-singleparent", "hidden");
+                     Dom.get(parent.id + "-singleparent-message").innerHTML = parent._msg("panel.deletegroup.singleparentmessage", displayName);
+                     this.widgets.deleteGroupOkButton.on("click", this.onConfirmedDeleteGroupClick, callbackObj, this);
+                  }
+                  else
+                  {
+                     // Group has multiple parents
+                     Dom.addClass(parent.id + "-singleparent", "hidden");
+                     Dom.removeClass(parent.id + "-multiparent", "hidden");
+                     Dom.get(parent.id + "-multiparent-message").innerHTML = parent._msg("panel.deletegroup.multiparentmessage", displayName);
+                     Dom.get(parent.id + "-remove-message").innerHTML = parent._msg("panel.deletegroup.removemessage", displayName, parentDisplayName);
+                     Dom.get(parent.id + "-delete-message").innerHTML = parent._msg("panel.deletegroup.deletemessage", displayName);
+                     Dom.get(parent.id + "-searchdelete-message").innerHTML = parent._msg("panel.deletegroup.searchdeletemessage", displayName);
+
+                     // Lets display the groups parents to the user, but only the first 10
+                     var parentStr = "", displayLimit = 10;
+                     for(var i = 0; i < groups.length && i < displayLimit; i++)
+                     {
+                        parentStr += groups[i].displayName + (i < groups.length - 1 ? ", " : "");
+                     }
+                     if(i >= displayLimit)
+                     {
+                        parentStr += parent._msg("label.moregroups", groups.length - displayLimit);
+                     }
+                     Dom.get(parent.id + "-parents").innerHTML = parentStr;
+
+                     if(parentShortName)
+                     {
+                        // Display both the option to remove from parent group and delete the group
+                        Dom.get(parent.id + "-remove").checked = true;
+                        Dom.removeClass(parent.id + "-removerow", "hidden");
+                        Dom.removeClass(parent.id + "-deleterow", "hidden");
+                        Dom.addClass(parent.id + "-searchdeleterow", "hidden");
+                     }
+                     else
+                     {
+                        /**
+                         * The group was clicked in a context where none of the parents was displayed,
+                         * in other words in the search list. There fore we can't display the option of just
+                         * removing the group.
+                         */
+                        Dom.get(parent.id + "-delete").checked = true;
+                        Dom.addClass(parent.id + "-removerow", "hidden");
+                        Dom.addClass(parent.id + "-deleterow", "hidden");
+                        Dom.removeClass(parent.id + "-searchdeleterow", "hidden");
+                     }
+
+                     // Make sure the callback knows what mode the dialog was displayed in
+                     callbackObj.multiParentMode = true;
+                     this.widgets.deleteGroupOkButton.on("click", this.onConfirmedDeleteGroupClick, callbackObj, this);
+                  }
+                  // Show the dialog
+                  this.widgets.deleteGroupPanel.show();
+               },
+               scope: this
+            }, "message.delete-failure");
+         },
+
+         /**
+          * Asks the users if he is sure he wants to remove the user from the group.
+          *
+          * @param groupId The id of the group to remove the user from
+          * @param userId The id of the user to remove
+          * @param userDisplayName The displayName of the user
+          */
+         _confirmRemoveUser: function ConsoleGroups_SearchPanelHandler__confirmRemoveUser(groupId, userId, userDisplayName)
+         {
+            var me = this;
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               text: parent._msg("message.confirm.removeuser", userDisplayName),
+               buttons: [
+                  {
+                     text: parent._msg("button.yes"),
+                     handler: function ConsoleGroups__removeUser_confirmYes()
+                     {
+                        this.destroy();
+                        me._removeUser.call(me, groupId, userId, userDisplayName);
+                     }
+                  },
+                  {
+                     text: parent._msg("button.no"),
+                     handler: function ConsoleGroups__removeUser_confirmNo()
+                     {
+                        this.destroy();
+                     },
+                     isDefault: true
+                  }]
             });
          },
 
-         onDeleteClick: function ConsoleGroups_onDeleteClick(itemInfo)
+         /**
+          * Deletes the group from the repository.
+          *
+          * @param shortName The shortName of the group
+          * @param displayName The displayName  of the group
+          * shall be removed from parent group. If now present group will be deleted.
+          */
+         _deleteGroup: function ConsoleGroups_SearchPanelHandler__deleteGroup(shortName, displayName)
          {
-            YAHOO.Bubbling.fire('deleteGroup', {group: itemInfo.shortName, groupDisplayName: itemInfo.label});
+            var url = Alfresco.constants.PROXY_URI + "api/groups/" + shortName;
+            this._doDeleteCall(url, displayName);
          },
 
-         onUpdateClick: function ConsoleGroups_onUpdateClick(itemInfo)
+         /**
+          * Removes the group from a parent group
+          *
+          * @param fullName The full authority name of the group
+          * @param parentShortName the shortname of the parent group
+          * @param displayName The displayName  of the group
+          */
+         _removeGroup: function ConsoleGroups_SearchPanelHandler__removeGroup(fullName, parentShortName, displayName)
          {
-            YAHOO.Bubbling.fire('updateGroup', {group: itemInfo.shortName, groupDisplayName: itemInfo.label});
+            if(parentShortName == null)
+            {
+               // todo implement when webscript api supports it
+               // This isn't supported by the webscript api yet
+               Alfresco.util.PopupManager.displayPrompt(
+               {
+                  title: parent._msg("message.failure"),
+                  text: parent._msg("message.noRemoveGroupFromRootSupport")
+               });
+               return;
+            }
+            var url = Alfresco.constants.PROXY_URI + "api/groups/" + parentShortName +"/children/" + fullName;
+            this._doDeleteCall(url, displayName);
+         },
+
+         /**
+          * Deletes or removes a group depending on the url
+          *
+          * @param url Url to use to remove or delete group
+          */
+         _doDeleteCall: function ConsoleGroups_SearchPanelHandler__deleteCall(url, displayName)
+         {
+            var groupDisplayName = displayName;
+            Alfresco.util.Ajax.jsonDelete(
+            {
+               url: url,
+               successCallback:
+               {
+                  fn: function(o)
+                  {
+                     // Refresh column browser
+                     var paths = this.widgets.columnbrowser.get("urlPath");
+                     this.widgets.columnbrowser.load(paths, true);
+
+                     // Refresh search table
+                     this.doSearch();
+
+                     // Display success message
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: parent._msg("message.delete-success", groupDisplayName)
+                     });
+                  },
+                  scope: this
+               },
+               failureMessage: parent._msg("message.delete-failure", groupDisplayName)
+            });
+         },
+
+         /**
+          * Remove the user from the group
+          *
+          * @param groupId The id of the group
+          * @param userId The id of the user
+          * @param userDisplayName The displayName of the user
+          */
+         _removeUser: function ConsoleGroups_SearchPanelHandler__removeUser(groupId, userId, userDisplayName)
+         {
+            var name = userDisplayName;
+            Alfresco.util.Ajax.jsonDelete(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/groups/" + groupId + "/children/" + userId,
+               successCallback:
+               {
+                  fn: function(o)
+                  {
+                     // Refresh column browser
+                     var paths = this.widgets.columnbrowser.get("urlPath");
+                     this.widgets.columnbrowser.load(paths, true);
+
+                     // Display success message
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: parent._msg("message.removeuser-success", name)
+                     });
+                  },
+                  scope: this
+               },
+               failureMessage: parent._msg("message.removeuser-failure", name)
+            });
+         },
+
+         /**
+          * Adds a user or group to a parent group.
+          *
+          * @param objectId The id to a user (userName) or a group (fullName)
+          * @param parentGroupShortName The shortName of the parent group that the object shall be added under
+          * @param successMessage Message to display if the request is successful
+          * @param failureMessage Message to display if the request fails
+          */
+         _addToGroup: function ConsoleGroups_SearchPanelHandler__addToGroup(objectId, parentGroupShortName, successMessage, failureMessage)
+         {
+            Alfresco.util.Ajax.jsonPost(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/groups/" + parentGroupShortName + "/children/" + objectId,
+               successCallback:
+               {
+                  fn: function(o)
+                  {
+                     // Refresh column browser
+                     var paths = this.widgets.columnbrowser.get("urlPath");
+                     this.widgets.columnbrowser.load(paths, true);
+
+                     // Display success message
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: successMessage
+                     });
+                  },
+                  scope: this
+               },
+               failureMessage: failureMessage
+            });
+         },
+
+         /**
+          * Helper method for creating the header button depending on if the header is used for the root or a sub group
+          *
+          * @method _buildHeaderButtons
+          * @param itemInfo
+          */
+         _buildHeaderButtons: function ConsoleGroups_SearchPanelHandler__buildheaderButton(itemInfo)
+         {
+            var headerButtons = [
+               {
+                  title: parent._msg("button.newgroup"),
+                  cssClass: "groups-newgroup-button",
+                  click: {
+                     fn: this.onNewGroupClick,
+                     scope: this
+                  }
+               }
+            ];
+            if(itemInfo)
+            {
+               // Only add the following button for NON root columns               
+               headerButtons.push({
+                  title: parent._msg("button.addgroup"),
+                  cssClass: "groups-addgroup-button",
+                  click: {
+                     fn: this.onAddGroupClick,
+                     scope: this
+                  }
+               });
+               headerButtons.push({
+                  title: parent._msg("button.adduser"),
+                  cssClass: "groups-adduser-button",
+                  click: {
+                     fn: this.onAddUserClick,
+                     scope: this
+                  }
+               });
+            }
+            return headerButtons;
          },
 
          /**
@@ -411,8 +1125,10 @@
           * @method _setupDataTable
           * @private
           */
-         _setupDataTable: function _setupDataTable()
+         _setupDataTable: function ConsoleGroups_SearchPanelHandler__setupDataTable()
          {
+            var me = this;
+            
             /**
              * DataTable Cell Renderers
              *
@@ -436,10 +1152,41 @@
             var renderActions = function renderActions(elCell, oRecord, oColumn, oData)
             {
                // fire the 'updateGroupClick' event when the group has been clicked
-               var actions = "<a href='#' class=\"update\" onclick=\"YAHOO.Bubbling.fire('updateGroup', {group: '" + oRecord.getData("shortName") + "', groupDisplayName: '" + oRecord.getData("displayName") + "'}); return false;\">&nbsp;</a>";
+               var updateLink = document.createElement("a");
+               //updateLink.setAttribute("href", "#");
+               Dom.addClass(updateLink, "update");
+               updateLink.innerHTML = "&nbsp;";
+               YAHOO.util.Event.addListener(updateLink, "click", function(e)
+               {
+                  YAHOO.Bubbling.fire('updateGroup',
+                  {
+                     group: oRecord.getData("shortName"),
+                     groupDisplayName: oRecord.getData("displayName"),
+                     query: this.query
+                  });
+               }, null, parent);
+               elCell.appendChild(updateLink);
+
+               //
+               var deleteLink = document.createElement("a");
+               //deleteLink.setAttribute("href", "#");
+               Dom.addClass(deleteLink, "delete");
+               deleteLink.innerHTML = "&nbsp;";
+               YAHOO.util.Event.addListener(deleteLink, "click", function(e)
+               {
+                  me._confirmDeleteGroup(
+                        oRecord.getData("shortName"),
+                        null,
+                        oRecord.getData("displayName"),
+                        null,
+                        null);
+               });
+               elCell.appendChild(deleteLink);
+
+               //var actions = "<a href='#' class=\"update\" onclick=\"YAHOO.Bubbling.fire('updateGroup', {group: '" + oRecord.getData("shortName") + "', groupDisplayName: '" + oRecord.getData("displayName") + "', query: '" + parent.query + "'}); return false;\">&nbsp;</a>";
                // fire the 'deleteGroupClick' event when the group has been clicked
-               actions += "<a href='#' class=\"delete\" onclick=\"YAHOO.Bubbling.fire('deleteGroup', {group: '" + oRecord.getData("shortName") + "', groupDisplayName: '" + oRecord.getData("displayName") + "'}); return false;\">&nbsp;</a>";
-               elCell.innerHTML = actions;
+               //var actions = "<a href='#' class=\"delete\" onclick=\"YAHOO.Bubbling.fire('deleteGroup', {groupShortName: '" + oRecord.getData("shortName") + "', groupDisplayName: '" + oRecord.getData("displayName") + "'}); return false;\">&nbsp;</a>";
+               //elCell.innerHTML = actions;
             };
 
             // DataTable column defintions
@@ -451,7 +1198,7 @@
             ];
 
             // DataTable definition
-            parent.widgets.dataTable = new YAHOO.widget.DataTable(parent.id + "-datatable", columnDefinitions, parent.widgets.dataSource,
+            this.widgets.dataTable = new YAHOO.widget.DataTable(parent.id + "-datatable", columnDefinitions, this.widgets.dataSource,
             {
                initialLoad: false,
                renderLoopSize: 32,
@@ -469,12 +1216,11 @@
           * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
           *
           * @method _setDefaultDataTableErrors
-          * @param dataTable {object} Instance of the DataTable
+          * @param dataTable Instance of the DataTable
           * @private
           */
-         _setDefaultDataTableErrors: function _setDefaultDataTableErrors(dataTable)
+         _setDefaultDataTableErrors: function ConsoleGroups_SearchPanelHandler__setDefaultDataTableErrors(dataTable)
          {
-            var msg = Alfresco.util.message;
             dataTable.set("MSG_EMPTY", parent._msg("message.empty", "Alfresco.ConsoleGroups"));
             dataTable.set("MSG_ERROR", parent._msg("message.error", "Alfresco.ConsoleGroups"));
          },
@@ -483,10 +1229,10 @@
           * Build URI parameters for People List JSON data webscript
           *
           * @method _buildSearchParams
-          * @param query {string} User search term
+          * @param query User search term
           * @private
           */
-         _buildSearchParams: function _buildSearchParams(query)
+         _buildSearchParams: function ConsoleGroups_SearchPanelHandler__buildSearchParams(query)
          {
             return "?shortNameFilter=" + encodeURIComponent(query);
          },
@@ -495,16 +1241,16 @@
           * Set the message in the Results Bar area
           *
           * @method _setResultsMessage
-          * @param messageId {string} The messageId to display
+          * @param messageId The messageId to display
           * @private
           */
-         _setResultsMessage: function _setResultsMessage(messageId, arg1, arg2)
+         _setResultsMessage: function ConsoleGroups_SearchPanelHandler__setResultsMessage(messageId, arg1, arg2)
          {
             var resultsDiv = Dom.get(parent.id + "-search-bar-text");
             resultsDiv.innerHTML = parent._msg(messageId, arg1, arg2);
          }
       });
-      new SearchPanelHandler();
+      this.panelHandlers.searchPanelHandler = new SearchPanelHandler();
 
       /* Create Group Panel Handler */
       CreatePanelHandler = function CreatePanelHandler_constructor()
@@ -514,11 +1260,31 @@
 
       YAHOO.extend(CreatePanelHandler, Alfresco.ConsolePanelHandler,
       {
+
+         /**
+          * INSTANCE VARIABLES
+          */
+
+         /**
+          * Keeps track if this panel is visble or not
+          *
+          * @property _visible
+          * @type Boolean
+          */
          _visible: false,
 
-         onLoad: function onLoad()
-         {
+         /**
+          * PANEL LIFECYCLE CALLBACKS
+          */
 
+         /**
+          * Called by the ConsolePanelHandler when this panel shall be loaded
+          *
+          * @method onLoad
+          */
+         onLoad: function ConsoleGroups_CreatePanelHandler_onLoad()
+         {
+            var me = this;
             var validFields = [];
             var onFieldKeyUp = function onFieldKeyUp(e)
             {
@@ -532,16 +1298,21 @@
                      break;
                   }
                }
-               parent.widgets.creategroupOkButton.set("disabled", !valid);
-               parent.widgets.creategroupAnotherButton.set("disabled", !valid);
+               me.widgets.creategroupOkButton.set("disabled", !valid);
+               me.widgets.creategroupAnotherButton.set("disabled", !valid);
             };
 
             // Buttons
-            parent.widgets.creategroupOkButton = Alfresco.util.createYUIButton(parent, "creategroup-ok-button", parent.onCreateGroupOKClick);
-            parent.widgets.creategroupAnotherButton = Alfresco.util.createYUIButton(parent, "creategroup-another-button", parent.onCreateGroupAnotherClick);
-            parent.widgets.creategroupCancelButton = Alfresco.util.createYUIButton(parent, "creategroup-cancel-button", parent.onCreateGroupCancelClick);
-            parent.widgets.creategroupOkButton.set("disabled", true);
-            parent.widgets.creategroupAnotherButton.set("disabled", true);
+            this.widgets.creategroupOkButton = new YAHOO.widget.Button(parent.id + "-creategroup-ok-button", {});
+            this.widgets.creategroupOkButton.on("click", this.onCreateGroupOKClick, null, this);
+            this.widgets.creategroupOkButton.set("disabled", true);
+
+            this.widgets.creategroupAnotherButton = new YAHOO.widget.Button(parent.id + "-creategroup-another-button", {});
+            this.widgets.creategroupAnotherButton.on("click", this.onCreateGroupAnotherClick, null, this);
+            this.widgets.creategroupAnotherButton.set("disabled", true);
+
+            this.widgets.creategroupCancelButton = new YAHOO.widget.Button(parent.id + "-creategroup-cancel-button", {});
+            this.widgets.creategroupCancelButton.on("click", this.onCreateGroupCancelClick, null, this);
 
             // Event handlers for mandatory fields
             validFields[parent.id + "-create-shortname"] = false;
@@ -551,7 +1322,12 @@
 
          },
 
-         onBeforeShow: function onBeforeShow()
+         /**
+          * Called by the ConsolePanelHandler when this panel shall be loaded
+          *
+          * @method onBeforeShow
+          */
+         onBeforeShow: function ConsoleGroups_CreatePanelHandler_onBeforeShow()
          {
             // Hide the main panel area before it is displayed - so we don't show
             // old data to the user before the onShow() method paints the results
@@ -568,7 +1344,12 @@
 
          },
 
-         onShow: function onShow()
+         /**
+          * Called by the ConsolePanelHandler when this panel is shown
+          *
+          * @method onShow
+          */
+         onShow: function ConsoleGroups_CreatePanelHandler_onShow()
          {
             this._visible = true;
             window.scrollTo(0, 0);
@@ -579,12 +1360,228 @@
             Dom.get(parent.id + "-create-shortname").focus();
          },
 
-         onHide: function onHide()
+
+         /**
+          * Called by the ConsolePanelHandler when this panel is hidden
+          *
+          * @method onHide
+          */
+         onHide: function ConsoleGroups_CreatePanelHandler_onHide()
          {
             this._visible = false;
+         },
+
+         /**
+          * BUTTON EVENT HANDLERS
+          */
+
+         /**
+          * Fired when the Create Group OK button is clicked.
+          *
+          * @method onCreateGroupOKClick
+          * @param e DomEvent
+          * @param args Event parameters (depends on event type)
+          */
+         onCreateGroupOKClick: function ConsoleGroups_CreatePanelHandler_onCreateGroupOKClick(e, args)
+         {
+            var successHandler = function(response)
+            {
+               window.scrollTo(0, 0);
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: parent._msg("message.create-success")
+               });
+               parent.refreshUIState({"panel": "search","refresh": "true"});
+            };
+            this._createGroup(successHandler);
+         },
+
+         /**
+          * Fired when the Create Group Cancel button is clicked.
+          *
+          * @method onCreateGroupCancelClick
+          * @param e {object} DomEvent
+          * @param args {array} Event parameters (depends on event type)
+          */
+         onCreateGroupCancelClick: function ConsoleGroups_CreatePanelHandler_onCreateGroupCancelClick(e, args)
+         {
+            parent.refreshUIState({"panel": "search"});
+         },
+
+         /**
+          * Fired when the Create Another Group button is clicked.
+          *
+          * @method onCreateGroupAnotherClick
+          * @param e DomEvent
+          * @param args Event parameters (depends on event type)
+          */
+         onCreateGroupAnotherClick: function ConsoleGroups_CreatePanelHandler_onCreateGroupAnotherClick(e, args)
+         {
+            var successHandler = function(response)
+            {
+               // Scroll to top and notify user
+               window.scrollTo(0, 0);
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: parent._msg("message.create-success")
+               });
+
+               // Clear old values so new ones can be entered
+               Dom.get(parent.id + "-create-shortname").value = "";
+               Dom.get(parent.id + "-create-displayname").value = "";
+               Dom.get(parent.id + "-create-shortname").focus();
+            };
+            this._createGroup(successHandler);
+         },
+
+         /**
+          * PRIVATE METHODS
+          */
+
+         /**
+          * Create a group, but first check if it already exists
+          *
+          * @method _createGroup
+          * @param handler Handler function to be called on successful creation
+          * @private
+          */
+         _createGroup: function ConsoleGroups_CreatePanelHandler__createGroup(successHandler)
+         {
+            var me = this;
+            var shortName = Dom.get(parent.id + "-create-shortname").value;
+            parent.getParentGroups(shortName,
+            {
+               fn: function(groups)
+               {
+                  if(groups)
+                  {
+                     // The group alredy existed, now let's see if the identifer already is placed under this group
+                     var alreadyThere = false;
+                     var parentStr = "";
+                     for(var i = 0; i < groups.length; i++)
+                     {
+                        parentStr += groups[i].displayName + (i < groups.length - 1 ? ", " : "");
+                     }
+                     parentStr = parentStr.length > 0 ? parentStr : parent._msg("label.theroot");
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        text: parent._msg("message.confirm.add", shortName, parentStr, parent.group ? parent.group : parent._msg("label.theroot")),
+                        buttons: [
+                           {
+                              text: parent._msg("button.ok"),
+                              handler: function ConsoleGroups__createGroup_confirmOk()
+                              {
+                                 // Hide Prompt
+                                 this.destroy();
+                                 if(parent.group)
+                                 {
+                                    me._createGroupAfterExistCheck.call(me, successHandler);
+                                 }
+                                 else
+                                 {
+                                    // todo implement when webscript api supports it
+                                    // This isn't supported by the webscript api yet
+                                    Alfresco.util.PopupManager.displayPrompt(
+                                    {
+                                       title: parent._msg("message.failure"),
+                                       text: parent._msg("message.noAddGroupFromRootSupport")
+                                    });
+                                    return;
+
+                                 }
+                              }
+                           },
+                           {
+                              text: parent._msg("button.cancel"),
+                              handler: function ConsoleGroups__createGroup_confirmCancel()
+                              {
+                                 // Hide prompt
+                                 this.destroy();
+                              },
+                              isDefault: true
+                           }]
+                     });
+                  }
+                  else
+                  {
+                     // Group didn't exist go ahead and create it
+                     me._createGroupAfterExistCheck.call(me, successHandler);
+                  }
+               },
+               scope: this
+            }, "message.create-failure");
+         },
+
+         /**
+          * Create the group
+          *
+          * @method _createGroupAfterExistCheck
+          * @param handler {function} Handler function to be called on successful creation
+          * @private
+          */
+         _createGroupAfterExistCheck: function ConsoleGroups_CreatePanelHandler__createGroupAfterExistCheck(successHandler)
+         {
+            // gather up the data for our JSON PUT request
+            var shortName = Dom.get(parent.id + "-create-shortname").value;
+            var displayName = Dom.get(parent.id + "-create-displayname").value;
+            displayName = displayName == "" ? undefined : displayName;
+            var groupObj = {};
+
+            var url = Alfresco.constants.PROXY_URI + "api/";
+            var sh = successHandler;
+            if(parent.group && parent.group.length > 0)
+            {
+               url += "groups/" + parent.group + "/children/GROUP_" + shortName;
+               sh = function(o)
+               {
+                  if(displayName && shortName != displayName)
+                  {
+                     /**
+                      * When a group is created by adding it to a parent group its not possible to
+                      * set the displayName in the same call, then another call must be made to
+                      * update the display name.
+                      */
+                     groupObj.displayName = displayName;
+                     parent.panelHandlers.updatePanelHandler.updateGroupRequest(shortName, groupObj, successHandler);
+                  }
+               };
+            }
+            else
+            {
+               url += "rootgroups/" + shortName;
+               if(displayName)
+               {
+                  groupObj.displayName = displayName;
+               }
+            }
+
+            Alfresco.util.Ajax.jsonPost(
+            {
+               url: url,
+               dataObj: groupObj,
+               successCallback:
+               {
+                  fn: sh,
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: function(o)
+                  {
+                     var obj = YAHOO.lang.JSON.parse(o.serverResponse.responseText);
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: parent._msg("message.failure"),
+                        text: parent._msg("message.create-failure", obj.message)
+                     });
+                  },
+                  scope: this
+               }
+            });
          }
+
       });
-      new CreatePanelHandler();
+      this.panelHandlers.createPanelHandler = new CreatePanelHandler();
 
 
       /* Update Group Panel Handler */
@@ -595,10 +1592,31 @@
 
       YAHOO.extend(UpdatePanelHandler, Alfresco.ConsolePanelHandler,
       {
+
+         /**
+          * INSTANCE VARIABLES
+          */
+
+         /**
+          * Keeps track if this panel is visble or not
+          *
+          * @property _visible
+          * @type Boolean
+          */
          _visible: false,
 
-         onLoad: function onLoad()                 
+         /**
+          * PANEL LIFECYCLE CALLBACKS
+          */
+
+         /**
+          * Called by the ConsolePanelHandler when this panel shall be loaded
+          *
+          * @method onLoad
+          */
+         onLoad: function ConsoleGroups_UpdatePanelHandler_onLoad()
          {
+            var me = this;
             var validFields = [];
             var onFieldKeyUp = function onFieldKeyUp(e)
             {
@@ -612,65 +1630,77 @@
                      break;
                   }
                }
-               parent.widgets.updategroupSaveButton.set("disabled", !valid);
+               me.widgets.updategroupSaveButton.set("disabled", !valid);
             };
 
             // Buttons
-            parent.widgets.updategroupSaveButton = Alfresco.util.createYUIButton(parent, "updategroup-save-button", parent.onUpdateGroupOKClick);
-            parent.widgets.updategroupCancelButton = Alfresco.util.createYUIButton(parent, "updategroup-cancel-button", parent.onUpdateGroupCancelClick);
+            this.widgets.updategroupSaveButton = new YAHOO.widget.Button(parent.id + "-updategroup-save-button", {});
+            this.widgets.updategroupSaveButton.on("click", this.onUpdateGroupOKClick, null, this);
+            this.widgets.updategroupCancelButton = new YAHOO.widget.Button(parent.id + "-updategroup-cancel-button", {});
+            this.widgets.updategroupCancelButton.on("click", this.onUpdateGroupCancelClick, null, this);
 
             // Event handlers for mandatory fields
-            validFields[parent.id + "-update-shortname"] = true;
-            Event.on(parent.id + "-update-shortname", "keyup", onFieldKeyUp);
             validFields[parent.id + "-update-displayname"] = true;
             Event.on(parent.id + "-update-displayname", "keyup", onFieldKeyUp);
          },
 
-         onBeforeShow: function onBeforeShow()
+
+         /**
+          * Called by the ConsolePanelHandler just before this panel is about to be shown
+          *
+          * @method onBeforeShow
+          */
+         onBeforeShow: function ConsoleGroups_UpdatePanelHandler_onBeforeShow()
          {
             // Hide the main panel area before it is displayed - so we don't show
             // old data to the user before the Update() method paints the results
             Dom.setStyle(parent.id + "-update-main", "visibility", "hidden");
          },
 
-         onShow: function onShow()
+         /**
+          * Called by the ConsolePanelHandler when this panel is shown
+          *
+          * @method onShow
+          */
+         onShow: function ConsoleGroups_UpdatePanelHandler_onShow()
          {
             this._visible = true;
             window.scrollTo(0, 0);
          },
 
-         onHide: function onHide()
+         /**
+          * Called by the ConsolePanelHandler when this panel is hidden
+          *
+          * @method onHide
+          */
+         onHide: function ConsoleGroups_UpdatePanelHandler_onHide()
          {
             this._visible = false;
          },
 
-         onUpdate: function onUpdate()
+         /**
+          * Called by the ConsolePanelHandler when this panel shall update its appearance
+          *
+          * @method onUpdate
+          */
+         onUpdate: function ConsoleGroups_UpdatePanelHandler_onUpdate()
          {
-            var me = this;
             var success = function(o)
             {
-               var fnSetter = function(id, val)
-               {
-                  Dom.get(parent.id + id).value = val;
-               };
-
+               // Properties section fields
                var group = o.json.data;
-
-
-               // About section fields
                Dom.get(parent.id + "-update-title").innerHTML = $html(group.displayName);
-               fnSetter("-update-shortname", group.shortName);
-               fnSetter("-update-displayname", group.displayName);
+               Dom.get(parent.id + "-update-shortname").innerHTML = $html(group.shortName);
+               Dom.get(parent.id + "-update-displayname").value = group.displayName;
 
                // Make main panel area visible
                Dom.setStyle(parent.id + "-update-main", "visibility", "visible");
             };
 
             // make an ajax call to get user details
-            Alfresco.util.Ajax.request(
+            Alfresco.util.Ajax.jsonGet(
             {
                url: Alfresco.constants.PROXY_URI + "api/groups/" + parent.group+ "",
-               method: Alfresco.util.Ajax.GET,
                successCallback:
                {
                   fn: success,
@@ -678,9 +1708,116 @@
                },
                failureMessage: parent._msg("message.getgroup-failure", parent.group)
             });
+         },
+
+         /**
+          * BUTTON EVENT HANDLERS
+          */
+
+         /**
+          * Fired when the Update User OK button is clicked.
+          *
+          * @method onUpdateGroupOKClick
+          * @param e DomEvent
+          * @param args Event parameters (depends on event type)
+          */
+         onUpdateGroupOKClick: function ConsoleGroups_UpdatePanelHandler_onUpdateGroupOKClick(e, args)
+         {            
+            var handler = function(res)
+            {
+               window.scrollTo(0, 0);
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: parent._msg("message.update-success")
+               });
+
+               var state = {panel: "search", refresh: "true"};
+               if(parent.query)
+               {
+                  // If this panel was triggered from the search list, send back the query so the list will be displayed
+                  state.query = parent.query;
+               }
+               parent.refreshUIState(state);
+            };
+            this._updateGroup(handler);
+         },
+
+         /**
+          * Fired when the Update Group Cancel button is clicked.
+          *
+          * @method onUpdateGroupCancelClick
+          * @param e {object} DomEvent
+          * @param args {array} Event parameters (depends on event type)
+          */
+         onUpdateGroupCancelClick: function ConsoleGroups_UpdatePanelHandler_onUpdateGroupCancelClick(e, args)
+         {
+            var state = {"panel": "search"};
+            if(parent.query)
+            {
+               // If this panel was triggered from the search list, send back the query so the list will be displayed
+               state.query = parent.query;
+            }
+            parent.refreshUIState(state);
+         },
+
+         /**
+          * PUBLIC METHODS
+          */
+
+         /**
+          * Update a group - returning true on success, false on any error.
+          *
+          * @method updateGroupRequest
+          * @param handler {function} Handler function to be called on successful update
+          * @private
+          */
+         updateGroupRequest: function ConsoleGroups_UpdatePanelHandler_updateGroupRequest(shortName, groupObj, successHandler)
+         {
+            Alfresco.util.Ajax.jsonPut(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/groups/" + shortName,
+               dataObj: groupObj,
+               successCallback:
+               {
+                  fn: successHandler,
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: function(o)
+                  {
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: parent._msg("message.failure"),
+                        text: parent._msg("message.update-failure", o.json.message)
+                     });
+                  },
+                  scope: this
+               }
+            });
+         },
+
+         /**
+          * PRIVATE METHODS
+          */
+
+         /**
+          * Update a group - returning true on success, false on any error.
+          *
+          * @method _updateGroup
+          * @param successHandler Handler function to be called on successful update
+          * @private
+          */
+         _updateGroup: function ConsoleGroups_UpdatePanelHandler__updateGroup(successHandler)
+         {
+            this.updateGroupRequest(parent.group,
+            {
+               displayName: Dom.get(parent.id + "-update-displayname").value
+            }, successHandler);
          }
+
       });
-      new UpdatePanelHandler();
+      this.panelHandlers.updatePanelHandler = new UpdatePanelHandler();
 
       return this;
    };
@@ -743,63 +1880,6 @@
        */
 
       /**
-       * Fired when the Create Group OK button is clicked.
-       *
-       * @method onCreateGroupOKClick
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onCreateGroupOKClick: function ConsoleUsers_onCreateGroupOKClick(e, args)
-      {
-         var successHandler = function(res)
-         {
-            window.scrollTo(0, 0);
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: this._msg("message.create-success")
-            });
-            this.refreshUIState({"panel": "search"});
-         };
-         this._createGroup(successHandler);
-      },
-
-      /**
-       * Fired when the Create Group and Create Another button is clicked.
-       *
-       * @method onCreateGroupAnotherClick
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onCreateGroupAnotherClick: function ConsoleGroups_onCreateGroupAnotherClick(e, args)
-      {
-         var successHandler = function(res)
-         {
-            window.scrollTo(0, 0);
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: this._msg("message.create-success")
-            });
-
-            // TODO: clear fields?
-
-            Dom.get(this.id + "-create-shortname").focus();
-         };
-         this._createGroup(successHandler);
-      },
-
-      /**
-       * Fired when the Create Group Cancel button is clicked.
-       *
-       * @method onCreateGroupCancelClick
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onCreateGroupCancelClick: function ConsoleGroups_onCreateGroupCancelClick(e, args)
-      {
-         this.refreshUIState({"panel": "search"});
-      },
-
-      /**
        * History manager state change event handler (override base class)
        *
        * @method onStateChanged
@@ -810,6 +1890,7 @@
       {
          // Clear old states
          this.query = undefined;
+         this.refresh = undefined;
          this.group = undefined;
          this.groupDisplayName = undefined;
 
@@ -817,6 +1898,10 @@
          if(state.query)
          {
             this.query = state.query;
+         }
+         if(state.refresh)
+         {
+            this.refresh = state.refresh;
          }
          if(state.group)
          {
@@ -858,20 +1943,7 @@
       },
 
       /**
-       * View User event handler
-       *
-       * @method onViewGroup
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onViewGroup: function ConsoleGroups_onViewGroup(e, args)
-      {
-         var group = args[1].group;
-         this.refreshUIState({"panel": "view", "group": group});
-      },
-
-      /**
-       * Update User event handler
+       * Update Group event handler
        *
        * @method onUpdateGroup
        * @param e {object} DomEvent
@@ -880,103 +1952,14 @@
       onUpdateGroup: function ConsoleGroups_onUpdateGroup(e, args)
       {
          var group = args[1].group;
-         this.refreshUIState({"panel": "update", "group": group});
-      },
-
-      /**
-       * Delete User event handler
-       *
-       * @method deleteGroupClick
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onDeleteGroup: function ConsoleGroups_onDeleteGroup(e, args)
-      {
-         this._confirmDeleteGroup(args[1].group, args[1].groupDisplayName);
-      },
-
-      /**
-       * Asks the users if he is sure he wants to delete the group
-       *
-       * @param shortName The id of the group
-       * @param displayName The displayName  of the group
-       */
-      _confirmDeleteGroup: function ConsoleGroups_onDeleteGroup(shortName, displayName)
-      {
-         var me = this;
-         Alfresco.util.PopupManager.displayPrompt(
+         var query = args[1].query;
+         var state = {"panel": "update", "group": group};
+         // Remember query if cancel is clicked
+         if(query)
          {
-            text: this._msg("message.confirm.delete", displayName),
-            buttons: [
-               {
-                  text: this._msg("button.yes"),
-                  handler: function ConsoleGroups__deleteGroup_confirmYes()
-                  {
-                     this.destroy();
-                     me._deleteGroup.call(me, shortName, displayName);
-                  }
-               },
-               {
-                  text: this._msg("button.no"),
-                  handler: function ConsoleGroups__deleteGroup_confirmNo()
-                  {
-                     this.destroy();
-                  },
-                  isDefault: true
-               }]
-         });
-      },
-
-      /**
-       * Remove the user from the repository
-       *
-       * @param shortName The id of the group
-       * @param displayName The displayName  of the group
-       */
-      _deleteGroup: function ConsoleGroups_onDeleteGroup(shortName, displayName)
-      {
-         Alfresco.util.Ajax.request(
-         {
-            url: Alfresco.constants.PROXY_URI + "api/groups/" + shortName,
-            method: Alfresco.util.Ajax.DELETE,
-            requestContentType: Alfresco.util.Ajax.JSON,
-            successMessage: this._msg("message.delete-success", displayName),
-            failureMessage: this._msg("message.delete-failure", displayName)
-         });
-      },
-
-      /**
-       * Fired when the Update User OK button is clicked.
-       *
-       * @method onUpdateGroupOKClick
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onUpdateGroupOKClick: function ConsoleGroups_onUpdateGroupOKClick(e, args)
-      {
-         var me = this;
-         var handler = function(res)
-         {
-            window.scrollTo(0, 0);
-            Alfresco.util.PopupManager.displayMessage(
-            {
-               text: me._msg("message.update-success")
-            });
-            me.refreshUIState({"panel": "search"});
-         };
-         this._updateGroup(handler);
-      },
-
-      /**
-       * Fired when the Update Group Cancel button is clicked.
-       *
-       * @method onUpdateGroupCancelClick
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onUpdateGroupCancelClick: function ConsoleGroups_onUpdateGroupCancelClick(e, args)
-      {
-         this.refreshUIState({"panel": "search"});
+            state.query = query;
+         }
+         this.refreshUIState(state);
       },
 
       /**
@@ -1012,63 +1995,36 @@
             state += state.length > 0 ? "&" : "";
             state += "query=" + encodeURIComponent(obj.query);
          }
-         return state;   
-       },
+         if (obj.refresh)
+         {
+            state += state.length > 0 ? "&" : "";
+            state += "refresh=" + encodeURIComponent(obj.refresh);
+         }
+         return state;
+      },
 
 
       /**
-       * Create a group - but first check if it already exists
+       * Helper method for getting the parent groups for group with identifier shortName
        *
-       * @method _createGroup
-       * @param handler {function} Handler function to be called on successful creation
-       * @private
+       * @method _getParentGroups
+       * @param shortName the group identifier
+       * @param successCallback Callback object Called with the groups as the argument or null if group doesn't exist
+       * @param failureMessage Displayed if an error (other than 404) occurs
        */
-      _createGroup: function ConsoleGroups__createGroup(successHandler)
+      getParentGroups: function ConsoleGroups_getParentGroups(shortName, successCallback, failureMessage)
       {
-         var shortName = Dom.get(this.id + "-create-shortname").value;
-         Alfresco.util.Ajax.request(
+         Alfresco.util.Ajax.jsonGet(
          {
             url:  Alfresco.constants.PROXY_URI + "api/groups/" + shortName + "/parents?level=ALL",
-            method: Alfresco.util.Ajax.GET,
-            requestContentType: Alfresco.util.Ajax.JSON,
             successCallback:
             {
                fn: function(o)
                {
-                  // The identifier is already used
                   var groups = o.json.data ? o.json.data : [];
 
-                  // Lets see if the identifer already is placed under this group
-                  var alreadyThere = false;
-
-                  var parentStr = "";
-                  for(var i = 0; i < groups.length; i++)
-                  {
-                     parentStr += groups[i].displayName + (i < groups.length - 1 ? ", " : "");
-                  }
-                  parentStr = parentStr.length > 0 ? parentStr : this._msg("label.theroot");
-                  var me = this;
-                  Alfresco.util.PopupManager.displayPrompt(
-                  {
-                     text: this._msg("message.confirm.add", shortName, parentStr, this.group ? this.group : this._msg("label.theroot")),
-                     buttons: [
-                        {
-                           text: this._msg("button.ok"),
-                           handler: function ConsoleGroups__createGroup_confirmOk()
-                           {
-                              this.destroy();
-                              me._createGroupAfterExistCheck.call(me, successHandler);
-                           }
-                        },
-                        {
-                           text: this._msg("button.cancel"),
-                           handler: function ConsoleGroups__createGroup_confirmCancel()
-                           {
-                              this.destroy();
-                           },
-                           isDefault: true
-                        }]
-                  });
+                  // Since we do
+                  successCallback.fn.call(successCallback.scope ? successCallback.scope : this, groups);
                },
                scope: this
             },
@@ -1079,15 +2035,15 @@
                   if(o.serverResponse.status == 404)
                   {
                      // group didn't exist just continue
-                     this._createGroupAfterExistCheck(successHandler);
+                     successCallback.fn.call(successCallback.scope ? successCallback.scope : this, null);
                   }
                   else
                   {
-                     // Notify the user that an error occured when checking if the identifier already is used
+                     // Notify the user that an error occured
                      Alfresco.util.PopupManager.displayPrompt(
                      {
                         title: this._msg("message.failure"),
-                        text: this._msg("message.create-failure", o.json.message)
+                        text: this._msg(failureMessage, o.json.message)
                      });
                   }
                },
@@ -1096,142 +2052,6 @@
          });
       },
 
-      /**
-       * Create a group - returning true on success, false on any error.
-       *
-       * @method _createGroupAfterExistCheck
-       * @param handler {function} Handler function to be called on successful creation
-       * @private
-       */
-      _createGroupAfterExistCheck: function ConsoleGroups__createGroupAfterExistCheck(successHandler)
-      {
-         // gather up the data for our JSON PUT request
-         var shortName = Dom.get(this.id + "-create-shortname").value;
-         var displayName = Dom.get(this.id + "-create-displayname").value;
-         displayName = displayName == "" ? undefined : displayName;
-         var groupObj = {};
-
-         var url = Alfresco.constants.PROXY_URI + "api/";
-         var sh = successHandler;
-         if(this.group && this.group.length > 0)
-         {
-            url += "groups/" + this.group + "/children/GROUP_" + shortName;
-            sh = function(o)
-            {
-               if(o.serverResponse && o.serverResponse.status == 200)
-               {
-                  // Group already existed but was added as a child
-                  // shall we display a message about it??
-                  // Shall the displayName be updated??
-               }
-               if(displayName && shortName != displayName)
-               {
-                  /**
-                   * When a group is created by adding it to a parent group its not possible to
-                   * set the displayName in the same call, then another call must be made to
-                   * update the display name.
-                   */
-                  groupObj.displayName = displayName;
-                  this._updateGroupRequest(shortName, groupObj, successHandler);
-               }
-            };
-         }
-         else
-         {
-            url += "rootgroups/" + shortName;
-            if(displayName)
-            {
-               groupObj.displayName = displayName;
-            }
-         }
-
-         Alfresco.util.Ajax.request(
-         {
-            url: url,
-            method: Alfresco.util.Ajax.POST,
-            dataObj: groupObj,
-            requestContentType: Alfresco.util.Ajax.JSON,
-            successCallback:
-            {
-               fn: sh,
-               scope: this
-            },
-            failureCallback:
-            {
-               fn: function(o)
-               {
-                  var obj = YAHOO.lang.JSON.parse(o.serverResponse.responseText);
-                  Alfresco.util.PopupManager.displayPrompt(
-                  {
-                     title: this._msg("message.failure"),
-                     text: this._msg("message.create-failure", obj.message)
-                  });
-               },
-               scope: this
-            }
-         });
-      },
-
-
-      /**
-       * Update a group - returning true on success, false on any error.
-       *
-       * @method _updateGroup
-       * @param handler {function} Handler function to be called on successful update
-       * @private
-       */
-      _updateGroup: function ConsoleGroups__updateGroup(successHandler)
-      {
-         var me = this;
-         var fnGetter = function(id)
-         {
-            return Dom.get(me.id + id).value;
-         };
-
-         var shortName =  fnGetter("-update-shortname");
-         var displayName = fnGetter("-update-displayname");
-                  
-         var groupObj =
-         {
-            displayName: displayName
-         };
-         this._updateGroupRequest(shortName, groupObj, successHandler);
-      },
-
-      /**
-       * Update a group - returning true on success, false on any error.
-       *
-       * @method _updateGroupRequest
-       * @param handler {function} Handler function to be called on successful update
-       * @private
-       */
-      _updateGroupRequest: function ConsoleGroups__updateGroupRequest(shortName, groupObj, successHandler)
-      {
-         Alfresco.util.Ajax.request(
-         {
-            url: Alfresco.constants.PROXY_URI + "api/groups/" + shortName,
-            method: Alfresco.util.Ajax.PUT,
-            dataObj: groupObj,
-            requestContentType: Alfresco.util.Ajax.JSON,
-            successCallback:
-            {
-               fn: successHandler,
-               scope: this
-            },
-            failureCallback:
-            {
-               fn: function(o)
-               {
-                  Alfresco.util.PopupManager.displayPrompt(
-                  {
-                     title: this._msg("message.failure"),
-                     text: this._msg("message.update-failure", o.json.message)
-                  });
-               },
-               scope: this
-            }
-         });
-      },
 
       /**
        * Gets a custom message

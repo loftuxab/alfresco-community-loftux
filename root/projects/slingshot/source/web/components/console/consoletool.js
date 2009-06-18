@@ -54,9 +54,12 @@
       
       /* Define panel handlers */
       var parent = this;
+
       Alfresco.ConsolePanelHandler = function(id)
       {
          this.id = id;
+         this.widgets = {};
+         this.modules = {};
          
          // register the panel with the parent object
          parent.panels.push(this);
@@ -66,6 +69,22 @@
       Alfresco.ConsolePanelHandler.prototype =
       {
          id : null,
+
+         /**
+          * Object container for storing YUI widget instances.
+          *
+          * @property widgets
+          * @type object
+          */
+         widgets: {},
+
+         /**
+          * Object container for storing module instances.
+          *
+          * @property modules
+          * @type object
+          */
+         modules: {},
          
          /**
           * Event handler - called once only when panel first initialised

@@ -16,7 +16,7 @@
 <div id="${el}-body" class="groups">
 
    <!-- Search panel -->
-   <div id="${el}-search" class="hidden">
+   <div id="${el}-search">
       <div class="yui-g">
          <div class="yui-u first">
             <div class="title"><label for="${el}-search-text">${msg("label.title-browse")}</label></div>
@@ -56,6 +56,69 @@
          </div>
          <div class="results" id="${el}-datatable"></div>
       </div>
+
+      <!-- People Finder Dialog -->
+      <div id="${el}-peoplepicker" class="groups people-picker hidden">
+         <div class="hd"><span id="${el}-peoplepicker-title">${msg("panel.adduser.header")}</span></div>
+         <div class="bd">
+            <div>
+               <div id="${el}-search-peoplefinder"></div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Group Finder Dialog -->
+      <div id="${el}-grouppicker" class="groups group-picker hidden">
+         <div class="hd"><span id="${el}-grouppicker-title">${msg("panel.addgroup.header")}</span></div>
+         <div class="bd">
+            <div>
+               <div id="${el}-search-groupfinder"></div>
+            </div>
+         </div>
+      </div>
+
+      <!-- Remove Group Dialog -->
+      <div id="${el}-deletegroupdialog" class="groups remove-dialog hidden">
+         <div class="hd">${msg("panel.deletegroup.header")}</div>
+         <div class="bd">
+            <div id="${el}-singleparent" class="dialog-panel">
+               <div>
+                  <span id="${el}-singleparent-message"></span>
+               </div>
+            </div>
+            <div id="${el}-multiparent" class="dialog-panel hidden">
+               <div>
+                  <span id="${el}-multiparent-message"></span>
+               </div>
+               <div id="${el}-parents" class="parent-list"></div>
+               <div id="${el}-removerow" class="yui-gf">
+                  <div class="yui-u first">
+                     <input id="${el}-remove" type="radio" checked="checked" name="-" />
+                  </div>
+                  <div class="yui-u">
+                     <span id="${el}-remove-message"></span>
+                  </div>
+               </div>
+               <div id="${el}-deleterow" class="yui-gf">
+                  <div class="yui-u first">
+                     <input id="${el}-delete" type="radio" name="-" />
+                  </div>
+                  <div class="yui-u">
+                     <span id="${el}-delete-message"></span>
+                     <div class="">${msg("panel.deletegroup.deletewarning")}</div>
+                  </div>
+               </div>
+               <div id="${el}-searchdeleterow">
+                  <span id="${el}-searchdelete-message"></span>
+               </div>
+            </div>
+            <div class="bdft">
+               <input type="submit" id="${el}-remove-button" value="${msg("button.remove")}"/>
+               <input type="button" id="${el}-cancel-button" value="${msg("button.cancel")}"/>
+            </div>
+         </div>
+      </div>
+
    </div>
 
    <!-- Create Group panel -->
@@ -76,7 +139,7 @@
             <span class="crud-label">${msg("label.shortname")}:&nbsp;*&nbsp;${msg("label.shortname.warning")}</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-create-shortname" type="text" maxlength="256" />
+            <input class="crud-input" id="${el}-create-shortname" type="text" maxlength="255" />
          </div>
          <div class="field-row">
             <span class="crud-label">${msg("label.displayname")}:&nbsp;*</span>
@@ -124,7 +187,7 @@
             <span class="crud-label">${msg("label.shortname")}:&nbsp;*</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-update-shortname" type="text" maxlength="256" />
+            <span class="crud-input" id="${el}-update-shortname"></span>
          </div>
          <div class="field-row">
             <span class="crud-label">${msg("label.displayname")}:&nbsp;*</span>
