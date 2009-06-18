@@ -2071,6 +2071,62 @@ Alfresco.util.Ajax = function()
       },
 
       /**
+       * Helper function for pure json requests, where both the request and
+       * response are using json. Will result in a call to request() with
+       * requestContentType and responseContentType set to JSON and method set to GET.
+       *
+       * @method request
+       * @param config {object} Description of the request that should be made
+       */
+      jsonGet: function(config)
+      {
+         config.method = this.GET;
+         this.jsonRequest(config);
+      },
+
+      /**
+       * Helper function for pure json requests, where both the request and
+       * response are using json. Will result in a call to request() with
+       * requestContentType and responseContentType set to JSON and method set to POST.
+       *
+       * @method request
+       * @param config {object} Description of the request that should be made
+       */
+      jsonPost: function(config)
+      {
+         config.method = this.POST;
+         this.jsonRequest(config);
+      },
+
+      /**
+       * Helper function for pure json requests, where both the request and
+       * response are using json. Will result in a call to request() with
+       * requestContentType and responseContentType set to JSON and method set to PUT.
+       *
+       * @method request
+       * @param config {object} Description of the request that should be made
+       */
+      jsonPut: function(config)
+      {
+         config.method = this.PUT;
+         this.jsonRequest(config);
+      },
+
+      /**
+       * Helper function for pure json requests, where both the request and
+       * response are using json. Will result in a call to request() with
+       * requestContentType and responseContentType set to JSON and method set to DELETE.
+       *
+       * @method request
+       * @param config {object} Description of the request that should be made
+       */
+      jsonDelete: function(config)
+      {
+         config.method = this.DELETE;         
+         this.jsonRequest(config);
+      },
+
+      /**
        * Takes an object and creates a decoded URL parameter string of it.
        * Note! Does not contain a '?' character in the beginning.
        *

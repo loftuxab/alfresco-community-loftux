@@ -41,11 +41,11 @@
 }
 
 .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a {
-    margin: 0 1px;
+    margin: 0 0;
     padding: 2px;
 }
 
-.yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-has-next {
+.yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-column-has-next {
     background-image: url(arrow-off.gif);
     background-position: right center;
     background-repeat: no-repeat;
@@ -60,7 +60,7 @@
 }
 
 /* IE6 cannot grok element selectors with chained class names */
-html>body .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-has-next.columnbrowser-active {
+html>body .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-column-has-next.columnbrowser-active {
     background-image: url(arrow-on.gif);
 }
 
