@@ -18,8 +18,8 @@
            </ul>
             
            <div class="tabcontent">
+             <#if ((numContentResults?number>0))>              
              <div id="Content" class="active">
-                <#if ((numContentResults?number>0))>
                    <h2>98 results in All sites <span>1 of 98</span></h2>
                    <ul class="e2e list">
                       <#list contentResults.items as content>
@@ -29,17 +29,19 @@
                        <p><span>${msg('label.modifiedBy')}:</span> ${content.modifiedBy}</p>
                        <p><span>${msg('label.modifiedOn')}:</span> ${content.modifiedOn?string("dd MMM yyyy HH:mm")}</p>
                        <p><span>${msg('label.size')}:</span> ${content.size}</p>
-                       <a id="Mobile-User-Stories" href="#docactions.html" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
+                       <a id="${content.domId}" href="#document?nodeRef=${content.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                      </li>
                       </#list>
                      </ul>
-                     <a id="loadmore" class="button white">Load next 25 results</a>
-                <#else>
-                <p>${msg('label.noResults')}</p>
-                </#if>
+                     <div id="loadmore">
+                        <a class="button white">Load next 25 results</a>
+                     </div>
                </div>
-               <div id="Sites">
+                <#else>
+                <p id="Content" class="noContent active">${msg('label.noResults')}</p>
+                </#if>
                 <#if ((numSiteResults?number>0))>                  
+               <div id="Sites">
                   <h2>10 results <span>1 of 10</span></h2>
                   <ul class="e2e list">
                   <#list siteResults as site>
@@ -51,13 +53,13 @@
                      </li>
                   </#list>
                   </ul>
-               <#else>
-                <p>${msg('label.noResults')}</p>
-               </#if>   
                </div>
-               <div id="People">
-                  <ul class="e2e list">
-                  <#if ((numPplResults?number>0))>                                    
+               <#else>
+                <p id="Sites" class="noContent">${msg('label.noResults')}</p>
+               </#if>
+               <#if ((numPplResults?number>0))>                                                   
+               <div id="People"> 
+                     <ul class="e2e list">
                      <#list pplResults.people as person>
                      <li class="details">
                         <#if (person.avatar??)>
@@ -65,16 +67,16 @@
                         <#else>
                           <p class="toenail"><a href="${url.context}/p/profile?person=${person.userName}"><img src="${url.context}/themes/${theme}/images/no-user-photo-64.png"/></a></p>
                         </#if>
-                       <a href="${url.context}/p/profile?person=${person.userName}" class="panelLink"><p><span>${msg('Name')}:</span> ${person.firstName} ${person.lastName}</p>
-                       <p><span>${msg('Title')}</span> ${person.jobtitle!''}:</p></a>
+                       <p><a href="${url.context}/p/profile?person=${person.userName}" class="panelLink person">${person.firstName} ${person.lastName}</a></p>
+                       <p><span>${msg('Title')}:</span> ${person.jobtitle!''}</p>
                        <a href="${url.context}/p/profile?person=${person.userName}" class="panelLink more" ><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                      </li>
                      </#list>
                   </ul>
-               <#else>
-                <p>${msg('label.noResults')}</p>
-               </#if>   
              </div>
+            <#else>
+             <p id="People" class="noContent">${msg('label.noResults')}</p>
+            </#if>   
            </div>
          </div>
     </div>

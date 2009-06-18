@@ -1,19 +1,12 @@
+<#include "../../utils.ftl" />
 <div id="container">
    <div id="${htmlid}Panel" class="panel selected">
-      <div class="toolbar">
-         <h1>${msg('label.site')}</h1>
-         <#if (backButton??)>
-         <a class="back button">${msg('label.backText')}</a>
-         </#if>
-         <#if (actionUrl??)>
-         <a class="button action" href="${actionUrl}">${msg('label.actionText')}</a>
-         </#if>
-      </div>
+      <@toolbar title="${site.title}" />
       <div class="content">   
          <div class="rr details">
             <img src="${url.context}/themes/${theme}/images/64-siteicon.png" width="64" height="64" ><!-- replace with background img-->
             <div>
-               <h2>${site.shortName}</h2>
+               <h2>${site.title}</h2>
                <p>${site.description?html}</p>
             </div>
             <a href="#TODO" class="more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>

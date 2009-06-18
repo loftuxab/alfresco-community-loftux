@@ -24,7 +24,7 @@
 //      "container": "documentLibrary"
 //    },
 //    ...
-
+var maxResults = 100;
 function getDocType(doc)
 {
   var displayType = '';
@@ -41,7 +41,7 @@ function getDocType(doc)
 
 function getContentSearchResults(term)
 {
-  var data  = remote.call("/slingshot/search?term="+stringUtils.urlEncode(term)+"&site=&container=&maxResults=26");
+  var data  = remote.call("/slingshot/search?term="+stringUtils.urlEncode(term)+"&site=&container=&maxResults="+maxResults);
   data = eval('('+ data+')');
   for (var i=0,len=data.items.length;i<len;i++)
   {
@@ -49,10 +49,11 @@ function getContentSearchResults(term)
     doc.modifiedOn = new Date(doc.modifiedOn);
     doc.displayType = getDocType(doc);
     doc.doclink =  "api/node/content/"+doc.nodeRef.replace(':/','')+'/'+stringUtils.urlEncode(doc.name);
+    doc.domId = doc.displayName.replace(/ /g,'').match(/^[a-zA-Z][a-zA-Z0-9\-\_]+/g)[0];    
     data.items[i]=doc;
   } 
   //work out if there we need pagination 
-  if (data.items.length===26)
+  if (data.items.length===(maxResults+1))
   {
     data.hasMore = true;
     //remove last
@@ -63,13 +64,13 @@ function getContentSearchResults(term)
 
 function getSiteResults(term)
 {
-  var data =remote.call("/api/sites?size=25&nf=" + stringUtils.urlEncode(term));
+  var data =remote.call("/api/sites?size=" + maxResults +"&nf=" + stringUtils.urlEncode(term));
   return eval('('+ data+')');
 }
 
 function getPeopleResults(term)
 {
-  var data = remote.call("/api/people?filter="+ stringUtils.urlEncode(term) +"&maxResults=26")
+  var data = remote.call("/api/people?filter="+ stringUtils.urlEncode(term) +"&maxResults=" +maxResults)
   return eval('('+ data+')');  
 }
 

@@ -58,12 +58,14 @@ ul.e2e li {
    margin:0;
 }
 #tasksPage ul.e2e li a {
-   background:url(./images/arrow2.png) 100% 7px no-repeat;   
+   padding-left:2.5em;
+
 }
-ul.e2e li:active a,
+/*ul.e2e li:active a,
 ul.e2e li:hover a{
    background-position:100% -32px;
 }
+*/
 ul.e2e li.details a,
 ul.e2e li.details:hover a,
 ul.e2e li.details:active a {
@@ -103,8 +105,8 @@ div.rr {
 }
 
 div.details,li.details {
-   margin:0.5em;
-   padding:0.5em;
+   margin:1em;
+   padding:1em;
    position:relative;
    min-height:64px;   
 }
@@ -123,7 +125,7 @@ div.details h2,li.details h2
    font-size:14px;
 }
 .details div {
-   margin-left:40px
+   margin:0 40px;
 }
 
 .details h2,.details h3 {
@@ -134,14 +136,19 @@ li.details h2 a,li.details h3 a {
    padding:0;
 }
 .details a.more img {
-   float:none;
-   margin:0 0.5em;
+   float:right;
+   padding:1.5em 0;
+}
+div.details a.more img
+{
+   margin-top:0.5em;
 }
 .details a.more {
    position:absolute;
-   right:10px;
-   width:30px;
-   top:25%;
+   height:64px;
+   top:0;
+   right:5px;
+   padding-right:0px;
 }
 
 ul.e2e li.details {
@@ -154,39 +161,29 @@ ul.e2e li.details {
 ul.e2e li.details h3{
    font-size:16px;
    font-weight:normal;
+   line-height:1.1em;
    margin-bottom:5px;
 }
 ul.e2e li.details p
 {
-   font-size:12px;
-   color:#999;
+   font-size:81%;
+   color:#000;
+   line-height:1.2em;
 }
 ul.e2e li.details span {
-   color:#000;
+   color:#999;
 }
-/*ul.e2e li.doc{
-   background:#fff url(./images/icons/doc.png) no-repeat 0.5em;
-}
-
-ul.e2e li.ppt {
-   background:#fff url(./images/icons/ppt.png) no-repeat 0.5em;
-}
-
-ul.e2e li.img {
-   background:#fff url(./images/icons/img.png) no-repeat 0.5em;
-}
-
-ul.e2e li.pdf {
-   background:#fff url(./images/icons/pdf.png) no-repeat 0.5em;
-}
-
-ul.e2e li.xls {
-   background:#fff url(./images/icons/xls.png) no-repeat 0.5em;
-}*/
 
 ul.rr.info li {
    background-image:none;
    padding:0.5em;
+/*   text-align:right;*/
+}
+ul.rr.info li span 
+{
+   color:#999;
+/*   float:left;*/
+   margin-right:0.5em;
 }
 p.toenail {
    float:left;
@@ -195,7 +192,7 @@ p.toenail {
    left:0;
    color:#000;
 }
-div#RMod {
+div#RMod ul{
    border-top:1px solid #999;
 }
 div#RMod .list{
@@ -203,9 +200,9 @@ div#RMod .list{
 }
 div#RMod li h2 {
    display:block;
-   border-bottom:1px solid #ccc;
    margin:0;
-   font-weight:normal;
+   font-weight:bold;
+   font-size:81%;
    padding:2px 0 2px 0.5em;
    background-color:#f2f2f2;
 }

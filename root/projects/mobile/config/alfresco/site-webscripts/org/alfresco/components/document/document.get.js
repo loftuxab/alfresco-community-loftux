@@ -78,6 +78,19 @@
 
 
 */
+
+/**
+ * Generate URL to thumbnail image
+ *
+ * @method generateThumbnailUrl
+ * @param path {YAHOO.widget.Record} File record
+ * @return {string} URL to thumbnail
+ */
+var generateThumbnailUrl = function generateThumbnailUrl(record)
+{
+   return "api/node/" + record.nodeRef.replace(":/", "") + "/content/thumbnails/doclib?c=queue&ph=true";
+};
+
 function getDocDetails(nodeRef) 
 {
    var data = remote.call('/slingshot/doclib/doclist/documents/node/' + nodeRef.replace(":/", "") + '?filter=node');
@@ -116,6 +129,7 @@ function getDocDetails(nodeRef)
       }
       
       doc.tags = doc.tags.join(' ');
+      doc.thumbnailUrl = generateThumbnailUrl(doc);
       
       data.items[i]=doc;
    }
@@ -123,4 +137,5 @@ function getDocDetails(nodeRef)
 }
 
 model.doc = getDocDetails(page.url.args.nodeRef).items[0];
+model.siteTitle = model.doc.location.site;
 model.backButton = true;

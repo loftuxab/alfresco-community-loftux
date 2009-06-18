@@ -1,14 +1,7 @@
+<#include "../../utils.ftl" />
 <div id="container">
    <div id="${htmlid}Panel" class="panel selected">
-      <div class="toolbar">
-      <h1>${doc.title}</h1>
-      <#if (backButton??)>
-         <a class="back button">${msg('label.backText')}</a>
-      </#if>
-      <#if (actionUrl??)>
-         <a class="button action" href="${actionUrl}">${msg('label.actionText')}</a>         
-      </#if>
-    </div>
+      <@toolbar title="${doc.title}" parentTitle="${siteTitle}" />
     <div class="content">
        <div class="panelBar">
             <a class="button" href="${url.context}/p/workflow?nodeRef=${doc.nodeRef}&site=${doc.location.site}">${msg('label.assignWorkflow')}</a>
@@ -16,7 +9,7 @@
                <input type="submit" name="delete" value="${msg('Delete')}" id="delete" class="button delete">
             </form>
           </div>
-          <a class="preview" href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/themes/${theme}/images/icons/${doc.type}.png" /></a>
+          <a class="preview" href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/proxy/alfresco/${doc.thumbnailUrl}" /></a>
           <ul class="rr info">
               <li><span>${msg('label.name')}:</span> ${doc.displayName}</li>
               <li><span>${msg('label.description')}:</span> ${doc.description}</li>

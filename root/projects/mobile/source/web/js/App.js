@@ -142,7 +142,11 @@ function(){
         },    
         onOrientationChange : function onOrientationChange(e) {
           var bodyEl = x$(document.body);
-          (window.orientation ==0 | window.orientation==180) ? bodyEl.removeClass('landscape').addClass('portrait') : bodyEl.removeClass('portrait').addClass('landscape');
+          if (window.orientation!=undefined)
+          {
+             (window.orientation ==0 | window.orientation==180) ? bodyEl.removeClass('landscape').addClass('portrait') : bodyEl.removeClass('portrait').addClass('landscape');             
+          }
+
           App.hideBrowserNavBar();
         },
         hideBrowserNavBar : function hideBrowserNavBar(timeout)

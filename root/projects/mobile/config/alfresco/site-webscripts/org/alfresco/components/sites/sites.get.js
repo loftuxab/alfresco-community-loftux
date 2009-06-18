@@ -6,4 +6,4 @@ var userSites = getUserSites();
 model.sites = userSites.sites;
 model.favSites = userSites.favSites;
 model.allSites = getAllSites();
-model.backButton = true
+model.backButton = true;

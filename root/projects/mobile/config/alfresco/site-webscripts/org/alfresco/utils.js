@@ -80,6 +80,7 @@
    ]
 }
 */
+
 // http://localhost:8080/alfresco/service/slingshot/doclib/doclist/{type}/site/{sites}/{container}/?
 function getDocuments(site,container,filter,amount)
 {
@@ -119,7 +120,7 @@ function getDocuments(site,container,filter,amount)
         doc.type = 'unknown';
       }
       //make valid dom id using docTitle - prob needs fixing for unicode characters
-      doc.domId = doc.title.replace(/ /g,'').match(/^[a-zA-Z][a-zA-Z0-9\-\_]+/g)[0];
+      doc.domId = doc.displayName.replace(/ /g,'').match(/^[a-zA-Z][a-zA-Z0-9\-\_]+/g)[0];
       data.items[i]=doc;
     }
 
