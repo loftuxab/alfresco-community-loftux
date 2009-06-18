@@ -30,7 +30,7 @@ Codeline
 {}
 
 CommandLineFailureAction
-{Fail (recommended)}
+{Continue without including missing files}
 
 Company
 Alfresco
@@ -235,8 +235,6 @@ test
 }
 FileGroup ::9C895371-373A-4923-840C-4F98632E4A99 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive} -name {Program Files} -parent FileGroups
 File ::BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27 -type dir -directory <%InstallDir%> -name W:/HEAD/root/projects/deployment/build/assemble -location ../../projects/deployment/build/assemble -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::5B9B1393-ED55-4BF8-9F59-350FAB441A69 -name alfresco-core-3.2_Preview2.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
-File ::A43068D3-051A-4EC9-9F93-AE26024E953C -name alfresco-deployment-3.2_Preview2.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
 File ::C7342068-63FE-4996-BCE4-44CD0C160FC9 -name application-context.xml -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
 File ::9332B944-282A-4054-A32C-05C0B344E3AD -name commons-logging-1.1.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
 File ::3E62D3B3-7213-4496-AC4D-27EFA25CFF3C -name deploy_start.bat -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
@@ -250,12 +248,14 @@ File ::2D030E00-66F1-48E3-81E1-F6BC667700DF -name log4j.properties -parent BE5AE
 File ::6FEF9DE5-5656-4FCF-A2C9-2BE2C981D367 -name readme.txt -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
 File ::7A500141-192D-4094-A46A-97F17BA0F65A -name shutdown-context.xml -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
 File ::6E531ACC-8C7D-4E45-8982-F10541E8C16C -name spring-2.0.8.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
-File ::9B767244-AA33-4E3F-9594-BA60294995AE -type dir -name C:/work/alfresco/WCM_WDR/root/projects/deployment/build/assemble/deployment -location ../../projects/deployment/build/assemble/deployment -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::DFDB1DBD-D9C0-4F4A-8476-322652B30715 -name default-target.xml -location ../../projects/deployment/build/assemble/deployment -parent 9B767244-AA33-4E3F-9594-BA60294995AE
-File ::A558D897-5624-492A-9863-5C2971B48CA2 -name deployment-receiver-context.xml -location ../../projects/deployment/build/assemble/deployment -parent 9B767244-AA33-4E3F-9594-BA60294995AE
-File ::18A6E351-5AC6-453B-8996-5838A5DD9F53 -name extras-context-sample.xml -location ../../projects/deployment/build/assemble/deployment -parent 9B767244-AA33-4E3F-9594-BA60294995AE
-File ::FA76A842-709E-4FD0-875A-8013235CF6D8 -name filesystem-target-sample.xml -location ../../projects/deployment/build/assemble/deployment -parent 9B767244-AA33-4E3F-9594-BA60294995AE
-File ::103BD13D-6699-475B-AC9E-68FDD82F0732 -name sample-target.xml -location ../../projects/deployment/build/assemble/deployment -parent 9B767244-AA33-4E3F-9594-BA60294995AE
+File ::40BF8E83-FC2B-4F93-B65D-A8688063F124 -type dir -name deployment -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::25649A0D-407A-4803-8FD6-A8596F2FC505 -name default-target.xml -parent 40BF8E83-FC2B-4F93-B65D-A8688063F124
+File ::46E55412-AED7-48DF-AD21-7082ACF4C81C -name deployment-receiver-context.xml -parent 40BF8E83-FC2B-4F93-B65D-A8688063F124
+File ::5AD0A8EA-9BA8-4E95-B9E1-6F21685638C8 -name extras-context-sample.xml -parent 40BF8E83-FC2B-4F93-B65D-A8688063F124
+File ::FCFBFB5A-E8C0-42A5-ABFD-8116D855FD14 -name filesystem-target-sample.xml -parent 40BF8E83-FC2B-4F93-B65D-A8688063F124
+File ::8E54CFB7-CECF-43C3-80A7-4C94D5CDCA7C -name alfresco-core-3.2_dev.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::60C530CE-5F6E-494A-9017-DE6C572197DF -name alfresco-deployment-3.2_dev.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
+File ::D0855B32-2CE6-4504-B755-946233528A86 -name alfresco-repository-3.2_dev.jar -parent BE5AE4CB-BA23-42D6-9EC8-EF627CBA3C27
 FileGroup ::03791E78-4713-45B0-8559-C66EA67DB28A -setup Install -active Yes -platforms Windows -name {Windows scripts} -parent FileGroups
 File ::E1A99665-AF17-41BF-A38B-31FA8EA7631E -name W:/V21/root/installer/resources/alfresco.ico -location ../resources -parent 03791E78-4713-45B0-8559-C66EA67DB28A
 FileGroup ::C3FE0508-0773-40D6-97C4-1FE52205D032 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc TarArchive} -name {Linux scripts} -parent FileGroups
@@ -403,7 +403,7 @@ array set Properties {
 <%InstallDir%>
 
 03791E78-4713-45B0-8559-C66EA67DB28A,FileSize
-3378
+894
 
 03791E78-4713-45B0-8559-C66EA67DB28A,Name
 {Windows scripts}
@@ -988,7 +988,7 @@ Finish
 <%InstallDir%>
 
 9C895371-373A-4923-840C-4F98632E4A99,FileSize
-3476939
+10497774
 
 9C895371-373A-4923-840C-4F98632E4A99,Name
 {Program Files}
@@ -1216,7 +1216,7 @@ C3FE0508-0773-40D6-97C4-1FE52205D032,Destination
 <%InstallDir%>
 
 C3FE0508-0773-40D6-97C4-1FE52205D032,FileSize
-4736
+4544
 
 C3FE0508-0773-40D6-97C4-1FE52205D032,Name
 {Linux scripts}
