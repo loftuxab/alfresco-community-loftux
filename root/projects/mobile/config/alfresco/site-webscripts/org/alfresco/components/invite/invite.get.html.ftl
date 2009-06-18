@@ -1,14 +1,7 @@
+<#include "../../utils.ftl" />
 <div id="container">
    <div id="${htmlid}Panel" class="panel selected">
-      <div class="toolbar">
-         <h1>${msg('label.inviteUser')}</h1>
-         <#if (backButton??)>
-            <a class="back button">${msg('label.backText')}</a>
-         </#if>
-         <#if (actionUrl??)>
-            <a class="button action" href="${actionUrl}">${msg('label.actionText')}</a>
-         </#if>
-      </div>
+      <@toolbar title="${msg('label.inviteUser')}" parentTitle="${page.url.args.site}" />
       <div class="content">
         <div class="tabs">
             <ul class="tablinks">
@@ -29,7 +22,7 @@
                     </select>
                   <div>
                     <input type="hidden" value="${site}" name="site" /> 
-                    <input type="submit" value="${msg('label.invite')}" class="button"/>
+                    <input type="submit" value="${msg('label.invite')}" class="button actionBut"/>
                     <input type="button" value="${msg('label.cancel')}" class="button"/>
                   </div>
                 </form>               
@@ -52,7 +45,7 @@
 
                   <div>
                     <input type="hidden" value="${site}" name="site" /> 
-                    <input type="submit" value="${msg('label.invite')}" class="button"/>
+                    <input type="submit" value="${msg('label.invite')}" class="button actionBut"/>
                     <input type="button" value="${msg('label.cancel')}" class="button"/>
                   </div>
                 </form>

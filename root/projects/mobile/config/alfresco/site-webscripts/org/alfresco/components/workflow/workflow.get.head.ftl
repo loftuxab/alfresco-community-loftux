@@ -10,10 +10,13 @@
          App.registerBehaviour('datePicker',function(rootNode)
             {
                x$(rootNode).find('.datepicker').each(function(el) {
+                  //get button value so we can reinstate if user clicks Clear
+                  var defaultButtonText = document.getElementById('datePicker').value;
                   function openDate(date) {
                    var date = date || new Date();
                    var days = { };
                    var years = { };
+                   //i18n
                    var months = { 1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun', 7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec' };
  
                    for( var i = 1; i < 32; i += 1 ) {
@@ -34,10 +37,18 @@
                        return (value<10) ? '0' + value : value;
                      }
                      var results = SpinningWheel.getSelectedValues().keys;
-      	             document.getElementById('date').value = results[0]+'/'+padZeros(results[1]-1)+'/'+padZeros(results[2]);
-      	             document.getElementById('datePicker').value = padZeros(results[2])+'/'+padZeros(results[1]-1)+'/'+results[0];//i18n
-                      // document.getElementById('datePicker').value = new Date(results[0],padZeros(results[1]-1),padZeros(results[2])).toString();
+                      //add date to hidden field
+      	             document.getElementById('date').value = results[0]+'/'+padZeros(results[1])+'/'+padZeros(results[2]);
+      	             //add date to view (button)
+      	             document.getElementById('datePicker').value = padZeros(results[2])+'/'+padZeros(results[1])+'/'+results[0];//i18n
+                      
                    });
+                   SpinningWheel.setClearAction(function (e) {
+                      //clear hidden field
+                      document.getElementById('date').value = '';
+                      //clear button
+      	             document.getElementById('datePicker').value = defaultButtonText
+      	          });
                    SpinningWheel.open();
                   }
 

@@ -1,15 +1,3 @@
-<#macro toolbar title>
-   <div class="toolbar">
-      <h1>${title}</h1>
-      <#if (backButton??)>
-         <a class="back button">${msg('label.backText')}</a>
-      </#if>
-      <#if (actionUrl??)>
-         <a class="button action" href="${actionUrl}">${msg('label.actionText')}</a>         
-      </#if>
-   </div>
-</#macro>
-
 <#macro panelContent>
 <div id="documentsTabs" class="tabs">
    <ul class="tablinks">
@@ -18,6 +6,7 @@
       <li><a href="#All" class="button">${msg('label.all')}</a></li>
    </ul>
    <div class="tabcontent">
+      <#if (allDocs?size!=0)>
       <div id="RMod" class="active">
          <ul class="list">
             <li>
@@ -33,15 +22,19 @@
                      <a id="${doc.domId}" href="#document?nodeRef=${doc.nodeRef}" class="panelLink more"><img src="${url.context}/themes/${theme}/images/30-goarrow2.png" /></a>
                   </li>
                   </#list>
-               </ul>
+               </ul>               
             </li>
-            <li>
+            <#-- <li>
                <h2>${msg('Yesterday')}</h2>
                <ul>
                </ul>
-            </li>
+            </li> -->
          </ul>
       </div>
+      <#else>
+         <p id="RMod" class="noContent">${msg('label.noResults')}</p>
+      </#if>         
+      <#if (allDocs?size!=0)>
       <div id="My">
          <ul class="e2e list">
             <#list myDocs as doc >
@@ -56,6 +49,10 @@
             </#list>
          </ul>
       </div>
+      <#else>
+         <p id="My" class="noContent">${msg('label.noResults')}</p>
+      </#if>         
+      <#if (allDocs?size!=0)>
       <div id="All">
          <ul class="e2e list">
             <#list allDocs as doc >
@@ -70,6 +67,9 @@
             </#list>
          </ul>
       </div>
+      <#else>
+         <p id="All" class="noContent">${msg('label.noResults')}</p>
+      </#if>      
       <ul class="rr list">
          <li class="allfolders"><a class="disabled">${msg('label.allFolders')}</a></li>
       </ul>

@@ -10,3 +10,4 @@ model.numTasks = userTasks.length;
 model.numOverdueTasks = overdueTasks.length
 model.numEvents = userEvents.length;
 model.backButton = true;
+context.setValue('SITE','SHABBA');

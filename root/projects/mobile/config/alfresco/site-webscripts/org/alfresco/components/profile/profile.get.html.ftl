@@ -19,10 +19,9 @@
 
               <div id="Info" class="active">
                 <div class="details">
-                  <img src="${url.context}/themes/${theme}/images/64-siteicon.png" width="64" height="64" >
+                  <img src="${url.context}/proxy/alfresco/api/node/${profile.properties.avatar?replace('://','/')}/content/thumbnails/avatar?c=force" width="64" height="64" >
                   <div>
-                     ${profile.name!""}
-                    <h2>${profile.firstName!""} ${profile.lastName!""}</h2>
+                     ${profile.firstName!""} ${profile.lastName!""}
                     <p>${profile.jobTitle!""}</p>
                     <p>${profile.location!""}</p>
                     <p>${profile.organization!""}</p>

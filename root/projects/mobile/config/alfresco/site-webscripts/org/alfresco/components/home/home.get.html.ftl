@@ -1,3 +1,4 @@
+<#include "../../utils.ftl" />
 <div id="container">
    <div id="homePanel" class="panel selected">
       <div class="toolbar">

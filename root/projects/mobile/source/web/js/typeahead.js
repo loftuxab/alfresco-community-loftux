@@ -210,7 +210,8 @@ window.addEventListener('DOMContentLoaded',function(){
               this.ta.render();
               var that = this;
               this.ta.on('selected',function(e,args){
-                x$('.typeAhead').first().value = that.ta.getSelectedItem().userName;
+                var userItem = that.ta.getSelectedItem();
+                x$('.typeAhead').first().value = userItem.firstName + ' ' + userItem.lastName;
                 that.ta.deactivate();
                 x$('.typeAheadTrigger').first().focus();
               });

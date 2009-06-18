@@ -26,7 +26,10 @@
 <head>
    <title>Alfresco Mobile &raquo; ${pageTitle}</title>
    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-   <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=0" />    
+   <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=0" />
+<#-- fullscreen -->
+	<meta name="apple-mobile-web-app-capable" content="yes" />   
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">	
 <!-- Shortcut Icons -->
    <link rel="shortcut icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" /> 
    <link rel="icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" />

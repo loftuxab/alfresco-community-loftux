@@ -11,9 +11,9 @@
          init : function init()
          {
            this.elements = [];
-           this.elements['Today'] = x$('ul#Today');
-           this.elements['All'] = x$('ul#All');
-           this.elements['Overdue'] = x$('ul#Overdue');
+           this.elements['Today'] = x$('#Today');
+           this.elements['All'] = x$('#All');
+           this.elements['Overdue'] = x$('#Overdue');
            this.data = {};
            var that = this;
            for (var filter in this.elements)
@@ -40,13 +40,24 @@
             this.data[filter] = {};
             this.data[filter].length = data.length;
             var elRef = this.elements[filter];
-
-            for (var i=0,len=data.length;i<len;i++)
+            if (data.length>0)
             {
-               var o = data[i];
-               var taskId = o.id.replace('$','-');
-               this.data[filter][taskId] = o;
-               elRef.html('bottom','<li><a id="'+taskId+'" href="#task" class="panelLink">' + o.description +'</a></li>');
+               for (var i=0,len=data.length;i<len;i++)
+               {
+                  var o = data[i];
+                  var taskId = o.id.replace('$','-');
+                  this.data[filter][taskId] = o;
+                  elRef.html('bottom','<li class="tasks"><a id="'+taskId+'" href="#task" class="panelLink">' + o.description +'</a></li>');
+               }  
+            }
+            else {
+               //remove ul and add no content element
+               var p = document.createElement('p');
+               p.id = elRef.first().id;
+               p.className='noContent';
+               p.innerHTML = 'No Tasks available';
+               elRef.first().parentNode.appendChild(p);
+               elRef.first().parentNode.removeChild(elRef.first());               
             }
          },
          getTask : function getTask(taskId,filter)
@@ -205,13 +216,13 @@
             var dueDateFormatted = (this.getDate(this.task.dueDate).getFullYear()===9999) ? 'No due date specified' : this.task.dueDate.split(' ')[0];
             var contentHTML = '<ul class="rr info">'+
             '    <li>'+this.task.description+'</li>'+
-            '    <li>'+dueDateFormatted+'</li>'+
+            '    <li class="taskEvent">'+dueDateFormatted+'</li>'+
             '</ul>';
             if (this.task.resources && this.task.resources.length>0)
             {
                var resource = this.task.resources[0];
                contentHTML+='<ul class="rr details">'+
-               '    <li><a href="'+Mobile.constants.PROXY_URI+'api/node/content/'+ resource.nodeRef.replace(':/','')+'">'+ resource.displayName+'</a></li>'+
+               '    <li class="taskDoc"><a href="'+Mobile.constants.PROXY_URI+'api/node/content/'+ resource.nodeRef.replace(':/','')+'">'+ resource.displayName+'</a></li>'+
                '</ul>';
             };
             contentHTML += '<form action="tasks.html" id="taskForm">'+
@@ -221,7 +232,9 @@
             for (var i = 0,len = this.task.transitions.length;i<len;i++)
             {
                var trans = this.task.transitions[i];
-               contentHTML += '<input type="submit" value="' + trans.label + '" id="' + trans.id + '" name="' + trans.id + '" class="button">';
+               //assign correct class name; assumption here is that action button is always first (ie left).
+               var className = (i==0) ? 'button actionBut' : 'button';
+               contentHTML += '<input type="submit" value="' + trans.label + '" id="' + trans.id + '" name="' + trans.id + '" class="' + className + '">';
             }
             contentHTML += '  </div></form>';
 
