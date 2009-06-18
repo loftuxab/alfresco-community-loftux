@@ -65,7 +65,8 @@
       
       // Initialise prototype properties
       this.widgets = {};
-      this.periodDefinitions = {};
+      this.periodDefinitionsByType = {};
+      this.periodDefinitionsByLabel = {};
 
       return this;
    };
@@ -127,10 +128,18 @@
       /**
        * Object containing all period definitions keyed by period type.
        * 
-       * @property periodDefinitions
+       * @property periodDefinitionsByType
        * @type object
        */
-      periodDefinitions: null,
+      periodDefinitionsByType: null,
+      
+      /**
+       * Object containing all period definitions keyed by period label.
+       * 
+       * @property periodDefinitionsByLabel
+       * @type object
+       */
+      periodDefinitionsByLabel: null,
 
       /**
        * Set multiple initialization options at once.
@@ -180,8 +189,20 @@
          // create the period definition data structure
          for (var p = 0; p < this.options.data.length; p++)
          {
-            this.periodDefinitions[this.options.data[p].type] = this.options.data[p];
+            this.periodDefinitionsByType[this.options.data[p].type] = this.options.data[p];
+            this.periodDefinitionsByLabel[this.options.data[p].label] = this.options.data[p];
          }
+         
+         // add a 'Not Set' option
+         var notSetOption = 
+         {
+            type: "",
+            label: this._msg("form.notset"),
+            hasExpression: false
+         }
+         
+         this.periodDefinitionsByType[notSetOption.type] = notSetOption;
+         this.periodDefinitionsByLabel[notSetOption.label] = notSetOption;
          
          // split the current value into it's parts
          var parts = this.options.currentValue.split("|");
@@ -194,7 +215,7 @@
          }
          
          // get the period definition for the current value
-         var periodDef = this.periodDefinitions[periodType];
+         var periodDef = this.periodDefinitionsByType[periodType];
          
          if (this.options.disabled)
          {
@@ -224,20 +245,21 @@
          }
          else
          {
-            // populate the drop down list with period options
-            var periodOptions = "<option value=\"\"";
-            if (periodType === "")
+            // sort the period options in display label order
+            var sortedOptions = [];
+            for (var x in this.periodDefinitionsByType)
             {
-               periodOptions += " selected=\"selected\"";
+               sortedOptions.push(this.periodDefinitionsByType[x].label);
             }
-            periodOptions += ">";
-            periodOptions += this._msg("form.notset");
-            periodOptions += "</option>";
-            
+            sortedOptions.sort();
+
+            // populate the drop down list with period options
+            // using the sorted array of labels
             var def = null;
-            for (var p = 0; p < this.options.data.length; p++)
+            var periodOptions = "";
+            for (var p = 0; p < sortedOptions.length; p++)
             {
-               def = this.options.data[p];
+               def = this.periodDefinitionsByLabel[sortedOptions[p]];
                periodOptions += "<option value=\"";
                periodOptions += def.type;
                periodOptions += "\"";
@@ -253,7 +275,6 @@
             Dom.get(this.id + "-type").innerHTML = periodOptions;
             
             // populate the expression field with the current value
-            // or hide it completely if there isn't an expression
             if (periodDef !== undefined && periodDef.hasExpression)
             {
                Dom.get(this.id + "-expression").value = expression;
@@ -291,7 +312,7 @@
          }
          else
          {
-            var periodDef = this.periodDefinitions[type];
+            var periodDef = this.periodDefinitionsByType[type];
             if (periodDef.hasExpression)
             {
                if (expression === "")
