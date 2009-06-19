@@ -38,7 +38,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
+import org.alfresco.web.sharepoint.auth.SiteMemberMappingException;
 import org.alfresco.module.vti.handler.MethodHandler;
 import org.alfresco.module.vti.handler.VtiHandlerException;
 import org.alfresco.module.vti.handler.alfresco.VtiPathHelper;
@@ -133,9 +133,9 @@ public class VtiFilter implements Filter
             {
                 user = authenticationHandler.authenticateRequest(httpRequest, httpResponse, alfrescoContext);
             }
-            catch (VtiHandlerException e)
+            catch (SiteMemberMappingException e)
             {
-                if (e.getMessage().equals(VtiHandlerException.DOESNOT_EXIST))
+                if (e.getMessage().contains(VtiHandlerException.DOESNOT_EXIST))
                 {
                     httpResponse.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     httpResponse.getOutputStream().close();
