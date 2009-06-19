@@ -42,4 +42,19 @@ public class EqualsHelper
     {
         return (left == right) || (left != null && right != null && left.equals(right));
     }
+	/**
+	 * Performs an case-sensitive or case-insensitive equality check after checking for null values
+	 * @param ignoreCase           <tt>true</tt> to ignore case
+	 */
+    public static boolean nullSafeEquals(String left, String right, boolean ignoreCase)
+    {
+        if (ignoreCase)
+        {
+            return (left == right) || (left != null && right != null && left.equalsIgnoreCase(right));
+        }
+        else
+        {
+            return (left == right) || (left != null && right != null && left.equals(right));
+        }
+    }
 }
