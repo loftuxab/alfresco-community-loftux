@@ -44,10 +44,8 @@ namespace AlfrescoExcel2003
            this.label1 = new System.Windows.Forms.Label();
            this.label6 = new System.Windows.Forms.Label();
            this.grpDetails = new System.Windows.Forms.GroupBox();
+           this.chkUseCIFS = new System.Windows.Forms.CheckBox();
            this.txtCIFSServer = new System.Windows.Forms.TextBox();
-           this.label5 = new System.Windows.Forms.Label();
-           this.txtWebDAVURL = new System.Windows.Forms.TextBox();
-           this.label4 = new System.Windows.Forms.Label();
            this.txtWebClientURL = new System.Windows.Forms.TextBox();
            this.label3 = new System.Windows.Forms.Label();
            this.pnlWebBrowser = new System.Windows.Forms.Panel();
@@ -108,7 +106,7 @@ namespace AlfrescoExcel2003
            this.grpConfiguration.Controls.Add(this.grpDetails);
            this.grpConfiguration.Location = new System.Drawing.Point(0, 150);
            this.grpConfiguration.Name = "grpConfiguration";
-           this.grpConfiguration.Size = new System.Drawing.Size(292, 474);
+           this.grpConfiguration.Size = new System.Drawing.Size(292, 504);
            this.grpConfiguration.TabIndex = 2;
            this.grpConfiguration.TabStop = false;
            this.grpConfiguration.Text = "Configuration";
@@ -116,9 +114,9 @@ namespace AlfrescoExcel2003
            // btnDetailsOK
            // 
            this.btnDetailsOK.BackColor = System.Drawing.SystemColors.ButtonFace;
-           this.btnDetailsOK.Location = new System.Drawing.Point(98, 440);
+           this.btnDetailsOK.Location = new System.Drawing.Point(98, 467);
            this.btnDetailsOK.Name = "btnDetailsOK";
-           this.btnDetailsOK.Size = new System.Drawing.Size(100, 23);
+           this.btnDetailsOK.Size = new System.Drawing.Size(100, 28);
            this.btnDetailsOK.TabIndex = 8;
            this.btnDetailsOK.Text = "Save Settings";
            this.btnDetailsOK.UseVisualStyleBackColor = false;
@@ -127,9 +125,9 @@ namespace AlfrescoExcel2003
            // btnDetailsCancel
            // 
            this.btnDetailsCancel.BackColor = System.Drawing.SystemColors.ButtonFace;
-           this.btnDetailsCancel.Location = new System.Drawing.Point(204, 440);
+           this.btnDetailsCancel.Location = new System.Drawing.Point(204, 467);
            this.btnDetailsCancel.Name = "btnDetailsCancel";
-           this.btnDetailsCancel.Size = new System.Drawing.Size(75, 23);
+           this.btnDetailsCancel.Size = new System.Drawing.Size(75, 28);
            this.btnDetailsCancel.TabIndex = 7;
            this.btnDetailsCancel.Text = "Reset";
            this.btnDetailsCancel.UseVisualStyleBackColor = false;
@@ -142,7 +140,7 @@ namespace AlfrescoExcel2003
            this.grpAuthentication.Controls.Add(this.label8);
            this.grpAuthentication.Controls.Add(this.txtUsername);
            this.grpAuthentication.Controls.Add(this.label1);
-           this.grpAuthentication.Location = new System.Drawing.Point(12, 281);
+           this.grpAuthentication.Location = new System.Drawing.Point(12, 273);
            this.grpAuthentication.Name = "grpAuthentication";
            this.grpAuthentication.Size = new System.Drawing.Size(267, 153);
            this.grpAuthentication.TabIndex = 6;
@@ -206,60 +204,39 @@ namespace AlfrescoExcel2003
            // 
            // grpDetails
            // 
+           this.grpDetails.Controls.Add(this.chkUseCIFS);
            this.grpDetails.Controls.Add(this.txtCIFSServer);
-           this.grpDetails.Controls.Add(this.label5);
-           this.grpDetails.Controls.Add(this.txtWebDAVURL);
-           this.grpDetails.Controls.Add(this.label4);
            this.grpDetails.Controls.Add(this.txtWebClientURL);
            this.grpDetails.Controls.Add(this.label3);
            this.grpDetails.Location = new System.Drawing.Point(12, 110);
            this.grpDetails.Name = "grpDetails";
-           this.grpDetails.Size = new System.Drawing.Size(267, 165);
+           this.grpDetails.Size = new System.Drawing.Size(267, 146);
            this.grpDetails.TabIndex = 4;
            this.grpDetails.TabStop = false;
            this.grpDetails.Text = "Location";
+           // 
+           // chkUseCIFS
+           // 
+           this.chkUseCIFS.AutoSize = true;
+           this.chkUseCIFS.Location = new System.Drawing.Point(9, 75);
+           this.chkUseCIFS.Name = "chkUseCIFS";
+           this.chkUseCIFS.Size = new System.Drawing.Size(131, 17);
+           this.chkUseCIFS.TabIndex = 11;
+           this.chkUseCIFS.Text = "Use CIFS Connection:";
+           this.chkUseCIFS.UseVisualStyleBackColor = true;
+           this.chkUseCIFS.CheckedChanged += new System.EventHandler(this.chkUseCIFS_CheckedChanged);
            // 
            // txtCIFSServer
            // 
            this.txtCIFSServer.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
            this.txtCIFSServer.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-           this.txtCIFSServer.Location = new System.Drawing.Point(9, 125);
+           this.txtCIFSServer.Location = new System.Drawing.Point(29, 98);
            this.txtCIFSServer.Name = "txtCIFSServer";
-           this.txtCIFSServer.Size = new System.Drawing.Size(251, 20);
+           this.txtCIFSServer.Size = new System.Drawing.Size(231, 20);
            this.txtCIFSServer.TabIndex = 9;
            this.tipOptional.SetToolTip(this.txtCIFSServer, "The UNC path, or mapped drive, to the Alfresco CIFS server.\r\ne.g. \\\\myserver_a\\al" +
                    "fresco\\");
            this.txtCIFSServer.TextChanged += new System.EventHandler(this.txtCIFSServer_TextChanged);
-           // 
-           // label5
-           // 
-           this.label5.AutoSize = true;
-           this.label5.Location = new System.Drawing.Point(6, 109);
-           this.label5.Name = "label5";
-           this.label5.Size = new System.Drawing.Size(67, 13);
-           this.label5.TabIndex = 8;
-           this.label5.Text = "CIFS Server:";
-           // 
-           // txtWebDAVURL
-           // 
-           this.txtWebDAVURL.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-           this.txtWebDAVURL.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-           this.txtWebDAVURL.Location = new System.Drawing.Point(9, 81);
-           this.txtWebDAVURL.Name = "txtWebDAVURL";
-           this.txtWebDAVURL.Size = new System.Drawing.Size(251, 20);
-           this.txtWebDAVURL.TabIndex = 7;
-           this.tipMandatory.SetToolTip(this.txtWebDAVURL, "The URL for the Alfresco Web Client.\r\ne.g. http://myserver:8080/alfresco/webdav/\r" +
-                   "\n");
-           this.txtWebDAVURL.TextChanged += new System.EventHandler(this.txtWebDAVURL_TextChanged);
-           // 
-           // label4
-           // 
-           this.label4.AutoSize = true;
-           this.label4.Location = new System.Drawing.Point(6, 65);
-           this.label4.Name = "label4";
-           this.label4.Size = new System.Drawing.Size(80, 13);
-           this.label4.TabIndex = 6;
-           this.label4.Text = "WebDAV URL:";
            // 
            // txtWebClientURL
            // 
@@ -313,7 +290,6 @@ namespace AlfrescoExcel2003
            this.webBrowser.ScrollBarsEnabled = false;
            this.webBrowser.Size = new System.Drawing.Size(292, 654);
            this.webBrowser.TabIndex = 1;
-           this.webBrowser.WebBrowserShortcutsEnabled = false;
            this.webBrowser.Navigated += new System.Windows.Forms.WebBrowserNavigatedEventHandler(this.webBrowser_Navigated);
            // 
            // tipGeneral
@@ -342,8 +318,8 @@ namespace AlfrescoExcel2003
            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
            this.ClientSize = new System.Drawing.Size(292, 686);
-           this.Controls.Add(this.pnlWebBrowser);
            this.Controls.Add(this.pnlConfiguration);
+           this.Controls.Add(this.pnlWebBrowser);
            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
            this.MaximizeBox = false;
@@ -372,9 +348,6 @@ namespace AlfrescoExcel2003
        private System.Windows.Forms.Label label6;
        private System.Windows.Forms.GroupBox grpDetails;
        private System.Windows.Forms.TextBox txtCIFSServer;
-       private System.Windows.Forms.Label label5;
-       private System.Windows.Forms.TextBox txtWebDAVURL;
-       private System.Windows.Forms.Label label4;
        private System.Windows.Forms.TextBox txtWebClientURL;
        private System.Windows.Forms.Label label3;
        private System.Windows.Forms.Label label7;
@@ -393,5 +366,6 @@ namespace AlfrescoExcel2003
        private System.Windows.Forms.Panel pnlWebBrowser;
        private System.Windows.Forms.LinkLabel lnkShowConfiguration;
        private System.Windows.Forms.WebBrowser webBrowser;
+       private System.Windows.Forms.CheckBox chkUseCIFS;
     }
 }

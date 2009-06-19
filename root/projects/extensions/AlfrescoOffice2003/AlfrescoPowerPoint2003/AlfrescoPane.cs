@@ -29,6 +29,7 @@ namespace AlfrescoPowerPoint2003
       private bool m_LastWebPageSuccessful = true;
       private bool m_SuppressCloseEvent = false;
       private bool m_ClearSession = false;
+      private bool m_SupportsPptx = false;
 
       // Win32 SDK functions
       [DllImport("user32.dll")]
@@ -42,6 +43,7 @@ namespace AlfrescoPowerPoint2003
          set
          {
             m_PowerPointApplication = value;
+            m_SupportsPptx = (Convert.ToDecimal(m_PowerPointApplication.Version) > 11);
          }
       }
 
@@ -335,10 +337,14 @@ namespace AlfrescoPowerPoint2003
             // WebDAV or CIFS?
             string strFullPath = m_ServerDetails.getFullPath(relativePath, m_PowerPointApplication.ActivePresentation.FullName, true);
             string strExtn = Path.GetExtension(relativePath).ToLower();
+            string fileName = Path.GetFileName(relativePath);
+            string nativeExtn = ".ppt" + (m_SupportsPptx ? "x" : "");
 
             // If we're using WebDAV, then download file locally before inserting
             if (strFullPath.StartsWith("http"))
             {
+               // Need to unescape the the original path to get the filename
+               fileName = Path.GetFileName(Uri.UnescapeDataString(relativePath));
                string strTempFile = Path.GetTempFileName();
                WebClient fileReader = new WebClient();
                string url = m_ServerDetails.WebClientURL + "download/direct/" + nodeRef.Replace(":/", "") + "/" + Path.GetFileName(relativePath);
@@ -365,7 +371,7 @@ namespace AlfrescoPowerPoint2003
             PowerPoint.Shapes shapes = currentSlide.Shapes;
 
             // Is another PowerPoint presentation being inserted?
-            if (".ppt".IndexOf(strExtn) != -1)
+            if (nativeExtn.IndexOf(strExtn) != -1)
             {
                // Load the presentation in a hidden state
                PowerPoint.Presentation insertPres = m_PowerPointApplication.Presentations.Open(
@@ -426,8 +432,8 @@ namespace AlfrescoPowerPoint2003
                   // Inserting a different file type - do it as an OLE object
                   string iconFilename = String.Empty;
                   int iconIndex = 0;
-                  string iconLabel = Path.GetFileName(strFullPath);
-                  string defaultIcon = Util.DefaultIcon(Path.GetExtension(strFullPath));
+                  string iconLabel = fileName;
+                  string defaultIcon = Util.DefaultIcon(strExtn);
                   if (defaultIcon.Contains(","))
                   {
                      string[] iconData = defaultIcon.Split(new char[] { ',' });
@@ -528,13 +534,16 @@ namespace AlfrescoPowerPoint2003
       /// Settings Management
       /// </summary>
       private bool m_SettingsChanged = false;
+      private string m_WebDAVURL = "";
 
       private void LoadSettings()
       {
          m_ServerDetails.LoadFromRegistry();
          txtWebClientURL.Text = m_ServerDetails.WebClientURL;
-         txtWebDAVURL.Text = m_ServerDetails.WebDAVURL;
+         m_WebDAVURL = m_ServerDetails.WebDAVURL;
          txtCIFSServer.Text = m_ServerDetails.CIFSServer;
+         chkUseCIFS.Checked = (m_ServerDetails.CIFSServer != "");
+         chkUseCIFS_CheckedChanged(null, null);
          if (m_ServerDetails.Username != "")
          {
             txtUsername.Text = m_ServerDetails.Username;
@@ -573,8 +582,8 @@ namespace AlfrescoPowerPoint2003
          if (m_SettingsChanged)
          {
             m_ServerDetails.WebClientURL = txtWebClientURL.Text;
-            m_ServerDetails.WebDAVURL = txtWebDAVURL.Text;
-            m_ServerDetails.CIFSServer = txtCIFSServer.Text;
+            m_ServerDetails.WebDAVURL = m_WebDAVURL;
+            m_ServerDetails.CIFSServer = chkUseCIFS.Checked ? txtCIFSServer.Text : "";
             if (chkRememberAuth.Checked)
             {
                m_ServerDetails.Username = txtUsername.Text;
@@ -601,8 +610,8 @@ namespace AlfrescoPowerPoint2003
       private void txtWebClientURL_TextChanged(object sender, EventArgs e)
       {
          m_SettingsChanged = true;
-         
-         // Build autocomplete string for the WebDAV textbox
+
+         // Build WebDAV URL
          try
          {
             string strWebDAV = txtWebClientURL.Text;
@@ -610,9 +619,7 @@ namespace AlfrescoPowerPoint2003
             {
                strWebDAV += "/";
             }
-            strWebDAV += "webdav/";
-            txtWebDAVURL.AutoCompleteCustomSource.Clear();
-            txtWebDAVURL.AutoCompleteCustomSource.Add(strWebDAV);
+            m_WebDAVURL = strWebDAV + "webdav/";
          }
          catch
          {
@@ -622,7 +629,7 @@ namespace AlfrescoPowerPoint2003
          try
          {
             Uri clientUri = new Uri(txtWebClientURL.Text);
-            string strCIFS = "\\\\" + clientUri.Host + "_a\\alfresco\\";
+            string strCIFS = "\\\\" + clientUri.Host + "a\\alfresco\\";
             txtCIFSServer.AutoCompleteCustomSource.Clear();
             txtCIFSServer.AutoCompleteCustomSource.Add(strCIFS);
          }
@@ -631,9 +638,10 @@ namespace AlfrescoPowerPoint2003
          }
       }
 
-      private void txtWebDAVURL_TextChanged(object sender, EventArgs e)
+      private void chkUseCIFS_CheckedChanged(object sender, EventArgs e)
       {
          m_SettingsChanged = true;
+         txtCIFSServer.Enabled = chkUseCIFS.Checked;
       }
 
       private void txtCIFSServer_TextChanged(object sender, EventArgs e)
@@ -683,6 +691,5 @@ namespace AlfrescoPowerPoint2003
             }
          }
       }
-
    }
 }
