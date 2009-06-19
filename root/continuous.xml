@@ -310,15 +310,17 @@
                                alf_stop.bat,
                                apply_amps.bat,
                                README.txt" />
-         <zipfileset dir="${dir.project.installer}/install_extension"
-                     prefix="install_extension" />
          <zipfileset dir="${dir.project.installer}"
                      includes="licenses/**,amps/**" />
-         <zipfileset dir="${dir.project.installer.extras}" 
+         <zipfileset dir="${dir.project.installer.extras}"
                      prefix="extras"
                      excludes="**/*.sh" />
          <zipfileset dir="${dir.project.installer.binwin}"
                      prefix="bin" />
+         <zipfileset dir="${dir.name.binaries.installer.win32}/mysql"
+                     prefix="mysql" />
+         <zipfileset dir="${dir.project.installer.windows}/alf_data"
+                     prefix="alf_data" />
          <zipfileset dir="${dir.name.binaries.installer.win32}"
                      prefix="bin"
                      includes="pdf2swf.exe" />
@@ -347,8 +349,6 @@
                      prefix="tomcat/bin"
                      includes="*.sh" 
                      mode="755" />
-         <tarfileset dir="${dir.project.installer}"
-                     includes="install_extension/**" />
          <tarfileset dir="${dir.project.installer}"
                      includes="licenses/**,amps/**" />
          <tarfileset dir="${dir.project.installer.linux}"
@@ -450,11 +450,13 @@
             file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
 
       <!-- Copy any required common libs -->
-      <copy todir="${dir.continuous.assemble.tomcat}/lib" 
+      <copy todir="${dir.continuous.assemble.tomcat}/lib"
             file="${dir.project.3rdparty.lib}/commons/commons-el.jar" />
-      
+      <copy todir="${dir.continuous.assemble.tomcat}/lib"
+            file="${dir.project.3rdparty.lib}/devenv/${file.name.jar.mysql.connector}" />
+
       <!-- Add shared loader to Tomcat 6-->
-      <replace file="${dir.continuous.assemble.tomcat}/conf/catalina.properties" 
+      <replace file="${dir.continuous.assemble.tomcat}/conf/catalina.properties"
          token="shared.loader=" 
          value="shared.loader=${catalina.base}/shared/classes,${catalina.base}/shared/lib/*.jar" />
       
@@ -462,6 +464,8 @@
       <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension">
          <fileset dir="${dir.project.repository.config}/alfresco/extension" />
          <fileset dir="${dir.project.webclient.config}/alfresco/extension" />
+      </copy>
+      <copy todir="${dir.continuous.assemble.tomcat}/shared/classes">
          <fileset dir="${dir.project.installer.extension}" />
       </copy>
       <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/web-extension">

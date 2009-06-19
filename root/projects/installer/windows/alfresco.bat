@@ -31,7 +31,17 @@ rem ---------------------------------------
 rem Start Components
 rem ---------------------------------------
 
-if not ""%1"" == ""start"" goto nostart
+if not ""%1"" == ""start"" goto stop
+
+rem ---------------------------------------
+rem Start MySQL
+rem ---------------------------------------
+echo Starting MySQL...
+start "MySQL" "%ALF_HOME%mysql\bin\mysqld" --defaults-file="%ALF_HOME%mysql\my.ini" --basedir="%ALF_HOME%mysql" --datadir="%ALF_HOME%alf_data\mysql" --console
+
+rem Uncomment below to pause for 5 seconds before starting Tomcat
+rem Change 5000 to 1000 x the number of seconds delay required
+rem ping 1.0.0.0 -n 1 -w 5000 >NUL
 
 rem ---------------------------------------
 rem Start Tomcat
@@ -45,8 +55,9 @@ rem Start Virtualization if available
 rem ---------------------------------
 rem if exist "~dp0virtual_start.bat" call "~dp0virtual_start.bat" 
 
-goto nostop
-:nostart
+goto end
+
+:stop
 
 rem ---------------------------------------
 rem Stop Components
@@ -57,10 +68,16 @@ if not ""%1"" == ""stop"" goto nostop
 echo Shutting down Tomcat...
 call "%CATALINA_HOME%\bin\shutdown.bat" 
 
+set /P pause="Please wait until Tomcat has shut down, then press ENTER to continue..."
+
+echo Stopping MySQL...
+call "%ALF_HOME%mysql\bin\mysqladmin" -u root shutdown
+
 rem if exist "virtual_start.bat" call virtual_stop.bat 
 
-:nostop
-exit
+goto end
 
 :error
-pause
+set /P pause="Press ENTER to continue..."
+
+:end

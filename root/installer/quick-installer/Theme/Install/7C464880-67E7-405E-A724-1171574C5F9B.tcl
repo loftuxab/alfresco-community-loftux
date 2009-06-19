@@ -1,4 +1,4 @@
-proc CreateWindow.3D88EE52-1868-4E40-8C75-4A27EF566021 {wizard id} {
+proc CreateWindow.7C464880-67E7-405E-A724-1171574C5F9B {wizard id} {
    
     
     set base  [$wizard widget get $id]
@@ -42,7 +42,7 @@ proc CreateWindow.3D88EE52-1868-4E40-8C75-4A27EF566021 {wizard id} {
     ttk::label $base.clientarea.label4 -text "Port:" -justify right
     grid $base.clientarea.label4 -row 0 -column 0 -sticky e
     
-    ttk::entry $base.clientarea.entry4 -textvariable ::info(DB_PORT)
+    ttk::entry $base.clientarea.entry4 -textvariable ::info(ALF_TOMCATPORT)
     grid $base.clientarea.entry4 -row 0 -column 1  -sticky e
     
     Label $base.message -anchor nw -justify left -autowrap 1  -textvariable [$wizard variable $id -text4]
