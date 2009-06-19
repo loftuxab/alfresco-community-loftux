@@ -79,7 +79,6 @@
 
       YAHOO.extend(SearchPanelHandler, Alfresco.ConsolePanelHandler,
       {
-
          /**
           * INSTANCE VARIABLES
           */
@@ -121,7 +120,7 @@
             // ColumnBrowser
             this.widgets.columnbrowser = new YAHOO.extension.ColumnBrowser(parent.id + "-columnbrowser",
             {
-               url: Alfresco.constants.PROXY_URI + "/api/rootgroups",
+               url: Alfresco.constants.PROXY_URI + "/api/rootgroups?includeInternal=false",
                numVisible: 3,
                columnInfoBuilder:
                {
@@ -146,9 +145,8 @@
             var closeSearchButton = new YAHOO.widget.Button(parent.id + "-closesearch-button", {});
             closeSearchButton.on("click", this.onCloseSearchClick, closeSearchButton, this);
 
-                        
             // DataTable and DataSource setup
-            this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups");
+            this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups?includeInternal=false");
             this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
             this.widgets.dataSource.responseSchema =
             {
@@ -396,7 +394,6 @@
                // Delete the group form the repository
                this._deleteGroup(obj.shortName, obj.displayName);
             }
-
          },
 
          /**
@@ -1697,10 +1694,10 @@
                Dom.setStyle(parent.id + "-update-main", "visibility", "visible");
             };
 
-            // make an ajax call to get user details
+            // make an ajax call to get group details
             Alfresco.util.Ajax.jsonGet(
             {
-               url: Alfresco.constants.PROXY_URI + "api/groups/" + parent.group+ "",
+               url: Alfresco.constants.PROXY_URI + "api/groups/" + parent.group,
                successCallback:
                {
                   fn: success,
@@ -1886,7 +1883,7 @@
        * @param e {object} DomEvent
        * @param args {array} Event parameters (depends on event type)
        */
-      onStateChanged: function ConsoleUsers_onStateChanged(e, args)
+      onStateChanged: function ConsoleGroups_onStateChanged(e, args)
       {
          // Clear old states
          this.query = undefined;
@@ -1936,7 +1933,7 @@
        * @param e {object} DomEvent
        * @param args {array} Event parameters (depends on event type)
        */
-      onNewGroup: function ConsoleUsers_onNewGroup(e, args)
+      onNewGroup: function ConsoleGroups_onNewGroup(e, args)
       {
          var parentGroup = args[1].group;
          this.refreshUIState({"panel": "create", "group": parentGroup});
@@ -2003,7 +2000,6 @@
          return state;
       },
 
-
       /**
        * Helper method for getting the parent groups for group with identifier shortName
        *
@@ -2052,7 +2048,6 @@
          });
       },
 
-
       /**
        * Gets a custom message
        *
@@ -2065,7 +2060,5 @@
       {
          return Alfresco.util.message.call(this, messageId, "Alfresco.ConsoleGroups", Array.prototype.slice.call(arguments).slice(1));
       }
-
    });
-
 })();
