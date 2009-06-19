@@ -100,7 +100,7 @@ public class DefaultAuthenticationHandler implements AuthenticationHandler, Site
 
         String targetUri = uri.startsWith(alfrescoContext) ? uri.substring(alfrescoContext.length()) : uri;
 
-        if (targetUri.startsWith("/_vti_inf.html") || targetUri.startsWith("/_vti_bin/") || targetUri.startsWith("/resources/"))
+        if (targetUri.equals("") || targetUri.startsWith("/_vti_inf.html") || targetUri.startsWith("/_vti_bin/") || targetUri.startsWith("/resources/"))
             return true;
 
         String dwsName = null;
