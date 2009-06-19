@@ -29,6 +29,7 @@ namespace AlfrescoExcel2003
       private bool m_LastWebPageSuccessful = true;
       private bool m_ClearSession = false;
       private bool m_SuppressAppEvents = false;
+      private bool m_SupportsXlsx = false;
 
       // Win32 SDK functions
       [DllImport("user32.dll")]
@@ -42,6 +43,7 @@ namespace AlfrescoExcel2003
          set
          {
             m_ExcelApplication = value;
+            m_SupportsXlsx = (Convert.ToDecimal(m_ExcelApplication.Version) > 11);
          }
       }
 
@@ -343,10 +345,14 @@ namespace AlfrescoExcel2003
             // WebDAV or CIFS?
             string strFullPath = m_ServerDetails.getFullPath(relativePath, m_ExcelApplication.ActiveWorkbook.FullName, true);
             string strExtn = Path.GetExtension(relativePath).ToLower();
+            string fileName = Path.GetFileName(relativePath);
+            string nativeExtn = ".xls" + (m_SupportsXlsx ? "x" : "");
 
             // If we're using WebDAV, then download file locally before inserting
             if (strFullPath.StartsWith("http"))
             {
+               // Need to unescape the the original path to get the filename
+               fileName = Path.GetFileName(Uri.UnescapeDataString(relativePath));
                string strTempFile = Path.GetTempFileName();
                WebClient fileReader = new WebClient();
                string url = m_ServerDetails.WebClientURL + "download/direct/" + nodeRef.Replace(":/", "") + "/" + Path.GetFileName(relativePath);
@@ -370,7 +376,7 @@ namespace AlfrescoExcel2003
                picture.ScaleWidth(1, Microsoft.Office.Core.MsoTriState.msoTrue, missingValue);
                picture.ScaleHeight(1, Microsoft.Office.Core.MsoTriState.msoTrue, missingValue);
             }
-            else if (".xls".IndexOf(strExtn) != -1)
+            else if (nativeExtn.IndexOf(strExtn) != -1)
             {
                // Workaround for KB210684 if clean, new workbook currently open
                if (!docHasExtension() && m_ExcelApplication.ActiveWorkbook.Saved)
@@ -418,8 +424,8 @@ namespace AlfrescoExcel2003
             {
                object iconFilename = Type.Missing;
                object iconIndex = Type.Missing;
-               object iconLabel = Path.GetFileName(strFullPath);
-               string defaultIcon = Util.DefaultIcon(Path.GetExtension(strFullPath));
+               object iconLabel = fileName;
+               string defaultIcon = Util.DefaultIcon(strExtn);
                if (defaultIcon.Contains(","))
                {
                   string[] iconData = defaultIcon.Split(new char[] { ',' });
@@ -522,13 +528,16 @@ namespace AlfrescoExcel2003
       /// Settings Management
       /// </summary>
       private bool m_SettingsChanged = false;
+      private string m_WebDAVURL = "";
 
       private void LoadSettings()
       {
          m_ServerDetails.LoadFromRegistry();
          txtWebClientURL.Text = m_ServerDetails.WebClientURL;
-         txtWebDAVURL.Text = m_ServerDetails.WebDAVURL;
+         m_WebDAVURL = m_ServerDetails.WebDAVURL;
          txtCIFSServer.Text = m_ServerDetails.CIFSServer;
+         chkUseCIFS.Checked = (m_ServerDetails.CIFSServer != "");
+         chkUseCIFS_CheckedChanged(null, null);
          if (m_ServerDetails.Username != "")
          {
             txtUsername.Text = m_ServerDetails.Username;
@@ -567,8 +576,8 @@ namespace AlfrescoExcel2003
          if (m_SettingsChanged)
          {
             m_ServerDetails.WebClientURL = txtWebClientURL.Text;
-            m_ServerDetails.WebDAVURL = txtWebDAVURL.Text;
-            m_ServerDetails.CIFSServer = txtCIFSServer.Text;
+            m_ServerDetails.WebDAVURL = m_WebDAVURL;
+            m_ServerDetails.CIFSServer = chkUseCIFS.Checked ? txtCIFSServer.Text : "";
             if (chkRememberAuth.Checked)
             {
                m_ServerDetails.Username = txtUsername.Text;
@@ -595,8 +604,8 @@ namespace AlfrescoExcel2003
       private void txtWebClientURL_TextChanged(object sender, EventArgs e)
       {
          m_SettingsChanged = true;
-         
-         // Build autocomplete string for the WebDAV textbox
+
+         // Build WebDAV URL
          try
          {
             string strWebDAV = txtWebClientURL.Text;
@@ -604,9 +613,7 @@ namespace AlfrescoExcel2003
             {
                strWebDAV += "/";
             }
-            strWebDAV += "webdav/";
-            txtWebDAVURL.AutoCompleteCustomSource.Clear();
-            txtWebDAVURL.AutoCompleteCustomSource.Add(strWebDAV);
+            m_WebDAVURL = strWebDAV + "webdav/";
          }
          catch
          {
@@ -616,7 +623,7 @@ namespace AlfrescoExcel2003
          try
          {
             Uri clientUri = new Uri(txtWebClientURL.Text);
-            string strCIFS = "\\\\" + clientUri.Host + "_a\\alfresco\\";
+            string strCIFS = "\\\\" + clientUri.Host + "a\\alfresco\\";
             txtCIFSServer.AutoCompleteCustomSource.Clear();
             txtCIFSServer.AutoCompleteCustomSource.Add(strCIFS);
          }
@@ -625,9 +632,10 @@ namespace AlfrescoExcel2003
          }
       }
 
-      private void txtWebDAVURL_TextChanged(object sender, EventArgs e)
+      private void chkUseCIFS_CheckedChanged(object sender, EventArgs e)
       {
          m_SettingsChanged = true;
+         txtCIFSServer.Enabled = chkUseCIFS.Checked;
       }
 
       private void txtCIFSServer_TextChanged(object sender, EventArgs e)
@@ -677,6 +685,5 @@ namespace AlfrescoExcel2003
             }
          }
       }
-
    }
 }
