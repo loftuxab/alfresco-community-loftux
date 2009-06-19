@@ -13,7 +13,7 @@ Index: src/com/ibatis/sqlmap/engine/execution/SqlExecutor.java
  import com.ibatis.sqlmap.engine.scope.ErrorContext;
  import com.ibatis.sqlmap.engine.scope.StatementScope;
  import com.ibatis.sqlmap.engine.scope.SessionScope;
-@@ -71,13 +73,51 @@
+@@ -71,13 +73,55 @@
      setupResultObjectFactory(statementScope);
      int rows = 0;
      try {
@@ -22,10 +22,14 @@ Index: src/com/ibatis/sqlmap/engine/execution/SqlExecutor.java
 +      if (mappedStatement instanceof InsertStatement)
 +      {
 +        InsertStatement insertStmt = (InsertStatement) mappedStatement;
-+        String generatedKeyColumn = insertStmt.getSelectKeyStatement().getGeneratedKeyColumn();
-+        if (generatedKeyColumn != null)
++        SelectKeyStatement selectKeyStmt = insertStmt.getSelectKeyStatement();
++        if (selectKeyStmt != null)
 +        {
-+          keyColumns = new String[] {generatedKeyColumn};
++          String generatedKeyColumn = selectKeyStmt.getGeneratedKeyColumn();
++          if (generatedKeyColumn != null)
++          {
++            keyColumns = new String[] {generatedKeyColumn};
++          }
 +        }
 +      }
 +      
@@ -66,7 +70,7 @@ Index: src/com/ibatis/sqlmap/engine/execution/SqlExecutor.java
        rows = ps.getUpdateCount();
      } finally {
        closeStatement(statementScope.getSession(), ps);
-@@ -500,6 +540,21 @@
+@@ -500,6 +544,21 @@
      }
    }
  

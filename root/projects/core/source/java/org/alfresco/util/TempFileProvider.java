@@ -77,12 +77,6 @@ public class TempFileProvider
     public static File getTempDir()
     {
         File systemTempDir = getSystemTempDir();
-//        if (!systemTempDir.isDirectory())
-//        {
-//            throw new AlfrescoRuntimeException("System property does not point to a directory: \n" +
-//                    "   property: " + SYSTEM_KEY_TEMP_DIR + "\n" +
-//                    "   value: " + systemTempDirPath);
-//        }
         // append the Alfresco directory
         File tempDir = new File(systemTempDir, ALFRESCO_TEMP_FILE_DIR);
         // ensure that the temp directory exists
