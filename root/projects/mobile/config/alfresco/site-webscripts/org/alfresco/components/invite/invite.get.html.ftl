@@ -11,8 +11,8 @@
             <div class="tabcontent">
               <div id="ShareUser" class="active">
                 <form action="${url.context}/p/home" method="post">
-                  <label for="name">${msg('label.name')}:</label>
-                  <input type="text" id="name" name="name" value="" class="typeAhead"/>
+                  <label for="name" class="typeAheadLabel">${msg('label.name')}:</label>
+                  <input type="text" value="" id="name" class="typeAhead display"/>
                   <label for="role">${msg('label.role')}:</label>
                     <select name="role" id="role" size="1" class="typeAheadTrigger">
                       <option value="SiteManager">${msg('label.manager')}</option>
@@ -45,6 +45,7 @@
 
                   <div>
                     <input type="hidden" value="${site}" name="site" /> 
+                    <input type="text" id="name" name="name" value="" class="typeAheadValue"/>
                     <input type="submit" value="${msg('label.invite')}" class="button actionBut"/>
                     <input type="button" value="${msg('label.cancel')}" class="button"/>
                   </div>

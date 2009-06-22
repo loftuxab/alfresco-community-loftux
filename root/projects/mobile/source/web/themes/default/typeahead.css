@@ -1,11 +1,15 @@
-.typeahead 
+.content form div.typeahead 
 {
-   position:absolute;
+/*   position:absolute;
    top:5em;
    left:0;
    width:100%;
+   height:480px;*/
+   position:relative;
+   top:0;
+   left:0;
    height:480px;
-   
+   margin:0 1em;
 }
 .landscape .typeahead
 {
@@ -28,10 +32,11 @@
 .typeahead .wrapper {
   position:relative;  /* needed */
   z-index:1;      /* needed and important */
-  height:208px;   /* needed */
+  height:120px;   /* needed */
   overflow:hidden;  /* suggested */
   border:1px solid black;
-  background-color:#fff;  
+  background-color:#fff;
+  margin:0;
 }
 
 .typeahead .scrollContent {
@@ -39,6 +44,7 @@
   padding:0;
   width:100%;
   padding-bottom:60px;
+  position:absolute;
 }
 
 .typeahead .scrollContent li {
@@ -65,8 +71,29 @@ text-decoration: none;
 }
 
 .typeahead #sw-cancel {
-   right:0.5em;
-   left:auto;
-   float:right;
-   top:10px;
+   position:absolute;
+   left:235px;
+   top:0;
+   margin:-33px 0 0 0;
+}
+
+.typeahead .searchField {
+   line-height:16px;
+   padding:0.5em;
+   margin-left:3em;
+   vertical-align:12%;
+}
+
+/*---*/
+
+
+.typeahead,
+.content form div.wrapper 
+{
+   width:225px;
+   text-align:left;
+}
+.activeTypeAhead .content form .typeAhead
+{
+   width:211px;
 }

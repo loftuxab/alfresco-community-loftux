@@ -5,7 +5,7 @@
       <div class="content">
         <ul id="My" class="e2e list hilite">
           <#list sites as site>
-          <li class="sites"><a id="${msg('label.inviteUser')}" href="#invite?site=${site.shortName}" class="panelLink">${site.shortName}</a></li>
+          <li class="sites"><a id="${msg('label.inviteUser')}" href="#invite?site=${site.shortName}" class="panelLink">${site.title}</a></li>
           </#list>
         </ul>
       </div>
