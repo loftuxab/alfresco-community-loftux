@@ -12,7 +12,7 @@
            <h2>${msg('label.description')}</h2>
            <textarea name="description" rows="4" cols="40"></textarea>
            <h2>${msg('label.user')}</h2>
-           <input type="text" value="" name="user" class="typeAhead"/>
+           <input type="text" value="" name="username" id="username" class="typeAhead display"/>
            <h2>${msg('label.dueDate')}</h2>
            <input name="datePicker" id="datePicker" value="${msg('label.pickDueDate')}" type="button" class="datepicker"/>
            <div>
@@ -21,6 +21,7 @@
            </div>
            <input type="hidden" name="nodeRef" value="${page.url.args.nodeRef}"/>
            <input type="hidden" name="site" value="${page.url.args.site}"/>
+           <input type="hidden" name="user" value="" id="user" class="typeAheadValue">
            <input type="hidden" name="date" value="" id="date">           
          </form>
     </div>

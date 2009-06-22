@@ -707,9 +707,9 @@ p.noContent
 }
 
 #Message span {
-   vertical-align:middle;
    height:1em;
-   margin:50% 0;
+   padding:13px;
+   display:block;
 }
 
 #taskForm .button {
