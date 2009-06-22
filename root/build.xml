@@ -267,6 +267,9 @@
          <exclude name="**/org/alfresco/repo/content/**/*Test.java" />
          <include name="**/org/alfresco/repo/content/ContentTestSuite.java" />
          <include name="**/org/alfresco/repo/content/metadata/xml/XmlMetadataExtracterTest.java" />
+         <!-- Domain Tests -->
+         <exclude name="**/org/alfresco/repo/domain/**/*Test.java" />
+         <include name="**/org/alfresco/repo/domain/DomainTestSuite.java" />
          <!-- Multilingual Tests -->
          <exclude name="**/org/alfresco/repo/model/ml/**/*Test.java" />
          <include name="**/org/alfresco/repo/model/ml/MultilingualTestSuite.java" />
