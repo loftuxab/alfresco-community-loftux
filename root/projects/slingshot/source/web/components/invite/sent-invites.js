@@ -218,7 +218,14 @@
                {
                   items = oFullResponse.invites;
                }
-               
+
+               // Sort the invites list by the invitee's name
+               items.sort(function (invite1, invite2){
+                  var name1 = invite1.invitee.firstName + invite1.invitee.lastName,
+                     name2 = invite2.invitee.firstName + invite2.invitee.lastName;
+                  return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
+               });
+
                // we need to wrap the array inside a JSON object so the DataTable is happy
                updatedResponse =
                {
@@ -252,7 +259,7 @@
          };
 
          // Enter key listener
-         var enterListener = new YAHOO.util.KeyListener(searchText,
+         var enterListener = new YAHOO.util.KeyListener(this.id + "-search-button",
          {
             keys: YAHOO.util.KeyListener.KEY.ENTER
          }, onKeyEnter, "keydown");
