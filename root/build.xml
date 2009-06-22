@@ -126,7 +126,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-lang-2.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-logging-1.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/commons/commons-pool-1.4.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/devenv/mysql-connector-java-5.0.3-bin.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/devenv/mysql-connector-java-5.1.7-bin.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/devenv/servlet.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/devenv/spring-mock-2.0.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/devenv/yguard.jar" />
