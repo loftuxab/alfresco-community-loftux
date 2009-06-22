@@ -477,10 +477,9 @@
        */
       onContentReady: function FP_onContentReady(event)
       {
-         //alert('contentReady');
          this.uploader.enable();
          this.uploader.setAllowMultipleFiles(this.showConfig.mode === this.MODE_MULTI_UPLOAD);
-         this.uploader.setFileFilters(this.showConfig.filter);         
+         this.uploader.setFileFilters(this.showConfig.filter);
       },
 
       /**
@@ -538,6 +537,15 @@
 
          // Show the upload panel
          this.panel.show();
+
+         // Need to resize FF in Ubuntu so the button appears
+         var swfWrapper = this.id + "-flashuploader-div";
+         if(navigator.userAgent && navigator.userAgent.indexOf("Ubuntu") != -1 &&
+            YAHOO.env.ua.gecko > 1 && !Dom.hasClass(swfWrapper, "button-fix"))
+         {
+            Dom.addClass(swfWrapper, "button-fix");            
+         }
+
       },
 
       _resetGUI: function FU__resetGUI()
