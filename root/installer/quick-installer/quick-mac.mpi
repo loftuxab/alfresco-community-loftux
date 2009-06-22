@@ -316,7 +316,6 @@ File ::78ACE50E-C49F-43B3-9520-0148915DD6E7 -type dir -name props -parent 2726D1
 File ::FD1B0E47-EE37-46C2-93A3-BA8BB66D66C8 -type dir -name text-base -parent 2726D1D4-6017-4F0F-A281-3F07D5F93D5A
 File ::F20609DB-4AD8-4096-AA89-D8D1AA213FAC -name alfresco-global.properties.install -parent 1C520117-CFA0-4273-912D-EA98D424ADE0
 File ::AE0710F6-0F0D-4065-AE8A-E9072DAF4B9E -directory <%InstallDir%>/bin -name W:/HEAD/root/build/dist/alfresco-mmt.jar -location ../../build/dist -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
-File ::09B268EE-C341-4587-80D3-1DF532DA173F -directory <%InstallDir%>/tomcat/lib -name W:/HEAD/root/projects/installer/mysql-connector-java-5.1.6-bin.jar -location ../../projects/installer -active 0 -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
 File ::19E1346C-800D-4A2A-AF02-AB97E9AC7412 -type dir -name W:/HEAD/root/projects/installer/licenses -location ../../projects/installer/licenses -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
 File ::A3EC7267-851F-4036-B155-C9202887A570 -name FLOSS-exception.txt -parent 19E1346C-800D-4A2A-AF02-AB97E9AC7412
 File ::B3C7B734-6190-4BE4-B97A-39FEE60549F8 -name gpl.txt -parent 19E1346C-800D-4A2A-AF02-AB97E9AC7412
@@ -1175,6 +1174,7 @@ File ::65C4842F-B140-4106-B10B-55881CBC6099 -type dir -name endorsed -parent B97
 File ::D60902A2-E46B-4798-AF0E-6C2A836A954D -name serializer.jar -parent 65C4842F-B140-4106-B10B-55881CBC6099
 File ::4766F877-CC31-4794-96D0-975A2EDF6606 -name xalan.jar -parent 65C4842F-B140-4106-B10B-55881CBC6099
 File ::1C0F3052-695B-4AFC-A409-9D486DC3220A -name W:/V30/root/projects/installer/windows/README.txt -location ../../projects/installer/windows -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
+File ::7E166789-3638-4C0A-B30F-E95C1FD87287 -name W:/HEAD/root/projects/3rd-party/lib/devenv/mysql-connector-java-5.1.7-bin.jar -location ../../projects/3rd-party/lib/devenv -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
 FileGroup ::FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive MacOS-X MacOS-X} -name Samples -parent FileGroups
 File ::73C4B60C-F180-49B7-8574-02573BBA4491 -directory <%InstallDir%>/amps -name W:/HEAD/root/projects/installer/amp-samples.txt -location ../../projects/installer -active 0 -parent FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF
 FileGroup ::33087B4E-DFD2-42AB-A812-338D015C210B -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive MacOS-X MacOS-X} -name WCM -parent FileGroups
