@@ -60,6 +60,11 @@
    margin-right:10px;
 }
 
+.flash-upload .browse.button-fix
+{
+   width:39px;
+}
+
 .flash-upload .tip
 {
    height:40px;
