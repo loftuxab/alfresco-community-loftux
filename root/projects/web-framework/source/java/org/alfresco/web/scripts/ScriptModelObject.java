@@ -35,7 +35,7 @@ import org.mozilla.javascript.Scriptable;
 
 /**
  * Provides a write-able model object wrapper to the script engine.
- * 
+ *
  * The properties of this object are writeable which means that the
  * developer has the option to use either the properties array or
  * explicit methods.
@@ -97,9 +97,9 @@ public final class ScriptModelObject extends ScriptBase
                 public void put(String name, Scriptable start, Object value)
                 {
                     put(name, (Serializable)value);
-
+                    
                     // update the model object
-                    modelObject.setProperty(name, (String) value);
+                    modelObject.setProperty(name, value != null ? value.toString() : null);
                 }
 
                 // do not allow
@@ -385,7 +385,7 @@ public final class ScriptModelObject extends ScriptBase
     public String getProperty(String propertyName)
     {
         ParameterCheck.mandatory("propertyName", propertyName);
-        return modelObject.getProperty(propertyName);
+        return (String)getProperties().get(propertyName);
     }
 
     /**
@@ -398,7 +398,7 @@ public final class ScriptModelObject extends ScriptBase
     {
         ParameterCheck.mandatory("propertyName", propertyName);
         ParameterCheck.mandatory("propertyValue", propertyValue);
-        modelObject.setProperty(propertyName, propertyValue);
+        getProperties().put(propertyName, propertyValue);
     }
 
     /**
@@ -409,7 +409,7 @@ public final class ScriptModelObject extends ScriptBase
     public void removeProperty(String propertyName)
     {
         ParameterCheck.mandatory("propertyName", propertyName);
-        modelObject.removeProperty(propertyName);
+        getProperties().remove(propertyName);
     }    
     
     /**
