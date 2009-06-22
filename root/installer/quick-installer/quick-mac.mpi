@@ -6091,7 +6091,7 @@ MacOS-X,DefaultFilePermission
 0755
 
 MacOS-X,Executable
-<%AppName%>-<%Version%>-<%Platform%>-Install<%Ext%>
+Alfresco-<%Codeline%>-<%Version%>-<%Platform%>-Install<%Ext%>
 
 MacOS-X,FallBackToConsole
 Yes
