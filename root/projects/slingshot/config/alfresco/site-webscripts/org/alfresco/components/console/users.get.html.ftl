@@ -172,6 +172,7 @@
          </div>
       </div>
       
+      <form id="${el}-create-form">
       <div id="${el}-create-main" class="create-main">
          <!-- Each info section separated by a header-bar div -->
          <div class="header-bar">${msg("label.info")}</div>
@@ -252,6 +253,7 @@
             </span>
          </div>
       </div>
+      </form>
    </div>
    
    <!-- Update User panel -->
@@ -265,6 +267,7 @@
          </div>
       </div>
       
+      <form id="${el}-update-form">
       <div id="${el}-update-main" class="update-main">
          <!-- Each info section separated by a header-bar div -->
          <div class="header-bar">${msg("label.info")}</div>
@@ -349,6 +352,7 @@
             </span>
          </div>
       </div>
+      </form>
    </div>
    
 </div>
