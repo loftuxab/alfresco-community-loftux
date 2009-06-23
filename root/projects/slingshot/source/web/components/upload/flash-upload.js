@@ -254,17 +254,6 @@
        */
       showConfig: {},
 
-     /**
-       * THe "Upload file(s)" button should only be visible when all selected
-       * files have been added to the datatable and datasource.
-       * noOfUnrenderedRows keeps track of how many of of the added files that
-       * has been rendered and properly added to the datasource.
-       *
-       * @property noOfUnrenderedRows
-       * @type int
-       */
-      noOfUnrenderedRows: 0,
-
       /**
        * Contains the upload gui
        *
@@ -543,7 +532,7 @@
          if(navigator.userAgent && navigator.userAgent.indexOf("Ubuntu") != -1 &&
             YAHOO.env.ua.gecko > 1 && !Dom.hasClass(swfWrapper, "button-fix"))
          {
-            Dom.addClass(swfWrapper, "button-fix");            
+            Dom.addClass(swfWrapper, "button-fix");
          }
 
       },
@@ -554,7 +543,6 @@
          this.state = this.STATE_BROWSING;
          this.noOfFailedUploads = 0;
          this.noOfSuccessfulUploads = 0;
-         this.noOfUnrenderedRows = 0;
          this.statusText["innerHTML"] = "&nbsp;";
          this.description.value = "";
          this.minorVersion.checked = true;
@@ -565,20 +553,14 @@
       },
 
       /**
-       * Fired by YUI:s DataTable when a row has been added to the data table list.
-       * Keeps track of added files.
+       * Fired by YUI:s DataTable when the added row has been rendered to the data table list.
        *
-       * @method onRowAddEvent
-       * @param event {object} a DataTable "rowAdd" event
+       * @method onPostRenderEvent       
        */
-      onRowAddEvent: function FU_onRowAddEvent(event)
+      onPostRenderEvent: function FU_onPostRenderEvent()
       {
-         // Since the flash movie allows the user to select one file several
-         // times we need to keep track of the selected files by our selves
-         var uniqueFileToken = this._getUniqueFileToken(event.record.getData());
-         this.addedFiles[uniqueFileToken] = event.record.getId();
-         this.noOfUnrenderedRows--;
-         if (this.noOfUnrenderedRows === 0)
+         // Display the upload button since all files are rendered
+         if (this.dataTable.getRecordSet().getLength() > 0)
          {
             this.widgets.uploadButton.set("disabled", false);
          }
@@ -617,9 +599,13 @@
        */
       onFileSelect: function FU_onFileSelect(event)
       {
+         // Disable upload button until all files have been rendered and added
+         this.widgets.uploadButton.set("disabled", true);
+
          // For each time the user select new files, all the previous selected
          // files also are included in the event.fileList. Make sure we only
          // add files to the table that haven's been added before.
+         var newFiles = [];
          for (var i in event.fileList)
          {
             if(this.dataTable.get("renderLoopSize") == 0)
@@ -633,19 +619,21 @@
                {
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: Alfresco.util.message("message.zeroByteFileSelected", this.name,
-                     {
-                        "0": data.name
-                     })
+                     text: Alfresco.util.message("message.zeroByteFileSelected", this.name, data.name)
                   });
                }
                else
                {
-                  this.noOfUnrenderedRows++;
-                  this.dataTable.addRow(data, 0);                  
+                  // Since the flash movie allows the user to select one file several
+                  // times we need to keep track of the selected files by our selves
+                  var uniqueFileToken = this._getUniqueFileToken(data);
+                  this.addedFiles[uniqueFileToken] = uniqueFileToken;
+                  newFiles.push(data);                  
                }
             }
          }
+         // Add all files to table
+         this.dataTable.addRows(newFiles, 0);
       },
 
       /**
@@ -1023,14 +1011,6 @@
 
             // Make the file list long
             this.dataTable.set("height", "204px", true);
-            /*
-            var h = "204px";
-            if(this.dataTable.get("height") != h)
-            {
-               alert('change h');
-               this.dataTable.set("height", h, true);
-               alert('changed h');
-            }*/
          }
          else
          {
@@ -1263,7 +1243,7 @@
             renderLoopSize: 0, // value > 0 results in an error in IE & Safari from YIU2.6.0
             MSG_EMPTY: Alfresco.util.message("label.noFiles", this.name)
          });
-         this.dataTable.subscribe("rowAddEvent", this.onRowAddEvent, this, true);
+         this.dataTable.subscribe("postRenderEvent", this.onPostRenderEvent, this, true);
          this.dataTable.subscribe("rowDeleteEvent", this.onRowDeleteEvent, this, true);
       },
 
