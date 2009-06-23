@@ -719,11 +719,8 @@
             flatten="false">
          <fileset dir="${dir.project.repository.config}" 
                   includes="alfresco/extension/**/*" />
-      </copy>
-      <!-- include the sharepoint module extension files -->
-      <copy todir="${dir.continuous.assemble.extension-samples}/alfresco/extension">
-         <fileset dir="${dir.module.sharepoint.config}/alfresco/module/org.alfresco.module.vti/context" 
-                  includes="custom-vti*.*" />
+         <fileset dir="${dir.project.repository.config}" 
+                  includes="alfresco/extension/*.sample" />
       </copy>
    </target>
    
