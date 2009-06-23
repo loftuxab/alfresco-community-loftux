@@ -334,6 +334,12 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    border: none;
 }
 
+.customise-dashlets ul.availableList,
+.customise-dashlets ul.usedList
+{
+   position: relative;
+}
+
 .customisableDashlet
 {
    overflow: hidden;

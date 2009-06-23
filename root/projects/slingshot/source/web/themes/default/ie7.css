@@ -71,6 +71,15 @@ textarea
 
 
 /**
+ * Customise dashlets
+ */
+.customise-dashlets ul.availableList,
+.customise-dashlets ul.usedList
+{
+   position: relative;
+}
+
+/**
  * Dashlets / position:relative and overflow:auto bug
  */
 .dashlet .scrollableList,
