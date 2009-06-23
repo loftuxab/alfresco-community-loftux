@@ -540,71 +540,43 @@
             YAHOO.Bubbling.on("itemSelected", this.onGroupSelected, this);
             YAHOO.Bubbling.on("removeGroupCreate", this.onRemoveGroupCreate, this);
             
-            var validFields = [];
-            var fieldValidators = [];
-            
-            var onFieldKeyUp = function onFieldKeyUp(e)
-            {
-               // run the validator for the modified field
-               var validator = fieldValidators[this.id];
-               if (validator)
-               {
-                  validFields[this.id] = validator.call(this, this);
-               }
-               else
-               {
-                  // default is simple mandatory field test
-                  validFields[this.id] = (YAHOO.lang.trim(this.value).length !== 0);
-               }
-               
-               // check to see if all fields are now valid
-               var valid = true;
-               for (var i in validFields)
-               {
-                  if (validFields[i] == false)
-                  {
-                     valid = false;
-                     break;
-                  }
-               }
-               
-               // enable buttons as appropriate after validation test
-               parent.widgets.createuserOkButton.set("disabled", !valid);
-               parent.widgets.createuserAnotherButton.set("disabled", !valid);
-            };
-            
             // Buttons
             parent.widgets.createuserOkButton = Alfresco.util.createYUIButton(parent, "createuser-ok-button", parent.onCreateUserOKClick);
             parent.widgets.createuserAnotherButton = Alfresco.util.createYUIButton(parent, "createuser-another-button", parent.onCreateUserAnotherClick);
             parent.widgets.createuserCancelButton = Alfresco.util.createYUIButton(parent, "createuser-cancel-button", parent.onCreateUserCancelClick);
-            parent.widgets.createuserOkButton.set("disabled", true);
-            parent.widgets.createuserAnotherButton.set("disabled", true);
             
-            // Event handlers for mandatory fields
-            validFields[parent.id + "-create-firstname"] = false;
-            Event.on(parent.id + "-create-firstname", "keyup", onFieldKeyUp);
-            validFields[parent.id + "-create-lastname"] = false;
-            Event.on(parent.id + "-create-lastname", "keyup", onFieldKeyUp);
-            validFields[parent.id + "-create-email"] = false;
-            Event.on(parent.id + "-create-email", "keyup", onFieldKeyUp);
-            fieldValidators[parent.id + "-create-username"] = function(field)
+            // Form definition
+            var form = new Alfresco.forms.Form(parent.id + "-create-form");
+            form.setSubmitElements([parent.widgets.createuserOkButton, parent.widgets.createuserAnotherButton]);
+            form.setShowSubmitStateDynamically(true);
+            
+            // Form field validation
+            form.addValidation(parent.id + "-create-firstname", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-create-lastname", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-create-email", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-create-email", Alfresco.forms.validation.email, null, "keyup");
+            form.addValidation(parent.id + "-create-username", Alfresco.forms.validation.nodeName, null, "keyup");
+            form.addValidation(parent.id + "-create-username", Alfresco.forms.validation.length,
             {
-               return (YAHOO.lang.trim(field.value).length >= parent.options.minUsernameLength);
-            };
-            validFields[parent.id + "-create-username"] = false;
-            Event.on(parent.id + "-create-username", "keyup", onFieldKeyUp);
-            fieldValidators[parent.id + "-create-password"] = function(field)
+               min: parent.options.minUsernameLength,
+               max: 255,
+               crop: true
+            }, "keyup");
+            form.addValidation(parent.id + "-create-password", Alfresco.forms.validation.length,
             {
-               return (YAHOO.lang.trim(field.value).length >= parent.options.minPasswordLength);
-            };
-            validFields[parent.id + "-create-password"] = false;
-            Event.on(parent.id + "-create-password", "keyup", onFieldKeyUp);
-            fieldValidators[parent.id + "-create-verifypassword"] = function(field)
+               min: parent.options.minPasswordLength,
+               max: 255,
+               crop: true
+            }, "keyup");
+            form.addValidation(parent.id + "-create-verifypassword", Alfresco.forms.validation.length,
             {
-               return (YAHOO.lang.trim(field.value).length >= parent.options.minPasswordLength);
-            };
-            validFields[parent.id + "-create-verifypassword"] = false;
-            Event.on(parent.id + "-create-verifypassword", "keyup", onFieldKeyUp);
+               min: parent.options.minPasswordLength,
+               max: 255,
+               crop: true
+            }, "keyup");
+            
+            // Initialise the form
+            form.init();
             
             // Load in the Groups Finder component from the server
             Alfresco.util.Ajax.request(
@@ -787,36 +759,24 @@
             YAHOO.Bubbling.on("itemSelected", this.onGroupSelected, this);
             YAHOO.Bubbling.on("removeGroupUpdate", this.onRemoveGroupUpdate, this);
             
-            var validFields = [];
-            var onFieldKeyUp = function onFieldKeyUp(e)
-            {
-               validFields[this.id] = (YAHOO.lang.trim(this.value).length !== 0);
-               
-               var valid = true;
-               for (var i in validFields)
-               {
-                  if (validFields[i] == false)
-                  {
-                     valid = false;
-                     break;
-                  }
-               }
-               
-               parent.widgets.updateuserSaveButton.set("disabled", !valid);
-            };
-            
             // Buttons
             parent.widgets.updateuserSaveButton = Alfresco.util.createYUIButton(parent, "updateuser-save-button", parent.onUpdateUserOKClick);
             parent.widgets.updateuserCancelButton = Alfresco.util.createYUIButton(parent, "updateuser-cancel-button", parent.onUpdateUserCancelClick);
             parent.widgets.updateuserClearPhotoButton = Alfresco.util.createYUIButton(parent, "updateuser-clearphoto-button", parent.onUpdateUserClearPhotoClick);
             
-            // Event handlers for mandatory fields
-            validFields[parent.id + "-update-firstname"] = true;
-            Event.on(parent.id + "-update-firstname", "keyup", onFieldKeyUp);
-            validFields[parent.id + "-update-lastname"] = true;
-            Event.on(parent.id + "-update-lastname", "keyup", onFieldKeyUp);
-            validFields[parent.id + "-update-email"] = true;
-            Event.on(parent.id + "-update-email", "keyup", onFieldKeyUp);
+            // Form definition
+            var form = new Alfresco.forms.Form(parent.id + "-update-form");
+            form.setSubmitElements(parent.widgets.updateuserSaveButton);
+            form.setShowSubmitStateDynamically(true);
+            
+            // Form field validation
+            form.addValidation(parent.id + "-update-firstname", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-update-lastname", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-update-email", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-update-email", Alfresco.forms.validation.email, null, "keyup");
+            
+            // Initialise the form
+            form.init();
             
             // Load in the Groups Finder component from the server
             Alfresco.util.Ajax.request(
