@@ -189,7 +189,7 @@
                so.addVariable("fileName", this.options.name);
                so.addVariable("paging", previewCtx.paging);
                so.addVariable("url", previewCtx.url);
-               so.addVariable("jsCallback", "Alfresco.util.ComponentManager.find({id:'" + this.id + "'})[0].onWebPreviewerEvent");
+               so.addVariable("jsCallback", "Alfresco.util.ComponentManager.get('" + this.id + "').onWebPreviewerEvent");
                so.addVariable("i18n_actualSize", $msg("preview.actualSize"));
                so.addVariable("i18n_fitPage", $msg("preview.fitPage"));
                so.addVariable("i18n_fitWidth", $msg("preview.fitWidth"));

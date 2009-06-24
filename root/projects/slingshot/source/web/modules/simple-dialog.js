@@ -52,7 +52,7 @@
        * Dialog instance.
        * 
        * @property dialog
-       * @type YUI.widget.Panel
+       * @type YAHOO.widget.Panel
        */
       dialog: null,
 

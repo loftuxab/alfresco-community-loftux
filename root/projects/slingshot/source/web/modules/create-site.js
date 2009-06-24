@@ -47,65 +47,19 @@
     */
    Alfresco.module.CreateSite = function(containerId)
    {
-      this.name = "Alfresco.module.CreateSite";
-      this.id = containerId;
-
-      var instance = Alfresco.util.ComponentManager.find(
-      {
-         id: this.id
-      });
-      if (instance !== undefined && instance.length > 0)
+      var instance = Alfresco.util.ComponentManager.get(this.id);
+      if (instance !== undefined)
       {
          throw new Error("An instance of Alfresco.module.CreateSite already exists.");
       }
-      
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
 
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "selector", "json", "event"], this.onComponentsLoaded, this);
+      Alfresco.module.CreateSite.superclass.constructor.call(this, "Alfresco.module.CreateSite", containerId, ["button", "container", "connection", "selector", "json"]);
 
       return this;
    };
 
-   Alfresco.module.CreateSite.prototype =
+   YAHOO.extend(Alfresco.module.CreateSite, Alfresco.component.Base,
    {
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-       widgets: {},
-
-      /**
-       * Set messages for this module.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.module.CreateSite} returns 'this' for method chaining
-       */
-      setMessages: function CS_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function CS_onComponentsLoaded()
-      {
-         /* Shortcut for dummy instance */
-         if (this.id === null)
-         {
-            return;
-         }
-      },
-
       /**
        * Shows the CreteSite dialog to the user.
        *
@@ -238,9 +192,9 @@
                
                // Site access
                var siteVisibility = "PUBLIC";
-               if (this.widgets.isPublic.checked == true)
+               if (this.widgets.isPublic.checked)
                {
-                  if (this.widgets.isModerated.checked == true)
+                  if (this.widgets.isModerated.checked)
                   {
                      siteVisibility = "MODERATED";
                   }
@@ -386,22 +340,15 @@
          // Set the focus on the first field
          Dom.get(this.id + "-title").focus();
       }
-
-   };
+   });
 })();
 
 Alfresco.module.getCreateSiteInstance = function()
 {
-   var instanceId = "alfresco-createSite-instance";
-   var instance = Alfresco.util.ComponentManager.find(
-   {
-      id: instanceId
-   });
-   if (instance !== undefined && instance.length != 0)
-   {
-      instance = instance[0];
-   }
-   else
+   var instanceId = "alfresco-createSite-instance",
+      instance = Alfresco.util.ComponentManager.get(instanceId);
+
+   if (typeof instance == "undefined")
    {
       instance = new Alfresco.module.CreateSite(instanceId);
    }

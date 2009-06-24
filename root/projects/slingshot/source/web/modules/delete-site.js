@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,9 +23,8 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-
 /**
- * DeleteSite component.
+ * DeleteSite module.
  *
  * Displays a dialog with cofirmation to delete a site.
  * 
@@ -47,31 +46,21 @@
     */
    Alfresco.module.DeleteSite = function(containerId)
    {
-      this.name = "Alfresco.module.DeleteSite";
-      this.id = containerId;
-
-      var instance = Alfresco.util.ComponentManager.find(
-      {
-         id: this.id
-      });
-      if (instance !== undefined && instance.length > 0)
+      var instance = Alfresco.util.ComponentManager.get(containerId);
+      if (typeof instance !== "undefined")
       {
          throw new Error("An instance of Alfresco.module.DeleteSite already exists.");
       }
 
+      Alfresco.module.DeleteSite.superclass.constructor.call(this, "Alfresco.module.DeleteSite", containerId, ["button", "container", "connection", "selector", "json"]);
+
       // Set prototype properties
       this.deletePromptActive = false;
-
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "selector", "json", "event"], this.onComponentsLoaded, this);
 
       return this;
    };
 
-   Alfresco.module.DeleteSite.prototype =
+   YAHOO.extend(Alfresco.module.DeleteSite, Alfresco.component.Base,
    {
       /**
        * Will become true when the template (that sets the i18n messages)
@@ -83,16 +72,6 @@
        * Makes sure the dialog isn't displayed twice at the same time
        */
       deletePromptActive: false,
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function CS_onComponentsLoaded()
-      {
-      },
 
       /**
        * Shows the dialog
@@ -109,7 +88,7 @@
        *    }
        * }
        */
-      show: function FU_show(config)
+      show: function DeleteSite_show(config)
       {
          var c = config;
          if (this.localized)
@@ -143,19 +122,26 @@
        * @method onMessagesLoaded
        * @param config {object} The config for the dialog
        */
-      onMessagesLoaded: function DS_onMessagesLoaded(config)
+      onMessagesLoaded: function DeleteSite_onMessagesLoaded(config)
       {
          this.localized = true;
          this._showDialog(config);
       },
 
-      _showDialog: function DS__showDialog(config)
+      /**
+       * Shows the dialog.
+       *
+       * @method _showDialog
+       * @param config {object} The config for the dialog
+       * @private
+       */
+      _showDialog: function DeleteSite__showDialog(config)
       {
-         if(!this.deletePromptActive)
+         if (!this.deletePromptActive)
          {
             this.deletePromptActive = true;
-            var me = this;
-            var c = config;
+            var me = this,
+               c = config;
             Alfresco.util.PopupManager.displayPrompt(
             {
                title: Alfresco.util.message("title.deleteSite", this.name),
@@ -165,31 +151,38 @@
                }),
                noEscape: true,
                buttons: [
+               {
+                  text: Alfresco.util.message("button.delete", this.name),
+                  handler: function DeleteSite__sD_delete()
+                  {                        
+                     this.destroy();
+                     me._onDeleteClick.call(me, c);
+                  }
+               },
+               {
+                  text: Alfresco.util.message("button.cancel", this.name),
+                  handler: function DeleteSite__sD_cancel()
                   {
-                     text: Alfresco.util.message("button.delete", this.name),
-                     handler: function DS_delete()
-                     {                        
-                        this.destroy();
-                        me._onDeleteClick.call(me, c);
-                     }
+                     me.deletePromptActive = false;
+                     this.destroy();
                   },
-                  {
-                     text: Alfresco.util.message("button.cancel", this.name),
-                     handler: function DL_cancel()
-                     {
-                        me.deletePromptActive = false;
-                        this.destroy();
-                     },
-                     isDefault: true
-                  }]
+                  isDefault: true
+               }]
             });
          }
       },
       
-      _onDeleteClick: function DS__onDeleteClick(config)
+      /**
+       * Handles delete click event.
+       *
+       * @method _onDeleteClick
+       * @param config {object} The config for the dialog
+       * @private
+       */
+      _onDeleteClick: function DeleteSite__onDeleteClick(config)
       {
-         var me = this;
-         var c = config;
+         var me = this,
+            c = config;
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: Alfresco.util.message("title.deleteSite", this.name),
@@ -198,7 +191,7 @@
             buttons: [
                {
                   text: Alfresco.util.message("button.yes", this.name),
-                  handler: function DS_delete()
+                  handler: function DeleteSite__oDC_delete()
                   {
                      this.destroy();
                      me._onConfirmedDeleteClick.call(me, c);
@@ -206,7 +199,7 @@
                },
                {
                   text: Alfresco.util.message("button.no", this.name),
-                  handler: function DL_cancel()
+                  handler: function DeleteSite__oDC_cancel()
                   {
                      me.deletePromptActive = false;
                      this.destroy();
@@ -216,9 +209,17 @@
          });
       },
 
-      _onConfirmedDeleteClick: function(config)
+      /**
+       * Handles confirmed delete click event.
+       *
+       * @method _onConfirmedDeleteClick
+       * @param config {object} The config for the dialog
+       * @private
+       */
+      _onConfirmedDeleteClick: function DeleteSite__onConfirmedDeleteClick(config)
       {
-         var c = config;
+         var me = this,
+            c = config;
          var feedbackMessage = Alfresco.util.PopupManager.displayMessage(
          {
             text: Alfresco.util.message("message.deletingSite", this.name),
@@ -227,17 +228,13 @@
          });
          
          // user has confirmed, perform the actual delete
-         var me = this;
-         Alfresco.util.Ajax.request(
+         Alfresco.util.Ajax.jsonPost(
          {
             url: Alfresco.constants.URL_SERVICECONTEXT + "modules/delete-site",
             dataObj:
             {
                shortName: config.site.shortName
             },
-            method: "POST",
-            requestContentType : "application/json",
-            responseContentType : "application/json",
             successCallback:
             {
                fn: function(response)
@@ -282,23 +279,15 @@
             }
          });
       }
-
-   };
-
+   });
 })();
 
 Alfresco.module.getDeleteSiteInstance = function()
 {
-   var instanceId = "alfresco-deletesite-instance";
-   var instance = Alfresco.util.ComponentManager.find(
-   {
-      id: instanceId
-   });
-   if (instance !== undefined && instance.length != 0)
-   {
-      instance = instance[0];
-   }
-   else
+   var instanceId = "alfresco-deletesite-instance",
+      instance = Alfresco.util.ComponentManager.get(instanceId);
+
+   if (typeof instance == "undefined")
    {
       instance = new Alfresco.module.DeleteSite(instanceId);
    }

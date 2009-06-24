@@ -1,6 +1,6 @@
 .my-documents .scrollableList
 {
-   padding: 0 0 6px;
+   padding-top: 2px;
 }
 
 /* Data Table */
@@ -20,6 +20,7 @@
    outline: none;
 }
 
+.my-documents .yui-dt tr.yui-dt-even,
 .my-documents .yui-dt tr.yui-dt-odd
 {
    background-color: #ffffff;

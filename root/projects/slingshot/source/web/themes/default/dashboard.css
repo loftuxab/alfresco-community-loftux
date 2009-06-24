@@ -64,8 +64,6 @@
     height: 208px;
     padding: 8px 0px;
     overflow: auto;
-/* TODO: need to revisit this */
-    margin-right: 1px;
 }
 
 .dashlet .scrollablePanel

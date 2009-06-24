@@ -603,10 +603,7 @@
             finderDiv.innerHTML = res.serverResponse.responseText;
             
             // Find the Group Finder by container ID
-            parent.modules.createGroupFinder = Alfresco.util.ComponentManager.find(
-            {
-               id: parent.id + "-create-groupfinder"
-            })[0];
+            parent.modules.createGroupFinder = Alfresco.util.ComponentManager.get(parent.id + "-create-groupfinder");
             
             // Set the correct options for our use
             parent.modules.createGroupFinder.setOptions(
@@ -803,10 +800,7 @@
             finderDiv.innerHTML = res.serverResponse.responseText;
             
             // Find the Group Finder by container ID
-            parent.modules.updateGroupFinder = Alfresco.util.ComponentManager.find(
-            {
-               id: parent.id + "-update-groupfinder"
-            })[0];
+            parent.modules.updateGroupFinder = Alfresco.util.ComponentManager.get(parent.id + "-update-groupfinder");
             
             // Set the correct options for our use
             parent.modules.updateGroupFinder.setOptions(

@@ -1,8 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   Alfresco.util.ComponentManager.find(
-   {
-      id: "${args.htmlid}"
-   })[0].setOptions(
+   Alfresco.util.ComponentManager.get("${args.htmlid}").setOptions(
    {
       roles:
       {

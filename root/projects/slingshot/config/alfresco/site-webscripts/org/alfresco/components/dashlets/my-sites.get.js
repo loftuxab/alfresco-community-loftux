@@ -1,5 +1,6 @@
-const PREF_FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
-const PREF_IMAP_FAVOURITE_SITES = "org.alfresco.share.sites.imap.favourites";
+const PREF_SITES = "org.alfresco.share.sites";
+const PREF_FAVOURITE_SITES = PREF_SITES + ".favourites";
+const PREF_IMAP_FAVOURITE_SITES = PREF_SITES + ".imap.favourites";
 
 /**
  * Sort favourites to the top, then in alphabetical order
@@ -24,10 +25,10 @@ function main()
       {
          // Check for IMAP server status
          result = remote.call("/imap/servstatus");
-         model.imapServerStatus = (result.status == 200 ? result : "disabled");
+         model.imapServerEnabled = true; //(result.status == 200 && result == "enabled");
          
          // Call the repo for the user's favourite sites
-         result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
+         result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_SITES);
          if (result.status == 200 && result != "{}")
          {
             var prefs = eval('(' + result + ')');
@@ -38,22 +39,12 @@ function main()
             {
                favourites = {};
             }
-         }
-         
-		   // Call the repo for the user's imap favourite sites
-		   if (model.imapServerStatus !== "disabled")
-		   {
-            result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_IMAP_FAVOURITE_SITES);
-            if (result.status == 200 && result != "{}")
+
+            // Populate the imap favourites object literal for easy look-up later
+            imapFavourites = eval('(prefs.' + PREF_IMAP_FAVOURITE_SITES + ')');
+            if (typeof imapFavourites != "object")
             {
-               var imapPrefs = eval('(' + result + ')');
-               
-               // Populate the imap favourites object literal for easy look-up later
-               imapFavourites = eval('(imapPrefs.' + PREF_IMAP_FAVOURITE_SITES + ')');
-               if (typeof imapFavourites != "object")
-               {
-                  imapFavourites = {};
-               }
+               imapFavourites = {};
             }
          }
          
@@ -80,7 +71,7 @@ function main()
             site.isFavourite = !!(favourites[site.shortName]);
             
             // Is this site a user imap favourite?
-            site.isImapFavourite = !!(imapFavourites[site.shortName]);
+            site.isIMAPFavourite = !!(imapFavourites[site.shortName]);
          }
 
          // Sort the favourites to the top

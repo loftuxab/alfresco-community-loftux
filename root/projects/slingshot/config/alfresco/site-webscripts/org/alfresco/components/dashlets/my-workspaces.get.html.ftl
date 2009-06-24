@@ -1,5 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.MySites("${args.htmlid}").setOptions(
+   new Alfresco.dashlet.MySites("${args.htmlid}").setOptions(
    {
       sites: [
 <#if sites??>

@@ -562,10 +562,7 @@
 
 
             // Find the People Finder by container ID
-            this.modules.searchPeopleFinder = Alfresco.util.ComponentManager.find(
-            {
-               id: parent.id + "-search-peoplefinder"
-            })[0];
+            this.modules.searchPeopleFinder = Alfresco.util.ComponentManager.get(parent.id + "-search-peoplefinder");
 
             // Set the correct options for our use
             this.modules.searchPeopleFinder.setOptions(
@@ -605,10 +602,7 @@
             this.widgets.addGroupPanel.render(document.body);
 
             // Find the Group Finder by container ID
-            this.modules.searchGroupFinder = Alfresco.util.ComponentManager.find(
-            {
-               id: parent.id + "-search-groupfinder"
-            })[0];
+            this.modules.searchGroupFinder = Alfresco.util.ComponentManager.get(parent.id + "-search-groupfinder");
 
             // Set the correct options for our use
             this.modules.searchGroupFinder.setOptions(

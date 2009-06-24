@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,8 +26,8 @@
 /**
  * Dashboard MySites component.
  * 
- * @namespace Alfresco
- * @class Alfresco.MySites
+ * @namespace Alfresco.dashlet
+ * @class Alfresco.dashlet.MySites
  */
 (function()
 {
@@ -38,22 +38,20 @@
       Event = YAHOO.util.Event;
 
    /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
+   /**
     * Dashboard MySites constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.MySites} The new component instance
+    * @return {Alfresco.dashlet.MySites} The new component instance
     * @constructor
     */
-   Alfresco.MySites = function MySites_constructor(htmlId)
+   Alfresco.dashlet.MySites = function MySites_constructor(htmlId)
    {
-      this.name = "Alfresco.MySites";
-      this.id = htmlId;
-
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
+      Alfresco.dashlet.MySites.superclass.constructor.call(this, "Alfresco.dashlet.MySites", htmlId, ["button", "container", "datasource", "datatable", "animation"]);
 
       // Initialise prototype properties
       this.preferencesService = new Alfresco.service.Preferences();
@@ -64,7 +62,7 @@
       return this;
    };
 
-   Alfresco.MySites.prototype =
+   YAHOO.extend(Alfresco.dashlet.MySites, Alfresco.component.Base,
    {
       /**
        * CreateSite module instance.
@@ -78,54 +76,26 @@
        * Object container for initialization options
        *
        * @property options
-       * @type {object} object literal
+       * @type object
        */
       options:
       {
          /**
-          * An array with shortNames in the same order as they are listed in the html template
-          *
+          * Site data
+          * 
           * @property sites
-          * @type Array
+          * @type array
           */
-         sites: []
-      },
+         sites: [],
 
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DocumentList} returns 'this' for method chaining
-       */
-      setOptions: function MySites_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.MySites} returns 'this' for method chaining
-       */
-      setMessages: function MySites_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function MySites_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
+         /**
+          * Flag if IMAP server is enabled
+          * 
+          * @property imapEnabled
+          * @type boolean
+          * @default false
+          */
+         imapEnabled: false
       },
 
       /**
@@ -134,243 +104,163 @@
        */
       onReady: function MySites_onReady()
       {
+         var me = this;
+         
          // Listen on clicks for the create site link
          Event.addListener(this.id + "-createSite-button", "click", this.onCreateSiteLinkClick, this, true);
          
-         // Listen on clicks for delete site icons
-         var sites = this.options.sites, i, j;
-         for (i = 0, j = sites.length; i < j; i++)
+         // DataSource definition
+         this.widgets.dataSource = new YAHOO.util.DataSource(this.options.sites,
          {
-            if (sites[i].isSiteManager)
+            responseType: YAHOO.util.DataSource.TYPE_JSARRAY,
+            responseSchema:
             {
-               this._addDeleteHandling(i);               
+               fields: ["shortName", "title", "description", "isFavourite", "isIMAPFavourite", "isSiteManager"]
             }
-            this._addFavouriteHandling(i);
-            this._addImapFavouriteHandling(i);
-         }
-         // initialize the mouse over listener
-         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onSiteElementMouseEntered, this.onSiteElementMouseExited, this);
-         // init mouse over
-         Alfresco.util.rollover.registerListenersByClassName(this.id, 'detail-list-item', 'div');         
+         });
+
+         /**
+          * Use the getDomId function to get some unique names for global event handling
+          */
+         var favEventClass = Alfresco.util.getDomId("fav-site"),
+            imapEventClass = Alfresco.util.getDomId("imap-site"),
+            deleteEventClass = Alfresco.util.getDomId("del-site");
+
+         /**
+          * Favourites custom datacell formatter
+          */
+         var renderCellFavourite = function MS_oR_renderCellFavourite(elCell, oRecord, oColumn, oData)
+         {
+            Dom.setStyle(elCell, "width", oColumn.width + "px");
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
+            var siteId = oRecord.getData("shortName"),
+               isFavourite = oRecord.getData("isFavourite"),
+               isIMAPFavourite = oRecord.getData("isIMAPFavourite");
+
+            var desc = '<div class="site-favourites">';
+            desc += '<a class="favourite-site ' + favEventClass + (isFavourite ? ' enabled' : '') + '" title="' + me.msg("link.favouriteSite") + '">&nbsp;</a>';
+            if (me.options.imapEnabled)
+            {
+               desc += '<a class="imap-favourite-site ' + imapEventClass + (isIMAPFavourite ? ' imap-enabled' : '') + '" title="' + me.msg("link.imap_favouriteSite") + '">&nbsp;</a>';
+            }
+            desc += '</div>';
+            elCell.innerHTML = desc;
+         };
+         
+         /**
+          * Name & description custom datacell formatter
+          */
+         var renderCellName = function MS_oR_renderCellName(elCell, oRecord, oColumn, oData)
+         {
+            var siteId = oRecord.getData("shortName"),
+               siteTitle = oRecord.getData("title"),
+               siteDescription = oRecord.getData("description");
+            
+            var desc = '<div class="site-title"><a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + siteId + '/dashboard" class="theme-color-1">' + $html(siteTitle) + '</a></div>';
+            desc += '<div class="site-description">' + $html(siteDescription) + '</div>';
+
+            elCell.innerHTML = desc;
+         };
+         
+         /**
+          * Actions custom datacell formatter
+          */
+         var renderCellActions = function MS_oR_renderCellActions(elCell, oRecord, oColumn, oData)
+         {
+            Dom.setStyle(elCell, "width", oColumn.width + "px");
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
+            var isSiteManager = oRecord.getData("isSiteManager"),
+               desc = "";
+            
+            if (isSiteManager)
+            {
+               desc = '<a class="delete-site ' + deleteEventClass + '" title="' + me.msg("link.deleteSite") + '">&nbsp;</a>';
+            }
+            elCell.innerHTML = desc;
+         };
+
+         // DataTable column defintions
+         var columnDefinitions =
+         [
+            { key: "siteId", label: "Favourite", sortable: false, formatter: renderCellFavourite, width: this.options.imapEnabled ? 40 : 20 },
+            { key: "title", label: "Description", sortable: false, formatter: renderCellName },
+            { key: "description", label: "Actions", sortable: false, formatter: renderCellActions, width: 32 }
+         ];
+
+         // DataTable definition
+         this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-sites", columnDefinitions, this.widgets.dataSource,
+         {
+            MSG_EMPTY: this.msg("label.noSites")
+         });
+
+         // Add animation to row delete
+         this.widgets.dataTable._deleteTrEl = function(row)
+         { 
+            var scope = this,
+               trEl = this.getTrEl(row);
+
+            var changeColor = new YAHOO.util.ColorAnim(trEl,
+            {
+               opacity:
+               {
+                  to: 0
+               }
+            }, 0.25);
+            changeColor.onComplete.subscribe(function()
+            {
+               YAHOO.widget.DataTable.prototype._deleteTrEl.call(scope, row);
+            });
+            changeColor.animate();
+         };
+
+         /**
+          * Hook favourite site events
+          */
+         var registerEventHandler = function(cssClass, fnHandler)
+         {
+            var fnEventHandler = function MS_oR_fnEventHandler(layer, args)
+            {
+               var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
+               if (owner !== null)
+               {
+                  fnHandler.call(me, args[1].target.offsetParent, owner);
+               }
+
+               return true;
+            };
+            YAHOO.Bubbling.addDefaultAction(cssClass, fnEventHandler);
+         };
+         
+         registerEventHandler(favEventClass, this.onFavouriteSite);
+         registerEventHandler(imapEventClass, this.onImapFavouriteSite);
+         registerEventHandler(deleteEventClass, this.onDeleteSite);
+
+         // Enable row highlighting
+         this.widgets.dataTable.subscribe("rowMouseoverEvent", this.widgets.dataTable.onEventHighlightRow);
+         this.widgets.dataTable.subscribe("rowMouseoutEvent", this.widgets.dataTable.onEventUnhighlightRow);
       },
 
       /**
        * Adds an event handler for bringing up the delete site dialog for the specific site
        *
-       * @method _addDeleteHandling
-       * @param siteIndex {int} The index of the site in the this.options.sites array
-       * @private
+       * @method onDeleteSite
+       * @param row {object} DataTable row representing file to be actioned
        */
-      _addDeleteHandling: function MySites__addDeleteHandling(siteIndex)
+      onDeleteSite: function MySites_onDeleteSite(row)
       {
-         var me = this;
-         var deleteSpan = Dom.get(this.id + "-delete-span-" + siteIndex);
-         if (deleteSpan)
+         var record = this.widgets.dataTable.getRecord(row);
+
+         // Display the delete dialog for the site
+         Alfresco.module.getDeleteSiteInstance().show(
          {
-            Event.addListener(deleteSpan, "click", function (event, obj)
-            {
-               // Find the site through its index and display the delete dialog for the site
-               Alfresco.module.getDeleteSiteInstance().show(
-               {
-                  site: me.options.sites[siteIndex]
-               });
-            });
-         }
+            site: record.getData()
+         });
       },
 
       /**
-       * Adds an event handler that adds or removes the site as favourite site
-       *
-       * @method _addFavouriteHandling
-       * @param siteIndex {int} The index of the site in the this.options.sites array
-       * @private
-       */
-      _addFavouriteHandling: function MySites__addFavouriteHandling(siteIndex)
-      {
-         var me = this;
-         var favouriteSpan = Dom.get(this.id + "-favourite-span-" + siteIndex);
-         if (favouriteSpan)
-         {
-            var favouriteClickHandler = function (event, obj)
-            {
-               /**
-                * We assume that the change of favourite site will work and therefore change
-                * the gui immediatly after the server call.
-                * If it doesn't we revoke the gui changes and display an error message
-                */
-               var responseConfig =
-               {
-                  failureCallback:
-                  {
-                     fn: function(event, obj)
-                     {
-                        obj.thisComponent._addFavouriteHandling(obj.siteIndex);
-                        obj.thisComponent._toggleFavourite(obj.siteIndex);
-                        Alfresco.util.PopupManager.displayPrompt(
-                        {
-                           text: Alfresco.util.message("message.siteFavourite.failure", obj.thisComponent.name)
-                        });
-                     },
-                     scope: this,
-                     obj:
-                     {
-                         siteIndex: siteIndex,
-                         thisComponent: me
-                     }
-                  },
-                  successCallback:
-                  {
-                     fn: function(event, obj)
-                     {
-                        obj.thisComponent._addFavouriteHandling(obj.siteIndex);
-                        var site = obj.thisComponent.options.sites[obj.siteIndex];
-                        YAHOO.Bubbling.fire(site.isFavourite ? "favouriteSiteAdded" : "favouriteSiteRemoved", site);
-                     },
-                     scope: this,
-                     obj:
-                     {
-                        siteIndex: siteIndex,
-                        thisComponent: me
-                     }
-                  }
-               };
-
-               // Remove listener so we don't do double submits
-               Event.removeListener(favouriteSpan, "click", favouriteClickHandler);
-               me._toggleFavourite(siteIndex);
-               me.preferencesService.set(
-                  Alfresco.service.Preferences.FAVOURITE_SITES + "." + me.options.sites[siteIndex].shortName,
-                  me.options.sites[siteIndex].isFavourite,
-                  responseConfig);
-            };
-
-            // Add listener to favourite icons
-            Event.addListener(favouriteSpan, "click", favouriteClickHandler);
-         }
-      },
-
-	 /**
-       * Adds an event handler that adds or removes the site as favourite site
-       *
-       * @method _addImapFavouriteHandling
-       * @param siteIndex {int} The index of the site in the this.options.sites array
-       * @private
-       */
-      _addImapFavouriteHandling: function MySites__addImapFavouriteHandling(siteIndex)
-      {
-         var me = this;
-         var imapFavouriteSpan = Dom.get(this.id + "-imap-favourite-span-" + siteIndex);
-         if (imapFavouriteSpan)
-         {
-            var imapFavouriteClickHandler = function (event, obj)
-            {
-               /**
-                * We assume that the change of favourite site will work and therefore change
-                * the gui immediatly after the server call.
-                * If it doesn't we revoke the gui changes and display an error message
-                */
-               var responseConfig =
-               {
-                  failureCallback:
-                  {
-                     fn: function(event, obj)
-                     {
-                        obj.thisComponent._addImapFavouriteHandling(obj.siteIndex);
-                        obj.thisComponent._toggleImapFavourite(obj.siteIndex);
-                        Alfresco.util.PopupManager.displayPrompt(
-                        {
-                           text: Alfresco.util.message("message.siteFavourite.failure", obj.thisComponent.name)
-                        });
-                     },
-                     scope: this,
-                     obj:
-                     {
-                         siteIndex: siteIndex,
-                         thisComponent: me
-                     }
-                  },
-                  successCallback:
-                  {
-                     fn: function(event, obj)
-                     {
-                        obj.thisComponent._addImapFavouriteHandling(obj.siteIndex);
-                        var site = obj.thisComponent.options.sites[obj.siteIndex];
-                        YAHOO.Bubbling.fire(site.isImapFavourite ? "favouriteSiteAdded" : "favouriteSiteRemoved", site);
-                     },
-                     scope: this,
-                     obj:
-                     {
-                        siteIndex: siteIndex,
-                        thisComponent: me
-                     }
-                  }
-               };
-
-               // Remove listener so we don't do double submits
-               Event.removeListener(imapFavouriteSpan, "click", imapFavouriteClickHandler);
-               me._toggleImapFavourite(siteIndex);
-               me.preferencesService.set(
-                  Alfresco.service.Preferences.IMAP_FAVOURITE_SITES + "." + me.options.sites[siteIndex].shortName,
-                  me.options.sites[siteIndex].isImapFavourite,
-                  responseConfig);
-            };
-
-            // Add listener to favourite icons
-            Event.addListener(imapFavouriteSpan, "click", imapFavouriteClickHandler);
-         }
-      },
-      
-      /**
-       * Helper method to change the gui and our local data model of sites
-       * @method _toggleFavourite
-       * @param siteIndex {integer} the index in our local data model
-       */
-      _toggleFavourite: function MySites__toggleFavourite(siteIndex)
-      {
-         var span = YAHOO.util.Dom.get(this.id + "-favourite-span-" + siteIndex);
-         this.options.sites[siteIndex].isFavourite = !this.options.sites[siteIndex].isFavourite;
-         if (this.options.sites[siteIndex].isFavourite)
-         {
-            YAHOO.util.Dom.addClass(span, "enabled");
-         }
-         else
-         {
-            YAHOO.util.Dom.removeClass(span, "enabled");
-         }
-      },	 
-      
-      /**
-       * Helper method to change the gui and our local data model of sites
-       * @method _toggleImapFavourite
-       * @param siteIndex {integer} the index in our local data model
-       */
-      _toggleImapFavourite: function MySites__toggleImapFavourite(siteIndex)
-      {
-         var span = YAHOO.util.Dom.get(this.id + "-imap-favourite-span-" + siteIndex);
-         this.options.sites[siteIndex].isImapFavourite = !this.options.sites[siteIndex].isImapFavourite;
-         if (this.options.sites[siteIndex].isImapFavourite)
-         {
-            YAHOO.util.Dom.addClass(span, "enabled");
-         }
-         else
-         {
-            YAHOO.util.Dom.removeClass(span, "enabled");
-         }
-      },
-
-      /**
-       * Fired by YUI Link when the "Create site" label is clicked
-       * @method onCreateSiteLinkClick
-       * @param event {domEvent} DOM event
-       */
-      onCreateSiteLinkClick: function MySites_onCreateSiteLinkClick(event)
-      {
-         Alfresco.module.getCreateSiteInstance().show();         
-      },
-
-      /**
-       * Fired by another component, DeleteSite, to let other components know
-       * that a site has been deleted.
+       * Fired by DeleteSite module when a site has been deleted.
        *
        * @method onSiteDeleted
        * @param layer {object} Event fired (unused)
@@ -378,128 +268,151 @@
        */
       onSiteDeleted: function MySites_onSiteDeleted(layer, args)
       {
-         // Hide the site in this component
-         var site = args[1].site;
-         Dom.setStyle(this.id + "-site-div-" + site.shortName, "display", "none");
+         var site = args[1].site,
+            siteId = site.shortName;
+
+         // Find the record corresponding to this site
+         var record = this._findRecordByParameter(siteId, "shortName");
+         if (record !== null)
+         {
+            this.widgets.dataTable.deleteRow(record);
+         }
       },
-      /** Called when the mouse enters into a list item. */
-      onSiteElementMouseEntered: function SiteList_onCommentElementMouseEntered(layer, args)
+
+      /**
+       * Adds an event handler that adds or removes the site as favourite site
+       *
+       * @method onFavouriteSite
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onFavouriteSite: function MySites_onFavouriteSite(row)
       {
-         var elem = args[1].target;
-         Dom.addClass(elem, 'over');
+         var record = this.widgets.dataTable.getRecord(row),
+            site = record.getData(),
+            siteId = site.shortName;
+         
+         site.isFavourite ^= true;
+         
+         this.widgets.dataTable.updateRow(record, site);
+         
+         // Assume the call will succeed, but register a failure handler to replace the UI state on failure
+         var responseConfig =
+         {
+            failureCallback:
+            {
+               fn: function MS_oFS_failure(event, obj)
+               {
+                  // Reset the flag to it's previous state
+                  var record = obj.record,
+                     site = record.getData();
+                  
+                  site.isFavourite ^= true;
+                  this.widgets.dataTable.updateRow(record, site);
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     text: this.msg("message.siteFavourite.failure", site.title)
+                  });
+               },
+               scope: this,
+               obj:
+               {
+                  record: record
+               }
+            },
+            successCallback:
+            {
+               fn: function MS_oFS_success(event, obj)
+               {
+                  var record = obj.record,
+                     site = record.getData();
+
+                  YAHOO.Bubbling.fire(site.isFavourite ? "favouriteSiteAdded" : "favouriteSiteRemoved", site);
+               },
+               scope: this,
+               obj:
+               {
+                  record: record
+               }
+            }
+         };
+
+         this.preferencesService.set(Alfresco.service.Preferences.FAVOURITE_SITES + "." + siteId, site.isFavourite, responseConfig);
+      },
+
+	   /**
+       * Adds an event handler that adds or removes the site as favourite site
+       *
+       * @method _addImapFavouriteHandling
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onImapFavouriteSite: function MySites_onImapFavouriteSite(row)
+      {
+         var record = this.widgets.dataTable.getRecord(row),
+            site = record.getData(),
+            siteId = site.shortName;
+         
+         site.isIMAPFavourite ^= true;
+         
+         this.widgets.dataTable.updateRow(record, site);
+         
+         // Assume the call will succeed, but register a failure handler to replace the UI state on failure
+         var responseConfig =
+         {
+            failureCallback:
+            {
+               fn: function MS_oIFS_failure(event, obj)
+               {
+                  // Reset the flag to it's previous state
+                  var record = obj.record,
+                     site = record.getData();
+                  
+                  site.isIMAPFavourite ^= true;
+                  this.widgets.dataTable.updateRow(record, site);
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     text: this.msg("message.siteFavourite.failure", site.title)
+                  });
+               },
+               scope: this,
+               obj:
+               {
+                  record: record
+               }
+            }
+         };
+
+         this.preferencesService.set(Alfresco.service.Preferences.IMAP_FAVOURITE_SITES + "." + siteId, site.isIMAPFavourite, responseConfig);
       },
       
-      /** Called whenever the mouse exits a list item. */
-      onSiteElementMouseExited: function SiteList_onCommentElementMouseExited(layer, args)
+      /**
+       * Fired by YUI Link when the "Create site" label is clicked
+       * @method onCreateSiteLinkClick
+       * @param event {domEvent} DOM event
+       */
+      onCreateSiteLinkClick: function MySites_onCreateSiteLinkClick(event)
       {
-         var elem = args[1].target;
-         Dom.removeClass(elem, 'over');
+         Alfresco.module.getCreateSiteInstance().show();
+         Event.preventDefault(event);
+      },
+
+      /**
+       * Searches the current recordSet for a record with the given parameter value
+       *
+       * @method _findRecordByParameter
+       * @param p_value {string} Value to find
+       * @param p_parameter {string} Parameter to look for the value in
+       */
+      _findRecordByParameter: function MySites__findRecordByParameter(p_value, p_parameter)
+      {
+        var recordSet = this.widgets.dataTable.getRecordSet();
+        for (var i = 0, j = recordSet.getLength(); i < j; i++)
+        {
+           if (recordSet.getRecord(i).getData(p_parameter) == p_value)
+           {
+              return recordSet.getRecord(i);
+           }
+        }
+        return null;
       }
-   };
+   });
 })();
-Alfresco.util.rollover = {};
-
-/**
- * Attaches mouseover/exit event listener to the passed element.
- * 
- * @method Alfresco.util.rollover._attachRolloverListener
- * @param elem the element to which to add the listeners
- * @param mouseOverEventName the bubble event name to fire for mouse enter events
- * @param mouseOutEventName the bubble event name to fire for mouse out events
- */
-Alfresco.util.rollover._attachRolloverListener = function(elem, mouseOverEventName, mouseOutEventName)
-{  
-   var eventElem = elem, relTarg;
-     
-   var mouseOverHandler = function(e)
-   {
-      // find the correct target element and check whether we only moved between
-      // subelements of the hovered element
-      if (!e)
-      {
-         e = window.event;
-      }
-      relTarg = (e.relatedTarget !== undefined) ? e.relatedTarget : e.fromElement;
-      while (relTarg && relTarg != eventElem && relTarg.nodeName != 'BODY')
-      {
-         relTarg = relTarg.parentNode;
-      }
-      if (relTarg == eventElem)
-      {
-         return;
-      }
-    
-      // the mouse entered the element, fire an event to inform about it
-      YAHOO.Bubbling.fire(mouseOverEventName,
-      {
-         event: e,
-         target: eventElem
-      });
-   };
- 
-   var mouseOutHandler = function(e)
-   {
-      // find the correct target element and check whether we only moved between
-      // subelements of the hovered element
-      if (!e)
-      {
-         e = window.event;         
-      }
-      relTarg = (e.relatedTarget !== undefined) ? e.relatedTarget : e.toElement;
-      while (relTarg !== null && relTarg != eventElem && relTarg.nodeName != 'BODY')
-      {
-         relTarg = relTarg.parentNode;
-      }
-      if (relTarg == eventElem)
-      {
-         return;
-      }
-     
-      // the mouse exited the element, fire an event to inform about it
-      YAHOO.Bubbling.fire(mouseOutEventName,
-      {
-         event: e,
-         target: eventElem
-      });
-   };
- 
-   YAHOO.util.Event.addListener(elem, 'mouseover', mouseOverHandler);
-   YAHOO.util.Event.addListener(elem, 'mouseout', mouseOutHandler);
-};
-
-/**
- * Register rollover listeners to elements identified by a class and tag name.
- * 
- * @param htmlId the id of the component for which the listeners get registered.
- *        This id is used to distinguish events from different components.
- * @param className the class name of elements to add the listener to
- * @param tagName the tag name of elements to add the listener to.
- */
-Alfresco.util.rollover.registerListenersByClassName = function(htmlId, className, tagName)
-{
-   var mouseEnteredBubbleEventName = 'onRolloverMouseEntered-' + htmlId;
-   var mouseExitedBubbleEventName = 'onRolloverMouseExited-' + htmlId;
-   var elems = YAHOO.util.Dom.getElementsByClassName(className, tagName, htmlId);
-   for (var x = 0; x < elems.length; x++)
-   {
-      Alfresco.util.rollover._attachRolloverListener(elems[x], mouseEnteredBubbleEventName, mouseExitedBubbleEventName);
-   }
-};
-
-
-/**
- * Register handle functions that handle the mouse enter/exit events
- * 
- * @param htmlId the id of the component for which the listeners got registered
- * @param mouseEnteredFn the function to call for mouse entered events
- * @param mouseExitedFunction the function to call for mouse exited events
- * @param scope the object which is used as scope for the function execution
- */
-Alfresco.util.rollover.registerHandlerFunctions = function(htmlId, mouseEnteredFn, mouseExitedFn, scope)
-{
-   // register bubble events
-   var mouseEnteredBubbleEventName = 'onRolloverMouseEntered-' + htmlId;
-   var mouseExitedBubbleEventName = 'onRolloverMouseExited-' + htmlId;
-   YAHOO.Bubbling.on(mouseEnteredBubbleEventName, mouseEnteredFn, scope);
-   YAHOO.Bubbling.on(mouseExitedBubbleEventName, mouseExitedFn, scope);
-};

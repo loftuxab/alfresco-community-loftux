@@ -51,15 +51,11 @@
       this.name = "Alfresco.module.RevertWikiVersion";
       this.id = containerId;
 
-      var instance = Alfresco.util.ComponentManager.find(
-      {
-         id: this.id
-      });
-      if (instance !== undefined && instance.length > 0)
+      var instance = Alfresco.util.ComponentManager.get(this.id);
+      if (typeof instance !== "undefined")
       {
          throw new Error("An instance of Alfresco.module.RevertWikiVersion already exists.");
       }
-
 
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -414,19 +410,12 @@
 
 })();
 
-
 Alfresco.module.getRevertWikiVersionInstance = function()
 {
-   var instanceId = "alfresco-revertWikiVersion-instance";
-   var instance = Alfresco.util.ComponentManager.find(
-   {
-      id: instanceId
-   });
-   if (instance !== undefined && instance.length > 0)
-   {
-      instance = instance[0];
-   }
-   else
+   var instanceId = "alfresco-revertWikiVersion-instance",
+      instance = Alfresco.util.ComponentManager.get(instanceId);
+   
+   if (typeof instance == "undefined")
    {
       instance = new Alfresco.module.RevertWikiVersion(instanceId);
    }

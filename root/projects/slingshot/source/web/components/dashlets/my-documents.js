@@ -137,7 +137,7 @@
          });
 
          // DataSource definition
-         var uriDocList = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/documents/node/alfresco/sites/home??max=50&filter=";
+         var uriDocList = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/documents/node/alfresco/sites/home?max=50&filter=";
          this.widgets.dataSource = new YAHOO.util.DataSource(uriDocList,
          {
             responseType: YAHOO.util.DataSource.TYPE_JSON,
@@ -161,6 +161,7 @@
          /**
           * Favourite Documents custom datacell formatter
           */
+         var favEventClass = Alfresco.util.getDomId("fav-doc");
          var renderCellFavourite = function MD_renderCellFavourite(elCell, oRecord, oColumn, oData)
          {
             var nodeRef = oRecord.getData("nodeRef"),
@@ -169,7 +170,7 @@
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            elCell.innerHTML = '<a class="favourite-document' + (isFavourite ? ' enabled' : '') + '" title="' + me.msg("tip.favourite-document") + '">&nbsp;</a>';
+            elCell.innerHTML = '<a class="favourite-document ' + favEventClass + (isFavourite ? ' enabled' : '') + '" title="' + me.msg("tip.favourite-document") + '">&nbsp;</a>';
          };
 
          /**
@@ -232,7 +233,6 @@
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-documents", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: this.options.usePagination ? 16 : 32,
             initialLoad: true,
             initialRequest: this.currentFilter,
             dynamicData: true,
@@ -267,12 +267,12 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  this.widgets.dataTable.set("MSG_ERROR", response.message);
+                  me.widgets.dataTable.set("MSG_ERROR", response.message);
                }
                catch(e)
                {
-                  this.widgets.dataTable.set("MSG_EMPTY", this.msg("label.empty"));
-                  this.widgets.dataTable.set("MSG_ERROR", this.msg("label.error"));
+                  me.widgets.dataTable.set("MSG_EMPTY", this.msg("label.empty"));
+                  me.widgets.dataTable.set("MSG_ERROR", this.msg("label.error"));
                }
             }
             
@@ -310,7 +310,7 @@
       		 
             return true;
          };
-         YAHOO.Bubbling.addDefaultAction("favourite-document", fnFavouriteHandler);
+         YAHOO.Bubbling.addDefaultAction(favEventClass, fnFavouriteHandler);
       },
       
       /**
@@ -398,7 +398,7 @@
                   }
                   else
                   {
-                     this.widgets.dataTable.updateRow(file, file);
+                     this.widgets.dataTable.updateRow(record, file);
                   }
                   Alfresco.util.PopupManager.displayPrompt(
                   {
