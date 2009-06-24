@@ -12,20 +12,24 @@ function sortSites(site1, site2)
 
 function main()
 {
+   var sites = [],
+      imapServerEnabled = false;
+   
    // Call the repo for sites the user is a member of
    var result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/sites");
    if (result.status == 200)
    {
-      var i, ii, j, jj;
+      var site, favourites = {}, imapFavourites = {}, managers,
+         i, ii, j, jj;
       
       // Create javascript objects from the server response
-      var sites = eval('(' + result + ')'), site, favourites = {}, imapFavourites = {}, managers;
+      sites = eval('(' + result + ')');
       
       if (sites.length > 0)
       {
          // Check for IMAP server status
          result = remote.call("/imap/servstatus");
-         model.imapServerEnabled = true; //(result.status == 200 && result == "enabled");
+         imapServerEnabled = (result.status == 200 && result == "enabled");
          
          // Call the repo for the user's favourite sites
          result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_SITES);
@@ -80,6 +84,7 @@ function main()
 
       // Prepare the model for the template
       model.sites = sites;
+      model.imapServerEnabled = imapServerEnabled;
    }
 }
 
