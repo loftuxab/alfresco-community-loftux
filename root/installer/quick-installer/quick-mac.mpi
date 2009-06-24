@@ -3474,7 +3474,7 @@ InstallComponent 80D7849E-9103-4EA2-B202-F23CC339309D -setup Install -type actio
 InstallComponent 63BFF8EA-EB59-59FD-0C1B-0FD60638D5AB -setup Install -type action -conditions AD2EFFE4-4566-CA74-88E1-0A74DAFE19CA -title {Set Virtual Text} -component SetVirtualText -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 Condition AD2EFFE4-4566-CA74-88E1-0A74DAFE19CA -active Yes -parent 63BFF8EA-EB59-59FD-0C1B-0FD60638D5AB -title {File Exists Condition} -component FileExistsCondition -TreeObject::id AD2EFFE4-4566-CA74-88E1-0A74DAFE19CA
 InstallComponent 7C8F5F7E-E82D-4197-987C-D0AD4F12AFED -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
-InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -conditions 710736DF-8343-4CA4-79DC-C3D09E164E83 -title {Write Text To File} -component WriteTextToFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -conditions 710736DF-8343-4CA4-79DC-C3D09E164E83 -title {Write Text To File} -component WriteTextToFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 Condition 710736DF-8343-4CA4-79DC-C3D09E164E83 -active Yes -parent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -title {Platform Condition} -component PlatformCondition -TreeObject::id 710736DF-8343-4CA4-79DC-C3D09E164E83
 InstallComponent F03F1387-C847-400B-A135-9A967D979941 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC -setup Install -type actiongroup -title {Path Setup} -alias {Path Setup} -active Yes -parent ActionGroupsInstall
@@ -5728,7 +5728,7 @@ F03F1387-C847-400B-A135-9A967D979941,Conditions
 {0 conditions}
 
 F03F1387-C847-400B-A135-9A967D979941,Files
-{<%InstallDir%>/tomcat/shared/alfresco-global.properties;<%TomcatPortConfig%>/server.xml;<%InstallDir%>/*.sh;<%InstallDir%>/Alfresco.app/Contents/Resources/script}
+{<%InstallDir%>/tomcat/shared/classes/alfresco-global.properties;<%TomcatPortConfig%>/server.xml;<%InstallDir%>/*.sh;<%InstallDir%>/Alfresco.app/Contents/Resources/script}
 
 F03F1387-C847-400B-A135-9A967D979941,StringMap
 {"@@ALF_HOME@@" "<%Dir <%InstallDir%> forward%>"
