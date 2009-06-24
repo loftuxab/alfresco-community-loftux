@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -64,12 +64,9 @@
     */
    Alfresco.DocumentList = function(htmlId)
    {
-      // Mandatory properties
-      this.name = "Alfresco.DocumentList";
-      this.id = htmlId;
+      Alfresco.DocumentList.superclass.constructor.call(this, "Alfresco.DocumentList", htmlId, ["button", "menu", "container", "datasource", "datatable", "paginator", "json", "history"]);
 
       // Initialise prototype properties
-      this.widgets = {};
       this.state =
       {
          actionEditOfflineActive: false
@@ -80,8 +77,6 @@
          filterOwner: "",
          filterData: ""
       };
-      this.modules = {};
-      this.services = {};
       this.actions = {};
       this.selectedFiles = {};
       this.tagId =
@@ -92,12 +87,6 @@
       this.afterDocListUpdate = [];
       this.doclistMetadata = {};
       this.previewTooltips = [];
-      
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable", "paginator", "json", "history"], this.onComponentsLoaded, this);
       
       /**
        * Decoupled event listeners
@@ -132,7 +121,7 @@
       return this;
    };
    
-   Alfresco.DocumentList.prototype =
+   YAHOO.extend(Alfresco.DocumentList, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -1109,7 +1098,7 @@
                try
                {
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
-                  this.widgets.dataTable.set("MSG_ERROR", response.message);
+                  me.widgets.dataTable.set("MSG_ERROR", response.message);
                }
                catch(e)
                {
@@ -2652,5 +2641,5 @@
         }
         return null;
       }
-   };
+   });
 })();

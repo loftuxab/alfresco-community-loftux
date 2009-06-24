@@ -268,10 +268,7 @@
          finderDiv.innerHTML = response.serverResponse.responseText;
 
          // Find the People Finder by container ID
-         this.modules.peopleFinder = Alfresco.util.ComponentManager.find(
-         {
-            id: this.id + "-peoplefinder"
-         })[0];
+         this.modules.peopleFinder = Alfresco.util.ComponentManager.get(this.id + "-peoplefinder");
          // Set the correct options for our use
          this.modules.peopleFinder.setOptions(
          {

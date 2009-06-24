@@ -81,31 +81,28 @@ textarea
 
 /**
  * Dashlets / position:relative and overflow:auto bug
+ * Plus: inability to do anything according to any standards, ever
  */
 .dashlet .scrollableList,
 .dashlet .scrollablePanel
 {
+   background-color: #fff;
    position: relative;
 }
 
-/**
- * My Sites dashlet / padding bug
- */
-.my-sites .first-item div.description
-{
-   margin-top: -7px;
-}
 
 /**
- * My Documents dashlet
- * MSIE's inability to do anything properly
+ * Dashlets that use a DataTable
+ * Fixing MSIE's inability to do anything properly
  */
-.my-documents .scrollableList
+.my-documents .scrollableList,
+.my-sites .scrollableList
 {
    padding-right: 20px;
 }
 
-.my-documents table
+.my-documents table,
+.my-sites table
 {
    margin-right: -20px !important;
 }

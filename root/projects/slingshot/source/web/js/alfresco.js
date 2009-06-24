@@ -753,7 +753,7 @@ Alfresco.util.relToTarget = function(p_rootNode)
  * @param p_name {string} Dom element ID of markup that button is created from {p_scope.id}-{name}
  * @param p_onclick {function} If supplied, registered with the button's click event
  * @param p_obj {object} Optional extra object parameters to pass to button constructor
- * @return {YUI.widget.Button} New Button instance
+ * @return {YAHOO.widget.Button} New Button instance
  * @static
  */
 Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
@@ -804,7 +804,7 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
  * Link buttons aren't disabled by YUI; see http://developer.yahoo.com/yui/button/#apiref
  *
  * @method Alfresco.util.disableYUIButton
- * @param p_button {YUI.widget.Button} Button instance
+ * @param p_button {YAHOO.widget.Button} Button instance
  * @static
  */
 Alfresco.util.disableYUIButton = function(p_button)
@@ -1215,7 +1215,7 @@ Alfresco.util.getQueryStringParameters = function(url)
  */
 Alfresco.util.toQueryString = function(p_params)
 {
-   var qs = "?", i, ii, name, value, val;
+   var qs = "?", name, value, val;
    for (name in p_params)
    {
       if (p_params.hasOwnProperty(name))
@@ -1996,23 +1996,18 @@ Alfresco.util.Ajax = function()
 
          if (c.requestContentType === this.JSON)
          {
-            // If json is used encode the dataObj parameter and put it in the body
-            if (c.method.toUpperCase() === this.GET && c.dataObj)
-            {
-               throw new Error("Parameter 'method' can not be 'GET' when trying to submit data in dataObj with contentType '" + c.requestContentType + "'");
-            }
-            else if(c.method.toUpperCase() !== this.GET)
+            if (c.method.toUpperCase() === this.GET)
             {
                if (c.dataObj)
                {
-                  c.dataStr = YAHOO.lang.JSON.stringify(c.dataObj);
-               }
-               else
-               {
-                  c.dataStr = "{}";
+                  throw new Error("Parameter 'method' can not be 'GET' when trying to submit data in dataObj with contentType '" + c.requestContentType + "'");
                }
             }
-            
+            else
+            {
+               // If json is used encode the dataObj parameter and put it in the body
+               c.dataStr = YAHOO.lang.JSON.stringify(c.dataObj || {});
+            }
          }
          else
          {

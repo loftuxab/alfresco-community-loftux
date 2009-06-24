@@ -23,7 +23,6 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-
 /**
  * RevertVersion component.
  *
@@ -34,7 +33,6 @@
  */
 (function()
 {
-
    /**
     * RevertVersion constructor.
     *
@@ -51,15 +49,11 @@
       this.name = "Alfresco.module.RevertVersion";
       this.id = containerId;
 
-      var instance = Alfresco.util.ComponentManager.find(
-      {
-         id: this.id
-      });
-      if (instance !== undefined && instance.length > 0)
+      var instance = Alfresco.util.ComponentManager.get(this.id);
+      if (typeof instance !== "undefined")
       {
          throw new Error("An instance of Alfresco.module.RevertVersion already exists.");
       }
-
 
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -164,9 +158,8 @@
          }
       },
 
-
       /**
-       * Called when the revret dialog html template has been returned from the server.
+       * Called when the revert dialog html template has been returned from the server.
        * Creates the YIU gui objects such as the panel.
        *
        * @method onTemplateLoaded
@@ -385,24 +378,15 @@
          // Show the revert panel
          this.widgets.panel.show();
       }
-
    };
-
 })();
-
 
 Alfresco.module.getRevertVersionInstance = function()
 {
-   var instanceId = "alfresco-revertVersion-instance";
-   var instance = Alfresco.util.ComponentManager.find(
-   {
-      id: instanceId
-   });
-   if (instance !== undefined && instance.length > 0)
-   {
-      instance = instance[0];
-   }
-   else
+   var instanceId = "alfresco-revertVersion-instance",
+      instance = Alfresco.util.ComponentManager.get(instanceId);
+
+   if (typeof instance == "undefined")
    {
       instance = new Alfresco.module.RevertVersion(instanceId);
    }

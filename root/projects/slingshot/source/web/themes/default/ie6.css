@@ -147,6 +147,11 @@ textarea
 
 div.dashlet .body
 {
+   width: auto;
+}
+
+div.dashlet .profile
+{
    width: 100%;
 }
 
@@ -352,6 +357,7 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 .dashlet .scrollableList,
 .dashlet .scrollablePanel
 {
+   background-color: #fff;
    position: relative;
 }
 
@@ -362,13 +368,32 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 
 
 /**
- * My Sites dashlet / padding bug
+ * Dashlets that use a DataTable
+ * Fixing MSIE's inability to do anything properly
  */
-.my-sites .first-item div.description
+.my-documents .scrollableList,
+.my-sites .scrollableList
 {
-   margin-top: -7px;
+   overflow-x: hidden;
 }
 
+.my-documents table,
+.my-sites table
+{
+   margin-right: -20px !important;
+}
+
+.my-documents td,
+.my-sites td
+{
+   cursor: default;
+}
+
+/* IE6 min-height fail */
+.my-sites div.site-title
+{
+   padding-bottom: 8px;
+}
 
 /**
  * Members / invite pages

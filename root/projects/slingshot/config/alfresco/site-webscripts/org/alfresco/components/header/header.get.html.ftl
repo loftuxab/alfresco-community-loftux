@@ -58,7 +58,7 @@
       </div>
    </div>
 
-   <div id="${args.htmlid}-sites-menu" class="yui-overlay">
+   <div id="${args.htmlid}-sites-menu" class="yui-overlay menu-with-icons">
       <div class="bd">
          <#assign favDisplay><#if favouriteSites?size &gt; 0>block<#else>none</#if></#assign>
          <ul id="${args.htmlid}-favouritesContainer" class="favourite-sites" style="display: ${favDisplay}">
@@ -74,18 +74,18 @@
          </#list>
          </ul>
          <#assign addFavDisplay><#if (page.url.templateArgs.site?? && !currentSiteIsFav)>block<#else>none</#if></#assign>
-         <ul id="${args.htmlid}-addFavourite" class="add-favourite separator" style="display: ${addFavDisplay}">
+         <ul id="${args.htmlid}-addFavourite" class="add-favourite-menuitem separator" style="display: ${addFavDisplay}">
             <li>
                <a href="#" onclick="thisHeader.addAsFavourite(); return false;">${msg("link.add-favourite", siteTitle)}</a>
             </li>
          </ul>
-         <ul class="<#if !isGuest>separator</#if>">
+         <ul class="site-finder-menuitem<#if !isGuest> separator</#if>">
             <li>
                <a href="${url.context}/page/site-finder">${msg("header.sites.findSites")}</a>
             </li>
          </ul>
          <#if !isGuest>
-         <ul>
+         <ul class="create-site-menuitem">
             <li>
                <a href="#" onclick="thisHeader.showCreateSite(); return false;">${msg("header.sites.createSite")}</a>
             </li>

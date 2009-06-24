@@ -68,10 +68,7 @@
       this.name = "Alfresco.FileUpload";
       this.id = containerId;
 
-      var instance = Alfresco.util.ComponentManager.find(
-      {
-         id: this.id
-      });
+      var instance = Alfresco.util.ComponentManager.get(this.id);
       if (instance !== undefined && instance.length > 0)
       {
          throw new Error("An instance of Alfresco.FileUpload already exists.");
@@ -231,22 +228,14 @@
 
 })();
 
-
 Alfresco.getFileUploadInstance = function()
 {
-   var instanceId = "alfresco-fileupload-instance";
-   var instance = Alfresco.util.ComponentManager.find(
-   {
-      id: instanceId
-   });
-   if (instance !== undefined && instance.length > 0)
-   {
-      instance = instance[0];
-   }
-   else
+   var instanceId = "alfresco-fileupload-instance",
+      instance = Alfresco.util.ComponentManager.get(instanceId);
+   
+   if (typeof instance == "undefined")
    {
       instance = new Alfresco.FileUpload(instanceId);
    }
    return instance;
 };
-

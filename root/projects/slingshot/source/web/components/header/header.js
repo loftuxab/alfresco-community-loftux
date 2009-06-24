@@ -59,6 +59,7 @@
       // Notifications that the favourite sites have been updated
       YAHOO.Bubbling.on("favouriteSiteAdded", this.onFavouriteSiteAdded, this);
       YAHOO.Bubbling.on("favouriteSiteRemoved", this.onFavouriteSiteRemoved, this);
+      YAHOO.Bubbling.on("siteDeleted", this.onSiteDeleted, this);
 
       this.preferencesService = new Alfresco.service.Preferences();
       return this;
@@ -382,6 +383,26 @@
             if (obj.shortName in this.options.favouriteSites)
             {
                delete this.options.favouriteSites[obj.shortName];
+               this._renderFavouriteSites();
+            }
+         }
+      },
+
+      /**
+       * Site has been deleted - maybe remove from favourites menu
+       *
+       * @method onSiteDeleted
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onSiteDeleted: function Header_onSiteDeleted(layer, args)
+      {
+         var obj = args[1];
+         if (obj && obj.site !== null)
+         {
+            if (obj.site.shortName in this.options.favouriteSites)
+            {
+               delete this.options.favouriteSites[obj.site.shortName];
                this._renderFavouriteSites();
             }
          }
