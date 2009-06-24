@@ -57,7 +57,7 @@
 
       <div class="text">
          <a class="closeLink" href="#" id="${args.htmlid}-closeAddPages-link">${msg("link.close")}</a>
-         <h3 class="padded">${msg("section.selectNewPages")}</h3>
+         <h3 class="padded theme-color-2">${msg("section.selectNewPages")}</h3>
       </div>
       <div>
          <ul>

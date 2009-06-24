@@ -20,10 +20,3 @@
    margin: 0 2px 0 0;
    padding: 0 0 0 10px;
 }
-
-.toolbar .link a.activePage,
-.toolbar .link a.activePage:visited,
-.toolbar .link a:hover
-{
-	color: #009300;
-}

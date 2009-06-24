@@ -221,12 +221,18 @@ span.navigation-item-alt
    color: #9fc6e1;
 }
 
+span.navigation-item a,
+span.navigation-item a:visited
+{
+   color: #0D3B57;
+}
 span.navigation-item a.active-page,
 span.navigation-item a.active-page:visited,
 span.navigation-item a:hover
 {
    color: #fff;
 }
+
 
 span.navigation-separator
 {
@@ -267,6 +273,13 @@ textarea
 {
    border: 1px solid #C5D6E2;
    font-weight: normal;
+}
+
+/* same as theme-color-2 */
+.toolbar .link a:hover,
+.members-bar .member-link a:hover
+{
+   color:#038603;
 }
 
 /* Richtext Editor Plug-ins */
@@ -389,15 +402,97 @@ span.mce_alfresco-imagelibrary
    border: 1px solid #FFFFFF;
 }
 
+/* YUI Menu */
+body.yui-skin-default .yuimenu .bd {
+   border:1px solid #6CA5CE;
+}
+/* YUI Menu roll over state*/
+body.yui-skin-default .yuimenu .bd ul li.yuimenuitem-selected
+{
+   background-color: #6CA5CE;
+}
+body.yui-skin-default .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel
+{
+   color:#6CA5CE;
+}
+body.yui-skin-default .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
+{
+    color:#FFF;
+}
+/*end YUI Menu */
+
+/* Doclist */
+body.yui-skin-default .doclist .more-actions a:active,
+body.yui-skin-default .doclist .more-actions a:hover
+{
+   background-color: #6CA5CE;
+}
+body.yui-skin-default .doclist div.more-actions {
+   border:1px solid #6CA5CE;
+}
+body.yui-skin-default .doclist .action-set a:active,
+body.yui-skin-default .doclist .action-set a:hover,
+body.yui-skin-default .doclist .action-set .highlighted
+{
+   border: 1px solid #6CA5CE;
+}
+
+
+body.yui-skin-default .doclist tr.yui-dt-odd.yui-dt-highlighted,
+body.yui-skin-default .doclist tr.yui-dt-even.yui-dt-highlighted,
+body.yui-skin-default .links-body tr.links-selected-row,
+body.yui-skin-default .over,
+.postview,
+.topicview
+{
+   background-color: #D2E5F2;
+}
+body.yui-skin-default .doclist tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last,
+body.yui-skin-default .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
+{
+   border-left: 1px solid #999;
+}
+
+/* end doclist */
+
+/* invite page */
+.inviteusersbyemail .byemailbody,
+.people-finder .results
+{
+   background-color: #f6f9fc;
+}
+
 /* filter list link */
 
 .yui-skin-default .treeview .selected,
 .yui-skin-default .filter li.selected, 
-.yui-skin-default .tags li.selected
+.yui-skin-default .tags li.selected,
+.archive li.selected,
+.tool li.selected,
+body.yui-skin-default .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
 {
    background-color: #D2E5F2;
 }
+/* Link color */
+body.yui-skin-default .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected a,
+li.selected a.filter-link,
+li.selected a.tool-link, 
+li.selected a.archive-link,
+li.selected a.tag-link,
+body.yui-skin-default .treeview .selected table .ygtvlabel, 
+body.yui-skin-default .treeview .selected table .ygtvlabel:link, 
+body.yui-skin-default .treeview .selected table .ygtvlabel:visited, 
+body.yui-skin-default .treeview .selected table .ygtvlabel:hover
+{
 
+}
+body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel, 
+body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:link, 
+body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:visited, 
+body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:hover
+{
+
+}
 .yui-skin-default .node .nodeTitle a,
 .yui-skin-default .node .nodeURL a,
 .yui-skin-default .nodeAttrValue a,
@@ -422,21 +517,24 @@ span.mce_alfresco-imagelibrary
    background-image: url(./images/navigation-bg.png);
 }
 
-.yui-skin-default .over
-{
-   background-color: #F4FAFF;
-}
-
 .toolbar .action-bar
 {
    border-right: 1px solid #9eb0b7;
 }
-
+/* Calendar */
 .yui-skin-default #calendar .yui-calendar td.calcell.selected a
 {
    background-color: #EBEFF1;
 }
 
+.yui-skin-default .dayview h2, .weekview h2,
+.yui-skin-default .calendar.weekview thead th,
+.yui-skin-default .calendar.monthview thead th 
+{
+   color:#000;
+}
+
+/* End Calendar */
 /* Theme colors */
 
 .theme-color-1,
@@ -468,9 +566,16 @@ a.theme-color-4,
 a.theme-color-4:visited,
 a.theme-color-4:hover
 {
-   color: #0D3B57;
+   color: #009300;
 }
 
+.theme-color-5,
+a.theme-color-5,
+a.theme-color-5:visited,
+a.theme-color-5:hover
+{
+
+}
 /* Theme background colors */
 
 .theme-bg-color-1,

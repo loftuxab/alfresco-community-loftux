@@ -53,7 +53,7 @@
                            <#assign numEvents = 0>
                            <#list viewArgs.view.dates[id].events as event>
                                 <#if (event.allday) >                              
-                                    <div class="vevent allday">
+                                    <div class="vevent allday theme-bg-color-1">
                                         <div>
                                              <a href="/calendar/event/${page.url.templateArgs.site!""}/${event.name}" class="summary theme-color-1">${event.summary}</a>
                                              <p class="description">${event.description}</p>
@@ -132,7 +132,7 @@
                 <#if (day==6)>
                     <#assign tdclass = tdclass + ' last'>
                 </#if> 
-                <td class="${tdclass}"><div class="target" style="width: 12.5%"> </div></td>
+                <td class="${tdclass}"><div class="target" > </div></td>
                </#list>
             </tr>
             <tr id="collapseTrigger">

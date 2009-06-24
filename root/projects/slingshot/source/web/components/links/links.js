@@ -601,7 +601,7 @@
             me.widgets.dataTable.selectRow(e.target);
             e.target.cells[2].childNodes[0].style.display = "";
             e.target.cells[2].childNodes[0].style.width = "100px";
-            e.target.cells[2].style.borderLeft = "1px solid #C5E6E9";
+            e.target.cells[2].style.borderLeft = "1px solid #999";
          };
 
          var onRowMouseout = function Links_onRowMouseout(e)

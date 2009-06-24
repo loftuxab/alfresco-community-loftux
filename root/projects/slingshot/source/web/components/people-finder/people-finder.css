@@ -81,7 +81,6 @@
 .people-finder .results
 {
    clear: both;
-   background-color: #f6f9fc;
    overflow-x: hidden;
    overflow-y: auto;
    position: relative !important;

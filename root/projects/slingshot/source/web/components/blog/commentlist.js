@@ -773,7 +773,7 @@
          html += ' ' + this._msg("comment.said") + ':';
          if (data.isUpdated)
          {
-            html += '<span class="nodeStatus">(' + this._msg("comment.updated") + ')</span>';
+            html += '<span class="theme-color-2 nodeStatus">(' + this._msg("comment.updated") + ')</span>';
          }
          html += '</div>';
          html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>';

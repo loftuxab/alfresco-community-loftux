@@ -160,7 +160,7 @@ div.boxOutline
 }
 #calTitle span.tagged 
 {
- color:#A1A1A1;
+ color:#808080;
  margin-left:0.5em;
 }
 #calTitle span.tagged span
@@ -395,12 +395,10 @@ padding:8px 10px;
 }*/
 .calendar.weekview thead th,.calendar.monthview thead th {
     height:2.5em;
-    color:#999;
     border:1px solid #EAEAEA;
     border-width:0 1px 0 0;
     text-align:center;
    font:normal 100% Arial;
-   color:#606060;
 }
 .calendar.weekview thead th {
     border-width:0 0 1px 1px; 
@@ -521,7 +519,6 @@ margin:1em auto 0.5em auto;
 div.allday {
 margin:0;
 padding:0;
-background-color:#2B6EB5;
 color:#fff;
 clear:both;
 float:left;
@@ -655,7 +652,6 @@ div.hour4 {
 }
 .dayview h2, .weekview h2 {
    font:normal 100% Arial;
-   color:#606060;
    margin:2px auto;
    text-align:center;
    width:100%;

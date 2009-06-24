@@ -379,7 +379,7 @@
                // begin view
                html += '<div class="nodeContent">';
                html += '<span class="nodeTitle"><a href="' + postViewUrl + '">' + $html(data.title) + '</a> ';
-               html += '<span class="nodeStatus">' + statusLabel + '</span></span>';
+               html += '<span class="theme-color-2 nodeStatus">' + statusLabel + '</span></span>';
                html += '<div class="published">';
                if (!data.isDraft)
                {
@@ -444,7 +444,7 @@
                // begin view
                html += '<div class="nodeContent">';
                html += '<span class="nodeTitle"><a href="' + postViewUrl + '">' + $html(data.title) + '</a> ';
-               html += '<span class="nodeStatus">' + statusLabel + '</span></span>';
+               html += '<span class="theme-color-2 nodeStatus">' + statusLabel + '</span></span>';
                html += '<div class="published">';
                if (!data.isDraft)
                {

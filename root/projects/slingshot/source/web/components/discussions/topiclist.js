@@ -382,7 +382,7 @@
                html += '<span class="nodeTitle"><a href="' + topicViewUrl + '">' + $html(data.title) + '</a> ';
                if (data.isUpdated)
                {
-                  html += '<span class="nodeStatus">(' + me._msg("post.updated") + ')</span>';
+                  html += '<span class="theme-color-2 nodeStatus">(' + me._msg("post.updated") + ')</span>';
                }
                html += '</span>';
                html += '<div class="published">';
@@ -459,7 +459,7 @@
                html += '<span class="nodeTitle"><a href="' + topicViewUrl + '">' + $html(data.title) + '</a> ';
                if (data.isUpdated)
                {
-                  html += '<span class="nodeStatus">(' + me._msg("post.updated") + ')</span>';
+                  html += '<span class="theme-color-2 nodeStatus">(' + me._msg("post.updated") + ')</span>';
                }
                html += '<div class="published">';
                html += '<span class="nodeAttrLabel">' + me._msg("post.createdOn") + ': </span>';
