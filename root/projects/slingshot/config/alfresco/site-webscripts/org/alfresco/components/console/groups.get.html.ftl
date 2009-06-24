@@ -46,7 +46,7 @@
       </div>
       <div id="${el}-search-panel" class="search-main hidden">
          <div id="${el}-search-bar" class="search-bar theme-bg-color-3">
-            <div id="${el}-search-bar-text">${msg("message.noresults")}</div>
+            <div id="${el}-search-bar-text" class="search-bar-text">${msg("message.noresults")}</div>
             <!-- Search button -->
             <div class="closesearch-button">
                <span class="yui-button yui-push-button" id="${el}-closesearch-button">

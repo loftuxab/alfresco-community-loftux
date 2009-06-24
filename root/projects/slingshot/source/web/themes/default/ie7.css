@@ -152,13 +152,15 @@ textarea
 }
 
 
-/* Full preview backgroundd mask */
+/* Full preview background mask */
 
 body.masked div.mask.full-preview-mask
 {
    background-color: #303030;
    filter: alpha(opacity = 100);
 }
+
+/* Dialogs */
 
 .yui-skin-default #prompt
 {
@@ -168,6 +170,17 @@ body.masked div.mask.full-preview-mask
 .yui-skin-default #message
 {
    width: 30em;
+}
+
+.yui-skin-default .groups.remove-dialog
+{
+   width: 41em;
+}
+
+.yui-skin-default .yui-panel.groups.people-picker,
+.yui-skin-default .yui-panel.groups.group-picker
+{
+   width: 51em;
 }
 
 /* Prevent ghost border on first row for DataTables */

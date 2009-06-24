@@ -174,7 +174,9 @@
                   // initial sort by username field
                   items.sort(function(a, b)
                   {
-                     return (a.shortName ? a.shortName.toLowerCase() : "" > b.shortName ? b.shortName.toLowerCase() : "");
+                     var name1 = a.shortName ? a.shortName.toLowerCase() : "",
+                        name2 = b.shortName ? b.shortName.toLowerCase() : "";
+                     return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
                   });
 
                   // we need to wrap the array inside a JSON object so the DataTable gets the object it expects
@@ -695,7 +697,7 @@
             ];
             var usersButtons = [
                {
-                  title: parent._msg("button.removegroup"),
+                  title: parent._msg("button.removeuser"),
                   cssClass: "users-remove-button",
                   click: {
                      fn: this.onUserRemoveClick,
@@ -732,7 +734,9 @@
             // Sort the groups & items
             column.body.items = column.body.items.sort(function(a, b)
             {
-               return (a.label.toLowerCase() > b.label.toLowerCase());
+               var name1 = a.label.toLowerCase(),
+                     name2 = b.label.toLowerCase();
+               return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
             });
 
             // Footer
