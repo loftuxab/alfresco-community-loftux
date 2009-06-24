@@ -33,6 +33,7 @@ rem ---------------------------------------
 
 if not ""%1"" == ""start"" goto stop
 
+if not exist "%ALF_HOME%mysql\my.ini" goto tomcat
 rem ---------------------------------------
 rem Start MySQL
 rem ---------------------------------------
@@ -43,6 +44,7 @@ rem Uncomment below to pause for 5 seconds before starting Tomcat
 rem Change 5000 to 1000 x the number of seconds delay required
 rem ping 1.0.0.0 -n 1 -w 5000 >NUL
 
+:tomcat
 rem ---------------------------------------
 rem Start Tomcat
 rem ---------------------------------------
@@ -68,11 +70,12 @@ if not ""%1"" == ""stop"" goto nostop
 echo Shutting down Tomcat...
 call "%CATALINA_HOME%\bin\shutdown.bat" 
 
+if not exist "%ALF_HOME%mysql\my.ini" goto nextstop
 set /P pause="Please wait until Tomcat has shut down, then press ENTER to continue..."
-
 echo Stopping MySQL...
 call "%ALF_HOME%mysql\bin\mysqladmin" -u root shutdown
 
+:nextstop
 rem if exist "virtual_start.bat" call virtual_stop.bat 
 
 goto end
