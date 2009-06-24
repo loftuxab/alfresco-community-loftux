@@ -1324,6 +1324,27 @@ Alfresco.util.setVar = function(p_name, p_value)
 
 
 /**
+ * Takes a string and splits it up to valid tags by using whitespace as separators.
+ * Note! If invalid characters are found they are treated as separators.
+ * I.e the string "hello*world alfresco" would result in  tags: "hello", "world" and "alfresco".
+ *
+ * @method getTags
+ * @param str {string} a string containing tags
+ * @return {array} of valid tags
+ * @static
+ */
+Alfresco.util.getTags = function(str)
+{
+   var tag = null, tags = [];
+   var regexp = /([^\s^,^&^\^<^>^\|^\"^\:^\/^\\^\?^\*/]+)/gi;
+   while ((tag = regexp.exec(str)))
+   {
+      tags.push(tag[1]);
+   }
+   return tags;
+};
+
+/**
  * Wrapper for helping components specify their YUI components.
  * @class Alfresco.util.YUILoaderHelper
  */
