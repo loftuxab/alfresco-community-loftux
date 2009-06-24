@@ -224,16 +224,23 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      // Allow linefeeds in textareas
                      return false;
                   }
-                  var targetName = event.target.name;
-                  if (targetName && (targetName != "-"))
+                  else if (event.target.tagName == "BUTTON")
                   {
-                     me._submitInvoked(event);
-                     form.attributes.action.nodeValue = "";
+                     // Eventlisteners for buttons must be notified that the enter key was entered                   
                   }
-                  Event.stopEvent(event);
-                  return false;
-               }
-               
+                  else
+                  {
+                     var targetName = event.target.name;
+                     if (targetName && (targetName != "-"))
+                     {
+                        me._submitInvoked(event);
+                        form.attributes.action.nodeValue = "";
+                     }
+                     Event.stopEvent(event);
+                     return false;
+                  }
+               };
+
                var enterListener = new KeyListener(form,
                {
                   keys: KeyListener.KEY.ENTER

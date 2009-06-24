@@ -66,6 +66,10 @@ hr
    width: 100%;
 }
 
+.yui-skin-default .yui-panel
+{
+   border-style:none;
+}
 
 .yui-skin-default .yui-panel .ft span.button-group
 {
