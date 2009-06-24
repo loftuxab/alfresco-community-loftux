@@ -15,9 +15,4 @@
    padding-left: 10px;
 }
 
-.members-bar .member-link a.activePage,
-.members-bar .member-link a.activePage:visited,
-.members-bar .member-link a:hover
-{
-	color: #009300;
-}
+

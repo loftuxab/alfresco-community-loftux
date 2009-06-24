@@ -10,8 +10,8 @@
 //]]></script>
 <div class="dashlet webview">
    <div class="title">
-      <a id="${args.htmlid}-title-link" class="title-link" <#if (isDefault == 'false')>href="${uri}"</#if> target="_blank"><#if webviewTitle?? && webviewTitle != "">${webviewTitle}<#else>${msg('label.header')}</#if></a>
-      <a id="${args.htmlid}-configWebView-link" class="configure theme-color-1" href="#">${msg("label.configure")}</a>
+      <a id="${args.htmlid}-title-link" class="title-link theme-color-5" <#if (isDefault == 'false')>href="${uri}"</#if> target="_blank"><#if webviewTitle?? && webviewTitle != "">${webviewTitle}<#else>${msg('label.header')}</#if></a>
+      <a id="${args.htmlid}-configWebView-link" class="configure theme-color-5" href="#">${msg("label.configure")}</a>
       <span>&nbsp;</span>
    </div>
 

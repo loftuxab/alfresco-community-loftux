@@ -295,7 +295,7 @@
          html += '<div class="nodeTitle"><a href="' + Alfresco.util.discussions.getTopicViewPage(this.options.siteId, this.options.containerId, data.name) + '">' + $html(data.title) + '</a> ';
          if (data.isUpdated)
          {
-            html += '<span class="nodeStatus">(' + this._msg("post.updated") + ')</span>';
+            html += '<span class="theme-color-2 nodeStatus">(' + this._msg("post.updated") + ')</span>';
          }
          html += '</div>';
          

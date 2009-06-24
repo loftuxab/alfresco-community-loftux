@@ -139,13 +139,12 @@
 .doclist tr.yui-dt-odd.yui-dt-highlighted,
 .doclist tr.yui-dt-even.yui-dt-highlighted
 {
-   background-color: #f4faff;
    cursor: auto;
 }
 .doclist tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last,
 .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
 {
-   border-left: 1px solid #c5e6e9;
+   border-left: 1px solid #999;
 }
 
 .doclist .documents.yui-dt .yui-dt-data td
@@ -359,7 +358,7 @@
 {
    background-position: 4px 1px;
    background-repeat: no-repeat;
-   border: 1px solid #f4faff;
+   border: 1px solid transparent;
    display: block;
    min-height: 16px;
    padding: 2px 0 2px 24px;

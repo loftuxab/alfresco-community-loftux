@@ -285,7 +285,7 @@
          // content
          html += '<div class="nodeContent">';
          html += '<div class="nodeTitle"><a href="' + postViewUrl + '">' + $html(data.title) + '</a> ';
-         html += '<span class="nodeStatus">' + statusLabel + '</span>';
+         html += '<span class="theme-color-2 nodeStatus">' + statusLabel + '</span>';
          html += '</div>';
           
          html += '<div class="published">';

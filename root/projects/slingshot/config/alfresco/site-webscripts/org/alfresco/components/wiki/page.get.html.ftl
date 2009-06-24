@@ -83,7 +83,7 @@
 ]>
 <#list tabs as tab>
    <#if tab.action == action>
-         <span class="tabSelected">${tab.label}</span>
+         <span class="theme-color-2">${tab.label}</span>
    <#elseif tab.permitted == false>
          <span class="tabLabelDisabled">${tab.label}</span>
    <#else>

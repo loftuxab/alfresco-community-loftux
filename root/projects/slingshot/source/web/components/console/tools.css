@@ -8,11 +8,6 @@
    padding: 4px 0px 3px 20px;
 }
 
-.tool li.selected
-{
-   background-color: #d2e5f2;
-}
-
 .tool a:hover
 {
    text-decoration: none;

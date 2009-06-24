@@ -1,8 +1,7 @@
 /****************
  * NODE DETAIL *
 *****************/
-.topicview, postview {
-  background: #f4faff;
+.topicview {
   border: 2px solid #e0e0e0;
   margin: 20px;
   margin-bottom: 0px;
@@ -68,7 +67,6 @@ html>body .node, .reply, .comment {
   font-weight: normal;
   font-size: 131%;
   line-height: 130%;
-  color: #669966;
 }
 
 .nodeAttrLabel {

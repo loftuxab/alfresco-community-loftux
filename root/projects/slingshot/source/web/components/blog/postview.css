@@ -4,7 +4,6 @@
 *****************/
 .postview
 {
-  background-color: #F8FAFB;
   border: 1px solid #c6c6c6 !important;
   margin: 20px;
   padding: 20px 10px;
@@ -78,7 +77,6 @@ html>body .node, .reply, .comment
 .node .nodeStatus {
   font-size: 131%;
   line-height: 130%;
-  color: #669966;
 }
 
 .nodeAttrLabel

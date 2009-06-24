@@ -66,7 +66,7 @@
 .links-body .edit-link
 {
    background: url( ../images/edit-link-16.png ) no-repeat scroll 10% 50%;
-   border: 1px solid #E4F3FA;
+   border: 1px solid transparent;
    padding: 2px 0px 2px 30px;
 }
 
@@ -91,7 +91,7 @@
 .links-body .delete-link
 {
    background: url( ../images/delete-link-16.png ) no-repeat scroll 10% 50%;
-   border: 1px solid #E4F3FA;
+   border: 1px solid transparent;
    padding: 2px 0px 2px 30px;
 }
 
@@ -140,11 +140,6 @@
    border-bottom: 1px dashed #C0C0C0;
    height: 2em;
    padding: 0.5em;
-}
-
-.links-selected-row
-{
-   background-color: #E4F3FA;
 }
 
 .links-body .yui-dt td
@@ -326,7 +321,6 @@
    font-weight: normal;
    font-size: 131%;
    line-height: 130%;
-   color: #669966;
 }
 
 .name-links-and-url

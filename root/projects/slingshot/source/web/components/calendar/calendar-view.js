@@ -585,7 +585,6 @@
             var header = Alfresco.CalendarHelper.renderTemplate('agendaDay',{date:date});
             var eventsHTML = '';
             var ul = document.createElement('ul');
-            ul.className = 'theme-color-1';
             var agendaEvts = events[event];
             for (var i = 0; i<agendaEvts.length;i++)
             {
@@ -600,7 +599,9 @@
               Dom.generateId(evEl);
               if (event.start===event.end)
               {
-                 Dom.addClass(Dom.getElementsByClassName('dates','p',evEl)[0],'theme-bg-color-1');
+                 var pEl = Dom.getElementsByClassName('dates','p',evEl)[0];
+                 Dom.addClass(pEl,'theme-bg-color-1');
+                 Dom.addClass(pEl,'theme-color-1');                 
               }
               ul.appendChild(evEl);
             }
