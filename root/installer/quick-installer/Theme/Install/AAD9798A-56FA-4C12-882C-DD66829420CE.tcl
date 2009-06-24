@@ -1,4 +1,4 @@
-proc CreateWindow.3D88EE52-1868-4E40-8C75-4A27EF566021 {wizard id} {
+proc CreateWindow.AAD9798A-56FA-4C12-882C-DD66829420CE {wizard id} {
    
     
     set base  [$wizard widget get $id]
