@@ -2841,7 +2841,6 @@ File ::47B3E066-8DFE-4842-9096-2715A1284B87 -directory <%InstallDir%>/bin -name 
 File ::73EC3550-4BD1-4D53-AA51-27A09A17ACAF -directory <%InstallDir%>/bin -name W:/HEAD/root/projects/alfresco-jlan/jni/Win32Utils.dll -location ../../projects/alfresco-jlan/jni -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
 File ::4E3FE006-33E5-40D0-A403-12BEBDB0E834 -directory <%InstallDir%>/bin -name W:/HEAD/root/projects/3rd-party/distro/pdf2swf.exe -location ../../../../ALF-BINARIES/installer/win32 -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
 File ::75B624EC-95BF-4063-9C59-13EE5F1FFA0A -directory <%InstallDir%>/bin -name W:/HEAD/root/installer/resources/alfresco.ico -location ../resources -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
-File ::9771A411-D69D-4E8D-B55F-951BE674BC8D -directory <%ALF_IMG%>/bin -name W:/ALF-BINARIES/installer/win32/convert.exe -location ../../../../ALF-BINARIES/installer/win32 -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
 File ::81EB9178-54DB-424F-9127-0919896ABC6C -type dir -name W:/ALF-BINARIES/installer/win32/mysql -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
 File ::209C113F-F4A6-4A53-80E6-D77276B03133 -name COPYING -parent 81EB9178-54DB-424F-9127-0919896ABC6C
 File ::5F421D54-68F5-4C30-BF21-804CE8EE9158 -name EXCEPTIONS-CLIENT -parent 81EB9178-54DB-424F-9127-0919896ABC6C
@@ -3584,6 +3583,31 @@ File ::ADDA1177-6485-41C5-9EBF-64CFF7AAED99 -type dir -name tmp -parent 929C00DD
 File ::97ED3EC4-BC25-418E-AC8C-B7C4184D5D2F -type dir -name prop-base -parent ADDA1177-6485-41C5-9EBF-64CFF7AAED99
 File ::3675BD32-2F6E-43BB-A556-80C214CCF997 -type dir -name props -parent ADDA1177-6485-41C5-9EBF-64CFF7AAED99
 File ::BE70E4BD-DBA7-4BE2-A0AF-7507D5A53D9B -type dir -name text-base -parent ADDA1177-6485-41C5-9EBF-64CFF7AAED99
+File ::F8A40D84-F258-4228-ABAD-104979CAF68F -type dir -directory <%ALF_IMG%>/bin -name W:/ALF-BINARIES/installer/win32/ImageMagick -location ../../../../ALF-BINARIES/installer/win32/ImageMagick -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
+File ::511221A3-5662-40EB-8C63-150CF8F781ED -name convert.exe -parent F8A40D84-F258-4228-ABAD-104979CAF68F
+File ::383FB19C-95A6-4BAB-B7EE-013EDF8FB290 -name mfc90.dll -parent F8A40D84-F258-4228-ABAD-104979CAF68F
+File ::D53B968B-C8F9-4E84-B6F1-E66D8D7FD797 -name Microsoft.VC90.ATL.manifest -parent F8A40D84-F258-4228-ABAD-104979CAF68F
+File ::189BF62A-4FD4-43EA-8BF1-BBC2B51CD293 -name Microsoft.VC90.CRT.manifest -parent F8A40D84-F258-4228-ABAD-104979CAF68F
+File ::DAFD5E3F-8F50-433A-A52A-625FF2AF420C -name Microsoft.VC90.MFC.manifest -parent F8A40D84-F258-4228-ABAD-104979CAF68F
+File ::949772EC-562C-4DC2-9EB5-7333DE2A7296 -name Microsoft.VC90.OpenMP.manifest -parent F8A40D84-F258-4228-ABAD-104979CAF68F
+File ::324E25B9-64F4-4F1D-814E-9DC7190E8F91 -name msvcp90.dll -parent F8A40D84-F258-4228-ABAD-104979CAF68F
+File ::9EC09F08-6240-4036-BACB-C5B431215227 -name msvcr90.dll -parent F8A40D84-F258-4228-ABAD-104979CAF68F
+File ::9F7BF899-5C0E-48D2-952C-8BEDB39B2F13 -name vcomp90.dll -parent F8A40D84-F258-4228-ABAD-104979CAF68F
+File ::79BA8368-4A39-4D21-884E-5D4203DFB5B3 -type dir -name .svn -active 0 -parent F8A40D84-F258-4228-ABAD-104979CAF68F
+File ::66FD7C16-08C2-4BC6-8588-5DCBC2E5A7A7 -name entries -parent 79BA8368-4A39-4D21-884E-5D4203DFB5B3
+File ::2080E8AD-E2B1-405A-8D42-D0296EDFCA12 -name format -parent 79BA8368-4A39-4D21-884E-5D4203DFB5B3
+File ::892FDD54-D489-499D-B3B4-5CA5705593FD -type dir -name prop-base -parent 79BA8368-4A39-4D21-884E-5D4203DFB5B3
+File ::9A475D9A-0034-40E2-BC9F-D1D7922BA569 -type dir -name props -parent 79BA8368-4A39-4D21-884E-5D4203DFB5B3
+File ::24259099-60E2-4EE0-AFB7-08F24F245E0A -name convert.exe.svn-work -parent 9A475D9A-0034-40E2-BC9F-D1D7922BA569
+File ::DCDC7A3E-6822-44A4-8C51-E0389CC828E2 -name mfc90.dll.svn-work -parent 9A475D9A-0034-40E2-BC9F-D1D7922BA569
+File ::A63C9B2E-522C-4DE3-9AC1-A7A687B5916B -name msvcp90.dll.svn-work -parent 9A475D9A-0034-40E2-BC9F-D1D7922BA569
+File ::11EB3B52-F951-4885-A84C-96741A4A5540 -name msvcr90.dll.svn-work -parent 9A475D9A-0034-40E2-BC9F-D1D7922BA569
+File ::90D12A45-594A-4C4A-8745-8F1DECFFAE5C -name vcomp90.dll.svn-work -parent 9A475D9A-0034-40E2-BC9F-D1D7922BA569
+File ::774FDBDE-E984-4E5E-9F94-A4EA70040749 -type dir -name text-base -parent 79BA8368-4A39-4D21-884E-5D4203DFB5B3
+File ::5D4C15E4-D1FB-4EF3-9164-53666FCB7941 -type dir -name tmp -parent 79BA8368-4A39-4D21-884E-5D4203DFB5B3
+File ::56653CDA-8B7E-4B5F-B0DF-04F7E6072A6D -type dir -name prop-base -parent 5D4C15E4-D1FB-4EF3-9164-53666FCB7941
+File ::7C4DD944-E231-4DC5-A5E3-26B7D9C7C2CE -type dir -name props -parent 5D4C15E4-D1FB-4EF3-9164-53666FCB7941
+File ::2C4A4B3F-3005-4AB6-9EB0-A64163E4665C -type dir -name text-base -parent 5D4C15E4-D1FB-4EF3-9164-53666FCB7941
 FileGroup ::8F9CD740-BE57-45DF-B176-5C11E746846B -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc TarArchive} -name {Program Files Linux} -parent FileGroups
 File ::7E577084-5A7A-44BC-BA72-C760E494C41B -name W:/HEAD/root/projects/installer/linux/installer/alfresco.sh -location ../../projects/installer/linux/installer -parent 8F9CD740-BE57-45DF-B176-5C11E746846B
 File ::0894F48A-B73C-4EA0-91D9-522185F30FCB -name W:/HEAD/root/projects/installer/linux/installer/alf_start.sh -location ../../projects/installer/linux/installer -parent 8F9CD740-BE57-45DF-B176-5C11E746846B
@@ -3610,7 +3634,7 @@ FileGroup ::6120050F-B3AE-4857-9845-470CBD79B31E -setup Install -active Yes -pla
 File ::141E54D8-E7B7-4B24-A8B0-954EC4DEA922 -name W:/HEAD/root/projects/installer/linux/installer/virtual_stop.sh -location ../../projects/installer/linux/installer -parent 6120050F-B3AE-4857-9845-470CBD79B31E
 File ::2F0DE958-728D-47ED-BAA2-E94074D0DD67 -name W:/HEAD/root/projects/installer/linux/installer/virtual_alf.sh -location ../../projects/installer/linux/installer -parent 6120050F-B3AE-4857-9845-470CBD79B31E
 File ::1342AA2D-1979-41D0-9C0D-7FBB6B566B0F -name W:/HEAD/root/projects/installer/linux/installer/virtual_start.sh -location ../../projects/installer/linux/installer -parent 6120050F-B3AE-4857-9845-470CBD79B31E
-FileGroup ::DC43C49C-C9EF-4C4F-B2DA-32B67341C839 -setup Install -alias jdbc -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name {JDBC Drivers} -parent FileGroups
+FileGroup ::DC43C49C-C9EF-4C4F-B2DA-32B67341C839 -setup Install -alias jdbc -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name {JDBC Drivers} -parent FileGroups
 File ::062BEB8D-6635-4D1E-A4F7-BDC6B25F3254 -name W:/HEAD/root/projects/3rd-party/lib/devenv/mysql-connector-java-5.1.7-bin.jar -location ../../projects/3rd-party/lib/devenv -parent DC43C49C-C9EF-4C4F-B2DA-32B67341C839
 FileGroup ::07D6DE98-FC0F-4F51-AE10-75314D0B4651 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name SPP -parent FileGroups
 File ::699A5FFE-B464-48B4-8306-9EAC58BE79B0 -directory <%InstallDir%>/amps -name W:/V3.1/root/modules/sharepoint/amp/build/dist/vti-module.amp -location ../../modules/sharepoint/amp/build/dist -parent 07D6DE98-FC0F-4F51-AE10-75314D0B4651
@@ -5846,6 +5870,9 @@ D7B8133E-4105-4082-AE9A-59F7B2F9C303,Text,subst
 
 D7B8133E-4105-4082-AE9A-59F7B2F9C303,Title,subst
 1
+
+DC43C49C-C9EF-4C4F-B2DA-32B67341C839,Active
+No
 
 DC43C49C-C9EF-4C4F-B2DA-32B67341C839,Alias
 jdbc
