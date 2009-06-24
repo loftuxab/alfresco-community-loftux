@@ -120,7 +120,7 @@
             // ColumnBrowser
             this.widgets.columnbrowser = new YAHOO.extension.ColumnBrowser(parent.id + "-columnbrowser",
             {
-               url: Alfresco.constants.PROXY_URI + "/api/rootgroups?includeInternal=false",
+               url: Alfresco.constants.PROXY_URI + "/api/rootgroups?zone=APP.DEFAULT",
                numVisible: 3,
                columnInfoBuilder:
                {
@@ -146,7 +146,7 @@
             closeSearchButton.on("click", this.onCloseSearchClick, closeSearchButton, this);
 
             // DataTable and DataSource setup
-            this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups?includeInternal=false");
+            this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups?zone=APP.DEFAULT");
             this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
             this.widgets.dataSource.responseSchema =
             {

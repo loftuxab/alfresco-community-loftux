@@ -261,7 +261,7 @@
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "group-search-button", this.onSearchClick);
 
          // DataSource definition  
-         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups?includeInternal=false&");
+         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups?zone=APP.DEFAULT&");
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
