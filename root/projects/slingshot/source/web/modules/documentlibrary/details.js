@@ -282,6 +282,7 @@
                this.widgets.editMetadata.set("disabled", true);
                this.widgets.okButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
+               Dom.get(this.id + "-tags").value = Alfresco.util.getTags(Dom.get(this.id + "-tags").value).join(" ");
                this.widgets.dialog.hide();
                this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                {
@@ -292,7 +293,7 @@
             },
             obj: null,
             scope: this
-         }
+         };
 
          // JSON submit type
          this.modules.form.setAJAXSubmit(true,

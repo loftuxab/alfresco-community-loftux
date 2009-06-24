@@ -408,13 +408,7 @@
 
          // extract all full words and add them as tags
          // take all full words in the string
-         var tags = [];
-         var tag = null;
-         var regexp = /([^\s^,^&^\^<^>^\|^\"^\:^\/^\\^\?^\*/]+)/gi; 
-         while ((tag = regexp.exec(text)))
-         {
-            tags.push(tag[1]);
-         }
+         var tags = Alfresco.util.getTags(text);
          for (var x=0; x < tags.length; x++)
          {
             this._addTagImpl(tags[x]);
