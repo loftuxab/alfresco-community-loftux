@@ -1,5 +1,5 @@
 <webscript>
-   <shortname>Image Preview Dashlet</shortname>
+   <shortname>Image Preview</shortname>
    <description>Image library thumbnail and preview dashlet component</description>
    <family>site-dashlet</family>
    <url>/components/dashlets/imagesummary</url>
