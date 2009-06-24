@@ -25,7 +25,7 @@
 }
 
 .groups .hidden,
-.remove-dialog .hidden
+.groups.remove-dialog .hidden
 {
    display: none;
 }
@@ -52,8 +52,12 @@
 
 .groups .search-bar
 {
-   line-height: 2.5em;
    padding-left: 1em;
+}
+
+.groups .search-bar-text
+{
+   line-height: 2.5em;
 }
 
 .groups .align-right

@@ -1980,7 +1980,7 @@ Alfresco.util.Ajax = function()
             {
                throw new Error("Parameter 'method' can not be 'GET' when trying to submit data in dataObj with contentType '" + c.requestContentType + "'");
             }
-            else
+            else if(c.method.toUpperCase() !== this.GET)
             {
                if (c.dataObj)
                {
