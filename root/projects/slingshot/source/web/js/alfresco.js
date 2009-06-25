@@ -24,6 +24,14 @@
  */
  
 /**
+* YUI Library aliases
+* Deliberately named differently to the ones various components and modules use, to avoid unexpected behaviour.
+*/
+var YUIDom = YAHOO.util.Dom,
+   YUIEvent = YAHOO.util.Event,
+   YUISelector = YAHOO.util.Selector;
+ 
+/**
  * Alfresco root namespace.
  * 
  * @namespace Alfresco
@@ -721,7 +729,7 @@ Alfresco.util.getDomId = function(p_prefix)
    do
    {
       domId = prefix + Alfresco.util.getDomId._nId++;
-   } while (YAHOO.util.Dom.get(domId) !== null);
+   } while (YUIDom.get(domId) !== null);
    
    return domId;
 };
@@ -736,7 +744,7 @@ Alfresco.util.getDomId._nId = 0;
 */
 Alfresco.util.relToTarget = function(p_rootNode)
 {
-   var elements = YAHOO.util.Selector.query("a[rel]", p_rootNode);
+   var elements = YUISelector.query("a[rel]", p_rootNode);
    for (var i = 0, ii = elements.length; i < ii; i++)
    {
       elements[i].setAttribute("target", elements[i].getAttribute("rel"));
@@ -828,6 +836,73 @@ Alfresco.util.disableYUIButton = function(p_button)
          p_button.removeStateCSSClasses("focus");
       }
    }
+};
+
+/**
+ * DRAFT - DO NOT USE
+ *
+ * Creates a "disclosure twister" UI control from existing mark-up.
+ *
+ * @method Alfresco.util.createTwister
+ * @param p_controller {Element|string} Element (or DOM ID) of controller node
+ * <pre>The code will search for the next sibling which will be used as the hideable panel, unless overridden below</pre>
+ * @param p_config {object} Optional additional configuration to override the defaults
+ * <pre>
+ *    panel {Element|string} Use this panel as the hideable element instead of the controller's first sibling
+ * </pre>
+ * @return {boolean} true = success
+ */
+Alfresco.util.createTwister = function(p_controller, p_config)
+{
+   /*
+   var elTwister, elPanel,
+      config = YAHOO.lang.merge(p_config, {});
+   
+   // Controller element
+   elController = YUIDom.get(p_controller);
+   if (elController === null)
+   {
+      return null;
+   }
+   
+   // Panel element - next sibling or specified in configuration
+   if (config.panel && YUIDom.get(config.panel))
+   {
+      elPanel = YUIDom.get(config.panel);
+   }
+   else
+   {
+      // Find the first sibling node
+      elPanel = elController.nextSibling;
+      while (elPanel.nodeType !== 1 && elPanel !== null)
+      {
+         elPanel = elPanel.nextSibling;
+      };
+   }
+   if (elPanel === null)
+   {
+      return null;
+   }
+   
+   YUIDom.addClass(elController, "alfresco-twister alfresco-twister-open");
+   YUIEvent.addListener(elController, "click", function(p_event, p_obj)
+   {
+      if (YUIDom.hasClass(p_obj.controller, "alfresco-twister-open"))
+      {
+         YUIDom.replaceClass(p_obj.controller, "alfresco-twister-open", "alfresco-twister-closed");
+         YUIDom.setStyle(p_obj.panel, "display", "none");
+      }
+      else
+      {
+         YUIDom.replaceClass(p_obj.controller, "alfresco-twister-closed", "alfresco-twister-open");
+         YUIDom.setStyle(p_obj.panel, "display", "block");
+      }
+   },
+   {
+      controller: elController,
+      panel: elPanel
+   });
+   */
 };
 
 /**
@@ -1008,13 +1083,13 @@ Alfresco.util.caretFix = function(p_formElement)
    {
       if (typeof p_formElement == "string")
       {
-         p_formElement = YAHOO.util.Dom.get(p_formElement);
+         p_formElement = YUIDom.get(p_formElement);
       }
-      var nodes = YAHOO.util.Selector.query(".yui-u", p_formElement);
+      var nodes = YUISelector.query(".yui-u", p_formElement);
       for (var x = 0; x < nodes.length; x++)
       {
          var elem = nodes[x];
-         YAHOO.util.Dom.addClass(elem, "caret-fix");
+         YUIDom.addClass(elem, "caret-fix");
       }
    }
 };
@@ -1033,13 +1108,13 @@ Alfresco.util.undoCaretFix = function(p_formElement)
    {
       if (typeof p_formElement == "string")
       {
-         p_formElement = YAHOO.util.Dom.get(p_formElement);
+         p_formElement = YUIDom.get(p_formElement);
       }
-      var nodes = YAHOO.util.Selector.query(".caret-fix", p_formElement);
+      var nodes = YUISelector.query(".caret-fix", p_formElement);
       for (var x = 0; x < nodes.length; x++)
       {
          var elem = nodes[x];
-         YAHOO.util.Dom.removeClass(elem, "caret-fix");
+         YUIDom.removeClass(elem, "caret-fix");
       }
    }
 };
@@ -2438,11 +2513,11 @@ Alfresco.util.Cursor = function()
             var cs = allStates[i];
             if (cs === cursorState)
             {
-               YAHOO.util.Dom.addClass(el, cursorState);
+               YUIDom.addClass(el, cursorState);
             }
             else
             {
-               YAHOO.util.Dom.removeClass(el, cs);
+               YUIDom.removeClass(el, cs);
             }
          }
       }
@@ -2516,8 +2591,7 @@ Alfresco.util.Anim = function()
        */
       _fade: function A__fade(el, fadeIn, attributes)
       {
-         var Dom = YAHOO.util.Dom;
-         el = Dom.get(el);
+         el = YUIDom.get(el);
          // No manadatory elements in attributes, avoid null checks below though
          attributes = YAHOO.lang.merge(this.fadeAttributes, attributes ? attributes : {});
          var adjustDisplay = attributes.adjustDisplay;
@@ -2528,24 +2602,24 @@ Alfresco.util.Anim = function()
          // Prepare el before fade
          if (supportsOpacity)
          {
-            Dom.setStyle(el, "opacity", fadeIn ? 0 : 1);
+            YUIDom.setStyle(el, "opacity", fadeIn ? 0 : 1);
          }
 
          // Show the element, transparent if opacity supported,
          // otherwise its visible and the "fade in" is finished
          if (supportsOpacity)
          {
-            Dom.setStyle(el, "visibility", "visible");
+            YUIDom.setStyle(el, "visibility", "visible");
          }
          else
          {
-            Dom.setStyle(el, "visibility", fadeIn ? "visible" : "hidden");
+            YUIDom.setStyle(el, "visibility", fadeIn ? "visible" : "hidden");
          }
 
          // Make sure element is displayed
-         if (adjustDisplay && Dom.getStyle(el, "display") === "none")
+         if (adjustDisplay && YUIDom.getStyle(el, "display") === "none")
          {
-            Dom.setStyle(el, "display", "block");
+            YUIDom.setStyle(el, "display", "block");
          }
 
          // Put variables in scope so they can be used in the callback below
@@ -2567,7 +2641,7 @@ Alfresco.util.Anim = function()
                if (!fadeIn && adjustDisplay)
                {
                   // Hide element from Dom if its a fadeOut
-                  YAHOO.util.Dom.setStyle(myEl, "display", "none");
+                  YUIDom.setStyle(myEl, "display", "none");
                }
                if (fn)
                {
@@ -2582,7 +2656,7 @@ Alfresco.util.Anim = function()
             if (!fadeIn && adjustDisplay)
             {
                // Hide element from Dom if its a fadeOut
-               YAHOO.util.Dom.setStyle(myEl, "display", "none");
+               YUIDom.setStyle(myEl, "display", "none");
             }
             if (fn)
             {
@@ -2627,13 +2701,13 @@ Alfresco.util.Anim = function()
             return;
          }
          
-         var el = YAHOO.util.Dom.get(p_el);
+         var el = YUIDom.get(p_el);
          if (el)
          {
             // Set outColor to existing backgroundColor
             var attr = YAHOO.lang.merge(this.pulseAttributes,
             {
-               outColor: YAHOO.util.Dom.getStyle(el, "backgroundColor")
+               outColor: YUIDom.getStyle(el, "backgroundColor")
             });
             if (typeof p_attributes == "object")
             {
@@ -2668,7 +2742,7 @@ Alfresco.util.Anim = function()
             {
                if (attr.clearOnComplete)
                {
-                  YAHOO.util.Dom.setStyle(el, "backgroundColor", "");
+                  YUIDom.setStyle(el, "backgroundColor", "");
                }
                if (attr.callback && (typeof attr.callback.fn == "function"))
                {
@@ -3277,7 +3351,7 @@ Alfresco.service.BaseService.prototype =
     * @type string
     */
     Alfresco.service.Preferences.FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
-    Alfresco.service.Preferences.IMAP_FAVOURITE_SITES = "org.alfresco.share.sites.imap.favourites";
+    Alfresco.service.Preferences.IMAP_FAVOURITE_SITES = "org.alfresco.share.sites.imapFavourites";
 
 })();
 
@@ -3431,6 +3505,10 @@ Alfresco.util.RichEditor = function(editorName,id,config)
       {
          Alfresco.util.YUILoaderHelper.require(components, this.onComponentsLoaded, this);
       }
+      else
+      {
+         this.onComponentsLoaded();
+      }
 
       return this;
    };
@@ -3508,7 +3586,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
       {
          if (this.onReady && this.onReady.call)
          {
-            YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
+            YUIEvent.onContentReady(this.id, this.onReady, this, true);
          }
       },
 
