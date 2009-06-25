@@ -427,8 +427,9 @@ body.yui-skin-default .doclist .more-actions a:hover
 {
    background-color: #6CA5CE;
 }
-body.yui-skin-default .doclist div.more-actions {
-   border:1px solid #6CA5CE;
+body.yui-skin-default .doclist div.more-actions
+{
+   border: 1px solid #6CA5CE;
 }
 body.yui-skin-default .doclist .action-set a:active,
 body.yui-skin-default .doclist .action-set a:hover,
@@ -439,7 +440,11 @@ body.yui-skin-default .doclist .action-set .highlighted
 
 
 body.yui-skin-default .doclist tr.yui-dt-odd.yui-dt-highlighted,
-body.yui-skin-default .doclist tr.yui-dt-even.yui-dt-highlighted,
+body.yui-skin-default .doclist tr.yui-dt-even.yui-dt-highlighted
+{
+   background-color: #f4faff;
+}
+
 body.yui-skin-default .links-body tr.links-selected-row,
 body.yui-skin-default .over,
 .postview,
@@ -450,7 +455,7 @@ body.yui-skin-default .over,
 body.yui-skin-default .doclist tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last,
 body.yui-skin-default .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
 {
-   border-left: 1px solid #999;
+   border-left: 1px solid #c5e6e9;
 }
 
 /* end doclist */
@@ -535,6 +540,19 @@ body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:hove
 }
 
 /* End Calendar */
+
+/* Twisters */
+
+.alfresco-twister-open
+{
+   background: transparent url(images/expanded.png) no-repeat scroll 0 50%;
+}
+
+.alfresco-twister-closed
+{
+   background: transparent url(images/collapsed.png) no-repeat scroll 0 50% !important;
+}
+
 /* Theme colors */
 
 .theme-color-1,
