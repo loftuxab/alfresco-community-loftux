@@ -1,6 +1,6 @@
 const PREF_SITES = "org.alfresco.share.sites";
 const PREF_FAVOURITE_SITES = PREF_SITES + ".favourites";
-const PREF_IMAP_FAVOURITE_SITES = PREF_SITES + ".imap.favourites";
+const PREF_IMAP_FAVOURITE_SITES = PREF_SITES + ".imapFavourites";
 
 /**
  * Sort favourites to the top, then in alphabetical order
@@ -38,14 +38,14 @@ function main()
             var prefs = eval('(' + result + ')');
             
             // Populate the favourites object literal for easy look-up later
-            favourites = eval('(prefs.' + PREF_FAVOURITE_SITES + ')');
+            favourites = eval('try{(prefs.' + PREF_FAVOURITE_SITES + ')}catch(e){}');
             if (typeof favourites != "object")
             {
                favourites = {};
             }
 
             // Populate the imap favourites object literal for easy look-up later
-            imapFavourites = eval('(prefs.' + PREF_IMAP_FAVOURITE_SITES + ')');
+            imapFavourites = eval('try{(prefs.' + PREF_IMAP_FAVOURITE_SITES + ')}catch(e){}');
             if (typeof imapFavourites != "object")
             {
                imapFavourites = {};
