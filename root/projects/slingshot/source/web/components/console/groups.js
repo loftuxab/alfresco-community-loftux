@@ -1527,7 +1527,7 @@
             if(parent.group && parent.group.length > 0)
             {
                url += "groups/" + parent.group + "/children/GROUP_" + shortName;
-               sh = function(o)
+               sh = function(response)
                {
                   if(displayName && shortName != displayName)
                   {
@@ -1538,6 +1538,10 @@
                       */
                      groupObj.displayName = displayName;
                      parent.panelHandlers.updatePanelHandler.updateGroupRequest(shortName, groupObj, successHandler);
+                  }
+                  else
+                  {
+                     successHandler.call(this, response);
                   }
                };
             }

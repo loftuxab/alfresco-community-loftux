@@ -174,12 +174,6 @@ body.masked div.mask.full-preview-mask
    width: 41em;
 }
 
-.yui-skin-default .yui-panel.groups.people-picker,
-.yui-skin-default .yui-panel.groups.group-picker
-{
-   width: 51em;
-}
-
 /* Prevent ghost border on first row for DataTables */
 table .yui-dt-empty
 {

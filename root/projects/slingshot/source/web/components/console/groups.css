@@ -398,6 +398,12 @@
 
 /* People picker */
 
+.groups.people-picker
+{
+   width: 51em;
+}
+
+
 .groups .people-finder .search-text
 {
    padding:0 1em 0.3em 0.3em;
@@ -424,6 +430,11 @@
 
 
 /* Group picker */
+
+.groups.group-picker
+{
+   width: 51em;
+}
 
 .groups.group-picker .group-finder
 {
