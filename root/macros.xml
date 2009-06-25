@@ -87,7 +87,8 @@
                   excludepackagenames="${javadoc.packages.exclude}" 
                   bottom="${javadoc.copyright}"
                   doctitle="@{documenttitle}"
-                  windowtitle="@{windowtitle}">
+                  windowtitle="@{windowtitle}"
+                  encoding="${javac.encoding}">
             <classpath>
 				<path refid="classpath.javadoc"/>
 				<path refid="classpath.javadoc.extension"/>
