@@ -18,7 +18,7 @@ AllowLanguageSelection
 Yes
 
 AppName
-{Alfresco <%Codeline%>}
+{Alfresco <%Codeline%> Edition}
 
 ApplicationID
 5B735D69-5180-4F87-9DDA-C4EA345DE7A5
@@ -1175,7 +1175,7 @@ File ::D60902A2-E46B-4798-AF0E-6C2A836A954D -name serializer.jar -parent 65C4842
 File ::4766F877-CC31-4794-96D0-975A2EDF6606 -name xalan.jar -parent 65C4842F-B140-4106-B10B-55881CBC6099
 File ::1C0F3052-695B-4AFC-A409-9D486DC3220A -name W:/V30/root/projects/installer/windows/README.txt -location ../../projects/installer/windows -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
 File ::7E166789-3638-4C0A-B30F-E95C1FD87287 -name W:/HEAD/root/projects/3rd-party/lib/devenv/mysql-connector-java-5.1.7-bin.jar -location ../../projects/3rd-party/lib/devenv -active 0 -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
-FileGroup ::FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive MacOS-X MacOS-X} -name Samples -parent FileGroups
+FileGroup ::FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF -setup Install -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive MacOS-X MacOS-X} -name Samples -parent FileGroups
 File ::73C4B60C-F180-49B7-8574-02573BBA4491 -directory <%InstallDir%>/amps -name W:/HEAD/root/projects/installer/amp-samples.txt -location ../../projects/installer -active 0 -parent FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF
 FileGroup ::33087B4E-DFD2-42AB-A812-338D015C210B -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive MacOS-X MacOS-X} -name WCM -parent FileGroups
 File ::72130FAF-CCB3-43E4-A870-E26924BDBCA1 -directory <%InstallDir%>/tomcat/shared/classes/alfresco/extension -name W:/HEAD/root/projects/installer/wcm-bootstrap-context.xml -location ../../projects/installer -parent 33087B4E-DFD2-42AB-A812-338D015C210B
@@ -3246,8 +3246,6 @@ InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane 
 Condition DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB
 InstallComponent D0BEA0E1-AE39-46EB-8F94-F52C1A40128D -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021
 InstallComponent A4B7881D-0357-4C8F-873B-C9B1E6C2FA6F -setup Install -type action -title {Create Checkbox} -component AddWidget -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021
-InstallComponent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -setup Install -type pane -conditions 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -title {JDBC Message} -component CustomBlankPane1 -command insert -active No -parent StandardInstall
-Condition 448A4C99-13E3-42B0-AE70-2BFA0854ECBE -active Yes -parent A35F8054-51C6-471B-8E45-0BE8AAFEA82B -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 448A4C99-13E3-42B0-AE70-2BFA0854ECBE
 InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {3FCADEE9-5DD9-768C-D188-CC3A6F8121FF B4542FD2-3F94-E787-C87C-253FEECEB594 5F62014D-FF00-1133-0073-1B34152260C9} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
 Condition 3FCADEE9-5DD9-768C-D188-CC3A6F8121FF -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 3FCADEE9-5DD9-768C-D188-CC3A6F8121FF
 Condition B4542FD2-3F94-E787-C87C-253FEECEB594 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id B4542FD2-3F94-E787-C87C-253FEECEB594
@@ -3258,11 +3256,11 @@ Condition 742564FA-3964-4BC5-A471-2E5C47E0815C -active Yes -parent 7C464880-67E7
 InstallComponent A6AD15A0-5754-4A70-A4C8-F7D64FE38031 -setup Install -type pane -title {Do Config} -component CustomBlankPane1 -active Yes -parent StandardInstall
 InstallComponent 5BF7D47A-D7A8-4FEF-8490-3FCC7397D7B2 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
 InstallComponent 4189489A-B002-4812-8ED2-5E7555A0F213 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
-InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions 2F0CB899-1C48-4F91-9AD0-327063548555 -title {Adding SPP} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions 2F0CB899-1C48-4F91-9AD0-327063548555 -title {Adding SPP} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
 Condition 2F0CB899-1C48-4F91-9AD0-327063548555 -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 InstallComponent 6167A49E-551C-4CF3-944D-1FDBDD9C0106 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -command reorder -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
 InstallComponent CD057CD8-68CA-4230-8D9E-F84606DC3EFD -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
-InstallComponent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -setup Install -type pane -conditions {6654B212-DC2E-4B87-87A4-A6651D834356 5D3CD088-B812-4912-A7BA-38C26DBAEA7B} -title {Adding Samples} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -setup Install -type pane -conditions {6654B212-DC2E-4B87-87A4-A6651D834356 5D3CD088-B812-4912-A7BA-38C26DBAEA7B} -title {Adding Samples} -component CustomBlankPane1 -command reorder -active No -parent StandardInstall
 Condition 6654B212-DC2E-4B87-87A4-A6651D834356 -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 Condition 5D3CD088-B812-4912-A7BA-38C26DBAEA7B -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 5D3CD088-B812-4912-A7BA-38C26DBAEA7B
 InstallComponent 6FD62EC4-634A-490E-A5B9-AFE1AEBCC406 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B
@@ -3933,15 +3931,6 @@ Yes
 4489F0C1-C985-41F0-B4A9-90868A73FE8E,Title,subst
 1
 
-448A4C99-13E3-42B0-AE70-2BFA0854ECBE,Operator
-{does not equal}
-
-448A4C99-13E3-42B0-AE70-2BFA0854ECBE,String1
-<%ALF_DB%>
-
-448A4C99-13E3-42B0-AE70-2BFA0854ECBE,String2
-derby
-
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Destination
 <%InstallDir%>
 
@@ -4554,9 +4543,6 @@ OpenOffice
 7A903A54-A58E-414B-8E67-5EF0F1364ABC,Message,subst
 1
 
-7A9C9E75-F41A-40E9-9332-F460A083AA2B,Active
-Yes
-
 7A9C9E75-F41A-40E9-9332-F460A083AA2B,BackButton,subst
 1
 
@@ -4759,7 +4745,7 @@ JavaHome
 {0 conditions}
 
 8CD15942-AC97-4AD0-BEB3-9AC3290C20B2,Components
-{A4F1E663-DD6F-4CFB-B8C8-496149F89359 A88563D5-3EDB-4933-A42D-D51B94ED8D72 3599937E-10E1-4029-8ACB-CCE5D85D306D EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 6DB1722A-53F8-4E0A-94C7-1DD43663EC60}
+{A4F1E663-DD6F-4CFB-B8C8-496149F89359 3599937E-10E1-4029-8ACB-CCE5D85D306D EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 6DB1722A-53F8-4E0A-94C7-1DD43663EC60}
 
 8CD15942-AC97-4AD0-BEB3-9AC3290C20B2,Description,subst
 1
@@ -4946,24 +4932,6 @@ A2841CF3-EEB2-479E-9284-330E06D1E1A7,NextButton,subst
 
 A2C4506D-7B3F-4F25-A656-7C86AB8838AD,Conditions
 {1 condition}
-
-A35F8054-51C6-471B-8E45-0BE8AAFEA82B,BackButton,subst
-1
-
-A35F8054-51C6-471B-8E45-0BE8AAFEA82B,CancelButton,subst
-1
-
-A35F8054-51C6-471B-8E45-0BE8AAFEA82B,Caption,subst
-1
-
-A35F8054-51C6-471B-8E45-0BE8AAFEA82B,Conditions
-{1 condition}
-
-A35F8054-51C6-471B-8E45-0BE8AAFEA82B,Message,subst
-1
-
-A35F8054-51C6-471B-8E45-0BE8AAFEA82B,NextButton,subst
-1
 
 A4B7881D-0357-4C8F-873B-C9B1E6C2FA6F,Checked
 Yes
@@ -5389,7 +5357,7 @@ CD057CD8-68CA-4230-8D9E-F84606DC3EFD,Conditions
 {0 conditions}
 
 CE9BD412-8B2C-422C-A23F-5572EB5F6410,Components
-{A4F1E663-DD6F-4CFB-B8C8-496149F89359 A88563D5-3EDB-4933-A42D-D51B94ED8D72 3599937E-10E1-4029-8ACB-CCE5D85D306D EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 6DB1722A-53F8-4E0A-94C7-1DD43663EC60}
+{A4F1E663-DD6F-4CFB-B8C8-496149F89359 3599937E-10E1-4029-8ACB-CCE5D85D306D EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 6DB1722A-53F8-4E0A-94C7-1DD43663EC60}
 
 CE9BD412-8B2C-422C-A23F-5572EB5F6410,Description,subst
 1
@@ -5676,6 +5644,9 @@ F9A8D3B6-7571-439A-9C7C-FEC0EBA70DA4,CheckCondition
 
 F9A8D3B6-7571-439A-9C7C-FEC0EBA70DA4,Platform
 Windows
+
+FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Active
+No
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Destination
 <%InstallDir%>
@@ -6373,14 +6344,6 @@ A2E94BE6-58FB-4A0A-ACCB-3F8E8E0FC0BD,Message
 
 A2E94BE6-58FB-4A0A-ACCB-3F8E8E0FC0BD,Title
 Test
-
-A35F8054-51C6-471B-8E45-0BE8AAFEA82B,Caption
-{Database JDBC Driver}
-
-A35F8054-51C6-471B-8E45-0BE8AAFEA82B,Message
-{The Alfresco server will need the appropriate JDBC Driver added to it in order to communicate with your database.  Your database JDBC driver file (.jar) needs to be added to the <%Dir <%InstallDir%>/tomcat/lib %> folder.
-
-Before starting the Alfresco server for the first time, the JDBC Driver must be in place.  We suggest you copy the file now before proceeding further.}
 
 A4B7881D-0357-4C8F-873B-C9B1E6C2FA6F,Text
 {Connect to database server and create new database}

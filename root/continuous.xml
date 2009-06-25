@@ -12,7 +12,7 @@
    <target name="continuous-init" 
            depends="init">
       <property file="continuous.properties"/>
-      <property file="labs.properties"/>
+      <property file="community.properties"/>
    </target>
 	
    <target name="bootstrap-wcm-test" depends="continuous-init" >
@@ -96,7 +96,7 @@
                value="${alf.build.number}"
                summary="yes" />
       <replace file="${dir.project.repository.config}/alfresco/version.properties"
-               token="version.edition=Labs"
+               token="version.edition=Community"
                value="version.edition=${file.name.codeline}"
                summary="yes" />
       <copy todir="${dir.project.webscriptframework.config}" 
@@ -123,7 +123,7 @@
                value="r${svn.revision}"
                summary="yes" />
       <replace file="${dir.project.repository.config}/alfresco/version.properties"
-               token="version.edition=Labs"
+               token="version.edition=Community"
                value="version.edition=${file.name.codeline}"
                summary="yes" />
       <copy todir="${dir.project.webscriptframework.config}" 

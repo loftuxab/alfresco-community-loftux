@@ -18,7 +18,7 @@ AllowLanguageSelection
 Yes
 
 AppName
-{Alfresco <%Codeline%>}
+{Alfresco <%Codeline%> Edition}
 
 ApplicationID
 5B735D69-5180-4F87-9DDA-C4EA345DE7A5
@@ -1165,7 +1165,7 @@ File ::65C4842F-B140-4106-B10B-55881CBC6099 -type dir -name endorsed -parent B97
 File ::D60902A2-E46B-4798-AF0E-6C2A836A954D -name serializer.jar -parent 65C4842F-B140-4106-B10B-55881CBC6099
 File ::4766F877-CC31-4794-96D0-975A2EDF6606 -name xalan.jar -parent 65C4842F-B140-4106-B10B-55881CBC6099
 File ::1C0F3052-695B-4AFC-A409-9D486DC3220A -name W:/V30/root/projects/installer/windows/README.txt -location ../../projects/installer/windows -parent 44D20E51-7275-41FD-BF5C-790496A2FDB2
-FileGroup ::FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name Samples -parent FileGroups
+FileGroup ::FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF -setup Install -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name Samples -parent FileGroups
 File ::D8DF33B6-BC4C-4FA3-ABA8-C11A22BF3666 -directory <%InstallDir%>/amps -name W:/HEAD/root/modules/records-mgmt/build/dist/alfresco-recordsmanagement.amp -location ../../modules/records-mgmt/build/dist -active 0 -parent FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF
 File ::73C4B60C-F180-49B7-8574-02573BBA4491 -directory <%InstallDir%>/amps -name W:/HEAD/root/projects/installer/amp-samples.txt -location ../../projects/installer -active 0 -parent FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF
 FileGroup ::33087B4E-DFD2-42AB-A812-338D015C210B -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name WCM -parent FileGroups
@@ -3892,7 +3892,7 @@ InstallComponent A7CCD851-05EF-4236-8321-7766DF06A256 -setup Install -type actio
 InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -title {Delete File} -component DeleteFile -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D
 InstallComponent 7F2F989E-9F6C-4CAC-AFF2-A925549A20D2 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
-InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane -conditions {238C7BD9-0EDF-4953-BC37-C32F5C2D089D E95B44DE-53E1-4944-AEE6-C2D89CCA323B} -title {Connect MySQL} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
+InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane -conditions {238C7BD9-0EDF-4953-BC37-C32F5C2D089D E95B44DE-53E1-4944-AEE6-C2D89CCA323B} -title {Connect MySQL} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 238C7BD9-0EDF-4953-BC37-C32F5C2D089D -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 238C7BD9-0EDF-4953-BC37-C32F5C2D089D
 Condition E95B44DE-53E1-4944-AEE6-C2D89CCA323B -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id E95B44DE-53E1-4944-AEE6-C2D89CCA323B
 InstallComponent 702B15CC-0F7B-4BF0-9498-7C1BE3A26C18 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE
@@ -3915,7 +3915,7 @@ InstallComponent 7D9FC8F7-16CA-44AE-B746-BF47219B7B58 -setup Install -type pane 
 Condition A7E44A74-C32A-48FF-AC7E-1EDB9C4E7F14 -active Yes -parent 7D9FC8F7-16CA-44AE-B746-BF47219B7B58 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id A7E44A74-C32A-48FF-AC7E-1EDB9C4E7F14
 InstallComponent 6E045DB2-884F-4DD3-97F6-D91941695011 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -active Yes -parent 7D9FC8F7-16CA-44AE-B746-BF47219B7B58
 InstallComponent 6DCB6ABE-1A00-43C8-8C0A-5D9CA6E3E16E -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 7D9FC8F7-16CA-44AE-B746-BF47219B7B58
-InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions {2F0CB899-1C48-4F91-9AD0-327063548555 44CBB169-887F-46E0-9A5B-A0F5C14E5088} -title {Adding Samples} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions {2F0CB899-1C48-4F91-9AD0-327063548555 44CBB169-887F-46E0-9A5B-A0F5C14E5088} -title {Adding Samples} -component CustomBlankPane1 -command insert -active No -parent StandardInstall
 Condition 2F0CB899-1C48-4F91-9AD0-327063548555 -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 Condition 44CBB169-887F-46E0-9A5B-A0F5C14E5088 -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 44CBB169-887F-46E0-9A5B-A0F5C14E5088
 InstallComponent 6167A49E-551C-4CF3-944D-1FDBDD9C0106 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -command reorder -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
@@ -4000,16 +4000,16 @@ Condition 28605D41-F3CF-4045-B4B9-1CE425EBDC03 -active Yes -parent 4489F0C1-C985
 InstallComponent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -setup Install -type action -conditions {4C5B630E-A819-4C8D-A223-F10643DC1CDA 0E2B711C-DEBF-49E5-A966-C2D5177AE431} -title {Launch Web Browser} -component LaunchWebBrowser -command insert -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
 Condition 4C5B630E-A819-4C8D-A223-F10643DC1CDA -active Yes -parent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -title {String Is Condition} -component StringIsCondition -TreeObject::id 4C5B630E-A819-4C8D-A223-F10643DC1CDA
 Condition 0E2B711C-DEBF-49E5-A966-C2D5177AE431 -active Yes -parent D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731 -title {String Is Condition} -component StringIsCondition -TreeObject::id 0E2B711C-DEBF-49E5-A966-C2D5177AE431
-InstallComponent 3615204F-29E3-473F-A769-A74E859BE866 -setup Install -type action -conditions 77EE16CC-651A-4D2C-9B02-71FF43EF9FF9 -title {Delete File} -component DeleteFile -command insert -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
+InstallComponent 3615204F-29E3-473F-A769-A74E859BE866 -setup Install -type action -conditions 77EE16CC-651A-4D2C-9B02-71FF43EF9FF9 -title {Delete File} -component DeleteFile -command reorder -active Yes -parent 3A1EFB11-4DE5-4ACB-8B8C-10BDA4DDE9B5
 Condition 77EE16CC-651A-4D2C-9B02-71FF43EF9FF9 -active Yes -parent 3615204F-29E3-473F-A769-A74E859BE866 -title {String Is Condition} -component StringIsCondition -TreeObject::id 77EE16CC-651A-4D2C-9B02-71FF43EF9FF9
 InstallComponent 2DF8D0C6-12F2-41FA-AC9C-BEEDFA5B1B1A -setup Install -type actiongroup -title {Cancel Actions} -alias {Cancel Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 80D7849E-9103-4EA2-B202-F23CC339309D -setup Install -type actiongroup -title {Config Actions} -alias {Config Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 7C8F5F7E-E82D-4197-987C-D0AD4F12AFED -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent F03F1387-C847-400B-A135-9A967D979941 -setup Install -type action -title {Replace Text In File} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 InstallComponent 34C97DF2-93F8-48A6-8BF2-56DF6F1DC5F1 -setup Install -type action -title {Replace MySQL Port} -component ReplaceTextInFile -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
-InstallComponent 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E -setup Install -type action -conditions 6605D03A-DFC5-49F9-9F75-BBDC0D3483C9 -title {Replace Text In File} -component ReplaceTextInFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E -setup Install -type action -conditions 6605D03A-DFC5-49F9-9F75-BBDC0D3483C9 -title {Replace Text In File} -component ReplaceTextInFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 Condition 6605D03A-DFC5-49F9-9F75-BBDC0D3483C9 -active Yes -parent 09BD7C92-04FB-4B0F-9553-DA08F4B6E59E -title {Platform Condition} -component PlatformCondition -TreeObject::id A4BB2D56-7848-464D-90C1-B75693CDD06E
-InstallComponent 1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3 -setup Install -type action -conditions A4BB2D56-7848-464D-90C1-B75693CDD06E -title {Replace Text In File} -component ReplaceTextInFile -command insert -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
+InstallComponent 1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3 -setup Install -type action -conditions A4BB2D56-7848-464D-90C1-B75693CDD06E -title {Replace Text In File} -component ReplaceTextInFile -command reorder -active Yes -parent 80D7849E-9103-4EA2-B202-F23CC339309D
 Condition A4BB2D56-7848-464D-90C1-B75693CDD06E -active Yes -parent 1A7FA951-8B8D-448A-8BA4-1DA6F9FC86B3 -title {Platform Condition} -component PlatformCondition -TreeObject::id A4BB2D56-7848-464D-90C1-B75693CDD06E
 InstallComponent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC -setup Install -type actiongroup -title {Path Setup} -alias {Path Setup} -active Yes -parent ActionGroupsInstall
 InstallComponent 8DF4772F-BB98-471E-99C9-CB3FEDD66C60 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent ABB6C1F3-1883-4A7C-8C76-3EBAC1D09FDC
@@ -4721,6 +4721,9 @@ false
 5230B397-A161-4CAC-990D-64E5618C7440,Filename
 <%ProgramExecutable%>
 
+54025279-EB49-42AA-85CC-5F61F46783F7,Conditions
+{0 conditions}
+
 5614AE89-3CFB-4B2A-9E9E-3D3FCB84A61A,Operator
 {cannot bind}
 
@@ -5430,7 +5433,7 @@ Windows
 {0 conditions}
 
 8CD15942-AC97-4AD0-BEB3-9AC3290C20B2,Components
-{A4F1E663-DD6F-4CFB-B8C8-496149F89359 A88563D5-3EDB-4933-A42D-D51B94ED8D72 3599937E-10E1-4029-8ACB-CCE5D85D306D EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 EB50BCBF-8CE5-447F-80F9-C7A7CAA939E2 00A22052-6976-4893-A8B4-542CB963FE07}
+{A4F1E663-DD6F-4CFB-B8C8-496149F89359 3599937E-10E1-4029-8ACB-CCE5D85D306D EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 EB50BCBF-8CE5-447F-80F9-C7A7CAA939E2 00A22052-6976-4893-A8B4-542CB963FE07}
 
 8CD15942-AC97-4AD0-BEB3-9AC3290C20B2,Description,subst
 1
@@ -5620,9 +5623,6 @@ Java
 
 A1AF4F54-A600-430D-AA51-39C5EA26D457,Operator
 {does not exist}
-
-A2841CF3-EEB2-479E-9284-330E06D1E1A7,Active
-Yes
 
 A2841CF3-EEB2-479E-9284-330E06D1E1A7,BackButton,subst
 1
@@ -6054,7 +6054,7 @@ CC04C0EA-21F5-464B-977F-6786765F611A,ExecuteAction
 {Before Pane is Displayed}
 
 CE9BD412-8B2C-422C-A23F-5572EB5F6410,Components
-{A4F1E663-DD6F-4CFB-B8C8-496149F89359 A88563D5-3EDB-4933-A42D-D51B94ED8D72 3599937E-10E1-4029-8ACB-CCE5D85D306D EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 EB50BCBF-8CE5-447F-80F9-C7A7CAA939E2 00A22052-6976-4893-A8B4-542CB963FE07}
+{A4F1E663-DD6F-4CFB-B8C8-496149F89359 3599937E-10E1-4029-8ACB-CCE5D85D306D EEE35F50-1F9E-44C8-9E0D-1F865FAAA301 751F7BDA-8E45-4F2F-B93A-3FA576BD0DA7 EB50BCBF-8CE5-447F-80F9-C7A7CAA939E2 00A22052-6976-4893-A8B4-542CB963FE07}
 
 CE9BD412-8B2C-422C-A23F-5572EB5F6410,Description,subst
 1
@@ -6357,6 +6357,9 @@ F9A8D3B6-7571-439A-9C7C-FEC0EBA70DA4,CheckCondition
 
 F9A8D3B6-7571-439A-9C7C-FEC0EBA70DA4,Platform
 Windows
+
+FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Active
+No
 
 FADCECF5-7B68-4F8C-A0AF-FC972E1D10BF,Destination
 <%InstallDir%>
