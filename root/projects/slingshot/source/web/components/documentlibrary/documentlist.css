@@ -144,7 +144,7 @@
 .doclist tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last,
 .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
 {
-   border-left: 1px solid #999;
+   border-left: 1px solid #c5e6e9;
 }
 
 .doclist .documents.yui-dt .yui-dt-data td
@@ -527,7 +527,6 @@
 
 
 /* History Manager */
-
 #yui-history-iframe
 {
    position: absolute;
@@ -545,6 +544,12 @@
    background-color: #f4faff !important;
    border: 1px solid #333 !important;
    padding: 4px 4px 1px !important;
+}
+
+/* Show Folders inline link */
+.doclist .show-folders-link
+{
+   cursor: pointer;
 }
 
 /* Customize Dialog */
