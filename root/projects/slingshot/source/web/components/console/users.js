@@ -1615,7 +1615,7 @@
                   // update the password for the user
                   Alfresco.util.Ajax.request(
                   {
-                     url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + this.currentUserId,
+                     url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + me.currentUserId,
                      method: Alfresco.util.Ajax.POST,
                      dataObj: passwordObj,
                      requestContentType: Alfresco.util.Ajax.JSON,
