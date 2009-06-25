@@ -2791,23 +2791,6 @@ FileGroup ::B2ED123B-F320-4F2D-A38A-7091403BDEB7 -setup Install -alias {Java Fil
 File ::7C7CC5EC-84E6-4572-A398-45D02DFE9959 -directory <%InstallDir%> -name W:/resources/jdk-i586-p.exe -location ../../../../ALF-BINARIES/installer/win32 -parent B2ED123B-F320-4F2D-A38A-7091403BDEB7
 FileGroup ::E181E06B-BC95-4065-80E8-8614EE6074B7 -setup Install -alias {OpenOffice File} -active Yes -platforms {Windows ZipArchive} -name {OpenOffice Installer} -parent FileGroups
 File ::4B58BAE9-06F6-4D30-ACA1-0645DF315D7A -name W:/ALF-BINARIES/installer/win32/OpenOfficeInstallFiles.zip -location ../../../../ALF-BINARIES/installer/win32 -parent E181E06B-BC95-4065-80E8-8614EE6074B7
-FileGroup ::E1D94860-98A3-46D1-A57A-AA0AED090F50 -setup Install -active Yes -platforms {Windows ZipArchive} -name {Temp Files Win} -parent FileGroups
-File ::F715539B-2586-45A9-A2B3-C1AE3C01AB21 -type dir -name W:/HEAD/root/projects/installer/windows/mysqltcl -location ../../projects/installer/windows/mysqltcl -parent E1D94860-98A3-46D1-A57A-AA0AED090F50
-File ::53B0BDAD-FF48-4D0C-AF82-43E4D9A3EAB7 -name libmySQL.dll -parent F715539B-2586-45A9-A2B3-C1AE3C01AB21
-File ::1FAB81AE-AC63-4FB1-ACBC-C728B1C130C7 -name libmysqltcl.dll -parent F715539B-2586-45A9-A2B3-C1AE3C01AB21
-File ::368170A4-BD8F-4207-B63C-3253E34D85DB -name pkgIndex.tcl -parent F715539B-2586-45A9-A2B3-C1AE3C01AB21
-File ::484668F2-B2C9-4D95-A82B-D670C14C1092 -type dir -name .svn -active 0 -parent F715539B-2586-45A9-A2B3-C1AE3C01AB21
-File ::7B8DCDAB-94A3-4E18-9F70-D395A1A39311 -name entries -parent 484668F2-B2C9-4D95-A82B-D670C14C1092
-File ::2B81956E-15D7-4C05-A146-BD1BD81829F1 -name format -parent 484668F2-B2C9-4D95-A82B-D670C14C1092
-File ::D2E5304B-F5D1-474C-9409-96CB282349E7 -type dir -name prop-base -parent 484668F2-B2C9-4D95-A82B-D670C14C1092
-File ::24268A7C-3608-4493-8CEE-E55E3544CDD4 -type dir -name props -parent 484668F2-B2C9-4D95-A82B-D670C14C1092
-File ::499FE727-5A29-4DD5-8842-07DFAF8849CA -name libmySQL.dll.svn-work -parent 24268A7C-3608-4493-8CEE-E55E3544CDD4
-File ::1CB5B859-D3F1-4E5D-B69B-29B93145399C -name libmysqltcl.dll.svn-work -parent 24268A7C-3608-4493-8CEE-E55E3544CDD4
-File ::D8099748-C6E2-4872-ABB0-B196D33BB89E -type dir -name text-base -parent 484668F2-B2C9-4D95-A82B-D670C14C1092
-File ::75CE05A5-85C1-4609-A5DE-4478B9A33267 -type dir -name tmp -parent 484668F2-B2C9-4D95-A82B-D670C14C1092
-File ::2EAC452E-4662-45FC-9FA0-BCBAC2719F80 -type dir -name prop-base -parent 75CE05A5-85C1-4609-A5DE-4478B9A33267
-File ::1146ED3D-A1E5-4D62-AB29-C6A97B99272B -type dir -name props -parent 75CE05A5-85C1-4609-A5DE-4478B9A33267
-File ::31E3C049-4B27-4C7C-9A3D-AFC3F1C4D62F -type dir -name text-base -parent 75CE05A5-85C1-4609-A5DE-4478B9A33267
 FileGroup ::332AF528-112D-43AC-B934-361D5E8E8AD6 -setup Install -active Yes -platforms {Windows ZipArchive} -name {Program Files Win} -parent FileGroups
 File ::F208915B-49FB-4595-A957-5AE12AE3AC97 -name W:/HEAD/root/projects/installer/windows/alfresco.bat -location ../../projects/installer/windows/ -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
 File ::AD0F590A-D8EB-438A-BF82-178E9272B283 -name W:/HEAD/root/projects/installer/windows/alf_start.bat -location ../../projects/installer/windows/ -parent 332AF528-112D-43AC-B934-361D5E8E8AD6
@@ -3913,7 +3896,8 @@ InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane 
 Condition 238C7BD9-0EDF-4953-BC37-C32F5C2D089D -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 238C7BD9-0EDF-4953-BC37-C32F5C2D089D
 Condition E95B44DE-53E1-4944-AEE6-C2D89CCA323B -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id E95B44DE-53E1-4944-AEE6-C2D89CCA323B
 InstallComponent 702B15CC-0F7B-4BF0-9498-7C1BE3A26C18 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE
-InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 3907E462-D52C-48BA-A959-7B629D58FF6F} -title {Check DB Port} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
+InstallComponent E230D053-6033-4990-B404-368AAA25BE36 -setup Install -type action -title {Create Checkbutton} -component AddWidget -command reorder -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE
+InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 3907E462-D52C-48BA-A959-7B629D58FF6F} -title {Check DB Port} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8
 Condition 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Port Test Condition} -component PortTestCondition -TreeObject::id 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631
 Condition 3907E462-D52C-48BA-A959-7B629D58FF6F -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Port Test Condition} -component PortTestCondition -TreeObject::id 3907E462-D52C-48BA-A959-7B629D58FF6F
@@ -4383,7 +4367,7 @@ WCM
 <%InstallDir%>
 
 332AF528-112D-43AC-B934-361D5E8E8AD6,FileSize
-11618527
+11618649
 
 332AF528-112D-43AC-B934-361D5E8E8AD6,Name
 {Program Files Win}
@@ -5677,7 +5661,7 @@ A4F1E663-DD6F-4CFB-B8C8-496149F89359,DisplayName,subst
 1
 
 A4F1E663-DD6F-4CFB-B8C8-496149F89359,FileGroups
-{44D20E51-7275-41FD-BF5C-790496A2FDB2 E1D94860-98A3-46D1-A57A-AA0AED090F50 332AF528-112D-43AC-B934-361D5E8E8AD6 8F9CD740-BE57-45DF-B176-5C11E746846B}
+{44D20E51-7275-41FD-BF5C-790496A2FDB2 332AF528-112D-43AC-B934-361D5E8E8AD6 8F9CD740-BE57-45DF-B176-5C11E746846B}
 
 A4F1E663-DD6F-4CFB-B8C8-496149F89359,Name
 {Default Component}
@@ -6159,14 +6143,26 @@ E181E06B-BC95-4065-80E8-8614EE6074B7,FileSize
 E181E06B-BC95-4065-80E8-8614EE6074B7,Name
 {OpenOffice Installer}
 
-E1D94860-98A3-46D1-A57A-AA0AED090F50,Destination
-<%Temp%>
+E230D053-6033-4990-B404-368AAA25BE36,Checked
+Yes
 
-E1D94860-98A3-46D1-A57A-AA0AED090F50,FileSize
-1597631
+E230D053-6033-4990-B404-368AAA25BE36,Conditions
+{0 conditions}
 
-E1D94860-98A3-46D1-A57A-AA0AED090F50,Name
-{Temp Files Win}
+E230D053-6033-4990-B404-368AAA25BE36,Text,subst
+1
+
+E230D053-6033-4990-B404-368AAA25BE36,Type
+checkbutton
+
+E230D053-6033-4990-B404-368AAA25BE36,VirtualText
+CreateDB
+
+E230D053-6033-4990-B404-368AAA25BE36,X
+90
+
+E230D053-6033-4990-B404-368AAA25BE36,Y
+240
 
 E35F2477-2025-4C48-BE4A-BC2DB58EFD16,Comment
 {Don't display this pane in an upgrade install}
@@ -6211,7 +6207,7 @@ E95B44DE-53E1-4944-AEE6-C2D89CCA323B,CheckCondition
 {Before Next Pane is Displayed}
 
 E95B44DE-53E1-4944-AEE6-C2D89CCA323B,Script
-##\ Create\ Alfresco\ DB\ in\ Mysql\nif\ \{\[catch\ \{\n\ \ \ \ \ \ if\ \{\ <%DB_ROOTPASS%>\ !=\ \"\"\ \}\ \{\n\ \ \ \ \ \ \ \ \ set\ sql\ \[mysql::connect\ -user\ root\ -password\ <%DB_ROOTPASS%>\ -host\ <%DB_HOST%>\ -port\ <%DB_PORT%>\]\n\ \ \ \ \ \ \}\ else\ \{\n\ \ \ \ \ \ \ \ \ set\ sql\ \[mysql::connect\ -user\ root\ -host\ <%DB_HOST%>\ -port\ <%DB_PORT%>\]\n\ \ \ \ \ \ \}\n\n\ \ \ \ \ \ mysql::exec\ \$sql\ \"create\ database\ <%DB_NAME%>\ default\ character\ set\ utf8\"\n\ \ \ \ \ \ mysql::exec\ \$sql\ \"grant\ all\ on\ <%DB_NAME%>.*\ to\ 'alfresco'@'localhost'\ identified\ by\ 'alfresco'\ with\ grant\ option\"\n\ \ \ \ \ \ mysql::exec\ \$sql\ \"grant\ all\ on\ <%DB_NAME%>.*\ to\ 'alfresco'@'localhost.localdomain'\ identified\ by\ 'alfresco'\ with\ grant\ option\"\n\n\ \ \ \ \}\ err\]\}\ \{\n\tset\ answer\ \[tk_messageBox\ -message\ \"\$err\ \"\ -type\ ok\ -icon\ error\ -title\ \"Database\ Configuration\"\]\n\treturn\ false\;\n\t\n\ \ \ \ \}\ else\ \{\n\t\n\tset\ answer\ \[tk_messageBox\ -message\ \"Connection\ established\ and\ '<%DB_NAME%>'\ has\ been\ created.\"\ -type\ ok\ -title\ \"Database\ Configuration\"\]\n\ \treturn\ true\;\ \ \ \n\t\}\ \t\n\n\}\n
+##\ Create\ Alfresco\ DB\ in\ Mysql\n\nif\ \{<%CreateDB%>\ !=\ 1\}\ \{\n\ \ \ set\ answer\ \[tk_messageBox\ -message\ \"You\ must\ manually\ create\ your\ database\ before\ starting\ the\ Alfresco\ server.\"\ -type\ ok\ -title\ \"Database\ Configuration\"\]\n\ \ \ return\ true\;\ \ \ \n\}\ \t\n\nif\ \{\[catch\ \{\n\ \ \ \ \ \ if\ \{\ <%DB_ROOTPASS%>\ !=\ \"\"\ \}\ \{\n\ \ \ \ \ \ \ \ \ set\ sql\ \[mysql::connect\ -user\ root\ -password\ <%DB_ROOTPASS%>\ -host\ <%DB_HOST%>\ -port\ <%DB_PORT%>\]\n\ \ \ \ \ \ \}\ else\ \{\n\ \ \ \ \ \ \ \ \ set\ sql\ \[mysql::connect\ -user\ root\ -host\ <%DB_HOST%>\ -port\ <%DB_PORT%>\]\n\ \ \ \ \ \ \}\n\n\ \ \ \ \ \ mysql::exec\ \$sql\ \"create\ database\ <%DB_NAME%>\ default\ character\ set\ utf8\"\n\ \ \ \ \ \ mysql::exec\ \$sql\ \"grant\ all\ on\ <%DB_NAME%>.*\ to\ 'alfresco'@'localhost'\ identified\ by\ 'alfresco'\ with\ grant\ option\"\n\ \ \ \ \ \ mysql::exec\ \$sql\ \"grant\ all\ on\ <%DB_NAME%>.*\ to\ 'alfresco'@'localhost.localdomain'\ identified\ by\ 'alfresco'\ with\ grant\ option\"\n\n\ \ \ \ \}\ err\]\}\ \{\n\ \ \ \ \ \ \ set\ answer\ \[tk_messageBox\ -message\ \"\$err\ \"\ -type\ ok\ -icon\ error\ -title\ \"Database\ Configuration\"\]\n\ \ \ \ \ \ \ return\ false\;\n\ \ \ \ \}\ else\ \{\n\ \ \ \ \ \ \ set\ answer\ \[tk_messageBox\ -message\ \"Connection\ established\ and\ '<%DB_NAME%>'\ has\ been\ created.\"\ -type\ ok\ -title\ \"Database\ Configuration\"\]\n\ \ \ \ \ \ \ return\ true\;\ \ \ \n\ \ \ \}\ \t\n\}\n
 
 EA551630-2C10-4F67-A450-D945DBFEE92F,Conditions
 {1 condition}
@@ -6860,6 +6856,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 {}
 
+E230D053-6033-4990-B404-368AAA25BE36,Text
+{}
+
 FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 <%InstallingApplicationText%>
 
@@ -7094,6 +7093,9 @@ CD047B45-9E60-4E0B-B9DD-2AD2CAB8772C,Message
 CE9BD412-8B2C-422C-A23F-5572EB5F6410,Description
 <%CustomInstallDescription%>
 
+E230D053-6033-4990-B404-368AAA25BE36,Text
+{Connect to database server and create new database}
+
 EB50BCBF-8CE5-447F-80F9-C7A7CAA939E2,Description
 {Include SharePoint Protocol support}
 
@@ -7161,6 +7163,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 {}
 
+E230D053-6033-4990-B404-368AAA25BE36,Text
+{}
+
 FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 <%InstallingApplicationText%>
 
@@ -7203,6 +7208,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
+{}
+
+E230D053-6033-4990-B404-368AAA25BE36,Text
 {}
 
 FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
@@ -7249,6 +7257,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 {}
 
+E230D053-6033-4990-B404-368AAA25BE36,Text
+{}
+
 FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 <%InstallingApplicationText%>
 
@@ -7291,6 +7302,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
+{}
+
+E230D053-6033-4990-B404-368AAA25BE36,Text
 {}
 
 FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
@@ -7337,6 +7351,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 {}
 
+E230D053-6033-4990-B404-368AAA25BE36,Text
+{}
+
 FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 <%InstallingApplicationText%>
 
@@ -7379,6 +7396,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
+{}
+
+E230D053-6033-4990-B404-368AAA25BE36,Text
 {}
 
 FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
@@ -7425,6 +7445,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 {}
 
+E230D053-6033-4990-B404-368AAA25BE36,Text
+{}
+
 FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 <%InstallingApplicationText%>
 
@@ -7467,6 +7490,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
+{}
+
+E230D053-6033-4990-B404-368AAA25BE36,Text
 {}
 
 FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
