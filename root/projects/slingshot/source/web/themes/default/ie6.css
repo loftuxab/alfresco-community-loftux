@@ -528,16 +528,6 @@ div.dashlet .toolbar
    margin: 0;
 }
 
-/* Dialogs */
-
-
-.yui-skin-default .yui-panel.groups.people-picker,
-.yui-skin-default .yui-panel.groups.group-picker
-{
-   width: 51em;
-}
-
-
 /* Full preview background mask */
 body.masked div.mask.full-preview-mask
 {
