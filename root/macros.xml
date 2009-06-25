@@ -27,9 +27,9 @@
                 excludes="@{compileExcludes}" >
             <src path="@{projectdir}/${dir.name.source}/${dir.name.java}" />
             <classpath>
-				<path refid="classpath.compile"/>
-				<path refid="classpath.compile.extension"/>
-			</classpath>
+            <path refid="classpath.compile"/>
+            <path refid="classpath.compile.extension"/>
+         </classpath>
 
             <!-- To run javac with Xlint:unchecked, uncomment the line below  -->
             <!-- <compilerarg value="-Xlint:unchecked"/> -->
@@ -58,9 +58,9 @@
             <src path="@{projectdir}/${dir.name.source}/${dir.name.java}" />
             <src path="@{projectdir}/${dir.name.source}/${dir.name.generated}" />
             <classpath>
-				<path refid="classpath.compile"/>
-				<path refid="classpath.compile.extension"/>
-			</classpath>
+            <path refid="classpath.compile"/>
+            <path refid="classpath.compile.extension"/>
+         </classpath>
          </javac>
          
          <copy todir="@{projectdir}/${dir.name.build}/${dir.name.classes}">
@@ -90,16 +90,16 @@
                   windowtitle="@{windowtitle}"
                   encoding="${javac.encoding}">
             <classpath>
-				<path refid="classpath.javadoc"/>
-				<path refid="classpath.javadoc.extension"/>
-			</classpath>
+            <path refid="classpath.javadoc"/>
+            <path refid="classpath.javadoc.extension"/>
+         </classpath>
             <!-- doclet that hides public classes/members via @exclude -->
             <doclet name="ExcludeDoclet" path="${dir.project.3rdparty.lib}/${dir.name.devenv}/exclude-doclet.jar"/>
          </javadoc>
       </sequential>
    </macrodef>
-	
-	<macrodef name="generate-generated-javadocs">
+   
+   <macrodef name="generate-generated-javadocs">
       <attribute name="projectdir" />
       <attribute name="documenttitle" />
       <attribute name="windowtitle" />
@@ -114,15 +114,35 @@
                   doctitle="@{documenttitle}"
                   windowtitle="@{windowtitle}">
             <classpath>
-				<path refid="classpath.javadoc"/>
-				<path refid="classpath.javadoc.extension"/>
-			</classpath>
+            <path refid="classpath.javadoc"/>
+            <path refid="classpath.javadoc.extension"/>
+         </classpath>
             <!-- doclet that hides public classes/members via @exclude -->
             <doclet name="ExcludeDoclet" path="${dir.project.3rdparty.lib}/${dir.name.devenv}/exclude-doclet.jar"/>
          </javadoc>
       </sequential>
    </macrodef>
    
+   <macrodef name="run-tests-startup" description="Runs the startup tests for the given project">
+      <attribute name="projectdir" />
+      <sequential>
+         <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.test.results}" />
+         <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="yes" dir="@{projectdir}">
+            <jvmarg value="-server"/>
+            <classpath>
+            <path refid="classpath.unit.test"/>
+            <path refid="classpath.unit.test.extension"/>
+         </classpath>
+            <formatter type="xml" />
+            <batchtest todir="@{projectdir}/${dir.name.build}/${dir.name.test.results}">
+               <fileset dir="@{projectdir}/${dir.name.source}/${dir.name.java}">
+                  <patternset refid="files.tests.startup" />
+               </fileset>
+            </batchtest>
+         </junit>
+      </sequential>
+   </macrodef>
+
    <macrodef name="run-tests" description="Runs the tests for the given project">
       <attribute name="projectdir" />
       <sequential>
@@ -130,9 +150,9 @@
          <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="no" dir="@{projectdir}">
             <jvmarg value="-server"/>
             <classpath>
-				<path refid="classpath.unit.test"/>
-				<path refid="classpath.unit.test.extension"/>
-			</classpath>
+            <path refid="classpath.unit.test"/>
+            <path refid="classpath.unit.test.extension"/>
+         </classpath>
             <formatter type="xml" />
             <batchtest todir="@{projectdir}/${dir.name.build}/${dir.name.test.results}">
                <fileset dir="@{projectdir}/${dir.name.source}/${dir.name.java}">
@@ -298,26 +318,26 @@
       <sequential>
       <echo file="@{classfile}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="]]></echo>
+   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+   <classpathentry exported="true" kind="lib" path="]]></echo>
 <!--
-	<classpathentry exported="true" kind="lib" path="alfresco"/>
+   <classpathentry exported="true" kind="lib" path="alfresco"/>
 -->
-	  <pathconvert pathsep="@@@" property="@{classprop}">
-		 <path>
+     <pathconvert pathsep="@@@" property="@{classprop}">
+       <path>
             <fileset dir="@{libdir}" includes="**/*.jar"/>
-		 </path>
+       </path>
          <map from="@{libdir}" to=""/>
       </pathconvert>
-	  <echo file="@{classfile}" append="true">${@{classprop}}</echo>
+     <echo file="@{classfile}" append="true">${@{classprop}}</echo>
 
       <replace file="@{classfile}" token="@@@">
          <replacevalue><![CDATA["/>
-	<classpathentry exported="true" kind="lib" path="]]></replacevalue>
+   <classpathentry exported="true" kind="lib" path="]]></replacevalue>
       </replace>
 
       <echo file="@{classfile}" append="true"><![CDATA["/>
-	<classpathentry kind="output" path=""/>
+   <classpathentry kind="output" path=""/>
 </classpath>
 ]]></echo>
        </sequential>

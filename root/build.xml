@@ -39,7 +39,7 @@
       <path id="classpath.compile">
          <fileset dir="${dir.project.3rdparty.lib}">
             <include name="**/*.jar" />
-         	<!-- Avoid compile-time dependencies against optional components, e.g. log4j -->
+            <!-- Avoid compile-time dependencies against optional components, e.g. log4j -->
             <exclude name="optional/**" />
          </fileset>
          <fileset dir="${dir.projects}">
@@ -52,7 +52,7 @@
             <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
          </fileset>
       </path>
-	  <!-- Extension point for overriding -->
+     <!-- Extension point for overriding -->
       <path id="classpath.compile.extension"/>
 
       <path id="classpath.unit.test">
@@ -245,19 +245,23 @@
          <pathelement location="${dir.project.3rdparty.lib}/XmlSchema-1.4.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
       </path>
-	  <!-- Extension point for overriding -->
+     <!-- Extension point for overriding -->
       <path id="classpath.unit.test.extension"/>
 
       <path id="classpath.javadoc">
          <path refid="classpath.compile"/>
       </path>
-	  <!-- Extension point for overriding -->
+     <!-- Extension point for overriding -->
       <path id="classpath.javadoc.extension"/>
 
+      <patternset id="files.tests.startup">
+         <include name="**/RepositoryStartupTest.java" />
+      </patternset>
       <patternset id="files.tests">
          <exclude name="**/Base*Test.java" />
          <exclude name="**/Abstract*Test.java" />
          <exclude name="**/*SystemTest.java" />
+         <exclude name="**/RepositoryStartupTest.java" />
          <!-- Action Tests -->
          <exclude name="**/org/alfresco/repo/action/**/*Test.java" />
          <include name="**/org/alfresco/repo/action/ActionTestSuite.java" />
@@ -311,12 +315,12 @@
                     incremental-mbeans,
                     incremental-deployment,
                     incremental-repository,
-					incremental-wdrdeployment,
+                    incremental-wdrdeployment,
                     incremental-remoteapi,
                     incremental-jndi,
                     incremental-catalinavirtual, 
                     incremental-linkvalidation" />
-		   
+         
    <target name="incremental" 
            description="Performs an incremental build of all projects"
            depends="incremental-webclient-depends,
@@ -437,7 +441,7 @@
                     generate-javadocs-mbeans,
                     generate-javadocs-deployment,
                     generate-javadocs-repository, 
-					generate-javadocs-wdrdeployment,
+                    generate-javadocs-wdrdeployment,
                     generate-javadocs-remoteapi, 
                     generate-javadocs-jndi,
                     generate-javadocs-catalinavirtual, 
@@ -474,7 +478,7 @@
                     clean-mbeans,
                     clean-deployment, 
                     clean-repository, 
-					clean-wdrdeployment,
+                    clean-wdrdeployment,
                     clean-remoteapi, 
                     clean-jndi, 
                     clean-catalinavirtual, 
@@ -642,7 +646,7 @@
          <fileset dir="${dir.project.webscriptframework.classes}" />
          <fileset dir="${dir.project.webclient.classes}" 
                   excludes="**/extension/**" />
-		  <fileset dir="${dir.project.jlan.classes}" excludes="org/alfresco/config/**" />
+        <fileset dir="${dir.project.jlan.classes}" excludes="org/alfresco/config/**" />
         
          <!-- copy config files -->
          <fileset dir="${dir.project.core.src.java}" 
@@ -882,24 +886,24 @@
    </target>
 
    <target name="minimize-mobile-deployed-javascript" depends="init">
-   	<concat destfile="${dir.deploy.tomcat.application.mobile}/js/alf-mobile.js">
+      <concat destfile="${dir.deploy.tomcat.application.mobile}/js/alf-mobile.js">
          <fileset dir="${dir.deploy.tomcat.application.mobile}">
             <include name="**/*.js" />
             <exclude name="**/alf-mobile.js" />
             <exclude name="**/*-min.js" />
             <exclude name="**/WEB-INF/**" />
          </fileset>
-   	</concat>
+      </concat>
 
-   	<apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.mobile}/js">
-   		<fileset dir="${dir.deploy.tomcat.application.mobile}/js" includes="alf-mobile.js"/>
-   		<arg line="-jar"/>
-   		<arg path="${dir.project.mobile}/lib/yuicompressor-2.4.2.jar"/>
-   		<arg line="-o"/>
-   		<targetfile/>
-   		<srcfile/>
-   		<mapper type="glob" from="*.js" to="*-min.js"/>
-   	</apply>
+      <apply executable="java" parallel="false" dest="${dir.deploy.tomcat.application.mobile}/js">
+         <fileset dir="${dir.deploy.tomcat.application.mobile}/js" includes="alf-mobile.js"/>
+         <arg line="-jar"/>
+         <arg path="${dir.project.mobile}/lib/yuicompressor-2.4.2.jar"/>
+         <arg line="-o"/>
+         <targetfile/>
+         <srcfile/>
+         <mapper type="glob" from="*.js" to="*-min.js"/>
+      </apply>
    </target>
    
    <target name="deploy-webstudio-tomcat" depends="init" 
@@ -1012,7 +1016,7 @@
                     test-deployment, 
                     test-repository, 
                     test-remoteapi,
-   					test-wdrdeployment,
+                    test-wdrdeployment,
                     test-catalinavirtual,
                     test-webscriptframework,
                     test-webframeworkcommons, 
