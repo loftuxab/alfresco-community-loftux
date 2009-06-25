@@ -534,6 +534,8 @@
          
          _groups: [],
          
+         _form: null,
+         
          onLoad: function onLoad()
          {
             // events we are interested in
@@ -577,6 +579,7 @@
             
             // Initialise the form
             form.init();
+            this._form = form;
             
             // Load in the Groups Finder component from the server
             Alfresco.util.Ajax.request(
@@ -697,6 +700,11 @@
             // old data to the user before the onShow() method paints the results
             Dom.setStyle(parent.id + "-create-main", "visibility", "hidden");
             
+            this.clear();
+         },
+         
+         clear: function clear()
+         {
             var fnClearEl = function(id)
             {
                Dom.get(parent.id + id).value = "";
@@ -714,6 +722,14 @@
             
             // reset quota selection drop-down
             Dom.get(parent.id + "-create-quotatype").value = "gb";
+            
+            // clear selected groups
+            this._groups = [];
+            Dom.get(parent.id + "-create-groups").innerHTML = "";
+            if (this._form !== null)
+            {
+               this._form.init();
+            }
          },
          
          onShow: function onShow()
@@ -1376,8 +1392,8 @@
                text: me._msg("message.create-success")
             });
             
-            // TODO: clear fields?
-            
+            // clear fields
+            this._getCurrentPanel().clear();
             Dom.get(me.id + "-create-firstname").focus();
          };
          this._createUser(handler);
