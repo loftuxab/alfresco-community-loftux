@@ -33,5 +33,12 @@
 		</web-framework>
 	</config>
 	-->
-
+   <config evaluator="string-compare" condition="WebFramework">
+      <web-framework>   
+      <!-- Application Defaults -->	
+         <application-defaults>
+            <theme>default</theme>
+         </application-defaults>
+      </web-framework>
+   </config>
 </alfresco-config>
