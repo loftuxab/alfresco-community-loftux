@@ -592,7 +592,7 @@ public class RemoteClient extends AbstractClient
                 ((EntityEnclosingMethod)method).setRequestEntity(new InputStreamRequestEntity(in, contentLength));
                 
                 // apply any supplied POST request parameters
-                if (req != null && method instanceof PostMethod)
+                if (req != null && contentLength == 0 && method instanceof PostMethod)
                 {
                     Map<String, String[]> postParams = req.getParameterMap();
                     
