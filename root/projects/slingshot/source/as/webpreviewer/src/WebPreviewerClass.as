@@ -1,12 +1,12 @@
 package
 {
 	import flash.external.ExternalInterface;
-	import flash.system.System;
 	
 	import mx.controls.Alert;
 	import mx.core.Application;
 	import mx.events.FlexEvent;
 	
+	import org.alfresco.core.ui.Cursors;
 	import org.alfresco.previewer.DocumentZoomDisplayEvent;
 	import org.alfresco.previewer.Previewer;
 	import org.alfresco.previewer.PreviewerEvent;
@@ -48,7 +48,6 @@ package
 		 */
 		public function onApplicationComplete(event:FlexEvent):void
 		{
-			 
 			// Add mouse wheel scroll support for browsers on mac.
 			ExternalMouseWheelSupport.getInstance(stage);
 			
@@ -87,13 +86,37 @@ package
 			previewer.showFullWindowButton = showFullWindowButton != null && showFullWindowButton.toLowerCase() == "true";
 			previewer.i18nLabels = i18n;
 			
-			trace(System.totalMemory);
+			/**
+			 * Respomnd to javascript callbacks for cursor handling.
+
+			 */
+			ExternalInterface.addCallback("setMode", onSetMode);
 			
 			// Start the loading the content in to the previewer				
 			previewer.url = url; 			
 		}
 		
-		
+		/**
+		 * Disables the custom cursors such as grab and move since
+		 * FF3 and SF4 hides the browser cursor if a flashmovie uses a custom cursor 
+		 * when the flash movie is placed/hidden under a div we must turn off custom cursor
+		 * when the html environment tells us to.
+		 * 
+		 * Also stops dragging   
+		 */		 
+		public function onSetMode(mode:String):void 
+		{
+			if(mode == "inactive")
+			{
+	        	Cursors.hideGrabCursor(null);        	
+	        	Cursors.enabled = false;
+			}
+			else if(mode == "active")
+			{
+	        	Cursors.enabled = true;
+			}        	
+     	}
+
 		/**
 		 * Called if something goes wrong during the loading of the content specified by url.
 		 * 

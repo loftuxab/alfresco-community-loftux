@@ -35,7 +35,8 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom;
+   var Dom = YAHOO.util.Dom,
+         Event = YAHOO.util.Event;
 
    /**
     * Alfresco Slingshot aliases
@@ -183,9 +184,10 @@
             if (previewCtx)
             {                  
                // Create flash web preview by using swfobject
+               var swfId = "WebPreviewer_" + this.id;
                var shadowSfwDivId = this.id + "-shadow-swf-div";
-               var so = new YAHOO.deconcept.SWFObject(Alfresco.constants.URL_CONTEXT + "/components/preview/WebPreviewer.swf",
-                       "WebPreviewer_" + this.id, "100%", "100%", "9.0.45");
+               var so = new YAHOO.deconcept.SWFObject(Alfresco.constants.URL_CONTEXT + "components/preview/WebPreviewer.swf",
+                       swfId, "100%", "100%", "9.0.45");
                so.addVariable("fileName", this.options.name);
                so.addVariable("paging", previewCtx.paging);
                so.addVariable("url", previewCtx.url);
@@ -226,6 +228,22 @@
                // Finally create the flash web preview o’n the new div
                so.write(realSwfDivEl.get("id"));
 
+               /**
+                * FF3 and SF4 hides the browser cursor if the flashmovie uses a custom cursor
+                * when the flash movie is placed/hidden under a div (which is what happens if a dialog
+                * is placed on top of the web previewer) so we must turn off custom cursor
+                * when the html environment tells us to.
+                */
+               Event.addListener(swfId, "mouseover", function(e)
+               {
+                  YAHOO.util.Dom.get(swfId).setMode("active");
+               });
+               Event.addListener(swfId, "mouseout", function(e)
+               {
+                  YAHOO.util.Dom.get(swfId).setMode("inactive");
+               });
+ 
+                              
             }
             else
             {
