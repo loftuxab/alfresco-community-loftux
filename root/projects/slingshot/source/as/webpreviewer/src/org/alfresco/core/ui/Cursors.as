@@ -27,6 +27,7 @@ package org.alfresco.core.ui
 {
 	import flash.events.Event;
 	
+	import mx.controls.Alert;
 	import mx.managers.CursorManager;
 	import mx.managers.CursorManagerPriority;
 	
@@ -35,6 +36,12 @@ package org.alfresco.core.ui
 	 */
 	public class Cursors
 	{
+
+		/** 
+		 * Boolean that decides if curors shall be displayed or not.
+		 */ 
+		public static var enabled:Boolean = true;
+
 		/** 
 		 * Array of ids to all the current hand cursors that are in use.
 		 */ 
@@ -71,7 +78,7 @@ package org.alfresco.core.ui
 		 */
 		public static function showHandCursor(event:Event):void 
 		{
-			if (handCursorId == 0)
+			if (enabled && handCursorId == 0)
 			{
 				handCursorId = CursorManager.setCursor(handCursor);
 			    CursorManager.showCursor();
@@ -100,7 +107,7 @@ package org.alfresco.core.ui
 		 */
 		public static function showGrabCursor(event:Event):void 
 		{
-			if (grabCursorId == 0)
+			if (enabled && grabCursorId == 0)
 			{
 				grabCursorId = CursorManager.setCursor(grabCursor, CursorManagerPriority.HIGH);
 		    	CursorManager.showCursor();
