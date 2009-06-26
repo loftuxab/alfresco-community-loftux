@@ -196,6 +196,13 @@ hr
    border-right-color: #C4C5C5;
 }
 
+.yui-skin-default .yui-dt-data tr.yui-dt-odd.yui-dt-highlighted,
+.yui-skin-default .yui-dt-data tr.yui-dt-even.yui-dt-highlighted
+{
+   background-color:#F4FAFF;
+   cursor:auto;
+}
+
 /* Style the default message  */
 
 .yui-skin-default #message .bd

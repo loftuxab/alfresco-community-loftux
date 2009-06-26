@@ -7,5 +7,6 @@
    <properties>
       <minSearchTermLength>3</minSearchTermLength>
       <setFocus>true</setFocus>
+      <addButtonSuffix> >></addButtonSuffix>      
    </properties>
 </component>

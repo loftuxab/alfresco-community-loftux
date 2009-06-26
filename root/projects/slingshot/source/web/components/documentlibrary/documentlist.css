@@ -136,11 +136,7 @@
 {
    background-color: #ffffff;
 }
-.doclist tr.yui-dt-odd.yui-dt-highlighted,
-.doclist tr.yui-dt-even.yui-dt-highlighted
-{
-   cursor: auto;
-}
+
 .doclist tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last,
 .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
 {
