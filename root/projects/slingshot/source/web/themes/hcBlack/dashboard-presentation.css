@@ -50,3 +50,19 @@
 {
    border-bottom: 1px dashed #575757; 
 }
+
+/* Wiki dashlet text */
+body.yui-skin-hcBlack .wiki .title a {
+   color:#fff;
+}
+/* dashlets */
+body.yui-skin-hcBlack .dashlet .body a 
+{
+   text-decoration:underline;
+}
+body.yui-skin-hcBlack .dashlet .body a:hover {
+   background-color:#F1FF00;
+}
+.topiclist .yui-dt-liner {
+   padding:0;
+}

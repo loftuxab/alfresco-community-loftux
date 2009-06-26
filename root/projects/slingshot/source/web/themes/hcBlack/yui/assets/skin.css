@@ -433,17 +433,17 @@ background-color: #fff;
 color: #000;
 }
 .yui-skin-hcBlack .yui-calendar td.calcell.selected a {
-background-color: #f1ff00; /* Changes appointment cell colour in mini calendar */
-color: #000;
+background-color: #000; /* Changes appointment cell colour in mini calendar */
+color: #fff;
 }
 .yui-skin-hcBlack .yui-calendar td.calcell.calcellhover {
-background-color: #000000; /* Changes mini calendar mouser-over outline colour in Calendar component */
-color: #fff;
+background-color: #f1ff00; /* Changes mini calendar mouser-over outline colour in Calendar component */
+color: #000;
 cursor: pointer;
 }
 .yui-skin-hcBlack .yui-calendar td.calcell.calcellhover a {
-background-color: #000000; /* Changes mini calendar mouser-over colour in Calendar component */
-color: #fff;
+background-color: #f1ff00; /* Changes mini calendar mouser-over colour in Calendar component */
+color: #000;
 }
 .yui-skin-hcBlack .yui-calendar td.calcell.previous {
 color: #e0e0e0;

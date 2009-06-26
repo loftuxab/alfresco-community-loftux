@@ -279,7 +279,9 @@ textarea
    border: 1px solid #838383;
    font-weight: normal;
 }
-
+#loginform input#username {
+   border:1px solid #C5D6E2;
+}
 /* same as theme-color-2 */
 .toolbar .link a:hover,
 .members-bar .member-link a:hover
@@ -328,7 +330,8 @@ textarea
 .yui-skin-hcBlack .flat-button .yui-radio-button-checked,
 .yui-skin-hcBlack .flat-button .yui-checkbox-button-checked
 {
-   background: #5FAC34 none;
+   background: #000 none;
+   color:#fff;
 }
 
 
@@ -396,7 +399,23 @@ textarea
 {   
    border: 1px solid #FFFFFF;
 }
+.topiclist .yui-dt-liner {
+   padding:0;
+}
+/* blog/wiki action items links */
+body.yui-skin-hcBlack .wikipage .editPage a:hover,
+body.yui-skin-hcBlack .wikipage .deletePage a:hover,
+body.yui-skin-hcBlack .wikipage .detailsPage a:hover,
+body.yui-skin-hcBlack .nodeEdit .onEditBlogPost a:hover,
+body.yui-skin-hcBlack .nodeEdit .onDeleteBlogPost a:hover
+{
+   background-color:#f1ff00;
+   text-decoration:underline;
+}
 
+.webview .title a.configure {
+   text-decoration:underline;
+}
 /* YUI Menu */
 body.yui-skin-hcBlack .yuimenu .bd {
    border:1px solid #000;
@@ -437,7 +456,8 @@ body.yui-skin-hcBlack .doclist tr.yui-dt-even.yui-dt-highlighted,
 body.yui-skin-hcBlack .links-body tr.links-selected-row,
 body.yui-skin-hcBlack .over,
 .postview,
-.topicview
+.topicview,
+.site-members .search-controls
 {
    background-color: #FEFFF1;
 }
@@ -448,13 +468,25 @@ body.yui-skin-hcBlack .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
 }
 
 /* end doclist */
+/* calendar */
 .yui-skin-hcBlack .dayview h2, .weekview h2,
 .yui-skin-hcBlack .calendar.weekview thead th,
 .yui-skin-hcBlack .calendar.monthview thead th
 {
    color:#000;
 }
-
+body.yui-skin-hcBlack .vcalendar table,
+body.yui-skin-hcBlack .vcalendar table th,
+body.yui-skin-hcBlack .vcalendar table td,
+body.yui-skin-hcBlack .vcalendar table .hourSegment,
+body.yui-skin-hcBlack .weekview div.day, 
+body.yui-skin-hcBlack .dayview div.day,
+body.yui-skin-hcBlack .calendar.weekview tbody tr.alldayRow td,
+body.yui-skin-hcBlack tr#collapseTrigger td
+{
+   border-color:#000;
+}
+/* end calendar */
 /* invite page */
 .inviteusersbyemail .byemailbody,
 .people-finder .results
@@ -515,6 +547,11 @@ body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:hove
 {
    background-image:url(./images/navigation-bg.png);
 }
+.cmis .body a {
+   color:#000;
+   text-decoration:underline;
+}
+
 /* Theme colors */
 .theme-color-1,
 a.theme-color-1,
