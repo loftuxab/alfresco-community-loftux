@@ -5,6 +5,9 @@ mysql
 ALF_IMG
 <%InstallDir%>/ImageMagick
 
+ALF_OO
+/Applications
+
 ALF_RMIPORT
 50500
 
@@ -3224,16 +3227,16 @@ InstallComponent C106AE81-88CA-44E9-8B7C-37C6579863FF -setup Install -type actio
 InstallComponent 8172F70F-8736-44D8-879E-694FF48D4E0A -setup Install -type action -conditions D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5 -title {Set Virtual Text} -component SetVirtualText -command insert -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 Condition D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5 -active Yes -parent 8172F70F-8736-44D8-879E-694FF48D4E0A -title {File Exists Condition} -component FileExistsCondition -TreeObject::id D6A862B0-7D1D-424D-BB9C-AF8698EEFAC5
 InstallComponent 319487D5-991A-4544-9CB7-69BDA7BC5617 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
-InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions {8C05E8E9-4358-4BBB-B89A-57FA88483ABA 1A86D8BA-BFEC-F5BC-6F73-CE9105568F10} -title {Installing OO} -component CustomBlankPane1 -operator OR -command insert -active Yes -parent StandardInstall
+InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions {8C05E8E9-4358-4BBB-B89A-57FA88483ABA 1A86D8BA-BFEC-F5BC-6F73-CE9105568F10} -title {Installing OO} -component CustomBlankPane1 -operator OR -command reorder -active Yes -parent StandardInstall
 Condition 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8C05E8E9-4358-4BBB-B89A-57FA88483ABA
 Condition 1A86D8BA-BFEC-F5BC-6F73-CE9105568F10 -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 1A86D8BA-BFEC-F5BC-6F73-CE9105568F10
 InstallComponent 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5 -setup Install -type action -conditions B18D42E8-E964-B9CA-F47B-34FC0F7C3259 -title {Execute OO Install} -component ExecuteExternalProgram -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition B18D42E8-E964-B9CA-F47B-34FC0F7C3259 -active Yes -parent 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5 -title {Platform Condition} -component PlatformCondition -TreeObject::id B18D42E8-E964-B9CA-F47B-34FC0F7C3259
 InstallComponent 5B4AD7AE-431A-94BD-C6D0-C5AB6EC27422 -setup Install -type action -conditions EDE206D6-55BC-A5BB-4477-7CDA03979430 -title {Execute OO untar} -component ExecuteExternalProgram -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition EDE206D6-55BC-A5BB-4477-7CDA03979430 -active Yes -parent 5B4AD7AE-431A-94BD-C6D0-C5AB6EC27422 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id EDE206D6-55BC-A5BB-4477-7CDA03979430
-InstallComponent 6D266300-35DB-78D2-7D5B-492B9CD37C79 -setup Install -type action -conditions 2428420B-8EB9-374D-DF12-98C7E63B248F -title {Set Virtual Text} -component SetVirtualText -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
+InstallComponent 6D266300-35DB-78D2-7D5B-492B9CD37C79 -setup Install -type action -conditions 2428420B-8EB9-374D-DF12-98C7E63B248F -title {Set Virtual Text} -component SetVirtualText -command reorder -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition 2428420B-8EB9-374D-DF12-98C7E63B248F -active Yes -parent 6D266300-35DB-78D2-7D5B-492B9CD37C79 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2428420B-8EB9-374D-DF12-98C7E63B248F
-InstallComponent DB93DFD9-76DF-3084-9485-18510E5642DC -setup Install -type action -conditions 920E50C4-356B-7461-6070-EC96C95F0207 -title {Set Virtual Text} -component SetVirtualText -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
+InstallComponent DB93DFD9-76DF-3084-9485-18510E5642DC -setup Install -type action -conditions 920E50C4-356B-7461-6070-EC96C95F0207 -title {Set Virtual Text} -component SetVirtualText -command reorder -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition 920E50C4-356B-7461-6070-EC96C95F0207 -active Yes -parent DB93DFD9-76DF-3084-9485-18510E5642DC -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 920E50C4-356B-7461-6070-EC96C95F0207
 InstallComponent B97EC16D-1719-AF98-9DDF-5C0A98A8737A -setup Install -type action -conditions {DA50A318-F7A6-978F-5F38-D2118CD15FC7 6151E18D-7B2E-0B3A-66AC-293C090F40D2} -title {Delete File} -component DeleteFile -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition DA50A318-F7A6-978F-5F38-D2118CD15FC7 -active Yes -parent B97EC16D-1719-AF98-9DDF-5C0A98A8737A -title {File Exists Condition} -component FileExistsCondition -TreeObject::id DA50A318-F7A6-978F-5F38-D2118CD15FC7
@@ -3242,11 +3245,11 @@ InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type actio
 Condition 4A6A733C-0C49-4A24-47AA-E2EFBB181D5B -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 4A6A733C-0C49-4A24-47AA-E2EFBB181D5B
 Condition 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 61E5C9E8-070C-4201-AA1B-F1B3F2FD424A
 InstallComponent 7F2F989E-9F6C-4CAC-AFF2-A925549A20D2 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
-InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -title {Configure MySQL} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
+InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -title {Configure MySQL} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id DAF0C0EA-F0A2-4EF1-B453-A0F828E42BAB
 InstallComponent D0BEA0E1-AE39-46EB-8F94-F52C1A40128D -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021
 InstallComponent A4B7881D-0357-4C8F-873B-C9B1E6C2FA6F -setup Install -type action -title {Create Checkbox} -component AddWidget -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021
-InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {3FCADEE9-5DD9-768C-D188-CC3A6F8121FF B4542FD2-3F94-E787-C87C-253FEECEB594 5F62014D-FF00-1133-0073-1B34152260C9} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
+InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {3FCADEE9-5DD9-768C-D188-CC3A6F8121FF B4542FD2-3F94-E787-C87C-253FEECEB594 5F62014D-FF00-1133-0073-1B34152260C9} -title OOLocation -component SelectDestination -operator OR -command reorder -alias OOLocation -active Yes -parent StandardInstall
 Condition 3FCADEE9-5DD9-768C-D188-CC3A6F8121FF -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 3FCADEE9-5DD9-768C-D188-CC3A6F8121FF
 Condition B4542FD2-3F94-E787-C87C-253FEECEB594 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id B4542FD2-3F94-E787-C87C-253FEECEB594
 Condition 5F62014D-FF00-1133-0073-1B34152260C9 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 5F62014D-FF00-1133-0073-1B34152260C9
@@ -3256,11 +3259,11 @@ Condition 742564FA-3964-4BC5-A471-2E5C47E0815C -active Yes -parent 7C464880-67E7
 InstallComponent A6AD15A0-5754-4A70-A4C8-F7D64FE38031 -setup Install -type pane -title {Do Config} -component CustomBlankPane1 -active Yes -parent StandardInstall
 InstallComponent 5BF7D47A-D7A8-4FEF-8490-3FCC7397D7B2 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
 InstallComponent 4189489A-B002-4812-8ED2-5E7555A0F213 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A6AD15A0-5754-4A70-A4C8-F7D64FE38031
-InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions 2F0CB899-1C48-4F91-9AD0-327063548555 -title {Adding SPP} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
+InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions 2F0CB899-1C48-4F91-9AD0-327063548555 -title {Adding SPP} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition 2F0CB899-1C48-4F91-9AD0-327063548555 -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 InstallComponent 6167A49E-551C-4CF3-944D-1FDBDD9C0106 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -command reorder -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
 InstallComponent CD057CD8-68CA-4230-8D9E-F84606DC3EFD -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
-InstallComponent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -setup Install -type pane -conditions {6654B212-DC2E-4B87-87A4-A6651D834356 5D3CD088-B812-4912-A7BA-38C26DBAEA7B} -title {Adding Samples} -component CustomBlankPane1 -command reorder -active No -parent StandardInstall
+InstallComponent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -setup Install -type pane -conditions {6654B212-DC2E-4B87-87A4-A6651D834356 5D3CD088-B812-4912-A7BA-38C26DBAEA7B} -title {Adding Samples} -component CustomBlankPane1 -command insert -active No -parent StandardInstall
 Condition 6654B212-DC2E-4B87-87A4-A6651D834356 -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 Condition 5D3CD088-B812-4912-A7BA-38C26DBAEA7B -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 5D3CD088-B812-4912-A7BA-38C26DBAEA7B
 InstallComponent 6FD62EC4-634A-490E-A5B9-AFE1AEBCC406 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B
@@ -5384,7 +5387,7 @@ D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,Conditions
 {2 conditions}
 
 D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,URL
-http://wiki.alfresco.com/wiki/Alfresco_<%Codeline%>_<%Version%>
+http://wiki.alfresco.com/wiki/Alfresco_<%Codeline%>_Edition_<%Version%>
 
 D425AAA6-9AE6-42BF-812A-9648213060EF,Comment
 {Do not display this pane if this is an upgrade install unless there is more than one installation present}
