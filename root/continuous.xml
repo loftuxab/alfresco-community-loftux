@@ -1044,16 +1044,28 @@
       <zip destfile="${dir.continuous.assemble.sdk}/doc/api/core-doc.zip">
          <zipfileset dir="${dir.project.core.docs.java}" />
       </zip>
+<!--      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/remote-api-doc.zip">
+         <zipfileset dir="${dir.project.remoteapi.docs.java}" />
+      </zip> -->
       <zip destfile="${dir.continuous.assemble.sdk}/doc/api/repository-doc.zip">
          <zipfileset dir="${dir.project.repository.docs.java}" />
-      </zip>
-      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/remote-api-doc.zip">
-         <zipfileset dir="${dir.project.remoteapi.docs.java}" />
       </zip>
       <zip destfile="${dir.continuous.assemble.sdk}/doc/api/web-client-doc.zip">
          <zipfileset dir="${dir.project.webclient.docs.java}" />
       </zip>
-
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/web-client-doc.zip">
+         <zipfileset dir="${dir.project.webclient.docs.java}" />
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/webscript-framework-doc.zip">
+         <zipfileset dir="${dir.project.webscriptframework.docs.java}" />
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/web-framework-doc.zip">
+         <zipfileset dir="${dir.project.webframework.docs.java}" />
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/doc/api/share-doc.zip">
+         <zipfileset dir="${dir.project.slingshot.docs.java}" />
+      </zip>
+      
       <!-- Taglib -->
       <mkdir dir="${dir.continuous.assemble.sdk}/doc/taglib" />
       <zip destfile="${dir.continuous.assemble.sdk}/doc/taglib/alfresco-taglib-doc.zip">
@@ -1176,6 +1188,15 @@
       </zip>
       <zip destfile="${dir.continuous.assemble.sdk}/src/web-client-src.zip">
          <zipfileset dir="${dir.project.webclient.src}" />
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/src/webscript-framework-src.zip">
+         <zipfileset dir="${dir.project.webscriptframework.src}" />
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/src/web-framework-src.zip">
+         <zipfileset dir="${dir.project.webframework.src}" />
+      </zip>
+      <zip destfile="${dir.continuous.assemble.sdk}/src/share-src.zip">
+         <zipfileset dir="${dir.project.slingshot.src}" />
       </zip>
 
       <!-- -->
