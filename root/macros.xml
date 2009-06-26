@@ -130,7 +130,7 @@
       <attribute name="projectdir" />
       <sequential>
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.test.results}" />
-         <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="yes" dir="@{projectdir}">
+         <junit showoutput="yes" printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="yes" dir="@{projectdir}">
             <jvmarg value="-server"/>
             <classpath>
             <path refid="classpath.unit.test"/>
