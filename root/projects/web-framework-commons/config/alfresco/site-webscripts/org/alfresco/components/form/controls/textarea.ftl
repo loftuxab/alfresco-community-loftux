@@ -1,5 +1,5 @@
-<#if field.control.params.rows?exists><#assign rows=field.control.params.rows><#else><#assign rows=3></#if>
-<#if field.control.params.columns?exists><#assign columns=field.control.params.columns><#else><#assign columns=32></#if>
+<#if field.control.params.rows?exists><#assign rows=field.control.params.rows><#else><#assign rows=2></#if>
+<#if field.control.params.columns?exists><#assign columns=field.control.params.columns><#else><#assign columns=60></#if>
 
 <#if form.mode == "view">
    <div class="viewmode-field">
