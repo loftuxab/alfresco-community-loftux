@@ -13,21 +13,26 @@ textarea
 {
    margin-bottom: -1px;
    margin-right: -3px;
-   /*padding-bottom: 10px;*/
 }
 
 .header .menu-wrapper
 {
-   height:18px;
-   line-height:18px;
+   height: 18px;
+   line-height: 18px;
    padding-bottom: 8px;
 }
 
 .header .personal-menu
 {
-   height:18px;
+   height: 18px;
    padding-top: 6px;
    padding-bottom: 6px;
+}
+
+.header div.util-menu
+{
+   margin-top: 4px;
+   padding-top: 1px;
 }
 
 .header .link-menu-button
@@ -37,22 +42,22 @@ textarea
    padding-top:1px;
 }
 
-.yui-skin-greenTheme span.link-menu-button span.yui-menu-button.yui-menu-button-hover
+#Share span.link-menu-button span.yui-menu-button.yui-menu-button-hover
 {
    border: 1px solid #7BA9CE;
 }
 
-.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active
+#Share .link-menu-button.link-menu-button-menu-active
 {
    border: 1px solid #7BA9CE;
 }
 
-.yui-skin-greenTheme span.link-menu-button.link-menu-button-menu-active span.yui-menu-button
+#Share span.link-menu-button.link-menu-button-menu-active span.yui-menu-button
 {
    border: 1px solid #FFFFFF;
 }
 
-.yui-skin-greenTheme span.link-menu-button.link-menu-button-menu-active span.yui-menu-button.yui-menu-button-hover
+#Share span.link-menu-button.link-menu-button-menu-active span.yui-menu-button.yui-menu-button-hover
 {
    border: 1px solid #FFFFFF;
 }
@@ -67,25 +72,26 @@ textarea
 /**
  * Global site footer
  */
-.sticky-wrapper
-{
-   margin-bottom: -2.5em;
-}
-
-.footer
+.footer-ent .copyright
 {
    padding-bottom: 0;
    padding-top: 0;
 }
 
+.footer-ent .copyright img
+{
+   padding-bottom: 10px;
+   padding-top: 10px;
+}
+
 
 /* These messages/dialogs were getting full width if none was specified */
-.yui-skin-greenTheme #prompt
+#Share #prompt
 {
    width: 30em;
 }
 
-.yui-skin-greenTheme #message
+#Share #message
 {
    width: 30em;
 }
@@ -97,39 +103,39 @@ textarea
  * Border property "transparent" doesnt work in IE6.
  * Set it to use a background color instead.  
  */
-.yui-skin-greenTheme .flat-button .yui-button .first-child,
-.yui-skin-greenTheme .flat-button .yui-button
+#Share .flat-button .yui-button .first-child,
+#Share .flat-button .yui-button
 {
    border-color: #E3EAEC;   
 }
 
-.yui-skin-greenTheme .dashlet .toolbar .yui-button .first-child,
-.yui-skin-greenTheme .dashlet .toolbar .yui-button
+#Share .dashlet .toolbar .yui-button .first-child,
+#Share .dashlet .toolbar .yui-button
 {
    border-color: #F6F6F6;
 }
 
-.yui-skin-greenTheme .header .yui-button .first-child,
-.yui-skin-greenTheme .header .yui-button
+#Share .header .yui-button .first-child,
+#Share .header .yui-button
 {
    border-color: #F2F2F2;
 }
 
-.yui-skin-greenTheme .dashlet .toolbar .yui-button.yui-button-hover .first-child,
-.yui-skin-greenTheme .dashlet .toolbar .yui-button.yui-button-hover,
-.yui-skin-greenTheme .flat-button      .yui-button.yui-button-hover .first-child,
-.yui-skin-greenTheme .flat-button      .yui-button.yui-button-hover
+#Share .dashlet .toolbar .yui-button.yui-button-hover .first-child,
+#Share .dashlet .toolbar .yui-button.yui-button-hover,
+#Share .flat-button      .yui-button.yui-button-hover .first-child,
+#Share .flat-button      .yui-button.yui-button-hover
 {
    border-color: #808080;
 }
 
-.yui-skin-greenTheme .header .flat-button      .yui-button.yui-button-hover
+#Share .header .flat-button      .yui-button.yui-button-hover
 {
    border: 1px solid #7BA9CE;
 }
 
-.yui-skin-greenTheme .sites-wrapper .yui-button.yui-split-button-activeoption,
-.yui-skin-greenTheme .sites-wrapper .yui-button.yui-split-button-hover
+#Share .sites-wrapper .yui-button.yui-split-button-activeoption,
+#Share .sites-wrapper .yui-button.yui-split-button-hover
 {
    border: 1px solid #7BA9CE;
 }
@@ -138,6 +144,16 @@ textarea
 /**
  * Dashlets
  */
+
+div.dashlet .body
+{
+   width: auto;
+}
+
+div.dashlet .profile
+{
+   width: 100%;
+}
 
 /* Some dashlets with css float in the body lost their border */
 div.dashlet .body .clear
@@ -161,7 +177,7 @@ div.dashlet .body .clear
    margin-top: -4px;
 }
 
-.yui-skin-greenTheme .title-button .yui-button
+#Share .title-button .yui-button
 {
    margin-left: 0.7em;
 }
@@ -176,7 +192,7 @@ div.dashlet .body .clear
 /**
  * Re-apply the color for the popup bodies
  */
-.yui-skin-greenTheme .yui-panel .bd
+#Share .yui-panel .bd
 {
    color: #515D6B;
    background-color: #F9FBFD;
@@ -323,6 +339,12 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    border: none;
 }
 
+.customise-dashlets ul.availableList,
+.customise-dashlets ul.usedList
+{
+   position: relative;
+}
+
 .customisableDashlet
 {
    overflow: hidden;
@@ -332,8 +354,10 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 /**
  * Dashlets / position:relative and overflow:auto bug
  */
-.dashlet .scrollableList
+.dashlet .scrollableList,
+.dashlet .scrollablePanel
 {
+   background-color: #fff;
    position: relative;
 }
 
@@ -344,13 +368,32 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 
 
 /**
- * My Sites dashlet / padding bug
+ * Dashlets that use a DataTable
+ * Fixing MSIE's inability to do anything properly
  */
-.my-sites .first-item div.description
+.my-documents .scrollableList,
+.my-sites .scrollableList
 {
-   margin-top: -7px;
+   overflow-x: hidden;
 }
 
+.my-documents table,
+.my-sites table
+{
+   margin-right: -20px !important;
+}
+
+.my-documents td,
+.my-sites td
+{
+   cursor: default;
+}
+
+/* IE6 min-height fail */
+.my-sites div.site-title
+{
+   padding-bottom: 8px;
+}
 
 /**
  * Members / invite pages
@@ -405,6 +448,11 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    width: auto;
 }
 
+.copy-to .container-picker
+{
+   margin: 0.5em 0.2em 0px;
+}
+
 .copy-to .path .treeview
 {
    width: 16em;
@@ -424,6 +472,23 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 }
 
 
+/**
+ * Blog
+ */
+.postlist-infobar div.yui-u
+{
+   width: 28%;
+}
+
+
+/**
+ * Discussions
+ */
+.topiclist-infobar div.yui-u
+{
+   width: 28%;
+}
+
 
 /**
  * Profile
@@ -441,11 +506,20 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 div.dashlet.site-profile div.body,
 div.dashlet.wiki div.body,
 div.dashlet.cmis div.body div,
-div.dashlet.rssfeed div.body,
+div.dashlet.rssfeed div.body div.headline,
 div.dashlet.calendar div.body
 {                          
-   padding-left:8px;
-   padding-right:8px;
+   padding-left: 8px;
+   padding-right: 8px;
+}
+div.dashlet div.hdr
+{
+   padding-left:9px;
+}
+div.dashlet .toolbar
+{
+   padding-left: 2px;
+   padding-right: 2px;
 }
 
 .toolbar,
@@ -454,8 +528,7 @@ div.dashlet.calendar div.body
    margin: 0;
 }
 
-
-/* Full preview backgroundd mask */
+/* Full preview background mask */
 body.masked div.mask.full-preview-mask
 {
    background-color: #303030;
@@ -464,6 +537,11 @@ body.masked div.mask.full-preview-mask
 
 .site-finder .search-bar
 {
-   height:2em;
+   height: 2em;
 }
 
+/* Prevent ghost border on first row for DataTables */
+table .yui-dt-empty
+{
+   border: none !important;
+}

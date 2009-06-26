@@ -87,7 +87,9 @@
    <script type="text/javascript" src="${url.context}/yui/yui-patch.js"></script>
 
 <!-- Site-wide Common Assets -->
-   <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
+   <#-- <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" /> -->
+   <@link rel="stylesheet" type="text/css" href="${url.context}/css/base.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/css/yui-layout.css" />   
    <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/presentation.css" />
    <@script type="text/javascript" src="${url.context}/js/bubbling.v2.1.js"></@script>
    <@script type="text/javascript" src="${url.context}/js/flash/AC_OETags.js"></@script>
@@ -119,8 +121,8 @@
 ${head}
 
 <!-- MSIE CSS fix overrides -->
-   <!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/ie6.css" /><![endif]-->
-   <!--[if IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/ie7.css" /><![endif]-->
+   <!--[if lt IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie6.css" /><![endif]-->
+   <!--[if IE 7]><link rel="stylesheet" type="text/css" href="${url.context}/css/ie7.css" /><![endif]-->
 </head>
 </#macro>
 
@@ -143,7 +145,7 @@ ${head}
    Pulls in main template body.
 -->
 <#macro templateBody>
-<body class="yui-skin-${theme}">
+<body id="Share" class="yui-skin-${theme}">
    <div class="sticky-wrapper">
       <div id="doc3">
 <#-- Template-specific body markup -->
