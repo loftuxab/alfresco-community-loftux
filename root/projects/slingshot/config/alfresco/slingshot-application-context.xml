@@ -3,6 +3,15 @@
 
 <beans>
    
+   <bean id="share.custom.config" class="org.alfresco.config.ConfigBootstrap" init-method="register">
+      <property name="configService" ref="web.config" />
+      <property name="configs">
+         <list>
+            <value>classpath:alfresco/web-extension/share-config-custom.xml</value>
+         </list>
+      </property>
+   </bean>
+    
    <!-- Override WebScript Messages - add slingshot application messages -->
    <bean id="webscripts.resources" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
       <property name="resourceBundles">
