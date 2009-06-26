@@ -1702,20 +1702,25 @@
            depends="package-slingshot-jar">
       <mkdir dir="${dir.project.slingshot.assemble}" />
       
-      <!-- copy all required files from webscript and web framework projects -->
+      <!-- first copy all required files from slingshot project -->
+      <copy todir="${dir.project.slingshot.assemble}">
+         <fileset dir="${dir.project.slingshot.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>
+      <!-- next copy all required files from webscript, web framework and web framework commons projects -->
       <copy todir="${dir.project.slingshot.assemble}">
          <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
          <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
          <fileset dir="${dir.project.webframeworkcommons.src.web}" excludes="WEB-INF/web.xml" />
-         <fileset dir="${dir.project.slingshot.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
       
+      <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.slingshot.config}" excludes="**/web-extension/**" />
+      </copy>
       <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
          <fileset dir="${dir.project.webscriptframework.config}" excludes="**/web-extension/**" />
          <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
          <fileset dir="${dir.project.webframeworkcommons.config}" excludes="**/web-extension/**" />
-         <fileset dir="${dir.project.slingshot.config}" excludes="**/web-extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->
