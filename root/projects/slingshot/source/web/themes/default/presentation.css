@@ -402,6 +402,20 @@ span.mce_alfresco-imagelibrary
    border: 1px solid #FFFFFF;
 }
 
+
+.topiclist .yui-dt-liner {
+   padding:0;
+}
+/* blog/wiki action items links */
+body.yui-skin-default .wikipage .editPage a:hover,
+body.yui-skin-default .wikipage .deletePage a:hover,
+body.yui-skin-default .wikipage .detailsPage a:hover,
+body.yui-skin-default .nodeEdit .onEditBlogPost a:hover,
+body.yui-skin-default .nodeEdit .onDeleteBlogPost a:hover
+{
+
+}
+
 /* YUI Menu */
 body.yui-skin-default .yuimenu .bd {
    border:1px solid #6CA5CE;
@@ -540,6 +554,9 @@ body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:hove
 }
 
 /* End Calendar */
+.cmis .body a {
+   color:#6CA5CE;
+}
 
 /* Twisters */
 

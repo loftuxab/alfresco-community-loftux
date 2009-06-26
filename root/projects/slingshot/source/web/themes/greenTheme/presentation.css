@@ -205,9 +205,9 @@ hr
 
 .site-navigation
 {
-   background-color: #73B4DA;
+   background-color: #5FAC34;
    background-image: url(../../components/images/navigation-bg.png);
-   border-bottom: 1px solid #4B86ae;
+   border-bottom: 1px solid #3a6c38;
    border-top: 1px dotted #bbd6e7;
    color: white;
 }
@@ -393,6 +393,23 @@ textarea
    border: 1px solid #FFFFFF;
 }
 
+.topiclist .yui-dt-liner {
+   padding:0;
+}
+/* blog/wiki action items links */
+body.yui-skin-greenTheme .wikipage .editPage a:hover,
+body.yui-skin-greenTheme .wikipage .deletePage a:hover,
+body.yui-skin-greenTheme .wikipage .detailsPage a:hover,
+body.yui-skin-greenTheme .nodeEdit .onEditBlogPost a:hover,
+body.yui-skin-greenTheme .nodeEdit .onDeleteBlogPost a:hover
+{
+
+}
+
+.webview .title a {
+   color:#262D35;
+}
+
 /* YUI Menu */
 body.yui-skin-greenTheme .yuimenu .bd {
    border:1px solid #008f22;
@@ -432,7 +449,8 @@ body.yui-skin-greenTheme .doclist tr.yui-dt-even.yui-dt-highlighted,
 body.yui-skin-greenTheme .links-body tr.links-selected-row,
 body.yui-skin-greenTheme .over,
 .postview,
-.topicview
+.topicview,
+.site-members .search-controls
 {
    background-color: #F7FEF4;
 }
@@ -504,6 +522,12 @@ body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:h
 {
    background-image:url(./images/navigation-bg.png);
 }
+
+.cmis .body a {
+   color:#00AE42;
+}
+
+
 /* Theme colors */
 .theme-color-1,
 a.theme-color-1,
