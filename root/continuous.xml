@@ -1125,9 +1125,9 @@
       <copy todir="${dir.continuous.assemble.sdk}/config"
             includeEmptyDirs="false">
          <fileset dir="${dir.project.repository.config}" 
-                  excludes="**/extension/*,**/desktop/*" />
-         <fileset dir="${dir.project.webclient.config}" 
                   excludes="**/extension/*" />
+<!--         <fileset dir="${dir.project.webclient.config}" 
+                  excludes="**/extension/*" /> -->
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
       </copy>
