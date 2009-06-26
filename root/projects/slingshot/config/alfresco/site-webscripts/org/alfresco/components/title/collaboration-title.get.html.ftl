@@ -48,6 +48,7 @@
       <select id="${args.htmlid}-more-menu">
          <option value="editSite">${msg("link.editSite")}</option>
          <option value="customiseSite">${msg("link.customiseSite")}</option>
+         <option value="leaveSite">${msg("link.leave")}</option>         
       </select> 
     <#elseif userIsMember>
       <input type="button" id="${args.htmlid}-more" name="${args.htmlid}-more" value="${msg("link.actions")}">    
