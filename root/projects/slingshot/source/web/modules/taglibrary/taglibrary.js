@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -35,19 +35,19 @@
 {
    Alfresco.module.TagLibrary = function(htmlId)
    {
-      this.name = "Alfresco.module.TagLibrary";
-      this.id = htmlId;
+      Alfresco.module.TagLibrary.superclass.constructor.call(this, "Alfresco.module.TagLibrary", htmlId, ["button"]);
+
+      this.tagId =
+      {
+         id: 0,
+         tags: {}
+      };
+      this.currentTags = [];
       
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "dom"], this.onComponentsLoaded, this);
-
       return this;
    };
 
-   Alfresco.module.TagLibrary.prototype =
+   YAHOO.extend(Alfresco.module.TagLibrary, Alfresco.component.Base,
    {
        /**
         * Object container for initialization options
@@ -75,11 +75,7 @@
        * @property tagId
        * @type object
        */
-      tagId:
-      {
-         id: 0,
-         tags: {}
-      },
+      tagId: null,
       
       /**
        * Currently selected tags.
@@ -87,32 +83,7 @@
        * @type: array of strings
        * @default empty array
        */
-      currentTags: [],
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       */
-      setOptions: function TagLibrary_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DiscussionsTopicListFilters} returns 'this' for method chaining
-       */
-      setMessages: function TagLibrary_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
+      currentTags: null,
 
       /**
        * Sets the current list of tags.
@@ -124,17 +95,6 @@
          this.currentTags = tags;
          return this;
       },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function TagLibrary_onComponentsLoaded()
-      {
-      },
-
       
       /**
        * Registers the tag library logic with the dom tree
@@ -162,26 +122,15 @@
             }
       		 
             return true;
-         }
+         };
          YAHOO.Bubbling.addDefaultAction("taglibrary-action", fnActionHandlerDiv);
 
-         // Add max length validator
-         if (formsRuntime)
-         {
-            formsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.length,
-            {
-               max: 256,
-               crop: true
-            }, "keyup");
-         }
-         
          // load link for popular tags
          YAHOO.util.Event.addListener(this.id + "-load-popular-tags-link", "click", this.onPopularTagsLinkClicked, this, true);
          
          // register the "enter" event on the tag text field to add the tag (otherwise the form gets submitted)
          var zinput = YAHOO.util.Dom.get(this.id + "-tag-input-field");
-         var me = this;
-         new YAHOO.util.KeyListener(zinput, 
+         var enterKeyListener = new YAHOO.util.KeyListener(zinput, 
          {
             keys:13
          }, 
@@ -194,15 +143,40 @@
             },
             scope: this,
             correctScope: true
-         }, 
-         "keypress").enable();
+         }, "keypress").enable();
          
          // button to add tag to list
          var addTagButton = new YAHOO.widget.Button(this.id + "-add-tag-button",
          {
-            type: "button"
+            type: "button",
+            disabled: (typeof formsRuntime != "undefined")
          });
          addTagButton.subscribe("click", this.onAddTagButtonClick, this, true);
+
+         // Add validators
+         if (formsRuntime)
+         {
+            var tagFormsRuntime = new Alfresco.forms.Form(formsRuntime.formId);
+            tagFormsRuntime.setShowSubmitStateDynamically(true, false);
+            tagFormsRuntime.setSubmitElements(addTagButton);
+            tagFormsRuntime.setAJAXSubmit(true);
+            tagFormsRuntime.doBeforeAjaxRequest =
+            {
+               fn: function(form, obj)
+               {
+                  return false;
+               },
+               obj: null,
+               scope: this
+            };
+            tagFormsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.nodeName);
+            tagFormsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.mandatory);
+            tagFormsRuntime.addValidation(this.id + "-tag-input-field", Alfresco.forms.validation.length,
+            {
+               max: 256,
+               crop: true
+            }, "keyup");
+         }
       },
       
       /**
@@ -292,8 +266,10 @@
          var formElem = YAHOO.util.Dom.get(formId);
          
          // find all input fields, delete the inputs that match the field name
-         var inputs = formElem.getElementsByTagName("input");
-         for (var x=0; x < inputs.length; x++)
+         var inputs = formElem.getElementsByTagName("input"),
+            x, xx;
+         
+         for (x = 0, xx = inputs.length; x < xx; x++)
          {
             if (inputs[x].name == fullFieldName)
             {
@@ -303,11 +279,12 @@
             }
          }
          
+         var tagName, elem;
          // generate inputs for the selected tags
-         for (var x=0; x < this.currentTags.length; x++)
+         for (x = 0, xx = this.currentTags.length; x < xx; x++)
          {
-            var tagName = this.currentTags[x];
-            var elem = document.createElement('input');
+            tagName = this.currentTags[x];
+            elem = document.createElement('input');
             elem.setAttribute('name', fullFieldName);
             elem.setAttribute('value', tagName);
             elem.setAttribute('type', 'hidden');
@@ -355,7 +332,7 @@
                fn: this._onPopularTagsLoaded,
                scope: this
             },
-            failureMessage: this._msg("taglibrary.msg.failedLoadTags")
+            failureMessage: this.msg("taglibrary.msg.failedLoadTags")
          });
          YAHOO.util.Event.stopEvent(e);
       },
@@ -436,7 +413,7 @@
       _addTagImpl: function TagLibrary__addTagImpl(tagName)
       {
          // sanity checks
-         if (tagName == null || tagName.length < 1)
+         if (tagName === null || tagName.length < 1)
          {
              return;
          }
@@ -463,9 +440,10 @@
         	</a>
          </li>
          */
-         var currentTagsElem = YAHOO.util.Dom.get(this.id + "-current-tags")
-         var elem = document.createElement('li');
-         var elemId = this.generateTagId(this, tagName, 'onRemoveTag');
+         var currentTagsElem = YAHOO.util.Dom.get(this.id + "-current-tags"),
+            elem = document.createElement('li'),
+            elemId = this.generateTagId(this, tagName, 'onRemoveTag');
+         
          elem.setAttribute('id', elemId);
          elem.setAttribute('class', 'onRemoveTag');
          elem.innerHTML = '<a href="#" class="taglibrary-action"> <span>' + tagName +
@@ -482,7 +460,7 @@
       _removeTagImpl: function TagLibrary__removeTagImpl(tagName)
       {
          // sanity checks
-         if (tagName == null || tagName.length < 1)
+         if (tagName === null || tagName.length < 1)
          {
              return;
          }
@@ -504,20 +482,6 @@
          
          // inform interested parties about change
          this._fireTagsChangedEvent();
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function DL__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.TagLibrary", Array.prototype.slice.call(arguments).slice(1));
       }
-
-   };     
+   });     
 })();

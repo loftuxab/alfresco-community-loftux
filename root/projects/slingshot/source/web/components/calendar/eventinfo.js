@@ -289,7 +289,6 @@
                           }
                           
                           //init taglib
-                          this.tagLibrary.initialize();
                           Dom.get(this.id + "-tag-input-field").disabled=false;
                           Dom.get(this.id + "-tag-input-field").tabIndex = 8;
                           Dom.get(this.id + "-add-tag-button").tabIndex = 9;
@@ -303,6 +302,14 @@
                           },this,true);                              
                        },
                scope : this.eventDialog
+            },
+            doSetupFormsValidation:
+            {
+               fn: function (form)
+               {
+                  this.tagLibrary.initialize(form);
+               },
+               scope: this.eventDialog
             },
             onSuccess : {
                fn : this.onEdited,
