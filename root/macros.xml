@@ -88,7 +88,8 @@
                   bottom="${javadoc.copyright}"
                   doctitle="@{documenttitle}"
                   windowtitle="@{windowtitle}"
-                  encoding="${javac.encoding}">
+                  encoding="${javac.encoding}"
+                  useexternalfile="true">
             <classpath>
             <path refid="classpath.javadoc"/>
             <path refid="classpath.javadoc.extension"/>
@@ -112,7 +113,9 @@
                   excludepackagenames="${javadoc.packages.exclude}" 
                   bottom="${javadoc.copyright}"
                   doctitle="@{documenttitle}"
-                  windowtitle="@{windowtitle}">
+                  windowtitle="@{windowtitle}"
+                  encoding="${javac.encoding}"
+                  useexternalfile="true">
             <classpath>
             <path refid="classpath.javadoc"/>
             <path refid="classpath.javadoc.extension"/>
