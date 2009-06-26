@@ -2658,7 +2658,6 @@ Alfresco.util.DialogManager = ( function () {
                     Dom.get("fd").value = dateStr;
                     Dom.get("td").value = dateStr;
                     Dom.get(this.id+"-from").value = Dom.get(this.id+"-to").value = Alfresco.util.formatDate(this.options.displayDate,'yyyy/mm/dd');
-                    this.tagLibrary.initialize();
                     Dom.get(this.id + "-tag-input-field").disabled=false;
                     Dom.get(this.id + "-tag-input-field").tabIndex = 8;
                     Dom.get(this.id + "-add-tag-button").tabIndex = 9;
@@ -2678,6 +2677,8 @@ Alfresco.util.DialogManager = ( function () {
                    form.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
                    form.addValidation(this.id + "-title", Alfresco.forms.validation.nodeName, null, "keyup");
                    form.addValidation(this.id + "-tag-input-field", Alfresco.module.event.validation.tags, null, "keyup");
+
+                   this.tagLibrary.initialize(form);
 
                    var dateElements = ["td", "fd", this.id + "-start", this.id + "-end"];
                    for (var i=0; i < dateElements.length; i++)
@@ -2856,8 +2857,8 @@ Alfresco.util.DialogManager = ( function () {
 
                 if (Alfresco.logger.isDebugEnabled())
                 {
-                   Alfresco.logger.debug("Current start date: " + start + " " + Dom.get(args.obj.id + "-start").value);
-                   Alfresco.logger.debug("Current end date: " + to + " " + Dom.get(args.obj.id + "-end").value);
+                   Alfresco.logger.debug("Current start date: " + startDate + " " + Dom.get(args.obj.id + "-start").value);
+                   Alfresco.logger.debug("Current end date: " + toDate + " " + Dom.get(args.obj.id + "-end").value);
                    Alfresco.logger.debug("End date is after start date: " + after);
                 }
 

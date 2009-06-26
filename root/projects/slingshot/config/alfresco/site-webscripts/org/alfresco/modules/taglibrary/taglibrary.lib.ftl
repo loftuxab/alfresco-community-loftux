@@ -35,13 +35,8 @@
    new Alfresco.module.TagLibrary("${htmlid}").setOptions(
    {
       siteId : "${site}"
-   }).setMessages(
-      ${messages}
-   ).setCurrentTags(
-      <@toJSONArray tags />
-   );
+   }).setMessages(${messages}).setCurrentTags(<@toJSONArray tags />);
 //]]></script>
-
 <div class="taglibrary">
    <div class="top_taglist tags_box">
       <ul id="${htmlid}-current-tags">

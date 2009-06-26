@@ -458,40 +458,6 @@
          });
          this.form.setSubmitAsJSON(true);
 
-         // Custom forms validation setup interest registered?
-         var doSetupFormsValidation = this.options.doSetupFormsValidation;
-         if (typeof doSetupFormsValidation.fn == "function")
-         {
-            doSetupFormsValidation.fn.call(doSetupFormsValidation.scope || this, this.form, doSetupFormsValidation.obj);
-         }
-         
-         // Custom forms before-submit interest registered?
-         var doBeforeFormSubmit = this.options.doBeforeFormSubmit;
-         if (typeof doBeforeFormSubmit.fn == "function")
-         {
-            this.form.doBeforeFormSubmit = doBeforeFormSubmit;
-         }
-         else
-         {
-            // If no specific handler disable buttons before submit to avoid double submits
-            this.form.doBeforeFormSubmit =
-            {
-               fn: function AmSD__defaultDoBeforeSubmit()
-               {
-                  this.widgets.okButton.set("disabled", true);
-                  this.widgets.cancelButton.set("disabled", true);
-               },
-               scope: this
-            }
-         }
-
-         // Custom ajax before-request interest registered?
-         var doBeforeAjaxRequest = this.options.doBeforeAjaxRequest;
-         if (typeof doBeforeAjaxRequest.fn == "function")
-         {
-            this.form.doBeforeAjaxRequest = doBeforeAjaxRequest;
-         }
-
          // Initialise the form
          this.form.init();
          
