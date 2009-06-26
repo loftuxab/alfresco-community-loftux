@@ -17,22 +17,26 @@
 {
    clear: both;
    display: block;
+   font-size: 12px;
 }
 
 .form-container input
 {
    clear: both;
-   margin: 0.6em 0 1.3em 0;
+   margin-bottom: 1em;
+   width: 30em;
 }
 
 .form-container textarea
 {
-   margin: 0.6em 0 1.3em 0;
+   margin-bottom: 1em;
+   width: 30em;
 }
 
 .form-container select
 {
-   margin: 0.6em 0 1.3em 0;
+   margin-bottom: 1em;
+   width: auto;
 }
 
 .form-container .missing-options
@@ -57,7 +61,6 @@
    color: green;
    margin-left: 0.4em;
    margin-right: 0.4em;
-   vertical-align: -0.3em;
 }
 
 .form-container .incomplete-warning
@@ -141,7 +144,7 @@
 
 .form-container .format-info
 {
-   margin-bottom: 1.2em;
+   margin-bottom: 0.6em;
 }
 
 .form-container .date-format

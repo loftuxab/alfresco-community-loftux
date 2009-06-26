@@ -111,6 +111,9 @@
                <show id="cm:subjectline" />
             </field-visibility>
             <appearance>
+               <field id="cm:title">
+                  <control template="controls/textfield.ftl" />
+               </field>
                <field id="mimetype">
                   <control template="controls/mimetype.ftl" />
                </field>
