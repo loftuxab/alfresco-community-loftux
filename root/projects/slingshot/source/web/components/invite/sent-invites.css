@@ -85,13 +85,6 @@
 {
    background-color: #ffffff;
 }
-.sent-invites tr.yui-dt-odd.yui-dt-highlighted,
-.sent-invites tr.yui-dt-even.yui-dt-highlighted
-{
-   background-color: #e8f6ff;
-   cursor: auto;
-}
-
 
 /**
  * If an element with "position: relative;" is used inside

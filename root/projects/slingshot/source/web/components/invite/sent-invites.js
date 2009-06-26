@@ -168,6 +168,30 @@
       {  
          var me = this;
 
+         // register the "enter" event on the search text field
+         var searchText = Dom.get(this.id + "-search-text");
+
+         // declare variable to keep JSLint and YUI Compressor happy
+         var enterListener = new YAHOO.util.KeyListener(searchText,
+         {
+            keys: YAHOO.util.KeyListener.KEY.ENTER
+         },
+         {
+            fn: function()
+            {
+               me.onSearchClick();
+            },
+            scope: this,
+            correctScope: true
+         }, "keydown");
+         enterListener.enable();
+
+         // Set initial focus?
+         if (this.options.setFocus)
+         {
+            searchText.focus();
+         }
+
          // Search button
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
 
@@ -408,11 +432,11 @@
             var buttonLabel;
             if (oRecord.getData("invitationStatus") == 'pending')
             {
-               buttonLabel = me._msg("button.cancel") + " >>";
+               buttonLabel = me._msg("button.cancel");
             }
             else
             {
-               buttonLabel = me._msg("button.clear") + " >>";
+               buttonLabel = me._msg("button.clear");
             }
             
             var button = new YAHOO.widget.Button(

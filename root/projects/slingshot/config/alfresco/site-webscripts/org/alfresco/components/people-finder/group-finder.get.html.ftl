@@ -4,7 +4,8 @@
       siteId: "<#if page?exists>${page.url.templateArgs.site!""}<#else>${args.site!""}</#if>",
       minSearchTermLength: "${args.minSearchTermLength!'3'}",
       maxSearchResults: "${args.maxSearchResults!'100'}",
-      setFocus: ${args.setFocus!'false'}
+      setFocus: ${args.setFocus!'false'},
+      addButtonSuffix: "${args.addButtonSuffix!''}"
    }).setMessages(
       ${messages}
    );
