@@ -66,99 +66,6 @@ hr
    width: 100%;
 }
 
-.yui-skin-default .yui-panel
-{
-   border-style:none;
-}
-
-.yui-skin-default .yui-panel .ft span.button-group
-{
-   text-align: center;
-   vertical-align: middle;
-}
-.yui-skin-default .yui-panel .bd
-{
-   padding: 0;
-   text-align: left;
-}
-
-.yui-skin-default .yui-panel .bd div.yui-gd,
-.yui-skin-default .yui-panel .bd div.yui-u,
-.yui-skin-default .yui-panel .bd div.bdft
-{
-   padding: 0.3em 0.3em 0.3em 0;
-}
-
-.yui-skin-default .yui-panel .yui-g h2
-{
-   padding: 0.3em;
-}
-
-.yui-skin-default .yui-panel .yui-gd .yui-u
-{
-   width: 60%;
-}
-.yui-skin-default .yui-panel .yui-gd .yui-u.first
-{
-   width: 28%;
-}
-
-.yui-skin-default .yui-panel .hd,
-.yui-skin-default .yui-panel .bdft,
-.yui-skin-default .yui-panel .ft
-{
-   text-align: center;
-}
-
-.yui-skin-default .yui-panel .bd .yui-u.first
-{
-   padding: 0.3em 0 0.3em 0.3em;
-}
-
-/* Style the default message  */
-
-.yui-skin-default #message
-{
-   border: medium none;
-}
-
-.yui-skin-default #message .bd
-{
-   padding: 2em;
-}
-
-.yui-skin-default #message .bd span.wait
-{
-   padding: 4px 0 0 24px;
-   visibility: visible;
-}
-
-/* Style the default prompt */
-
-.yui-skin-default #prompt .hd
-{
-   border-bottom: medium none;
-}
-
-.yui-skin-default #prompt .bd
-{
-   padding: 1em;
-   text-align: center;
-}
-
-.yui-skin-default #prompt .ft .button-group
-{
-   display: block;
-   padding-top: 0.5em;
-   text-align: center;
-}
-
-.yui-skin-default #prompt .ft
-{
-   border-top: none;
-}
-
-
 /* Page title and navigation styles */
 
 .page-title
@@ -310,11 +217,6 @@ textarea
    width: 15em;
 }
 
-/* DataTable overrides */
-.yui-skin-default .yui-dt tr.yui-dt-first td
-{
-   border-top: medium none;
-}
 
 /* Richtext Editor Plug-ins */
 .yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon
@@ -322,54 +224,166 @@ textarea
    left: 6px;
 }
 
+/* DASHLETS */
 
-.yui-skin-default .flat-button a:hover
+.dashlet
 {
-   text-decoration: none;
-}
-
-.yui-skin-default .title-button .yui-button span a
-{
-   white-space: nowrap;
-}
-
-
-/* A combination of a link and splitbutton wrapped inside a span */
-
-.yui-skin-default .link-menu-button
-{ 
-   padding-bottom:4px;
-   padding-top:2px;
-   vertical-align:middle;
-   border: 1px solid transparent;
-}
-
-.yui-skin-default .link-menu-button .yui-menu-button,
-.yui-skin-default .link-menu-button .yui-menu-button span,
-.yui-skin-default .link-menu-button .yui-menu-button span button
-{
-   margin: 0;
+   background-color: white;
+   margin: 20px 0;
    padding: 0;
-   vertical-align: middle;  
 }
 
-.yui-skin-default .link-menu-button .yui-menu-button
+.dashlet.resizable
 {
-   border: 1px solid transparent;
-   background-image: none;
-   /*margin-top:3px;*/
+   padding-bottom: 6px !important;
 }
 
-.yui-skin-default .link-menu-button .yui-menu-button span button
+.dashlet .title
 {
-   padding: 6px 7px;   
-   /*
-   width: 20px;
-   */  
+   padding: 5px 9px 5px 9px;
 }
 
-.yui-skin-default .link-menu-button .yui-menu-button.yui-menu-button-activeoption button,
-.yui-skin-default .link-menu-button .yui-menu-button.yui-menu-button-hover button
+.dashlet .feed
 {
+   float: right;
+   height: 16px;
+   left: -8px;
+   position: relative;
+   top: -22px;
+   width: 16px;
+}
+.dashlet .feed a,
+.dashlet .feed a:active,
+.dashlet .feed a:hover
+{
+   display: block;
+   height: 16px;
    text-decoration: none;
+   width: 16px;
+}
+
+.dashlet .toolbar
+{
+   padding: 5px 9px 5px 9px;
+}
+
+.dashlet .body
+{
+	overflow-x: hidden;
+}
+
+.dashlet .body a,
+.dashlet .body a:visited,
+.dashlet .body a:hover
+{
+   outline: none;
+   text-decoration: none;
+}
+
+.dashlet .body a:hover
+{
+   text-decoration: underline;
+}
+
+.dashlet .scrollableList
+{
+    height: 208px;
+    padding: 8px 0px;
+    overflow: auto;
+}
+
+.dashlet .scrollablePanel
+{
+    height: 208px;
+    overflow: auto;
+    margin-right: 1px;
+}
+
+.dashlet .body>div
+{
+   padding-left: 8px;
+   padding-right: 8px;
+}
+
+.dashlet .msg
+{
+   padding-bottom: 8px;
+   padding-top: 8px;
+}
+
+.dashlet .text-list-item
+{
+   padding-bottom: 6px;
+}
+
+.dashlet .detail-list-item
+{
+   clear: both;
+   padding: 7px 9px;
+}
+
+div.dashlet div.detail-list-item.first-item
+{
+   float: none;
+   padding-top: 0;
+}
+
+div.dashlet div.hdr {
+   margin-bottom:5px;
+   padding-top:3px;
+}
+.dashlet .detail-list-item.last-item
+{
+   border-bottom: none;
+}
+
+.dashlet .detail-list-item .icon,
+.dashlet .detail-list-item .avatar
+{
+   float: left;
+}
+
+.dashlet .detail-list-item .avatar img
+{
+   width: 32px;
+}
+
+.dashlet .detail-list-item .details,
+.dashlet .detail-list-item .person
+{
+   padding-left: 40px;
+}
+
+.dashlet .detail-list-item .details2
+{
+   padding-left: 20px;
+}
+
+
+.yui-g.grid,
+.yui-gb.grid,
+.yui-gc.grid,
+.yui-gd.grid
+{
+   margin: 0 10px;
+}
+
+
+/* 3 column layout */
+
+.yui-gb.grid .column1,
+.yui-gb.grid .column3
+{
+   width: 24%;
+}
+
+.yui-gb.grid .column2
+{
+   width: 48%;
+}
+
+/* 4 column layout */
+.yui-g.grid .yui-g .yui-u
+{
+   width: 48%;
 }

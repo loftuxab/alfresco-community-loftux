@@ -1,0 +1,149 @@
+#Share .yui-panel
+{
+   border-style:none;
+}
+
+#Share .yui-panel .ft span.button-group
+{
+   text-align: center;
+   vertical-align: middle;
+}
+#Share .yui-panel .bd
+{
+   padding: 0;
+   text-align: left;
+}
+
+#Share .yui-panel .bd div.yui-gd,
+#Share .yui-panel .bd div.yui-u,
+#Share .yui-panel .bd div.bdft
+{
+   padding: 0.3em 0.3em 0.3em 0;
+}
+
+#Share .yui-panel .yui-g h2
+{
+   padding: 0.3em;
+}
+
+#Share .yui-panel .yui-gd .yui-u
+{
+   width: 60%;
+}
+#Share .yui-panel .yui-gd .yui-u.first
+{
+   width: 28%;
+}
+
+#Share .yui-panel .hd,
+#Share .yui-panel .bdft,
+#Share .yui-panel .ft
+{
+   text-align: center;
+}
+
+#Share .yui-panel .bd .yui-u.first
+{
+   padding: 0.3em 0 0.3em 0.3em;
+}
+
+/* Style the default message  */
+
+#Share #message
+{
+   border: medium none;
+}
+
+#Share #message .bd
+{
+   padding: 2em;
+}
+
+#Share #message .bd span.wait
+{
+   padding: 4px 0 0 24px;
+   visibility: visible;
+}
+
+/* Style the default prompt */
+
+#Share #prompt .hd
+{
+   border-bottom: medium none;
+}
+
+#Share #prompt .bd
+{
+   padding: 1em;
+   text-align: center;
+}
+
+#Share #prompt .ft .button-group
+{
+   display: block;
+   padding-top: 0.5em;
+   text-align: center;
+}
+
+#Share #prompt .ft
+{
+   border-top: none;
+}
+
+
+#Share .flat-button a:hover
+{
+   text-decoration: none;
+}
+
+#Share .title-button .yui-button span a
+{
+   white-space: nowrap;
+}
+
+
+/* A combination of a link and splitbutton wrapped inside a span */
+
+#Share .link-menu-button
+{ 
+   padding-bottom:4px;
+   padding-top:2px;
+   vertical-align:middle;
+   border: 1px solid transparent;
+}
+
+#Share .link-menu-button .yui-menu-button,
+#Share .link-menu-button .yui-menu-button span,
+#Share .link-menu-button .yui-menu-button span button
+{
+   margin: 0;
+   padding: 0;
+   vertical-align: middle;  
+}
+
+#Share .link-menu-button .yui-menu-button
+{
+   border: 1px solid transparent;
+   background-image: none;
+   /*margin-top:3px;*/
+}
+
+#Share .link-menu-button .yui-menu-button span button
+{
+   padding: 6px 7px;   
+   /*
+   width: 20px;
+   */  
+}
+
+#Share .link-menu-button .yui-menu-button.yui-menu-button-activeoption button,
+#Share .link-menu-button .yui-menu-button.yui-menu-button-hover button
+{
+   text-decoration: none;
+}
+
+/* DataTable overrides */
+#Share .yui-dt tr.yui-dt-first td
+{
+   border-top: medium none;
+}

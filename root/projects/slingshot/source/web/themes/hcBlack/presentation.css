@@ -99,6 +99,75 @@ hr
    font-weight: normal;
 }
 
+/* DASHLETS */
+
+.dashlet
+{
+   border: 1px solid #232323;
+   background-color: white;
+}
+
+.dashlet .title
+{
+   background-color: #d7e0e7;
+   background-image: url(images/dashlet-title-bg.png);
+   background-repeat: repeat-x;
+   border-bottom: 1px solid #bababa; 
+   color: #ffffff; 
+}
+
+.dashlet .feed
+{
+   background-image: url(images/feed-icon-16.png);
+   background-repeat: no-repeat;
+}
+
+.dashlet .toolbar
+{
+   background-color: #f6f6f6; 
+   border-bottom: 1px solid #7e7e7e; 
+}
+
+/*.dashlet .toolbar a
+{
+   color: #5497c4;
+}*/
+
+.dashlet .body
+{
+    background-image: url(images/dashlet-bg.png);
+    background-repeat: repeat-x;
+	background-color: white; 
+}
+
+/*.dashlet .body a,
+.dashlet .body a:visited,
+.dashlet .body a:hover
+{
+   color: #4f94c9;
+}*/
+
+.dashlet .detail-list-item
+{
+   border-bottom: 1px dashed #575757; 
+}
+
+/* Wiki dashlet text */
+body.yui-skin-hcBlack .wiki .title a {
+   color:#fff;
+}
+/* dashlets */
+body.yui-skin-hcBlack .dashlet .body a 
+{
+   text-decoration:underline;
+}
+body.yui-skin-hcBlack .dashlet .body a:hover {
+   background-color:#F1FF00;
+}
+.topiclist .yui-dt-liner {
+   padding:0;
+}
+
 .yui-skin-hcBlack .yui-panel
 {
    border-bottom:medium none;
@@ -210,7 +279,7 @@ hr
 
 .site-navigation
 {
-   background-color: #73B4DA;
+   background-color: #000;
    background-image: url(../../components/images/navigation-bg.png);
    border-bottom: 1px solid #000000; 
    border-top: 1px solid #393939; 
@@ -338,7 +407,7 @@ textarea
 /* Override YUI Button styles for - title button style */
 .yui-skin-hcBlack .title-button .yui-button
 {
-   background: transparent url(images/title-button-bg.png) repeat-x 0 0;
+   background: #ccc url(images/title-button-bg.png) repeat-x 0 0;
    border-color: #6e6e6e; 
 }
 
@@ -551,7 +620,10 @@ body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:hove
    color:#000;
    text-decoration:underline;
 }
-
+.groups .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
+{
+   color:#fff;
+}
 /* Theme colors */
 .theme-color-1,
 a.theme-color-1,
