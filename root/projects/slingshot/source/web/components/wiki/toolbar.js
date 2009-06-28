@@ -302,7 +302,7 @@
                   if (widget.get("srcelement").className != "no-access-check")
                   {
                      widget.set("disabled", false);
-                     if (widget.get("value") !== null)
+                     if (typeof widget.get("value") == "string")
                      {
                         widgetPermissions = widget.get("value").split(",");
                         for (var i = 0, ii = widgetPermissions.length; i < ii; i++)

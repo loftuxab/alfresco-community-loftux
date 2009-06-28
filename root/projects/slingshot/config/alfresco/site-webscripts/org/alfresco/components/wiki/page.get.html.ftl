@@ -108,17 +108,31 @@
                <input type="hidden" name="context" value="${pageContext?html}" />
                <input type="hidden" name="page" value="wiki-page" />
                <input type="hidden" name="currentVersion" value="${currentVersion}" />
-               <label for="${htmlid}-content">${msg("label.text")}:</label>
-               <textarea name="pagecontent" id="${args.htmlid}-content" cols="50" rows="10"><#if result.pagetext??>${result.pagetext?html}</#if></textarea>
-               <label for="${htmlid}-tag-input-field">${msg("label.tags")}:</label>
-               <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
-
-               <!-- Render the tag inputs -->
-               <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
-               <!-- end tags -->
-               <div class="buttons">
-                  <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
-                  <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
+               <div class="yui-gd">
+                  <div class="yui-u first">
+                     <label for="${htmlid}-content">${msg("label.text")}:</label>
+                  </div>
+                  <div class="yui-u">
+                     <textarea name="pagecontent" id="${args.htmlid}-content" cols="50" rows="10"><#if result.pagetext??>${result.pagetext?html}</#if></textarea>
+                  </div>
+               </div>
+               <div class="yui-gd">
+                  <div class="yui-u first">
+                     <label for="${htmlid}-tag-input-field">${msg("label.tags")}:</label>
+                  </div>
+                  <div class="yui-u">
+                     <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
+                     <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
+                  </div>
+               </div>
+               <div class="yui-gd">
+                  <div class="yui-u first">&nbsp;</div>
+                  <div class="yui-u">
+                     <div class="buttons">
+                        <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
+                        <input type="submit" id="${args.htmlid}-cancel-button" value="${msg("button.cancel")}" />
+                     </div>
+                  </div>
                </div>
             </fieldset>
          </form>
@@ -137,13 +151,13 @@
             <#if result.versionhistory??>
                <div class="version-quick-change">
                <#list result.versionhistory as version>
-               <#if version_index == 0>
-               <input type="button" id="${args.htmlid}-selectVersion-button" name="selectButton" value="${version.version} (${msg("label.latest")})" />
-               <select id="${args.htmlid}-selectVersion-menu" name="selectVersion">
-               </#if>
-                  <option value="${version.versionId}">${version.version} <#if version_index = 0>(${msg("label.latest")})</#if></option>
+                  <#if version_index == 0>
+                  <input type="button" id="${args.htmlid}-selectVersion-button" name="selectButton" value="${version.version} (${msg("label.latest")})" />
+                  <select id="${args.htmlid}-selectVersion-menu" name="selectVersion">
+                  </#if>
+                     <option value="${version.versionId}">${version.version} <#if version_index = 0>(${msg("label.latest")})</#if></option>
                </#list>
-               </select>
+                  </select>
                </div>
                <div class="version-quick-change">${msg("label.viewVersion")}</div>
             </#if>

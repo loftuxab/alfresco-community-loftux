@@ -182,7 +182,7 @@ html>body .node, .reply, .comment
    padding: 1px;
 }
 
-.nodeFooter .tag
+.nodeFooter .tagLabel
 {
    background:transparent url(../images/tag-16.png) no-repeat scroll 0px 0px;
    padding-left: 18px;

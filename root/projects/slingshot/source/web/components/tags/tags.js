@@ -51,19 +51,15 @@
     */
    Alfresco.TagComponent = function(htmlId)
    {
-      this.name = "Alfresco.TagComponent";
-      this.id = htmlId;
+      Alfresco.TagComponent.superclass.constructor.call(this, "Alfresco.TagComponent", htmlId);
       
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-      
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
+      // Decoupled event listeners
+      YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
       
       return this;
    }
    
-   Alfresco.TagComponent.prototype =
+   YAHOO.extend(Alfresco.TagComponent, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -91,41 +87,6 @@
       },      
 
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.TagComponent} returns 'this' for method chaining
-       */
-       setOptions: function TagComponent_setOptions(obj)
-       {
-          this.options = YAHOO.lang.merge(this.options, obj);
-          return this;
-       },
-       
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function TagComponent_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-      /**
-       * Set messages for this component
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       */
-      setMessages: function(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-   
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Registers event handler on "tagRefresh" event. If a component wants to refresh
        * the tags component, they need to fire this event.
@@ -135,6 +96,9 @@
       onReady: function TagComponent_onReady()
       {
          this._registerDefaultActionHandler();
+
+         // Create twister from our H2 tag
+         Alfresco.util.createTwister(this.id + "-h2", "TagComponent");
          
          YAHOO.Bubbling.on("tagRefresh", this.onTagRefresh, this);
       },
@@ -166,7 +130,7 @@
       },
       
       /**
-       * Function that gets called when another component fires ? 
+       * Handler for the "tagRefresh" event
        * Issues a request to the repo to retrieve the latest tag data.
        *
        * @method onTagRefresh
@@ -195,6 +159,24 @@
       },
       
       /**
+       * Event handler for tagSelected event
+       *
+       * @method onTagSelected
+       */
+      onTagSelected: function TagComponent_onTagSelected(layer, args)
+      {
+         var tagname = args[1].tagname,
+            candidates = YAHOO.util.Selector.query("a[rel='" + tagname.replace("'", "\\'") + "']", this.id),
+            liTags = YAHOO.util.Selector.query("li", this.id);
+         
+         Dom.removeClass(liTags, "selected");
+         if (candidates.length == 1)
+         {
+            Dom.addClass(candidates[0].parentNode.parentNode, "selected");
+         }
+      },
+      
+      /**
        * Event handler that gets called when the tag data 
        * loads successfully.
        *
@@ -206,21 +188,16 @@
          var resp = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
          if (resp && !YAHOO.lang.isUndefined(resp.tags))
          {
-            var html = "", tags = resp.tags, tag, i, j;
+            var html = '<li><span class="tag"><a href="#" class="tag-link" rel="-all-">' + this.msg("label.all-tags") + '</a></span></li>',
+               tags = resp.tags, tag, i, ii;
 
-            for (i = 0, j = tags.length; i < j; i++)
+            for (i = 0, ii = tags.length; i < ii; i++)
             {
                tag = tags[i];
                html += this._generateTagMarkup(tag);
             }
             
-            var elem = Dom.get('tagFilterLinks');
-            if (elem)
-            {
-               html = '<li class="onTagSelection nav-label">'+elem.getElementsByTagName('li')[0].innerHTML+'</li>'+html;
-               elem.innerHTML = html;
-               this._registerDefaultActionHandler();
-            }
+            Dom.get(this.id + '-ul').innerHTML = html;
          }
       },
       
@@ -230,12 +207,13 @@
        * @method _generateTagMarkup
        * @param tag {Object} the tag to render
        */
-      _generateTagMarkup: function (tag)
+      _generateTagMarkup: function TagComponent__generateTagMarkup(tag)
       {
-         var html = '<li class="onTagSelection nav-label">';
-         html += '<a href="#" class="tag-link nav-link">' + $html(tag.name) + '</a>&nbsp;(' + tag.count + ')';
-         html += '</li>';
+         var tag = $html(tag.name),
+            html = '<li><span class="tag">';
+         html += '<a href="#" class="tag-link" rel="' + tag + '">' + tag + '</a>&nbsp;(' + tag.count + ')';
+         html += '</span></li>';
          return html;
       }
-   }
+   });
 })();

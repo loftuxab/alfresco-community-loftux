@@ -114,3 +114,30 @@
    	return returnVal;
    };
 }());
+
+/**
+ * Patch to Container to prevent IE6 trying to set properties on elements that have been removed from the DOM.
+ * This function is called via a setTimer(), so this patch fixes a race condition.
+ * Required by: Document List "Loading Document Library..." pop-up.
+ * Patches: YUI 2.7.0
+ */
+(function()
+{
+   /**
+   * Adjusts the size of the shadow based on the size of the element.
+   * @method sizeUnderlay
+   */
+   YAHOO.widget.Panel.prototype.sizeUnderlay = function()
+   {
+       var oUnderlay = this.underlay,
+           oElement;
+
+       if (oUnderlay) {
+           oElement = this.element;
+           if (oElement) {
+              oUnderlay.style.width = oElement.offsetWidth + "px";
+              oUnderlay.style.height = oElement.offsetHeight + "px";
+           }
+       }
+   }
+}());

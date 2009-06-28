@@ -13,6 +13,9 @@
 <!-- Details -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/details.css" />
 <@script type="text/javascript" src="${page.url.context}/modules/documentlibrary/details.js"></@script>
+<!-- Tag Library -->
+<@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/taglibrary/taglibrary.css" />
+<@script type="text/javascript" src="${page.url.context}/modules/taglibrary/taglibrary.js"></@script>
 <!-- Assign Workflow -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/documentlibrary/workflow.css" />
 <@script type="text/javascript" src="${page.url.context}/modules/documentlibrary/workflow.js"></@script>

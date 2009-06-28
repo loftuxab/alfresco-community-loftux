@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -40,21 +40,10 @@
 
    Alfresco.module.DoclibDetails = function(htmlId)
    {
-      // Mandatory properties
-      this.name = "Alfresco.module.DoclibDetails";
-      this.id = htmlId;
-
-      // Initialise prototype properties
-      this.widgets = {};
-      this.modules = {};
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json"], this.onComponentsLoaded, this);
-
-      return this;
+      return Alfresco.module.DoclibDetails.superclass.constructor.call(this, "Alfresco.module.DoclibDetails", htmlId, ["button", "container", "connection", "json"]);
    };
    
-   Alfresco.module.DoclibDetails.prototype =
+   YAHOO.extend(Alfresco.module.DoclibDetails, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -99,27 +88,11 @@
           *
           * @property: width
           * @type: integer
-          * @default: 40em
+          * @default: 45em
           */
-         width: "40em"
+         width: "45em"
       },
       
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
-
       /**
        * Container element for template in DOM.
        * 
@@ -127,41 +100,6 @@
        * @type DOMElement
        */
       containerDiv: null,
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.module.DoclibDetails} returns 'this' for method chaining
-       */
-      setOptions: function DLD_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.module.DoclibDetails} returns 'this' for method chaining
-       */
-      setMessages: function DLD_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DLD_onComponentsLoaded()
-      {
-      },
 
       /**
        * Main entry point
@@ -242,7 +180,8 @@
          // OK button
          this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok", null,
          {
-            type: "submit"
+            type: "submit",
+            htmlName: "-"
          });
 
          // Cancel button
@@ -250,6 +189,14 @@
 
          // Form definition
          this.modules.form = new Alfresco.forms.Form(this.id + "-form");
+
+         // Tag Library
+         this.modules.tagLibrary = new Alfresco.module.TagLibrary(this.id);
+         this.modules.tagLibrary.setOptions(
+         {
+            siteId: this.options.siteId
+         });
+         this.modules.tagLibrary.initialize(this.modules.form);
 
          // Validation
          this.modules.form.addValidation(this.id + "-name", Alfresco.forms.validation.mandatory, null, "blur");
@@ -282,7 +229,7 @@
                this.widgets.editMetadata.set("disabled", true);
                this.widgets.okButton.set("disabled", true);
                this.widgets.cancelButton.set("disabled", true);
-               Dom.get(this.id + "-tags").value = Alfresco.util.getTags(Dom.get(this.id + "-tags").value).join(" ");
+               this.modules.tagLibrary.updateForm(this.id + "-form", "tags");
                this.widgets.dialog.hide();
                this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                {
@@ -357,7 +304,7 @@
 
          Alfresco.util.PopupManager.displayPrompt(
          {
-            text: this._msg("message.details.failure")
+            text: this.msg("message.details.failure")
          });         
       },
 
@@ -383,7 +330,7 @@
          // Display success message
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("message.details.success")
+            text: this.msg("message.details.success")
          });
          
          this._hideDialog();
@@ -400,7 +347,7 @@
          // Display success message anyway
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("message.details.success")
+            text: this.msg("message.details.success")
          });
          
          // Fire metadataRefresh event
@@ -453,13 +400,13 @@
          // Dialog title
          var titleDiv = Dom.get(this.id + "-title");
          var fileSpan = '<span class="light">' + file.displayName + '</span>';
-         titleDiv.innerHTML = this._msg("title", fileSpan)
+         titleDiv.innerHTML = this.msg("title", fileSpan);
 
          // Item details
          Dom.get(this.id + "-name").value = file.fileName ? file.fileName : "";
          Dom.get(this.id + "-fileTitle").value = file.title ? file.title : "";
          Dom.get(this.id + "-description").value = file.description ? file.description : "";
-         Dom.get(this.id + "-tags").value = file.tags.join(" ");
+         this.modules.tagLibrary.setTags(file.tags);
          
          // Edit Metadata link
          this.widgets.editMetadata.set("href", "edit-metadata?nodeRef=" + file.nodeRef);
@@ -514,22 +461,9 @@
          // Undo Firefox caret issue
          Alfresco.util.undoCaretFix(formElement);
          this.widgets.dialog.hide();
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-       _msg: function DLD__msg(messageId)
-       {
-          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
        }
-   };
+   });
 })();
 
 /* Dummy instance to load optional YUI components early */
-new Alfresco.module.DoclibDetails(null);
+new Alfresco.module.DoclibDetails("null");

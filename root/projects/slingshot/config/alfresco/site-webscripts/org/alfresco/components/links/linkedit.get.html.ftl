@@ -1,3 +1,4 @@
+<#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.LinkEdit("${args.htmlid}").setOptions(
    {
@@ -43,13 +44,10 @@
             <input class="internal" id="${args.htmlid}-internal" type="checkbox" name="internal" tabindex="4"/>
             <span class="lbl help">${msg("form.internalDescription")}</span>
          </div>
-
-         <!-- tags -->
-         <label for="${args.htmlid}-tag-input-field">${msg("form.tags")}:</label>
-         <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
-         <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
-         <!-- end tags -->
-
+         <div>
+            <label for="${args.htmlid}-tag-input-field">${msg("form.tags")}:</label>
+            <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
+         </div>
          <input type="hidden" name="page" value="links-view"/>
       </div>
       <div class="nodeFormAction">
