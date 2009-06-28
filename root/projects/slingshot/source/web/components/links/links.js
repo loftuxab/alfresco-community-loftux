@@ -36,9 +36,7 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom,
-         Event = YAHOO.util.Event,
-         Element = YAHOO.util.Element;
+   var Dom = YAHOO.util.Dom;
          
    /**
     * Alfresco Slingshot aliases
@@ -55,25 +53,15 @@
     */
    Alfresco.Links = function(htmlId)
    {
+      Alfresco.Links.superclass.constructor.call(this, "Alfresco.Links", htmlId, ["button", "container", "datasource", "datatable", "paginator", "json"]);
 
-      this.id = htmlId;
-      this.name = "Alfresco.Links";
       this.currentFilter = {};
-
-      this.widgets = {};
-
-      /**
-       * Object literal used to generate unique tag ids
-       *
-       * @property tagId
-       * @type object
-       */
-
       this.tagId =
       {
          id: 0,
          tags: {}
       };
+      this.busy = false;
 
       /**
        * The deleted link CSS style.
@@ -85,19 +73,21 @@
        */
       this.EDITEDCLASS = "edit-link";
 
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "paginator", "json", "resize"], this.onComponentsLoaded, this);
-
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("linksListRefresh", this.onLinksListRefresh, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
    };
 
-   Alfresco.Links.prototype =
+   YAHOO.extend(Alfresco.Links, Alfresco.component.Base,
    {
+      /**
+       * Object literal used to generate unique tag ids
+       *
+       * @property tagId
+       * @type object
+       */
+      tagId: null,
+
       /**
        * Tells whether an action is currently ongoing.
        *
@@ -105,8 +95,26 @@
        * @type boolean
        * @see _setBusy/_releaseBusy
        */
-      busy: false,
+      busy: null,
 
+      /**
+       * Offset of first record on page
+       * 
+       * @property recordOffset
+       * @type int
+       * @default 0
+       */
+      recordOffset: 0,
+
+      /**
+       * Total number of posts in the current view (across all pages)
+       * 
+       * @property totalRecords
+       * @type int
+       * @default 0
+       */
+      totalRecords: 0,
+      
       /**
        * Object container for initialization options
        *
@@ -193,47 +201,6 @@
       },
 
       /**
-       * Offset of first record on page
-       * 
-       * @property recordOffset
-       * @type int
-       * @default 0
-       */
-      recordOffset: 0,
-
-      /**
-       * Total number of posts in the current view (across all pages)
-       * 
-       * @property totalRecords
-       * @type int
-       * @default 0
-       */
-      totalRecords: 0,
-      
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       */
-      setOptions: function Links_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function Links_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
        *
@@ -243,13 +210,6 @@
       {
          this.activate();
       },
-
-      /** Object container for storing YUI widget instances.
-       *
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
 
       /**
        * init DataSource
@@ -281,6 +241,7 @@
 
          return this;
       },
+
       /**
        * Updates the toolbar using the passed permissions
        * @method updateToolbar
@@ -293,18 +254,6 @@
             this.widgets.newLinkBtn.set("disabled", true);
          }
       },
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Links} returns 'this' for method chaining
-       */
-      setMessages: function Links_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
 
       /**
        * Initialise DataTable
@@ -314,15 +263,6 @@
       createDataTable: function Links_createDataTable()
       {
          var me = this;
-
-         var generateUserProfileUrl = function DL_generateUserProfileUrl(userName)
-         {
-            return Alfresco.util.uriTemplate("userpage",
-            {
-               userid: userName,
-               pageid: "profile"
-            });
-         };
 
          /**
           * Selector custom datacell formatter
@@ -355,13 +295,13 @@
          var renderCellDescription = function Links_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             var data = oRecord.getData();
-            var name = data["title"],
-               url = data["url"],
-               description = data["description"],
-               createdOn = data["createdOn"],
-               author = data["author"],
-               tags = data["tags"],
-               internal = data["internal"];
+            var name = data.title,
+               url = data.url,
+               description = data.description,
+               createdOn = data.createdOn,
+               author = data.author,
+               tags = data.tags,
+               internal = data.internal;
             
             var linksViewUrl = me.generateLinksViewUrl(me.options.siteId, me.options.containerId, data.name);
             var tagsStr = "";
@@ -378,22 +318,22 @@
             }
             else
             {
-               tagsStr = me._msg("dialog.tags.none");
+               tagsStr = me.msg("dialog.tags.none");
             }
             var innerHtml = '<h3 class="link-title"><a href="' + linksViewUrl + '" class="theme-color-1">' + $html(name) + '</a></h3>';
             
-            innerHtml += '<div class="detail"><span class="item"><em style="padding-right: 2px; float: left">' + me._msg("details.url") + ':</em> ' +
+            innerHtml += '<div class="detail"><span class="item"><em style="padding-right: 2px; float: left">' + me.msg("details.url") + ':</em> ' +
                          '<a style="float: left;" class="theme-color-1"' +  (internal ? '' : ' target="_blank" class="external"') + ' href=' + (url.indexOf("://") === -1 || url[0] === '/' ? 'http://' : '') +
                          $html(url) + '>' + $html(url) + '</a></span></div>';
 
             if (!me.options.simpleView)
             {
-               innerHtml += '<div class="detail"><span class="item"><em>' + me._msg("details.created.on") + ':</em> ' + Alfresco.util.formatDate(data["createdOn"]) + '</span>' +
-                            '<span class="item"><em>' + me._msg("details.created.by") + ':</em> ' + Alfresco.util.people.generateUserLink(author) + '</span></div>';
+               innerHtml += '<div class="detail"><span class="item"><em>' + me.msg("details.created.on") + ':</em> ' + Alfresco.util.formatDate(createdOn) + '</span>' +
+                            '<span class="item"><em>' + me.msg("details.created.by") + ':</em> ' + Alfresco.util.people.generateUserLink(author) + '</span></div>';
 
-               innerHtml += '<div class="detail"><span class="item"><em>' + me._msg("details.description") + ':</em> ' + $links($html(description)) + '</span></div>';
+               innerHtml += '<div class="detail"><span class="item"><em>' + me.msg("details.description") + ':</em> ' + $links($html(description)) + '</span></div>';
 
-               innerHtml += '<div class="detail"><span class="tag-item"><em>' + me._msg("details.tags") + ': </em>' + tagsStr + '</span></div>';
+               innerHtml += '<div class="detail"><span class="tag-item"><em>' + me.msg("details.tags") + ': </em>' + tagsStr + '</span></div>';
             }
 
             elCell.innerHTML = innerHtml;
@@ -413,17 +353,15 @@
             var prefix = oRecord.getData("title"),
                permissions = oRecord.getData("permissions");
                
-            elCell.style.display = "none";
-            elCell.innerHTML = "<div class='" + me.EDITEDCLASS +  "'><a id='edit-" + prefix + "'><span class='theme-color-1'>" + me._msg("links.edit") + "</a></span></div>" +
-               "<div class='" + me.DELETEDCLASS + "'><a id='delete-" + prefix + "'><span class='theme-color-1'>" + me._msg("links.delete") + "</a></span></div>";
+            elCell.style.visibility = "hidden";
+            elCell.innerHTML = "<div class='" + me.EDITEDCLASS +  "'><a id='edit-" + prefix + "'><span class='theme-color-1'>" + me.msg("links.edit") + "</a></span></div>" +
+               "<div class='" + me.DELETEDCLASS + "'><a id='delete-" + prefix + "'><span class='theme-color-1'>" + me.msg("links.delete") + "</a></span></div>";
 
-            var elink = elCell.getElementsByTagName("a")[0];
-            var ec = elCell.childNodes[0];
-            var dlink = elCell.getElementsByTagName("a")[1];
-            var dc = elCell.childNodes[1];
+            var ec = elCell.childNodes[0],
+               dc = elCell.childNodes[1];
 
             // Edit permission?
-            if (permissions["edit"])
+            if (permissions.edit)
             {
                ec.onclick = function Links_onEditLink()
                {
@@ -454,7 +392,7 @@
             {
                dc.onclick = function ()
                {
-                  var mes = me._msg("dialog.confirm.message.delete", prefix);
+                  var mes = me.msg("dialog.confirm.message.delete", prefix);
                   var callback = function()
                   {
                      me.deleteLinks([oRecord]);
@@ -508,10 +446,10 @@
             containers: [this.id + "-paginator"],
             rowsPerPage: this.options.pageSize,
             initialPage: 1,
-            template: this._msg("pagination.template"),
-            pageReportTemplate: this._msg("pagination.template.page-report"),
-            previousPageLinkLabel: this._msg("pagination.previousPageLinkLabel"),
-            nextPageLinkLabel: this._msg("pagination.nextPageLinkLabel")
+            template: this.msg("pagination.template"),
+            pageReportTemplate: this.msg("pagination.template.page-report"),
+            previousPageLinkLabel: this.msg("pagination.previousPageLinkLabel"),
+            nextPageLinkLabel: this.msg("pagination.nextPageLinkLabel")
          });
 
          // called by the paginator on state changes
@@ -529,7 +467,7 @@
          {
             renderLoopSize: 32,
             initialLoad: false,
-            MSG_EMPTY: '<span class="datatable-msg-empty">' + this._msg("links.empty") + '</span>'
+            MSG_EMPTY: '<span class="datatable-msg-empty">' + this.msg("links.empty") + '</span>'
          });
 
          YAHOO.widget.DataTable.CLASS_SELECTED = "links-selected-row";
@@ -568,13 +506,13 @@
             oPayload.recordOffset = oResponse.meta.recordOffset;
             oPayload.totalRecords = oResponse.meta.totalRecords;
             return oPayload;
-         }
+         };
 
          // Prevent the DataTable from updating the Paginator widget
          this.widgets.dataTable.doBeforePaginatorChange = function Links_doBeforePaginatorChange(oPaginatorState)
          {
             return false;
-         }
+         };
 
          // Rendering complete event handler
          this.widgets.dataTable.subscribe("renderEvent", function()
@@ -599,7 +537,7 @@
          var onRowMouseover = function Links_onRowMouseover(e)
          {
             me.widgets.dataTable.selectRow(e.target);
-            e.target.cells[2].childNodes[0].style.display = "";
+            e.target.cells[2].childNodes[0].style.visibility = "visible";
             e.target.cells[2].childNodes[0].style.width = "100px";
             e.target.cells[2].style.borderLeft = "1px solid #999";
          };
@@ -607,7 +545,7 @@
          var onRowMouseout = function Links_onRowMouseout(e)
          {
             me.widgets.dataTable.unselectRow(e.target);
-            e.target.cells[2].childNodes[0].style.display = "none";
+            e.target.cells[2].childNodes[0].style.visibility = "hidden";
             e.target.cells[2].style.borderLeft = "1px solid #FFF";
          };
 
@@ -692,7 +630,7 @@
             this.widgets.linksMenu.set("disabled", this.getSelectedLinks().length === 0);
             var perm = oResponse.meta.metadata.linkPermissions;
             this.options.permissionDelete = perm["delete"];
-            this.options.permissionUpdate = perm["edit"];
+            this.options.permissionUpdate = perm.edit;
             this.updateToolbar(perm);
          }
 
@@ -736,7 +674,7 @@
       updateListTitle: function Links_updateListTitle()
       {
          var elem = Dom.get(this.id + '-listTitle');
-         var title = this._msg("title.generic");
+         var title = this.msg("title.generic");
 
          var filterOwner = this.currentFilter.filterOwner;
          var filterId = this.currentFilter.filterId;
@@ -746,20 +684,20 @@
             switch (filterId)
             {
                case "all":
-                  title = this._msg("title.all");
+                  title = this.msg("title.all");
                   break;
                case "user":
-                  title = this._msg("title.user");
+                  title = this.msg("title.user");
                   break;
                case "recent":
-                  title = this._msg("title.recent");
+                  title = this.msg("title.recent");
                   break;
             }
 
          }
          else if (filterOwner == "Alfresco.LinkTags")
          {
-            title = this._msg("title.bytag", $html(filterData));
+            title = this.msg("title.bytag", $html(filterData));
          }
 
          elem.innerHTML = title;
@@ -774,7 +712,7 @@
        */
       onDeactivateAllControls: function Links_onDeactivateAllControls(layer, args)
       {
-         var index, widget, fnDisable = Alfresco.util.disableYUIButton;
+         var index, fnDisable = Alfresco.util.disableYUIButton;
          for (index in this.widgets)
          {
             if (this.widgets.hasOwnProperty(index))
@@ -814,7 +752,7 @@
                   var arrLinks = me.getSelectedLinks();
                   me.deleteLinks(arrLinks);
                };
-               this.showConfirmDialog(this._msg("dialog.confirm.message.delete.selected"), callback);
+               this.showConfirmDialog(this.msg("dialog.confirm.message.delete.selected"), callback);
                break;
                
             case "deselect-item":
@@ -846,7 +784,6 @@
        */
       attachButtons: function Links_attachButtons()
       {
-         var me = this;
          this.widgets.newLinkBtn = Alfresco.util.createYUIButton(this, "create-link-button", this.showCreateLinkDlg,
          {
             disabled: false,
@@ -974,7 +911,7 @@
                j++;
             }
          }
-         this.widgets.changeListViewBtn.set("label", this._msg(this.options.simpleView ? "header.detailedList" : "header.simpleList"));
+         this.widgets.changeListViewBtn.set("label", this.msg(this.options.simpleView ? "header.detailedList" : "header.simpleList"));
       },
 
       /**
@@ -983,8 +920,7 @@
        */
       deleteLinks: function Links_deleteLinks(arr)
       {
-         var me = this;
-         if (!this._setBusy(this._msg('message.wait')))
+         if (!this._setBusy(this.msg('message.wait')))
          {
             return;
          }
@@ -1022,13 +958,13 @@
             url: url,
             method: "POST",
             requestContentType: "application/json",
-            successMessage: this._msg("message.delete.success"),
+            successMessage: this.msg("message.delete.success"),
             successCallback:
             {
                fn: onDeletedSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.delete.failure"),
+            failureMessage: this.msg("message.delete.failure"),
             failureCallback:
             {
                fn: function(response)
@@ -1078,14 +1014,12 @@
        */
       showConfirmDialog: function Links_showConfirmDialog(mes, callback)
       {
-         var me = this;
-
-         var prompt = Alfresco.util.PopupManager.displayPrompt(
+         Alfresco.util.PopupManager.displayPrompt(
          {
             text: mes,
             buttons: [
             {
-               text: this._msg("button.delete"),
+               text: this.msg("button.delete"),
                handler: function()
                {
                   callback();
@@ -1093,7 +1027,7 @@
                }
             },
             {
-               text: this._msg("button.cancel"),
+               text: this.msg("button.cancel"),
                handler: function()
                {
                   this.destroy();
@@ -1191,7 +1125,7 @@
          {
             url = "?filter=" + filterId;
          }
-         else if (filterOwner == "Alfresco.LinkTags")
+         else if (filterOwner == "Alfresco.TagFilter")
          {
             url = "?filter=tag";
             params.tag = filterData;
@@ -1212,19 +1146,6 @@
          }
          return url + "&" + urlExt;
 
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function Links_msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
       },
 
       /**
@@ -1276,10 +1197,7 @@
       _generateTagLink: function Links_generateTagLink(tagName)
       {
          var encodedTagName = $html(tagName);
-         var html = '<span id="' + this._generateTagId(tagName) + '" class="nodeAttrValue">';
-         html += '<a href="#" class="tag-link" title="' + encodedTagName + '">';
-         html += '<span>' + encodedTagName + '</span></a></span>';
-         return html;
+         return '<span class="tag"><a href="#" class="tag-link" rel="' + encodedTagName + '" title="' + encodedTagName + '">' + encodedTagName + '</a></span>';
       },
 
       /**
@@ -1297,5 +1215,5 @@
 
          return url;
       }
-   };
+   });
 })();
