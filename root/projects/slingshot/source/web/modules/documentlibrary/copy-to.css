@@ -81,6 +81,7 @@
    float: left;
    height: 20em;
    margin: 0.5em 0.5em 0px;
+   overflow-x: hidden;
    overflow-y: auto;
    width: 14em;
 }
@@ -91,6 +92,7 @@
    float: left;
    height: 20em;
    margin: 0.5em 0.5em 0px;
+   overflow-x: hidden;
    overflow-y: auto;
    width: 14em;
 }
@@ -149,9 +151,9 @@
    width: 18em;
 }
 
-.copy-to .ygtvitem
+.copy-to .treeview .ygtvitem
 {
-   background-color: #ffffff;
+   overflow-x: visible;
 }
 
 .copy-to .ygtvitem .no-permission

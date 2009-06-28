@@ -784,6 +784,11 @@
             var node = this.widgets.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
             if (node !== null)
             {
+               var el = node.getContentEl(),
+                  container = Dom.get(this.id + "-treeview");
+               
+               container.scrollTop = Dom.getY(el) - (container.scrollHeight / 3);
+
                if (node.data.path == this.currentPath)
                {
                   this._updateSelectedNode(node);
@@ -853,21 +858,27 @@
           * eventually display the current path's node
           */
          var paths = path.split("/"),
-            expandPath = "";
+            expandPath = "/";
+         // Check for root path special case
+         if (path === "/")
+         {
+            paths = [""];
+         }
          this.pathsToExpand = [];
          
          for (var i = 0, j = paths.length; i < j; i++)
          {
-            if (paths[i] != "")
-            {
-               // Push the path onto the list of paths to be expanded
-               expandPath += "/" + paths[i];
-               this.pathsToExpand.push(expandPath);
-            }
+            // Push the path onto the list of paths to be expanded
+            expandPath = $combine(expandPath, paths[i]);
+            this.pathsToExpand.push(expandPath);
          }
+
+         // Kick off the expansion process by expanding the first unexpanded path
+         do
+         {
+            node = this.widgets.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
+         } while (this.pathsToExpand.length > 0 && node.expanded);
          
-         // Kick off the expansion process by expanding the root node
-         node = this.widgets.treeview.getNodeByProperty("path", "/");
          if (node !== null)
          {
             node.expand();
