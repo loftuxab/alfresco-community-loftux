@@ -1,16 +1,23 @@
+.treeview h2
+{
+   padding-left: 1em;
+}
+
 .treeview .tree
 {
+   display: none;
    padding: 0.5em 0 1em;
 }
 
 .treeview .ygtvspacer
 {
+   display: block;
    width: 18px;
 }
 
 .treeview .ygtvchildren
 {
-   width: 150%;
+   width: 100%;
 }
 
 .treeview .ygtvitem
@@ -26,6 +33,7 @@
 {
    background: none;
    color: #000;
+   white-space: nowrap;
 }
 
 .treeview .ygtverror,

@@ -10,9 +10,9 @@
    padding: 0.5em;
 }
 
-.move-to .ygtvitem
+.move-to .treeview .ygtvitem
 {
-   background-color: #ffffff;
+   overflow-x: visible;
 }
 
 .move-to .ygtvitem .no-permission
