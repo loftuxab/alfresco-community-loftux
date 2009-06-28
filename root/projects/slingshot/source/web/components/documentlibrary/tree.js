@@ -53,12 +53,9 @@
     */
    Alfresco.DocListTree = function DLT_constructor(htmlId)
    {
-      // Mandatory properties
-      this.name = "Alfresco.DocListTree";
-      this.id = htmlId;
+      Alfresco.DocListTree.superclass.constructor.call(this, "Alfresco.DocListTree", htmlId, ["treeview", "json"]);
       
       // Initialise prototype properties
-      this.widgets = {};
       this.currentFilter =
       {
          filterId: null,
@@ -67,12 +64,6 @@
       };
       this.pathsToExpand = [];
 
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-      
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["treeview", "json"], this.onComponentsLoaded, this);
-      
       // Decoupled event listeners
       YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
       YAHOO.Bubbling.on("folderCopied", this.onFolderCopied, this);
@@ -85,7 +76,7 @@
       return this;
    };
    
-   Alfresco.DocListTree.prototype =
+   YAHOO.extend(Alfresco.DocListTree, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -110,14 +101,6 @@
          containerId: "documentLibrary"
       },
       
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
       /**
        * Flag set after TreeView instantiated.
        * 
@@ -183,43 +166,6 @@
       selectedNode: null,
 
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
-       */
-      setOptions: function DLT_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
-       */
-      setMessages: function DLT_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DLT_onComponentsLoaded()
-      {
-         // Register the onReady callback when the component parent element has been loaded
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
-      /**
        * Fired by YUI when parent element is available for scripting
        * @method onReady
        */
@@ -227,6 +173,9 @@
       {
          // Reference to self - used in inline functions
          var me = this;
+         
+         // Create twister from our H2 tag
+         Alfresco.util.createTwister(this.id + "-h2", "DocListTree");
          
          /**
           * Dynamically loads TreeView nodes.
@@ -474,13 +423,13 @@
              * of parent paths that we need to expand one-by-one in order to
              * eventually display the current path's node
              */
-            var paths = obj.path.split("/");
+            var paths = obj.path.split("/"),
+               expandPath = "/";
             // Check for root path special case
             if (obj.path === "/")
             {
                paths = [""];
             }
-            var expandPath = "/";
             for (var i = 0; i < paths.length; i++)
             {
                // Push the path onto the list of paths to be expanded
@@ -950,5 +899,5 @@
           var uriTemplate ="slingshot/doclib/treenode/site/" + $combine(encodeURIComponent(this.options.siteId), encodeURIComponent(this.options.containerId), encodeURI(path));
           return  Alfresco.constants.PROXY_URI + uriTemplate;
        }
-   };
+   });
 })();

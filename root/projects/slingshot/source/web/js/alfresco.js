@@ -30,7 +30,7 @@
 var YUIDom = YAHOO.util.Dom,
    YUIEvent = YAHOO.util.Event,
    YUISelector = YAHOO.util.Selector;
- 
+
 /**
  * Alfresco root namespace.
  * 
@@ -786,8 +786,9 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
    }
    
    // Create the button
-   var htmlId = p_scope.id + "-" + p_name;
-   var button = new YAHOO.widget.Button(htmlId, obj);
+   var htmlId = p_scope.id + "-" + p_name,
+      button = new YAHOO.widget.Button(htmlId, obj);
+
    if (typeof button == "object")
    {
       // Register the click listener if one was supplied
@@ -802,6 +803,12 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
          {
             button.on("click", p_onclick, button, p_scope);
          }
+      }
+      
+      // Special case if htmlName was passed-in as an option
+      if (typeof obj.htmlName != "undefined")
+      {
+         button.get("element").getElementsByTagName("button")[0].name = obj.htmlName;
       }
    }
    return button;
@@ -839,30 +846,38 @@ Alfresco.util.disableYUIButton = function(p_button)
 };
 
 /**
- * DRAFT - DO NOT USE
- *
  * Creates a "disclosure twister" UI control from existing mark-up.
  *
  * @method Alfresco.util.createTwister
  * @param p_controller {Element|string} Element (or DOM ID) of controller node
  * <pre>The code will search for the next sibling which will be used as the hideable panel, unless overridden below</pre>
+ * @param p_filterName {string} Filter's name under which to save it's collapsed state via preferences
  * @param p_config {object} Optional additional configuration to override the defaults
  * <pre>
  *    panel {Element|string} Use this panel as the hideable element instead of the controller's first sibling
+ *    collapsed {boolean} Whether the twister should be drawn collapsed upon creation
  * </pre>
  * @return {boolean} true = success
  */
-Alfresco.util.createTwister = function(p_controller, p_config)
+Alfresco.util.createTwister = function(p_controller, p_filterName, p_config)
 {
-   /*
-   var elTwister, elPanel,
-      config = YAHOO.lang.merge(p_config, {});
+   var defaultConfig =
+   {
+      panel: null,
+      collapsed: null,
+      CLASS_BASE: "alfresco-twister",
+      CLASS_OPEN: "alfresco-twister-open",
+      CLASS_CLOSED: "alfresco-twister-closed"
+   };
+   
+   var elController, elPanel,
+      config = YAHOO.lang.merge(defaultConfig, p_config || {});
    
    // Controller element
    elController = YUIDom.get(p_controller);
    if (elController === null)
    {
-      return null;
+      return false;
    }
    
    // Panel element - next sibling or specified in configuration
@@ -877,33 +892,52 @@ Alfresco.util.createTwister = function(p_controller, p_config)
       while (elPanel.nodeType !== 1 && elPanel !== null)
       {
          elPanel = elPanel.nextSibling;
-      };
+      }
    }
    if (elPanel === null)
    {
-      return null;
+      return false;
    }
+
+   // If "collapsed" isn't specified in config, then use the value stored in preferences
+   if (config.collapsed === null)
+   {
+      var collapsedPrefs = Alfresco.util.arrayToObject(Alfresco.util.createTwister.collapsed.split(","));
+      config.collapsed = !!collapsedPrefs[p_filterName];
+   }
+
+   // Initial State
+   YUIDom.addClass(elController, config.CLASS_BASE);
+   YUIDom.addClass(elController, config.collapsed ? config.CLASS_CLOSED : config.CLASS_OPEN);
+   YUIDom.setStyle(elPanel, "display", config.collapsed ? "none" : "block");
    
-   YUIDom.addClass(elController, "alfresco-twister alfresco-twister-open");
    YUIEvent.addListener(elController, "click", function(p_event, p_obj)
    {
-      if (YUIDom.hasClass(p_obj.controller, "alfresco-twister-open"))
+      // Update UI to new state
+      var collapse = YUIDom.hasClass(p_obj.controller, config.CLASS_OPEN);
+      if (collapse)
       {
-         YUIDom.replaceClass(p_obj.controller, "alfresco-twister-open", "alfresco-twister-closed");
-         YUIDom.setStyle(p_obj.panel, "display", "none");
+         YUIDom.replaceClass(p_obj.controller, config.CLASS_OPEN, config.CLASS_CLOSED);
       }
       else
       {
-         YUIDom.replaceClass(p_obj.controller, "alfresco-twister-closed", "alfresco-twister-open");
-         YUIDom.setStyle(p_obj.panel, "display", "block");
+         YUIDom.replaceClass(p_obj.controller, config.CLASS_CLOSED, config.CLASS_OPEN);
       }
+      YUIDom.setStyle(p_obj.panel, "display", collapse ? "none" : "block");
+
+      // Save to preferences
+      var fnPref = collapse ? "add" : "remove",
+         preferences = new Alfresco.service.Preferences();
+      
+      preferences[fnPref].call(preferences, Alfresco.service.Preferences.COLLAPSED_TWISTERS, p_obj.filterName);
    },
    {
       controller: elController,
-      panel: elPanel
+      panel: elPanel,
+      filterName: p_filterName
    });
-   */
 };
+Alfresco.util.createTwister.collapsed = "";
 
 /**
  * Find an event target's class name, ignoring YUI classes.
@@ -2777,7 +2811,7 @@ if (typeof log4javascript != "undefined")
     *    Show if AUTOLOGGING flag is false, but have enabled logger in this session
     */
    Alfresco.logger = log4javascript.getDefaultLogger();
-   if (Alfresco.constants.AUTOLOGGING)
+   if (Alfresco.constants.AUTOLOGGING || Alfresco.util.getQueryStringParameter("log") == "on")
    {
       Alfresco.logger.info("Alfresco Share LOGGING enabled.");
    }
@@ -2808,7 +2842,7 @@ if (typeof log4javascript != "undefined")
          logSequenceLen = logSequence.length,
          logSequenceStr = logSequence.toString();
       
-      window.addEventListener("keydown", function(e)
+      document.addEventListener("keydown", function(e)
       {
          sequence.push(e.keyCode);
          while (sequence.length > logSequenceLen)
@@ -3345,13 +3379,12 @@ Alfresco.service.BaseService.prototype =
    });
    
    /**
-    * The name token that is used to save the user's favourite sites.
-    *
-    * @property SITE_FAVOURITES
-    * @type string
+    * Preference keys
     */
+    Alfresco.service.Preferences.FAVOURITE_DOCUMENTS = "org.alfresco.share.documents.favourites";
     Alfresco.service.Preferences.FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
     Alfresco.service.Preferences.IMAP_FAVOURITE_SITES = "org.alfresco.share.sites.imapFavourites";
+    Alfresco.service.Preferences.COLLAPSED_TWISTERS = "org.alfresco.share.twisters.collapsed";
 
 })();
 
@@ -3482,8 +3515,10 @@ Alfresco.util.RichEditor = function(editorName,id,config)
    /**
     * Alfresco.component.Base constructor.
     * 
-    * @param {String} htmlId The HTML id of the parent element
-    * @return {pbject} The new instance
+    * @param name {String} The name of the component
+    * @param id {String} he DOM ID of the parent element
+    * @param components {Array} Optional: Array of required YAHOO
+    * @return {object} The new instance
     * @constructor
     */
    Alfresco.component.Base = function(name, id, components)
@@ -3602,4 +3637,213 @@ Alfresco.util.RichEditor = function(editorName,id,config)
          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
       }
    };
+})();
+
+/**
+ * The Alfresco.component.BaseFilter class provides core functions for a "twister-style" filter.
+ * It can be extended by other UI filters, or simply instantiated on it's own.
+ */
+(function()
+{
+   /**
+    * Alfresco.component.BaseFilter constructor.
+    * 
+    * @param name {String} The name of the component
+    * @param id {String} he DOM ID of the parent element
+    * @param components {Array} Optional: Array of required YAHOO
+    * @return {object} The new instance
+    * @constructor
+    */
+   Alfresco.component.BaseFilter = function(name, id, components)
+   {
+      Alfresco.component.BaseFilter.superclass.constructor.apply(this, arguments);
+      
+      this.filterName = this.name.substring(this.name.lastIndexOf(".") + 1);
+      this.controlsDeactivated = false;
+      this.uniqueEventKey = Alfresco.util.getDomId("filter");
+
+      // Decoupled event listeners
+      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
+      
+      return this;
+   };
+
+   YAHOO.extend(Alfresco.component.BaseFilter, Alfresco.component.Base,
+   {
+      /**
+       * Filter name, automatically generated from component name.
+       * 
+       * @property filterName
+       * @type {string}
+       */
+      filterName: null,
+
+      /**
+       * Selected filter.
+       * 
+       * @property selectedFilter
+       * @type {element}
+       */
+      selectedFilter: null,
+
+      /**
+       * Flag to indicate whether all controls are deactivated or not.
+       * 
+       * @property controlsDeactivated
+       * @type {boolean}
+       */
+      controlsDeactivated: null,
+
+      /**
+       * Unique event key used to hook DOM clicks on filters
+       * 
+       * @property uniqueEventKey
+       * @type {string}
+       */
+      uniqueEventKey: null,
+
+      /**
+       * Fired by YUI when parent element is available for scripting.
+       * Component initialisation, including instantiation of YUI widgets and event listener binding.
+       *
+       * @method onReady
+       */
+      onReady: function BaseFilter_onReady()
+      {
+         var me = this,
+            headers = YUISelector.query("h2", this.id);
+         
+         if (YAHOO.lang.isArray(headers))
+         {
+            // Create twister from the first H2 tag found by the query
+            Alfresco.util.createTwister(headers[0], this.filterName);
+         }
+         
+         // Add the unique event key into the filter link nodes
+         var filterLinks = YUISelector.query("li a", this.id);
+         for (var i = 0, ii = filterLinks.length; i < ii; i++)
+         {
+            YUIDom.addClass(filterLinks[i], this.uniqueEventKey);
+         }
+         
+         // ...and attach a global listener to the unique event key
+         YAHOO.Bubbling.addDefaultAction(this.uniqueEventKey, function BaseFilter_filterAction(layer, args)
+         {
+            var anchor = args[1].anchor,
+               owner = YAHOO.Bubbling.getOwnerByTagName(anchor, "span");
+            
+            if ((owner !== null) && !me.controlsDeactivated)
+            {
+               var href = anchor.getAttribute("href", 2);
+               // Check the filter isn't a link (yes wiki, we're all looking at you)
+               // Note: IE6 just doesn't get it, even with the second parameter on getAttribute()
+               if (YAHOO.env.ua.ie == 6)
+               {
+                  var d = href.length - 1;
+                  if (d < 0 || href.lastIndexOf("#") != d)
+                  {
+                     return false;
+                  }
+               }
+               else if (anchor.getAttribute("href", 2).length > 1)
+               {
+                  return false;
+               }
+               
+               var filterId = owner.className,
+                  filterData = anchor.rel;
+
+               YAHOO.Bubbling.fire("filterChanged",
+               {
+                  filterOwner: me.name,
+                  filterId: filterId,
+                  filterData: filterData
+               });
+
+               // If a function has been provided which corresponds to the filter Id, then call it
+               if (typeof me[filterId] == "function")
+               {
+                  me[filterId].call(me);
+               }
+
+               args[1].stop = true;
+            }
+      		 
+            return true;
+         });
+      },
+
+      /**
+       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
+       * Disconnected event handlers for inter-component event notification
+       */
+
+      /**
+       * Fired when the currently active filter has changed
+       *
+       * @method onFilterChanged
+       * @param layer {string} the event source
+       * @param args {object} arguments object
+       */
+      onFilterChanged: function BaseFilter_onFilterChanged(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.filterId !== null))
+         {
+            if (obj.filterOwner == this.name)
+            {
+               // Remove the old highlight, as it might no longer be correct
+               if (this.selectedFilter !== null)
+               {
+                  YUIDom.removeClass(this.selectedFilter, "selected");
+               }
+
+               // Need to find the selectedFilter element, from the current filterId
+               var candidates = YUISelector.query("." + obj.filterId, this.id);
+               if (candidates.length == 1)
+               {
+                  // This component now owns the active filter
+                  this.selectedFilter = candidates[0].parentNode;
+                  YUIDom.addClass(this.selectedFilter, "selected");
+               }
+               else if (candidates.length > 1)
+               {
+                  candidates = YUISelector.query("a[rel='" + obj.filterData.replace("'", "\\'") + "']", this.id);
+                  if (candidates.length == 1)
+                  {
+                     // This component now owns the active filter
+                     this.selectedFilter = candidates[0].parentNode.parentNode;
+                     YUIDom.addClass(this.selectedFilter, "selected");
+                  }
+               }
+            }
+            else
+            {
+               // Currently filtering by something other than this component
+               if (this.selectedFilter !== null)
+               {
+                  YUIDom.removeClass(this.selectedFilter, "selected");
+               }
+            }
+         }
+      },
+
+      /**
+       * Deactivate All Controls event handler
+       *
+       * @method onDeactivateAllControls
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDeactivateAllControls: function BaseFilter_onDeactivateAllControls(layer, args)
+      {
+         this.controlsDeactivated = true;
+         var filters = YUISelector.query("a." + this.uniqueEventKey, this.id);
+         for (var i = 0, ii = filters.length; i < ii; i++)
+         {
+            YUIDom.addClass(filters[i], "disabled");
+         }
+      }
+   });
 })();

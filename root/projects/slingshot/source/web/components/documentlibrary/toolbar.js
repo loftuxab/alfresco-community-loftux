@@ -48,8 +48,7 @@
     * Preferences
     */
    var PREFERENCES_ROOT = "org.alfresco.share.documentList",
-      PREF_HIDE_NAVBAR = PREFERENCES_ROOT + ".hideNavBar",
-      PREF_ACTIONS = PREFERENCES_ROOT + ".actions";
+      PREF_HIDE_NAVBAR = PREFERENCES_ROOT + ".hideNavBar";
    
    /**
     * DocListToolbar constructor.
@@ -893,8 +892,7 @@
             {
                var owner = obj.filterOwner.split(".")[1];
                // Obtain array of DIVs we might want to hide
-               var divs = YAHOO.util.Selector.query('div.hideable', Dom.get(this.id + "-body"));
-               var div;
+               var divs = YAHOO.util.Selector.query('div.hideable', Dom.get(this.id + "-body")), div;
                for (var i = 0, j = divs.length; i < j; i++)
                {
                   div = divs[i];
@@ -961,7 +959,7 @@
                   if (widget.get("srcelement").className != "no-access-check")
                   {
                      widget.set("disabled", false);
-                     if (widget.get("value") !== null)
+                     if (typeof widget.get("value") == "string")
                      {
                         widgetPermissions = widget.get("value").split(",");
                         for (var i = 0, ii = widgetPermissions.length; i < ii; i++)

@@ -530,7 +530,7 @@ body.yui-skin-greenTheme .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-la
 }
 
 /* filter list link */
-.yui-skin-greenTheme .treeview .selected,
+.yui-skin-greenTheme .treeview .selected > table,
 .yui-skin-greenTheme .filter li.selected, 
 .yui-skin-greenTheme .tags li.selected,
 .archive li.selected,
@@ -539,12 +539,33 @@ body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnb
 {
    background-color:#D4F8C4;
 }
+
+.yui-skin-greenTheme .filter a.disabled,
+.yui-skin-greenTheme .filter a.disabled:active,
+.yui-skin-greenTheme .filter a.disabled:hover,
+.yui-skin-greenTheme .filter a.disabled:visited,
+.yui-skin-greenTheme .tags a.disabled,
+.yui-skin-greenTheme .tags a.disabled:active,
+.yui-skin-greenTheme .tags a.disabled:hover,
+.yui-skin-greenTheme .tags a.disabled:visited
+{
+   color: #a6a6a6;
+   cursor: not-allowed;
+}
+
+.yui-skin-greenTheme .filter a:hover,
+.yui-skin-greenTheme .tags a:hover
+{
+   text-decoration: none;
+}
+
 /* Link color */
 body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected a,
 li.selected a.filter-link,
 li.selected a.tool-link,
 li.selected a.archive-link,
 li.selected a.tag-link,
+li.selected span.tag,
 body.yui-skin-greenTheme .treeview .selected table .ygtvlabel, 
 body.yui-skin-greenTheme .treeview .selected table .ygtvlabel:link, 
 body.yui-skin-greenTheme .treeview .selected table .ygtvlabel:visited, 
@@ -562,6 +583,9 @@ body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:h
 .yui-skin-greenTheme .node .nodeTitle a,
 .yui-skin-greenTheme .node .nodeURL a,
 .yui-skin-greenTheme .nodeAttrValue a,
+.yui-skin-greenTheme .nodeFooter .tag a,
+.yui-skin-greenTheme .detail .tag a,
+.yui-skin-greenTheme a.wiki-tag-link,
 .yui-skin-greenTheme .node .userLink a,
 .yui-skin-greenTheme .site-members h3 a,
 .yui-skin-greenTheme .yui-calendar td.calcell a,
@@ -577,6 +601,18 @@ body.yui-skin-greenTheme .treeview .selected div.ygtvchildren table .ygtvlabel:h
 
 .cmis .body a {
    color:#00AE42;
+}
+
+/* Twisters */
+
+.alfresco-twister-open
+{
+   background: transparent url(images/expanded.png) no-repeat scroll 0 50%;
+}
+
+.alfresco-twister-closed
+{
+   background: transparent url(images/collapsed.png) no-repeat scroll 0 50% !important;
 }
 
 

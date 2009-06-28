@@ -566,8 +566,8 @@ body.yui-skin-hcBlack tr#collapseTrigger td
 
 /* filter list link */
 .yui-skin-hcBlack .treeview .selected,
+.yui-skin-hcBlack .treeview .selected > table,
 .yui-skin-hcBlack .filter li.selected, 
-.yui-skin-hcBlack .tags li.selected,
 .yui-skin-hcBlack .tags li.selected,
 .archive li.selected,
 .tool li.selected,
@@ -575,12 +575,33 @@ body.yui-skin-hcBlack .yui-columnbrowser .yui-carousel-content li.yui-columnbrow
 {
    background-color: #000;
 }
+
+.yui-skin-hcBlack .filter a.disabled,
+.yui-skin-hcBlack .filter a.disabled:active,
+.yui-skin-hcBlack .filter a.disabled:hover,
+.yui-skin-hcBlack .filter a.disabled:visited,
+.yui-skin-hcBlack .tags a.disabled,
+.yui-skin-hcBlack .tags a.disabled:active,
+.yui-skin-hcBlack .tags a.disabled:hover,
+.yui-skin-hcBlack .tags a.disabled:visited
+{
+   color: #a6a6a6;
+   cursor: not-allowed;
+}
+
+.yui-skin-hcBlack .filter a:hover,
+.yui-skin-hcBlack .tags a:hover
+{
+   text-decoration: none;
+}
+
 /* Link color */
 body.yui-skin-hcBlack .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected a,
 li.selected a.filter-link,
 li.selected a.tool-link,
 li.selected a.archive-link,
 li.selected a.tag-link,
+li.selected span.tag,
 body.yui-skin-hcBlack .treeview .selected table .ygtvlabel, 
 body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:link, 
 body.yui-skin-hcBlack .treeview .selected table .ygtvlabel:visited, 
@@ -598,9 +619,11 @@ body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:hove
 .yui-skin-hcBlack .node .nodeTitle a,
 .yui-skin-hcBlack .node .nodeURL a,
 .yui-skin-hcBlack .nodeAttrValue a,
+.yui-skin-hcBlack .nodeFooter .tag a,
+.yui-skin-hcBlack .detail .tag a,
+.yui-skin-hcBlack a.wiki-tag-link,
 .yui-skin-hcBlack .node .userLink a,
 .yui-skin-hcBlack .site-members h3 a,
-
 .yui-skin-hcBlack .doclist .documents a,
 .yui-skin-hcBlack .attrValue a {
   color: #000000; 
@@ -620,10 +643,24 @@ body.yui-skin-hcBlack .treeview .selected div.ygtvchildren table .ygtvlabel:hove
    color:#000;
    text-decoration:underline;
 }
+
 .groups .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
 {
    color:#fff;
 }
+
+/* Twisters */
+
+.alfresco-twister-open
+{
+   background: transparent url(images/expanded.png) no-repeat scroll 0 50%;
+}
+
+.alfresco-twister-closed
+{
+   background: transparent url(images/collapsed.png) no-repeat scroll 0 50% !important;
+}
+
 /* Theme colors */
 .theme-color-1,
 a.theme-color-1,
