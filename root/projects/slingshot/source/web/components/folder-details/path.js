@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,9 +34,7 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+   var Dom = YAHOO.util.Dom;
    
    /**
     * Alfresco Slingshot aliases
@@ -52,22 +50,15 @@
     */
    Alfresco.FolderPath = function(htmlId)
    {
-      this.name = "Alfresco.FolderPath";
-      this.id = htmlId;
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
+      Alfresco.FolderPath.superclass.constructor.call(this, "Alfresco.FolderPath", htmlId);
    
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);
       
       return this;
-   }
+   };
    
-   Alfresco.FolderPath.prototype =
+   YAHOO.extend(Alfresco.FolderPath, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -87,51 +78,14 @@
       },
       
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setOptions: function SiteMembers_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setMessages: function FolderPath_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function FolderPath_onComponentsLoaded()
-      {
-         // don't need to do anything we will be informed via an event when data is ready
-      },
-      
-      /**
        * Event handler called when the "folderDetailsAvailable" event is received
        */
       onFolderDetailsAvailable: function FolderPath_onFolderDetailsAvailable(layer, args)
       {
          var folderData = args[1],
             pathHtml = "",
-            rootLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary";
-            baseLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary{file}#path=";
+            rootLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary",
+            baseLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary{file}#path=",
             pathUrl = "/";
          
          // create an array of paths
@@ -140,7 +94,7 @@
          {
             pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
             {
-               file: "?file=" + folderData.fileName
+               file: "?file=" + encodeURIComponent(folderData.fileName)
             });
             pathHtml += '">' + Alfresco.util.message("path.documents", this.name) + '</a></span>';
          }
@@ -156,13 +110,13 @@
             
             for (var x = 0, y = folders.length; x < y; x++)
             {
-               pathUrl += folders[x];
+               pathUrl += window.escape(folders[x]);
                
                pathHtml += '<span class="path-link ' + (y - x == 1 ? "self" : "folder") + '"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
                {
-                  file: (y - x == 2) ? "?file=" + folderData.fileName : ""
+                  file: (y - x == 2) ? "?file=" + encodeURIComponent(folderData.fileName) : ""
                });
-               pathHtml += this._encodePath(pathUrl) + '">' + $html(folders[x]) + '</a></span>';
+               pathHtml += pathUrl + '">' + $html(folders[x]) + '</a></span>';
                
                if (y - x > 1)
                {
@@ -174,20 +128,6 @@
          
          Dom.setStyle(this.id + "-defaultPath", "display", "none");
          Dom.get(this.id + "-path").innerHTML = pathHtml;
-      },
-      
-      /**
-       * Encodes the given path for use on a URL
-       *
-       * @method _encodePath
-       * @param path The path to encode
-       * @return The encoded path
-       */
-      _encodePath: function FolderPath__encodePath(path)
-      {
-         var encodedPath = (YAHOO.env.ua.gecko > 0) ? encodeURIComponent(path) : path;
-         
-         return encodedPath;
       }
-   };
+   });
 })();
