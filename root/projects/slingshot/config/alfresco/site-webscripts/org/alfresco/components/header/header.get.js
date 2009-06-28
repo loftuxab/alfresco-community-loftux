@@ -1,4 +1,5 @@
 const PREF_FAVOURITE_SITES = "org.alfresco.share.sites.favourites";
+const PREF_COLLAPSED_TWISTERS = "org.alfresco.share.twisters.collapsed";
 
 function sortByTitle(site1, site2)
 {
@@ -8,18 +9,20 @@ function sortByTitle(site1, site2)
 function main()
 {
    var favouriteSites = [],
+      collapsedTwisters = "",
       currentSiteIsFav = false,
-      siteTitle = "";
+      siteTitle = "",
+      prefs;
    
    // Call the repo for the user's favourite sites
    // TODO: Clean-up old favourites here?
    var result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
    if (result.status == 200 && result != "{}")
    {
-      var prefs = eval('(' + result + ')');
+      prefs = eval('(' + result + ')');
       
       // Populate the favourites object literal for easy look-up later
-      favourites = eval('(prefs.' + PREF_FAVOURITE_SITES + ')');
+      favourites = eval('try{(prefs.' + PREF_FAVOURITE_SITES + ')}catch(e){}');
       if (typeof favourites != "object")
       {
          favourites = {};
@@ -88,9 +91,24 @@ function main()
          }
       }
    }
+   
+   // Call the repo for the user's filter states
+   result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_COLLAPSED_TWISTERS);
+   if (result.status == 200 && result != "{}")
+   {
+      prefs = eval('(' + result + ')');
+      
+      collapsedTwisters = eval('try{(prefs.' + PREF_COLLAPSED_TWISTERS + ')}catch(e){}');
+      if (typeof collapsedTwisters != "string")
+      {
+         collapsedTwisters = "";
+      }
+   }
+   
    // Prepare the model for the template
    model.currentSiteIsFav = currentSiteIsFav;
    model.favouriteSites = favouriteSites;
+   model.collapsedTwisters = collapsedTwisters;
    model.siteTitle = siteTitle;
 }
 

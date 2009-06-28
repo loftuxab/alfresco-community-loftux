@@ -1,14 +1,11 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.DocListFilter("${args.htmlid}");
+   new Alfresco.component.BaseFilter("Alfresco.DocListFilter", "${args.htmlid}");
 //]]></script>
-<div id="${args.htmlid}-body" class="filter doclib-filter">
+<div class="filter doclib-filter">
    <h2>${msg("header.documents")}</h2>
    <ul class="filterLink">
-      <li><span class="all"><a href="#" onclick="return false;" class="filter-link">${msg("link.all")}</a></span></li>
-      <li><span class="editingMe"><a href="#" onclick="return false;" class="filter-link">${msg("link.editingMe")}</a></span></li>
-      <li><span class="editingOthers"><a href="#" onclick="return false;" class="filter-link">${msg("link.editingOthers")}</a></span></li>
-      <li><span class="recentlyModified"><a href="#" onclick="return false;" class="filter-link">${msg("link.recentlyModified")}</a></span></li>
-      <li><span class="recentlyAdded"><a href="#" onclick="return false;" class="filter-link">${msg("link.recentlyAdded")}</a></span></li>
-      <li><span class="favouriteDocuments"><a href="#" onclick="return false;" class="filter-link">${msg("link.favouriteDocuments")}</a></span></li>
+   <#list filters as filter>
+      <li><span class="${filter.id}"><a rel="${filter.data?html}" href="#">${msg(filter.label)}</a></span></li>
+   </#list>
    </ul>
 </div>

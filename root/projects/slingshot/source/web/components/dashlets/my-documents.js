@@ -43,12 +43,6 @@
    var $html = Alfresco.util.encodeHTML,
       $links = Alfresco.util.activateLinks;
 
-   /**
-    * Preferences
-    */
-   var PREFERENCES_DOCUMENTS = "org.alfresco.share.documents",
-      PREF_FAVOURITES = PREFERENCES_DOCUMENTS + ".favourites";
-
 
    /**
     * Dashboard MyDocuments constructor.
@@ -415,7 +409,7 @@
          };
 
          var fnPref = file.isFavourite ? "add" : "remove";
-         this.services.preferences[fnPref].call(this.services.preferences, PREF_FAVOURITES, nodeRef, responseConfig);
+         this.services.preferences[fnPref].call(this.services.preferences, Alfresco.service.Preferences.FAVOURITE_DOCUMENTS, nodeRef, responseConfig);
       }
 
    });

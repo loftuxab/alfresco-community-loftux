@@ -12,7 +12,8 @@
       permissions:
       {
          "create": ${(permissions["create"]!false)?string}
-      }
+      },
+      filterId: "${page.url.args.filter!"recentlyModified"}"
    });                                       
 //]]></script>
 <div id="${args.htmlid}-pagelist" class="yui-navset pagelist"> 

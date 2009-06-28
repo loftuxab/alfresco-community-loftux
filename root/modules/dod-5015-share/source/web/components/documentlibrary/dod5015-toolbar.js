@@ -48,8 +48,7 @@
     * Preferences
     */
    var PREFERENCES_ROOT = "org.alfresco.share.documentList",
-      PREF_HIDE_NAVBAR = PREFERENCES_ROOT + ".hideNavBar",
-      PREF_ACTIONS = PREFERENCES_ROOT + ".actions";
+      PREF_HIDE_NAVBAR = PREFERENCES_ROOT + ".hideNavBar";
    
    /**
     * RecordsDocListToolbar constructor.

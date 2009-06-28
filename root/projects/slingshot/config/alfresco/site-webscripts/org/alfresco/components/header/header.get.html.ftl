@@ -13,6 +13,7 @@
    }).setMessages(
       ${messages}
    );
+   Alfresco.util.createTwister.collapsed = "${collapsedTwisters?html}"
 //]]></script>
 </#if>
 <div class="header">

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -316,9 +316,6 @@
          };
          YAHOO.Bubbling.addDefaultAction("blogpost-action-link-span", fnActionHandlerSpan);
          
-         // Hook tag clicks
-         Alfresco.util.tags.registerTagActionHandler(this);
-
          // DataSource definition
          var uriBlogPostList = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/blog/site/{site}/{container}/posts",
          {
@@ -410,7 +407,7 @@
                html += '<span class="nodeAttrValue"><a href="' + postViewUrl + '">' + me._msg("post.read") + '</a></span>';
                html += '<span class="separator">&nbsp;</span>';
                
-               html += '<span class="nodeAttrLabel tag">' + me._msg("post.tags") +': </span>';
+               html += '<span class="nodeAttrLabel tagLabel">' + me._msg("post.tags") +': </span>';
                if (data.tags.length > 0)
                {
                   for (var x=0; x < data.tags.length; x++)
@@ -1283,7 +1280,7 @@
                 url = "/publishedext";
             }
          }
-         else if (filterOwner == "Alfresco.BlogPostListTags")
+         else if (filterOwner == "Alfresco.TagFilter")
          {
             params.tag = filterData;
          }

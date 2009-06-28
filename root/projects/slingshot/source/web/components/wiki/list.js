@@ -172,14 +172,20 @@
           {
             userAccess: this.options.permissions
           });
+          
+          YAHOO.Bubbling.fire("filterChanged",
+          {
+             filterId: this.options.filterId,
+             filterOwner: "Alfresco.WikiFilter",
+             filterdata: ""
+          });
        },
        
        onTagSelected: function WikiList_onTagSelected(e, args)
        {
           var tagname = args[1].tagname;
           
-          // TODO: do something with the tag name for all tags
-          if (tagname === "All Tags")
+          if (tagname === Alfresco.util.message('label.all-tags', 'Alfresco.TagComponent'))
           {
              var divs = Dom.getElementsByClassName('wikiPageDeselect', 'div');
              for (var i=0; i < divs.length; i++)

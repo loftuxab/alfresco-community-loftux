@@ -387,3 +387,28 @@ div.dashlet div.hdr {
 {
    width: 48%;
 }
+
+
+/* Twisters */
+.alfresco-twister
+{
+   cursor: pointer;
+   padding-left: 1em;
+}
+
+/* Filters */
+.tag
+{
+   white-space: nowrap;
+}
+
+.filter ul
+{
+   padding: 0.5em 0 1em;
+}
+
+.filter li
+{
+   overflow-x: hidden;
+   padding: 4px 0px 3px 20px;
+}

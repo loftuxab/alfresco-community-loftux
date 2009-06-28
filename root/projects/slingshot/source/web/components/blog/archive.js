@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,14 +34,7 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
-
-   /**
-    * Alfresco Slingshot aliases
-    */
-   var $html = Alfresco.util.encodeHTML;
+   var Dom = YAHOO.util.Dom;
 
    /**
     * BlogPostListArchive constructor.
@@ -52,29 +45,21 @@
     */
    Alfresco.BlogPostListArchive = function(htmlId)
    {
-      this.name = "Alfresco.BlogPostListArchive";
-      this.id = htmlId;
+      Alfresco.BlogPostListArchive.superclass.constructor.call(this, "Alfresco.BlogPostListArchive", htmlId);
+
       this.monthId =
       {
          id: 0,
          months: {}
       };
       
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-      
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
-      
       // Decoupled event listeners
       YAHOO.Bubbling.on("archiveRefresh", this.onArchiveRefresh, this);
-      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
-      YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       
       return this;
    };
    
-   Alfresco.BlogPostListArchive.prototype =
+   YAHOO.extend(Alfresco.BlogPostListArchive, Alfresco.component.BaseFilter,
    {
       /**
        * Object container for initialization options
@@ -111,47 +96,6 @@
       monthId: null,
 
       /**
-       * Selected filter.
-       * 
-       * @property selectedFilter
-       * @type {element}
-       */
-      selectedFilter: null,
-
-      /**
-       * Flag to indicate whether all controls are deactivated or not.
-       * 
-       * @property controlsDeactivated
-       * @type {boolean}
-       * @default false
-       */
-      controlsDeactivated: false,
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.BlogPostListArchive} returns 'this' for method chaining
-       */
-       setOptions: function BlogPostListArchive_setOptions(obj)
-       {
-          this.options = YAHOO.lang.merge(this.options, obj);
-          return this;
-       },
-       
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function BlogPostListArchive_onComponentsLoaded()
-      {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Registers event handler on 'onTagRefresh' event. If a component wants to refresh
        * the tags component, they need to fire this event.
@@ -160,9 +104,11 @@
        */   
       onReady: function BlogPostListArchive_onReady()
       {
+         Alfresco.BlogPostListArchive.superclass.onReady.call(this);
+         
          var me = this;
          
-         YAHOO.Bubbling.addDefaultAction('archive-link', function(layer, args)
+         YAHOO.Bubbling.addDefaultAction(this.uniqueEventKey, function(layer, args)
          {
             var link = args[1].target;
             if (link && !me.controlsDeactivated)
@@ -181,7 +127,7 @@
                });
             }
             return true;
-         });
+         }, true);
          
          // Kick-off tag population
          if (this.options.siteId && this.options.containerId)
@@ -291,41 +237,11 @@
          }
       },
       
-      /**
-       * Deactivate All Controls event handler
-       *
-       * @method onDeactivateAllControls
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onDeactivateAllControls: function BlogPostListArchive_onDeactivateAllControls(layer, args)
-      {
-         this.controlsDeactivated = true;
-         var controls = YAHOO.util.Selector.query("a.archive-link", this.id + "-body");
-         for (var i = 0, j = controls.length; i < j; i++)
-         {
-            Dom.addClass(controls[i], "disabled");
-         }
-      },
-
 
       /**
        * PRIVATE FUNCTIONS
        */
 
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function BlogPostListArchive__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.BlogPostListArchive", Array.prototype.slice.call(arguments).slice(1));
-      },
-      
       /**
        * Generates the HTML for a month element.
        *
@@ -334,9 +250,8 @@
        */
       _generateMonthMarkup: function BlogPostListArchive__generateTagMarkup(date)
       {
-         
          var html = '<li id="' + this._generateIdFromMonth(date) + '"><span class="nav-label">';
-         html += '<a href="#" class="archive-link nav-link">' + Alfresco.util.formatDate(date, "mmmm yyyy") + '</a>';
+         html += '<a href="#" class="' + this.uniqueEventKey + ' filter-link">' + Alfresco.util.formatDate(date, "mmmm yyyy") + '</a>';
          html += '</span></li>';
          return html;
       },
@@ -362,9 +277,8 @@
       _getMonthFromId: function BlogPostListArchive__getMonthFromId(id)
       {
          // get the date millis part
-         var millis = id.substring((this.id + "-month-").length);
-         millis = parseInt(millis, 10);
+         var millis = parseInt(id.substring((this.id + "-month-").length), 10);
          return new Date(millis);
       }
-   };
+   });
 })();
