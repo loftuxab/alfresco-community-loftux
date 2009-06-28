@@ -29,24 +29,10 @@
     */
    Alfresco.LinkEdit = function(htmlId)
    {
-      /* Mandatory properties */
-      this.name = "Alfresco.LinkEdit";
-      this.id = htmlId;
-      
-      /* Initialise prototype properties */
-      this.widgets = {};
-      this.modules = {};
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["json", "connection", "event", "button", "menu", "editor"], this.onComponentsLoaded, this);
-
-      return this;
+      return Alfresco.LinkEdit.superclass.constructor.call(this, "Alfresco.LinkEdit", htmlId, ["json", "button", "menu"]);
    };
    
-   Alfresco.LinkEdit.prototype =
+   YAHOO.extend(Alfresco.LinkEdit, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -85,63 +71,10 @@
       },
 
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
-
-      /**
        * Stores the data of the currently edited link
        */
       linkData: null,
       
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.LinkEdit} returns 'this' for method chaining
-       */
-      setOptions: function LinkEdit_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.LinkEdit} returns 'this' for method chaining
-       */
-      setMessages: function LinkEdit_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function LinkEdit_onComponentsLoaded()
-      {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -198,7 +131,7 @@
                fn: loadLinkDataSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.loadlinkdata.failure")
+            failureMessage: this.msg("message.loadlinkdata.failure")
          });
       },
 
@@ -288,11 +221,11 @@
          var okButtonLabel = '';
          if (this.options.editMode)
          {
-            okButtonLabel = this._msg('button.update');
+            okButtonLabel = this.msg('button.update');
          }
          else
          {
-            okButtonLabel = this._msg('button.save');
+            okButtonLabel = this.msg('button.save');
          }
          this.widgets.okButton = new YAHOO.widget.Button(this.id + "-ok",
          {
@@ -339,7 +272,7 @@
                fn: this.onFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.savelink.failure"),
+            failureMessage: this.msg("message.savelink.failure"),
             failureCallback:
             {
                fn: this.onFormSubmitFailure,
@@ -366,7 +299,7 @@
                // show a wait message
                this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
                {
-                  text: Alfresco.util.message(this._msg("message.submitting")),
+                  text: Alfresco.util.message(this.msg("message.submitting")),
                   spanClass: "wait",
                   displayTime: 0
                });
@@ -405,7 +338,7 @@
             linkId = response.json.name;
          }
 
-         Alfresco.util.PopupManager.displayMessage({text: this._msg("message.savelink.success")});
+         Alfresco.util.PopupManager.displayMessage({text: this.msg("message.savelink.success")});
          this._loadLinkViewPage(linkId);
       },
 
@@ -439,19 +372,6 @@
             linkId: linkId
          });
          window.location = url;
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function LinkEdit_msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.LinkEdit", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();
