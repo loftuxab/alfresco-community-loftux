@@ -21,18 +21,22 @@ function main()
    var title = page.url.args.title;
    if (title)
    {
-      var context = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args.title;
-      var uri = "/slingshot/wiki/page/" + encodeURIComponent(page.url.templateArgs.site) + "/" + encodeURIComponent(page.url.args.title) + "?context=" + escape(context);
+      var context = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args.title,
+         uri = "/slingshot/wiki/page/" + encodeURIComponent(page.url.templateArgs.site) + "/" + encodeURIComponent(page.url.args.title) + "?context=" + escape(context),
+         connector = remote.connect("alfresco"),
+         result = connector.get(uri);
       
-      var connector = remote.connect("alfresco");
-      var result = connector.get(uri);
       // we allow 200 and 404 as valid responses - any other error then cannot show page
       // the 404 response means we can create a new page for the title
       if (result.status.code == status.STATUS_OK || result.status.code == status.STATUS_NOT_FOUND)
       {
-         var response = eval('(' + result.response + ')');
+         var response = eval('(' + result.response + ')'),
+            myConfig = new XML(config.script);
          
-         response.pagetext = response.pagetext ? stringUtils.stripUnsafeHTML(response.pagetext) : null;
+         if (response.pagetext)
+         {
+            response.pagetext = myConfig.allowUnfilteredHTML == true ? response.pagetext : stringUtils.stripUnsafeHTML(response.pagetext);
+         }
          if (response.versionhistory != undefined)
          {
             response.versionhistory.sort(sortByLabel);
