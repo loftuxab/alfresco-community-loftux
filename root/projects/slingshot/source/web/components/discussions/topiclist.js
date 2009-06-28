@@ -423,7 +423,7 @@
                html += '<span class="nodeAttrValue"><a href="' + topicViewUrl + '">' + me._msg("action.read") + '</a></span>';
                html += '<span class="separator">&nbsp;</span>';
                
-               html += '<span class="nodeAttrLabel tag">' + me._msg("tags.label") +': </span>';
+               html += '<span class="nodeAttrLabel tagLabel">' + me._msg("tags.label") +': </span>';
                if (data.tags.length > 0)
                {
                   for (var x=0; x < data.tags.length; x++)
@@ -638,7 +638,7 @@
             var filterObj =
             {
                filterId: obj.tagName,
-               filterOwner: "Alfresco.DiscussionsTopicListTags",
+               filterOwner: "Alfresco.TagFilter",
                filterData: null
             };
             YAHOO.Bubbling.fire("filterChanged", filterObj);
@@ -839,7 +839,7 @@
                title = this._msg("title.mytopics");
             }
          }
-         else if (filterOwner == "Alfresco.TopicListTags")
+         else if (filterOwner == "Alfresco.TagFilter")
          {
             title = this._msg("title.bytag", $html(filterData));
          }
@@ -1031,7 +1031,7 @@
                 url = "/myposts"
             }
          }
-         else if (filterOwner == "Alfresco.TopicListTags")
+         else if (filterOwner == "Alfresco.TagFilter")
          {
             params.tag = filterData;
          }

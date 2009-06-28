@@ -301,13 +301,7 @@ Alfresco.util.tags.generateTagId = function generateTagId(scope, tagName)
 Alfresco.util.tags.generateTagLink = function generateTagLink(scope, tagName)
 {
     var encodedTagName = Alfresco.util.encodeHTML(tagName);
-    var html = '';
-    html += '<span id="' + Alfresco.util.tags.generateTagId(scope, tagName) + '" class="nodeAttrValue">';
-    html += '<a href="#" class="tag-link" title="' + encodedTagName + '">';
-    html += '<span>' + encodedTagName + '</span>';
-    html += '</a>';
-    html += '</span>';
-    return html;
+    return '<span class="tag"><a href="#" class="tag-link" rel="' + encodedTagName + '" title="' + encodedTagName + '">' + encodedTagName + '</a></span>';
 };
 
 

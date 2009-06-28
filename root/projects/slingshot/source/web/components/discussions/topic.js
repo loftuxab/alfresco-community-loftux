@@ -332,7 +332,7 @@
          html += '<span class="nodeAttrValue">(' + data.totalReplyCount + ')</span>';
          html += '<span class="separator">&nbsp;</span>';
              
-         html += '<span class="nodeAttrLabel tag">' + this._msg("tags.label") +': </span>';
+         html += '<span class="nodeAttrLabel tagLabel">' + this._msg("tags.label") +': </span>';
          if (data.tags.length > 0)
          {
             for (var x=0; x < data.tags.length; x++)
@@ -475,7 +475,7 @@
                site: this.options.siteId,
                container: this.options.containerId,
                filterId: "tag",
-               filterOwner: "Alfresco.TopicListTags",
+               filterOwner: "Alfresco.TagFilter",
                filterData: obj.tagName
             });
 

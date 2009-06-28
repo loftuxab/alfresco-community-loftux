@@ -16,7 +16,7 @@
       <a class="theme-color-1" href="#" id="${args.htmlid}-wiki-link">${msg("label.configure")}</a>
    </div>
 </#if>
-   <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
+   <div class="body scrollablePanel" <#if args.height??>style="height: ${args.height}px;"</#if>>
       <div id="${args.htmlid}-scrollableList" class="rich-content">
 <#if wikipage?exists>
          ${wikipage}

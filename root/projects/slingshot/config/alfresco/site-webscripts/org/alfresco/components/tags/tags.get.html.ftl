@@ -7,20 +7,16 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="tag tagTitle">
-	<h2>${msg("header.title")}</h2>
-	<ul class="filterLink" id="tagFilterLinks">
-	<#if tags?size &gt; 0>
-	   <li class="onTagSelection nav-label" id="${args.htmlid}-onTagSelection-alltags">
-	      <a href="#" class="tag-link nav-link">${msg("label.all-tags")}</a>
-	   </li>   
-      <#list tags as tag>
-      <li class="onTagSelection nav-label" id="${args.htmlid}-onTagSelection-${tag.name}">
-         <a href="#" class="tag-link nav-link">${tag.name}</a>&nbsp;(${tag.count})
-      </li>
-      </#list>
-	<#else>
+<div class="filter tags">
+	<h2 id="${args.htmlid}-h2">${msg("header.title")}</h2>
+	<ul id="${args.htmlid}-ul" class="filterLink">
+<#if tags?size &gt; 0>
+	   <li><span class="tag"><a href="#" class="tag-link" rel="-all-">${msg("label.all-tags")}</a></span></li>
+   <#list tags as tag>
+      <li><span class="tag"><a href="#" class="tag-link" rel="${tag.name?html}">${tag.name?html}</a>&nbsp;(${tag.count})</span></li>
+   </#list>
+<#else>
 	   <li>${msg("label.no-tags")}</li>
-	</#if>
+</#if>
 	</ul>
 </div>

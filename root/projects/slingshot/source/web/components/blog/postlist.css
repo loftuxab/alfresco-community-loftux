@@ -279,7 +279,7 @@
    padding: 4px;
 }
 
-.nodeFooter .tag
+.nodeFooter .tagLabel
 {
    background: transparent url(../images/tag-16.png) no-repeat scroll 0 0;
    padding-left: 20px;

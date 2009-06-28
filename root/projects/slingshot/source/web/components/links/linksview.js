@@ -298,7 +298,7 @@
          html += '</div>';
          
          html += '<div class="nodeFooter">';
-         html += '<span class="nodeAttrLabel tag">' + this._msg("link.tags") + ': </span>';
+         html += '<span class="nodeAttrLabel tagLabel">' + this._msg("link.tags") + ': </span>';
          if (data.tags.length > 0)
          {
             for (var x=0; x < data.tags.length; x++)

@@ -218,19 +218,21 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                 */
                var fnStopEvent = function(id, keyEvent)
                {
-                  var event = keyEvent[1];
-                  if (event.target.tagName == "TEXTAREA")
+                  var event = keyEvent[1],
+                     target = event.target ? event.target : event.srcElement;
+                  
+                  if (target.tagName == "TEXTAREA")
                   {
                      // Allow linefeeds in textareas
                      return false;
                   }
-                  else if (event.target.tagName == "BUTTON")
+                  else if (target.tagName == "BUTTON")
                   {
-                     // Eventlisteners for buttons must be notified that the enter key was entered                   
+                     // Eventlisteners for buttons must be notified that the enter key was entered
                   }
                   else
                   {
-                     var targetName = event.target.name;
+                     var targetName = target.name;
                      if (targetName && (targetName != "-"))
                      {
                         me._submitInvoked(event);
@@ -244,7 +246,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                var enterListener = new KeyListener(form,
                {
                   keys: KeyListener.KEY.ENTER
-               }, fnStopEvent, KeyListener.KEYDOWN);
+               }, fnStopEvent, YAHOO.env.ua.ie > 0 ? KeyListener.KEYDOWN : "keypress");
                enterListener.enable();
             }
             

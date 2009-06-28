@@ -335,13 +335,15 @@
             keys: YAHOO.util.KeyListener.KEY.ENTER
          },
          {
-            fn: function() 
+            fn: function(eventName, event, obj)
             {
                me.onSearchClick();
+               Event.stopEvent(event[1]);
+               return false;
             },
             scope: this,
             correctScope: true
-         }, "keydown");
+         }, YAHOO.env.ua.ie > 0 ? YAHOO.util.KeyListener.KEYDOWN : "keypress");
          enterListener.enable();
          
          // Set initial focus?

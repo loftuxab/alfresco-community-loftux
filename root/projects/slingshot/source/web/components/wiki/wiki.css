@@ -79,12 +79,14 @@ table.versionHistory
    width:5em;
 }
 
-.wiki-page .yui-editor-container,
-.wiki-page .buttons,
-.wiki-page .taglibrary
+.wiki-page .yui-gd .yui-u
 {
-   margin-left:6em;
-   margin-bottom:1em;
+   width: 80% !important;
+}
+
+.wiki-page .yui-gd .yui-u.first
+{
+   width: 5% !important;
 }
 
 /* VERSIONING */
@@ -207,8 +209,8 @@ table.versionHistory
 {
    background: #F0F0F0;
    border-bottom: 1px solid #C5C6C6;
-   height: 2.3em;
-   line-height: 2.3em;
+   height: 2.5em;
+   line-height: 2em;
    padding-top: 0.2em;
 }
 

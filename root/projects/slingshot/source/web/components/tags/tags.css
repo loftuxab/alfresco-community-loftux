@@ -1,18 +1,17 @@
-.tagTitle h2
+.tags h2
 {
    background: url(../images/expanded.png) no-repeat 0% 50%;
    margin-top: 1em;
    padding-left: 1em;
 }
 
-.tag ul
+.tags ul
 {
-   margin-left: 20px;
    padding: 0.5em 0 1em;
 }
 
-.tag li
+.tags li
 {
    overflow: hidden;
-   padding: 2px 0;
+   padding: 4px 0 3px 20px;
 }

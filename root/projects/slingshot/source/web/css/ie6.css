@@ -35,7 +35,7 @@ textarea
    padding-top: 1px;
 }
 
-.header .link-menu-button
+#Share .header .link-menu-button
 {
    border:1px solid #F2F2F2;
    padding-bottom:2px;
@@ -145,9 +145,9 @@ textarea
  * Dashlets
  */
 
-div.dashlet .body
+div.dashlet .scrollableList
 {
-   width: auto;
+   width: 100%;
 }
 
 div.dashlet .profile
@@ -408,6 +408,13 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
    height:2em;  
 }
 
+/* First filter won't get disclosure triangle without this rule */
+
+div.filter
+{
+   position: relative;
+}
+
 
 /**
  * Document Library
@@ -432,15 +439,25 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 .doclist a.simple-link,
 .doclist a.show-more
 {
-   height:16px;
+   border: medium none;
+   height: 16px;
    white-space: nowrap;
    width: 1px;
 }
 
-/* When folder names are too long the layout is destroyed */
-#divDocLibraryFilters
+/* When folder, tag, etc. names are too long the layout is destroyed */
+#divTopicListFilters,
+#divPostListFilters,
+#divDocLibraryFilters,
+#divCalendarFilters,
+#divLinkFilters
 {
    overflow-x: hidden;
+}
+
+.doclib-filter h2
+{
+   background-image: url(../components/images/expanded.png);
 }
 
 .treeview .ygtvchildren
@@ -455,7 +472,13 @@ div.grid.columnSize4.yui-g div.yui-g div.yui-u.first
 
 .copy-to .path .treeview
 {
+   overflow-x: scroll;
    width: 16em;
+}
+
+.move-to .path .treeview
+{
+   overflow-x: scroll;
 }
 
 .workflow .people-finder .results table

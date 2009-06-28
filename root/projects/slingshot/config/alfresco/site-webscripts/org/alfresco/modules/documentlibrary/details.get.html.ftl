@@ -1,11 +1,4 @@
-<#macro mimetypes>
-   <#assign mtConfig = config.scoped["Mimetype Map"]["mimetypes"]>
-   <select>
-   <#list mtConfig.childrenMap["mimetype"] as mt>
-         <option value="${mt.attributes["mimetype"]}">${mt.attributes["display"]}</option>
-   </#list>
-   </select>
-</#macro>
+<#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
 <script type="text/javascript">//<![CDATA[
    new Alfresco.module.DoclibDetails("${args.htmlid}").setMessages(
       ${messages}
@@ -37,12 +30,12 @@
             <h2>${msg("header.tags")}</h2>
          </div>
          <div class="yui-gd">
-            <div class="yui-u first"><label for="${args.htmlid}-tags">${msg("label.tags")}:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-tags" type="text" name="tags" tabindex="5" /><br />${msg("label.tags.hint")}</div>
+            <div class="yui-u first"><label for="${args.htmlid}-tag-input-field">${msg("label.tags")}:</label></div>
+            <div class="yui-u"><@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid /></div>
          </div>
          <div class="bdft">
-            <input type="button" id="${args.htmlid}-ok" value="${msg("button.ok")}" tabindex="6" />
-            <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="7" />
+            <input type="button" id="${args.htmlid}-ok" value="${msg("button.ok")}" tabindex="1001" />
+            <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="1002" />
          </div>
       </form>
    </div>

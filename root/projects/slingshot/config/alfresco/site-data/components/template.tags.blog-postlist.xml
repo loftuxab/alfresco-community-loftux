@@ -3,6 +3,6 @@
    <scope>template</scope>
    <region-id>tags</region-id>
    <source-id>blog-postlist</source-id>
-   <url>/components/blog/tags</url>
+   <url>/components/tag-filter</url>
    <properties></properties>
 </component>
