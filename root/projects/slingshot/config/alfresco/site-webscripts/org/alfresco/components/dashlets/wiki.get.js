@@ -3,13 +3,14 @@
 var wikipage = args.wikipage;
 if (wikipage)
 {
-   var uri = "/slingshot/wiki/page/" + page.url.templateArgs.site + "/" + wikipage + "?format=mediawiki";
-
-   var connector = remote.connect("alfresco");
-   var result = connector.get(uri);
+   var uri = "/slingshot/wiki/page/" + page.url.templateArgs.site + "/" + wikipage + "?format=mediawiki",
+      connector = remote.connect("alfresco"),
+      result = connector.get(uri),
+      myConfig = new XML(config.script);
+   
    if (result.status == status.STATUS_OK)
    {
-      model.wikipage = result.response;
+      model.wikipage = myConfig.allowUnfilteredHTML == true ? result.response : stringUtils.stripUnsafeHTML(result.response);
    }
    
    model.wikiLink = String(wikipage);
