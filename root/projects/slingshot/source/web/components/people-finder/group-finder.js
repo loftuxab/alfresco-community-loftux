@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -52,25 +52,19 @@
     */
    Alfresco.GroupFinder = function(htmlId)
    {
-      this.name = "Alfresco.GroupFinder";
-      this.id = htmlId;
+      Alfresco.GroupFinder.superclass.constructor.call(this, "Alfresco.GroupFinder", htmlId, ["button", "container", "datasource", "datatable", "json"]);
       
       // Initialise prototype properties
-      this.widgets = {};
       this.itemSelectButtons = {};
       this.searchTerm = "";
       this.singleSelectedItem = "";
       this.selectedItems = {};
+      this.notAllowed = {};
 
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
-   
       /**
        * Decoupled event listeners
        */
+      YAHOO.Bubbling.on("itemSelected", this.onItemSelected, this);
       YAHOO.Bubbling.on("itemDeselected", this.onItemDeselected, this);
 
       return this;
@@ -83,7 +77,7 @@
       VIEW_MODE_FULLPAGE: "FULLPAGE"
    });
    
-   Alfresco.GroupFinder.prototype =
+   YAHOO.lang.extend(Alfresco.GroupFinder, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -161,17 +155,17 @@
           * @property addButtonSuffix
           * @type string
           */
-         addButtonSuffix: ""
+         addButtonSuffix: "",
+
+         /**
+          * Override the default data webscript
+          *
+          * @property dataWebScript
+          * @type string
+          */
+         dataWebScript: ""
       },
 
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-      
       /**
        * Object container for storing YUI button instances, indexed by groupname.
        * 
@@ -205,42 +199,13 @@
       selectedItems: null,
 
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.GroupFinder} returns 'this' for method chaining
+       * Groups for whom the action is not allowed
+       * 
+       * @property notAllowed
+       * @type array
        */
-      setOptions: function GroupFinder_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.GroupFinder} returns 'this' for method chaining
-       */
-      setMessages: function GroupFinder_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function GroupFinder_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
+      notAllowed: null,
+
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -269,7 +234,10 @@
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "group-search-button", this.onSearchClick);
 
          // DataSource definition  
-         this.widgets.dataSource = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI + "api/groups?zone=APP.DEFAULT&");
+         var groupSearchUrl = Alfresco.constants.PROXY_URI + YAHOO.lang.substitute(this.options.dataWebScript, this.options);
+         groupSearchUrl += (groupSearchUrl.indexOf("?") < 0) ? "?" : "&";
+         groupSearchUrl += "zone=APP.DEFAULT&";
+         this.widgets.dataSource = new YAHOO.util.DataSource(groupSearchUrl);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
@@ -290,6 +258,12 @@
                if (items.length > me.options.maxSearchResults)
                {
                   items = items.slice(0, me.options.maxSearchResults - 1);
+               }
+
+               me.notAllowed = {};
+               if (oFullResponse.notAllowed)
+               {
+                  me.notAllowed = Alfresco.util.arrayToObject(oFullResponse.notAllowed);
                }
 
                // we need to wrap the array inside a JSON object so the DataTable is happy
@@ -380,10 +354,10 @@
             var desc = '<h3 class="itemname">' + $html(displayName) + '</h3>';
             if (me.options.viewMode !== Alfresco.GroupFinder.VIEW_MODE_COMPACT)
             {
-               desc += '<div class="detail"><span>' + me._msg("label.name") + ":</span> " + $html(oRecord.getData("fullName")) + '</div>';
+               desc += '<div class="detail"><span>' + me.msg("label.name") + ":</span> " + $html(oRecord.getData("fullName")) + '</div>';
                desc += '<div class="detail">';
-               desc += '<span class="item"><span>' + me._msg("label.users") + ":</span> " + $html(oRecord.getData("userCount")) + '</span>';
-               desc += '<span class="item"><span>' + me._msg("label.subgroups") + ":</span> " + $html(oRecord.getData("groupCount")) + '</span>';
+               desc += '<span class="item"><span>' + me.msg("label.users") + ":</span> " + $html(oRecord.getData("userCount")) + '</span>';
+               desc += '<span class="item"><span>' + me.msg("label.subgroups") + ":</span> " + $html(oRecord.getData("groupCount")) + '</span>';
                desc += '</div>';
             }
             elCell.innerHTML = desc;
@@ -403,7 +377,7 @@
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "text-align", "right");
             
-            var itemName = oRecord.getData("shortName");
+            var itemName = oRecord.getData("fullName");
             var desc = '<span id="' + me.id + '-select-' + itemName + '"></span>';
             elCell.innerHTML = desc;
             
@@ -413,9 +387,10 @@
                var button = new YAHOO.widget.Button(
                {
                   type: "button",
-                  label: me._msg("button.add") + me.options.addButtonSuffix,
+                  label: me.msg("button.add") + " " + me.options.addButtonSuffix,
                   name: me.id + "-selectbutton-" + itemName,
                   container: me.id + '-select-' + itemName,
+                  disabled: itemName in me.notAllowed,
                   onclick:
                   {
                      fn: me.onItemSelect,
@@ -449,7 +424,7 @@
          {
             renderLoopSize: 32,
             initialLoad: false,
-            MSG_EMPTY: this._msg("message.instructions")
+            MSG_EMPTY: this.msg("message.instructions")
          });
 
          this.widgets.dataTable.doBeforeLoadData = function GroupFinder_doBeforeLoadData(sRequest, oResponse, oPayload)
@@ -505,26 +480,6 @@
             itemName: itemName,
             displayName: p_obj.getData("displayName")
          });
-         
-         // Add the userName to the selectedItems object
-         this.selectedItems[itemName] = true;
-         this.singleSelectedItem = itemName;
-         
-         // Disable the add button(s)
-         if (this.options.singleSelectMode)
-         {
-            for (var button in this.itemSelectButtons)
-            {
-               if (this.itemSelectButtons.hasOwnProperty(button))
-               {
-                  this.itemSelectButtons[button].set("disabled", true);
-               }
-            }
-         }
-         else
-         {
-            this.itemSelectButtons[itemName].set("disabled", true);
-         }
       },
 
       /**
@@ -541,7 +496,7 @@
          {
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.minimum-length", this.options.minSearchTermLength)
+               text: this.msg("message.minimum-length", this.options.minSearchTermLength)
             });
             return;
          }
@@ -557,13 +512,49 @@
        */
 
       /**
+       * Item Selected event handler
+       *
+       * @method onItemSelected
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onItemSelected: function GroupFinder_onItemSelected(layer, args)
+      {
+         var obj = args[1];
+         // Should be person details in the arguments
+         if (obj && (obj.itemName !== null))
+         {
+            var itemName = obj.itemName;
+            // Add the userName to the selectedItems object
+            this.selectedItems[itemName] = true;
+            this.singleSelectedItem = itemName;
+
+            // Disable the add button(s)
+            if (this.options.singleSelectMode)
+            {
+               for (var button in this.itemSelectButtons)
+               {
+                  if (this.itemSelectButtons.hasOwnProperty(button))
+                  {
+                     this.itemSelectButtons[button].set("disabled", true);
+                  }
+               }
+            }
+            else
+            {
+               this.itemSelectButtons[itemName].set("disabled", true);
+            }
+         }
+      },
+
+      /**
        * Item Deselected event handler
        *
        * @method onItemDeselected
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onItemDeselected: function DL_onItemDeselected(layer, args)
+      onItemDeselected: function GroupFinder_onItemDeselected(layer, args)
       {
          var obj = args[1];
          // Should be item details in the arguments
@@ -620,7 +611,7 @@
          this._setDefaultDataTableErrors(this.widgets.dataTable);
          
          // Don't display any message
-         this.widgets.dataTable.set("MSG_EMPTY", this._msg("message.searching"));
+         this.widgets.dataTable.set("MSG_EMPTY", this.msg("message.searching"));
          
          // Empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
@@ -672,19 +663,6 @@
       _buildSearchParams: function GroupFinder__buildSearchParams(searchTerm)
       {
          return "shortNameFilter=" + (this.options.wildcardPrefix ? "*" : "") + encodeURIComponent(searchTerm);
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function GroupFinder__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.GroupFinder", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();

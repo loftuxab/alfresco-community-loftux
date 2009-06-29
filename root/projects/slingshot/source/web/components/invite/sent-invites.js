@@ -202,7 +202,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "invites",
-             fields: ["inviteId", "inviter", "invitee", "siteShortName", "invitationStatus", "role", "sentInviteDate"]
+             fields: ["inviteId", "invitee", "invitationStatus", "role", "sentInviteDate"]
          };
 
          this.widgets.dataSource.doBeforeParseData = function SentInvites_doBeforeParseData(oRequest, oFullResponse)

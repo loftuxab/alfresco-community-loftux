@@ -7,5 +7,7 @@
    <properties>
       <minSearchTermLength>3</minSearchTermLength>
       <setFocus>true</setFocus>
+      <addButtonSuffix>&gt;&gt;</addButtonSuffix>      
+      <dataWebScript>api/sites/[siteId]/potentialmembers?authorityType=GROUP</dataWebScript>
    </properties>
 </component>

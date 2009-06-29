@@ -5,7 +5,8 @@
       minSearchTermLength: "${args.minSearchTermLength!'3'}",
       maxSearchResults: "${args.maxSearchResults!'100'}",
       setFocus: ${args.setFocus!'false'},
-      addButtonSuffix: "${args.addButtonSuffix!''}"
+      addButtonSuffix: "${args.addButtonSuffix!''}",
+      dataWebScript: "${(args.dataWebScript!'api/people')?replace("[", "{")?replace("]", "}")}"
    }).setMessages(
       ${messages}
    );

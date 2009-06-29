@@ -547,9 +547,17 @@
        */
       _doAddResult: function GroupsList__doAddResult(resultData)
       {
+         // fetch the record to process
+         var record = resultData.recs[resultData.index];
+
          // success handler
          var success = function GroupsList__doAddResult_success(response)
          {
+            YAHOO.Bubbling.fire("itemSelected",
+            {
+               itemName: record.getData("itemName"),
+               displayName: record.getData("displayName")
+            });
             resultData.successes.push(resultData.index);
             resultData.index++;
             this._processResultData(resultData);
@@ -562,13 +570,7 @@
             this._processResultData(resultData);
          };
           
-         // fetch the record to process
-         var record = resultData.recs[resultData.index];
-
          // Repository call for each group
-         /**
-          * TODO (mjh): Ensure the API parameters are correct once the REST API is in place
-          */
          Alfresco.util.Ajax.request(
          {
             url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships",
