@@ -129,26 +129,6 @@ Alfresco.messages = Alfresco.messages ||
 };
 
 /**
- * Trims leading whitespace characters from the beginning and the end,
- * @method Alfresco.util.trim
- * @param str {String} String to trim
- * @return {string} The trimmed string
- * @static
- */
-Alfresco.util.trim = function(str)
-{
-   if(str)
-   {
-      var str = str.replace(/^\s\s*/, ''),
-            ws = /\s/,
-            i = str.length;
-      while (ws.test(str.charAt(--i)));
-      return str.slice(0, i + 1);
-   }
-   return null;
-};
-
-/**
  * Appends an array onto an object
  * @method Alfresco.util.appendArrayToObject
  * @param obj {object} Object to be appended to

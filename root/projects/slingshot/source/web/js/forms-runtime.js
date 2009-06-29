@@ -1049,7 +1049,7 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
       myArgs.max = myArgs.maxLength;
    }
 
-   var length = myArgs.includeWhitespace ? field.value.length : Alfresco.util.trim(field.value).length;
+   var length = myArgs.includeWhitespace ? field.value.length : YAHOO.lang.trim(field.value).length;
    
    if (myArgs.min != -1 && length < myArgs.min)
    {
@@ -1063,7 +1063,7 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
       {
          if(myArgs.includeWhitespace)
          {
-            field.value = Alfresco.util.trim(field.value);
+            field.value = YAHOO.lang.trim(field.value);
          }
          if(field.value.length > myArgs.max)
          {
