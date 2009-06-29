@@ -449,7 +449,7 @@ span.mce_alfresco-imagelibrary
    border-right: 1px #BDBDBD solid;
 }
 
-.yui-skin-default .link-menu-button.link-menu-button-menu-active
+#Share.yui-skin-default .link-menu-button.link-menu-button-menu-active
 {
    background-color: #FFFFFF;
    border: 1px solid #7BA9CE;
