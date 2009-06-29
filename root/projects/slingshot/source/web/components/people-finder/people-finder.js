@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -52,25 +52,19 @@
     */
    Alfresco.PeopleFinder = function(htmlId)
    {
-      this.name = "Alfresco.PeopleFinder";
-      this.id = htmlId;
+      Alfresco.PeopleFinder.superclass.constructor.call(this, "Alfresco.PeopleFinder", htmlId, ["button", "container", "datasource", "datatable", "json"]);
       
       // Initialise prototype properties
-      this.widgets = {};
       this.userSelectButtons = {};
       this.searchTerm = "";
       this.singleSelectedUser = "";
       this.selectedUsers = {};
+      this.notAllowed = {};
 
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
-   
       /**
        * Decoupled event listeners
        */
+      YAHOO.Bubbling.on("personSelected", this.onPersonSelected, this);
       YAHOO.Bubbling.on("personDeselected", this.onPersonDeselected, this);
 
       return this;
@@ -83,7 +77,7 @@
       VIEW_MODE_FULLPAGE: "FULLPAGE"
    });
    
-   Alfresco.PeopleFinder.prototype =
+   YAHOO.lang.extend(Alfresco.PeopleFinder, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -161,17 +155,17 @@
           * @property addButtonSuffix
           * @type string
           */
-         addButtonSuffix: ""
+         addButtonSuffix: "",
+
+         /**
+          * Override the default data webscript
+          *
+          * @property dataWebScript
+          * @type string
+          */
+         dataWebScript: ""
       },
 
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-      
       /**
        * Object container for storing YUI button instances, indexed by username.
        * 
@@ -205,42 +199,13 @@
       selectedUsers: null,
 
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.PeopleFinder} returns 'this' for method chaining
+       * Users for whom the action is not allowed
+       * 
+       * @property notAllowed
+       * @type array
        */
-      setOptions: function PeopleFinder_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.PeopleFinder} returns 'this' for method chaining
-       */
-      setMessages: function PeopleFinder_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function PeopleFinder_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
+      notAllowed: null,
+
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -269,7 +234,8 @@
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
 
          // DataSource definition  
-         var peopleSearchUrl = Alfresco.constants.PROXY_URI + "api/people?";
+         var peopleSearchUrl = Alfresco.constants.PROXY_URI + YAHOO.lang.substitute(this.options.dataWebScript, this.options);
+         peopleSearchUrl += (peopleSearchUrl.indexOf("?") < 0) ? "?" : "&";
          this.widgets.dataSource = new YAHOO.util.DataSource(peopleSearchUrl);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
@@ -285,7 +251,7 @@
             
             if (oFullResponse)
             {
-               var items = oFullResponse.people;
+               var items = oFullResponse.people, i, ii;
 
                // crop item list to max length if required
                if (items.length > me.options.maxSearchResults)
@@ -293,10 +259,10 @@
                   items = items.slice(0, me.options.maxSearchResults-1);
                }
 
-               // Remove the current user form the list?
+               // Remove the current user from the list?
                if (!me.options.showSelf)
                {
-                  for (var i = 0; i < items.length; i++)
+                  for (i = 0, ii == items.length; i < ii; i++)
                   {
                       if (items[i].userName == Alfresco.constants.USERNAME)
                       {
@@ -305,13 +271,19 @@
                       }
                   }
                }
-
+               
                // Sort the user list by name
                items.sort(function (user1, user2){
                   var name1 = user1.firstName + user1.lastName,
                      name2 = user2.firstName + user2.lastName;
                   return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
                });
+               
+               me.notAllowed = {};
+               if (oFullResponse.notAllowed)
+               {
+                  me.notAllowed = Alfresco.util.arrayToObject(oFullResponse.notAllowed);
+               }
 
                // we need to wrap the array inside a JSON object so the DataTable is happy
                updatedResponse =
@@ -429,7 +401,7 @@
                }
                else
                {
-                  desc += '<div class="detail"><span>' + me._msg("label.title") + ":</span> " + $html(title) + '</div>';
+                  desc += '<div class="detail"><span>' + me.msg("label.title") + ":</span> " + $html(title) + '</div>';
                }
             }
             if (organisation.length !== 0)
@@ -440,7 +412,7 @@
                }
                else
                {
-                  desc += '<div class="detail"><span>' + me._msg("label.company") + ":</span> " + $html(organisation) + '</div>';
+                  desc += '<div class="detail"><span>' + me.msg("label.company") + ":</span> " + $html(organisation) + '</div>';
                }
             }
             elCell.innerHTML = desc;
@@ -470,9 +442,10 @@
                var button = new YAHOO.widget.Button(
                {
                   type: "button",
-                  label: me._msg("button.add") + me.options.addButtonSuffix,
+                  label: me.msg("button.add") + " " + me.options.addButtonSuffix,
                   name: me.id + "-selectbutton-" + userName,
                   container: me.id + '-select-' + userName,
+                  disabled: userName in me.notAllowed,
                   onclick:
                   {
                      fn: me.onPersonSelect,
@@ -506,7 +479,7 @@
          {
             renderLoopSize: 32,
             initialLoad: false,
-            MSG_EMPTY: this._msg("message.instructions")
+            MSG_EMPTY: this.msg("message.instructions")
          });
 
          this.widgets.dataTable.doBeforeLoadData = function PeopleFinder_doBeforeLoadData(sRequest, oResponse, oPayload)
@@ -564,26 +537,6 @@
             lastName: p_obj.getData("lastName"),
             email: p_obj.getData("email")
          });
-         
-         // Add the userName to the selectedUsers object
-         this.selectedUsers[userName] = true;
-         this.singleSelectedUser = userName;
-         
-         // Disable the add button(s)
-         if (this.options.singleSelectMode)
-         {
-            for (var button in this.userSelectButtons)
-            {
-               if (this.userSelectButtons.hasOwnProperty(button))
-               {
-                  this.userSelectButtons[button].set("disabled", true);
-               }
-            }
-         }
-         else
-         {
-            this.userSelectButtons[userName].set("disabled", true);
-         }
       },
 
       /**
@@ -600,7 +553,7 @@
          {
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.minimum-length", this.options.minSearchTermLength)
+               text: this.msg("message.minimum-length", this.options.minSearchTermLength)
             });
             return;
          }
@@ -617,13 +570,49 @@
        */
 
       /**
+       * Person Selected event handler
+       *
+       * @method onPersonSelected
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onPersonSelected: function PeopleFinder_onPersonSelected(layer, args)
+      {
+         var obj = args[1];
+         // Should be person details in the arguments
+         if (obj && (obj.userName !== null))
+         {
+            var userName = obj.userName;
+            // Add the userName to the selectedUsers object
+            this.selectedUsers[userName] = true;
+            this.singleSelectedUser = userName;
+         
+            // Disable the add button(s)
+            if (this.options.singleSelectMode)
+            {
+               for (var button in this.userSelectButtons)
+               {
+                  if (this.userSelectButtons.hasOwnProperty(button))
+                  {
+                     this.userSelectButtons[button].set("disabled", true);
+                  }
+               }
+            }
+            else
+            {
+               this.userSelectButtons[userName].set("disabled", true);
+            }
+         }
+      },
+
+      /**
        * Person Deselected event handler
        *
        * @method onPersonDeselected
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onPersonDeselected: function DL_onPersonDeselected(layer, args)
+      onPersonDeselected: function PeopleFinder_onPersonDeselected(layer, args)
       {
          var obj = args[1];
          // Should be person details in the arguments
@@ -680,7 +669,7 @@
          this._setDefaultDataTableErrors(this.widgets.dataTable);
          
          // Don't display any message
-         this.widgets.dataTable.set("MSG_EMPTY", this._msg("message.searching"));
+         this.widgets.dataTable.set("MSG_EMPTY", this.msg("message.searching"));
          
          // Empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
@@ -731,19 +720,6 @@
       _buildSearchParams: function PeopleFinder__buildSearchParams(searchTerm)
       {
          return "filter=" + encodeURIComponent(searchTerm) + "&maxResults=" + this.options.maxSearchResults;
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function PeopleFinder__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.PeopleFinder", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();

@@ -344,7 +344,7 @@
       /**
        * Returns the role label for a given record.
        */
-      getRoleLabel: function(record)
+      getRoleLabel: function InvitationList_getRoleLabel(record)
       {
          if (record.getData("role") !== undefined)
          {
@@ -397,7 +397,7 @@
       /**
        * Select all roles dropdown
        */
-      onSelectAllRoles: function DL_onFileSelect(sType, aArgs, p_obj)
+      onSelectAllRoles: function InvitationList_onFileSelect(sType, aArgs, p_obj)
       {
          var value = aArgs[1].value;
          if (value === "")
@@ -553,9 +553,16 @@
        */
       _doInviteUser: function InvitationList__doInviteUser(inviteData)
       {
+         // fetch the record to process
+         var record = inviteData.recs[inviteData.index];
+         
          // success handler
          var success = function InvitationList__doInviteUser_success(response)
          {
+            YAHOO.Bubbling.fire("onPersonSelected",
+            {
+               userName: record.getData("userName")
+            })
             inviteData.successes.push(inviteData.index);
             inviteData.index++;
             this._processInviteData(inviteData);
@@ -568,9 +575,6 @@
             this._processInviteData(inviteData);
          };
           
-         // fetch the record to process
-         var record = inviteData.recs[inviteData.index];
-         
          // We have to do a backend call for each invited person
          var serverPath = window.location.protocol + "//" + window.location.host + Alfresco.constants.URL_CONTEXT;
 
