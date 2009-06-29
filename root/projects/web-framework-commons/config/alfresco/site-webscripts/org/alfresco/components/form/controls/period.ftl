@@ -27,17 +27,19 @@
 })();
 //]]></script>
 
-<#if form.mode == "view">
-   <div class="viewmode-field">
-      <span class="viewmode-label">${field.label?html}:</span>
-      <span class="viewmode-value" id="${controlId}"></span>
-   </div>
-<#else>
-   <label for="${fieldHtmlId}-when">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
-   <input id="${fieldHtmlId}" name="${field.name}" type="hidden" value="${field.value}"/>
-   <div id="${controlId}" class="period">
-      <span>${msg("form.control.period.type")}</span><select id="${controlId}-type" name="-"></select>
-      <span>${msg("form.control.period.expression")}</span><input id="${controlId}-expression" name="-" type="text" />
-   </div>
-</#if>
-              
+<div class="form-field">
+   <#if form.mode == "view">
+      <div class="viewmode-field">
+         <span class="viewmode-label">${field.label?html}:</span>
+         <span class="viewmode-value" id="${controlId}"></span>
+      </div>
+   <#else>
+      <label for="${fieldHtmlId}-when">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
+      <input id="${fieldHtmlId}" name="${field.name}" type="hidden" value="${field.value}"/>
+      <div id="${controlId}" class="period">
+         <span>${msg("form.control.period.type")}</span><select id="${controlId}-type" name="-"></select>
+         <span>${msg("form.control.period.expression")}</span><input id="${controlId}-expression" name="-" type="text" />
+      </div>
+   </#if>
+</div>
+     

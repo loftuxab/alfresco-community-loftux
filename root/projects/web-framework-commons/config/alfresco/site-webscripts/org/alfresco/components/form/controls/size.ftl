@@ -11,9 +11,11 @@
    <#assign size=field.value>
 </#if>
 
-<div class="viewmode-field">
-   <span class="viewmode-label">${msg("form.control.size.label")}:</span>
-   <span id="${fieldHtmlId}" class="viewmode-value"></span>
+<div class="form-field">
+   <div class="viewmode-field">
+      <span class="viewmode-label">${msg("form.control.size.label")}:</span>
+      <span id="${fieldHtmlId}" class="viewmode-value"></span>
+   </div>
 </div>
 
 <script type="text/javascript">//<![CDATA[

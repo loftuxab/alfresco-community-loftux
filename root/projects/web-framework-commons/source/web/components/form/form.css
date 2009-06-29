@@ -23,20 +23,22 @@
 .form-container input
 {
    clear: both;
-   margin-bottom: 1em;
    width: 30em;
 }
 
 .form-container textarea
 {
-   margin-bottom: 1em;
    width: 30em;
 }
 
 .form-container select
 {
-   margin-bottom: 1em;
    width: auto;
+}
+
+.form-container .form-field
+{
+   margin: 0 0 1em 0;
 }
 
 .form-container .missing-options
@@ -144,7 +146,7 @@
 
 .form-container .format-info
 {
-   margin-bottom: 0.6em;
+   margin-bottom: 0;
 }
 
 .form-container .date-format
