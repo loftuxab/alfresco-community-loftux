@@ -652,6 +652,8 @@
           * columnInfo object that the Column Browser understands
           *
           * @method onBuildColumnInfo
+          * @param serverResponse Respons from the server containing column data
+          * @param itemInfo The parent item that was clicked to get the column data
           */
          onBuildColumnInfo: function ConsoleGroups_SearchPanelHandler_onBuildColumnInfo(serverResponse, itemInfo)
          {
@@ -1083,7 +1085,7 @@
          {
             var headerButtons = [
                {
-                  title: parent._msg("button.newgroup"),
+                  title: (itemInfo ? parent._msg("button.newsubgroup") : parent._msg("button.newgroup")),
                   cssClass: "groups-newgroup-button",
                   click: {
                      fn: this.onNewGroupClick,

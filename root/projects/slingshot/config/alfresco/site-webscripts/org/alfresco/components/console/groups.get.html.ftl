@@ -77,7 +77,7 @@
          </div>
       </div>
 
-      <!-- Remove Group Dialog -->
+      <!-- Delete Group Dialog -->
       <div id="${el}-deletegroupdialog" class="groups remove-dialog hidden">
          <div class="hd">${msg("panel.deletegroup.header")}</div>
          <div class="bd">
@@ -113,7 +113,7 @@
                </div>
             </div>
             <div class="bdft">
-               <input type="submit" id="${el}-remove-button" value="${msg("button.remove")}"/>
+               <input type="submit" id="${el}-remove-button" value="${msg("button.delete")}"/>
                <input type="button" id="${el}-cancel-button" value="${msg("button.cancel")}"/>
             </div>
          </div>
