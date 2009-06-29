@@ -1454,7 +1454,7 @@
          _createGroup: function ConsoleGroups_CreatePanelHandler__createGroup(successHandler)
          {
             var me = this;
-            var shortName = Alfresco.util.trim(Dom.get(parent.id + "-create-shortname").value);
+            var shortName = YAHOO.lang.trim(Dom.get(parent.id + "-create-shortname").value);
             parent.getParentGroups(shortName,
             {
                fn: function(groups)
@@ -1528,8 +1528,8 @@
          _createGroupAfterExistCheck: function ConsoleGroups_CreatePanelHandler__createGroupAfterExistCheck(successHandler)
          {
             // gather up the data for our JSON PUT request
-            var shortName = Alfresco.util.trim(Dom.get(parent.id + "-create-shortname").value);
-            var displayName = Alfresco.util.trim(Dom.get(parent.id + "-create-displayname").value);
+            var shortName = YAHOO.lang.trim(Dom.get(parent.id + "-create-shortname").value);
+            var displayName = YAHOO.lang.trim(Dom.get(parent.id + "-create-displayname").value);
             displayName = displayName == "" ? undefined : displayName;
             var groupObj = {};
 
@@ -1827,7 +1827,7 @@
          {
             this.updateGroupRequest(parent.group,
             {
-               displayName: Alfresco.util.trim(Dom.get(parent.id + "-update-displayname").value)
+               displayName: YAHOO.lang.trim(Dom.get(parent.id + "-update-displayname").value)
             },
             {
                fn: successHandler,
