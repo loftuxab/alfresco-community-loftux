@@ -5,7 +5,7 @@
    {
       <#if form.mode == "view" || field.disabled>disabled: true,</#if>
       compactMode: ${compactMode?string},
-      mandatory: ${field.endpointMandatory?string},
+      <#if field.endpointMandatory??>mandatory: ${field.endpointMandatory?string},</#if>
       currentValue: "${field.value}",
       minSearchTermLength: "${args.minSearchTermLength!'3'}",
       maxSearchResults: "${args.maxSearchResults!'100'}"
