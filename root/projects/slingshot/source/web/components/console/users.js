@@ -425,6 +425,7 @@
          onLoad: function onLoad()
          {
             // Buttons
+            parent.widgets.gobackButton = Alfresco.util.createYUIButton(parent, "goback-button", parent.onGoBackClick);
             parent.widgets.deleteuserButton = Alfresco.util.createYUIButton(parent, "deleteuser-button", parent.onDeleteUserClick);
             parent.widgets.edituserButton = Alfresco.util.createYUIButton(parent, "edituser-button", parent.onEditUserClick);
          },
@@ -1291,7 +1292,19 @@
          var userid = args[1].username;
          this.refreshUIState({"panel": "view", "userid": userid});
       },
-      
+
+      /**
+       * Go back button click event handler
+       *
+       * @method onGoBackClick
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onGoBackClick: function ConsoleUsers_onGoBackClick(e, args)
+      {
+         this.refreshUIState({"panel": "search"});
+      },
+
       /**
        * Delete User button click event handler
        *
