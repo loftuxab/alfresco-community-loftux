@@ -5,6 +5,9 @@ mysql
 ALF_IMG
 <%InstallDir%>/ImageMagick
 
+ALF_MYSQL
+<%InstallDir%>/mysql
+
 ALF_RMIPORT
 50500
 
@@ -2562,6 +2565,9 @@ File ::5896B96E-D629-403B-B025-EE8DDBAF0E1E -name servlet-api.jar -parent 933F62
 File ::1112380C-3716-4D2B-A306-5E33169341B1 -name alfresco-core-3.2_dev.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
 File ::32AFFE81-E188-4562-A8B8-4CB7CC740D38 -name alfresco-jndi-client-3.2_dev.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
 File ::C2C478FC-267B-4645-96F5-4D59ED595338 -name alfresco-repository-3.2_dev.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
+File ::91EA240E-D529-4122-93EA-94695C12BBE2 -name alfresco-core-3.2.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
+File ::4517A6A2-6621-4556-8AE4-28B0AA0CA136 -name alfresco-jndi-client-3.2.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
+File ::2A3420C0-CDF2-4B40-8982-59D2CEC108D5 -name alfresco-repository-3.2.jar -parent 933F62BF-BBB1-4D7A-A120-BA48D6F757A2
 File ::82939A2E-1CF4-44BF-AB23-83E0B3C21195 -type dir -name conf -parent 3A9C34F9-0AE2-4F1C-9AB9-3BAE8BC4858C
 File ::692E4170-8A10-4860-A11D-56E8F7470EC0 -name alfresco-jmxrmi.access -parent 82939A2E-1CF4-44BF-AB23-83E0B3C21195
 File ::BD3CE02E-BD00-408A-91AE-93AE4BE4350B -name alfresco-jmxrmi.password -parent 82939A2E-1CF4-44BF-AB23-83E0B3C21195
@@ -3872,7 +3878,7 @@ InstallComponent 95BB0407-03A2-493A-B74A-133E8F7F111A -setup Install -type actio
 InstallComponent 9103325D-9719-4A25-87AE-B14FE9E12609 -setup Install -type action -conditions 78477F30-E4C0-40BC-BA73-3F7526414A57 -title {Write Setpaths} -component WriteTextToFile -command insert -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
 Condition 78477F30-E4C0-40BC-BA73-3F7526414A57 -active Yes -parent 9103325D-9719-4A25-87AE-B14FE9E12609 -title {String Is Condition} -component StringIsCondition -TreeObject::id 78477F30-E4C0-40BC-BA73-3F7526414A57
 InstallComponent A7A67250-725D-453B-94A7-3384D68498D3 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
-InstallComponent A679983A-9E44-4848-AE89-1571B8FD6229 -setup Install -type pane -conditions {6AD46333-4FF3-48A6-A054-61D16F32A431 D4D47D94-3A94-47CD-AD89-6101CC515BE4} -title {Installing Java} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent A679983A-9E44-4848-AE89-1571B8FD6229 -setup Install -type pane -conditions {6AD46333-4FF3-48A6-A054-61D16F32A431 D4D47D94-3A94-47CD-AD89-6101CC515BE4} -title {Installing Java} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
 Condition 6AD46333-4FF3-48A6-A054-61D16F32A431 -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 6AD46333-4FF3-48A6-A054-61D16F32A431
 Condition D4D47D94-3A94-47CD-AD89-6101CC515BE4 -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229 -title {String Is Condition} -component StringIsCondition -TreeObject::id D4D47D94-3A94-47CD-AD89-6101CC515BE4
 InstallComponent C106AE81-88CA-44E9-8B7C-37C6579863FF -setup Install -type action -title {Execute JDK Install} -component ExecuteExternalProgram -command reorder -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
@@ -3885,23 +3891,23 @@ Condition 8E1EFCAF-14C0-4649-999A-AEACDA8E4203 -active No -parent 3C654D54-8DFB-
 InstallComponent BFE9EF55-8DDE-4A48-A848-02EB9F58FE38 -setup Install -type action -conditions 408A2212-FC97-4BCD-9A91-9AFBDB442052 -title {Message Box} -component MessageBox -command insert -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 Condition 408A2212-FC97-4BCD-9A91-9AFBDB442052 -active Yes -parent BFE9EF55-8DDE-4A48-A848-02EB9F58FE38 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 408A2212-FC97-4BCD-9A91-9AFBDB442052
 InstallComponent 319487D5-991A-4544-9CB7-69BDA7BC5617 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
-InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -title {Installing OO} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
+InstallComponent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -setup Install -type pane -conditions 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -title {Installing OO} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
 Condition 8C05E8E9-4358-4BBB-B89A-57FA88483ABA -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8C05E8E9-4358-4BBB-B89A-57FA88483ABA
 InstallComponent 71CA18D3-6126-4F6A-A65A-54E4DBB1BDD5 -setup Install -type action -title {Execute OO Install} -component ExecuteExternalProgram -command reorder -active No -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 InstallComponent A7CCD851-05EF-4236-8321-7766DF06A256 -setup Install -type action -title {Unzip File} -component UnzipFile -command reorder -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -title {Delete File} -component DeleteFile -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D
 InstallComponent 7F2F989E-9F6C-4CAC-AFF2-A925549A20D2 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
-InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane -conditions {238C7BD9-0EDF-4953-BC37-C32F5C2D089D E95B44DE-53E1-4944-AEE6-C2D89CCA323B} -title {Connect MySQL} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane -conditions {238C7BD9-0EDF-4953-BC37-C32F5C2D089D E95B44DE-53E1-4944-AEE6-C2D89CCA323B} -title {Connect MySQL} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
 Condition 238C7BD9-0EDF-4953-BC37-C32F5C2D089D -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 238C7BD9-0EDF-4953-BC37-C32F5C2D089D
 Condition E95B44DE-53E1-4944-AEE6-C2D89CCA323B -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id E95B44DE-53E1-4944-AEE6-C2D89CCA323B
 InstallComponent 702B15CC-0F7B-4BF0-9498-7C1BE3A26C18 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE
 InstallComponent E230D053-6033-4990-B404-368AAA25BE36 -setup Install -type action -title {Create Checkbutton} -component AddWidget -command reorder -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE
-InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 3907E462-D52C-48BA-A959-7B629D58FF6F} -title {Check DB Port} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 3907E462-D52C-48BA-A959-7B629D58FF6F} -title {Check DB Port} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
 Condition 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8
 Condition 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Port Test Condition} -component PortTestCondition -TreeObject::id 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631
 Condition 3907E462-D52C-48BA-A959-7B629D58FF6F -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Port Test Condition} -component PortTestCondition -TreeObject::id 3907E462-D52C-48BA-A959-7B629D58FF6F
-InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {8945FF90-FE58-47F6-A4C7-97F8E8DDC075 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command insert -alias OOLocation -active Yes -parent StandardInstall
+InstallComponent 73EBD608-2E51-4D77-A456-569367970EA1 -setup Install -type pane -conditions {8945FF90-FE58-47F6-A4C7-97F8E8DDC075 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 87245761-D5F3-470A-9E78-B56E97ADD1AF} -title OOLocation -component SelectDestination -operator OR -command reorder -alias OOLocation -active Yes -parent StandardInstall
 Condition 8945FF90-FE58-47F6-A4C7-97F8E8DDC075 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8945FF90-FE58-47F6-A4C7-97F8E8DDC075
 Condition 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3 -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 24B2E02C-BE75-4F0F-80E7-AC2B4826D1F3
 Condition 87245761-D5F3-470A-9E78-B56E97ADD1AF -active Yes -parent 73EBD608-2E51-4D77-A456-569367970EA1 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id 87245761-D5F3-470A-9E78-B56E97ADD1AF
@@ -4095,7 +4101,7 @@ No
 <%InstallDir%>
 
 07D6DE98-FC0F-4F51-AE10-75314D0B4651,FileSize
-890608
+890579
 
 07D6DE98-FC0F-4F51-AE10-75314D0B4651,Name
 SPP
@@ -4253,7 +4259,7 @@ CreateQuickLaunchShortcut
 1
 
 238C7BD9-0EDF-4953-BC37-C32F5C2D089D,Filename
-<%InstallDir%>/mysql
+<%ALF_MYSQL%>
 
 238C7BD9-0EDF-4953-BC37-C32F5C2D089D,Operator
 {does not exist}
@@ -4358,7 +4364,7 @@ false
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-25559147
+25615718
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -4659,7 +4665,7 @@ Yes
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-117598708
+115518079
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
@@ -5014,7 +5020,7 @@ CreateQuickLaunchShortcut
 <%JavaInstaller%>
 
 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8,Filename
-<%InstallDir%>/mysql
+<%ALF_MYSQL%>
 
 6BFC63DF-E301-4FCB-8B01-BDFB6DF5068C,BackButton,subst
 1
@@ -6922,6 +6928,12 @@ SET JAVA_HOME=<%Dir <%JavaInstallDir%> platform%>}
 
 4489F0C1-C985-41F0-B4A9-90868A73FE8E,Title
 <%ApplicationReadmeText%>
+
+4EFE7BCF-E649-49F5-AFC9-487CE1DD4C88,Message
+{Continue as <%InstallDir%>/mysql/my.ini not found}
+
+4EFE7BCF-E649-49F5-AFC9-487CE1DD4C88,Title
+Test
 
 5B9B98D5-D2EE-44DD-898C-99A7F0714878,Text
 <%CreateDesktopShortcutText%>
