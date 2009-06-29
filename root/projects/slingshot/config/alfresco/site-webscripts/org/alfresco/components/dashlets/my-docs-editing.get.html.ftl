@@ -52,7 +52,7 @@
             <div class="details">
                <h4><@doclibUrl doc /></h4>
                <div>
-                  ${msg("text.editing-since", doc.modifiedOn?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("dd MMM, yyyy HH:mm"))}
+                  ${msg("text.editing-since", doc.modifiedOn?datetime("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")?string("dd MMM, yyyy HH:mm"), doc.location.siteTitle)}
                </div>
             </div>
          </div>
