@@ -105,11 +105,11 @@ hr
 
 .dashlet .title
 {
-   background-color: #d7e0e7;
+   background-color: #92c15f;
    background-image: url(images/dashlet-title-bg.png);
    background-repeat: repeat-x;
    border-bottom: 1px dashed #bababa;
-   color: #262d35;
+   color: #fff;
 }
 
 .dashlet .feed
@@ -331,7 +331,7 @@ textarea
 .toolbar .link a:hover,
 .members-bar .member-link a:hover
 {
-   color:#66BC29;
+   color:#009300;
 }
 
 
@@ -434,10 +434,10 @@ textarea
    border-right: 1px #BDBDBD solid;
 }
 
-.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active
+#Share.yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active
 {
    background-color: #FFFFFF;
-   border: 1px solid #7BA9CE;
+   border: 1px solid #008F22;
 }
 
 .yui-skin-greenTheme .link-menu-button.link-menu-button-menu-active .yui-menu-button.yui-menu-button-hover
@@ -458,8 +458,10 @@ body.yui-skin-greenTheme .nodeEdit .onDeleteBlogPost a:hover
 
 }
 
-.webview .title a {
-   color:#262D35;
+.webview .title a,
+.wiki .title a
+{
+   color:#fff;
 }
 
 /* YUI Menu */
@@ -501,12 +503,15 @@ body.yui-skin-greenTheme .doclist tr.yui-dt-even.yui-dt-highlighted,
 body.yui-skin-greenTheme .links-body tr.links-selected-row,
 body.yui-skin-greenTheme .over,
 .postview,
-.topicview,
-.site-members .search-controls
+.topicview
 {
    background-color: #F7FEF4;
 }
 
+.site-members .search-controls
+{
+   background-color: #F5F5F5;
+}
 body.yui-skin-greenTheme .doclist tr.yui-dt-odd.yui-dt-highlighted td.yui-dt-last,
 body.yui-skin-greenTheme .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
 {
@@ -535,7 +540,8 @@ body.yui-skin-greenTheme .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-la
 .yui-skin-greenTheme .tags li.selected,
 .archive li.selected,
 .tool li.selected,
-body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected
+body.yui-skin-greenTheme .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected,
+#Share.yui-skin-greenTheme .treeview .selected
 {
    background-color:#D4F8C4;
 }
