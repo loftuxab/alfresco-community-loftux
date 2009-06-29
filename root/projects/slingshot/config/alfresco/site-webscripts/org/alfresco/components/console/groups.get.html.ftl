@@ -132,6 +132,7 @@
          </div>
       </div>
 
+      <form id="${el}-create-form">                  
       <div id="${el}-create-main" class="create-main">
          <!-- Each info section separated by a header-bar div -->
          <div class="header-bar">${msg("label.properties")}</div>
@@ -145,7 +146,7 @@
             <span class="crud-label">${msg("label.displayname")}:&nbsp;*</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-create-displayname" type="text" maxlength="256" />
+            <input class="crud-input" id="${el}-create-displayname" type="text" maxlength="255" />
          </div>
       </div>
 
@@ -166,6 +167,7 @@
             </span>
          </div>
       </div>
+      </form>
    </div>
    
 
@@ -180,6 +182,7 @@
          </div>
       </div>
 
+      <form id="${el}-update-form">
       <div id="${el}-update-main" class="update-main">
          <!-- Each info section separated by a header-bar div -->
          <div class="header-bar">${msg("label.properties")}</div>
@@ -193,7 +196,7 @@
             <span class="crud-label">${msg("label.displayname")}:&nbsp;*</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-update-displayname" type="text" maxlength="256" />
+            <input class="crud-input" id="${el}-update-displayname" type="text" maxlength="255" />
          </div>
       </div>
 
@@ -209,6 +212,7 @@
             </span>
          </div>
       </div>
+      </form>
    </div>
 
 </div>
