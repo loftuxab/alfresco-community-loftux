@@ -76,7 +76,7 @@
          </div>
       </div>
       
-      <div id="${el}-view-main" class="view-main">
+      <div id="${el}-view-main" class="view-main separator">
          <!-- Each info section separated by a header-bar div -->
          <div class="header-bar">${msg("label.about")}</div>
          <div class="photo-row">
@@ -157,6 +157,15 @@
          <div class="field-row">
             <span class="field-label-right">${msg("label.usage")}:</span>
             <span id="${el}-view-usage" class="field-value"></span>
+         </div>
+      </div>
+
+      <div class="yui-g">
+         <!-- Cancel view user button -->
+         <div class="goback-button">
+            <span class="yui-button yui-push-button" id="${el}-goback-button">
+               <span class="first-child"><button>${msg("button.goback")}</button></span>
+            </span>
          </div>
       </div>
    </div>
