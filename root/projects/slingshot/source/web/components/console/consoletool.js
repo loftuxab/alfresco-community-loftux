@@ -60,7 +60,8 @@
          this.id = id;
          this.widgets = {};
          this.modules = {};
-         
+         this.forms = {};
+
          // register the panel with the parent object
          parent.panels.push(this);
       };
@@ -85,7 +86,15 @@
           * @type object
           */
          modules: {},
-         
+
+         /**
+          * Object container for storing form instances.
+          *
+          * @property forms
+          * @type object
+          */
+         forms: {},
+
          /**
           * Event handler - called once only when panel first initialised
           * @method onLoad

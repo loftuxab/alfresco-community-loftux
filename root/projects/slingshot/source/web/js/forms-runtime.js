@@ -1035,7 +1035,8 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
    {
       min: -1,
       max: -1,
-      crop: false
+      crop: false,
+      includeWhitespace: true
    }, args);
    
    if (myArgs.minLength)
@@ -1048,7 +1049,7 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
       myArgs.max = myArgs.maxLength;
    }
 
-   var length = field.value.length;
+   var length = myArgs.includeWhitespace ? field.value.length : Alfresco.util.trim(field.value).length;
    
    if (myArgs.min != -1 && length < myArgs.min)
    {
@@ -1060,7 +1061,14 @@ Alfresco.forms.validation.length = function length(field, args, event, form, sil
       valid = false;
       if (myArgs.crop)
       {
-         field.value = field.value.substring(0, myArgs.max);
+         if(myArgs.includeWhitespace)
+         {
+            field.value = Alfresco.util.trim(field.value);
+         }
+         if(field.value.length > myArgs.max)
+         {
+            field.value = field.value.substring(0, myArgs.max);
+         }
          if (field.type && field.type == "textarea")
          {
             field.scrollTop = field.scrollHeight;

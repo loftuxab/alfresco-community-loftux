@@ -1281,24 +1281,6 @@
           */
          onLoad: function ConsoleGroups_CreatePanelHandler_onLoad()
          {
-            var me = this;
-            var validFields = [];
-            var onFieldKeyUp = function onFieldKeyUp(e)
-            {
-               validFields[this.id] = (this.value.length !== 0);
-               var valid = true;
-               for (var i in validFields)
-               {
-                  if (validFields[i] == false)
-                  {
-                     valid = false;
-                     break;
-                  }
-               }
-               me.widgets.creategroupOkButton.set("disabled", !valid);
-               me.widgets.creategroupAnotherButton.set("disabled", !valid);
-            };
-
             // Buttons
             this.widgets.creategroupOkButton = new YAHOO.widget.Button(parent.id + "-creategroup-ok-button", {});
             this.widgets.creategroupOkButton.on("click", this.onCreateGroupOKClick, null, this);
@@ -1311,11 +1293,33 @@
             this.widgets.creategroupCancelButton = new YAHOO.widget.Button(parent.id + "-creategroup-cancel-button", {});
             this.widgets.creategroupCancelButton.on("click", this.onCreateGroupCancelClick, null, this);
 
-            // Event handlers for mandatory fields
-            validFields[parent.id + "-create-shortname"] = false;
-            Event.on(parent.id + "-create-shortname", "keyup", onFieldKeyUp);
-            validFields[parent.id + "-create-displayname"] = false;
-            Event.on(parent.id + "-create-displayname", "keyup", onFieldKeyUp);
+            // Form definition
+            var form = new Alfresco.forms.Form(parent.id + "-create-form");
+            form.setSubmitElements([this.widgets.creategroupOkButton, this.widgets.creategroupAnotherButton]);
+            form.setShowSubmitStateDynamically(true);
+
+            // Form field validation
+            form.addValidation(parent.id + "-create-shortname", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-create-shortname", Alfresco.forms.validation.nodeName, null, "keyup");
+            form.addValidation(parent.id + "-create-shortname", Alfresco.forms.validation.length,
+            {
+               min: 3,
+               max: 255,
+               crop: true,
+               includeWhitespace: false
+            }, "keyup");
+            form.addValidation(parent.id + "-create-displayname", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-create-displayname", Alfresco.forms.validation.length,
+            {
+               min: 3,
+               max: 255,
+               crop: true,
+               includeWhitespace: false
+            }, "keyup");
+
+            // Initialize form
+            form.init();
+            this.forms.createForm = form;
 
          },
 
@@ -1329,16 +1333,23 @@
             // Hide the main panel area before it is displayed - so we don't show
             // old data to the user before the onShow() method paints the results
             Dom.setStyle(parent.id + "-create-main", "visibility", "hidden");
+            this.clear();
+         },
 
-            var fnClearEl = function(id)
+         /**
+          * Clears the form fields, makes sure buttons are in correct state and sets focus
+          *
+          * @method clear
+          */
+         clear: function clear()
+         {
+            Dom.get(parent.id + "-create-shortname").value = "";
+            Dom.get(parent.id + "-create-displayname").value = "";
+            Dom.get(parent.id + "-create-shortname").focus();
+            if (this.forms.createForm !== null)
             {
-               Dom.get(parent.id + id).value = "";
-            };
-
-            // clear data fields
-            fnClearEl("-create-shortname");
-            fnClearEl("-create-displayname");
-
+               this.forms.createForm.init();
+            }
          },
 
          /**
@@ -1424,9 +1435,7 @@
                });
 
                // Clear old values so new ones can be entered
-               Dom.get(parent.id + "-create-shortname").value = "";
-               Dom.get(parent.id + "-create-displayname").value = "";
-               Dom.get(parent.id + "-create-shortname").focus();
+               this.clear();
             };
             this._createGroup(successHandler);
          },
@@ -1445,7 +1454,7 @@
          _createGroup: function ConsoleGroups_CreatePanelHandler__createGroup(successHandler)
          {
             var me = this;
-            var shortName = Dom.get(parent.id + "-create-shortname").value;
+            var shortName = Alfresco.util.trim(Dom.get(parent.id + "-create-shortname").value);
             parent.getParentGroups(shortName,
             {
                fn: function(groups)
@@ -1519,8 +1528,8 @@
          _createGroupAfterExistCheck: function ConsoleGroups_CreatePanelHandler__createGroupAfterExistCheck(successHandler)
          {
             // gather up the data for our JSON PUT request
-            var shortName = Dom.get(parent.id + "-create-shortname").value;
-            var displayName = Dom.get(parent.id + "-create-displayname").value;
+            var shortName = Alfresco.util.trim(Dom.get(parent.id + "-create-shortname").value);
+            var displayName = Alfresco.util.trim(Dom.get(parent.id + "-create-displayname").value);
             displayName = displayName == "" ? undefined : displayName;
             var groupObj = {};
 
@@ -1539,7 +1548,11 @@
                       * update the display name.
                       */
                      groupObj.displayName = displayName;
-                     parent.panelHandlers.updatePanelHandler.updateGroupRequest(shortName, groupObj, successHandler);
+                     parent.panelHandlers.updatePanelHandler.updateGroupRequest(shortName, groupObj, 
+                     {
+                        fn: successHandler,
+                        scope: this
+                     });
                   }
                   else
                   {
@@ -1617,32 +1630,30 @@
           */
          onLoad: function ConsoleGroups_UpdatePanelHandler_onLoad()
          {
-            var me = this;
-            var validFields = [];
-            var onFieldKeyUp = function onFieldKeyUp(e)
-            {
-               validFields[this.id] = (this.value.length !== 0);
-               var valid = true;
-               for (var i in validFields)
-               {
-                  if (validFields[i] == false)
-                  {
-                     valid = false;
-                     break;
-                  }
-               }
-               me.widgets.updategroupSaveButton.set("disabled", !valid);
-            };
-
             // Buttons
             this.widgets.updategroupSaveButton = new YAHOO.widget.Button(parent.id + "-updategroup-save-button", {});
             this.widgets.updategroupSaveButton.on("click", this.onUpdateGroupOKClick, null, this);
             this.widgets.updategroupCancelButton = new YAHOO.widget.Button(parent.id + "-updategroup-cancel-button", {});
             this.widgets.updategroupCancelButton.on("click", this.onUpdateGroupCancelClick, null, this);
 
-            // Event handlers for mandatory fields
-            validFields[parent.id + "-update-displayname"] = true;
-            Event.on(parent.id + "-update-displayname", "keyup", onFieldKeyUp);
+            // Form definition
+            var form = new Alfresco.forms.Form(parent.id + "-update-form");
+            form.setSubmitElements(this.widgets.updategroupSaveButton);
+            form.setShowSubmitStateDynamically(true);
+
+            // Form field validation
+            form.addValidation(parent.id + "-update-displayname", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-update-displayname", Alfresco.forms.validation.length,
+            {
+               min: 3,
+               max: 255,
+               crop: true,
+               includeWhitespace: false
+            }, "keyup");            
+
+            // Initialise the form
+            form.init();
+            this.forms.updateForm = form;
          },
 
 
@@ -1666,7 +1677,6 @@
          onShow: function ConsoleGroups_UpdatePanelHandler_onShow()
          {
             this._visible = true;
-            window.scrollTo(0, 0);
          },
 
          /**
@@ -1694,8 +1704,16 @@
                Dom.get(parent.id + "-update-shortname").innerHTML = $html(group.shortName);
                Dom.get(parent.id + "-update-displayname").value = group.displayName;
 
-               // Make main panel area visible
+               // Make sure buttons are in the correct state
+               if(this.forms.updateForm)
+               {
+                  this.forms.updateForm.init();
+               }
+
+               // Make main panel area visible and focus
+               window.scrollTo(0, 0);
                Dom.setStyle(parent.id + "-update-main", "visibility", "visible");
+               Dom.get(parent.id + "-update-displayname").focus();
             };
 
             // make an ajax call to get group details
@@ -1705,7 +1723,7 @@
                successCallback:
                {
                   fn: success,
-                  scope: parent
+                  scope: this
                },
                failureMessage: parent._msg("message.getgroup-failure", parent.group)
             });
@@ -1769,20 +1787,16 @@
           * Update a group - returning true on success, false on any error.
           *
           * @method updateGroupRequest
-          * @param handler {function} Handler function to be called on successful update
+          * @param successCallback {function} Success callback to be called on successful update
           * @private
           */
-         updateGroupRequest: function ConsoleGroups_UpdatePanelHandler_updateGroupRequest(shortName, groupObj, successHandler)
+         updateGroupRequest: function ConsoleGroups_UpdatePanelHandler_updateGroupRequest(shortName, groupObj, successCallback)
          {
             Alfresco.util.Ajax.jsonPut(
             {
                url: Alfresco.constants.PROXY_URI + "api/groups/" + shortName,
                dataObj: groupObj,
-               successCallback:
-               {
-                  fn: successHandler,
-                  scope: this
-               },
+               successCallback: successCallback,
                failureCallback:
                {
                   fn: function(o)
@@ -1813,8 +1827,12 @@
          {
             this.updateGroupRequest(parent.group,
             {
-               displayName: Dom.get(parent.id + "-update-displayname").value
-            }, successHandler);
+               displayName: Alfresco.util.trim(Dom.get(parent.id + "-update-displayname").value)
+            },
+            {
+               fn: successHandler,
+               scope: this
+            });
          }
 
       });
