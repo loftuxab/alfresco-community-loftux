@@ -23,7 +23,11 @@
          <p>
             <span class="label">${msg("label.siteAdmin")}</span>
    <#list sitemanagers as sitemanager>
-            <a href="${url.context}/page/user/${sitemanager.authority.userName?url}/profile" class="theme-color-1">${sitemanager.authority.firstName?html}<#if sitemanager.authority.lastName != ""> ${sitemanager.authority.lastName?html}</#if></a><#if sitemanager_has_next>, </#if>
+      <#if sitemanager.authority.authorityType = 'USER'>
+            <a href="${url.context}/page/user/${sitemanager.authority.userName?url}/profile" class="theme-color-1">${sitemanager.authority.firstName?html}<#if sitemanager.authority.lastName != ""> ${sitemanager.authority.lastName?html}</#if></a><#if sitemanager_has_next>,</#if>
+      <#else>
+            <span>${sitemanager.authority.displayName}</span><#if sitemanager_has_next>,</#if>
+      </#if>
    </#list>
          </p>
 </#if>

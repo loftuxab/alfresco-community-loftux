@@ -1,3 +1,5 @@
+"'></a></script>
+<!-- above dodgy HTML is required to end any open tags, script etc. before further script injection -->
 <script type="text/javascript">
 var _errorhidden = true;
 function _toggleErrorDetails()
