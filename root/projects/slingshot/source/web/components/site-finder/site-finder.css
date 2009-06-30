@@ -1,6 +1,6 @@
 .site-finder 
 {
-	margin: 24px 10px 10px;
+   margin: 24px 10px 10px;
 }
 
 .site-finder .title
@@ -11,16 +11,16 @@
 
 .site-finder .finder-wrapper
 {
-	border: 1px solid #c0c0c0;
-	margin-top: 10px;
+   border: 1px solid #c0c0c0;
+   margin-top: 10px;
 }
 
 .site-finder .search-bar
 {
-	background-color: #dee8ed;
-	border-bottom: 1px dashed #c0c0c0;
+   background-color: #dee8ed;
+   border-bottom: 1px dashed #c0c0c0;
    height: 2em;
-	padding: 0.5em;
+   padding: 0.5em;
 }
 
 .site-finder .search-bar div
@@ -54,18 +54,18 @@
 
 .site-finder .yui-dt table
 {
-	width: 100%;
-	border: none;
+   width: 100%;
+   border: none;
 }
 
 .site-finder .siteFinderTableMessage
 {
-    white-space: nowrap;
+   white-space: nowrap;
 }
 
 .site-finder .yui-dt table thead
 {
-	display: none;
+   display: none;
 }
 
 .site-finder .yui-dt td
@@ -107,4 +107,12 @@
 .site-finder .sitedescription
 {
    margin-bottom: 6px;
+}
+
+.site-finder .moderated
+{
+   color: #fff;
+   float: left;
+   font-size: 93%;
+   padding: 0.1em 0.2em;
 }
