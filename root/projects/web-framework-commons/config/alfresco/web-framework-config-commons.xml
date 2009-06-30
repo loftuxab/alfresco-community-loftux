@@ -14,31 +14,31 @@
    <config>
       <forms>
 	      <default-controls>
-	         <type name="d:text" template="controls/textfield.ftl" />
-	         <type name="d:mltext" template="controls/textarea.ftl" />
-	         <type name="d:int" template="controls/textfield.ftl" />
-	         <type name="d:float" template="controls/textfield.ftl" />
-	         <type name="d:double" template="controls/textfield.ftl" />
-	         <type name="d:long" template="controls/textfield.ftl" />
-	         <type name="d:boolean" template="controls/checkbox.ftl" />
-	         <type name="d:date" template="controls/date.ftl" />
-	         <type name="d:datetime" template="controls/date.ftl">
+	         <type name="d:text" template="/org/alfresco/components/form/controls/textfield.ftl" />
+	         <type name="d:mltext" template="/org/alfresco/components/form/controls/textarea.ftl" />
+	         <type name="d:int" template="/org/alfresco/components/form/controls/textfield.ftl" />
+	         <type name="d:float" template="/org/alfresco/components/form/controls/textfield.ftl" />
+	         <type name="d:double" template="/org/alfresco/components/form/controls/textfield.ftl" />
+	         <type name="d:long" template="/org/alfresco/components/form/controls/textfield.ftl" />
+	         <type name="d:boolean" template="/org/alfresco/components/form/controls/checkbox.ftl" />
+	         <type name="d:date" template="/org/alfresco/components/form/controls/date.ftl" />
+	         <type name="d:datetime" template="/org/alfresco/components/form/controls/date.ftl">
 	            <control-param name="showTime">true</control-param>
 	         </type>
-             <type name="d:period" template="controls/period.ftl" />
-	         <type name="d:any" template="controls/textfield.ftl" />
-	         <type name="d:category" template="controls/category.ftl">
+             <type name="d:period" template="/org/alfresco/components/form/controls/period.ftl" />
+	         <type name="d:any" template="/org/alfresco/components/form/controls/textfield.ftl" />
+	         <type name="d:category" template="/org/alfresco/components/form/controls/category.ftl">
                <control-param name="compactMode">true</control-param>
             </type>
-	         <type name="association" template="controls/association.ftl" />
+	         <type name="association" template="/org/alfresco/components/form/controls/association.ftl" />
 	         <!-- Data types that should always be rendered read-only -->
-	         <type name="d:content" template="controls/readonly.ftl" />
-	         <type name="d:qname" template="controls/readonly.ftl" />
-	         <type name="d:noderef" template="controls/readonly.ftl" />
-	         <type name="d:childassocref" template="controls/readonly.ftl" />
-	         <type name="d:assocref" template="controls/readonly.ftl" />
-	         <type name="d:path" template="controls/readonly.ftl" />
-	         <type name="d:locale" template="controls/readonly.ftl" />
+	         <type name="d:content" template="/org/alfresco/components/form/controls/readonly.ftl" />
+	         <type name="d:qname" template="/org/alfresco/components/form/controls/readonly.ftl" />
+	         <type name="d:noderef" template="/org/alfresco/components/form/controls/readonly.ftl" />
+	         <type name="d:childassocref" template="/org/alfresco/components/form/controls/readonly.ftl" />
+	         <type name="d:assocref" template="/org/alfresco/components/form/controls/readonly.ftl" />
+	         <type name="d:path" template="/org/alfresco/components/form/controls/readonly.ftl" />
+	         <type name="d:locale" template="/org/alfresco/components/form/controls/readonly.ftl" />
 	      </default-controls>
 	      <constraint-handlers>
 	         <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.mandatory" event="keyup" />
@@ -112,13 +112,13 @@
             </field-visibility>
             <appearance>
                <field id="cm:title">
-                  <control template="controls/textfield.ftl" />
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
                <field id="mimetype">
-                  <control template="controls/mimetype.ftl" />
+                  <control template="/org/alfresco/components/form/controls/mimetype.ftl" />
                </field>
                <field id="size">
-                  <control template="controls/size.ftl" />
+                  <control template="/org/alfresco/components/form/controls/size.ftl" />
                </field>
                <field id="cm:taggable">
                   <control>
