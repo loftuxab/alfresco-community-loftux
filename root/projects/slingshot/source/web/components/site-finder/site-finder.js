@@ -52,30 +52,21 @@
     */
    Alfresco.SiteFinder = function(htmlId)
    {
-      this.name = "Alfresco.SiteFinder";
-      this.id = htmlId;
+      Alfresco.SiteFinder.superclass.constructor.call(this, "Alfresco.SiteFinder", htmlId, ["button", "container", "datasource", "datatable", "json"]);
       
       // Initialise prototype properties
-      this.widgets = {};
       this.buttons = [];
-      this.modules = {};
       this.searchTerm = "";
       this.memberOfSites = {};
       this.membershipsRetrieved = false;
       this.pendingInvites = {};
       
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json"], this.onComponentsLoaded, this);
-
       YAHOO.Bubbling.on("siteDeleted", this.onSiteDeleted, this);
 
       return this;
    };
    
-   Alfresco.SiteFinder.prototype =
+   YAHOO.extend(Alfresco.SiteFinder, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -121,28 +112,12 @@
       },
 
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-      
-      /**
        * List of Join/Leave buttons
        * 
        * @property buttons
        * @type array
        */
       buttons: null,
-
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
 
       /**
        * Search term used for the site search.
@@ -179,43 +154,6 @@
       pendingInvites: null,
       
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setOptions: function SiteFinder_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setMessages: function SiteFinder_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function SiteFinder_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-      
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
        *
@@ -238,7 +176,7 @@
             failureCallback:
             {
                fn: this._failureCallback,
-               obj: this._msg("site-finder.no-membership-detail"),
+               obj: this.msg("site-finder.no-membership-detail"),
                scope: this
             }
          };
@@ -322,8 +260,8 @@
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "button", this.doSearch);
          
          // register the "enter" event on the search text field
-         var searchInput = Dom.get(this.id + "-term");
-         new KeyListener(searchInput,
+         var searchInput = Dom.get(this.id + "-term"),
+            keyListener = new KeyListener(searchInput,
          {
             keys:13
          },
@@ -400,9 +338,9 @@
           */
          renderCellThumbnail = function SiteFinder_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
-            var shortName = oRecord.getData("shortName");
-            var url = Alfresco.constants.URL_PAGECONTEXT + "site/" + shortName + "/dashboard";
-            var siteName = $html(oRecord.getData("title"));
+            var shortName = oRecord.getData("shortName"),
+               url = Alfresco.constants.URL_PAGECONTEXT + "site/" + shortName + "/dashboard",
+               siteName = $html(oRecord.getData("title"));
 
             // Render the icon
             elCell.innerHTML = '<a href="' + url + '"><img src="' + 
@@ -421,12 +359,19 @@
           */
          renderCellDescription = function SiteFinder_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            var url = Alfresco.constants.URL_PAGECONTEXT + "site/" + oRecord.getData("shortName") + "/dashboard";         
+            var siteVisibility = oRecord.getData("visibility").toUpperCase(),
+               url = Alfresco.constants.URL_PAGECONTEXT + "site/" + oRecord.getData("shortName") + "/dashboard";         
             
             // title/link to site page
             var details = '<h3 class="sitename"><a href="' + url + '" class="theme-color-1">' + $html(oRecord.getData("title")) + '</a></h3>';
             // description
             details += '<div class="sitedescription">' + $html(oRecord.getData("description")) + '</div>';
+            
+            // Moderated flag
+            if (siteVisibility == "MODERATED")
+            {
+               details += '<div class="moderated theme-bg-color-1">' + me.msg("site-finder.moderated")  + '</div>';
+            }
             
             elCell.innerHTML = details;
          };
@@ -440,7 +385,7 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         renderCellActions = function InvitationList_renderCellActions(elCell, oRecord, oColumn, oData)
+         renderCellActions = function SiteFinder_renderCellActions(elCell, oRecord, oColumn, oData)
          {
             if (me.membershipsRetrieved)
             {
@@ -466,7 +411,7 @@
                   {
                       container: me.id + '-deleteButton-' + shortName
                   });
-                  deleteButton.set("label", me._msg("site-finder.delete"));
+                  deleteButton.set("label", me.msg("site-finder.delete"));
                   deleteButton.set("onclick",
                   {
                      fn: me.doDelete,
@@ -492,7 +437,7 @@
                      if (me.memberOfSites[shortName] == "MEMBER")
                      {
                         // Leave site action
-                        button.set("label", me._msg("site-finder.leave"));
+                        button.set("label", me.msg("site-finder.leave"));
                         button.set("onclick",
                         {
                            fn: me.doLeave,
@@ -507,7 +452,7 @@
                      else
                      {
                         // Join site action
-                        button.set("label", me._msg("site-finder.join"));
+                        button.set("label", me.msg("site-finder.join"));
                         button.set("onclick",
                         {
                            fn: me.doJoin,
@@ -528,7 +473,7 @@
                   
                   case "PRIVATE":
                      // Must already be a member of the site so show leave action
-                     button.set("label", me._msg("site-finder.leave"));
+                     button.set("label", me.msg("site-finder.leave"));
                      button.set("onclick",
                      {
                         fn: me.doLeave,
@@ -551,7 +496,7 @@
                      if (me.memberOfSites[shortName] == "MEMBER")
                      {
                         // Leave site action
-                        button.set("label", me._msg("site-finder.leave"));
+                        button.set("label", me.msg("site-finder.leave"));
                         button.set("onclick",
                         {
                            fn: me.doLeave,
@@ -566,7 +511,7 @@
                      else if (me.memberOfSites[shortName] == "PENDING")
                      {
                         // Leave site action
-                        button.set("label", me._msg("site-finder.cancel-request"));
+                        button.set("label", me.msg("site-finder.cancel-request"));
                         button.set("onclick",
                         {
                            fn: me.doCancelRequest,
@@ -581,7 +526,7 @@
                      else
                      {
                         // Join site action
-                        button.set("label", me._msg("site-finder.request-join"));
+                        button.set("label", me.msg("site-finder.request-join"));
                         button.set("onclick",
                         {
                            fn: me.doRequestJoin,
@@ -627,7 +572,7 @@
          {
             renderLoopSize: 32,
             initialLoad: false,
-            MSG_EMPTY: this._msg("message.instructions")
+            MSG_EMPTY: this.msg("message.instructions")
          });
          this.widgets.dataTable.subscribe("rowDeleteEvent", this.onRowDeleteEvent, this, true);
          
@@ -650,7 +595,7 @@
             {
                if (oResponse.results.length === 0)
                {
-                  me.widgets.dataTable.set("MSG_EMPTY", '<span style="white-space: nowrap;">' + me._msg("message.empty") + '</span>');
+                  me.widgets.dataTable.set("MSG_EMPTY", '<span style="white-space: nowrap;">' + me.msg("message.empty") + '</span>');
                }
                me.renderLoopSize = oResponse.results.length >> (YAHOO.env.ua.gecko === 1.8) ? 3 : 5;
             }
@@ -724,7 +669,7 @@
             failureCallback:
             {
                fn: this._failureCallback,
-               obj: this._msg("site-finder.join-failure", this.options.currentUser, site.title),
+               obj: this.msg("site-finder.join-failure", this.options.currentUser, site.title),
                scope: this
             }
          });
@@ -745,7 +690,7 @@
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("site-finder.join-success", this.options.currentUser, site.title)
+            text: this.msg("site-finder.join-success", this.options.currentUser, site.title)
          });
          
          // redo the search again to get updated info
@@ -777,7 +722,7 @@
             failureCallback:
             {
                fn: this._failureCallback,
-               obj: this._msg("site-finder.leave-failure", this.options.currentUser, site.title),
+               obj: this.msg("site-finder.leave-failure", this.options.currentUser, site.title),
                scope: this
             }
          });
@@ -798,7 +743,7 @@
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("site-finder.leave-success", this.options.currentUser, site.title)
+            text: this.msg("site-finder.leave-success", this.options.currentUser, site.title)
          });
          
          // redo the search again to get updated info
@@ -819,7 +764,7 @@
          // show a wait message
          this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("message.please-wait"),
+            text: this.msg("message.please-wait"),
             spanClass: "wait",
             displayTime: 0
          });
@@ -845,7 +790,7 @@
             failureCallback:
             {
                fn: this._failureCallback,
-               obj: this._msg("site-finder.request-join-failure", this.options.currentUser, site.title),
+               obj: this.msg("site-finder.request-join-failure", this.options.currentUser, site.title),
                scope: this
             }
          });
@@ -872,7 +817,7 @@
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("site-finder.request-join-success", this.options.currentUser, site.title)
+            text: this.msg("site-finder.request-join-success", this.options.currentUser, site.title)
          });
          
          // redo the search again to get updated info
@@ -894,7 +839,7 @@
          // show a wait message
          this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("message.please-wait"),
+            text: this.msg("message.please-wait"),
             spanClass: "wait",
             displayTime: 0
          });
@@ -913,7 +858,7 @@
             failureCallback:
             {
                fn: this._failureCallback,
-               obj: this._msg("site-finder.cancel-request-failure", this.options.currentUser, site.title),
+               obj: this.msg("site-finder.cancel-request-failure", this.options.currentUser, site.title),
                scope: this
             }
          });
@@ -934,7 +879,7 @@
          // show popup message to confirm
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("site-finder.cancel-request-success", this.options.currentUser, site.title)
+            text: this.msg("site-finder.cancel-request-success", this.options.currentUser, site.title)
          });
          
          // redo the search again to get updated info
@@ -1011,12 +956,12 @@
          
          // loading message function
          var loadingMessage = null;
-         var fnShowLoadingMessage = function DL_fnShowLoadingMessage()
+         var fnShowLoadingMessage = function SiteFinder__pS_fnShowLoadingMessage()
          {
             loadingMessage = Alfresco.util.PopupManager.displayMessage(
             {
                displayTime: 0,
-               text: '<span class="wait">' + $html(this._msg("message.loading")) + '</span>',
+               text: '<span class="wait">' + $html(this.msg("message.loading")) + '</span>',
                noEscape: true
             });
          };
@@ -1024,7 +969,7 @@
          // slow data webscript message
          var timerShowLoadingMessage = YAHOO.lang.later(2000, this, fnShowLoadingMessage);
          
-         function successHandler(sRequest, oResponse, oPayload)
+         var successHandler = function SiteFinder__pS_successHandler(sRequest, oResponse, oPayload)
          {
             if (timerShowLoadingMessage)
             {
@@ -1037,9 +982,9 @@
             
             this.searchTerm = searchTerm;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
-         }
+         };
          
-         function failureHandler(sRequest, oResponse)
+         var failureHandler = function SiteFinder__pS_failureHandler(sRequest, oResponse)
          {
             if (timerShowLoadingMessage)
             {
@@ -1068,7 +1013,7 @@
                   this._setDefaultDataTableErrors(this.widgets.dataTable);
                }
             }
-         }
+         };
          
          this.widgets.dataSource.sendRequest(this._buildSearchParams(searchTerm),
          {
@@ -1130,21 +1075,8 @@
       {
          if (this.widgets.dataTable.getRecordSet().getLength() === 0)
          {
-            this.widgets.dataTable.showTableMessage(this._msg("site-finder.enter-search-term", this.name), "siteFinderTableMessage");
+            this.widgets.dataTable.showTableMessage(this.msg("site-finder.enter-search-term", this.name), "siteFinderTableMessage");
          }
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function SiteFinder__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.SiteFinder", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();
