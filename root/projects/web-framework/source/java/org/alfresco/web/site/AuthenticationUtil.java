@@ -24,9 +24,13 @@
  */
 package org.alfresco.web.site;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.alfresco.util.Base64;
 
 /**
  * @author muzquiano
@@ -36,7 +40,7 @@ public class AuthenticationUtil
 {
     /** cookie names */
     private static final String COOKIE_ALFLOGIN = "alfLogin";
-    private static final String COOKIE_ALFUSER = "alfUsername";
+    private static final String COOKIE_ALFUSER = "alfUsername2";
     private static final int TIMEOUT = 60*60*24*7;
     
     private static final String MT_GUEST_PREFIX = UserFactory.USER_GUEST + "@"; // eg. for MT Share
@@ -87,10 +91,18 @@ public class AuthenticationUtil
             
             if (isGuest(userId) == false)
             {
-                Cookie userCookie = new Cookie(COOKIE_ALFUSER, userId);
-                userCookie.setPath(request.getContextPath());
-                userCookie.setMaxAge(TIMEOUT);
-                response.addCookie(userCookie);
+                Cookie userCookie;
+                try
+                {
+                    userCookie = new Cookie(COOKIE_ALFUSER, Base64.encodeBytes(userId.getBytes("UTF-8")));
+                    userCookie.setPath(request.getContextPath());
+                    userCookie.setMaxAge(TIMEOUT);
+                    response.addCookie(userCookie);
+                }
+                catch (UnsupportedEncodingException e)
+                {
+                    // should never happen
+                }
             }
         }
     }
