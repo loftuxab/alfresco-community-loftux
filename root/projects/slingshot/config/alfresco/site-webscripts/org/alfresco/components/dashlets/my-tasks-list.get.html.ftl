@@ -17,7 +17,7 @@
    <img src="${avatarUrl}" alt="${theUser.userName}" width="16" height="16" />
 </#macro>
 <#macro userProfile theUser>
-   <a href="${url.context}/pages/user/${theUser.userName}/profile">${theUser.fullName?html}</a>
+   <a href="${url.context}/page/user/${theUser.userName}/profile">${theUser.fullName?html}</a>
 </#macro>
 <#if myTasks?? && myTasks.tasks?size &gt; 0>
    <#list myTasks.tasks?sort_by("dueDate")?sort_by("priority") as task>
