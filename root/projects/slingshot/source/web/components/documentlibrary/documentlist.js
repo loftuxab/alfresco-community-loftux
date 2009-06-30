@@ -681,7 +681,7 @@
                nodeRef = record.getData("nodeRef"),
                isFavourite = record.getData("isFavourite");
 
-            return '<a id="' + id + '" class="favourite-document' + (isFavourite ? ' enabled' : '') + '" title="' + scope.msg("tip.favourite-document") + '">&nbsp;</a>';
+            return '<a id="' + id + '" class="favourite-document' + (isFavourite ? ' enabled' : '') + '" title="' + scope.msg("tip.favourite-document." + (isFavourite ? 'remove' : 'add')) + '">&nbsp;</a>';
          };
 
 
