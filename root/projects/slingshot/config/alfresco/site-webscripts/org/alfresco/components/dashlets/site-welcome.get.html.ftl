@@ -10,35 +10,35 @@
       </div>
 <#if userIsSiteManager>
       <div class="detail-list-item">
-         <h4 class="theme-color-1">${msg("header.joinSite")}</h4>
+         <h4 class="theme-color-2">${msg("header.joinSite")}</h4>
          <div>${msg("text.joinSite")}</div>
-         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/invite" class="theme-color-1">${msg("link.joinSite")}</a></div>
+         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/invite" class="theme-color-2">${msg("link.joinSite")}</a></div>
       </div>
       <div class="detail-list-item">
-         <h4 class="theme-color-1">${msg("header.customiseDashboard")}</h4>
+         <h4 class="theme-color-2">${msg("header.customiseDashboard")}</h4>
          <div>${msg("text.customiseDashboard")}</div>
-         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site-dashboard" class="theme-color-1">${msg("link.customiseDashboard")}</a></div>
+         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site-dashboard" class="theme-color-2">${msg("link.customiseDashboard")}</a></div>
       </div>
       <div class="detail-list-item last-item">
-         <h4 class="theme-color-1">${msg("header.customiseSite")}</h4>
+         <h4 class="theme-color-2">${msg("header.customiseSite")}</h4>
          <div>${msg("text.customiseSite")}</div>
-         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site" class="theme-color-1">${msg("link.customiseSite")}</a></div>
+         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/customise-site" class="theme-color-2">${msg("link.customiseSite")}</a></div>
       </div>         
 <#else>
       <div class="detail-list-item">
-         <h4 class="theme-color-1">${msg("header.siteMembers")}</h4>
+         <h4 class="theme-color-2">${msg("header.siteMembers")}</h4>
          <div>${msg("text.siteMembers")}</div>
-         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/site-members" class="theme-color-1">${msg("link.siteMembers")}</a></div>
+         <div><a href="${url.context}/page/site/${page.url.templateArgs.site!}/site-members" class="theme-color-2">${msg("link.siteMembers")}</a></div>
       </div>
       <div class="detail-list-item">
-         <h4 class="theme-color-1">${msg("header.onlineHelp")}</h4>
+         <h4 class="theme-color-2">${msg("header.onlineHelp")}</h4>
          <div>${msg("text.onlineHelp")}</div>
-         <div><a href="${helpLink}" class="theme-color-1" target="_blank">${msg("link.onlineHelp")}</a></div>
+         <div><a href="${helpLink}" class="theme-color-2" target="_blank">${msg("link.onlineHelp")}</a></div>
       </div>
       <div class="detail-list-item last-item">
-         <h4 class="theme-color-1">${msg("header.featureTour")}</h4>
+         <h4 class="theme-color-2">${msg("header.featureTour")}</h4>
          <div>${msg("text.featureTour")}</div>
-         <div><a href="${tutorialLink}" class="theme-color-1" target="_blank">${msg("link.featureTour")}</a></div>
+         <div><a href="${tutorialLink}" class="theme-color-2" target="_blank">${msg("link.featureTour")}</a></div>
       </div>
 </#if>
       <div class="clear"></div>
