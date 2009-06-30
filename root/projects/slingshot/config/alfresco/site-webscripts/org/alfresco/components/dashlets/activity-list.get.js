@@ -83,14 +83,24 @@ function specialize(item, activity, summary)
 {
    switch (activity.activityType)
    {
+      case "org.alfresco.site.group-added":
+      case "org.alfresco.site.group-removed":
+         item.suppressSite = true;
+         // Fall through....
+      case "org.alfresco.site.group-role-changed":
+         item.fullName = summary.groupName.replace("GROUP_", "");
+         item.userProfile = null;
+         item.custom0 = msg.get("role." + summary.role);
+         break;
+
       case "org.alfresco.site.user-joined":
       case "org.alfresco.site.user-left":
-      case "org.alfresco.site.user-role-changed":
-         item.title = activity.siteNetwork;
-         item.custom0 = msg.get("role." + summary.role);
-         item.fullName = trim(summary.memberFirstName + " " + summary.memberLastName);
          item.suppressSite = true;
+         // Fall through....
+      case "org.alfresco.site.user-role-changed":
+         item.fullName = trim(summary.memberFirstName + " " + summary.memberLastName);
          item.userProfile = userProfileUrl(summary.memberUserName);
+         item.custom0 = msg.get("role." + summary.role);
          break;
    }
    
