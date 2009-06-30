@@ -19,5 +19,8 @@
 </div>
 
 <script type="text/javascript">//<![CDATA[
-YAHOO.util.Dom.get("${fieldHtmlId}").innerHTML = Alfresco.util.formatFileSize(${size});
+YAHOO.util.Event.onContentReady("${fieldHtmlId}", function ()
+{
+   YAHOO.util.Dom.get("${fieldHtmlId}").innerHTML = Alfresco.util.formatFileSize(${size});
+}, this);
 //]]></script>
