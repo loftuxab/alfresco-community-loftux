@@ -22,11 +22,13 @@
    <div class="heading"><label for="${args.htmlid}-term">${msg("site-groups.heading")}</label></div>
    
    <div class="add-groups">
+   <#if currentUserRole = "SiteManager">
       <span id="${args.htmlid}-addGroups" class="yui-button yui-link-button">
          <span class="first-child">
             <a href="add-groups">${msg("site-groups.add-groups")}</a>
          </span>
       </span>
+   </#if>
    </div>
 
    <div class="finder-wrapper">
