@@ -22,11 +22,13 @@
    <div class="heading"><label for="${args.htmlid}-term">${msg("site-members.heading")}</label></div>
 
    <div class="invite-people">
+   <#if currentUserRole = "SiteManager">
       <span id="${args.htmlid}-invitePeople" class="yui-button yui-link-button">
          <span class="first-child">
             <a href="invite">${msg("site-members.invite-people")}</a>
          </span>
       </span>
+   </#if>
    </div>
    
    <div class="finder-wrapper">
