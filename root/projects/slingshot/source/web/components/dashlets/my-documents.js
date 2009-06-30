@@ -164,7 +164,7 @@
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            elCell.innerHTML = '<a class="favourite-document ' + favEventClass + (isFavourite ? ' enabled' : '') + '" title="' + me.msg("tip.favourite-document") + '">&nbsp;</a>';
+            elCell.innerHTML = '<a class="favourite-document ' + favEventClass + (isFavourite ? ' enabled' : '') + '" title="' + me.msg("tip.favourite-document." + (isFavourite ? 'remove' : 'add')) + '">&nbsp;</a>';
          };
 
          /**
