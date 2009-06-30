@@ -25,6 +25,7 @@
 package org.alfresco.web.site.servlet;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.connector.User;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.util.Base64;
 import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.framework.exception.RendererExecutionException;
 import org.alfresco.web.framework.model.ContentAssociation;
@@ -318,7 +320,14 @@ public class DispatcherServlet extends BaseServlet
                         Cookie cookie = AuthenticationUtil.getUsernameCookie(request);
                         if (cookie != null)
                         {
-                            context.setValue(ALF_LAST_USERNAME, cookie.getValue());
+                            try
+                            {
+                                context.setValue(ALF_LAST_USERNAME, new String(Base64.decode(cookie.getValue()), "UTF-8"));
+                            }
+                            catch (UnsupportedEncodingException e)
+                            {
+                                // should never happen
+                            }
                         }
                         
                         // dispatch to the login page

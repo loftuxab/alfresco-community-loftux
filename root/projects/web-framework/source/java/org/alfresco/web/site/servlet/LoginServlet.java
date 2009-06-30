@@ -50,6 +50,7 @@ public class LoginServlet extends BaseServlet
     protected void service(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
+        request.setCharacterEncoding("UTF-8");
         String username = (String) request.getParameter("username");
         String password = (String) request.getParameter("password");
         String successPage = (String) request.getParameter("success");
