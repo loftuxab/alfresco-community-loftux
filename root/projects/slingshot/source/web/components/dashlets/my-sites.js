@@ -291,7 +291,7 @@
             site = record.getData(),
             siteId = site.shortName;
          
-         site.isFavourite ^= true;
+         site.isFavourite = !site.isFavourite;
          
          this.widgets.dataTable.updateRow(record, site);
          
@@ -306,7 +306,7 @@
                   var record = obj.record,
                      site = record.getData();
                   
-                  site.isFavourite ^= true;
+                  site.isFavourite = !site.isFavourite;
                   this.widgets.dataTable.updateRow(record, site);
                   Alfresco.util.PopupManager.displayPrompt(
                   {
@@ -351,7 +351,7 @@
             site = record.getData(),
             siteId = site.shortName;
          
-         site.isIMAPFavourite ^= true;
+         site.isIMAPFavourite = !site.isIMAPFavourite;
          
          this.widgets.dataTable.updateRow(record, site);
          
@@ -366,7 +366,7 @@
                   var record = obj.record,
                      site = record.getData();
                   
-                  site.isIMAPFavourite ^= true;
+                  site.isIMAPFavourite = !site.isIMAPFavourite;
                   this.widgets.dataTable.updateRow(record, site);
                   Alfresco.util.PopupManager.displayPrompt(
                   {

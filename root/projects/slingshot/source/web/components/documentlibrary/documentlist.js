@@ -2344,7 +2344,7 @@
             file = record.getData(),
             nodeRef = file.nodeRef;
          
-         file.isFavourite ^= true;
+         file.isFavourite = !file.isFavourite;
          this.widgets.dataTable.updateRow(record, file);
                
          var responseConfig =
@@ -2355,7 +2355,7 @@
                {
                   // Reset the flag to it's previous state
                   var file = p_oRecord.getData();
-                  file.isFavourite ^= true;
+                  file.isFavourite = !file.isFavourite;
                   this.widgets.dataTable.updateRow(p_oRecord, file);
                   Alfresco.util.PopupManager.displayPrompt(
                   {
