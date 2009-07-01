@@ -1282,15 +1282,24 @@
          onLoad: function ConsoleGroups_CreatePanelHandler_onLoad()
          {
             // Buttons
-            this.widgets.creategroupOkButton = new YAHOO.widget.Button(parent.id + "-creategroup-ok-button", {});
+            this.widgets.creategroupOkButton = new YAHOO.widget.Button(parent.id + "-creategroup-ok-button",
+            {
+               type: "button"
+            });
             this.widgets.creategroupOkButton.on("click", this.onCreateGroupOKClick, null, this);
             this.widgets.creategroupOkButton.set("disabled", true);
 
-            this.widgets.creategroupAnotherButton = new YAHOO.widget.Button(parent.id + "-creategroup-another-button", {});
+            this.widgets.creategroupAnotherButton = new YAHOO.widget.Button(parent.id + "-creategroup-another-button",
+            {
+               type: "button"
+            });
             this.widgets.creategroupAnotherButton.on("click", this.onCreateGroupAnotherClick, null, this);
             this.widgets.creategroupAnotherButton.set("disabled", true);
 
-            this.widgets.creategroupCancelButton = new YAHOO.widget.Button(parent.id + "-creategroup-cancel-button", {});
+            this.widgets.creategroupCancelButton = new YAHOO.widget.Button(parent.id + "-creategroup-cancel-button",
+            {
+               type: "button"
+            });
             this.widgets.creategroupCancelButton.on("click", this.onCreateGroupCancelClick, null, this);
 
             // Form definition
@@ -1344,8 +1353,7 @@
          clear: function clear()
          {
             Dom.get(parent.id + "-create-shortname").value = "";
-            Dom.get(parent.id + "-create-displayname").value = "";
-            Dom.get(parent.id + "-create-shortname").focus();
+            Dom.get(parent.id + "-create-displayname").value = "";            
             if (this.forms.createForm !== null)
             {
                this.forms.createForm.init();
@@ -1424,7 +1432,7 @@
           * @param args Event parameters (depends on event type)
           */
          onCreateGroupAnotherClick: function ConsoleGroups_CreatePanelHandler_onCreateGroupAnotherClick(e, args)
-         {
+         {            
             var successHandler = function(response)
             {
                // Scroll to top and notify user
@@ -1436,6 +1444,7 @@
 
                // Clear old values so new ones can be entered
                this.clear();
+               Dom.get(parent.id + "-create-shortname").focus();
             };
             this._createGroup(successHandler);
          },
@@ -1631,9 +1640,15 @@
          onLoad: function ConsoleGroups_UpdatePanelHandler_onLoad()
          {
             // Buttons
-            this.widgets.updategroupSaveButton = new YAHOO.widget.Button(parent.id + "-updategroup-save-button", {});
+            this.widgets.updategroupSaveButton = new YAHOO.widget.Button(parent.id + "-updategroup-save-button",
+            {
+               type: "button"
+            });
             this.widgets.updategroupSaveButton.on("click", this.onUpdateGroupOKClick, null, this);
-            this.widgets.updategroupCancelButton = new YAHOO.widget.Button(parent.id + "-updategroup-cancel-button", {});
+            this.widgets.updategroupCancelButton = new YAHOO.widget.Button(parent.id + "-updategroup-cancel-button",
+            {
+               type: "button"
+            });
             this.widgets.updategroupCancelButton.on("click", this.onUpdateGroupCancelClick, null, this);
 
             // Form definition
