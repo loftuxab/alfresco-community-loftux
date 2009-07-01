@@ -363,7 +363,7 @@
             nodeRef = file.nodeRef,
             undoIndex;
          
-         file.isFavourite ^= true;
+         file.isFavourite = !file.isFavourite;
          
          if (this.currentFilter == "favouriteDocuments")
          {
@@ -385,7 +385,7 @@
                   var record = obj.record,
                      file = record.getData();
                   
-                  file.isFavourite ^= true;
+                  file.isFavourite = !file.isFavourite;
                   if (this.currentFilter == "favouriteDocuments")
                   {
                      this.widgets.dataTable.addRow(file, obj.undoIndex);
