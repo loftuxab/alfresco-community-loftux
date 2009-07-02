@@ -30,10 +30,7 @@ WebStudio.ContentView = function()
 
 	this.events = {};
 	
-	this.INDEX_BUTTON_ADD = 0;
-	this.INDEX_BUTTON_EDIT = 1;
-	this.INDEX_BUTTON_COPY = 2;
-	this.INDEX_BUTTON_DELETE = 3;	
+	this.INDEX_BUTTON_PREVIEW = 0;
 };
 
 WebStudio.ContentView.prototype = new WebStudio.AbstractTemplater('WebStudio.ContentView');
@@ -53,85 +50,25 @@ WebStudio.ContentView.prototype.activate = function()
 		this.menu.activate();
 		this.menu.show();
 
-		this.menu.addEvent('click', 'ContentViewAddEditDelete', function(group, index) 
+		this.menu.addEvent('click', 'ContentViewPreview', function(group, index) 
 		{
 			if (group == 'roots') 
 			{
-				if (index == _this.INDEX_BUTTON_ADD) {
-					_this.fireEvent('AddContent');
-				} else if (index == _this.INDEX_BUTTON_EDIT) {
-					_this.fireEvent('EditContent');
-				} else if (index == _this.INDEX_BUTTON_COPY) {
-					_this.fireEvent('CopyContent');
-				} else if (index == _this.INDEX_BUTTON_DELETE) {
-					_this.fireEvent('DeleteContent');
+				if (index == _this.INDEX_BUTTON_PREVIEW) {
+					_this.fireEvent('PreviewContent');
 				}
 			}
 		}, this);
 	}
 	
 	// Set up initial state of buttons
-	this.menu.setEnabled('roots', this.INDEX_BUTTON_ADD);
-	this.menu.setDisabled('roots', this.INDEX_BUTTON_EDIT);
-	this.menu.setDisabled('roots', this.INDEX_BUTTON_COPY);
-	this.menu.setDisabled('roots', this.INDEX_BUTTON_DELETE);
+	this.menu.setDisabled('roots', this.INDEX_BUTTON_PREVIEW);
 		
 	// Set up Events
-	this.addEvent('AddContent', 'add_content', function() 
+	this.addEvent('PreviewContent', 'preview_content', function() 
 	{
-		var w = new WebStudio.Wizard();
-		w.setDefaultJson(
-		{
-			refreshSession: 'true'
-		});
-		var url = WebStudio.ws.studio('/wizard/content/add');
-		w.start(url, 'addnewcontent');
-		w.onComplete = function() 
-		{
-		};
+		// TODO
 		
-	}, this);
-
-	this.addEvent('EditContent', 'edit_content', function() 
-	{
-		var w = new WebStudio.Wizard();
-		w.setDefaultJson(
-		{
-		});
-		var url = WebStudio.ws.studio('/wizard/content/edit');
-		w.start(url, 'editcontent');
-		w.onComplete = function() 
-		{
-		};
-
-	}, this);
-
-	this.addEvent('CopyContent', 'copy_content', function() 
-	{
-		var w = new WebStudio.Wizard();
-		w.setDefaultJson(
-		{
-		});
-		var url = WebStudio.ws.studio('/wizard/content/copy');
-		w.start(url, 'editcontent');
-		w.onComplete = function() 
-		{
-		};
-
-	}, this);
-
-	this.addEvent('DeleteContent', 'delete_content', function() 
-	{
-		var w = new WebStudio.Wizard();
-		w.setDefaultJson(
-		{
-		});
-		var url = WebStudio.ws.studio('/wizard/content/remove');
-		w.start(url, 'removecontent');
-		w.onComplete = function() 
-		{
-		};
-
 	}, this);
 
 	var scrollContainer = this.Body[0].ScrollContainer.el;

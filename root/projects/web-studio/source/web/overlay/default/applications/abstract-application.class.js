@@ -285,7 +285,7 @@ WebStudio.Applications.Abstract.prototype.onRootMenuItemClick = function(index,d
 	
 	if(index == 'visit-alfresco')
 	{
-		WebStudio.app.openBrowser("alfresco.com", "http://www.alfresco.com");
+		WebStudio.app.openBrowser("alfresco", "http://www.alfresco.com");
 	}
 	
 	if(index == 'explore-alfresco-network')
@@ -396,7 +396,8 @@ WebStudio.Applications.Abstract.prototype.onRootMenuItemClick = function(index,d
 	if (index == 'page-template-edit')
 	{
 		// jump to the current template
-		this.GoToTemplateDisplay(Surf.context.getCurrentTemplateId());
+		//this.GoToTemplateDisplay(Surf.context.getCurrentTemplateId());
+		WebStudio.app.GoToTemplateDisplay(Surf.context.getCurrentTemplateId());
 	}
 	
 	// Page - Template Associations

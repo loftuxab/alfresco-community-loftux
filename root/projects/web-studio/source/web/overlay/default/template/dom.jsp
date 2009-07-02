@@ -266,17 +266,17 @@
 					<td width="100%" valign="top" style="padding-left: 3px; padding-top: 1px; padding-right: 1px; border-right: 1px white solid; border-bottom: 1px white solid; border-top: 1px white solid" valign="top" align="left">					
 						<table width="100%" cellpadding="1" cellspacing="0">
 							<tr>
-								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px">
+								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px" nowrap>
 									<span class="FloatingMenuTitle"></span>
 								</td>
 							</tr>						
 							<tr>
-								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px">
+								<td width="100%" style="border-bottom: 1px gray solid; padding-bottom: 1px" nowrap>
 									<span class="FloatingMenuSandboxId"></span>
 								</td>
 							</tr>
 							<tr>
-								<td width="100%" style="padding-bottom: 1px">
+								<td width="100%" style="padding-bottom: 1px" nowrap>
 									<span class="FloatingMenuInfo"></span>
 								</td>
 							</tr>
@@ -838,7 +838,7 @@
 					<tr>
 						<td width="1px;" class="AMItemLeft">&nbsp;</td>
 						<td class="AMItemCenter" valign="middle">
-						   <img src="<%=rootPath%>/images/buttons/add.gif" style="padding-right: 2px">
+						   <img src="<%=rootPath%>/images/buttons/options.gif" style="padding-right: 2px">
 						</td>
 						<td class="AMItemCenter" valign="middle" style="font-size:10px">Preview</td>
 						<td width="1px;" class="AMItemRight">&nbsp;</td>

@@ -32,64 +32,46 @@ WebStudio.Applets.Videos.prototype.bindSliderControl = function(container)
 			{
 				url : "/studio/images/common/filetypes/avi-128.png",
 				thumbnailUrl : "/studio/images/common/filetypes/avi-128.png",
-				title : "AVI-128",
-				description : "AVI-128 description",
+				title : "Sample AVI file",
+				description : "Description of AVI file",
 				mimetype: "png",
 				endpoint: "http"				
 			}
 			,
 			{
-				url : "/studio/images/common/filetypes/css-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/css-128.png",
-				title : "CSS-128",
-				description : "CSS-128 description",
+				url : "/studio/images/common/filetypes/mov-128.png",
+				thumbnailUrl : "/studio/images/common/filetypes/mov-128.png",
+				title : "Sample MOV file",
+				description : "Description of MOV file",
 				mimetype: "png",
 				endpoint: "http"				
 			}
 			,
 			{
-				url : "/studio/images/common/filetypes/folder-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/folder-128.png",
-				title : "FOLDER-128",
-				description : "FOLDER-128 description",
+				url : "/studio/images/common/filetypes/mpg-128.png",
+				thumbnailUrl : "/studio/images/common/filetypes/mpg-128.png",
+				title : "Sample MPG file",
+				description : "Description of MPG file",
 				mimetype: "png",
 				endpoint: "http"				
 			}
 			,
 			{
-				url : "/studio/images/common/filetypes/excel-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/excel-128.png",
-				title : "EXCEL-128",
-				description : "EXCEL-128 description",
+				url : "/studio/images/common/filetypes/other_movie-128.png",
+				thumbnailUrl : "/studio/images/common/filetypes/other_movie-128.png",
+				title : "Sample Movie file",
+				description : "Description of Movie file",
 				mimetype: "png",
 				endpoint: "http"				
 			}
 			,
 			{
-				url : "/studio/images/common/filetypes/html-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/html-128.png",
-				title : "HTML-128",
-				description : "HTML-128 description",
+				url : "/studio/images/common/filetypes/wmv-128.png",
+				thumbnailUrl : "/studio/images/common/filetypes/wmv-128.png",
+				title : "Sample WMV file",
+				description : "Description of WMV file",
 				mimetype: "png",
 				endpoint: "http"								
-			}
-			,
-			{
-				url : "/studio/images/common/filetypes/jpg-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/jpg-128.png",
-				title : "JPG-128",
-				description : "JPG-128 description",
-				mimetype: "png",
-				endpoint: "http"								
-			}
-			,
-			{
-				url : "/studio/images/common/filetypes/text-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/text-128.png",
-				title : "TEXT-128",
-				description : "TEXT-128 description",
-				mimetype: "png",
-				endpoint: "http"				
 			}
 		];
 		this.videosView.setItems(items);
