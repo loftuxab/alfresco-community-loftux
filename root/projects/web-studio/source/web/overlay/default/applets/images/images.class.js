@@ -30,46 +30,19 @@ WebStudio.Applets.Images.prototype.bindSliderControl = function(container)
 		// set up content
 		var items = [
 			{
-				url : "/studio/images/common/filetypes/avi-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/avi-128.png",
-				title : "AVI-128",
-				description : "AVI-128 description",
+				url : "/studio/images/common/filetypes/bmp-128.png",
+				thumbnailUrl : "/studio/images/common/filetypes/bmp-128.png",
+				title : "Sample BMP file",
+				description : "Sample BMP file description",
 				mimetype: "png",
 				endpoint: "http"
 			}
 			,
 			{
-				url : "/studio/images/common/filetypes/css-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/css-128.png",
-				title : "CSS-128",
-				description : "CSS-128 description",
-				mimetype: "png",
-				endpoint: "http"
-			}
-			,
-			{
-				url : "/studio/images/common/filetypes/folder-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/folder-128.png",
-				title : "FOLDER-128",
-				description : "FOLDER-128 description",
-				mimetype: "png",
-				endpoint: "http"
-			}
-			,
-			{
-				url : "/studio/images/common/filetypes/excel-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/excel-128.png",
-				title : "EXCEL-128",
-				description : "EXCEL-128 description",
-				mimetype: "png",
-				endpoint: "http"
-			}
-			,
-			{
-				url : "/studio/images/common/filetypes/html-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/html-128.png",
-				title : "HTML-128",
-				description : "HTML-128 description",
+				url : "/studio/images/common/filetypes/gif-128.png",
+				thumbnailUrl : "/studio/images/common/filetypes/gif-128.png",
+				title : "Sample GIF file",
+				description : "Sample GIF file description",
 				mimetype: "png",
 				endpoint: "http"
 			}
@@ -77,17 +50,26 @@ WebStudio.Applets.Images.prototype.bindSliderControl = function(container)
 			{
 				url : "/studio/images/common/filetypes/jpg-128.png",
 				thumbnailUrl : "/studio/images/common/filetypes/jpg-128.png",
-				title : "JPG-128",
-				description : "JPG-128 description",
+				title : "Sample JPG file",
+				description : "Sample JPG file description",
 				mimetype: "png",
 				endpoint: "http"
 			}
 			,
 			{
-				url : "/studio/images/common/filetypes/text-128.png",
-				thumbnailUrl : "/studio/images/common/filetypes/text-128.png",
-				title : "TEXT-128",
-				description : "TEXT-128 description",
+				url : "/studio/images/common/filetypes/other_image-128.png",
+				thumbnailUrl : "/studio/images/common/filetypes/other_image-128.png",
+				title : "Sample Image file",
+				description : "Sample Image file description",
+				mimetype: "png",
+				endpoint: "http"
+			}
+			,
+			{
+				url : "/studio/images/common/filetypes/png-128.png",
+				thumbnailUrl : "/studio/images/common/filetypes/png-128.png",
+				title : "Sample PNG file",
+				description : "Sample PNG file description",
 				mimetype: "png",
 				endpoint: "http"
 			}

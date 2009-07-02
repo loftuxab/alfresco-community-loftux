@@ -889,7 +889,7 @@ WebStudio.dd = WebStudio.dd ||
 	makeDraggable: function(el, scope, options, imgUrl)
 	{
 		// fail out if this element is already draggable
-		if (el.hasClass("ui-draggable"))
+		if (jQuery(el).hasClass("ui-draggable"))
 		{
 			return;
 		}

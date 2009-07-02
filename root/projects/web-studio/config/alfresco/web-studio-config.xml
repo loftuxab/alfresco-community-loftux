@@ -63,6 +63,7 @@
 
             </application>
 
+			<!--
             <application>
                <id>content</id>
                <title>Content Editor</title>
@@ -70,20 +71,15 @@
                <image-url>/images/floatingmenu/webstudio-content-64.png</image-url>
                <bootstrap-classname>WebStudio.Applications.Content</bootstrap-classname>
                <bootstrap-location>/overlay/default/applications/content/content.class.js</bootstrap-location>
-
-               <!-- User Sandbox Tools -->               
+              
                <include-applet id="sandbox" />
 
-               <!-- Content Behaviours -->
                <include-applet id="webforms" />				
                <include-applet id="images" />					
                <include-applet id="videos" />
 
-               <!-- 
-               <include-applet id="search" />
-               -->
-
             </application>
+            -->
 
          </applications>
 

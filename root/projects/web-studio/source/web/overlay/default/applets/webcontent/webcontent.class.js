@@ -160,7 +160,8 @@ WebStudio.Applets.WebContent.prototype.loadData = function(node, fnLoadComplete)
 		,
 		failure: function(oResponse) {
 			oResponse.argument.fnLoadComplete();
-			Alfresco.App.onFailure(oResponse);
+			
+			//Alfresco.App.onFailure(oResponse);
 		}
 		,
 		argument: {
