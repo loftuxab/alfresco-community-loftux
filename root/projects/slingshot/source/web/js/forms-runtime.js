@@ -1254,7 +1254,7 @@ Alfresco.forms.validation.email = function email(field, args, event, form, silen
       args = {};
    }
    
-   args.pattern = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/;
+   args.pattern = /(.+@.+\.[a-zA-Z0-9]{2,6})/;
    args.match = true;
 
    return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
