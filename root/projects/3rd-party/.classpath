@@ -128,5 +128,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jbpm/jbpm-identity-3.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jbpm/jbpm-jpdl-3.3.1.jar" sourcepath="src/jbpm-jpdl-3.2.2-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/jutf7-1.0.0.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.5.8.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-jcl-1.5.8.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
