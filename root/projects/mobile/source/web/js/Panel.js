@@ -34,13 +34,13 @@
         {
           var div = document.createElement('div');
           var dt = t;
-          dt = dt.replace(/{panelId}/g,this.id);
+          dt = dt.replace(/{panelId}/g,this.id.replace('.',''));
           dt = dt.replace(/{title}/g,this.config.title);
           dt = dt.replace(/{backButtonText}/g,this.config.buttons.backText||'back');
           div.innerHTML = dt;
 
           document.getElementById('container').appendChild(div.firstChild);
-          this.panelEl = document.getElementById(this.id);
+          this.panelEl = document.getElementById(this.id.replace('.',''));
           this.renderContent();
         };
       },
