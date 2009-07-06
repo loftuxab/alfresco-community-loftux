@@ -32,8 +32,7 @@ import org.alfresco.service.namespace.QName;
  * @author Roy Wetherall
  */
 public interface RecordsManagementModel 
-{
-	
+{	
 	// Namespace details
 	public static String RM_URI = "http://www.alfresco.org/model/recordsmanagement/1.0";
 	public static String RM_PREFIX = "rma";
@@ -51,23 +50,24 @@ public interface RecordsManagementModel
     public static QName TYPE_RECORDS_MANAGEMENT_CONTAINER = QName.createQName(RM_URI, "recordsManagementContainer");
     
     // Disposition instructions aspect
-    public static QName ASPECT_DISPOSITION_INSTRUCTIONS = QName.createQName(RM_URI, "dispositionInstructions");
-    public static QName ASSOC_DISPOSITION_INSTRUCTIONS = QName.createQName(RM_URI, "dispositionInstructions");
+    public static QName ASPECT_SCHEDULED = QName.createQName(RM_URI, "scheduled");
+    public static QName ASSOC_DISPOSITION_SCHEDULE = QName.createQName(RM_URI, "dispositionSchedule");
     
     // Disposition definition type
-    public static QName TYPE_DISPOSITION_DEFINITION = QName.createQName(RM_URI, "dispositionDefinition");
+    public static QName TYPE_DISPOSITION_SCHEDULE = QName.createQName(RM_URI, "dispositionSchedule");
     public static QName PROP_DISPOSITION_AUTHORITY = QName.createQName(RM_URI, "dispositionAuthority");
     public static QName PROP_DISPOITION_INSTRUCTIONS = QName.createQName(RM_URI, "dispositionInstructions");
     public static QName PROP_RECORD_LEVEL_DISPOSITION = QName.createQName(RM_URI, "recordLevelDisposition");
-    public static QName ASSOC_DISPOSITION_ACTIONS = QName.createQName(RM_URI, "dispositionActions");    
+    public static QName ASSOC_DISPOSITION_ACTION_DEFINITIONS = QName.createQName(RM_URI, "dispositionActionDefinitions");    
     
     // Disposition action type
-    public static QName PROP_TYPE = QName.createQName(RM_URI, "dispositionAction");
+    public static QName TYPE_DISPOSITION_ACTION_DEFINITION = QName.createQName(RM_URI, "dispositionActionDefinition");
     public static QName PROP_DISPOSITION_ACTION_NAME = QName.createQName(RM_URI, "dispositionActionName");
     public static QName PROP_DISPOSITION_DESCRIPTION = QName.createQName(RM_URI, "dispositionDescription");
     public static QName PROP_DISPOSITION_PERIOD = QName.createQName(RM_URI, "dispositionPeriod");
     public static QName PROP_DISPOSITION_PERIOD_PROPERTY = QName.createQName(RM_URI, "dispositionPeriodProperty");
-    
+    public static QName PROP_DISPOSITION_EVENT = QName.createQName(RM_URI, "dispositionEvent");
+    public static QName PROP_DISPOSITION_EVENT_COMBINATION = QName.createQName(RM_URI, "dispositionEventCombination");
     // Records folder
     public static QName TYPE_RECORD_FOLDER = QName.createQName(RM_URI, "recordFolder");
     public static QName PROP_IS_CLOSED = QName.createQName(RM_URI, "isClosed");
@@ -110,12 +110,26 @@ public interface RecordsManagementModel
     public static QName PROP_CUT_OFF_DATE = QName.createQName(RM_URI, "cutOffDate");
     
     // Disposition schedule aspect
-    public static QName ASPECT_DISPOSITION_SCHEDULE = QName.createQName(RM_URI, "dispositionSchedule");
+    public static QName ASPECT_DISPOSITION_LIFECYCLE = QName.createQName(RM_URI, "dispositionLifecycle");
+    public static QName ASSOC_NEXT_DISPOSITION_ACTION = QName.createQName(RM_URI, "nextDispositionAction");
+    public static QName ASSOC_DISPOSITION_ACTION_HISTORY = QName.createQName(RM_URI, "dispositionActionHistory");
+    
+    // Disposition action type
+    public static QName TYPE_DISPOSITION_ACTION = QName.createQName(RM_URI, "dispositionAction");
     public static QName PROP_DISPOSITION_ACTION_ID = QName.createQName(RM_URI, "dispositionActionId");
     public static QName PROP_DISPOSITION_ACTION = QName.createQName(RM_URI, "dispositionAction");
     public static QName PROP_DISPOSITION_AS_OF = QName.createQName(RM_URI, "dispositionAsOf");
     public static QName PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION = QName.createQName(RM_URI, "previousDispositionAction");
     public static QName PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE = QName.createQName(RM_URI, "previousDispositionDate");
+    public static QName ASSOC_EVENT_EXECUTIONS = QName.createQName(RM_URI, "eventExecutions");
+    
+    // Event execution type
+    public static QName TYPE_EVENT_EXECUTION = QName.createQName(RM_URI, "eventExecution");
+    public static QName PROP_EVENT_EXECUTION_NAME = QName.createQName(RM_URI, "eventExecutionName");
+    public static QName PROP_EVENT_EXECUTION_AUTOMATIC = QName.createQName(RM_URI, "eventExecutionAutomatic");
+    public static QName PROP_EVENT_EXECUTION_COMPLETE = QName.createQName(RM_URI, "eventExecutionComplete");
+    public static QName PROP_EVENT_EXECUTION_COMPLETED_BY = QName.createQName(RM_URI, "eventExecutionCompletedBy");
+    public static QName PROP_EVENT_EXECUTION_COMPLETED_AT = QName.createQName(RM_URI, "eventExecutionCompletedAt");
     
     // Custom RM data aspect
     public static QName ASPECT_CUSTOM_RM_DATA = QName.createQName(RM_URI, "customRMData");

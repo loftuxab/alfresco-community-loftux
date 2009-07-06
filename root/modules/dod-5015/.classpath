@@ -10,5 +10,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Web-Client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Remote API"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/WebScript Framework"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MBean"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -57,7 +57,7 @@
          <parent>rma:recordsManagementContainer</parent>         
          
          <mandatory-aspects>         
-            <aspect>rma:dispositionInstructions</aspect>
+            <aspect>rma:scheduled</aspect>
             <aspect>rma:vitalRecordDefinition</aspect>
          </mandatory-aspects>
          

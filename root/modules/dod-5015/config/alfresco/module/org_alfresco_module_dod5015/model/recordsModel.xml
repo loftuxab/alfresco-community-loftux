@@ -77,8 +77,8 @@
 
       </type> 
       
-      <type name="rma:dispositionDefinition">
-        <title>Disposition Definition</title>        
+      <type name="rma:dispositionSchedule">
+        <title>Disposition Schedule</title>        
         <parent>cm:cmobject</parent>
         
         <properties>
@@ -106,14 +106,14 @@
          
          <associations>
             
-            <child-association name="rma:dispositionActions">
+            <child-association name="rma:dispositionActionDefinitions">
                 <title>Disposition Actions</title>
                 <source>
                     <mandatory>false</mandatory>
                     <many>false</many>
                 </source>
                 <target>
-                    <class>rma:dispositionAction</class>
+                    <class>rma:dispositionActionDefinition</class>
                     <mandatory>false</mandatory>
                     <many>true</many>
                 </target>
@@ -123,9 +123,9 @@
 
       </type>
             
-      <type name="rma:dispositionAction">
+      <type name="rma:dispositionActionDefinition">
          
-         <title>Disposition Action</title>
+         <title>Disposition Action Definition</title>
          <parent>cm:cmobject</parent>
          
          <properties>
@@ -202,15 +202,103 @@
          
       </type>
             
-      <type name="rma:nonElectronicRecord">
+      <type name="rma:nonElectronicDocument">
          
-         <title>Non-Electronic Record</title>
+         <title>Non-Electronic Document</title>
          <parent>cm:cmobject</parent>           
-         
-         <mandatory-aspects>         
-            <aspect>rma:record</aspect>            
-         </mandatory-aspects>
       
+      </type>
+      
+      <type name="rma:dispositionAction">
+         <title>Disposition Action</title>  
+         <parent>cm:cmobject</parent>       
+         <properties>            
+            <property name="rma:dispositionActionId">
+               <title>Disposition Action Id</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>    
+            <property name="rma:dispositionAction">
+               <title>Disposition Action</title> 
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>              
+            <property name="rma:dispositionAsOf">
+               <title>Disposition Action Date</title>
+               <type>d:date</type>
+               <mandatory>true</mandatory>
+            </property>            
+            <property name="rma:previousDispositionAction">
+               <title>Previous Disposition Action</title> 
+               <type>d:text</type>
+               <protected>true</protected>
+               <mandatory>false</mandatory>
+            </property>            
+            <property name="rma:previousDispositionDate">
+               <title>Previous Disposition Date</title> 
+               <type>d:date</type>
+               <protected>true</protected>
+               <mandatory>false</mandatory>
+            </property>
+                        
+         </properties>
+         
+         <associations>
+            
+            <child-association name="rma:eventExecutions">
+                <title>Event executions</title>
+                <source>
+                    <mandatory>false</mandatory>
+                    <many>false</many>
+                </source>
+                <target>
+                    <class>rma:eventExecution</class>
+                    <mandatory>false</mandatory>
+                    <many>false</many>
+                </target>
+            </child-association>
+         
+         </associations>
+         
+      </type>
+      
+      <type name="rma:eventExecution">
+      
+         <title>Event Execution</title>
+         <description>Execution details of an event</description>
+         <parent>cm:cmobject</parent>
+         
+         <properties>
+         
+            <property name="rma:eventExecutionName">
+               <title>Event Name</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="rma:eventExecutionAutomatic">
+               <title>Event automatic</title>
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+            </property>
+            <property name="rma:eventExecutionComplete">
+               <title>Event complete</title>
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+               <default>false</default>
+            </property>
+            <property name="rma:eventExecutionCompletedBy">
+               <title>Event completed by</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+            <property name="rma:eventExecutionCompletedAt">
+               <title>Event completed at</title>
+               <type>d:date</type>
+               <mandatory>false</mandatory>
+            </property>         
+         
+         </properties>
+         
       </type>
     
    </types>
@@ -248,9 +336,7 @@
                <default>false</default>
             </property>            
          </properties>
-      </aspect>
-      
-      
+      </aspect>            
       
       <!-- Record Meta-data -->
          
@@ -375,18 +461,18 @@
          </properties>
       </aspect> 
       
-      <aspect name="rma:dispositionInstructions">
-        <title>Disposition Instructions</title>         
+      <aspect name="rma:scheduled">
+        <title>Scheduled</title>         
          <associations>
             
-            <child-association name="rma:dispositionInstructions">
-                <title>Disposition Definition</title>
+            <child-association name="rma:dispositionSchedule">
+                <title>Disposition Schedule</title>
                 <source>
                     <mandatory>false</mandatory>
                     <many>false</many>
                 </source>
                 <target>
-                    <class>rma:dispositionDefinition</class>
+                    <class>rma:dispositionSchedule</class>
                     <mandatory>false</mandatory>
                     <many>true</many>
                 </target>
@@ -395,47 +481,38 @@
          </associations>
       </aspect>
       
-      <aspect name="rma:dispositionSchedule">
-         <title>Next Disposition Action</title>         
-         <properties>            
-            <property name="rma:dispositionActionId">
-               <title>Disposition Action Id</title>
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>    
-            <property name="rma:dispositionAction">
-               <title>Disposition Action</title> 
-               <type>d:text</type>
-               <mandatory>true</mandatory>
-            </property>              
-            <property name="rma:dispositionAsOf">
-               <title>Disposition Action Date</title>
-               <type>d:date</type>
-               <mandatory>true</mandatory>
-            </property>
+      <aspect name="rma:dispositionLifecycle">
+        <title>Disposition Lifecycle</title>         
+         <associations>
             
-            <!-- TODO need to model events complete here -->
+            <child-association name="rma:nextDispositionAction">
+                <title>Next disposition action</title>
+                <source>
+                    <mandatory>false</mandatory>
+                    <many>false</many>
+                </source>
+                <target>
+                    <class>rma:dispositionAction</class>
+                    <mandatory>false</mandatory>
+                    <many>false</many>
+                </target>
+            </child-association>
             
-            <!-- TODO model previous action information -->
-            
-            <property name="rma:previousDispositionAction">
-               <title>Previous Disposition Action</title> 
-               <type>d:text</type>
-               <protected>true</protected>
-               <mandatory>false</mandatory>
-            </property>            
-            <property name="rma:previousDispositionDate">
-               <title>Previous Disposition Date</title> 
-               <type>d:date</type>
-               <protected>true</protected>
-               <mandatory>false</mandatory>
-            </property>
-                        
-         </properties>
+             
+            <child-association name="rma:dispositionActionHistory">
+                <title>Disposition Action History</title>
+                <source>
+                    <mandatory>false</mandatory>
+                    <many>false</many>
+                </source>
+                <target>
+                    <class>rma:dispositionAction</class>
+                    <mandatory>false</mandatory>
+                    <many>true</many>
+                </target>
+            </child-association>
          
-         <!-- TODO association linking back to disposition action ?? -->
-         <!-- TODO association linking record back to record category instead ?? -->
-         
+         </associations>
       </aspect>
    
       <aspect name="rma:cutOff">

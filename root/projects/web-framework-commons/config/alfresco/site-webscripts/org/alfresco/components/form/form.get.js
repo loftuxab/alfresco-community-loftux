@@ -417,6 +417,13 @@ function setupFormUIModel(mode, formModel, formConfig)
       data: formModel.data.formData
    };
    
+   // if a destination has been provided add to the model
+   var destination = getArgument("destination");
+   if (destination !== null)
+   {
+      formUIModel.destination = destination;
+   }
+   
    // setup custom form templates to use if they are present
    if (formConfig !== null)
    {
@@ -581,7 +588,7 @@ function setupSet(mode, setConfig, formModel, formConfig)
          var fieldConfig = formConfig.fields[fieldName];
          
          // setup the field
-         var field = setupField(formModel, fieldName, fieldConfig);
+         var field = setupField(mode, formModel, fieldName, fieldConfig);
          
          // if a field was created add to the set's list of children
          if (field !== null)
@@ -616,13 +623,14 @@ function setupSet(mode, setConfig, formModel, formConfig)
  * field defintion and field UI configuration.
  *
  * @method setupField
+ * @param mode The mode of the form
  * @param formModel The form model returned from the server
  * @param fieldName The name of the field to setup
  * @param fieldConfig Object representing the UI configuration 
  *                    or null if there isn't any configuration 
  * @return Object representing the field 
  */
-function setupField(formModel, fieldName, fieldConfig)
+function setupField(mode, formModel, fieldName, fieldConfig)
 {
    var fieldDef = null;
    
@@ -708,7 +716,7 @@ function setupField(formModel, fieldName, fieldConfig)
          setupFieldConstraints(fieldDef, fieldConfig);
          
          // setup the value for the field
-         setupFieldValue(formModel, fieldDef, fieldConfig);
+         setupFieldValue(mode, formModel, fieldDef, fieldConfig);
       }
       else
       {
@@ -1059,18 +1067,27 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
  * Sets up the value of the field.
  *
  * @method setupFieldValue
+ * @param mode The mode of the form
  * @param formModel The form model returned from the server
  * @param fieldDef Object representing the field definition 
  * @param fieldConfig Object representing the UI configuration
  *                    or null if there isn't any configuration
  */
-function setupFieldValue(formModel, fieldDef, fieldConfig)
+function setupFieldValue(mode, formModel, fieldDef, fieldConfig)
 {
    fieldDef.value = "";
    
    if (typeof formModel.data.formData[fieldDef.dataKeyName] !== "undefined")
    {
       fieldDef.value = formModel.data.formData[fieldDef.dataKeyName];
+   }
+   
+   // if the value is still empty, we're in create mode and the 
+   // field has a default value use it for initial value
+   if (fieldDef.value === "" && mode === "create" && 
+       (typeof fieldDef.defaultValue !== "undefined"))
+   {
+      fieldDef.value = fieldDef.defaultValue;
    }
 }
 

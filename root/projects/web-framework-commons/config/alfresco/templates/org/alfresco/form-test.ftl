@@ -29,6 +29,10 @@
                <label for="itemId">Id:</label>
                <input id="itemId" type="text" name="itemId" style="width: 450px; margin: 5px 5px 5px 0px;" 
                       value="<#if url.args.itemId?exists>${url.args.itemId}</#if>" />
+               <br/>
+               <label for="destination">Destination:</label>
+               <input id="destination" type="text" name="destination" style="width: 494px; margin: 5px 5px 5px 0px;" 
+                      value="<#if url.args.destination?exists>${url.args.destination}</#if>" />
             </fieldset>
             <fieldset style="border: 1px solid #aaa; margin: 10px 0px; padding: 8px;">
                <legend style="color: #515d6b;">Form Details</legend>
@@ -38,6 +42,7 @@
                <label style="margin-right: 5px;">Mode:</label>
                <input id="mode-view" type="radio" name="mode" value="view"<#if mode == "view"> checked</#if>>&nbsp;View&nbsp;
                <input id="mode-edit" type="radio" name="mode" value="edit"<#if mode == "edit"> checked</#if>>&nbsp;Edit&nbsp;
+               <input id="mode-create" type="radio" name="mode" value="create"<#if mode == "create"> checked</#if>>&nbsp;Create&nbsp;
                <br/>
                <label style="margin-right: 5px;">Submit Type:</label>
                <input id="submitType-multi" type="radio" name="submitType" value="multipart"<#if submitType == "multipart"> checked</#if>>&nbsp;Multipart&nbsp;

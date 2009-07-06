@@ -27,10 +27,12 @@ package org.alfresco.module.org_alfresco_module_dod5015.action;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.module.org_alfresco_module_dod5015.DispositionInstructions;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 /**
  * @author Roy Wetherall
@@ -42,17 +44,28 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
     protected boolean checkEligibility = true;
     
     /**
+     * All children of this implementation are disposition actions.
+     * 
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase#isDispositionAction()
+     */
+    @Override
+    public boolean isDispositionAction()
+    {
+        return true;
+    }
+    
+    /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {
-        // Check the validity of the actoin (is it the next action, are we dealing with the correct type of object for the disposition level?
-        DispositionInstructions di = checkDispositionActionExecutionValidity(actionedUponNodeRef);
+        // Check the validity of the action (is it the next action, are we dealing with the correct type of object for the disposition level?
+        DispositionSchedule di = checkDispositionActionExecutionValidity(actionedUponNodeRef);
         
         // TODO check for frozen state (can not execute a disposition action when frozen)
         
-        // Check the eligability of the action
+        // Check the eligibility of the action
         if (checkEligibility == false || this.recordsManagementService.isNextDispositionActionEligible(actionedUponNodeRef) == true)
         {
             if (di.isRecordLevelDisposition() == true)
@@ -120,7 +133,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
         }
         else
         {
-            throw new AlfrescoRuntimeException("Unable to execute disposition action" + 
+            throw new AlfrescoRuntimeException("Unable to execute disposition action " + 
                     getName() + 
                     ", because the next disposition action on the record or record folder is not eligiable. (" 
                     + actionedUponNodeRef.toString() + 
@@ -156,10 +169,10 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
      * @param nodeRef
      * @return
      */
-    protected DispositionInstructions checkDispositionActionExecutionValidity(NodeRef nodeRef)
+    protected DispositionSchedule checkDispositionActionExecutionValidity(NodeRef nodeRef)
     {
         // Check the node has associated disposition instructions
-        DispositionInstructions di = this.recordsManagementService.getDispositionInstructions(nodeRef);
+        DispositionSchedule di = this.recordsManagementService.getDispositionSchedule(nodeRef);
         if (di == null)
         {
             throw new AlfrescoRuntimeException("Unable to find disposition instructions for node.  Can not execute disposition action " + 
@@ -170,17 +183,26 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
         }
         
         // Check the node has the disposition schedule aspect applied
-        if (this.nodeService.hasAspect(nodeRef, ASPECT_DISPOSITION_SCHEDULE) == false)
+        if (this.nodeService.hasAspect(nodeRef, ASPECT_DISPOSITION_LIFECYCLE) == false)
         {
             throw new AlfrescoRuntimeException("Unable to execute disposition action" + 
                     getName() + 
-                    ", because node does not have a disposition schedule set. (" 
+                    ", because node does not have a disposition lifecycle set. (" 
                     + nodeRef.toString() + 
                     ")");
         }
         
         // Check this the next disposition action
-        String actionName = (String)this.nodeService.getProperty(nodeRef, PROP_DISPOSITION_ACTION);
+        NodeRef nextDispositionAction = getNextDispostionAction(nodeRef);
+        if (nextDispositionAction == null)
+        {
+            throw new AlfrescoRuntimeException("Unable to execute disposition action" + 
+                    getName() + 
+                    ", because the next disposition action is not set. (" 
+                    + nodeRef.toString() + 
+                    ")");
+        }
+        String actionName = (String)this.nodeService.getProperty(nextDispositionAction, PROP_DISPOSITION_ACTION);
         if (actionName == null || actionName.equals(getName()) == false)
         {
             throw new AlfrescoRuntimeException("Unable to execute disposition action" + 
@@ -191,6 +213,151 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
         }
         
         return di;
+    }
+    
+//    public void updateNextDispositionAction(NodeRef nodeRef)
+//    {
+//        // Get this disposition instructions for the node
+//        DispositionSchedule di = recordsManagementService.getDispositionSchedule(nodeRef);
+//        if (di != null)
+//        {
+//            // Get the current action node
+//            NodeRef currentDispositionAction = null;
+//            if (this.nodeService.hasAspect(nodeRef, ASPECT_DISPOSITION_LIFECYCLE) == true)
+//            {
+//                List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL);
+//                if (assocs.size() > 0)
+//                {
+//                    currentDispositionAction = assocs.get(0).getChildRef();
+//                }
+//            }
+//            
+//            if (currentDispositionAction != null)
+//            {
+//                // Stamp it complete
+//                // TODO
+//            
+//                // Move it to the history association
+//                this.nodeService.moveNode(currentDispositionAction, nodeRef, ASSOC_DISPOSITION_ACTION_HISTORY, ASSOC_DISPOSITION_ACTION_HISTORY);
+//            }
+//           
+//            List<DispositionActionDefinition> dispositionActionDefinitions = di.getDispositionActionDefinitions();
+//            DispositionActionDefinition currentDispositionActionDefinition = null;
+//            DispositionActionDefinition nextDispositionActionDefinition = null;
+//            
+//            if (currentDispositionAction == null)
+//            {
+//                if (dispositionActionDefinitions.isEmpty() == false)
+//                {
+//                    // The next disposition action is the first action
+//                    nextDispositionActionDefinition = dispositionActionDefinitions.get(0);
+//                }
+//            }
+//            else
+//            {
+//                // Get the current action
+//                String currentADId = (String)this.nodeService.getProperty(currentDispositionAction, PROP_DISPOSITION_ACTION_ID);
+//                currentDispositionActionDefinition = di.getDispositionActionDefinition(currentADId);
+//                
+//                // Get the next disposition action
+//                int index = currentDispositionActionDefinition.getIndex();
+//                index++;
+//                if (index < dispositionActionDefinitions.size())
+//                {
+//                    nextDispositionActionDefinition = dispositionActionDefinitions.get(index);
+//                }
+//            }
+//            
+//            if (nextDispositionActionDefinition != null)
+//            {
+//                if (this.nodeService.hasAspect(nodeRef, ASPECT_DISPOSITION_LIFECYCLE) == false)
+//                {
+//                    // Add the disposition life cycle aspect
+//                    this.nodeService.addAspect(nodeRef, ASPECT_DISPOSITION_LIFECYCLE, null);
+//                }
+//                
+//                // Create the properties
+//                Map<QName, Serializable> props = new HashMap<QName, Serializable>(10);
+//                
+//                // Calculate the asOf date
+//                Date asOfDate = null;
+//                Period period = nextDispositionActionDefinition.getPeriod();
+//                if (period != null)
+//                {
+//                    // Use NOW as the default context date
+//                    Date contextDate = new Date();
+//                    
+//                    // Get the period properties value
+//                    QName periodProperty = nextDispositionActionDefinition.getPeriodProperty();
+//                    if (periodProperty != null)
+//                    {
+//                        contextDate = (Date)this.nodeService.getProperty(nodeRef, periodProperty);
+//                        
+//                        if (contextDate == null)
+//                        {
+//                            throw new AlfrescoRuntimeException("Date used to calculate disposition action asOf date is not set for property " + periodProperty.toString());
+//                        }
+//                    }
+//                    
+//                    // Calculate the as of date
+//                    asOfDate = period.getNextDate(contextDate);
+//                }            
+//                
+//                // Set the property values
+//                props.put(PROP_DISPOSITION_ACTION_ID, nextDispositionActionDefinition.getId());
+//                props.put(PROP_DISPOSITION_ACTION, nextDispositionActionDefinition.getName());
+//                if (asOfDate != null)
+//                {
+//                    props.put(PROP_DISPOSITION_AS_OF, asOfDate);
+//                }
+//                
+//                // Create a new disposition action object
+//                NodeRef dispositionActionNodeRef = this.nodeService.createNode(
+//                        nodeRef, 
+//                        ASSOC_NEXT_DISPOSITION_ACTION, 
+//                        ASSOC_NEXT_DISPOSITION_ACTION, 
+//                        TYPE_DISPOSITION_ACTION,
+//                        props).getChildRef();     
+//                
+//                // Create the events
+//                List<RecordsManagementEvent> events = nextDispositionActionDefinition.getEvents();
+//                for (RecordsManagementEvent event : events)
+//                {
+//                    // For every event create an entry on the action
+//                    Map<QName, Serializable> eventProps = new HashMap<QName, Serializable>(7);
+//                    eventProps.put(PROP_EVENT_EXECUTION_NAME, event.getName());
+//                    // TODO display label
+//                    RecordsManagementEventType eventType = this.recordsManagementEventService.getEventType(event.getType());
+//                    eventProps.put(PROP_EVENT_EXECUTION_AUTOMATIC, eventType.isAutomaticEvent());
+//                    eventProps.put(PROP_EVENT_EXECUTION_COMPLETE, false);
+//                    
+//                    // Create the event execution object
+//                    this.nodeService.createNode(
+//                            dispositionActionNodeRef,
+//                            ASSOC_EVENT_EXECUTIONS,
+//                            ASSOC_EVENT_EXECUTIONS,
+//                            TYPE_EVENT_EXECUTION,
+//                            eventProps);
+//                }
+//            }
+//        }
+//    }
+    
+    /**
+     * Get the next disposition action node.  Null if none present.
+     * 
+     * @param nodeRef       the disposable node reference
+     * @return NodeRef      the next disposition action, null if none
+     */
+    private NodeRef getNextDispostionAction(NodeRef nodeRef)
+    {
+        NodeRef result = null;
+        List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL);
+        if (assocs.size() != 0)
+        {
+            result = assocs.get(0).getChildRef();
+        }
+        return result;
     }
 
 }

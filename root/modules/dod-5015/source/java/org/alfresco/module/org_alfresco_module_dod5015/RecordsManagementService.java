@@ -44,16 +44,18 @@ public interface RecordsManagementService
     boolean isRecord(NodeRef nodeRef);
     
     /**
+     * Indicates whether the record is declared
      * 
-     * @param nodeRef
-     * @return
+     * @param nodeRef   node reference (record)
+     * @return boolean  true if record is declared, false otherwise
      */
     boolean isRecordDeclared(NodeRef nodeRef);
     
     /**
+     * Indicates whether the contents of a record folder are all declared.
      * 
-     * @param nodeRef
-     * @return
+     * @param nodeRef   node reference (record folder)
+     * @return boolean  true if record folder contents are declared, false otherwise
      */
     boolean isRecordFolderDeclared(NodeRef nodeRef);
     
@@ -66,7 +68,7 @@ public interface RecordsManagementService
     boolean isRecordFolder(NodeRef nodeRef);
     
     /**
-     * Indicates wehther the given node is a record management container of not.
+     * Indicates whether the given node is a record management container of not.
      * 
      * @param nodeRef   node reference
      * @return boolean  true if records management container
@@ -89,14 +91,15 @@ public interface RecordsManagementService
     List<NodeRef> getRecords(NodeRef recordFolder);
     
     /**
-     * Get the disposition instructions for a given record management node.
+     * Get the disposition schedule for a given record management node.
      * 
      * @param nodeRef                   node reference to rm container, record folder or record
      * @return DispositionInstructions  disposition instructions
      */
-    DispositionInstructions getDispositionInstructions(NodeRef nodeRef);
+    DispositionSchedule getDispositionSchedule(NodeRef nodeRef);
     
     /**
+     * TODO MOVE THIS FROM THIS API
      * 
      * @param dispositionInstructions
      * @param record
@@ -104,11 +107,16 @@ public interface RecordsManagementService
     void updateNextDispositionAction(NodeRef nodeRef);
     
     /**
+     * TODO MOVE THIS FROM THIS API
      * 
      * @param nodeRef
      * @return
      */
     boolean isNextDispositionActionEligible(NodeRef nodeRef);
+    
+    // TODO DispositionAction getDispositionNextDispositionAction(NodeRef nodeRef);
+    // TODO List<DispositionAction> getDispositionActionHistory(NodeRef nodeRef);
+    // TODO boolean isDispositionActionEligible(DispositionAction nodeRef); ???  (move to disposition action object?)  
     
     /**
      * Get the vital record definition for a given node reference within the file plan
@@ -116,5 +124,5 @@ public interface RecordsManagementService
      * @param nodeRef               node reference to a container, record folder or record
      * @return VitalRecordDetails   vital record details, null if none
      */
-    VitalRecordDefinition getVitalRecordDefinition(NodeRef nodeRef);
+    VitalRecordDefinition getVitalRecordDefinition(NodeRef nodeRef);  
 }

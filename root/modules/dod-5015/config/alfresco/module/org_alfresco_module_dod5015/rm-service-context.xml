@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <!-- Records Management Service Registry -->
+
+    <bean id="RecordsManagementServiceRegistry" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistryImpl" />    
+    
+    <!-- Records Management Service -->
+    
+    <bean id="recordsManagementService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceImpl"
+          depends-on="org_alfresco_module_dod5015_dictionaryBootstrap" init-method="init">        
+        <property name="recordsManagementServiceRegistry" ref="RecordsManagementServiceRegistry"/>
+        <property name="policyComponent" ref="policyComponent"/>
+    </bean>
+    
+    <bean id="RecordsManagementService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService</value>
+        </property>
+        <property name="target">
+            <ref bean="recordsManagementService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="RecordsManagementService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref local="RecordsManagementService_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+  
+    
+    <!-- Records Management Action Service -->
+    
+    <bean id="recordsManagementActionService" class="org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionServiceImpl"/>
+    
+    <bean id="RecordsManagementActionService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService</value>
+        </property>
+        <property name="target">
+            <ref bean="recordsManagementActionService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="RecordsManagementActionService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref local="RecordsManagementActionService_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementActionService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementActionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    
+    <!-- Records Management Event Service -->
+    
+    <bean id="recordsManagementEventService" class="org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventServiceImpl">
+      <property name="nodeService" ref="NodeService"/>
+      <property name="contentService" ref="ContentService"/>
+    </bean>
+    
+    <bean id="RecordsManagementEventService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService</value>
+        </property>
+        <property name="target">
+            <ref bean="recordsManagementEventService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="RecordsManagementEventService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref local="RecordsManagementEventService_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementEventService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementEventService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    
+    <!-- Records Management Admin Service -->
+    
+    <bean id="recordsManagementAdminService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl">
+        <property name="serviceRegistry">
+            <ref bean="ServiceRegistry" />
+        </property>
+    </bean>
+    
+    <bean id="RecordsManagementAdminService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService</value>
+        </property>
+        <property name="target">
+            <ref bean="recordsManagementAdminService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="RecordsManagementAdminService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref local="RecordsManagementAdminService_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementAdminService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementAdminService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    
+</beans>    

@@ -41,7 +41,9 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
+import org.alfresco.web.scripts.TestWebScriptServer.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -51,9 +53,13 @@ import org.json.JSONStringer;
  * 
  * @author Neil McErlean
  */
+@Deprecated
+//TODO The Rest API for RM has been removed, so this class may be deleted. I'm not "svn delete"ing it
+//     just yet as I may reuse the code for other tests.
 public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsManagementModel
 {
-    private static final String RMA_REST_URL = "/api/rma/actions/ExecutionQueue";
+    private static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
+    private static final String RMA_CUSTOM_ASSOCS_URL = "/api/rma/customassocs";
     protected static final String APPLICATION_JSON = "application/json";
     protected NodeService nodeService;
     protected ContentService contentService;
@@ -86,7 +92,7 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
      * 
      * @throws Exception
      */
-    public void testPostActionToNonExistentNode() throws Exception
+    public void off_testPostActionToNonExistentNode() throws Exception
     {
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");     
         assertNotNull(recordCategory);
@@ -105,10 +111,10 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
         String jsonPostString = jsonPostData.toString();
         
         final int expectedStatus = 404;
-        sendRequest(new PostRequest(RMA_REST_URL, jsonPostString, APPLICATION_JSON), expectedStatus);
+        sendRequest(new PostRequest(RMA_ACTIONS_URL, jsonPostString, APPLICATION_JSON), expectedStatus);
     }
 
-    public void testPost_ReviewedAction() throws IOException, JSONException
+    public void off_testPost_ReviewedAction() throws IOException, JSONException
     {
         // Get the recordCategory under which we will create the testNode.
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");     
@@ -156,11 +162,51 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
         
         // Submit the JSON request.
         final int expectedStatus = 200;
-        sendRequest(new PostRequest(RMA_REST_URL,
+        sendRequest(new PostRequest(RMA_ACTIONS_URL,
                                  jsonString, APPLICATION_JSON), expectedStatus);
         
         Serializable newReviewAsOfDate = this.nodeService.getProperty(testRecord, PROP_REVIEW_AS_OF);
         assertFalse("The reviewAsOf property should have changed. Was " + pristineReviewAsOf,
         		pristineReviewAsOf.equals(newReviewAsOfDate));
+    }
+
+    public void off_testPostCustomAssoc() throws IOException, JSONException
+    {
+        // Standard association
+        final String standardAssocName = "rmc:customAssocStandard" + System.currentTimeMillis();
+        String jsonString = new JSONStringer().object()
+            .key("assocName").value(standardAssocName)
+            .key("isChild").value(false)
+        .endObject()
+        .toString();
+        
+        // Submit the JSON request.
+        final int expectedStatus = 200;
+        sendRequest(new PostRequest(RMA_CUSTOM_ASSOCS_URL,
+                                 jsonString, APPLICATION_JSON), expectedStatus);
+
+        // Child association
+        final String childAssocName = "rmc:customAssocChild" + System.currentTimeMillis();
+        jsonString = new JSONStringer().object()
+            .key("assocName").value(childAssocName)
+            .key("isChild").value(true)
+        .endObject()
+        .toString();
+        
+        // Submit the JSON request.
+        sendRequest(new PostRequest(RMA_CUSTOM_ASSOCS_URL,
+                                 jsonString, APPLICATION_JSON), expectedStatus);
+        
+        //TODO Assert they worked.
+    }
+
+    public void off_testGetCustomAssocs() throws IOException, JSONException
+    {
+        // Submit the JSON request.
+        final int expectedStatus = 200;
+        Response rsp = sendRequest(new GetRequest(RMA_CUSTOM_ASSOCS_URL), expectedStatus);
+
+        System.out.println("GET rsp: " + rsp.getContentAsString());
+        //TODO Assert it worked.
     }
 }
