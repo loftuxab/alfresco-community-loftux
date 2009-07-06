@@ -1,4 +1,4 @@
-function getFilterParams(filter, parsedArgs)
+function getFilterParams(filter, parsedArgs, favourites)
 {
    var filterParams =
    {
@@ -17,17 +17,25 @@ function getFilterParams(filter, parsedArgs)
    }
 
    // Create query based on passed-in arguments
+   var filterId = String(filter),
+      filterData = String(args["filterData"]);
+
+   // Common types and aspects to filter from the UI
+   var filterQueryDefaults = " -ASPECT:\"{http://www.alfresco.org/model/content/1.0}workingcopy\"";
+   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/content/1.0}thumbnail\"";
+   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/content/1.0}systemfolder\"";
+   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}forums\"";
+   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}forum\"";
+   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}topic\"";
+   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}post\"";
+
+   // Create query based on passed-in arguments
    switch (String(filter))
    {
       case "all":
          var filterQuery = "+PATH:\"" + parsedArgs.rootNode.qnamePath + "//*\"";
-         filterQuery += " -TYPE:\"{http://www.alfresco.org/model/content/1.0}thumbnail\"";
          filterQuery += " -TYPE:\"{http://www.alfresco.org/model/content/1.0}folder\"";
-         filterQuery += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}forums\"";
-         filterQuery += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}forum\"";
-         filterQuery += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}topic\"";
-         filterQuery += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}post\"";
-         filterParams.query = filterQuery;
+         filterParams.query = filterQuery + filterQueryDefaults;
          break;
          
       case "node":
@@ -35,15 +43,27 @@ function getFilterParams(filter, parsedArgs)
          filterParams.query = "+ID:\"" + parsedArgs.parentNode.nodeRef + "\"";
          break;
       
+      case "savedsearch":
+         var searchNode = parsedArgs.location.siteNode.getContainer("Saved Searches");
+         if (searchNode != null)
+         {
+            var ssNode = searchNode.childByNamePath(filterData),
+               cleanXml, e4x;
+
+            if (ssNode != null)
+            {
+               cleanXml = new String(ssNode.content);
+               cleanXml = cleanXml.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // Rhino E4X bug 336551
+               cleanXml = cleanXml.replace(/^\s+|\s+$/g, ""); // General Rhino E4X inability to handle leading whitespace
+               e4x = new XML(cleanXml);
+               filterParams.query = e4x.query.toString();
+            }
+         }
+         break;
+      
       default:
          var filterQuery = "+PATH:\"" + parsedArgs.parentNode.qnamePath + "/*\"";
-         filterQuery += " -ASPECT:\"{http://www.alfresco.org/model/content/1.0}workingcopy\"";
-         filterQuery += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}forums\"";
-         filterQuery += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}forum\"";
-         filterQuery += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}topic\"";
-         filterQuery += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}post\"";
-         
-         filterParams.query = filterQuery;
+         filterParams.query = filterQuery + filterQueryDefaults;
          break;
    }
    
@@ -52,7 +72,6 @@ function getFilterParams(filter, parsedArgs)
 
 const TYPE_MAP =
 {
-   "all": '+(TYPE:"{http://www.alfresco.org/model/content/1.0}content" OR TYPE:"{http://www.alfresco.org/model/application/1.0}filelink" OR TYPE:"{http://www.alfresco.org/model/content/1.0}folder")',
    "documents": '+(TYPE:"{http://www.alfresco.org/model/content/1.0}content" OR TYPE:"{http://www.alfresco.org/model/application/1.0}filelink" OR TYPE:"{http://www.alfresco.org/model/content/1.0}folder")',
    "folders": '+TYPE:"{http://www.alfresco.org/model/content/1.0}folder"',
    "images": "-TYPE:\"{http://www.alfresco.org/model/content/1.0}thumbnail\" +@cm\\:content.mimetype:image/*"

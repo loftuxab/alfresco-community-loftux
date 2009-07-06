@@ -7,13 +7,13 @@ function getAssetType(asset)
    // More detailed asset type
    switch (String(asset.typeShort))
    {
-      case "rma:filePlan":
+      case "dod:filePlan":
          assetType = "fileplan";
          break;
-      case "rma:recordSeries":
+      case "dod:recordSeries":
          assetType = "record-series";
          break;
-      case "rma:recordCategory":
+      case "dod:recordCategory":
          assetType = "record-category";
          break;
       case "rma:recordFolder":
@@ -176,10 +176,6 @@ function runEvaluator(asset, assetType)
                permissions.push(asset.properties["rma:dispositionAction"]);
             }
          }
-         /**
-          * Test values for demo
-          */
-         permissions.push("add-reference");
          break;
 
 

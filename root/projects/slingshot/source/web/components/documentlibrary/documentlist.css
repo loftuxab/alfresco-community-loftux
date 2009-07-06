@@ -196,8 +196,8 @@
    min-height: 32px;
 }
 
-.doclist .documents .icon32 span,
-.doclist .documents .folder-small span
+.doclist .documents .icon32 span.link,
+.doclist .documents .folder-small span.link
 {
    background: url(images/link-16.png) no-repeat;
    display: block;

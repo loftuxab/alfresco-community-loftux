@@ -39,7 +39,7 @@
     */
    Alfresco.DocumentLibrary = function DocumentLibrary_constructor()
    {
-      Alfresco.DocumentLibrary.superclass.constructor.call(this);
+      Alfresco.DocumentLibrary.superclass.constructor.call(this, "DocumentLibrary");
       return this;
    };
    

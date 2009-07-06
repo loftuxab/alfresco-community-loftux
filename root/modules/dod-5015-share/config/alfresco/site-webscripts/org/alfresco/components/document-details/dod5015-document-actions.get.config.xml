@@ -14,8 +14,9 @@
       </actionSet>
 
       <actionSet id="undeclaredRecord">
-         <action id="onActionDeclare" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.declare" />
-         <action id="onActionUploadNewVersion" permission="create,edit,HIDDEN" type="action-link" label="actions.upload-new-version" />
+         <action id="onActionEditDetails" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action id="onActionDeclare" permission="declare" type="action-link" label="actions.declare" />
+         <action id="onActionUploadNewVersion" permission="HIDDEN" type="action-link" label="actions.upload-new-version" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 

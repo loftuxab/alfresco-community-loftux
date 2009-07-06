@@ -559,7 +559,7 @@ Alfresco.util.decodeHTML = function(html)
  */
 Alfresco.util.encodeHTML = function(text)
 {
-   if (text === null)
+   if (text === null || typeof text == "undefined")
    {
       return "";
    }
