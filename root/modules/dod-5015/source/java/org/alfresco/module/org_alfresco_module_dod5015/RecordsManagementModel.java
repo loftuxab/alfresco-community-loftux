@@ -73,7 +73,7 @@ public interface RecordsManagementModel
     public static QName PROP_IS_CLOSED = QName.createQName(RM_URI, "isClosed");
     
     // Undeclared record aspect
-    public static QName ASPECT_UNDECLARED_RECORD = QName.createQName(RM_URI, "undeclaredRecord");
+    public static QName ASPECT_DECLARED_RECORD = QName.createQName(RM_URI, "declaredRecord");
     
     // Record aspect
     public static QName ASPECT_RECORD = QName.createQName(RM_URI, "record");

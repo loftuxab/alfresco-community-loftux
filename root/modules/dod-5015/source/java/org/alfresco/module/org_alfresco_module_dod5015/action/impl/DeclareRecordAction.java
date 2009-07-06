@@ -54,21 +54,21 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
         {
             if (recordsManagementService.isRecordDeclared(actionedUponNodeRef) == false)
             {
-                // Need to check that all the mandatory properties have been set
+            	//Aspect not already defined - check mandatory properties then add
                 if (mandatoryPropertiesSet(actionedUponNodeRef) == true)
                 {
-                    // Remove the undeclared aspect
-                    this.nodeService.removeAspect(actionedUponNodeRef, ASPECT_UNDECLARED_RECORD);
+                    // Add the declared aspect
+                    this.nodeService.addAspect(actionedUponNodeRef, ASPECT_DECLARED_RECORD, null);
                 }
                 else
                 {
-                    throw new AlfrescoRuntimeException("Can not declare record as not all mandatory properties have been set. (" + actionedUponNodeRef.toString() + ")");
+                	throw new AlfrescoRuntimeException("Can not declare record as not all mandatory properties have been set. (" + actionedUponNodeRef.toString() + ")");
                 }
             }
         }
         else
         {
-            throw new AlfrescoRuntimeException("Can only declare a record. (" + actionedUponNodeRef.toString() + ")");
+            throw new AlfrescoRuntimeException("Can only undeclare a record. (" + actionedUponNodeRef.toString() + ")");
         }
     }
     

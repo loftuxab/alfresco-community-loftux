@@ -46,8 +46,8 @@ public class UndeclareRecordAction extends RMActionExecuterAbstractBase
         {
             if (recordsManagementService.isRecordDeclared(actionedUponNodeRef) == true)
             {
-                // Add the undeclared aspect
-                this.nodeService.addAspect(actionedUponNodeRef, ASPECT_UNDECLARED_RECORD, null);
+                // Remove the declared aspect
+                this.nodeService.removeAspect(actionedUponNodeRef, ASPECT_DECLARED_RECORD);
             }
         }
         else

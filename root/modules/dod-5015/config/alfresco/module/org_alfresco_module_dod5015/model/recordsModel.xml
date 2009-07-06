@@ -305,8 +305,8 @@
    
    <aspects>
    
-      <aspect name="rma:undeclaredRecord">
-         <title>Undeclared Record</title>         
+      <aspect name="rma:declaredRecord">
+         <title>Declared Record</title>         
       </aspect>
    
       <aspect name="rma:recordComponentIdentifier">

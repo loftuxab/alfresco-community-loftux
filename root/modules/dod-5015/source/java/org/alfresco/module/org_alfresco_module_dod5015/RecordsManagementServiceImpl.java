@@ -187,7 +187,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         {
             throw new AlfrescoRuntimeException("Expecting a record.  Node is not a record. (" + record.toString() + ")");
         }
-        return (this.nodeService.hasAspect(record, ASPECT_UNDECLARED_RECORD) == false);
+        return (this.nodeService.hasAspect(record, ASPECT_DECLARED_RECORD));
     }
     
     /**

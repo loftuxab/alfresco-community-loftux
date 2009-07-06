@@ -65,7 +65,6 @@ public class FileAction extends RMActionExecuterAbstractBase
                 
         // Add the record and undeclared aspect
         nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_RECORD, null);
-        nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_UNDECLARED_RECORD, null);
         
         // Get the records properties
         Map<QName, Serializable> recordProperties = this.nodeService.getProperties(actionedUponNodeRef);
