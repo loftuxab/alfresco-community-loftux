@@ -174,6 +174,15 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         // NOOP
     }
     
+    /**
+     * Basic Filling Test
+     *
+     * create a folder
+     *    put a record (record one) into the folder
+     *    declare the record
+     *    
+     * @throws Exception
+     */
 	public void testBasicFilingTest() throws Exception
 	{	    
 	    NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
@@ -218,7 +227,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         
 	    // Checked that the document has been marked as incomplete
 	    System.out.println("recordOne ...");
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_UNDECLARED_RECORD));	   
+	    
 	    assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_RECORD));
         assertNotNull(this.nodeService.getProperty(recordOne, PROP_IDENTIFIER));
         System.out.println("Record id: " + this.nodeService.getProperty(recordOne, PROP_IDENTIFIER));
@@ -269,7 +278,8 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
             // Expected
         }
         
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_UNDECLARED_RECORD));    
+        assertTrue("Before test DECLARED aspect was set", 
+        		this.nodeService.hasAspect(recordOne, ASPECT_DECLARED_RECORD) == false);    
         
         propValues = this.nodeService.getProperties(recordOne);        
         propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
@@ -279,9 +289,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         
         // Declare the record as we have set everything we should have
         this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
-        
-        // Assert that the record is no longer undeclared
-        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_UNDECLARED_RECORD));
+        assertTrue(" the record is not declared", this.nodeService.hasAspect(recordOne, ASPECT_DECLARED_RECORD));
         
         // Execute the cutoff action (should fail because this is being done at the record level)
         try
@@ -349,6 +357,11 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         //txn.commit();
     }
     
+	/**
+	 * Vital Record Test
+	 * 
+	 * @throws Exception
+	 */
     public void testVitalRecords() throws Exception
     {
         //
@@ -462,8 +475,10 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
                 rmService.getVitalRecordDefinition(nonVitalFolder).getReviewPeriod());
 
         // Declare as a record
-        assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_RECORD));    
-        assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_UNDECLARED_RECORD));    
+        assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_RECORD)); 
+ 
+        assertTrue("Declared record already on prior to test", 
+        	this.nodeService.hasAspect(nonVitalRecord, ASPECT_DECLARED_RECORD) == false);  
 
         Map<QName, Serializable> propValues = this.nodeService.getProperties(nonVitalRecord);        
         propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
@@ -481,7 +496,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 
         this.rmActionService.executeRecordsManagementAction(nonVitalRecord, "declareRecord");
         assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_RECORD));    
-        assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_UNDECLARED_RECORD) == false);  
+        assertTrue("Declared aspect not set", this.nodeService.hasAspect(nonVitalRecord, ASPECT_DECLARED_RECORD));  
         
         //
         // Now we will change the vital record indicator in the containers above these records
@@ -595,6 +610,11 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         txn.commit();
     }
     
+    /**
+     * Caveat Config
+     * 
+     * @throws Exception
+     */
     public void testCaveatConfig() throws Exception
     {
         setComplete();
