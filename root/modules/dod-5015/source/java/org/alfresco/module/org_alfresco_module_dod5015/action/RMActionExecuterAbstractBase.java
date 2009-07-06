@@ -25,18 +25,21 @@
 package org.alfresco.module.org_alfresco_module_dod5015.action;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
+import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
@@ -58,6 +61,12 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     /** Dictionary service */
     protected DictionaryService dictionaryService;
     
+    /** Content service */
+    protected ContentService contentService;
+    
+    /** Namespace service */
+    protected NamespaceService namespaceService;
+    
     /** Action service */
     protected ActionService actionService;
     
@@ -66,6 +75,9 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     
     /** Records management service */
     protected RecordsManagementService recordsManagementService;
+    
+    /** Records management event service */
+    protected RecordsManagementEventService recordsManagementEventService;
     
     /**
      * Set node service
@@ -88,6 +100,26 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     }
     
     /**
+     * Set the content service
+     * 
+     * @param contentService
+     */
+    public void setContentService(ContentService contentService)
+    {
+        this.contentService = contentService;
+    }
+    
+    /**
+     * Set the namespace service
+     * 
+     * @param namespaceService
+     */
+    public void setNamespaceService(NamespaceService namespaceService)
+    {
+        this.namespaceService = namespaceService;
+    }
+    
+    /**
      * Set action service 
      * 
      * @param actionService
@@ -98,7 +130,7 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     }
     
     /**
-     * Set records managment service
+     * Set records management service
      * 
      * @param recordsManagementActionService
      */
@@ -116,6 +148,16 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     {
         this.recordsManagementService = recordsManagementService;
     }    
+    
+    /** 
+     * Set records management event service
+     * 
+     * @param recordsManagementEventService records management event service
+     */
+    public void setRecordsManagementEventService(RecordsManagementEventService recordsManagementEventService)
+    {
+        this.recordsManagementEventService = recordsManagementEventService;
+    }
     
     /**
      * Init method
@@ -143,6 +185,16 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     public String getName()
     {
         return this.name;
+    }
+    
+    /**
+     * By default an action is not a disposition action
+     * 
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction#isDispositionAction()
+     */
+    public boolean isDispositionAction()
+    {
+        return false;
     }
     
     /**
@@ -175,4 +227,15 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
        }
        return result;
     }    
+    
+    /**
+     * By default there are no parameters.
+     * 
+     * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefinitions(java.util.List)
+     */
+    @Override
+    protected void addParameterDefinitions(List<ParameterDefinition> paramList)
+    {
+        // No parameters
+    }
 }

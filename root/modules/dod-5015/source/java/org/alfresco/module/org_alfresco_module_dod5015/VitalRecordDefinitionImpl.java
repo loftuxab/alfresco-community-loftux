@@ -41,7 +41,7 @@ public class VitalRecordDefinitionImpl implements VitalRecordDefinition, Records
     /** Service registry */
     private ServiceRegistry services;
     
-    /** Node reference containing the vital record defintion aspect */
+    /** Node reference containing the vital record definition aspect */
     private NodeRef nodeRef;
     
     /**

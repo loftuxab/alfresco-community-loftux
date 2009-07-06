@@ -38,8 +38,10 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
@@ -54,6 +56,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
@@ -65,6 +68,7 @@ import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.PropertyMap;
@@ -72,7 +76,7 @@ import org.alfresco.util.PropertyMap;
 /**
  * 
  * 
- * @author Roy Wetherall
+ * @author Roy Wetherall, Neil McErlean
  */
 public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 {    
@@ -84,7 +88,8 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 	private SearchService searchService;
 	private ImporterService importService;
 	private ContentService contentService;
-	private RecordsManagementActionService rmService;
+    private RecordsManagementService rmService;
+    private RecordsManagementActionService rmActionService;
 	private TransactionService transactionService;
 	private RMCaveatConfigImpl caveatConfigImpl;
 	
@@ -115,7 +120,8 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 		this.searchService = (SearchService)this.applicationContext.getBean("SearchService"); // use upper 'S'earchService (to test access config interceptor)
 		this.importService = (ImporterService)this.applicationContext.getBean("importerComponent");
 		this.contentService = (ContentService)this.applicationContext.getBean("ContentService");
-		this.rmService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
+        this.rmService = (RecordsManagementService)this.applicationContext.getBean("RecordsManagementService");
+        this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		
 		this.caveatConfigImpl = (RMCaveatConfigImpl)this.applicationContext.getBean("caveatConfigImpl");
@@ -227,14 +233,18 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         // NOTE the disposition is being managed at a folder level ...
         
         // Check the disposition action
-        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_SCHEDULE));
-        assertTrue(this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_SCHEDULE));
-        assertNotNull(this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION_ID));
-        System.out.println("Disposition action id: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION_ID));
-        assertEquals("cutoff", this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION));
-        System.out.println("Disposition action: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION));
-        assertNotNull(this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_AS_OF));
-        System.out.println("Disposition as of: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_AS_OF));
+        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
+        assertTrue(this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+        
+        NodeRef ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        assertNotNull(ndNodeRef);        
+        
+        assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+        System.out.println("Disposition action id: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+        assertEquals("cutoff", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+        System.out.println("Disposition action: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+        assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+        System.out.println("Disposition as of: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
         
 	    // Test the declaration of a record by editing properties
         Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
@@ -247,10 +257,17 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 	    propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
 	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());
 	    this.nodeService.setProperties(recordOne, propValues);
-	    
-        txn.commit(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        
+        // Try and declare, expected failure
+        try
+        {
+            this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
+            fail("Should not be able to declare a record that still has mandatory properties unset");
+        }
+        catch (Exception e)
+        {
+            // Expected
+        }
         
         assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_UNDECLARED_RECORD));    
         
@@ -260,17 +277,16 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         propValues.put(ContentModel.PROP_TITLE, "titleValue");
         this.nodeService.setProperties(recordOne, propValues);
         
-        txn.commit(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        // Declare the record as we have set everything we should have
+        this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
         
         // Assert that the record is no longer undeclared
         assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_UNDECLARED_RECORD));
         
-        // Execute the cutoff action (should fail becuase this is being done at the record level)
+        // Execute the cutoff action (should fail because this is being done at the record level)
         try
         {
-            this.rmService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+            this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
             fail(("Shouldn't have been able to execute cut off at the record level"));
         }
         catch (Exception e)
@@ -281,7 +297,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         // Execute the cutoff action (should fail becuase it is not yet eligiable)
         try
         {
-            this.rmService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+            this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
             fail(("Shouldn't have been able to execute because it is not yet eligiable"));
         }
         catch (Exception e)
@@ -295,33 +311,288 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         calendar.set(Calendar.SECOND, 0);
         
         // Clock the asOf date back to ensure eligibility
-        this.nodeService.setProperty(recordFolder, PROP_DISPOSITION_AS_OF, calendar.getTime());
-        this.rmService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+        ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());        
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
         
         // Check the disposition action
-        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_SCHEDULE));
-        assertTrue(this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_SCHEDULE));
-        assertNotNull(this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION_ID));
-        System.out.println("Disposition action id: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION_ID));
-        assertEquals("destroy", this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION));
-        System.out.println("Disposition action: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_ACTION));
-        assertNotNull(this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_AS_OF));
-        System.out.println("Disposition as of: " + this.nodeService.getProperty(recordFolder, PROP_DISPOSITION_AS_OF));
+        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
+        assertTrue(this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+        
+        ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        assertNotNull(ndNodeRef);                
+        
+        assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+        System.out.println("Disposition action id: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+        assertEquals("destroy", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+        System.out.println("Disposition action: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+        assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+        System.out.println("Disposition as of: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
         
         // Check the previous action details
-        assertEquals("cutoff", this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
-        assertNotNull(this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
-        System.out.println("Previous aciont date: " + this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE).toString());
+        // TODO check the history association
+        //assertEquals("cutoff", this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
+        //assertNotNull(this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
+        //System.out.println("Previous aciont date: " + this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE).toString());
+
         
         // Execute the destroy action
-        this.nodeService.setProperty(recordFolder, PROP_DISPOSITION_AS_OF, calendar.getTime());
-        this.rmService.executeRecordsManagementAction(recordFolder, "destroy", null);
+        ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "destroy", null);
         
         // Check that the node has been destroyed
         assertFalse(this.nodeService.exists(recordFolder));
         assertFalse(this.nodeService.exists(recordOne));
         
+        txn.rollback();
         //txn.commit();
+    }
+    
+    public void testVitalRecords() throws Exception
+    {
+        //
+        // Create a record folder under a "vital" category
+        //
+        NodeRef vitalRecCategory =
+            TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
+        assertNotNull(vitalRecCategory);
+        assertEquals("AIS Audit Records",
+                this.nodeService.getProperty(vitalRecCategory, ContentModel.PROP_NAME));
+
+        NodeRef vitalRecFolder = this.nodeService.createNode(vitalRecCategory, 
+                                                    ContentModel.ASSOC_CONTAINS, 
+                                                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI,
+                                                            "March AIS Audit Records"), 
+                                                    TYPE_RECORD_FOLDER).getChildRef();
+        
+        setComplete();
+        endTransaction();
+
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Check the Vital Record data
+        VitalRecordDefinition vitalRecCatDefinition = rmService.getVitalRecordDefinition(vitalRecCategory);
+        assertNotNull("This record category should have a VitalRecordDefinition", vitalRecCatDefinition);
+        assertTrue(vitalRecCatDefinition.isVitalRecord());
+        
+        VitalRecordDefinition vitalRecFolderDefinition = rmService.getVitalRecordDefinition(vitalRecFolder);
+        assertNotNull("This record folder should have a VitalRecordDefinition", vitalRecFolderDefinition);
+        assertTrue(vitalRecFolderDefinition.isVitalRecord());
+        
+        assertEquals("The Vital Record reviewPeriod in the folder did not match its parent category",
+        		vitalRecFolderDefinition.getReviewPeriod(),
+                vitalRecCatDefinition.getReviewPeriod());
+        
+        // Create a vital record
+        NodeRef vitalRecord = this.nodeService.createNode(vitalRecFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                        ContentModel.TYPE_CONTENT).getChildRef();
+        
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(vitalRecord, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+        txn.commit();
+        
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Check the review schedule
+        assertTrue(this.nodeService.hasAspect(vitalRecord, ASPECT_VITAL_RECORD));
+        VitalRecordDefinition vitalRecDefinition = rmService.getVitalRecordDefinition(vitalRecord);
+        assertTrue(vitalRecDefinition.isVitalRecord());
+        Date vitalRecordAsOfDate = (Date)this.nodeService.getProperty(vitalRecord, PROP_REVIEW_AS_OF);
+        assertNotNull("vitalRecord should have a reviewAsOf date.", vitalRecordAsOfDate);
+        
+        //
+        // Create a record folder under a "non-vital" category
+        //
+        NodeRef nonVitalRecordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "Unit Manning Documents");    
+        assertNotNull(nonVitalRecordCategory);
+        assertEquals("Unit Manning Documents", this.nodeService.getProperty(nonVitalRecordCategory, ContentModel.PROP_NAME));
+
+        NodeRef nonVitalFolder = this.nodeService.createNode(nonVitalRecordCategory,
+                                                           ContentModel.ASSOC_CONTAINS, 
+                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "4th Quarter Unit Manning Documents"), 
+                                                           TYPE_RECORD_FOLDER).getChildRef();
+        
+
+        txn.commit();
+
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Check the Vital Record data
+        assertTrue(rmService.getVitalRecordDefinition(nonVitalRecordCategory).isVitalRecord() == false);
+        assertTrue(rmService.getVitalRecordDefinition(nonVitalFolder).isVitalRecord() == false);
+        assertEquals("The Vital Record reviewPeriod in the folder did not match its parent category",
+                rmService.getVitalRecordDefinition(nonVitalFolder).getReviewPeriod(),
+                rmService.getVitalRecordDefinition(nonVitalRecordCategory).getReviewPeriod());
+
+        
+        // Create a record
+        NodeRef nonVitalRecord = this.nodeService.createNode(nonVitalFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyNonVitalRecord.txt"), 
+                                                        ContentModel.TYPE_CONTENT).getChildRef();
+        
+        // Set content
+        writer = this.contentService.getWriter(nonVitalRecord, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Check the review schedule
+        assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_VITAL_RECORD) == false);
+        VitalRecordDefinition nonvitalRecordDefinition = rmService.getVitalRecordDefinition(nonVitalRecord);
+        assertNotNull(nonvitalRecordDefinition);
+        assertTrue(rmService.getVitalRecordDefinition(nonVitalRecord).isVitalRecord() == false);
+        assertEquals("The Vital Record reviewPeriod did not match its parent category",
+                rmService.getVitalRecordDefinition(nonVitalRecord).getReviewPeriod(),
+                rmService.getVitalRecordDefinition(nonVitalFolder).getReviewPeriod());
+
+        // Declare as a record
+        assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_RECORD));    
+        assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_UNDECLARED_RECORD));    
+
+        Map<QName, Serializable> propValues = this.nodeService.getProperties(nonVitalRecord);        
+        propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
+        List<String> smList = new ArrayList<String>(2);
+        smList.add(FOUO);
+        smList.add(NOFORN);
+        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
+        propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
+        propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
+        propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());
+        propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        propValues.put(ContentModel.PROP_TITLE, "titleValue");
+        this.nodeService.setProperties(nonVitalRecord, propValues);
+
+        this.rmActionService.executeRecordsManagementAction(nonVitalRecord, "declareRecord");
+        assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_RECORD));    
+        assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_UNDECLARED_RECORD) == false);  
+        
+        //
+        // Now we will change the vital record indicator in the containers above these records
+        // and ensure that the change is reflected down to the record.
+        //
+        
+        // 1. Switch parent folder from non-vital to vital.
+        Map<QName, Serializable> nonVitalFolderProps = this.nodeService.getProperties(nonVitalFolder);
+        nonVitalFolderProps.put(PROP_VITAL_RECORD_INDICATOR, true);
+        nonVitalFolderProps.put(PROP_REVIEW_PERIOD, "week|1");
+        this.nodeService.setProperties(nonVitalFolder, nonVitalFolderProps);
+        
+        txn.commit();
+        
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        NodeRef formerlyNonVitalRecord = nonVitalRecord;
+
+        assertTrue("Expected VitalRecord aspect not present", nodeService.hasAspect(formerlyNonVitalRecord, ASPECT_VITAL_RECORD));
+        VitalRecordDefinition formerlyNonVitalRecordDefinition = rmService.getVitalRecordDefinition(formerlyNonVitalRecord);
+        assertNotNull(formerlyNonVitalRecordDefinition);
+        
+        assertEquals("The Vital Record reviewPeriod is wrong.", new Period("week|1"),
+                rmService.getVitalRecordDefinition(formerlyNonVitalRecord).getReviewPeriod());
+        assertNotNull("formerlyNonVitalRecord should now have a reviewAsOf date.",
+                      nodeService.getProperty(formerlyNonVitalRecord, PROP_REVIEW_AS_OF));
+
+
+        // 2. Switch parent folder from vital to non-vital.
+        Map<QName, Serializable> vitalFolderProps = this.nodeService.getProperties(vitalRecFolder);
+        vitalFolderProps.put(PROP_VITAL_RECORD_INDICATOR, false);
+        this.nodeService.setProperties(vitalRecFolder, vitalFolderProps);
+        
+        txn.commit();
+        
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        NodeRef formerlyVitalRecord = vitalRecord;
+
+        assertTrue("Unexpected VitalRecord aspect present",
+                nodeService.hasAspect(formerlyVitalRecord, ASPECT_VITAL_RECORD) == false);
+        VitalRecordDefinition formerlyVitalRecordDefinition = rmService.getVitalRecordDefinition(formerlyVitalRecord);
+        assertNotNull(formerlyVitalRecordDefinition);
+        assertNull("formerlyVitalRecord should now not have a reviewAsOf date.",
+                nodeService.getProperty(formerlyVitalRecord, PROP_REVIEW_AS_OF));
+        
+
+        // 3. override the VitalRecordDefinition between Category, Folder, Record and ensure
+        // the overrides work
+        
+        // First switch the non-vital record folder back to vital.
+        vitalFolderProps = this.nodeService.getProperties(vitalRecFolder);
+        vitalFolderProps.put(PROP_VITAL_RECORD_INDICATOR, true);
+        this.nodeService.setProperties(vitalRecFolder, vitalFolderProps);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        assertTrue("Unexpected VitalRecord aspect present",
+                nodeService.hasAspect(vitalRecord, ASPECT_VITAL_RECORD));
+
+        // The reviewAsOf date should be changing as the parent review periods are updated.
+        Date initialReviewAsOfDate = (Date)nodeService.getProperty(vitalRecord, PROP_REVIEW_AS_OF);
+        assertNotNull("record should have a reviewAsOf date.",
+                initialReviewAsOfDate);
+
+        // Change some of the VitalRecordDefinition in Record Category
+        Map<QName, Serializable> recCatProps = this.nodeService.getProperties(vitalRecCategory);
+        assertEquals(new Period("week|1"), recCatProps.get(PROP_REVIEW_PERIOD));
+        recCatProps.put(PROP_REVIEW_PERIOD, new Period("day|1"));
+        this.nodeService.setProperties(vitalRecCategory, recCatProps);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+
+        assertEquals(new Period("day|1"), rmService.getVitalRecordDefinition(vitalRecCategory).getReviewPeriod());
+        assertEquals(new Period("day|1"), rmService.getVitalRecordDefinition(vitalRecFolder).getReviewPeriod());
+
+        
+        // Change some of the VitalRecordDefinition in Record Folder
+        Map<QName, Serializable> folderProps = this.nodeService.getProperties(vitalRecFolder);
+        assertEquals(new Period("day|1"), folderProps.get(PROP_REVIEW_PERIOD));
+        folderProps.put(PROP_REVIEW_PERIOD, new Period("month|1"));
+        this.nodeService.setProperties(vitalRecFolder, folderProps);
+
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+
+        assertEquals(new Period("day|1"), rmService.getVitalRecordDefinition(vitalRecCategory).getReviewPeriod());
+        assertEquals(new Period("month|1"), rmService.getVitalRecordDefinition(vitalRecFolder).getReviewPeriod());
+
+        // Need to commit the transaction to trigger the behaviour that handles changes to VitalRecord Definition.
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        Date newReviewAsOfDate = (Date)nodeService.getProperty(vitalRecord, PROP_REVIEW_AS_OF);
+        assertNotNull("record should have a reviewAsOf date.", initialReviewAsOfDate);
+        assertTrue("reviewAsOfDate should have changed.",
+                initialReviewAsOfDate.toString().equals(newReviewAsOfDate.toString()) == false);
+        
+        // Now clean up after this test.
+        nodeService.deleteNode(vitalRecFolder);
+        nodeService.deleteNode(nonVitalFolder);
+        
+        txn.commit();
     }
     
     public void testCaveatConfig() throws Exception

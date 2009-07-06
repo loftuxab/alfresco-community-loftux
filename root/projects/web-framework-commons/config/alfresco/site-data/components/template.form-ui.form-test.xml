@@ -4,4 +4,7 @@
    <region-id>form-ui</region-id>
    <source-id>form-test</source-id>
    <url>/components/form</url>
+   <properties>
+      <showResetButton>true</showResetButton>
+   </properties>
 </component>

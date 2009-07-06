@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Definition of Records Management Model -->
+
+<!-- Note: the rmc: namespace is defined further on in the document -->
+<model name="rmc:rmcustom" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+   <!-- Meta-data about the model -->
+   <description>Records Management Custom Model</description>
+   <author>Neil McErlean</author>
+   <version>1.0</version>
+
+   <!-- Imports are required to allow references to definitions in other models -->
+   <imports>
+      <!-- Import Alfresco DOD 5015 Records Management Definitions -->
+      <import uri="http://www.alfresco.org/model/dod5015/1.0" prefix="dod"/>
+      <!-- Import Alfresco Records Management Definitions -->
+      <import uri="http://www.alfresco.org/model/recordsmanagement/1.0" prefix="rma"/>
+      <!-- Import Alfresco Dictionary Definitions -->
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <!-- Import Alfresco Content Domain Model Definitions -->
+      <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+      <!-- Import Alfresco Content Domain Model Definitions -->
+      <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys" />
+   </imports>
+
+   <!-- Records Management Custom Models Namespace -->
+   <!-- TODO Should this be given a DOD5015-like name? -->
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/model/rmcustom/1.0" prefix="rmc"/>
+   </namespaces>
+   
+   <aspects>
+      <!-- These aspects are intentionally empty. New associations and/or properties
+           will be defined at runtime. These new definitions will then be
+           programmatically added to this aspect. -->
+      <aspect name="rmc:customAssocs">
+         <title>Records Management Custom Associations</title>
+      </aspect>
+
+      <aspect name="rmc:customProperties">
+         <title>Records Management Custom Properties</title>
+      </aspect>
+   </aspects>
+</model>

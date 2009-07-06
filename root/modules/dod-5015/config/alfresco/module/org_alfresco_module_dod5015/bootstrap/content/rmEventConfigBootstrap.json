@@ -1,0 +1,10 @@
+{
+   "events" :
+   [
+      {
+         "eventType" : "rmEventType.simple",
+         "eventName" : "case_closed",
+         "eventDisplayLabel" : "Case Closed"
+      }
+   ]
+}

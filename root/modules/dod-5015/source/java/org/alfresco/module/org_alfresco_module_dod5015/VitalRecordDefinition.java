@@ -29,7 +29,7 @@ import java.util.Date;
 import org.alfresco.service.cmr.repository.Period;
 
 /**
- * Vital record definition inteface
+ * Vital record definition interface
  * 
  * @author Roy Wetherall
  */

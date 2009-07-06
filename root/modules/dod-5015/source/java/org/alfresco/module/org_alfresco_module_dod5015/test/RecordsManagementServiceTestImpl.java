@@ -33,8 +33,8 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
-import org.alfresco.module.org_alfresco_module_dod5015.DispositionInstructions;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -44,6 +44,7 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 
@@ -119,7 +120,7 @@ public class RecordsManagementServiceTestImpl extends BaseSpringTest implements 
 	    assertTrue(rmService.isRecordFolder(folderRecord));
 	    assertFalse(rmService.isRecordsManagementContainer(folderRecord));	 
 	    
-	    DispositionInstructions di = this.rmService.getDispositionInstructions(folderRecord);
+	    DispositionSchedule di = this.rmService.getDispositionSchedule(folderRecord);
 	    assertNotNull(di);
 	    assertEquals("N1-218-00-4 item 023", di.getDispositionAuthority());
 	    assertEquals("Cut off monthly, hold 1 month, then destroy.", di.getDispositionInstructions());
@@ -134,13 +135,13 @@ public class RecordsManagementServiceTestImpl extends BaseSpringTest implements 
         assertFalse(rmService.isRecordFolder(recordCategory));
         assertTrue(rmService.isRecordsManagementContainer(recordCategory));   
         
-        di = this.rmService.getDispositionInstructions(recordCategory);
+        di = this.rmService.getDispositionSchedule(recordCategory);
         assertNotNull(di);
         assertEquals("N1-218-00-4 item 023", di.getDispositionAuthority());
         assertEquals("Cut off monthly, hold 1 month, then destroy.", di.getDispositionInstructions());
         assertFalse(di.isRecordLevelDisposition());
         
-        List<DispositionAction> das = di.getDispositionActions();
+        List<DispositionActionDefinition> das = di.getDispositionActionDefinitions();
         assertNotNull(das);
         assertEquals(2, das.size());
         assertEquals("cutoff", das.get(0).getName());
@@ -154,43 +155,50 @@ public class RecordsManagementServiceTestImpl extends BaseSpringTest implements 
         assertNotNull(folderRecord);
         assertEquals("January AIS Audit Records", this.nodeService.getProperty(folderRecord, ContentModel.PROP_NAME));
         
-        DispositionInstructions di = this.rmService.getDispositionInstructions(folderRecord);
+        DispositionSchedule di = this.rmService.getDispositionSchedule(folderRecord);
         assertNotNull(di);
         assertEquals("N1-218-00-4 item 023", di.getDispositionAuthority());
         assertEquals("Cut off monthly, hold 1 month, then destroy.", di.getDispositionInstructions());
         assertFalse(di.isRecordLevelDisposition());
         
-        assertFalse(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_SCHEDULE));
+        assertFalse(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_LIFECYCLE));
         
         this.rmService.updateNextDispositionAction(folderRecord);
         
-        assertTrue(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_SCHEDULE));
-        assertNull(this.nodeService.getProperty(folderRecord, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
-        assertNull(this.nodeService.getProperty(folderRecord, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
-        assertEquals("cutoff", this.nodeService.getProperty(folderRecord, PROP_DISPOSITION_ACTION));
-        assertEquals(di.getDispositionActions().get(0).getId(), this.nodeService.getProperty(folderRecord, PROP_DISPOSITION_ACTION_ID));
-        assertNotNull(this.nodeService.getProperty(folderRecord, PROP_DISPOSITION_AS_OF));
+        
+        // Check the next disposition action
+        assertTrue(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_LIFECYCLE));
+        NodeRef ndNodeRef = this.nodeService.getChildAssocs(folderRecord, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        assertNotNull(ndNodeRef);
+        assertEquals("cutoff", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+        assertEquals(di.getDispositionActionDefinitions().get(0).getId(), this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+        assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+        
+        // Check the history is empty
+        // TODO        
         
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
         props.put(PROP_CUT_OFF_DATE, new Date());
         this.nodeService.addAspect(folderRecord, ASPECT_CUT_OFF, props);        
         this.rmService.updateNextDispositionAction(folderRecord);
         
-        assertTrue(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_SCHEDULE));
-        assertEquals("cutoff", this.nodeService.getProperty(folderRecord, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
-        assertNotNull(this.nodeService.getProperty(folderRecord, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
-        assertEquals("destroy", this.nodeService.getProperty(folderRecord, PROP_DISPOSITION_ACTION));
-        assertEquals(di.getDispositionActions().get(1).getId(), this.nodeService.getProperty(folderRecord, PROP_DISPOSITION_ACTION_ID));
-        assertNotNull(this.nodeService.getProperty(folderRecord, PROP_DISPOSITION_AS_OF));
+        assertTrue(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_LIFECYCLE));
+        ndNodeRef = this.nodeService.getChildAssocs(folderRecord, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        assertNotNull(ndNodeRef);
+        assertEquals("destroy", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+        assertEquals(di.getDispositionActionDefinitions().get(1).getId(), this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+        assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+        
+        // Check the history has an action
+        // TODO
         
         this.rmService.updateNextDispositionAction(folderRecord);
         
-        assertTrue(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_SCHEDULE));
-        assertEquals("destroy", this.nodeService.getProperty(folderRecord, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
-        assertNotNull(this.nodeService.getProperty(folderRecord, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
-        assertNull(this.nodeService.getProperty(folderRecord, PROP_DISPOSITION_ACTION));
-        assertNull(this.nodeService.getProperty(folderRecord, PROP_DISPOSITION_ACTION_ID));
-        assertNull(this.nodeService.getProperty(folderRecord, PROP_DISPOSITION_AS_OF));
+        assertTrue(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_LIFECYCLE));
+        assertTrue(this.nodeService.getChildAssocs(folderRecord, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).isEmpty());
+        
+        // Check the history has both actions
+        // TODO
 	}
 	
 }

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    <!-- Test actions -->
+    <bean id="testAction" class="org.alfresco.module.org_alfresco_module_dod5015.test.TestAction" parent="rmAction"/>
+    <bean id="testAction2" class="org.alfresco.module.org_alfresco_module_dod5015.test.TestAction2" parent="rmAction"/>  
+</beans> 
