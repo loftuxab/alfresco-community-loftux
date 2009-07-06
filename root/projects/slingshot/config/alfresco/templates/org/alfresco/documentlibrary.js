@@ -4,7 +4,7 @@ function toRepoType(appType)
    switch (String(appType))
    {
       case "dod5015":
-         type = "rma:filePlan";
+         type = "dod:filePlan";
          break;
    }
    return type;
@@ -15,7 +15,7 @@ function fromRepoType(repoType)
    var type = "";
    switch (String(repoType))
    {
-      case "rma:filePlan":
+      case "dod:filePlan":
          type = "dod5015";
          break;
    }

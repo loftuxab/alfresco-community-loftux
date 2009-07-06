@@ -19,13 +19,13 @@ function getFolderType(p_type)
    switch (String(p_type))
    {
       case "fileplan":
-         type = "rma:fileplan";
+         type = "dod:filePlan";
          break;
       case "record-series":
-         type = "rma:recordSeries";
+         type = "dod:recordSeries";
          break;
       case "record-category":
-         type = "rma:recordCategory";
+         type = "dod:recordCategory";
          break;
       case "record-folder":
          type = "rma:recordFolder";

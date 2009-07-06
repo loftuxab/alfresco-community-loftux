@@ -4,19 +4,19 @@
 
       <actionSet id="recordSeries">
          <action id="onActionViewDetails" type="simple-link" href="{folderDetailsUrl}" label="actions.view-details" />
-         <action id="onActionEditDetails" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action id="onActionEditDetails" permisson="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 
       <actionSet id="recordCategory">
          <action id="onActionViewDetails" type="simple-link" href="{folderDetailsUrl}" label="actions.view-details" />
-         <action id="onActionEditDetails" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action id="onActionEditDetails" permisson="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 
       <actionSet id="recordFolder">
          <action id="onActionViewDetails" type="simple-link" href="{folderDetailsUrl}" label="actions.view-details" />
-         <action id="onActionEditDetails" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action id="onActionEditDetails" permisson="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
          <action id="onActionClose" permission="close" type="action-link" label="actions.close" />
          <action id="onActionReopen" permission="reopen" type="action-link" label="actions.reopen" />
          <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
@@ -25,7 +25,7 @@
       </actionSet>
 
       <actionSet id="record">
-         <action id="onActionEditDetails" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action id="onActionEditDetails" permisson="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
          <action id="onActionReviewed" permission="reviewed" type="action-link" label="actions.reviewed" />
          <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
          <action id="onActionTransfer" permission="transfer" type="action-link" label="actions.transfer" />
@@ -37,8 +37,9 @@
       </actionSet>
 
       <actionSet id="undeclaredRecord">
-         <action id="onActionDeclare" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.declare" />
-         <action id="onActionUploadNewVersion" permission="create,edit" type="action-link" label="actions.upload-new-version" />
+         <action id="onActionEditDetails" permisson="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action id="onActionDeclare" permission="declare" type="action-link" label="actions.declare" />
+         <action id="onActionUploadNewVersion" permission="HIDDEN" type="action-link" label="actions.upload-new-version" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 

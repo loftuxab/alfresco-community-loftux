@@ -148,7 +148,7 @@
             webscript:
             {
                method: Alfresco.util.Ajax.POST,
-               stem: Alfresco.constants.PROXY_URI + "/api/rma/actions/",
+               stem: Alfresco.constants.PROXY_URI + "api/rma/actions/",
                name: "ExecutionQueue"
             },
             config:

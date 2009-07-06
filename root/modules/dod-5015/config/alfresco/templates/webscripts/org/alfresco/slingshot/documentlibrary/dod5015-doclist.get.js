@@ -15,7 +15,7 @@ function getDocList(filter)
    var haveThumbnails = thumbnailService.isThumbnailNameRegistered(THUMBNAIL_NAME);
 
    // Use helper function to get the arguments
-   var parsedArgs = getParsedArgs("rma:filePlan");
+   var parsedArgs = getParsedArgs("dod:filePlan");
    if (parsedArgs === null)
    {
       return;

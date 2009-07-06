@@ -35,10 +35,12 @@
  * @return {Alfresco.widget.Resizer} The new Alfresco.widget.Resizer instance
  * @constructor
  */
-Alfresco.widget.Resizer = function Resizer_constructor()
+Alfresco.widget.Resizer = function Resizer_constructor(p_name)
 {
    // Load YUI Components
    Alfresco.util.YUILoaderHelper.require(["resize"], this.onComponentsLoaded, this);
+   
+   this.name = p_name;
    
    // Initialise prototype properties
    this.widgets = {};
