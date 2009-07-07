@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>DispositionActions</shortname>
-  <description>Service to return metadata of a list of disposition actions</description>
-  <url>/api/forms/dispositionactions</url>
-  <format default="json"/>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>
