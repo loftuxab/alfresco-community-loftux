@@ -50,6 +50,7 @@ import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -65,6 +66,7 @@ import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.cmr.site.SiteVisibility;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -90,6 +92,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 	private ContentService contentService;
     private RecordsManagementService rmService;
     private RecordsManagementActionService rmActionService;
+    private ServiceRegistry serviceRegistry;
 	private TransactionService transactionService;
 	private RMCaveatConfigImpl caveatConfigImpl;
 	
@@ -122,6 +125,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 		this.contentService = (ContentService)this.applicationContext.getBean("ContentService");
         this.rmService = (RecordsManagementService)this.applicationContext.getBean("RecordsManagementService");
         this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
+        this.serviceRegistry = (ServiceRegistry)this.applicationContext.getBean("ServiceRegistry");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		
 		this.caveatConfigImpl = (RMCaveatConfigImpl)this.applicationContext.getBean("caveatConfigImpl");
@@ -221,7 +225,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 	    writer.setEncoding("UTF-8");
 	    writer.putContent("There is some content in this record");
 	    
-	    txn.commit();
+	    txn.commit(); // - triggers FileAction
         txn = transactionService.getUserTransaction(false);
         txn.begin();
         
@@ -355,6 +359,76 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         
         txn.rollback();
         //txn.commit();
+    }
+	
+    /**
+     * This method tests the filing of an already existing document i.e. one that is
+     * already contained within the document library.
+     */
+    public void testFileFromDoclib() throws Exception
+    {
+        // Get the relevant RecordCategory and create a RecordFolder underneath it.
+        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
+                
+        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
+        folderProps.put(ContentModel.PROP_NAME, "March AIS Audit Records");
+        NodeRef recordFolder = this.nodeService.createNode(recordCategory, 
+                                                           ContentModel.ASSOC_CONTAINS, 
+                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "March AIS Audit Records"), 
+                                                           TYPE_RECORD_FOLDER).getChildRef();
+        setComplete();
+        endTransaction();
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Unlike testBasicFilingTest, we now create a normal Alfresco content node
+        // rather than a fully-fledged record. The content must also be outside the
+        // fileplan.
+
+        // Create a site - to put the content in.
+        final String rmTestSiteShortName = "rmTest" + System.currentTimeMillis();
+        this.serviceRegistry.getSiteService().createSite("RMTestSite", rmTestSiteShortName,
+                "Test site for Records Management", "", SiteVisibility.PUBLIC);
+
+        NodeRef siteRoot = this.serviceRegistry.getSiteService().getSite(rmTestSiteShortName).getNodeRef();
+        NodeRef siteDocLib = this.nodeService.createNode(siteRoot, 
+                                                   ContentModel.ASSOC_CONTAINS, 
+                                                   QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "documentLibrary"), 
+                                                   ContentModel.TYPE_FOLDER).getChildRef();
+        // Create the test document
+        NodeRef testDocument = this.nodeService.createNode(siteDocLib,
+                                                    ContentModel.ASSOC_CONTAINS, 
+                                                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "PreexistingDocument.txt"), 
+                                                    ContentModel.TYPE_CONTENT).getChildRef();
+        // Set some content
+        ContentWriter writer = this.contentService.getWriter(testDocument, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("Some dummy content.");
+
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+
+        // Clearly, this should not be a record at this point.
+        assertFalse(this.nodeService.hasAspect(testDocument, ASPECT_RECORD));
+
+        // Now we want to file this document as a record within the RMA.
+        // To do this we simply move a document into the fileplan.
+        this.serviceRegistry.getFileFolderService().move(testDocument, recordFolder, null);
+
+        txn.commit(); // Commit to trigger the file action.
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+
+        assertTrue(this.nodeService.hasAspect(testDocument, ASPECT_RECORD));
+        assertNotNull(this.nodeService.getProperty(testDocument, PROP_IDENTIFIER));
+        assertNotNull(this.nodeService.getProperty(testDocument, PROP_DATE_FILED));
+        
+        // Check the review schedule
+        assertTrue(this.nodeService.hasAspect(testDocument, ASPECT_VITAL_RECORD));
+        assertNotNull(this.nodeService.getProperty(testDocument, PROP_REVIEW_AS_OF));
     }
     
 	/**
