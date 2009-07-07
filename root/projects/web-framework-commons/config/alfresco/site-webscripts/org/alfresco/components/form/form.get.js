@@ -649,7 +649,7 @@ function setupField(mode, formModel, fieldName, fieldConfig)
       }
       
       var control = {};
-      control.template = "controls/ambiguous.ftl";
+      control.template = "/org/alfresco/components/form/controls/ambiguous.ftl";
       fieldDef = createTransientField(fieldName, control);
    }
    else
@@ -1038,8 +1038,16 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
       if (constraintId === "LIST")
       {
          // if the constraint is the list of values constraint, force the control
-         // template to be selectone.ftl
-         fieldDef.control.template = "controls/selectone.ftl";
+         // template to be selectone.ftl or selectmany.ftl depending on whether
+         // the field has multiple values
+         if (fieldDef.repeating)
+         {
+            fieldDef.control.template = "/org/alfresco/components/form/controls/selectmany.ftl";
+         }
+         else
+         {
+            fieldDef.control.template = "/org/alfresco/components/form/controls/selectone.ftl";
+         }
          
          // setup the options string and set as control params
          fieldDef.control.params.options = constraintParams.allowedValues.join();
