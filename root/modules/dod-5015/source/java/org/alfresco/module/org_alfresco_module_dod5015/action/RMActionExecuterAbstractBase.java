@@ -174,6 +174,7 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     /**
      * @see org.alfresco.repo.action.CommonResourceAbstractBase#setBeanName(java.lang.String)
      */
+    @Override
     public void setBeanName(String name)
     {
         this.name = name;
