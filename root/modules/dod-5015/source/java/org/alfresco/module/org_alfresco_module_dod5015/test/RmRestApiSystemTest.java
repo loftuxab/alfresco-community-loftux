@@ -53,9 +53,6 @@ import org.json.JSONStringer;
  * 
  * @author Neil McErlean
  */
-@Deprecated
-//TODO The Rest API for RM has been removed, so this class may be deleted. I'm not "svn delete"ing it
-//     just yet as I may reuse the code for other tests.
 public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsManagementModel
 {
     private static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
@@ -92,7 +89,7 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
      * 
      * @throws Exception
      */
-    public void off_testPostActionToNonExistentNode() throws Exception
+    public void testPostActionToNonExistentNode() throws Exception
     {
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");     
         assertNotNull(recordCategory);
@@ -114,7 +111,7 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
         sendRequest(new PostRequest(RMA_ACTIONS_URL, jsonPostString, APPLICATION_JSON), expectedStatus);
     }
 
-    public void off_testPost_ReviewedAction() throws IOException, JSONException
+    public void testPost_ReviewedAction() throws IOException, JSONException
     {
         // Get the recordCategory under which we will create the testNode.
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");     
@@ -162,8 +159,9 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
         
         // Submit the JSON request.
         final int expectedStatus = 200;
-        sendRequest(new PostRequest(RMA_ACTIONS_URL,
+        Response rsp = sendRequest(new PostRequest(RMA_ACTIONS_URL,
                                  jsonString, APPLICATION_JSON), expectedStatus);
+        System.err.println(rsp.getContentAsString());
         
         Serializable newReviewAsOfDate = this.nodeService.getProperty(testRecord, PROP_REVIEW_AS_OF);
         assertFalse("The reviewAsOf property should have changed. Was " + pristineReviewAsOf,
@@ -172,6 +170,8 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
 
     public void off_testPostCustomAssoc() throws IOException, JSONException
     {
+        //TODO Need to reimpl after the REST changes
+        
         // Standard association
         final String standardAssocName = "rmc:customAssocStandard" + System.currentTimeMillis();
         String jsonString = new JSONStringer().object()
@@ -202,6 +202,8 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
 
     public void off_testGetCustomAssocs() throws IOException, JSONException
     {
+        //TODO Need to reimpl after the REST changes
+
         // Submit the JSON request.
         final int expectedStatus = 200;
         Response rsp = sendRequest(new GetRequest(RMA_CUSTOM_ASSOCS_URL), expectedStatus);

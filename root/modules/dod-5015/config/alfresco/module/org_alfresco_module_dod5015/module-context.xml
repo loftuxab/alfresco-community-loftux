@@ -216,5 +216,10 @@
         </property>
     </bean>
     
-    
+    <!-- ReST impl for RM Action Service -->
+    <bean id="webscript.org.alfresco.rma.rmaction.post"
+          class="org.alfresco.module.org_alfresco_module_dod5015.script.RmActionPost" parent="webscript">
+          <property name="recordsManagementActionService" ref="RecordsManagementActionService" />
+          <property name="nodeService" ref="NodeService" />
+    </bean>
 </beans>
