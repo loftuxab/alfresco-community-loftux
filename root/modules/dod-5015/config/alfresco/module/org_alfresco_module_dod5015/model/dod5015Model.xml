@@ -96,6 +96,9 @@
                 <mandatory>false</mandatory>
             </property>
         </properties>
+        <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+        </mandatory-aspects>
       </aspect>
    
       <aspect name="dod:pdfRecord">
@@ -127,6 +130,9 @@
                 <mandatory>false</mandatory>
             </property>
         </properties>
+        <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+        </mandatory-aspects>
       </aspect>
    
       <aspect name="dod:digitalPhotographRecord">
@@ -183,6 +189,9 @@
                 <mandatory>false</mandatory>
             </property>
         </properties>
+        <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+        </mandatory-aspects>
       </aspect>     
       
       <aspect name="dod:webRecord">
@@ -229,6 +238,9 @@
                 <mandatory>false</mandatory>
             </property>
         </properties>
+        <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+        </mandatory-aspects>  
       </aspect>
       
    </aspects>

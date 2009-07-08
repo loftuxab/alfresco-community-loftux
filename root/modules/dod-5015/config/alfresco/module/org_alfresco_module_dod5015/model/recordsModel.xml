@@ -63,6 +63,9 @@
       <type name="rma:caveatConfig">
          <title>Caveat Config</title>
          <parent>cm:content</parent>
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </type>
       
       <!-- Records management container type -->      
@@ -73,6 +76,7 @@
          <mandatory-aspects>
             <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
+            <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
 
       </type> 
@@ -121,6 +125,9 @@
          
          </associations>
 
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </type>
             
       <type name="rma:dispositionActionDefinition">
@@ -170,7 +177,9 @@
             </property>
             
          </properties>       
-      
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </type>
       
       <type name="rma:recordFolder">
@@ -198,6 +207,7 @@
             <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>           
             <aspect>rma:commonRecordDetails</aspect>
+            <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
          
       </type>
@@ -206,7 +216,9 @@
          
          <title>Non-Electronic Document</title>
          <parent>cm:cmobject</parent>           
-      
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </type>
       
       <type name="rma:dispositionAction">
@@ -259,6 +271,10 @@
             </child-association>
          
          </associations>
+          
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
          
       </type>
       
@@ -299,14 +315,27 @@
          
          </properties>
          
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </type>
     
    </types>
    
    <aspects>
    
+	  <!-- rma:filePlanComponent is a marker interface for all things RM -->
+      <!-- Security uses it as a key to determine which implementation to use -->
+       
+      <aspect name="rma:filePlanComponent">
+          <title>File Plan Component</title>
+      </aspect>  
+	   
       <aspect name="rma:declaredRecord">
-         <title>Declared Record</title>         
+         <title>Declared Record</title>  
+		 <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>       
       </aspect>
    
       <aspect name="rma:recordComponentIdentifier">
@@ -318,6 +347,9 @@
                <mandatory>true</mandatory>
             </property>
          </properties>
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </aspect>
       
       <aspect name="rma:vitalRecordDefinition">
@@ -336,6 +368,9 @@
                <default>false</default>
             </property>            
          </properties>
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </aspect>            
       
       <!-- Record Meta-data -->
@@ -422,6 +457,7 @@
             <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
             <aspect>rma:commonRecordDetails</aspect>
+            <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
          
       </aspect>
@@ -446,6 +482,9 @@
             </property>
             
         </properties>
+        <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+        </mandatory-aspects>
       </aspect>                         
    
       <!-- State management aspects -->   
@@ -459,6 +498,9 @@
                <mandatory>false</mandatory>
             </property>
          </properties>
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </aspect> 
       
       <aspect name="rma:scheduled">
@@ -479,6 +521,9 @@
             </child-association>
          
          </associations>
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </aspect>
       
       <aspect name="rma:dispositionLifecycle">
@@ -513,6 +558,9 @@
             </child-association>
          
          </associations>
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </aspect>
    
       <aspect name="rma:cutOff">
@@ -524,6 +572,9 @@
                <mandatory>true</mandatory>
             </property>
          </properties>
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
       </aspect>
       
       <aspect name="rma:caveatConfigRoot">
@@ -542,6 +593,11 @@
                <duplicate>false</duplicate>
             </child-association>
          </associations>
+         <!--
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
+         -->
       </aspect>
       
    </aspects>

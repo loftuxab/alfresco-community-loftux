@@ -32,12 +32,14 @@ import junit.framework.Assert;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterBinding;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
@@ -55,7 +57,7 @@ public class TestUtilities implements DOD5015Model
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     
     public static NodeRef loadFilePlanData(String siteName, NodeService nodeService,
-            ImporterService importerService)
+            ImporterService importerService, PermissionService permissionService)
     {
         NodeRef filePlan = null;
 
@@ -67,6 +69,7 @@ public class TestUtilities implements DOD5015Model
             filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
                     TYPE_FILE_PLAN,
                     TYPE_FILE_PLAN).getChildRef();
+            permissionService.setPermission(filePlan, PermissionService.ALL_AUTHORITIES, RMPermissionModel.VIEW_RECORDS, true);
         } else
         {
             // Find the file plan in the site provided

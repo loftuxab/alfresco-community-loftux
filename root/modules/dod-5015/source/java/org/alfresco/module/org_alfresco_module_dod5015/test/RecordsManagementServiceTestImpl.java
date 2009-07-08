@@ -42,6 +42,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -64,6 +65,8 @@ public class RecordsManagementServiceTestImpl extends BaseSpringTest implements 
 	private TransactionService transactionService;
 	private RecordsManagementService rmService;
 	private SearchService searchService;
+
+    private PermissionService permissionService;
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -76,6 +79,7 @@ public class RecordsManagementServiceTestImpl extends BaseSpringTest implements 
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		this.searchService = (SearchService)this.applicationContext.getBean("searchService");
 		this.rmService = (RecordsManagementService)this.applicationContext.getBean("recordsManagementService");
+		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
 
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -86,7 +90,7 @@ public class RecordsManagementServiceTestImpl extends BaseSpringTest implements 
 	
 	private void setUpTestData()
 	{
-        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService);
+        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService);
 	}
 
     @Override

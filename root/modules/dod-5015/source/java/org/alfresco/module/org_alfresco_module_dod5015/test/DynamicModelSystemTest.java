@@ -42,6 +42,7 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -59,6 +60,8 @@ public class DynamicModelSystemTest extends BaseSpringTest implements DOD5015Mod
     private RecordsManagementActionService rmActionService;
     private ServiceRegistry serviceRegistry;
     private TransactionService transactionService;
+
+    private PermissionService permissionService;
     
     @Override
     protected void onSetUpInTransaction() throws Exception 
@@ -71,6 +74,7 @@ public class DynamicModelSystemTest extends BaseSpringTest implements DOD5015Mod
         this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
         this.serviceRegistry = (ServiceRegistry)this.applicationContext.getBean("ServiceRegistry");
         this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
+        this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
         
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -81,7 +85,7 @@ public class DynamicModelSystemTest extends BaseSpringTest implements DOD5015Mod
     
     private void setUpTestData()
     {
-        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService);
+        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, permissionService);
     }
 
     @Override
