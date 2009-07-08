@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -179,7 +179,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
     }
     
     /**
-     * Basic Filling Test
+     * Basic Filing Test
      *
      * create a folder
      *    put a record (record one) into the folder
@@ -193,12 +193,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 	    assertNotNull(recordCategory);
 	    assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
         	    
-	    Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
-	    folderProps.put(ContentModel.PROP_NAME, "March AIS Audit Records");
-	    NodeRef recordFolder = this.nodeService.createNode(recordCategory, 
-	                                                       ContentModel.ASSOC_CONTAINS, 
-	                                                       QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "March AIS Audit Records"), 
-	                                                       TYPE_RECORD_FOLDER).getChildRef();
+	    NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
 	    
 	    setComplete();
         endTransaction();
@@ -370,12 +365,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         // Get the relevant RecordCategory and create a RecordFolder underneath it.
         NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
                 
-        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
-        folderProps.put(ContentModel.PROP_NAME, "March AIS Audit Records");
-        NodeRef recordFolder = this.nodeService.createNode(recordCategory, 
-                                                           ContentModel.ASSOC_CONTAINS, 
-                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "March AIS Audit Records"), 
-                                                           TYPE_RECORD_FOLDER).getChildRef();
+        NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
         setComplete();
         endTransaction();
         
@@ -430,7 +420,78 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         assertTrue(this.nodeService.hasAspect(testDocument, ASPECT_VITAL_RECORD));
         assertNotNull(this.nodeService.getProperty(testDocument, PROP_REVIEW_AS_OF));
     }
-    
+
+    /**
+     * This method tests the filing of non-electronic record.
+     */
+    public void testFileNonElectronicRecord() throws Exception
+    {
+        // Get the relevant RecordCategory and create a RecordFolder underneath it.
+        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
+                
+        NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
+        
+        setComplete();
+        endTransaction();
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Create the document
+        NodeRef testRecord = this.nodeService.createNode(recordFolder,
+                                    ContentModel.ASSOC_CONTAINS,
+                                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "Non-electronic Record"),
+                                    RecordsManagementModel.TYPE_NON_ELECTRONIC_DOCUMENT).getChildRef();
+
+        // There is no content on a non-electronic record.
+
+        // These properties are required in order to declare the record.
+        Map<QName, Serializable> props = nodeService.getProperties(testRecord);
+        props.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "alfresco");
+        props.put(RecordsManagementModel.PROP_ORIGINATOR, "admin");
+        props.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperties(testRecord, props);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        assertTrue("Expected non-electronic record to be a record.", rmService.isRecord(testRecord));
+        assertFalse("Expected non-electronic record not to be declared yet.", rmService.isRecordDeclared(testRecord));
+        
+        // Try to declare it and see what's required.
+        rmActionService.executeRecordsManagementAction(testRecord, "declareRecord");
+        
+        assertTrue("Non-electronic record should now be declared.", rmService.isRecordDeclared(testRecord));
+        
+        // These properties are added automatically
+        assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_IDENTIFIER));
+        assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_DATE_FILED));
+        
+//      assertNotNull(nodeService.getProperty(testRecord, ContentModel.PROP_TITLE));
+//      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST));
+//      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_MEDIA_TYPE));
+//      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_FORMAT));
+//      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_DATE_RECEIVED));
+//      assertEquals("foo", nodeService.getProperty(testRecord, RecordsManagementModel.PROP_ADDRESS));
+//      assertEquals("foo", nodeService.getProperty(testRecord, RecordsManagementModel.PROP_OTHER_ADDRESS));
+//      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_LOCATION));
+//      assertEquals("foo", nodeService.getProperty(testRecord, RecordsManagementModel.PROP_PROJECT_NAME));
+        
+        //TODO Add links to other records as per test doc.
+    }
+
+    private NodeRef createRecordFolder(NodeRef recordCategory, String folderName)
+    {
+        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
+        folderProps.put(ContentModel.PROP_NAME, folderName);
+        NodeRef recordFolder = this.nodeService.createNode(recordCategory, 
+                                                           ContentModel.ASSOC_CONTAINS, 
+                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, folderName), 
+                                                           TYPE_RECORD_FOLDER).getChildRef();
+        return recordFolder;
+    }
+
 	/**
 	 * Vital Record Test
 	 * 
@@ -737,12 +798,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         assertNotNull(recordCategory);
         assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
         
-        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
-        folderProps.put(ContentModel.PROP_NAME, "March AIS Audit Records");
-        NodeRef recordFolder = this.nodeService.createNode(recordCategory, 
-                                                           ContentModel.ASSOC_CONTAINS, 
-                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "March AIS Audit Records"), 
-                                                           TYPE_RECORD_FOLDER).getChildRef();
+        NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
         
         // temp
         permissionService.setPermission(recordFolder, PermissionService.ALL_AUTHORITIES, PermissionService.ADD_CHILDREN, true);
