@@ -103,7 +103,7 @@ public interface RecordsManagementModel
      
     // Vital record aspect
     public static QName ASPECT_VITAL_RECORD = QName.createQName(RM_URI, "vitalRecord");
-    public static QName PROP_REVIEW_AS_OF = QName.createQName(RM_URI, "reviewAsOf");        
+    public static QName PROP_REVIEW_AS_OF = QName.createQName(RM_URI, "reviewAsOf");
     
     // Cut off aspect
     public static QName ASPECT_CUT_OFF = QName.createQName(RM_URI, "cutOff");
@@ -134,5 +134,6 @@ public interface RecordsManagementModel
     // Custom RM data aspect
     public static QName ASPECT_CUSTOM_RM_DATA = QName.createQName(RM_URI, "customRMData");
     
-	
+    // Non-electronic document
+	public static QName TYPE_NON_ELECTRONIC_DOCUMENT = QName.createQName(RM_URI, "nonElectronicDocument");
 }
