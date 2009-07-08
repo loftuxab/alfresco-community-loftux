@@ -139,21 +139,11 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
         String jsonString = new JSONStringer().object()
             .key("name").value("reviewed")
             .key("nodeRef").value(testRecord.toString())
-            
-            // These old JSON params were for an out-of-date TC. Keeping for comparison.
-//            .key("params").object()
-//                .key("recordFolder").value(recordFolder)
-//                .key("recordProperties").object()
-//                    .key(RecordsManagementModel.PROP_PUBLICATION_DATE.toString()).value(new Date())
-//                    .key(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST.toString()).array()
-//                        .value(DODSystemTest.FOUO)
-//                        .value(DODSystemTest.NOFORN)
-//                    .endArray()
-//                    .key(RecordsManagementModel.PROP_MEDIA_TYPE.toString()).value("mediaTypeValue")
-//                    .key(RecordsManagementModel.PROP_FORMAT.toString()).value("formatValue")
-//                    .key(RecordsManagementModel.PROP_DATE_RECEIVED.toString()).value(new Date())
-//                .endObject()
-//            .endObject()
+            // These JSON params are just to test the submission of params. They'll be ignored.
+            .key("params").object()
+                .key("param1").value("one")
+                .key("param2").value("two")
+            .endObject()
         .endObject()
         .toString();
         
@@ -161,7 +151,6 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
         final int expectedStatus = 200;
         Response rsp = sendRequest(new PostRequest(RMA_ACTIONS_URL,
                                  jsonString, APPLICATION_JSON), expectedStatus);
-        System.err.println(rsp.getContentAsString());
         
         Serializable newReviewAsOfDate = this.nodeService.getProperty(testRecord, PROP_REVIEW_AS_OF);
         assertFalse("The reviewAsOf property should have changed. Was " + pristineReviewAsOf,
