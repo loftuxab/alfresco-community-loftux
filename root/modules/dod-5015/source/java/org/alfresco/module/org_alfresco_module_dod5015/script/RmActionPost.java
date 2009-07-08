@@ -25,6 +25,10 @@
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -51,13 +55,14 @@ public class RmActionPost extends AbstractWebScript
     
     private static final String PARAM_NAME = "name";
     private static final String PARAM_NODE_REF = "nodeRef";
+    private static final String PARAM_PARAMS = "params";
     
     private NodeService nodeService;
     private RecordsManagementActionService rmActionService;
     
     private String actionName;
     private NodeRef targetNodeRef;
-    // TODO Add support for action params.
+    private Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
     
     public void setNodeService(NodeService nodeService)
     {
@@ -102,11 +107,13 @@ public class RmActionPost extends AbstractWebScript
             msg.append("Executing Record Action ")
                .append(this.actionName)
                .append(", ")
-               .append(this.targetNodeRef);
+               .append(this.targetNodeRef)
+               .append(", ")
+               .append(this.actionParams);
             logger.debug(msg.toString());
         }
         
-        this.rmActionService.executeRecordsManagementAction(targetNodeRef, actionName);
+        this.rmActionService.executeRecordsManagementAction(targetNodeRef, actionName, actionParams);
         
         
         // Set some JSON response content.
@@ -123,6 +130,7 @@ public class RmActionPost extends AbstractWebScript
         rsp.getWriter().write(jsonString);
     }
 
+    @SuppressWarnings("unchecked")
     private void initJsonParams(WebScriptResponse res, final String reqContentAsString)
     {
         try
@@ -144,10 +152,22 @@ public class RmActionPost extends AbstractWebScript
                     logger.debug("Mandatory name parameter is not present");
                 }
             }
-            //TODO Add handling for action parameters.
             
             this.actionName = jsonObj.getString(PARAM_NAME);
             this.targetNodeRef = new NodeRef(jsonObj.getString(PARAM_NODE_REF));
+            
+            // params are optional.
+            if (jsonObj.has(PARAM_PARAMS))
+            {
+                JSONObject paramsObj = jsonObj.getJSONObject(PARAM_PARAMS);
+                for (Iterator iter = paramsObj.keys(); iter.hasNext(); )
+                {
+                    Object nextKey = iter.next();
+                    String nextKeyString = (String)nextKey;
+                    Object nextValue = paramsObj.get(nextKeyString);
+                    this.actionParams.put(nextKeyString, (Serializable)nextValue);
+                }
+            }
         }
         catch(JSONException je)
         {
