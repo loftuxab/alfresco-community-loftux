@@ -11,18 +11,59 @@
 .search .title
 {
    margin: 16px 10px 4px;
-   font-size: 123.1%;
+   font-size: 146.5%;
    font-weight: bold;
    color: #515D6B;
    padding-bottom: 0.5em;
 }
 
-.search .builder
+.search .topmargin
 {
+   margin-top: 12px;
+}
+
+.search .alignright
+{
+   text-align: right;
+}
+
+.search .newsearch-button
+{
+   float: right;
+}
+
+.search .savesearch-button
+{
+   float: right;
+}
+
+.search .savedsearches-button
+{
+   float: right;
+}
+
+.search .yui-nav
+{
+   border-color: #AAAAAA !important;
+}
+
+.search .yui-navset .yui-content
+{
+   border-color: #808080;
    margin: 0 -10px;
    background-color: #DDDDDD;
    padding: 10px 24px 16px;
    line-height: 2em;
+}
+
+.search .yui-navset .yui-nav .selected a,
+.search .yui-navset .yui-nav .selected a em,
+.search .yui-navset .yui-nav .selected a:hover,
+.search .yui-navset .yui-nav .selected a:visited
+{
+   background: transparent;
+   border-color: #808080 !important;
+   background-color: #AAAAAA !important;
 }
 
 .search textarea

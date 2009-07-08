@@ -61,7 +61,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json", "menu"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json", "menu", "tabview"], this.onComponentsLoaded, this);
       
       return this;
    };
@@ -88,6 +88,9 @@
       onReady: function RecordsSearch_onReady()
       {
          var me = this;
+         
+         // Wire up tab component
+         this.widgets.tabs = new YAHOO.widget.TabView(this.id + "-tabs");
          
          // Buttons
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
@@ -116,9 +119,13 @@
          var query = null;
          if (Dom.get(this.id + "-undeclared").checked === false)
          {
-            query = '-ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}undeclaredRecord"';
+            query = '+ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}declaredRecord"';
          }
          
+         // switch to results tab
+         this.widgets.tabs.selectTab(1);
+         
+         // execute the search and populate the results
          this._performSearch(query, searchTerm);
       },
       
