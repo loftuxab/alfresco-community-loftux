@@ -134,6 +134,9 @@ public interface RecordsManagementModel
     // Custom RM data aspect
     public static QName ASPECT_CUSTOM_RM_DATA = QName.createQName(RM_URI, "customRMData");
     
+    // marker aspect on all RM objercts (except caveat root
+    public static QName ASPECT_FILE_PLAN_COMPONENT = QName.createQName(RM_URI, "filePlanComponent");
+	
     // Non-electronic document
 	public static QName TYPE_NON_ELECTRONIC_DOCUMENT = QName.createQName(RM_URI, "nonElectronicDocument");
 }

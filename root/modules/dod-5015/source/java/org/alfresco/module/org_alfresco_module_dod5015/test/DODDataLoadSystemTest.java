@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.test;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.util.BaseSpringTest;
 
@@ -40,6 +41,7 @@ public class DODDataLoadSystemTest extends BaseSpringTest
 	private NodeService nodeService;
 	private AuthenticationComponent authenticationComponent;
 	private ImporterService importer;
+    private PermissionService permissionService;
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -50,6 +52,8 @@ public class DODDataLoadSystemTest extends BaseSpringTest
 		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService");
 		this.authenticationComponent = (AuthenticationComponent)this.applicationContext.getBean("authenticationComponent");
 		this.importer = (ImporterService)this.applicationContext.getBean("ImporterService");
+		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
+		
 		
 		// Set the current security context as admin
 		this.authenticationComponent.setCurrentUser(AuthenticationUtil.getSystemUserName());		
@@ -62,7 +66,7 @@ public class DODDataLoadSystemTest extends BaseSpringTest
     
 	public void testLoadFilePlanData()
 	{
-	    TestUtilities.loadFilePlanData(null, nodeService, importer);
+	    TestUtilities.loadFilePlanData(null, nodeService, importer, permissionService);
 	    
 	    setComplete();
         endTransaction();

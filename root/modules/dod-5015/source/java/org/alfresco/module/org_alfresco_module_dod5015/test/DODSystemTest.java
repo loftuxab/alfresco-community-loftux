@@ -42,6 +42,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
@@ -146,7 +147,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 	
 	private void setUpTestData()
 	{
-        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService);
+        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService);
 	}
 
     @Override
@@ -419,6 +420,8 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         // Check the review schedule
         assertTrue(this.nodeService.hasAspect(testDocument, ASPECT_VITAL_RECORD));
         assertNotNull(this.nodeService.getProperty(testDocument, PROP_REVIEW_AS_OF));
+        
+        txn.rollback();
     }
 
     /**
@@ -479,6 +482,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 //      assertEquals("foo", nodeService.getProperty(testRecord, RecordsManagementModel.PROP_PROJECT_NAME));
         
         //TODO Add links to other records as per test doc.
+        txn.rollback();
     }
 
     private NodeRef createRecordFolder(NodeRef recordCategory, String folderName)
@@ -800,13 +804,16 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         
         NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
         
-        // temp
-        permissionService.setPermission(recordFolder, PermissionService.ALL_AUTHORITIES, PermissionService.ADD_CHILDREN, true);
+        // Requires explicit RM permissions
+        permissionService.setPermission(recordFolder, PermissionService.ALL_AUTHORITIES, RMPermissionModel.VIEW_RECORDS, true);
         
         setComplete();
         endTransaction();
         
         startNewTransaction();
+        
+        int expectedChildCount = 1;
+        assertEquals(expectedChildCount, nodeService.getChildAssocs(recordFolder).size());
         
         final String RECORD_NAME = "MyRecord.txt";
         final String SOME_CONTENT = "There is some content in this record";
@@ -843,9 +850,9 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         // Test caveats (security interceptors) BEFORE setting properties
         //
         
-        sanityCheckAccess("dmartinz", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
-        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
-        sanityCheckAccess("dsandy", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
+        sanityCheckAccess("dmartinz", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true, expectedChildCount);
+        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true, expectedChildCount);
+        sanityCheckAccess("dsandy", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true, expectedChildCount);
         
         // Test setting properties (with restricted set of allowed values)
         
@@ -973,8 +980,8 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         // Test caveats (security interceptors) AFTER setting properties
         //
         
-        sanityCheckAccess("dmartinz", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
-        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, false); // denied by rma:prjList ("Project A")
+        sanityCheckAccess("dmartinz", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true, expectedChildCount);
+        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, false, expectedChildCount); // denied by rma:prjList ("Project A")
         
         startNewTransaction();
         
@@ -985,8 +992,8 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         setComplete();
         endTransaction();
         
-        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true);
-        sanityCheckAccess("dsandy", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, false); // denied by rma:smList  ("NOFORN", "FOUO")
+        sanityCheckAccess("gsmith", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, true, expectedChildCount);
+        sanityCheckAccess("dsandy", recordFolder, recordOne, RECORD_NAME, SOME_CONTENT, false, expectedChildCount); // denied by rma:smList  ("NOFORN", "FOUO")
         
         cleanCaveatConfigData();
     }
@@ -1140,7 +1147,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         authorityService.removeAuthority(authorityService.getName(AuthorityType.GROUP, groupShortName), authorityName);
     }
     
-    private void sanityCheckAccess(String user, NodeRef recordFolder, NodeRef record, String expectedName, String expectedContent, boolean expectedAllowed)
+    private void sanityCheckAccess(String user, NodeRef recordFolder, NodeRef record, String expectedName, String expectedContent, boolean expectedAllowed, int baseCount)
     {
         //startNewTransaction();
         
@@ -1191,12 +1198,12 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         
         if (expectedAllowed)
         {
-            assertEquals(1, childAssocs.size());
-            assertEquals(record.toString(), childAssocs.get(0).getChildRef().toString());
+            assertEquals(baseCount+1, childAssocs.size());
+            assertEquals(record.toString(), childAssocs.get(baseCount).getChildRef().toString());
         }
         else
         {
-            assertEquals(0, childAssocs.size());
+            assertEquals(baseCount, childAssocs.size());
         }
         
         // Sanity check content service - eg. getReader
