@@ -438,7 +438,6 @@
          
          // show initial message
          this._setDefaultDataTableErrors(this.widgets.dataTable);
-         this.widgets.dataTable.set("MSG_EMPTY", "");
          
          // Override abstract function within DataTable to set custom error message
          this.widgets.dataTable.doBeforeLoadData = function RecordsResults_doBeforeLoadData(sRequest, oResponse, oPayload)
@@ -447,6 +446,12 @@
             {
                try
                {
+                  // update message area if any
+                  var el = Dom.get(me.id + "-itemcount");
+                  if (el)
+                  {
+                     el.innerHTML = me._msg("message.error");
+                  }
                   var response = YAHOO.lang.JSON.parse(oResponse.responseText);
                   me.widgets.dataTable.set("MSG_ERROR", response.message);
                }
@@ -457,10 +462,7 @@
             }
             else if (oResponse.results)
             {
-               // clear the empty error message
-               me.widgets.dataTable.set("MSG_EMPTY", "");
-               
-               // update the results count, update hasMoreResults.
+               // update the results count
                me.hasMoreResults = (oResponse.results.length > me.options.maxResults);
                if (me.hasMoreResults)
                {
@@ -469,10 +471,18 @@
                me.resultsCount = oResponse.results.length;
                me.renderLoopSize = 32;
                
-               if (oResponse.results.length === 0)
+               // update message area if any
+               var el = Dom.get(me.id + "-itemcount");
+               if (el)
                {
-                  var msg = Alfresco.util.message;
-                  me.widgets.dataTable.set("MSG_EMPTY", me._msg("message.empty"));
+                  if (me.resultsCount === 0)
+                  {
+                     el.innerHTML = me._msg("message.empty");
+                  }
+                  else
+                  {
+                     el.innerHTML = me._msg("message.foundresults", me.resultsCount);
+                  }
                }
             }
             
@@ -496,7 +506,7 @@
       _setDefaultDataTableErrors: function RecordsResults__setDefaultDataTableErrors(dataTable)
       {
          var msg = Alfresco.util.message;
-         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.RecordsResults"));
+         dataTable.set("MSG_EMPTY", "");
          dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.RecordsResults"));
       },
       
@@ -513,7 +523,6 @@
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
           
          // update the ui to show that a search is on-going
-         this.widgets.dataTable.set("MSG_EMPTY", "");
          this.widgets.dataTable.render();
          
          function successHandler(sRequest, oResponse, oPayload)
