@@ -152,6 +152,9 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
         Response rsp = sendRequest(new PostRequest(RMA_ACTIONS_URL,
                                  jsonString, APPLICATION_JSON), expectedStatus);
         
+        String rspContent = rsp.getContentAsString();
+        assertTrue(rspContent.contains("Successfully queued action [reviewed]"));
+        
         Serializable newReviewAsOfDate = this.nodeService.getProperty(testRecord, PROP_REVIEW_AS_OF);
         assertFalse("The reviewAsOf property should have changed. Was " + pristineReviewAsOf,
         		pristineReviewAsOf.equals(newReviewAsOfDate));

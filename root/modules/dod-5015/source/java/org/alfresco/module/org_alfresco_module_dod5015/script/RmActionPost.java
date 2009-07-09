@@ -33,11 +33,11 @@ import java.util.Map;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.web.scripts.AbstractWebScript;
+import org.alfresco.web.scripts.Cache;
+import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -49,7 +49,7 @@ import org.json.JSONTokener;
  * 
  * @author Neil McErlean
  */
-public class RmActionPost extends AbstractWebScript
+public class RmActionPost extends DeclarativeWebScript
 {
     private static Log logger = LogFactory.getLog(RmActionPost.class);
     
@@ -74,30 +74,32 @@ public class RmActionPost extends AbstractWebScript
         this.rmActionService = rmActionService;
     }
 
-    public void execute(WebScriptRequest req, WebScriptResponse rsp) throws IOException
+    @Override
+    public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
-        final String reqContentAsString = req.getContent().getContent();
+        String reqContentAsString;
+        try
+        {
+            reqContentAsString = req.getContent().getContent();
+        } catch (IOException iox)
+        {
+            throw new WebScriptException(Status.STATUS_BAD_REQUEST,
+                    "Could not read content from req.", iox);
+        }
 
-        initJsonParams(rsp, reqContentAsString);
+        initJsonParams(reqContentAsString);
         
         // validate input: check for mandatory params, valid nodeRef.
         if (this.actionName == null || this.targetNodeRef == null)
         {
-            rsp.setStatus(Status.STATUS_BAD_REQUEST);
-            return;
+            throw new WebScriptException(Status.STATUS_BAD_REQUEST,
+                "A mandatory parameter has not been provided in URL");
         }
 
         if (nodeService.exists(this.targetNodeRef) == false)
         {
-            if (logger.isDebugEnabled())
-            {
-                StringBuilder msg = new StringBuilder();
-                msg.append("Node does not exist ")
-                .append(targetNodeRef);
-                logger.debug(msg.toString());
-            }
-            rsp.setStatus(Status.STATUS_NOT_FOUND);
-            return;
+            throw new WebScriptException(Status.STATUS_NOT_FOUND,
+                "The targetNode does not exist");
         }
 
         // Proceed to execute the specified action on the specified node.
@@ -115,43 +117,18 @@ public class RmActionPost extends AbstractWebScript
         
         this.rmActionService.executeRecordsManagementAction(targetNodeRef, actionName, actionParams);
         
-        
-        // Set some JSON response content.
-        JSONObject jsonRsp = new JSONObject();
-        try
-        {
-            jsonRsp.put("message", "Successfully queued action [" + actionName + "] on " + targetNodeRef);
-        } catch (JSONException je)
-        {
-            throw new WebScriptException("JSON error", je);
-        }
-        
-        String jsonString = jsonRsp.toString();
-        rsp.getWriter().write(jsonString);
+        Map<String, Object> model = new HashMap<String, Object>();
+        model.put("message", "Successfully queued action [" + actionName + "] on " + targetNodeRef);
+
+        return model;
     }
 
     @SuppressWarnings("unchecked")
-    private void initJsonParams(WebScriptResponse res, final String reqContentAsString)
+    private void initJsonParams(final String reqContentAsString)
     {
         try
         {
             JSONObject jsonObj = new JSONObject(new JSONTokener(reqContentAsString));
-            
-            // Both nodeRef and name parameters are mandatory.
-            if (jsonObj.has(PARAM_NODE_REF) == false)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Mandatory nodeRef parameter is not present");
-                }
-            }
-            if (jsonObj.has(PARAM_NAME) == false)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Mandatory name parameter is not present");
-                }
-            }
             
             this.actionName = jsonObj.getString(PARAM_NAME);
             this.targetNodeRef = new NodeRef(jsonObj.getString(PARAM_NODE_REF));
@@ -171,7 +148,7 @@ public class RmActionPost extends AbstractWebScript
         }
         catch(JSONException je)
         {
-            throw new WebScriptException("Unable to serialize JSON", je);
+            // Intentionally empty. Missing mandatory parameters are detected in the calling method.
         }
     }
 }
