@@ -89,6 +89,22 @@ public class TestUtilities implements DOD5015Model
         return filePlan;
     }
     
+    protected static NodeRef getRecordSeries(SearchService searchService, String seriesName)
+    {
+        SearchParameters searchParameters = new SearchParameters();
+        searchParameters.addStore(SPACES_STORE);
+        
+        String query = "PATH:\"dod:filePlan/cm:" + ISO9075.encode(seriesName) + "\"";
+
+        searchParameters.setQuery(query);
+        searchParameters.setLanguage(SearchService.LANGUAGE_LUCENE);
+        ResultSet rs = searchService.query(searchParameters);
+        
+        //setComplete();
+        //endTransaction();
+        return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
+    }
+    
     protected static NodeRef getRecordCategory(SearchService searchService, String seriesName, String categoryName)
     {
         SearchParameters searchParameters = new SearchParameters();
