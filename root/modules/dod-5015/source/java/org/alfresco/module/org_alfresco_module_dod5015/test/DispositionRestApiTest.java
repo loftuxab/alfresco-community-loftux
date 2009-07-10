@@ -24,8 +24,13 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
@@ -37,6 +42,8 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
 import org.json.JSONArray;
@@ -196,5 +203,36 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertNotNull(events);
         assertEquals(1, events.length());
         assertEquals("superseded", events.get(0));*/
+        
+        // Test the retrieval of an empty disposition schedule
+        NodeRef recordSeries = TestUtilities.getRecordSeries(this.searchService, "Civilian Files");
+        assertNotNull(recordSeries);
+        
+        // create a new recordCategory node in the recordSeries and then get
+        // the disposition schedule
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        //String recordCategoryName = "Test Record Category";
+        //props.put(ContentModel.PROP_NAME, recordCategoryName);
+        NodeRef newRecordCategory = this.nodeService.createNode(recordSeries, ContentModel.ASSOC_CONTAINS, 
+                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("recordCategory")), 
+                    DOD5015Model.TYPE_RECORD_CATEGORY).getChildRef();
+        
+        categoryNodeUrl = newRecordCategory.toString().replace("://", "/");
+        requestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
+        rsp = sendRequest(new GetRequest(requestUrl), expectedStatus);
+        System.out.println("GET response: " + rsp.getContentAsString());
+        
+        // get response as JSON
+        jsonParsedObject = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        assertNotNull(jsonParsedObject);
+
+        // check JSON data
+        dataObj = jsonParsedObject.get("data");
+        assertEquals(JSONObject.class, dataObj.getClass());
+        rootDataObject = (JSONObject)dataObj;
+        assertEquals(4, rootDataObject.length());
+        actions = rootDataObject.getJSONArray("actions");
+        assertNotNull(actions);
+        assertEquals(0, actions.length());
     }
 }
