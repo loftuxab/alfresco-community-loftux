@@ -122,11 +122,19 @@ public class DispositionScheduleGet extends DeclarativeWebScript
         // add all the schedule data to Map
         Map<String, Object> scheduleModel = new HashMap<String, Object>(8);
         scheduleModel.put("url", req.getURL());
-        scheduleModel.put("authority", schedule.getDispositionAuthority());
-        scheduleModel.put("instructions", schedule.getDispositionInstructions());
-        scheduleModel.put("recordLevelDisposition", schedule.isRecordLevelDisposition());
         String actionsUrl = req.getURL() + "/dispositionactiondefinitions";
         scheduleModel.put("actionsUrl", actionsUrl);
+        scheduleModel.put("recordLevelDisposition", schedule.isRecordLevelDisposition());
+        
+        if (schedule.getDispositionAuthority() != null)
+        {
+            scheduleModel.put("authority", schedule.getDispositionAuthority());
+        }
+        
+        if (schedule.getDispositionInstructions() != null)
+        {
+            scheduleModel.put("instructions", schedule.getDispositionInstructions());
+        }
         
         List<Map<String, Object>> actions = new ArrayList<Map<String, Object>>();
         for (DispositionActionDefinition actionDef : schedule.getDispositionActionDefinitions())

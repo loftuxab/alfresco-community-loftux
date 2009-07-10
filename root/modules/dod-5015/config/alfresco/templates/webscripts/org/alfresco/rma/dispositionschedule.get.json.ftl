@@ -2,8 +2,8 @@
    "data" :
    {
       "url" : "${schedule.url}",
-      "authority" : "${schedule.authority}",
-      "instructions" : "${schedule.instructions}",
+      <#if schedule.authority??>"authority" : "${schedule.authority}",</#if>
+      <#if schedule.instructions??>"instructions" : "${schedule.instructions}",</#if>
       "recordLevelDisposition" : ${schedule.recordLevelDisposition?string},
       "actionsUrl" : "${schedule.actionsUrl}",
       "actions" : 
