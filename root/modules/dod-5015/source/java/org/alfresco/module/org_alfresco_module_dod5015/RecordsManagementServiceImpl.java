@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.alfresco.email.server.EmailServerModel;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -113,13 +115,17 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"), 
                 TYPE_RECORDS_MANAGEMENT_CONTAINER, 
                 ContentModel.ASSOC_CONTAINS, 
-                new JavaBehaviour(this, "onCreateRecordFolder", NotificationFrequency.TRANSACTION_COMMIT));  
+                new JavaBehaviour(this, "onCreateRecordFolder", NotificationFrequency.TRANSACTION_COMMIT));
+        
         // Register class behaviours.
         this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"),
                 ASPECT_VITAL_RECORD_DEFINITION,
                 new JavaBehaviour(this, "onChangeToVRDefinition", NotificationFrequency.TRANSACTION_COMMIT));
+        this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"), 
+                ASPECT_SCHEDULED, 
+                new JavaBehaviour(this, "onAddAspect", NotificationFrequency.FIRST_EVENT));
     }
-
+    
     /**
      * Try to file any record created in a record folder
      * 
@@ -150,6 +156,24 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                                        Map<QName, Serializable> newProps)
     {
         rmActionService.executeRecordsManagementAction(node, "broadcastVitalRecordDefinition");
+    }
+    
+    /**
+     * Called when the rma:scheduled aspect is applied
+     * 
+     * @param nodeRef The node the aspect is being applied to
+     * @param aspectTypeQName The type of aspect being applied (should be rma:scheduled)
+     */
+    public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName)
+    {
+        // ensure the aspect is the one we expect
+        if (aspectTypeQName.equals(ASPECT_SCHEDULED))
+        {
+            // ensure the disposition schedule is present
+            this.nodeService.createNode(nodeRef, ASSOC_DISPOSITION_SCHEDULE, 
+                            QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("dispositionSchedule")),
+                            TYPE_DISPOSITION_SCHEDULE);
+        }
     }
     
     /**
