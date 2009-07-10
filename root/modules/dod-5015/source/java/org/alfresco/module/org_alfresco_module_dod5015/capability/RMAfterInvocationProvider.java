@@ -42,6 +42,7 @@ import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.afterinvocation.AfterInvocationProvider;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.search.SimpleResultSetMetaData;
 import org.alfresco.repo.search.impl.lucene.PagingLuceneResultSet;
 import org.alfresco.repo.search.impl.querymodel.QueryEngineResults;
@@ -320,6 +321,14 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                     logger.debug("Array Access");
                 }
                 return decide(authentication, object, config, (Object[]) returnedObject);
+            }
+            else if (Map.class.isAssignableFrom(returnedObject.getClass()))
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Map Access");
+                }
+                return decide(authentication, object, config, (Map) returnedObject);
             }
             else
             {
@@ -871,6 +880,13 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
             }
             return answer;
         }
+    }
+    
+    private Map decide(Authentication authentication, Object object, ConfigAttributeDefinition config, Map returnedObject) throws AccessDeniedException
+
+    {
+        // ToDO: filter for flattened frozen information.
+        return returnedObject;
     }
 
     private class ConfigAttributeDefintion

@@ -198,7 +198,10 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }
-            else if ((cad.parameter1 >= invocation.getArguments().length) || (cad.parameter2 >= invocation.getArguments().length))
+            else if (
+                        ((cad.parameters.get(0) != null) && (cad.parameters.get(0) >= invocation.getArguments().length)) || 
+                        ((cad.parameters.get(1) != null) && (cad.parameters.get(1) >= invocation.getArguments().length))
+                    )
             {
                 continue;
             }
@@ -224,7 +227,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     private int checkCapability(MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
     {
-        NodeRef testNodeRef = getTestNode(nodeService, invocation, params, cad.parameter1, cad.parent);
+        NodeRef testNodeRef = getTestNode(nodeService, invocation, params, cad.parameters.get(0), cad.parent);
 
         if (testNodeRef != null)
         {
@@ -414,10 +417,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         SimplePermissionReference required;
 
-        int parameter1 = -1;
-
-        int parameter2 = -1;
-
+        HashMap<Integer, Integer> parameters = new HashMap<Integer, Integer>(2, 1.0f);
+        
         boolean parent = false;
 
         ConfigAttributeDefintion(ConfigAttribute attr)
@@ -437,15 +438,13 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             if (typeString.equals(RM))
             {
                 policyName = st.nextToken();
-                if (st.hasMoreElements())
+                int position = 0;
+                while (st.hasMoreElements())
                 {
                     String numberString = st.nextToken();
-                    parameter1 = Integer.parseInt(numberString);
-                }
-                if (st.hasMoreElements())
-                {
-                    String numberString = st.nextToken();
-                    parameter2 = Integer.parseInt(numberString);
+                    Integer value = Integer.parseInt(numberString);
+                    parameters.put(position, value);
+                    position++;
                 }
             }
             else if (typeString.equals(RM_CAP))
@@ -454,7 +453,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
                 String qNameString = st.nextToken();
                 String permissionString = st.nextToken();
 
-                parameter1 = Integer.parseInt(numberString);
+                Integer value = Integer.parseInt(numberString);
+                parameters.put(0, value);
 
                 QName qName = QName.createQName(qNameString, nspr);
 
@@ -534,7 +534,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
         {
-            NodeRef testNodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameter1, cad.parent);
+            NodeRef testNodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(0), cad.parent);
 
             if (testNodeRef != null)
             {
@@ -556,9 +556,9 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             int first = AccessDecisionVoter.ACCESS_ABSTAIN;
             int second = AccessDecisionVoter.ACCESS_ABSTAIN;
 
-            if (cad.parameter1 > -1)
+            if (cad.parameters.get(0) > -1)
             {
-                NodeRef testNodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameter1, cad.parent);
+                NodeRef testNodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(0), cad.parent);
 
                 if (testNodeRef != null)
                 {
@@ -567,9 +567,9 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
                 }
             }
             
-            if (cad.parameter2 > -1)
+            if (cad.parameters.get(1) > -1)
             {
-                NodeRef testNodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameter2, cad.parent);
+                NodeRef testNodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(1), cad.parent);
 
                 if (testNodeRef != null)
                 {
