@@ -33,17 +33,20 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
@@ -108,6 +111,28 @@ public class RecordsManagementServiceTestImpl extends BaseSpringTest implements 
             // Nothing
             //System.out.println("DID NOT DELETE FILE PLAN!");
         }
+    }
+    
+    public void testDispositionPresence() throws Exception
+    {
+        // create a record category node in 
+        NodeRef rootNode = this.nodeService.getRootNode(SPACES_STORE);
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        String recordCategoryName = "Test Record Category";
+        props.put(ContentModel.PROP_NAME, recordCategoryName);
+        NodeRef nodeRef = this.nodeService.createNode(rootNode, ContentModel.ASSOC_CONTAINS, 
+                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(recordCategoryName)), 
+                    DOD5015Model.TYPE_RECORD_CATEGORY, props).getChildRef();
+        
+        // ensure the record category node has the scheduled aspect and the disposition schedule association
+        assertTrue(this.nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_SCHEDULED));
+        List<ChildAssociationRef> scheduleAssocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_DISPOSITION_SCHEDULE, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(scheduleAssocs);
+        assertEquals(1, scheduleAssocs.size());
+        
+        // test retrieval of the disposition schedule via RM service
+        DispositionSchedule schedule = this.rmService.getDispositionSchedule(nodeRef);
+        assertNotNull(schedule);
     }
     
 	public void testGetDispositionInstructions() throws Exception
