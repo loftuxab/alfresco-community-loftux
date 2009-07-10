@@ -24,6 +24,9 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.capability;
 
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
+
 /**
  * Capability constants for the RM Permission Model
  * 
@@ -31,6 +34,16 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability;
  */
 public interface RMPermissionModel
 {
+    public static final String ROLE_USER = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "User").toString();
+    
+    public static final String ROLE_POWER_USER = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "PowerUser").toString();
+    
+    public static final String ROLE_SECURITY_OFFICER = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "SecurityOfficer").toString();
+    
+    public static final String ROLE_RECORDS_MANAGER = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "RecordsManager").toString();
+    
+    public static final String ROLE_ADMINISTRATOR = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "Administrator").toString();
+    
     public static final String DECLARE_RECORDS = "DeclareRecords";
 
     public static final String VIEW_RECORDS = "ViewRecords";

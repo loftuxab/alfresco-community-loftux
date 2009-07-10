@@ -805,7 +805,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
         
         // Requires explicit RM permissions
-        permissionService.setPermission(recordFolder, PermissionService.ALL_AUTHORITIES, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(recordFolder, PermissionService.ALL_AUTHORITIES, RMPermissionModel.ROLE_USER, true);
         
         setComplete();
         endTransaction();
