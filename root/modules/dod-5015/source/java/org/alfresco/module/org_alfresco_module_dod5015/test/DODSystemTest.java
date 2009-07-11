@@ -812,7 +812,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         
         startNewTransaction();
         
-        int expectedChildCount = 1;
+        int expectedChildCount = 0;
         assertEquals(expectedChildCount, nodeService.getChildAssocs(recordFolder).size());
         
         final String RECORD_NAME = "MyRecord.txt";

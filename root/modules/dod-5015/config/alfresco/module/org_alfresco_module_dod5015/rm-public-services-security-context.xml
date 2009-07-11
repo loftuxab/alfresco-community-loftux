@@ -85,6 +85,9 @@
             <ref bean="nodeService"></ref>
         </property>
         <property name="caveatConfigImpl" ref="caveatConfigImpl"/>
+		<property name="dictionaryService">
+            <ref bean="dictionaryService"/>
+        </property>
     </bean>
     
     <!-- ======================= -->
@@ -112,6 +115,33 @@
     <!-- Post method call application of security -->
     <!-- ======================================== -->
     
+	 <bean id="afterAcl" class="org.alfresco.repo.security.permissions.impl.acegi.ACLEntryAfterInvocationProvider" abstract="false" singleton="true"
+        lazy-init="default" autowire="default" dependency-check="default" >
+        <property name="permissionService">
+            <ref bean="permissionServiceImpl"></ref>
+        </property>
+        <property name="namespacePrefixResolver">
+            <ref bean="namespaceService"></ref>
+        </property>
+        <property name="nodeService">
+            <ref bean="nodeService"></ref>
+        </property>
+        <property name="authenticationService">
+             <ref bean="authenticationService" />
+        </property>
+        <property name="maxPermissionCheckTimeMillis">
+            <value>${system.acl.maxPermissionCheckTimeMillis}</value>
+        </property>
+        <property name="maxPermissionChecks">
+            <value>${system.acl.maxPermissionChecks}</value>
+        </property>
+		<property name="unfilteredFor">
+            <set>
+                <value>{http://www.alfresco.org/model/recordsmanagement/1.0}filePlanComponent</value>
+            </set>
+        </property>
+    </bean>
+	
     <bean id="afterRm" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMAfterInvocationProvider">
         <property name="permissionService">
             <ref bean="permissionServiceImpl"></ref>
@@ -251,16 +281,16 @@
             <ref local="afterInvocationManager"/>
         </property>
         <property name="objectDefinitionSource">
-            <value> org.alfresco.service.cmr.repository.NodeService.getStores=AFTER_ACL_NODE.sys:base.ReadProperties,RM_DENY
-                org.alfresco.service.cmr.repository.NodeService.createStore=ACL_METHOD.ROLE_ADMINISTRATOR,RM_DENY
+            <value> org.alfresco.service.cmr.repository.NodeService.getStores=AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.repository.NodeService.createStore=ACL_METHOD.ROLE_ADMINISTRATOR,RM_ABSTAIN
                 org.alfresco.service.cmr.repository.NodeService.exists=ACL_ALLOW,RM_ALLOW
                 org.alfresco.service.cmr.repository.NodeService.getNodeStatus=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0
-                org.alfresco.service.cmr.repository.NodeService.getRootNode=ACL_NODE.0.sys:base.ReadProperties,RM_DENY
-                org.alfresco.service.cmr.repository.NodeService.createNode=ACL_NODE.0.sys:base.CreateChildren,RM.Create.0
+                org.alfresco.service.cmr.repository.NodeService.getRootNode=ACL_NODE.0.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.repository.NodeService.createNode=ACL_NODE.0.sys:base.CreateChildren,RM.Create.0.3
                 org.alfresco.service.cmr.repository.NodeService.moveNode=ACL_NODE.0.sys:base.DeleteNode,ACL_NODE.1.sys:base.CreateChildren,RM.Move.0.1
-                org.alfresco.service.cmr.repository.NodeService.setChildAssociationIndex=ACL_PARENT.0.sys:base.WriteProperties,RM_DENY
+                org.alfresco.service.cmr.repository.NodeService.setChildAssociationIndex=ACL_PARENT.0.sys:base.WriteProperties,RM_ABSTAIN
                 org.alfresco.service.cmr.repository.NodeService.getType=ACL_ALLOW,RM_ALLOW
-                org.alfresco.service.cmr.repository.NodeService.setType=ACL_NODE.0.sys:base.WriteProperties,RM_DENY
+                org.alfresco.service.cmr.repository.NodeService.setType=ACL_NODE.0.sys:base.WriteProperties,RM_ABSTAIN
                 org.alfresco.service.cmr.repository.NodeService.addAspect=ACL_NODE.0.sys:base.WriteProperties,RM.Update.0
                 org.alfresco.service.cmr.repository.NodeService.removeAspect=ACL_NODE.0.sys:base.WriteProperties,RM.Update.0
                 org.alfresco.service.cmr.repository.NodeService.hasAspect=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0
@@ -286,9 +316,9 @@
                 org.alfresco.service.cmr.repository.NodeService.getSourceAssocs=ROLE_AUTHENTICATED,RM.Read.0
                 org.alfresco.service.cmr.repository.NodeService.getPath=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0
                 org.alfresco.service.cmr.repository.NodeService.getPaths=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0
-                org.alfresco.service.cmr.repository.NodeService.getStoreArchiveNode=ACL_NODE.0.sys:base.Read,RM_DENY
-                org.alfresco.service.cmr.repository.NodeService.restoreNode=ACL_NODE.0.sys:base.DeleteNode,ACL_NODE.1.sys:base.CreateChildren,RM_DENY
-                org.alfresco.service.cmr.repository.NodeService.getChildAssocsWithoutParentAssocsOfType=ACL_NODE.0.sys:base.ReadProperties,AFTER_ACL_NODE.sys:base.ReadProperties,RM_DENY
+                org.alfresco.service.cmr.repository.NodeService.getStoreArchiveNode=ACL_NODE.0.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.repository.NodeService.restoreNode=ACL_NODE.0.sys:base.DeleteNode,ACL_NODE.1.sys:base.CreateChildren,RM_ABSTAIN
+                org.alfresco.service.cmr.repository.NodeService.getChildAssocsWithoutParentAssocsOfType=ACL_NODE.0.sys:base.ReadProperties,AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN
                 org.alfresco.service.cmr.repository.NodeService.*=ACL_DENY,RM_DENY </value>
         </property>
     </bean>
@@ -315,10 +345,10 @@
                 org.alfresco.service.cmr.model.FileFolderService.searchSimple=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.Read,RM.Read.0,AFTER_RM.FilterNode
                 org.alfresco.service.cmr.model.FileFolderService.rename=AFTER_ACL_NODE.sys:base.WriteProperties,RM.Update.0
                 org.alfresco.service.cmr.model.FileFolderService.move=ACL_NODE.0.sys:base.DeleteNode,ACL_NODE.1.sys:base.CreateChildren,RM.Move.0.1
-                org.alfresco.service.cmr.model.FileFolderService.copy=ACL_NODE.0.sys:base.ReadProperties,ACL_NODE.1.sys:base.CreateChildren,RM_DENY
+                org.alfresco.service.cmr.model.FileFolderService.copy=ACL_NODE.0.sys:base.ReadProperties,ACL_NODE.1.sys:base.CreateChildren,RM.Read.0,RM.Create.1
                 org.alfresco.service.cmr.model.FileFolderService.create=ACL_NODE.0.sys:base.CreateChildren,RM.Create.0
                 org.alfresco.service.cmr.model.FileFolderService.delete=ACL_NODE.0.sys:base.DeleteNode,RM.Delete.0
-                org.alfresco.service.cmr.model.FileFolderService.makeFolders=ACL_METHOD.ROLE_ADMINISTRATOR,RM_DENY
+                org.alfresco.service.cmr.model.FileFolderService.makeFolders=ACL_METHOD.ROLE_ADMINISTRATOR,RM_ABSTAIN
                 org.alfresco.service.cmr.model.FileFolderService.getNamePath=ACL_NODE.1.sys:base.ReadProperties,RM.Read.0
                 org.alfresco.service.cmr.model.FileFolderService.resolveNamePath=AFTER_ACL_NODE.sys:base.ReadProperties,RM.Read.0
                 org.alfresco.service.cmr.model.FileFolderService.getFileInfo=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0
@@ -347,7 +377,7 @@
             <ref local="afterInvocationManager"/>
         </property>
         <property name="objectDefinitionSource">
-            <value> org.alfresco.service.cmr.repository.ContentService.getRawReader=ACL_METHOD.ROLE_ADMINISTRATOR,RM_DENY
+            <value> org.alfresco.service.cmr.repository.ContentService.getRawReader=ACL_METHOD.ROLE_ADMINISTRATOR,RM_ABSTAIN
                 org.alfresco.service.cmr.repository.ContentService.getReader=ACL_NODE.0.sys:base.ReadContent,RM.Read.0
                 org.alfresco.service.cmr.repository.ContentService.getWriter=ACL_NODE.0.sys:base.WriteContent,RM.WriteContent.0
                 org.alfresco.service.cmr.repository.ContentService.isTransformable=ACL_ALLOW,RM_ALLOW
@@ -385,10 +415,10 @@
         </property>
         <property name="objectDefinitionSource">
             <value> org.alfresco.service.cmr.search.SearchService.query=AFTER_ACL_NODE.sys:base.Read,RM_QUERY,AFTER_RM.FilterNode
-                org.alfresco.service.cmr.search.SearchService.selectNodes=AFTER_ACL_NODE.sys:base.Read,RM_DENY
-                org.alfresco.service.cmr.search.SearchService.selectProperties=ACL_NODE.0.sys:base.Read,RM_DENY
-                org.alfresco.service.cmr.search.SearchService.contains=ACL_NODE.0.sys:base.Read,RM_DENY
-                org.alfresco.service.cmr.search.SearchService.like=ACL_NODE.0.sys:base.Read,RM_DENY 
+                org.alfresco.service.cmr.search.SearchService.selectNodes=AFTER_ACL_NODE.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.search.SearchService.selectProperties=ACL_NODE.0.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.search.SearchService.contains=ACL_NODE.0.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.search.SearchService.like=ACL_NODE.0.sys:base.Read,RM_ABSTAIN 
                 org.alfresco.service.cmr.search.SearchService.*=ACL_DENY,RM_DENY </value>
         </property>
     </bean>
@@ -413,17 +443,17 @@
             <ref local="afterInvocationManager"/>
         </property>
         <property name="objectDefinitionSource">
-            <value> org.alfresco.service.cmr.search.CategoryService.getChildren=AFTER_ACL_NODE.sys:base.ReadProperties,RM_DENY
-                org.alfresco.service.cmr.search.CategoryService.getCategories=AFTER_ACL_NODE.sys:base.ReadProperties,RM_DENY
-                org.alfresco.service.cmr.search.CategoryService.getClassifications=AFTER_ACL_NODE.sys:base.ReadProperties,RM_DENY
-                org.alfresco.service.cmr.search.CategoryService.getRootCategories=AFTER_ACL_NODE.sys:base.ReadProperties,RM_DENY
-                org.alfresco.service.cmr.search.CategoryService.getClassificationAspects=ACL_ALLOW,RM_DENY
-                org.alfresco.service.cmr.search.CategoryService.createClassifiction=ACL_ALLOW,RM_DENY
-                org.alfresco.service.cmr.search.CategoryService.createRootCategory=ACL_ALLOW,RM_DENY 
-                org.alfresco.service.cmr.search.CategoryService.createCategory=ACL_ALLOW,RM_DENY
-                org.alfresco.service.cmr.search.CategoryService.deleteClassification=ACL_ALLOW,RM_DENY
-                org.alfresco.service.cmr.search.CategoryService.deleteCategory=ACL_ALLOW,RM_DENY 
-                org.alfresco.service.cmr.search.CategoryService.getTopCategories=ACL_ALLOW,RM_DENY
+            <value> org.alfresco.service.cmr.search.CategoryService.getChildren=AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.search.CategoryService.getCategories=AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.search.CategoryService.getClassifications=AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.search.CategoryService.getRootCategories=AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.search.CategoryService.getClassificationAspects=ACL_ALLOW,RM_ABSTAIN
+                org.alfresco.service.cmr.search.CategoryService.createClassifiction=ACL_ALLOW,RM_ABSTAIN
+                org.alfresco.service.cmr.search.CategoryService.createRootCategory=ACL_ALLOW,RM_ABSTAIN 
+                org.alfresco.service.cmr.search.CategoryService.createCategory=ACL_ALLOW,RM_ABSTAIN
+                org.alfresco.service.cmr.search.CategoryService.deleteClassification=ACL_ALLOW,RM_ABSTAIN
+                org.alfresco.service.cmr.search.CategoryService.deleteCategory=ACL_ALLOW,RM_ABSTAIN 
+                org.alfresco.service.cmr.search.CategoryService.getTopCategories=ACL_ALLOW,RM_ABSTAIN
                 org.alfresco.service.cmr.search.CategoryService.*=ACL_DENY,RM_DENY </value>
         </property>
     </bean>
@@ -455,12 +485,12 @@
             <ref local="afterInvocationManager"/>
         </property>
         <property name="objectDefinitionSource">
-            <value> org.alfresco.service.cmr.lock.LockService.lock=ACL_NODE.0.cm:lockable.Lock,RM_DENY
-                org.alfresco.service.cmr.lock.LockService.unlock=ACL_NODE.0.cm:lockable.Unlock,RM_DENY
-                org.alfresco.service.cmr.lock.LockService.getLockStatus=ACL_NODE.0.sys:base.ReadProperties,RM_DENY
-                org.alfresco.service.cmr.lock.LockService.getLockType=ACL_NODE.0.sys:base.ReadProperties,RM_DENY
-                org.alfresco.service.cmr.lock.LockService.checkForLock=ACL_NODE.0.sys:base.ReadProperties,RM_DENY
-                org.alfresco.service.cmr.lock.LockService.getLocks=ACL_NODE.0.sys:base.ReadProperties,RM_DENY 
+            <value> org.alfresco.service.cmr.lock.LockService.lock=ACL_NODE.0.cm:lockable.Lock,RM_ABSTAIN
+                org.alfresco.service.cmr.lock.LockService.unlock=ACL_NODE.0.cm:lockable.Unlock,RM_ABSTAIN
+                org.alfresco.service.cmr.lock.LockService.getLockStatus=ACL_NODE.0.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.lock.LockService.getLockType=ACL_NODE.0.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.lock.LockService.checkForLock=ACL_NODE.0.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.lock.LockService.getLocks=ACL_NODE.0.sys:base.ReadProperties,RM_ABSTAIN 
                 org.alfresco.service.cmr.lock.LockService.*=ACL_DENY,RM_DENY </value>
         </property>
     </bean>
@@ -492,19 +522,19 @@
             <ref local="afterInvocationManager"/>
         </property>
         <property name="objectDefinitionSource">
-            <value> org.alfresco.service.cmr.ml.MultilingualContentService.getTranslationContainer=ACL_ALLOW,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.getTranslations=ACL_NODE.0.sys:base.Read,AFTER_ACL_NODE.sys:base.Read,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.getTranslationForLocale=ACL_NODE.0.sys:base.Read,AFTER_ACL_NODE.sys:base.Read,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.getMissingTranslations=ACL_ALLOW,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.getPivotTranslation=ACL_NODE.0.sys:base.Read,AFTER_ACL_NODE.sys:base.Read,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.isTranslation=ACL_NODE.0.sys:base.Read,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.makeTranslation=ACL_NODE.0.sys:base.Write,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.unmakeTranslation=ACL_NODE.0.sys:base.Write,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.addTranslation=ACL_NODE.0.sys:base.Read,ACL_NODE.1.sys:base.Write,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.addEmptyTranslation=ACL_NODE.0.sys:base.Read,ACL_NODE.0.sys:base.CreateChildren,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.copyTranslationContainer=ACL_NODE.0.sys:base.Read,ACL_NODE.1.sys:base.CreateChildren,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.moveTranslationContainer=ACL_NODE.0.sys:base.DeleteNode,ACL_NODE.1.sys:base.CreateChildren,RM_DENY
-                org.alfresco.service.cmr.ml.MultilingualContentService.deleteTranslationContainer=ACL_NODE.0.sys:base.DeleteNode,ACL_NODE.0.sys:base.DeleteChildren,RM_DENY
+            <value> org.alfresco.service.cmr.ml.MultilingualContentService.getTranslationContainer=ACL_ALLOW,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.getTranslations=ACL_NODE.0.sys:base.Read,AFTER_ACL_NODE.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.getTranslationForLocale=ACL_NODE.0.sys:base.Read,AFTER_ACL_NODE.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.getMissingTranslations=ACL_ALLOW,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.getPivotTranslation=ACL_NODE.0.sys:base.Read,AFTER_ACL_NODE.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.isTranslation=ACL_NODE.0.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.makeTranslation=ACL_NODE.0.sys:base.Write,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.unmakeTranslation=ACL_NODE.0.sys:base.Write,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.addTranslation=ACL_NODE.0.sys:base.Read,ACL_NODE.1.sys:base.Write,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.addEmptyTranslation=ACL_NODE.0.sys:base.Read,ACL_NODE.0.sys:base.CreateChildren,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.copyTranslationContainer=ACL_NODE.0.sys:base.Read,ACL_NODE.1.sys:base.CreateChildren,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.moveTranslationContainer=ACL_NODE.0.sys:base.DeleteNode,ACL_NODE.1.sys:base.CreateChildren,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.MultilingualContentService.deleteTranslationContainer=ACL_NODE.0.sys:base.DeleteNode,ACL_NODE.0.sys:base.DeleteChildren,RM_ABSTAIN
                 org.alfresco.service.cmr.ml.MultilingualContentService.*=ACL_DENY,RM_DENY </value>
         </property>
     </bean>
@@ -524,10 +554,10 @@
             <ref local="afterInvocationManager"/>
         </property>
         <property name="objectDefinitionSource">
-            <value> org.alfresco.service.cmr.ml.EditionService.createEdition=ACL_NODE.0.sys:base.Read,RM_DENY
-                org.alfresco.service.cmr.ml.EditionService.getEditions=ACL_NODE.0.sys:base.Read,RM_DENY
-                org.alfresco.service.cmr.ml.EditionService.getVersionedTranslations=ACL_ALLOW,RM_DENY
-                org.alfresco.service.cmr.ml.EditionService.getVersionedMetadatas=ACL_ALLOW,RM_DENY 
+            <value> org.alfresco.service.cmr.ml.EditionService.createEdition=ACL_NODE.0.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.EditionService.getEditions=ACL_NODE.0.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.EditionService.getVersionedTranslations=ACL_ALLOW,RM_ABSTAIN
+                org.alfresco.service.cmr.ml.EditionService.getVersionedMetadatas=ACL_ALLOW,RM_ABSTAIN 
                 org.alfresco.service.cmr.ml.EditionService.*=ACL_DENY,RM_DENY </value>
         </property>
     </bean>
@@ -552,10 +582,10 @@
             <ref local="afterInvocationManager"/>
         </property>
         <property name="objectDefinitionSource">
-            <value> org.alfresco.service.cmr.coci.CheckOutCheckInService.checkout=ACL_NODE.0.cm:lockable.CheckOut,RM_DENY
-                org.alfresco.service.cmr.coci.CheckOutCheckInService.checkin=ACL_NODE.0.cm:lockable.CheckIn,RM_DENY
-                org.alfresco.service.cmr.coci.CheckOutCheckInService.cancelCheckout=ACL_NODE.0.cm:lockable.CancelCheckOut,RM_DENY
-                org.alfresco.service.cmr.coci.CheckOutCheckInService.getWorkingCopy=ACL_NODE.0.sys:base.Read,RM_DENY
+            <value> org.alfresco.service.cmr.coci.CheckOutCheckInService.checkout=ACL_NODE.0.cm:lockable.CheckOut,RM_ABSTAIN
+                org.alfresco.service.cmr.coci.CheckOutCheckInService.checkin=ACL_NODE.0.cm:lockable.CheckIn,RM_ABSTAIN
+                org.alfresco.service.cmr.coci.CheckOutCheckInService.cancelCheckout=ACL_NODE.0.cm:lockable.CancelCheckOut,RM_ABSTAIN
+                org.alfresco.service.cmr.coci.CheckOutCheckInService.getWorkingCopy=ACL_NODE.0.sys:base.Read,RM_ABSTAIN
                 org.alfresco.service.cmr.coci.CheckOutCheckInService.*=ACL_DENY,RM_DENY </value>
         </property>
     </bean>
@@ -724,10 +754,10 @@
             <ref local="afterInvocationManager"/>
         </property>
         <property name="objectDefinitionSource">
-            <value> org.alfresco.service.cmr.security.OwnableService.getOwner=ACL_NODE.0.sys:base.ReadProperties,RM_DENY
-                org.alfresco.service.cmr.security.OwnableService.setOwner=ACL_NODE.0.cm:ownable.SetOwner,RM_DENY
-                org.alfresco.service.cmr.security.OwnableService.takeOwnership=ACL_NODE.0.cm:ownable.TakeOwnership,RM_DENY
-                org.alfresco.service.cmr.security.OwnableService.hasOwner=ACL_NODE.0.sys:base.ReadProperties,RM_DENY
+            <value> org.alfresco.service.cmr.security.OwnableService.getOwner=ACL_NODE.0.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.security.OwnableService.setOwner=ACL_NODE.0.cm:ownable.SetOwner,RM_ABSTAIN
+                org.alfresco.service.cmr.security.OwnableService.takeOwnership=ACL_NODE.0.cm:ownable.TakeOwnership,RM_ABSTAIN
+                org.alfresco.service.cmr.security.OwnableService.hasOwner=ACL_NODE.0.sys:base.ReadProperties,RM_ABSTAIN
                 org.alfresco.service.cmr.security.OwnableService.*=ACL_DENY,RM_DENY </value>
         </property>
     </bean>

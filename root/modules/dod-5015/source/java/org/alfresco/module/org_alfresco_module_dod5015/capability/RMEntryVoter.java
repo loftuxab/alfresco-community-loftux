@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.capability;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,11 +42,13 @@ import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.repo.security.permissions.impl.acegi.ACLEntryVoterException;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
@@ -66,6 +69,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     private static final String RM_DENY = "RM_DENY";
 
     private static final String RM_CAP = "RM_CAP";
+    
+    private static final String RM_ABSTAIN = "RM_ABSTAIN";
 
     private NamespacePrefixResolver nspr;
 
@@ -75,10 +80,9 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     protected RMCaveatConfigImpl caveatConfigImpl;
 
-    private static HashMap<String, Policy> policies = new HashMap<String, Policy>();
+    private DictionaryService dictionaryService;
 
-    static SimplePermissionReference VIEW_RECORDS = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT,
-            RMPermissionModel.VIEW_RECORDS);
+    private static HashMap<String, Policy> policies = new HashMap<String, Policy>();
 
     static
     {
@@ -130,10 +134,17 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         this.caveatConfigImpl = caveatConfigImpl;
     }
 
+    
+    
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+
     public boolean supports(ConfigAttribute attribute)
     {
         if ((attribute.getAttribute() != null)
-                && (attribute.getAttribute().equals(RM_ALLOW) || attribute.getAttribute().equals(RM_DENY) || attribute.getAttribute().startsWith(RM_CAP) || attribute
+                && (attribute.getAttribute().equals(RM_ABSTAIN) || attribute.getAttribute().equals(RM_ALLOW) || attribute.getAttribute().equals(RM_DENY) || attribute.getAttribute().startsWith(RM_CAP) || attribute
                         .getAttribute().startsWith(RM)))
         {
             return true;
@@ -190,7 +201,11 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         for (ConfigAttributeDefintion cad : supportedDefinitions)
         {
-            if (cad.typeString.equals(RM_DENY))
+            if (cad.typeString.equals(RM_ABSTAIN))
+            {
+                return AccessDecisionVoter.ACCESS_ABSTAIN;
+            }
+            else if (cad.typeString.equals(RM_DENY))
             {
                 return AccessDecisionVoter.ACCESS_DENIED;
             }
@@ -198,10 +213,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }
-            else if (
-                        ((cad.parameters.get(0) != null) && (cad.parameters.get(0) >= invocation.getArguments().length)) || 
-                        ((cad.parameters.get(1) != null) && (cad.parameters.get(1) >= invocation.getArguments().length))
-                    )
+            else if (((cad.parameters.get(0) != null) && (cad.parameters.get(0) >= invocation.getArguments().length))
+                    || ((cad.parameters.get(1) != null) && (cad.parameters.get(1) >= invocation.getArguments().length)))
             {
                 continue;
             }
@@ -261,6 +274,28 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         return AccessDecisionVoter.ACCESS_ABSTAIN;
 
+    }
+
+    private static QName getType(NodeService nodeService, MethodInvocation invocation, Class[] params, int position, boolean parent)
+    {
+        if (QName.class.isAssignableFrom(params[position]))
+        {
+            if (invocation.getArguments()[position] != null)
+            {
+                QName qname = (QName) invocation.getArguments()[position];
+                return qname;
+            }
+        }
+        else if (NodeRef.class.isAssignableFrom(params[position]))
+        {
+            if (invocation.getArguments()[position] != null)
+            {
+                NodeRef nodeRef = (NodeRef) invocation.getArguments()[position];
+                return nodeService.getType(nodeRef);
+            }
+        }
+
+        throw new ACLEntryVoterException("Unknown type");
     }
 
     private static NodeRef getTestNode(NodeService nodeService, MethodInvocation invocation, Class[] params, int position, boolean parent)
@@ -418,7 +453,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         SimplePermissionReference required;
 
         HashMap<Integer, Integer> parameters = new HashMap<Integer, Integer>(2, 1.0f);
-        
+
         boolean parent = false;
 
         ConfigAttributeDefintion(ConfigAttribute attr)
@@ -476,7 +511,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             {
                 logger.debug("\t\tNode ref is not null");
             }
-            if (voter.permissionService.hasPermission(nodeRef, VIEW_RECORDS.toString()) == AccessStatus.DENIED)
+            if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.VIEW_RECORDS) == AccessStatus.DENIED)
             {
                 if (logger.isDebugEnabled())
                 {
@@ -524,6 +559,118 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         }
     }
 
+    private static int checkCreate(RMEntryVoter voter, NodeRef nodeRef, QName type)
+    {
+        if (voter.nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT))
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("\t\tNode ref is not null");
+            }
+
+            // we can read
+            // we file into arg 0
+
+            // Filing Record
+            if (isRecordFolder(voter, voter.nodeService.getType(nodeRef)))
+            {
+
+                if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.DECLARE_RECORDS) == AccessStatus.DENIED)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("\t\tPermission is denied");
+                        Thread.dumpStack();
+                    }
+
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+                else
+                {
+
+                    if (isClosed(voter, nodeRef))
+                    {
+                        if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS) == AccessStatus.DENIED)
+                        {
+                            return AccessDecisionVoter.ACCESS_DENIED;
+                        }
+                    }
+                    if (isCutoff(voter, nodeRef))
+                    {
+                        if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS) == AccessStatus.DENIED)
+                        {
+                            return AccessDecisionVoter.ACCESS_DENIED;
+                        }
+                    }
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
+            }
+            // Create Record Folder
+            else if (isRecordFolder(voter, type))
+            {
+                if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS) == AccessStatus.DENIED)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("\t\tPermission is denied");
+                        Thread.dumpStack();
+                    }
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+                else
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
+            }
+            // else other file plan component
+            else
+            {
+                if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA) == AccessStatus.DENIED)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("\t\tPermission is denied");
+                        Thread.dumpStack();
+                    }
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+                else
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
+            }
+        }
+
+        return AccessDecisionVoter.ACCESS_ABSTAIN;
+
+    }
+
+    private static boolean isRecordFolder(RMEntryVoter voter, QName type)
+    {
+        return voter.dictionaryService.isSubClass(type, RecordsManagementModel.TYPE_RECORD_FOLDER);
+    }
+
+    private static boolean isCutoff(RMEntryVoter voter, NodeRef nodeRef)
+    {
+        return voter.nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_CUT_OFF);
+    }
+
+    private static boolean isClosed(RMEntryVoter voter, NodeRef nodeRef)
+    {
+        Serializable serializableValue = voter.nodeService.getProperty(nodeRef, RecordsManagementModel.PROP_IS_CLOSED);
+        if (serializableValue == null)
+        {
+            return false;
+        }
+        Boolean isClosed = DefaultTypeConverter.INSTANCE.convert(Boolean.class, serializableValue);
+        return isClosed;
+    }
+
+    private static boolean isRm(RMEntryVoter voter, NodeRef nodeRef)
+    {
+        return voter.nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT);
+    }
+
     interface Policy
     {
         int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad);
@@ -566,7 +713,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
                     first = checkRead(voter, testNodeRef, true);
                 }
             }
-            
+
             if (cad.parameters.get(1) > -1)
             {
                 NodeRef testNodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(1), cad.parent);
@@ -578,16 +725,16 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
                 }
             }
 
-            if((first == AccessDecisionVoter.ACCESS_DENIED ) || (second  == AccessDecisionVoter.ACCESS_DENIED))
+            if ((first == AccessDecisionVoter.ACCESS_DENIED) || (second == AccessDecisionVoter.ACCESS_DENIED))
             {
                 return AccessDecisionVoter.ACCESS_DENIED;
             }
-            
-            if((first == AccessDecisionVoter.ACCESS_GRANTED ) && (second  == AccessDecisionVoter.ACCESS_GRANTED))
+
+            if ((first == AccessDecisionVoter.ACCESS_GRANTED) && (second == AccessDecisionVoter.ACCESS_GRANTED))
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
-            }      
-            
+            }
+
             return AccessDecisionVoter.ACCESS_ABSTAIN;
 
         }
@@ -606,7 +753,16 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             }
             else
             {
-                return policy.evaluate(voter, invocation, params, cad);
+                if (policy.evaluate(voter, invocation, params, cad) != AccessDecisionVoter.ACCESS_GRANTED)
+                {
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+                else
+                {
+                    NodeRef nodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(0), cad.parent);
+                    QName type = getType(voter.nodeService, invocation, params, cad.parameters.get(1), cad.parent);
+                    return checkCreate(voter, nodeRef, type);
+                }
             }
         }
 

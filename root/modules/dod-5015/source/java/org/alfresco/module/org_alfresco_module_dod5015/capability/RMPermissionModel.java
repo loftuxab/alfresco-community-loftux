@@ -44,6 +44,8 @@ public interface RMPermissionModel
     
     public static final String ROLE_ADMINISTRATOR = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "Administrator").toString();
     
+    // 
+    
     public static final String DECLARE_RECORDS = "DeclareRecords";
 
     public static final String VIEW_RECORDS = "ViewRecords";
