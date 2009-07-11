@@ -368,6 +368,11 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
             return null;
         }
 
+        if(isUnfitered(returnedObject))
+        {
+            return returnedObject;
+        }
+        
         List<ConfigAttributeDefintion> supportedDefinitions = extractSupportedDefinitions(config);
 
         if (supportedDefinitions.size() == 0)
@@ -397,9 +402,16 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
         return returnedObject;
     }
 
+    private boolean isUnfitered(NodeRef nodeRef)
+    {
+        return !nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT);
+        
+    }
+    
     private FileInfo decide(Authentication authentication, Object object, ConfigAttributeDefinition config, FileInfo returnedObject) throws AccessDeniedException
 
     {
+        // Filter via nodeRef
         NodeRef nodeRef = returnedObject.getNodeRef();
         // this is virtually equivalent to the noderef
         decide(authentication, object, config, nodeRef);
@@ -457,6 +469,11 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
 
             // Enforce Read Policy
 
+            if(isUnfitered(testNodeRef))
+            {
+               continue;
+            }
+            
             if (entryVoter.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED)
             {
                 throw new AccessDeniedException("Access Denied");
@@ -496,6 +513,11 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                 testNodeRef = returnedObject.getTargetRef();
             }
 
+            if(isUnfitered(testNodeRef))
+            {
+               continue;
+            }
+            
             if (entryVoter.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED)
             {
                 throw new AccessDeniedException("Access Denied");
@@ -612,6 +634,11 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                     testNodeRef = returnedObject.getNodeRef(i);
                 }
 
+                if(isUnfitered(testNodeRef))
+                {
+                   continue;
+                }
+                
                 if (inclusionMask.get(i) && (testNodeRef != null) && (entryVoter.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
                 {
                     inclusionMask.set(i, false);
@@ -764,6 +791,11 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                         logger.debug("\t" + cad.typeString + " test on " + testNodeRef + " from " + nextObject.getClass().getName());
                     }
 
+                    if(isUnfitered(testNodeRef))
+                    {
+                       continue;
+                    }
+                    
                     if (allowed && (testNodeRef != null) && (entryVoter.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
                     {
                         allowed = false;
@@ -859,6 +891,11 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                     logger.debug("\t" + cad.typeString + " test on " + testNodeRef + " from " + current.getClass().getName());
                 }
 
+                if(isUnfitered(testNodeRef))
+                {
+                   continue;
+                }
+                
                 if (incudedSet.get(i) && (testNodeRef != null) && (entryVoter.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
                 {
                     incudedSet.set(i, false);
