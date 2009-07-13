@@ -149,11 +149,21 @@
         <property name="caveatConfigImpl" ref="caveatConfigImpl"/>
     </bean>
     
-    <!-- ReST impl for RM Action Service -->
+    <!-- REST impl for RM Action Service -->
     <bean id="webscript.org.alfresco.rma.rmaction.post"
           class="org.alfresco.module.org_alfresco_module_dod5015.script.RmActionPost" parent="webscript">
           <property name="recordsManagementActionService" ref="RecordsManagementActionService" />
           <property name="nodeService" ref="NodeService" />
+    </bean>
+    
+    <!-- REST impl for RM Admin Service -->
+    <bean id="webscript.org.alfresco.rma.customassocs.get"
+          class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssocsGet" parent="webscript">
+          <property name="recordsManagementAdminService" ref="RecordsManagementAdminService" />
+    </bean>
+    <bean id="webscript.org.alfresco.rma.customprops.get"
+          class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropsGet" parent="webscript">
+          <property name="recordsManagementAdminService" ref="RecordsManagementAdminService" />
     </bean>
     
     <!-- REST impl for Disposition Schedule -->
@@ -164,7 +174,7 @@
         <property name="nodeService" ref="NodeService" />
         <property name="namespaceService" ref="NamespaceService" />
     </bean>
-    
+
     <!-- REST impl for Disposition Action Definition -->
     <bean id="webscript.org.alfresco.rma.dispositionactiondefinitions.post" 
           class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPost" 
@@ -173,5 +183,4 @@
         <property name="nodeService" ref="NodeService" />
         <property name="namespaceService" ref="NamespaceService" />
     </bean>
-	
 </beans>

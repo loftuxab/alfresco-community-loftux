@@ -102,7 +102,7 @@ public class DynamicModelSystemTest extends BaseSpringTest implements DOD5015Mod
         Set<QName> availableCustomAssocs = this.rmAdminService.getAvailableCustomAssociations().keySet();
         final int initialCustomAssocCount = availableCustomAssocs.size();
         
-        String childAssocName = "dynamicAssocChild" + System.currentTimeMillis();
+        String childAssocName = "rmc:dynamicAssocChild" + System.currentTimeMillis();
         
         HashMap<String, Serializable> actionParams = new HashMap<String, Serializable>();
         actionParams.put("name", childAssocName);
@@ -112,7 +112,7 @@ public class DynamicModelSystemTest extends BaseSpringTest implements DOD5015Mod
         this.rmActionService.executeRecordsManagementAction(RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF, 
                 "defineCustomAssociation", actionParams);
 
-        String assocName = "dynamicAssocStandard" + System.currentTimeMillis();
+        String assocName = "rmc:dynamicAssocStandard" + System.currentTimeMillis();
         actionParams.clear();
         actionParams.put("name", assocName);
         actionParams.put("sourceRoleName", "supporting");
@@ -125,10 +125,7 @@ public class DynamicModelSystemTest extends BaseSpringTest implements DOD5015Mod
         final int updatedCount = updatedCustomAssocs.size();
         assertEquals("Incorrect custom assoc count.", initialCustomAssocCount + 2, updatedCount);
         
-        //TODO Need to cleanly separate parent/child from bi-di assocs in the service API.
-
-        QName assocQName = QName.createQName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX,
-                childAssocName, serviceRegistry.getNamespaceService());
+        QName assocQName = QName.createQName(childAssocName, serviceRegistry.getNamespaceService());
 
         assertTrue("Custom assoc missing", updatedCustomAssocs.containsKey(assocQName));
         assertEquals("rma:record", updatedCustomAssocs.get(assocQName).getTargetClassName());
@@ -140,7 +137,7 @@ public class DynamicModelSystemTest extends BaseSpringTest implements DOD5015Mod
         Set<QName> availableCustomProps = this.rmAdminService.getAvailableCustomProperties().keySet();
         final int initialCustomPropCount = availableCustomProps.size();
         
-        String propLocalName = "dynamicProperty" + System.currentTimeMillis();
+        String propLocalName = "rmc:dynamicProperty" + System.currentTimeMillis();
         
         Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
         actionParams.put("name", propLocalName);
@@ -153,9 +150,7 @@ public class DynamicModelSystemTest extends BaseSpringTest implements DOD5015Mod
         final int updatedCount = updatedCustomProps.size();
         assertEquals("Incorrect custom property count.", initialCustomPropCount + 1, updatedCount);
         
-        // I'm tolerating a dependency from test code to the custom model prefix here.
-        QName propertyQName = QName.createQName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX,
-                                                propLocalName, serviceRegistry.getNamespaceService());
+        QName propertyQName = QName.createQName(propLocalName, serviceRegistry.getNamespaceService());
         assertTrue("Custom property missing", updatedCustomProps.containsKey(propertyQName));
         assertEquals(updatedCustomProps.get(propertyQName).getType(), DataTypeDefinition.BOOLEAN);
     }

@@ -38,6 +38,7 @@ public final class CustomProperty
     private String defaultValue;
     private String description;
     private boolean mandatory;
+    private boolean multiValued;
     private String name;
     private boolean protected_;
     private String title;
@@ -92,6 +93,16 @@ public final class CustomProperty
         this.mandatory = mandatory;
     }
 
+    public boolean isMultiValued()
+    {
+        return multiValued;
+    }
+
+    public void setMultiValued(boolean multiValued)
+    {
+        this.multiValued = multiValued;
+    }
+
     public String getName()
     {
         return name;
@@ -137,7 +148,6 @@ public final class CustomProperty
     // newProp.setIndexedAtomically(boolean)
     // newProp.setIndexTokenisationMode(IndexTokenisationMode)
     // newProp.setMandatoryEnforced(boolean)
-    // newProp.setMultiValued(boolean)
     // newProp.setOverride(boolean)
     // newProp.setStoredInIndex(boolean)
 }
