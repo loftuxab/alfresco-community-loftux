@@ -60,12 +60,16 @@ function getRecord(siteId, node)
       };
       
       // collect up the RMA namespace properties
-      // TODO: collect up props under aspects extending rma:customRMData marker
+      // collect up custom props under the rmc:customProperties marker
       for (var k in node.properties)
       {
          if (k.match("^{http://www.alfresco.org/model/recordsmanagement/1.0}") == "{http://www.alfresco.org/model/recordsmanagement/1.0}")
          {
-            item.properties[k.split('}')[1]] = node.properties[k];
+            item.properties["rma_" + k.split('}')[1]] = node.properties[k];
+         }
+         else if (k.match("^{http://www.alfresco.org/model/rmcustom/1.0}") == "{http://www.alfresco.org/model/rmcustom/1.0}")
+         {
+            item.properties["rmc_" + k.split('}')[1]] = node.properties[k];
          }
       }
       

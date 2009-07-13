@@ -153,7 +153,7 @@
          var query = "";
          if (Dom.get(this.id + "-undeclared").checked === false)
          {
-            query = '-ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}undeclaredRecord"';
+            query = '+ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}declaredRecord"';
          }
          
          // TEMP: hardcoded queries for demo - replaced with canned query index and move to repo side
@@ -168,7 +168,7 @@
          else
          {
             // TEMP: assume disposition query for now
-            query += ' +ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule"' +
+            query += ' +ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}scheduled"' +
                      ' +@rma\\:dispositionAction:' + this.filter +
                      ' +@rma\\:dispositionAsOf:[MIN TO ' + today.getFullYear() + '\\-' + (today.getMonth()+1) + '\\-' + today.getDate() + 'T00:00:00]';
          }

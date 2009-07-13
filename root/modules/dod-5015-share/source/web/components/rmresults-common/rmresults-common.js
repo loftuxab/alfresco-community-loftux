@@ -80,9 +80,17 @@
           * 
           * @property maxResults
           * @type int
-          * @default 100
+          * @default 500
           */
-         maxResults: 100
+         maxResults: 500,
+         
+         /**
+          * Custom rm meta fields
+          * 
+          * @property customFields
+          * @type Array
+          */
+         customFields: []
       },
 
       /**
@@ -259,14 +267,21 @@
          this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
+         // add the well known 'cm' fields and 'rma' namespace
+         var fields = ["nodeRef", "name", "title", "description", "modifiedOn", "modifiedByUser", "modifiedBy",
+                       "createdOn", "createdByUser", "createdBy", "size", "browseUrl",
+                       "properties.rma_identifier", "properties.rma_dateFiled", "properties.rma_publicationDate", "properties.rma_dateReceived",
+                       "properties.rma_originatingOrganization", "properties.rma_mediaType", "properties.rma_format", "properties.rma_location",
+                       "properties.rma_supplementalMarkingList", "properties.rma_reviewAsOf"];
+         // add the custom meta fields - 'rmc' namespace
+         for (var i=0, j=this.options.customFields.length; i<j; i++)
+         {
+            fields.push("properties.rmc_" + this.options.customFields[i].id);
+         }
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "items",
-             fields: ["nodeRef", "name", "title", "description", "modifiedOn", "modifiedByUser", "modifiedBy",
-                      "createdOn", "createdByUser", "createdBy", "size", "browseUrl",
-                      "properties.identifier", "properties.dateFiled", "properties.publicationDate", "properties.dateReceived",
-                      "properties.originatingOrganization", "properties.mediaType", "properties.format", "properties.location",
-                      "properties.supplementalMarkingList", "properties.reviewAsOf"]
+             fields: fields
          };
          
          // setup of the datatable.
@@ -313,7 +328,7 @@
           */
          var renderCellVitalRecord = function RecordsResults_renderCellVitalRecord(elCell, oRecord, oColumn, oData)
          {
-            var reviewDate = oRecord.getData("properties.reviewAsOf");
+            var reviewDate = oRecord.getData("properties.rma_reviewAsOf");
             if (reviewDate)
             {
                // found a vital record - is it due for review?
@@ -340,7 +355,7 @@
          var renderCellURI = function RecordsResults_renderCellURI(elCell, oRecord, oColumn, oData)
          {
             var url = me._getBrowseUrlForRecord(oRecord);
-            elCell.innerHTML = '<span><a href="' + encodeURI(url) + '">' + oRecord.getData("properties.identifier") + '</a></span>';
+            elCell.innerHTML = '<span><a href="' + encodeURI(url) + '">' + oRecord.getData("properties.rma_identifier") + '</a></span>';
          };
          
          /**
@@ -370,8 +385,8 @@
          var sortCellURI = function sortCellURI(a, b, desc)
          {
             // identifier format is: YYYY-NNNNNNNNNN where Y=4 digit year and N=zero padded DBID
-            var sa = a.getData("properties.identifier");
-            var sb = b.getData("properties.identifier");
+            var sa = a.getData("properties.rma_identifier");
+            var sb = b.getData("properties.rma_identifier");
             var numA = parseInt(sa.substring(0, 4) + sa.substring(5)),
                 numB = parseInt(sb.substring(0, 4) + sb.substring(5));
             
@@ -389,13 +404,13 @@
          {
             var sa = null;
             var sb = null;
-            if (a.getData("properties.reviewAsOf"))
+            if (a.getData("properties.rma_reviewAsOf"))
             {
-               sa = Alfresco.util.fromISO8601(a.getData("properties.reviewAsOf"));
+               sa = Alfresco.util.fromISO8601(a.getData("properties.rma_reviewAsOf"));
             }
-            if (b.getData("properties.reviewAsOf"))
+            if (b.getData("properties.rma_reviewAsOf"))
             {
-               sb = Alfresco.util.fromISO8601(b.getData("properties.reviewAsOf"));
+               sb = Alfresco.util.fromISO8601(b.getData("properties.rma_reviewAsOf"));
             }
             if (sa === null && sb === null) return 0;
             if (desc)
@@ -417,16 +432,25 @@
             { key: "name", label: me._msg("label.name"), field: "name", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
             { key: "title", label: me._msg("label.title"), field: "title", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
             { key: "originator", label: me._msg("label.originator"), field: "createdBy", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
-            { key: "dateFiled", label: me._msg("label.dateFiled"), field: "properties.dateFiled", sortable: true, resizeable: true, formatter: renderCellDate },
-            { key: "publicationDate", label: me._msg("label.publicationDate"), field: "properties.publicationDate", sortable: true, resizeable: true, formatter: renderCellDate },
+            { key: "dateFiled", label: me._msg("label.dateFiled"), field: "properties.rma_dateFiled", sortable: true, resizeable: true, formatter: renderCellDate },
+            { key: "publicationDate", label: me._msg("label.publicationDate"), field: "properties.rma_publicationDate", sortable: true, resizeable: true, formatter: renderCellDate },
             { key: "vitalRecord", label: me._msg("label.vitalRecord"), sortable: true, sortOptions: {sortFunction: sortCellVitalRecord}, resizeable: false, formatter: renderCellVitalRecord },
-            { key: "originatingOrganization", label: me._msg("label.originatingOrganization"), field: "properties.originatingOrganization", sortable: true, resizeable: true, hidden: true },
-            { key: "mediaType", label: me._msg("label.mediaType"), field: "properties.mediaType", sortable: true, resizeable: true, hidden: true },
-            { key: "format", label: me._msg("label.format"), field: "properties.format", sortable: true, resizeable: true, hidden: true },
-            { key: "dateReceived", label: me._msg("label.dateReceived"), field: "properties.dateReceived", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true },
-            { key: "location", label: me._msg("label.location"), field: "properties.location", sortable: true, resizeable: true, hidden: true },
-            { key: "supplementalMarkingList", label: me._msg("label.supplementalMarkingList"), field: "properties.supplementalMarkingList", sortable: true, resizeable: true, hidden: true }
+            { key: "originatingOrganization", label: me._msg("label.originatingOrganization"), field: "properties.rma_originatingOrganization", sortable: true, resizeable: true, hidden: true },
+            { key: "mediaType", label: me._msg("label.mediaType"), field: "properties.rma_mediaType", sortable: true, resizeable: true, hidden: true },
+            { key: "format", label: me._msg("label.format"), field: "properties.rma_format", sortable: true, resizeable: true, hidden: true },
+            { key: "dateReceived", label: me._msg("label.dateReceived"), field: "properties.rma_dateReceived", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true },
+            { key: "location", label: me._msg("label.location"), field: "properties.rma_location", sortable: true, resizeable: true, hidden: true },
+            { key: "supplementalMarkingList", label: me._msg("label.supplementalMarkingList"), field: "properties.rma_supplementalMarkingList", sortable: true, resizeable: true, hidden: true }
          ];
+         
+         // Add the custom metadata columns
+         for (var i=0, j=this.options.customFields.length; i<j; i++)
+         {
+            var prop = this.options.customFields[i];
+            columnDefinitions.push(
+               { key: prop.id, label: prop.title, field: "properties.rmc_" + prop.id, sortable: true, resizeable: true, hidden: true }
+            );
+         }
          
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
