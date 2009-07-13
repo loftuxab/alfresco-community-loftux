@@ -24,10 +24,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
@@ -44,6 +41,7 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.scripts.TestWebScriptServer.DeleteRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
@@ -61,6 +59,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     protected static final String GET_SCHEDULE_URL_FORMAT = "/api/node/{0}/dispositionschedule";
     protected static final String POST_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions";
+    protected static final String DELETE_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions/{1}";
     protected static final String APPLICATION_JSON = "application/json";
     
     protected NodeService nodeService;
@@ -317,5 +316,47 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         jsonPostData.put("period", period);
         jsonPostString = jsonPostData.toString();
         sendRequest(new PostRequest(requestUrl, jsonPostString, APPLICATION_JSON), 400);
+    }
+    
+    public void testDeleteDispositionAction() throws Exception
+    {
+        // create a new recordCategory node in the recordSeries and then get
+        // the disposition schedule
+        NodeRef recordSeries = TestUtilities.getRecordSeries(this.searchService, "Civilian Files");
+        assertNotNull(recordSeries);
+        NodeRef newRecordCategory = this.nodeService.createNode(recordSeries, ContentModel.ASSOC_CONTAINS, 
+                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("recordCategory")), 
+                    DOD5015Model.TYPE_RECORD_CATEGORY).getChildRef();
+        
+        // create an action definition to then delete
+        String categoryNodeUrl = newRecordCategory.toString().replace("://", "/");
+        String postRequestUrl = MessageFormat.format(POST_ACTIONDEF_URL_FORMAT, categoryNodeUrl);
+        JSONObject jsonPostData = new JSONObject();
+        jsonPostData.put("name", "cutoff");
+        String jsonPostString = jsonPostData.toString();
+        sendRequest(new PostRequest(postRequestUrl, jsonPostString, APPLICATION_JSON), 200);
+        
+        // verify the action definition is present and retrieve it's id
+        String getRequestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
+        Response rsp = sendRequest(new GetRequest(getRequestUrl), 200);
+        System.out.println("GET response: " + rsp.getContentAsString());
+        JSONObject json = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        String actionDefId = json.getJSONObject("data").getJSONArray("actions").getJSONObject(0).getString("id");
+        
+        // try and delete a non existent action definition to check for 404
+        String deleteRequestUrl = MessageFormat.format(DELETE_ACTIONDEF_URL_FORMAT, categoryNodeUrl, "xyz");
+        rsp = sendRequest(new DeleteRequest(deleteRequestUrl), 404);
+        
+        // now delete the action defintion created above
+        deleteRequestUrl = MessageFormat.format(DELETE_ACTIONDEF_URL_FORMAT, categoryNodeUrl, actionDefId);
+        rsp = sendRequest(new DeleteRequest(deleteRequestUrl), 200);
+        
+        // verify it got deleted
+        getRequestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
+        rsp = sendRequest(new GetRequest(getRequestUrl), 200);
+        System.out.println("GET response: " + rsp.getContentAsString());
+        json = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        JSONArray actions = json.getJSONObject("data").getJSONArray("actions");
+        assertEquals(0, actions.length());
     }
 }
