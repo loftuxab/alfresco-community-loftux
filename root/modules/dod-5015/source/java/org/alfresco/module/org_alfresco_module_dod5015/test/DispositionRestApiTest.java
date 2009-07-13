@@ -45,6 +45,7 @@ import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
+import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -59,6 +60,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
 {
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     protected static final String GET_SCHEDULE_URL_FORMAT = "/api/node/{0}/dispositionschedule";
+    protected static final String POST_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions";
     protected static final String APPLICATION_JSON = "application/json";
     
     protected NodeService nodeService;
@@ -67,7 +69,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
     protected ImporterService importService;
     protected ServiceRegistry services;
     protected PermissionService permissionService;
-
+    
     @Override
     protected void setUp() throws Exception
     {
@@ -118,23 +120,23 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertNotNull(jsonParsedObject);
         
         // check JSON data
-        Object dataObj = jsonParsedObject.get("data");
-        assertEquals(JSONObject.class, dataObj.getClass());
+        JSONObject dataObj = jsonParsedObject.getJSONObject("data");
+        assertNotNull(dataObj);
         JSONObject rootDataObject = (JSONObject)dataObj;
         assertEquals(6, rootDataObject.length());
         
         // check individual data items
         String serviceUrl = "/alfresco/service" + requestUrl;
-        String url = (String)rootDataObject.get("url");
+        String url = rootDataObject.getString("url");
         assertEquals(serviceUrl, url);
         
-        String authority = (String)rootDataObject.get("authority");
+        String authority = rootDataObject.getString("authority");
         assertEquals("N1-218-00-4 item 023", authority);
         
-        String instructions = (String)rootDataObject.get("instructions");
+        String instructions = rootDataObject.getString("instructions");
         assertEquals("Cut off monthly, hold 1 month, then destroy.", instructions);
         
-        String actionsUrl = (String)rootDataObject.get("actionsUrl");
+        String actionsUrl = rootDataObject.getString("actionsUrl");
         assertEquals(serviceUrl + "/dispositionactiondefinitions", actionsUrl);
         
         boolean recordLevel = rootDataObject.getBoolean("recordLevelDisposition");
@@ -148,8 +150,8 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertNotNull(action1.get("id"));
         assertNotNull(action1.get("url"));
         assertEquals(0, action1.getInt("index"));
-        assertEquals("cutoff", action1.get("name"));
-        assertEquals("monthend|1", action1.get("period"));
+        assertEquals("cutoff", action1.getString("name"));
+        assertEquals("monthend|1", action1.getString("period"));
         assertTrue(action1.getBoolean("eligibleOnFirstCompleteEvent"));
         
         JSONObject action2 = (JSONObject)actions.get(1);
@@ -170,20 +172,20 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertNotNull(jsonParsedObject);
 
         // check JSON data
-        dataObj = jsonParsedObject.get("data");
-        assertEquals(JSONObject.class, dataObj.getClass());
+        dataObj = jsonParsedObject.getJSONObject("data");
+        assertNotNull(dataObj);
         rootDataObject = (JSONObject)dataObj;
         assertEquals(6, rootDataObject.length());
         
         // check individual data items
         serviceUrl = "/alfresco/service" + requestUrl;
-        url = (String)rootDataObject.get("url");
+        url = rootDataObject.getString("url");
         assertEquals(serviceUrl, url);
         
-        authority = (String)rootDataObject.get("authority");
+        authority = rootDataObject.getString("authority");
         assertEquals("GRS 1 item 23b(1)", authority);
         
-        instructions = (String)rootDataObject.get("instructions");
+        instructions = rootDataObject.getString("instructions");
         assertEquals("Cutoff when superseded.  Destroy immediately after cutoff", instructions);
         
         recordLevel = rootDataObject.getBoolean("recordLevelDisposition");
@@ -197,7 +199,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertNotNull(action1.get("id"));
         assertNotNull(action1.get("url"));
         assertEquals(0, action1.getInt("index"));
-        assertEquals("cutoff", action1.get("name"));
+        assertEquals("cutoff", action1.getString("name"));
         assertTrue(action1.getBoolean("eligibleOnFirstCompleteEvent"));
         /*JSONArray events = action1.getJSONArray("events");
         assertNotNull(events);
@@ -210,9 +212,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         
         // create a new recordCategory node in the recordSeries and then get
         // the disposition schedule
-        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
-        //String recordCategoryName = "Test Record Category";
-        //props.put(ContentModel.PROP_NAME, recordCategoryName);
         NodeRef newRecordCategory = this.nodeService.createNode(recordSeries, ContentModel.ASSOC_CONTAINS, 
                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("recordCategory")), 
                     DOD5015Model.TYPE_RECORD_CATEGORY).getChildRef();
@@ -227,12 +226,96 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertNotNull(jsonParsedObject);
 
         // check JSON data
-        dataObj = jsonParsedObject.get("data");
-        assertEquals(JSONObject.class, dataObj.getClass());
+        dataObj = jsonParsedObject.getJSONObject("data");
+        assertNotNull(dataObj);
         rootDataObject = (JSONObject)dataObj;
         assertEquals(4, rootDataObject.length());
         actions = rootDataObject.getJSONArray("actions");
         assertNotNull(actions);
         assertEquals(0, actions.length());
+    }
+    
+    public void testPostDispositionAction() throws Exception
+    {
+        // create a recordCategory to get a disposition schedule
+        NodeRef recordSeries = TestUtilities.getRecordSeries(this.searchService, "Civilian Files");
+        assertNotNull(recordSeries);
+        
+        // create a new recordCategory node in the recordSeries and then get
+        // the disposition schedule
+        NodeRef newRecordCategory = this.nodeService.createNode(recordSeries, ContentModel.ASSOC_CONTAINS, 
+                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("recordCategory")), 
+                    DOD5015Model.TYPE_RECORD_CATEGORY).getChildRef();
+        
+        String categoryNodeUrl = newRecordCategory.toString().replace("://", "/");
+        String requestUrl = MessageFormat.format(POST_ACTIONDEF_URL_FORMAT, categoryNodeUrl);
+        
+        // Construct the JSON request.
+        String name = "destroy";
+        String desc = "Destroy this record after 5 years";
+        String period = "year|5";
+        String periodProperty = "rma:cutOffDate";
+        boolean eligibleOnFirstCompleteEvent = true;
+        
+        JSONObject jsonPostData = new JSONObject();
+        jsonPostData.put("name", name);
+        jsonPostData.put("description", desc);
+        jsonPostData.put("period", period);
+        jsonPostData.put("periodProperty", periodProperty);
+        jsonPostData.put("eligibleOnFirstCompleteEvent", eligibleOnFirstCompleteEvent);
+        JSONArray events = new JSONArray();
+        events.put("superseded");
+        events.put("no_longer_needed");
+        jsonPostData.put("events", events);
+        
+        // Submit the JSON request.
+        String jsonPostString = jsonPostData.toString();
+        Response rsp = sendRequest(new PostRequest(requestUrl, jsonPostString, APPLICATION_JSON), 200);
+        System.out.println("POST response: " + rsp.getContentAsString());
+        
+        // check the returned data is what was expected
+        JSONObject jsonResponse = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        JSONObject dataObj = jsonResponse.getJSONObject("data");
+        JSONObject rootDataObject = (JSONObject)dataObj;
+        assertNotNull(rootDataObject.getString("id"));
+        assertNotNull(rootDataObject.getString("url"));
+        assertEquals(0, rootDataObject.getInt("index"));
+        assertEquals(name, rootDataObject.getString("name"));
+        assertEquals(desc, rootDataObject.getString("description"));
+        assertEquals(period, rootDataObject.getString("period"));
+        assertEquals(periodProperty, rootDataObject.getString("periodProperty"));
+        assertTrue(rootDataObject.getBoolean("eligibleOnFirstCompleteEvent"));
+        /*JSONArray events = rootDataObject.getJSONArray("events");
+        assertNotNull(events);
+        assertEquals(2, events.length());
+        assertEquals("superseded", events.get(0));
+        assertEquals("no_longer_needed", events.get(1));*/
+        
+        // test the minimum amount of data required to create an action definition
+        jsonPostData = new JSONObject();
+        jsonPostData.put("name", name);
+        jsonPostString = jsonPostData.toString();
+        rsp = sendRequest(new PostRequest(requestUrl, jsonPostString, APPLICATION_JSON), 200);
+        System.out.println("POST response: " + rsp.getContentAsString());
+        
+        // check the returned data is what was expected
+        jsonResponse = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        dataObj = jsonResponse.getJSONObject("data");
+        assertNotNull(rootDataObject.getString("id"));
+        assertNotNull(rootDataObject.getString("url"));
+        assertEquals(0, rootDataObject.getInt("index"));
+        assertEquals(name, dataObj.getString("name"));
+        assertEquals("none|0", dataObj.getString("period"));
+        assertFalse(dataObj.has("description"));
+        assertFalse(dataObj.has("periodProperty"));
+        assertFalse(dataObj.has("events"));
+        assertTrue(dataObj.getBoolean("eligibleOnFirstCompleteEvent"));
+        
+        // negative test to ensure not supplying mandatory data results in an error
+        jsonPostData = new JSONObject();
+        jsonPostData.put("description", desc);
+        jsonPostData.put("period", period);
+        jsonPostString = jsonPostData.toString();
+        sendRequest(new PostRequest(requestUrl, jsonPostString, APPLICATION_JSON), 400);
     }
 }

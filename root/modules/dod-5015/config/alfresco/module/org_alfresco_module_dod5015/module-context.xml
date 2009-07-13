@@ -164,5 +164,14 @@
         <property name="nodeService" ref="NodeService" />
         <property name="namespaceService" ref="NamespaceService" />
     </bean>
+    
+    <!-- REST impl for Disposition Action Definition -->
+    <bean id="webscript.org.alfresco.rma.dispositionactiondefinitions.post" 
+          class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPost" 
+          parent="webscript">
+        <property name="recordsManagementService" ref="RecordsManagementService" />
+        <property name="nodeService" ref="NodeService" />
+        <property name="namespaceService" ref="NamespaceService" />
+    </bean>
 	
 </beans>
