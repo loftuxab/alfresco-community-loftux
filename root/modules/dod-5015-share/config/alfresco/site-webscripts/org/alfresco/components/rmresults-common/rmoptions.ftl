@@ -61,6 +61,13 @@
                         <input type="checkbox" id="${el}-metadata-supplementalMarkingList" />
                         <label for="${el}-metadata-supplementalMarkingList">${msg("label.supplementalMarkingList")}</label>
                      </li>
+                     <#list meta as d>
+                     <#assign prop=d.name?substring(4)>
+                     <li>
+                        <input type="checkbox" id="${el}-metadata-${prop}" />
+                        <label for="${el}-metadata-${prop}">${d.title}</label>
+                     </li>
+                     </#list>
                   </ul>
                </div>
             </td>
