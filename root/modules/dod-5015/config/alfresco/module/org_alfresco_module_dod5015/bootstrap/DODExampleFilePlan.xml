@@ -400,9 +400,9 @@
                                             <view:properties>
                                                 <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                                 <rma:dispositionEvent>
-                                                   abolished
-                                                   re_designated
-                                                   no_longer_needed
+                                                   <view:value>abolished</view:value>
+                                                   <view:value>re_designated</view:value>
+                                                   <view:value>no_longer_needed</view:value>
                                                 </rma:dispositionEvent>                                                
                                                 <rma:dispositionEventCombination>and</rma:dispositionEventCombination>
                                             </view:properties>                              
@@ -625,8 +625,8 @@
                                             <view:properties>
                                                 <rma:dispositionActionName>cutoff</rma:dispositionActionName>
                                                 <rma:dispositionEvent>
-                                                   WGI_action_complete
-                                                   separation
+                                                   <view:value>WGI_action_complete</view:value>
+                                                   <view:value>separation</view:value>
                                                 </rma:dispositionEvent>
                                                 <rma:dispositionEventCombination>or</rma:dispositionEventCombination>
                                             </view:properties>                              

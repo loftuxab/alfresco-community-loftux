@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.alfresco.email.server.EmailServerModel;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -123,7 +122,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                 new JavaBehaviour(this, "onChangeToVRDefinition", NotificationFrequency.TRANSACTION_COMMIT));
         this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"), 
                 ASPECT_SCHEDULED, 
-                new JavaBehaviour(this, "onAddAspect", NotificationFrequency.FIRST_EVENT));
+                new JavaBehaviour(this, "onAddAspect", NotificationFrequency.TRANSACTION_COMMIT));
     }
     
     /**
@@ -169,10 +168,15 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         // ensure the aspect is the one we expect
         if (aspectTypeQName.equals(ASPECT_SCHEDULED))
         {
-            // ensure the disposition schedule is present
-            this.nodeService.createNode(nodeRef, ASSOC_DISPOSITION_SCHEDULE, 
+            // Check whether there is already a disposition schedule object present
+            List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_DISPOSITION_SCHEDULE, RegexQNamePattern.MATCH_ALL);            
+            if (assocs.size() == 0)
+            {
+                // Create the disposition scedule object
+                this.nodeService.createNode(nodeRef, ASSOC_DISPOSITION_SCHEDULE, 
                             QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("dispositionSchedule")),
                             TYPE_DISPOSITION_SCHEDULE);
+            }
         }
     }
     
@@ -374,9 +378,6 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
             
             if (currentDispositionAction != null)
             {
-                // Stamp it complete
-                // TODO
-            
                 // Move it to the history association
                 this.nodeService.moveNode(currentDispositionAction, nodeRef, ASSOC_DISPOSITION_ACTION_HISTORY, ASSOC_DISPOSITION_ACTION_HISTORY);
             }
@@ -530,6 +531,20 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
             }
         }
         
+        return result;
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getNextDispositionAction(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public DispositionAction getNextDispositionAction(NodeRef nodeRef)
+    {
+        DispositionAction result = null;
+        NodeRef dispositionActionNodeRef = getNextDispostionAction(nodeRef);
+        if (dispositionActionNodeRef != null)
+        {
+            result = new DispositionActionImpl(this.serviceRegistry, dispositionActionNodeRef);
+        }
         return result;
     }
     

@@ -119,8 +119,11 @@ public interface RecordsManagementModel
     public static QName PROP_DISPOSITION_ACTION_ID = QName.createQName(RM_URI, "dispositionActionId");
     public static QName PROP_DISPOSITION_ACTION = QName.createQName(RM_URI, "dispositionAction");
     public static QName PROP_DISPOSITION_AS_OF = QName.createQName(RM_URI, "dispositionAsOf");
-    public static QName PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION = QName.createQName(RM_URI, "previousDispositionAction");
-    public static QName PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE = QName.createQName(RM_URI, "previousDispositionDate");
+    public static QName PROP_DISPOSITION_EVENTS_ELIGIBLE = QName.createQName(RM_URI, "dispositionEventsEligible");
+    public static QName PROP_DISPOSITION_ACTION_STARTED_AT = QName.createQName(RM_URI, "dispositionActionStartedAt");
+    public static QName PROP_DISPOSITION_ACTION_STARTED_BY = QName.createQName(RM_URI, "dispositionActionStartedBy");
+    public static QName PROP_DISPOSITION_ACTION_COMPLETED_AT = QName.createQName(RM_URI, "dispositionActionCompletedAt");
+    public static QName PROP_DISPOSITION_ACTION_COMPLETED_BY = QName.createQName(RM_URI, "dispositionActionCompletedBy");
     public static QName ASSOC_EVENT_EXECUTIONS = QName.createQName(RM_URI, "eventExecutions");
     
     // Event execution type

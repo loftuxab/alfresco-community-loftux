@@ -114,7 +114,13 @@ public interface RecordsManagementService
      */
     boolean isNextDispositionActionEligible(NodeRef nodeRef);
     
-    // TODO DispositionAction getDispositionNextDispositionAction(NodeRef nodeRef);
+    /**
+     * 
+     * @param nodeRef
+     * @return
+     */
+    DispositionAction getNextDispositionAction(NodeRef nodeRef);
+    
     // TODO List<DispositionAction> getDispositionActionHistory(NodeRef nodeRef);
     // TODO boolean isDispositionActionEligible(DispositionAction nodeRef); ???  (move to disposition action object?)  
     
