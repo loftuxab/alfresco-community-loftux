@@ -38,10 +38,13 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
+import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
 import org.alfresco.repo.content.MimetypeMap;
@@ -177,18 +180,9 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
     public void testSetup()
     {
         // NOOP
-    }
-    
-    /**
-     * Basic Filing Test
-     *
-     * create a folder
-     *    put a record (record one) into the folder
-     *    declare the record
-     *    
-     * @throws Exception
-     */
-	public void testBasicFilingTest() throws Exception
+    }    
+
+	public void testDispositionLifecycle_0318_01_basictest() throws Exception
 	{	    
 	    NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
 	    assertNotNull(recordCategory);
@@ -356,7 +350,116 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         txn.rollback();
         //txn.commit();
     }
+
 	
+	public void testDispositionLifecycle_0412_01() throws Exception
+    {
+	    
+    }
+	
+	public void testDispositionLifecycle_0412_03_eventtest() throws Exception
+    {
+	    NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Military Files", "Personnel Security Program Records");    
+        assertNotNull(recordCategory);
+        assertEquals("Personnel Security Program Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+                
+        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
+        folderProps.put(ContentModel.PROP_NAME, "My Folder");
+        NodeRef recordFolder = this.nodeService.createNode(recordCategory, 
+                                                           ContentModel.ASSOC_CONTAINS, 
+                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "My Folder"), 
+                                                           TYPE_RECORD_FOLDER).getChildRef();
+        
+        setComplete();
+        endTransaction();
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Create the document
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+        NodeRef recordOne = this.nodeService.createNode(recordFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                        ContentModel.TYPE_CONTENT).getChildRef();
+        
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // NOTE the disposition is being managed at a folder level ...
+        
+        // Check the disposition action
+        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
+        assertTrue(this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+        
+        // Check the dispostion action
+        DispositionAction da = rmService.getNextDispositionAction(recordFolder);
+        assertNotNull(da);
+        assertEquals("cutoff", da.getDispositionActionDefinition().getName());
+        assertNull(da.getAsOfDate());
+        assertFalse((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        assertEquals(false, da.getDispositionActionDefinition().eligibleOnFirstCompleteEvent());
+        List<EventCompletionDetails> events = da.getEventCompletionDetails();
+        assertNotNull(events);
+        assertEquals(3, events.size());
+        
+        EventCompletionDetails ecd = events.get(0);
+        assertFalse(ecd.isEventComplete());
+        assertNull(ecd.getEventCompletedBy());
+        assertNull(ecd.getEventCompletedAt());
+        
+        Map<String, Serializable> params = new HashMap<String, Serializable>(3);
+        params.put(CompleteEventAction.PARAM_EVENT_NAME, events.get(0).getEventName());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
+        
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
+        
+        assertFalse((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        assertEquals(false, da.getDispositionActionDefinition().eligibleOnFirstCompleteEvent());
+        events = da.getEventCompletionDetails();
+        assertNotNull(events);
+        assertEquals(3, events.size());
+        
+        params = new HashMap<String, Serializable>(3);
+        params.put(CompleteEventAction.PARAM_EVENT_NAME, events.get(1).getEventName());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
+        
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
+        
+        assertFalse((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        
+        params = new HashMap<String, Serializable>(3);
+        params.put(CompleteEventAction.PARAM_EVENT_NAME, events.get(2).getEventName());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
+        
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
+        
+        assertTrue((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        
+        events = da.getEventCompletionDetails();
+        assertNotNull(events);
+        assertEquals(3, events.size());        
+        for (EventCompletionDetails e : events)
+        {
+            assertTrue(e.isEventComplete());
+            assertEquals("roy", e.getEventCompletedBy());
+            assertNotNull(e.getEventCompletedAt());
+        }
+        
+    }
+    
+
     /**
      * This method tests the filing of an already existing document i.e. one that is
      * already contained within the document library.

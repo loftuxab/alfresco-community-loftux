@@ -24,12 +24,19 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
+import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
+import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Complete event action
@@ -38,18 +45,110 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public class CompleteEventAction extends RMActionExecuterAbstractBase
 {
+    public static final String PARAM_EVENT_NAME = "completeEvent.eventName";
+    public static final String PARAM_EVENT_COMPLETED_BY = "completeEvent.eventCompletedBy";
+    public static final String PARAM_EVENT_COMPLETED_AT = "completeEvent.eventCompletedAt";
+    
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {
-        // TODO
+        String eventName = (String)action.getParameterValue(PARAM_EVENT_NAME);
+        String eventCompletedBy = (String)action.getParameterValue(PARAM_EVENT_COMPLETED_BY);
+        Date eventCompletedAt = (Date)action.getParameterValue(PARAM_EVENT_COMPLETED_AT);
         
-        // Check that the records corresponds to the event we are trying to complete
-        
-        // Mark the event complete
+        if (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_DISPOSITION_LIFECYCLE) == true)
+        {
+            // Get the next disposition action
+            DispositionAction da = this.recordsManagementService.getNextDispositionAction(actionedUponNodeRef);
+            if (da != null)
+            {
+                // Get the disposition event
+                EventCompletionDetails event = getEvent(da, eventName);
+                if (event != null)
+                {
+                    // Update the event so that it is complete
+                    NodeRef eventNodeRef = event.getNodeRef();
+                    Map<QName, Serializable> props = this.nodeService.getProperties(eventNodeRef);
+                    props.put(PROP_EVENT_EXECUTION_COMPLETE, true);
+                    props.put(PROP_EVENT_EXECUTION_COMPLETED_AT, eventCompletedAt);
+                    props.put(PROP_EVENT_EXECUTION_COMPLETED_BY, eventCompletedBy);
+                    this.nodeService.setProperties(eventNodeRef, props);
+                    
+                    // Check to see if the events eligible property needs to be updated
+                    updateEventEigible(da);
+                    
+                }
+                else
+                {
+                    throw new AlfrescoRuntimeException("The event " + eventName + " can not be completed, because it is not defined on the disposition lifecycle.");
+                }
+            }
+        }
     }
+    
+    /**
+     * Get the event from the dispostion action
+     * 
+     * @param da
+     * @param eventName
+     * @return
+     */
+    private EventCompletionDetails getEvent(DispositionAction da, String eventName)
+    {
+        EventCompletionDetails result = null;
+        List<EventCompletionDetails> events = da.getEventCompletionDetails();
+        for (EventCompletionDetails event : events)
+        {
+            if (eventName.equals(event.getEventName()) == true)
+            {
+                result = event;
+                break;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * 
+     * @param da
+     * @param nodeRef
+     */
+    private void updateEventEigible(DispositionAction da)
+    {
+        List<EventCompletionDetails> events = da.getEventCompletionDetails();
+        
+        boolean eligible = false;
+        if (da.getDispositionActionDefinition().eligibleOnFirstCompleteEvent() == false)
+        {
+            eligible = true;
+            for (EventCompletionDetails event : events)
+            {
+                if (event.isEventComplete() == false)
+                {
+                    eligible = false;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for (EventCompletionDetails event : events)
+            {
+                if (event.isEventComplete() == true)
+                {
+                    eligible = true;
+                    break;
+                }
+            }
+        }
+        
+        // Update the property with the eligible value
+        this.nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE, eligible);
+    }
+    
 
     /**
      * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefinitions(java.util.List)
@@ -57,6 +156,7 @@ public class CompleteEventAction extends RMActionExecuterAbstractBase
     @Override
     protected void addParameterDefinitions(List<ParameterDefinition> paramList)
     {
+        // TODO add parameter definitions ....
         // eventId, executeBy, executedAt
 
     }

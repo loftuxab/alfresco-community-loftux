@@ -120,19 +120,28 @@ public class RecordsManagementServiceTestImpl extends BaseSpringTest implements 
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
         String recordCategoryName = "Test Record Category";
         props.put(ContentModel.PROP_NAME, recordCategoryName);
-        NodeRef nodeRef = this.nodeService.createNode(rootNode, ContentModel.ASSOC_CONTAINS, 
+        NodeRef nodeRef = this.nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN, 
                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(recordCategoryName)), 
                     DOD5015Model.TYPE_RECORD_CATEGORY, props).getChildRef();
+        
+        setComplete();
+        endTransaction();        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
         
         // ensure the record category node has the scheduled aspect and the disposition schedule association
         assertTrue(this.nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_SCHEDULED));
         List<ChildAssociationRef> scheduleAssocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_DISPOSITION_SCHEDULE, RegexQNamePattern.MATCH_ALL);
+        
+        
         assertNotNull(scheduleAssocs);
         assertEquals(1, scheduleAssocs.size());
         
         // test retrieval of the disposition schedule via RM service
         DispositionSchedule schedule = this.rmService.getDispositionSchedule(nodeRef);
         assertNotNull(schedule);
+        
+        txn.commit();
     }
     
 	public void testGetDispositionInstructions() throws Exception

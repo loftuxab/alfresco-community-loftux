@@ -90,7 +90,7 @@ public class RecordsManagementEventServiceImpl implements RecordsManagementEvent
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService#getEvent(java.lang.String)
      */
-    public RecordsManagementEvent getEvent(String eventName)
+    public RecordsManagementEvent getEvent(String eventName) 
     {
         if (getEventMap().containsKey(eventName) == false)
         {

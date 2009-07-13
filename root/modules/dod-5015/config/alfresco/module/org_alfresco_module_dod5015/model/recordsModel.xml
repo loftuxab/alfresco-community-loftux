@@ -161,8 +161,7 @@
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>       
-                                   
-            <!-- This contains one of a prepaired list of available events -->                       
+                                                      
             <property name="rma:dispositionEvent">
                <title>Disposition Event</title>
                <type>d:text</type>               
@@ -215,7 +214,7 @@
       <type name="rma:nonElectronicDocument">
          
          <title>Non-Electronic Document</title>
-         <parent>cm:cmobject</parent>           
+         <parent>cm:content</parent>           
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
@@ -238,20 +237,33 @@
             <property name="rma:dispositionAsOf">
                <title>Disposition Action Date</title>
                <type>d:date</type>
-               <mandatory>true</mandatory>
-            </property>            
-            <property name="rma:previousDispositionAction">
-               <title>Previous Disposition Action</title> 
-               <type>d:text</type>
-               <protected>true</protected>
                <mandatory>false</mandatory>
-            </property>            
-            <property name="rma:previousDispositionDate">
-               <title>Previous Disposition Date</title> 
+            </property>               
+            <property name="rma:dispositionEventsEligible">
+               <title>Disposition Events Eligible</title>
+               <type>d:boolean</type>
+               <default>false</default>
+            </property>             
+            <property name="rma:dispositionActionStartedAt">
+               <title>Disposition Action Started At</title>
                <type>d:date</type>
-               <protected>true</protected>
                <mandatory>false</mandatory>
-            </property>
+            </property>              
+            <property name="rma:dispositionActionStartedBy">
+               <title>Disposition Action Started By</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>              
+            <property name="rma:dispositionActionCompletedAt">
+               <title>Disposition Action Completed At</title>
+               <type>d:date</type>
+               <mandatory>false</mandatory>
+            </property>              
+            <property name="rma:dispositionActionCompletedBy">
+               <title>Disposition Action Copmleted By</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property> 
                         
          </properties>
          
@@ -266,7 +278,7 @@
                 <target>
                     <class>rma:eventExecution</class>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </target>
             </child-association>
          
@@ -516,7 +528,7 @@
                 <target>
                     <class>rma:dispositionSchedule</class>
                     <mandatory>false</mandatory>
-                    <many>true</many>
+                    <many>false</many>
                 </target>
             </child-association>
          

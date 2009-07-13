@@ -78,6 +78,7 @@
           parent="rmAction"/>
     <bean id="defineCustomAssociation" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomAssociationAction"
           parent="rmAction"/>
+    <bean id="completeEvent" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction" parent="rmAction"/>
 
     <!-- Event types -->
     

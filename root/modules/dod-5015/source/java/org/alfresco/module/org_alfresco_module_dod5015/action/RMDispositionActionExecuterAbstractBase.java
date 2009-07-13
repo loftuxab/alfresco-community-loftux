@@ -24,10 +24,12 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action;
 
+import java.util.Date;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -55,6 +57,16 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
     }
     
     /**
+     * Indicates whether the disposition is marked complete 
+     * 
+     * @return  boolean true if marked complete, false otherwise
+     */
+    public boolean setDispositionActionComplete()
+    {
+        return true;
+    }
+    
+    /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
@@ -76,8 +88,19 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
                     // Can only execute disposition action on record if declared
                     if (this.recordsManagementService.isRecordDeclared(actionedUponNodeRef) == true)
                     {
+                        // Indicate that the disposition action is underway
+                        this.nodeService.setProperty(actionedUponNodeRef, PROP_DISPOSITION_ACTION_STARTED_AT, new Date());
+                        this.nodeService.setProperty(actionedUponNodeRef, PROP_DISPOSITION_ACTION_STARTED_BY, AuthenticationUtil.getRunAsUser());
+                        
                         // Execute record level disposition
                         executeRecordLevelDisposition(action, actionedUponNodeRef);
+                        
+                        // Indicate that the disposition action is compelte
+                        if (setDispositionActionComplete() == true)
+                        {
+                            this.nodeService.setProperty(actionedUponNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT, new Date());
+                            this.nodeService.setProperty(actionedUponNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY, AuthenticationUtil.getRunAsUser());                            
+                        }
                     }
                     else
                     {
