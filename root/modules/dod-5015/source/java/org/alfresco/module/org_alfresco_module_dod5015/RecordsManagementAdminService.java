@@ -37,6 +37,5 @@ public interface RecordsManagementAdminService
 {
     public Map<QName, CustomProperty> getAvailableCustomProperties();
 
-    //TODO How to separate std from child? 2 methods??
     public Map<QName, CustomAssociation> getAvailableCustomAssociations();
 }

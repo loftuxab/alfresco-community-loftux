@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
+import org.alfresco.repo.dictionary.M2ChildAssociation;
 import org.alfresco.repo.dictionary.M2ClassAssociation;
 import org.alfresco.service.ServiceRegistry;
 
@@ -47,7 +48,10 @@ public final class CustomAssociation
     private String targetRoleName;
     private String title;
     private boolean protected_;
+    
+    private boolean isChild;
 
+    //TODO Determine whether these extra properties are needed.
 //    // // Child Assoc adds:
 //     private String requiredChildName;
 //     private Boolean allowDuplicateChildName;
@@ -74,7 +78,14 @@ public final class CustomAssociation
         result.setTitle(m2Assoc.getTitle());
         result.setProtected(m2Assoc.isProtected());
         
+        result.isChild = m2Assoc instanceof M2ChildAssociation;
+        
         return result;
+    }
+
+    public boolean isChildAssociation()
+    {
+        return isChild;
     }
 
     public String getDescription()

@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
@@ -51,6 +52,12 @@ public class DefineCustomPropertyAction extends RMActionExecuterAbstractBase
     private static Log logger = LogFactory.getLog(DefineCustomPropertyAction.class);
     private static final String PARAM_NAME = "name";
     private static final String PARAM_TYPE = "type";
+    private static final String PARAM_TITLE = "title";
+    private static final String PARAM_DESCRIPTION = "description";
+    private static final String PARAM_DEFAULT_VALUE = "defaultValue";
+    private static final String PARAM_MANDATORY = "mandatory";
+    private static final String PARAM_MULTI_VALUED = "multiValued";
+    private static final String PARAM_PROTECTED = "protected";
 
 	/**
 	 * 
@@ -60,36 +67,67 @@ public class DefineCustomPropertyAction extends RMActionExecuterAbstractBase
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
-        Serializable serializableName = action.getParameterValue(PARAM_NAME);
-        Serializable serializableType = action.getParameterValue(PARAM_TYPE);
-        
-        String name = (String)serializableName;
-        QName type = (QName)serializableType;
-        
         if (logger.isDebugEnabled())
         {
             StringBuilder msg = new StringBuilder();
             msg.append("Creating custom property: ")
                 .append(action.getParameterValue(PARAM_NAME))
                 .append(", ")
-                .append(PARAM_TYPE);
+                .append(action.getParameterValue(PARAM_TYPE));
             logger.debug(msg.toString());
         }
 
         CustomModelUtil customModelUtil = new CustomModelUtil();
         customModelUtil.setContentService(contentService);
 
+        Map<String, Serializable> params = action.getParameterValues();
+
         M2Model deserializedModel = customModelUtil.readCustomContentModel();
         M2Aspect customPropsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_PROPS);
 
-        // We're creating a full QName here in order to avoid the client code having to know
-        // the correct prefix for the custom model.
-        QName propQName = QName.createQName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX, name, this.namespaceService);
+        QName propQName = QName.createQName(name, namespaceService);
         String propQNameAsString = propQName.toPrefixString(namespaceService);
         
         M2Property newProp = customPropsAspect.createProperty(propQNameAsString);
+        newProp.setName((String)params.get(PARAM_NAME));
+
+        // Special handling for type param as it's a QName.
+        // TODO Refactor this out into a method.
+        Serializable serializableType = params.get(PARAM_TYPE);
+        QName type = null;
+        if (serializableType instanceof String)
+        {
+            type = QName.createQName((String)serializableType);
+        }
+        else
+        {
+            type = (QName)serializableType;
+        }
+
         newProp.setType(type.toPrefixString(namespaceService));
-        //TODO There are many more setters on property than just name and type.
+        newProp.setTitle((String)params.get(PARAM_TITLE));
+        newProp.setDescription((String)params.get(PARAM_DESCRIPTION));
+        newProp.setDefaultValue((String)params.get(PARAM_DEFAULT_VALUE));
+
+        Serializable serializableParam = params.get(PARAM_MANDATORY);
+        if (serializableParam != null)
+        {
+            Boolean bool = (Boolean)serializableParam;
+            newProp.setMandatory(bool);
+        }
+        serializableParam = params.get(PARAM_PROTECTED);
+        if (serializableParam != null)
+        {
+            Boolean bool = (Boolean)serializableParam;
+            newProp.setProtected(bool);
+        }
+        serializableParam = params.get(PARAM_MULTI_VALUED);
+        if (serializableParam != null)
+        {
+            Boolean bool = (Boolean)serializableParam;
+            newProp.setMultiValued(bool);
+        }
+        //TODO Other params?
 
         customModelUtil.writeCustomContentModel(deserializedModel);
     }

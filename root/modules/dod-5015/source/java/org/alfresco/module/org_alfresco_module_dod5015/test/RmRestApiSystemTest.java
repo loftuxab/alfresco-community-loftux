@@ -28,11 +28,13 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -47,6 +49,7 @@ import org.alfresco.web.scripts.TestWebScriptServer.Response;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
+import org.json.JSONTokener;
 
 /**
  * This class tests the Rest API for the submission of RM actions.
@@ -56,8 +59,9 @@ import org.json.JSONStringer;
 public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsManagementModel
 {
     private static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
-    private static final String RMA_CUSTOM_ASSOCS_URL = "/api/rma/customassocs";
     protected static final String APPLICATION_JSON = "application/json";
+    protected static final String RMA_CUSTOM_ASSOCS_URL = "/api/rma/admin/customassocs";
+    protected static final String RMA_CUSTOM_PROPS_URL = "/api/rma/admin/customprops";
     protected NodeService nodeService;
     protected ContentService contentService;
     protected SearchService searchService;
@@ -111,7 +115,7 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
         sendRequest(new PostRequest(RMA_ACTIONS_URL, jsonPostString, APPLICATION_JSON), expectedStatus);
     }
 
-    public void testPost_ReviewedAction() throws IOException, JSONException
+    public void testPostReviewedAction() throws IOException, JSONException
     {
         // Get the recordCategory under which we will create the testNode.
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");     
@@ -160,47 +164,141 @@ public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsMan
         		pristineReviewAsOf.equals(newReviewAsOfDate));
     }
 
-    public void off_testPostCustomAssoc() throws IOException, JSONException
+    public void testPostCustomAssoc() throws IOException, JSONException
     {
-        //TODO Need to reimpl after the REST changes
+        NodeRef customModelNodeRef = RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF;
+        // Construct the JSON request for 'defineCustomAssociation'.
+        // 1. Child association.
+        final String childAssocName = "rmc:customAssocChild" + System.currentTimeMillis();
         
-        // Standard association
-        final String standardAssocName = "rmc:customAssocStandard" + System.currentTimeMillis();
         String jsonString = new JSONStringer().object()
-            .key("assocName").value(standardAssocName)
-            .key("isChild").value(false)
+            .key("name").value("defineCustomAssociation")
+            .key("nodeRef").value(customModelNodeRef.toString()) // The nodeRef doesn't matter!
+            .key("params").object()
+                .key("name").value(childAssocName)
+                .key("isChild").value(true)
+                .key("title").value("Supersedes link")
+                .key("description").value("Child supersedes parent or is it the other way round?")
+                .key("sourceRoleName").value("superseding")
+                .key("targetRoleName").value("superseded")
+                .key("sourceMandatory").value(true)
+                .key("targetMandatory").value(true)
+                .key("targetMandatoryEnforced").value(true)
+                .key("sourceMany").value(false)
+                .key("targetMany").value(false)
+                // Have left out 'protected'.
+            .endObject()
         .endObject()
         .toString();
         
         // Submit the JSON request.
         final int expectedStatus = 200;
-        sendRequest(new PostRequest(RMA_CUSTOM_ASSOCS_URL,
+        Response rsp = sendRequest(new PostRequest(RMA_ACTIONS_URL,
                                  jsonString, APPLICATION_JSON), expectedStatus);
+        
+        String rspContent = rsp.getContentAsString();
+        assertTrue(rspContent.contains("Successfully queued action [defineCustomAssociation]"));
 
-        // Child association
-        final String childAssocName = "rmc:customAssocChild" + System.currentTimeMillis();
+        // 2. Non-child or standard association.
+        final String stdAssocName = "rmc:customAssocStandard" + System.currentTimeMillis();
+        
         jsonString = new JSONStringer().object()
-            .key("assocName").value(childAssocName)
-            .key("isChild").value(true)
+            .key("name").value("defineCustomAssociation")
+            .key("nodeRef").value(customModelNodeRef.toString()) // The nodeRef doesn't matter!
+            .key("params").object()
+                .key("name").value(stdAssocName)
+                .key("isChild").value(false)
+                .key("title").value("Cross-references link")
+                //TODO Use a proper DOD 5015 link below.
+                .key("description").value("Not sure this is a 'proper' DOD relationship.")
+                .key("sourceRoleName").value("cross-referencing")
+                .key("targetRoleName").value("cross-referenced")
+                .key("sourceMandatory").value(true)
+                .key("targetMandatory").value(true)
+                .key("targetMandatoryEnforced").value(true)
+                .key("sourceMany").value(false)
+                .key("targetMany").value(false)
+                // Have left out 'protected'.
+            .endObject()
         .endObject()
         .toString();
         
         // Submit the JSON request.
-        sendRequest(new PostRequest(RMA_CUSTOM_ASSOCS_URL,
+        rsp = sendRequest(new PostRequest(RMA_ACTIONS_URL,
                                  jsonString, APPLICATION_JSON), expectedStatus);
         
-        //TODO Assert they worked.
+        rspContent = rsp.getContentAsString();
+        assertTrue(rspContent.contains("Successfully queued action [defineCustomAssociation]"));
     }
 
-    public void off_testGetCustomAssocs() throws IOException, JSONException
+    public void testGetCustomAssociations() throws IOException, JSONException
     {
-        //TODO Need to reimpl after the REST changes
-
-        // Submit the JSON request.
+        // Ensure that there is at least one custom association in the model.
+        this.testPostCustomAssoc();
+        
         final int expectedStatus = 200;
         Response rsp = sendRequest(new GetRequest(RMA_CUSTOM_ASSOCS_URL), expectedStatus);
 
-        System.out.println("GET rsp: " + rsp.getContentAsString());
-        //TODO Assert it worked.
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+
+        JSONObject dataObj = (JSONObject)jsonRsp.get("data");
+        assertNotNull("JSON 'data' object was null", dataObj);
+        
+        JSONObject customAssocsObj = (JSONObject)dataObj.get("customAssociations");
+        assertNotNull("JSON 'customAssocsObj' object was null", customAssocsObj);
+        
+        final int customAssocsCount = customAssocsObj.length();
+        assertTrue("There should be at least one custom association. Found " + customAssocsObj, customAssocsCount > 0);
+    }
+    
+    public void testPostCustomProperty() throws Exception
+    {
+        NodeRef customModelNodeRef = RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF;
+        // Construct the JSON request for 'defineCustomProperty'.
+        final String propertyName = "rmc:customProperty" + System.currentTimeMillis();
+        
+        String jsonString = new JSONStringer().object()
+            .key("name").value("defineCustomProperty")
+            .key("nodeRef").value(customModelNodeRef.toString()) // The nodeRef doesn't matter!
+            .key("params").object()
+                .key("name").value(propertyName)
+                .key("title").value("Custom test property")
+                .key("description").value("Dynamically defined test property")
+                .key("defaultValue").value("invalid")
+                .key("mandatory").value(false)
+                .key("multiValued").value(false)
+                .key("type").value(DataTypeDefinition.BOOLEAN)
+                // Have left out 'protected'.
+            .endObject()
+        .endObject()
+        .toString();
+        
+        // Submit the JSON request.
+        final int expectedStatus = 200;
+        Response rsp = sendRequest(new PostRequest(RMA_ACTIONS_URL,
+                                 jsonString, APPLICATION_JSON), expectedStatus);
+        
+        String rspContent = rsp.getContentAsString();
+        assertTrue(rspContent.contains("Successfully queued action [defineCustomProperty]"));
+    }
+
+    public void testGetCustomProperties() throws Exception
+    {
+        // Ensure that there is at least one custom property.
+        this.testPostCustomProperty();
+
+        final int expectedStatus = 200;
+        Response rsp = sendRequest(new GetRequest(RMA_CUSTOM_PROPS_URL), expectedStatus);
+
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+
+        JSONObject dataObj = (JSONObject)jsonRsp.get("data");
+        assertNotNull("JSON 'data' object was null", dataObj);
+        
+        JSONObject customPropsObj = (JSONObject)dataObj.get("customProperties");
+        assertNotNull("JSON 'customProperties' object was null", customPropsObj);
+        
+        final int customPropsCount = customPropsObj.length();
+        assertTrue("There should be at least one custom property. Found " + customPropsObj, customPropsCount > 0);
     }
 }
