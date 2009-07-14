@@ -601,6 +601,30 @@ Alfresco.util.activateLinks = function(text)
 };
 
 /**
+ * Tests a select element's options against "value" and
+ * if there is a match that option is set to the selected index.
+ *
+ * @method Alfresco.util.setSelectedIndex
+ * @param value {HTMLSelectElement} The select element to change the selectedIndex for
+ * @param selectEl {string} The value to match agains the select elements option values
+ * @return {string} The label/name of the seleceted option OR null if no option was found
+ * @static
+ */
+Alfresco.util.setSelectedIndex = function(selectEl, value)
+{
+   var l = selectEl.options.length;
+   for(var i = 0; i < l; i++)
+   {
+      if(selectEl.options[i].value == value)
+      {
+         selectEl.selectedIndex = i;
+         return selectEl.options[i].text;
+      }
+   }
+   return false;
+};
+
+/**
  * Removes all potentially non safe tags from s (tags that are not listed in safeTags).
  * Normally the freemarker ?html encoding shall be used on the content from the repository but
  * components like blog, forum/discussion, wiki and comments requires some basic html tags to handle formatting.
@@ -760,10 +784,11 @@ Alfresco.util.relToTarget = function(p_rootNode)
  * @param p_name {string} Dom element ID of markup that button is created from {p_scope.id}-{name}
  * @param p_onclick {function} If supplied, registered with the button's click event
  * @param p_obj {object} Optional extra object parameters to pass to button constructor
+ * @param p_oElement {string|HTMLElement} Optional and accepts a string to use as an ID for getting a DOM reference or an actual DOM reference
  * @return {YAHOO.widget.Button} New Button instance
  * @static
  */
-Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
+Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj, p_oElement)
 {
    // Default button parameters
    var obj =
@@ -785,8 +810,8 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
    }
    
    // Create the button
-   var htmlId = p_scope.id + "-" + p_name,
-      button = new YAHOO.widget.Button(htmlId, obj);
+   var p_oElement = p_oElement ? p_oElement : p_scope.id + "-" + p_name,
+      button = new YAHOO.widget.Button(p_oElement, obj);
 
    if (typeof button == "object")
    {
@@ -3655,8 +3680,8 @@ Alfresco.util.RichEditor = function(editorName,id,config)
          Alfresco.util.addMessages(obj, this.name);
          return this;
       },
-      
-      /**
+
+      /**    
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        *

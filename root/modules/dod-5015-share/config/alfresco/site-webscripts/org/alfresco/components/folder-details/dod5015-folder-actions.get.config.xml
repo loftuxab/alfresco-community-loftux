@@ -9,6 +9,7 @@
 
       <actionSet id="recordCategory">
          <action id="onActionDetails" type="simple-link" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action id="onActionEditDispositionSchedule" type="simple-link" label="actions.edit-disposition-schedule" domId="{htmlid}-edit-dispositionSchedule-action" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 

@@ -13,7 +13,10 @@ var nodeType = "document";
 if (result.status == 200)
 {
    var metadata = eval('(' + result + ')');
-   nodeType = metadata.data.items[0].isContainer ? "folder" : "document";
+   if(metadata.data.items[0].isContainer)
+   {
+      nodeType = metadata.data.items[0].type == "dod:recordCategory" ? "record-category" : "folder";
+   }
 }
 
 model.nodeType = nodeType;
