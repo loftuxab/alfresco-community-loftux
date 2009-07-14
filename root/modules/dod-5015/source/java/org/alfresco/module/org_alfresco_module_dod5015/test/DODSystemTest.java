@@ -515,22 +515,17 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         assertFalse(this.nodeService.hasAspect(testDocument, ASPECT_RECORD));
 
         // Now we want to file this document as a record within the RMA.
-        // To do this we simply move a document into the fileplan.
+        // To do this we simply move a document into the fileplan and file
         this.serviceRegistry.getFileFolderService().move(testDocument, recordFolder, null);
+        rmActionService.executeRecordsManagementAction(testDocument, "file");
 
-        txn.commit(); // Commit to trigger the file action.
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-
-        assertTrue(this.nodeService.hasAspect(testDocument, ASPECT_RECORD));
+        assertTrue("testDocument should be a record.", rmService.isRecord(testDocument));
         assertNotNull(this.nodeService.getProperty(testDocument, PROP_IDENTIFIER));
         assertNotNull(this.nodeService.getProperty(testDocument, PROP_DATE_FILED));
         
         // Check the review schedule
         assertTrue(this.nodeService.hasAspect(testDocument, ASPECT_VITAL_RECORD));
         assertNotNull(this.nodeService.getProperty(testDocument, PROP_REVIEW_AS_OF));
-        
-        txn.rollback();
     }
 
     /**
