@@ -25,7 +25,6 @@
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +44,7 @@ import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
+import org.springframework.util.StringUtils;
 
 /**
  * WebScript java backed bean implementation to get details of a node's
@@ -165,6 +165,8 @@ public class DispositionScheduleGet extends DeclarativeWebScript
         model.put("index", actionDef.getIndex());
         model.put("url", url + "/" + actionDef.getId());
         model.put("name", actionDef.getName());
+        // TODO: get the proper label for the action name
+        model.put("label", StringUtils.capitalize(actionDef.getName()));
         model.put("eligibleOnFirstCompleteEvent", actionDef.eligibleOnFirstCompleteEvent());
         
         if (actionDef.getDescription() != null)
@@ -182,7 +184,7 @@ public class DispositionScheduleGet extends DeclarativeWebScript
             model.put("periodProperty", actionDef.getPeriodProperty().toPrefixString(this.namespaceService));
         }
         
-        /*List<RecordsManagementEvent> events = actionDef.getEvents();
+        List<RecordsManagementEvent> events = actionDef.getEvents();
         if (events != null && events.size() > 0)
         {
             List<String> eventNames = new ArrayList<String>(events.size());
@@ -191,7 +193,7 @@ public class DispositionScheduleGet extends DeclarativeWebScript
                 eventNames.add(event.getName());
             }
             model.put("events", eventNames);
-        }*/
+        }
         
         return model;
     }

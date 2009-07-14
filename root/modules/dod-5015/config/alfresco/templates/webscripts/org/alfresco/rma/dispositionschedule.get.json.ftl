@@ -14,6 +14,7 @@
             "url" : "${action.url}",
             "index" : ${action.index},
             "name" : "${action.name}",
+            "label" : "${action.label}",
             <#if action.description??>
             "description" : "${action.description}",
             </#if>
