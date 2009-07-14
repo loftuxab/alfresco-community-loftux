@@ -303,14 +303,22 @@
             if (dataStatus.length > 0)
             {
                var statuses = dataStatus.split(","),
-                  status,
+                  status, s, SPACE = " ", meta,
                   tip = "",
                   desc = "";
 
                for (var i = 0, j = statuses.length; i < j; i++)
                {
                   status = statuses[i];
-                  tip = me.msg("tip." + status);
+                  meta = "";
+                  s = status.indexOf(SPACE);
+                  if (s > -1)
+                  {
+                     meta = status.substring(s + 1);
+                     status = status.substring(0, s);
+                  }
+                  
+                  tip = me.msg("tip." + status, meta);
                   desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + status + '-indicator-16.png" title="' + tip + '" alt="' + status + '" /></div>';
                }
 
@@ -1112,9 +1120,47 @@
        */
       onActionDeclare: function DL_onActionDeclare(row)
       {
-         this._dod5015Action(row, "declareRecord", "message.declare");
-      },
+         var record = this.widgets.dataTable.getRecord(row),
+            displayName = record.getData("displayName"),
+            editMetadataUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + record.getData("nodeRef");
 
+         this._dod5015Action(row, "declareRecord", "message.declare",
+         {
+            failure:
+            {
+               message: null,
+               callback:
+               {
+                  fn: function DL_oAD_failure(data)
+                  {
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: this.msg("message.declare.failure", displayName),
+                        text: this.msg("message.declare.failure.more"),
+                        buttons: [
+                        {
+                           text: this.msg("actions.edit-details"),
+                           handler: function DL_oAD_f_editDetails()
+                           {
+                              window.location = editMetadataUrl;
+                              this.destroy();
+                           },
+                           isDefault: true
+                        },
+                        {
+                           text: this.msg("button.cancel"),
+                           handler: function DL_oAD_f_cancel()
+                           {
+                              this.destroy();
+                           }
+                        }]
+                     });
+                  },
+                  scope: this
+               }
+            }
+         });
+      },
 
       /**
        * Destroy action.
@@ -1156,15 +1202,16 @@
        * @param row {object} DataTable row representing file to be actioned
        * @param actionName {string} Name of repository action to run
        * @param i18n {string} Will be appended with ".success" or ".failure" depending on action outcome
+       * @param customParams {object} Optional object literal to override default action parameters
        * @private
        */
-      _dod5015Action: function DL__dod5015Action(row, actionName, i18n)
+      _dod5015Action: function DL__dod5015Action(row, actionName, i18n, customParams)
       {
          var record = this.widgets.dataTable.getRecord(row),
             displayName = record.getData("displayName"),
             nodeRef = record.getData("nodeRef");
-
-         this.modules.actions.genericAction(
+         
+         var actionParams =
          {
             success:
             {
@@ -1193,7 +1240,14 @@
                   nodeRef: nodeRef
                }
             }
-         });
+         };
+         
+         if (YAHOO.lang.isObject(customParams))
+         {
+            actionParams = YAHOO.lang.merge(actionParams, customParams);
+         }
+
+         this.modules.actions.genericAction(actionParams);
       }
    });
 })();
