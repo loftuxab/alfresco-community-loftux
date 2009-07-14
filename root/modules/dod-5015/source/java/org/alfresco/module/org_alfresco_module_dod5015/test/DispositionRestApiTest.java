@@ -44,6 +44,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.TestWebScriptServer.DeleteRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
+import org.alfresco.web.scripts.TestWebScriptServer.PutRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -60,6 +61,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
     protected static final String GET_SCHEDULE_URL_FORMAT = "/api/node/{0}/dispositionschedule";
     protected static final String POST_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions";
     protected static final String DELETE_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions/{1}";
+    protected static final String PUT_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions/{1}";
     protected static final String APPLICATION_JSON = "application/json";
     
     protected NodeService nodeService;
@@ -316,6 +318,76 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         jsonPostData.put("period", period);
         jsonPostString = jsonPostData.toString();
         sendRequest(new PostRequest(requestUrl, jsonPostString, APPLICATION_JSON), 400);
+    }
+    
+    public void testPutDispositionAction() throws Exception
+    {
+        // create a new recordCategory node in the recordSeries and then get
+        // the disposition schedule
+        NodeRef recordSeries = TestUtilities.getRecordSeries(this.searchService, "Civilian Files");
+        assertNotNull(recordSeries);
+        NodeRef newRecordCategory = this.nodeService.createNode(recordSeries, ContentModel.ASSOC_CONTAINS, 
+                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("recordCategory")), 
+                    DOD5015Model.TYPE_RECORD_CATEGORY).getChildRef();
+        
+        // create an action definition to then delete
+        String categoryNodeUrl = newRecordCategory.toString().replace("://", "/");
+        String postRequestUrl = MessageFormat.format(POST_ACTIONDEF_URL_FORMAT, categoryNodeUrl);
+        JSONObject jsonPostData = new JSONObject();
+        jsonPostData.put("name", "cutoff");
+        String jsonPostString = jsonPostData.toString();
+        sendRequest(new PostRequest(postRequestUrl, jsonPostString, APPLICATION_JSON), 200);
+        
+        // verify the action definition is present and retrieve it's id
+        String getRequestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
+        Response rsp = sendRequest(new GetRequest(getRequestUrl), 200);
+        System.out.println("GET response: " + rsp.getContentAsString());
+        JSONObject json = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        JSONObject actionDef = json.getJSONObject("data").getJSONArray("actions").getJSONObject(0);
+        String actionDefId = actionDef.getString("id");
+        assertEquals("cutoff", actionDef.getString("name"));
+        assertEquals("none|0", actionDef.getString("period"));
+        assertFalse(actionDef.has("description"));
+        //assertEquals(0, actionDef.getJSONArray("events").length());
+        
+        // define body for PUT request
+        String name = "destroy";
+        String desc = "Destroy this record after 5 years";
+        String period = "year|5";
+        String periodProperty = "rma:cutOffDate";
+        boolean eligibleOnFirstCompleteEvent = false;
+        
+        jsonPostData = new JSONObject();
+        jsonPostData.put("name", name);
+        jsonPostData.put("description", desc);
+        jsonPostData.put("period", period);
+        jsonPostData.put("periodProperty", periodProperty);
+        jsonPostData.put("eligibleOnFirstCompleteEvent", eligibleOnFirstCompleteEvent);
+        JSONArray events = new JSONArray();
+        events.put("superseded");
+        events.put("no_longer_needed");
+        jsonPostData.put("events", events);
+        jsonPostString = jsonPostData.toString();
+        
+        // try and update a non existent action definition to check for 404
+        String putRequestUrl = MessageFormat.format(PUT_ACTIONDEF_URL_FORMAT, categoryNodeUrl, "xyz");
+        rsp = sendRequest(new PutRequest(putRequestUrl, jsonPostString, APPLICATION_JSON), 404);
+        
+        // update the action definition
+        putRequestUrl = MessageFormat.format(PUT_ACTIONDEF_URL_FORMAT, categoryNodeUrl, actionDefId);
+        rsp = sendRequest(new PutRequest(putRequestUrl, jsonPostString, APPLICATION_JSON), 200);
+        
+        // check the update happened correctly
+        System.out.println("PUT response: " + rsp.getContentAsString());
+        json = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        actionDef = json.getJSONObject("data");
+        assertEquals(name, actionDef.getString("name"));
+        assertEquals(desc, actionDef.getString("description"));
+        assertEquals(period, actionDef.getString("period"));
+        assertEquals(periodProperty, actionDef.getString("periodProperty"));
+        assertFalse(actionDef.getBoolean("eligibleOnFirstCompleteEvent"));
+        //assertEquals(2, actionDef.getJSONArray("events").length());
+        //assertEquals("no_longer_needed", actionDef.getJSONArray("events").getJSONObject(1).getString("no_longer_needed"));
     }
     
     public void testDeleteDispositionAction() throws Exception

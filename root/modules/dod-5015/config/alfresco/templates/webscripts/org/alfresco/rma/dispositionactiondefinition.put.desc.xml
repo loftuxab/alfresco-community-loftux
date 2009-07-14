@@ -1,8 +1,8 @@
 <webscript>
-  <shortname>Add Disposition Action Definition</shortname>
+  <shortname>Update Disposition Action Definition</shortname>
   <description><![CDATA[
-  Adds a disposition action definition to the collection.
-  The body of the post should be in the form<br/>
+  Updates a disposition action definition.
+  The body of the put should be in the form<br/>
   {<br/>
   &nbsp;&nbsp;&nbsp;"name" : Name of action,<br/>
   &nbsp;&nbsp;&nbsp;"description" : Description of the action definition,<br/>
@@ -13,7 +13,7 @@
   }<br/>
   ]]>
   </description>
-  <url>/api/node/{store_type}/{store_id}/{id}/dispositionschedule/dispositionactiondefinitions</url>
+  <url>/api/node/{store_type}/{store_id}/{id}/dispositionschedule/dispositionactiondefinitions/{action_def_id}</url>
   <format default="json">argument</format>
   <authentication>user</authentication>
   <transaction>required</transaction>
