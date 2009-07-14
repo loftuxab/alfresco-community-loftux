@@ -587,6 +587,43 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
 	}
     
+    /**
+     * This method tests the filing of a custom type, as defined in DOD 5015.
+     */
+    public void testFileDOD5015CustomTypes() throws Exception
+    {
+        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
+                
+        NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
+        setComplete();
+        endTransaction();
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        NodeRef testDocument = this.nodeService.createNode(recordFolder, 
+                ContentModel.ASSOC_CONTAINS, 
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "CustomType"), 
+                ContentModel.TYPE_CONTENT).getChildRef();
+
+        // It's not necessary to set content for this test.
+        
+        // File the record.
+        rmActionService.executeRecordsManagementAction(testDocument, "file");
+
+        assertTrue("testDocument should be a record.", rmService.isRecord(testDocument));
+
+        // Have the customType aspect applied..
+        Map<String, Serializable> props = new HashMap<String, Serializable>();
+        props.put(PROP_SCANNED_FORMAT.toPrefixString(serviceRegistry.getNamespaceService()), "f");
+        props.put(PROP_SCANNED_FORMAT_VERSION.toPrefixString(serviceRegistry.getNamespaceService()), "1.0");
+        props.put(PROP_RESOLUTION_X.toPrefixString(serviceRegistry.getNamespaceService()), "100");
+        props.put(PROP_RESOLUTION_Y.toPrefixString(serviceRegistry.getNamespaceService()), "100");
+        props.put(PROP_SCANNED_BIT_DEPTH.toPrefixString(serviceRegistry.getNamespaceService()), "10");
+        rmActionService.executeRecordsManagementAction(testDocument, "applyScannedRecord", props);
+
+        assertTrue("Custom type should have ScannedRecord aspect.", nodeService.hasAspect(testDocument, DOD5015Model.ASPECT_SCANNED_RECORD));
+    }
 
     /**
      * This method tests the filing of an already existing document i.e. one that is

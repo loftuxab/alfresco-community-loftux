@@ -80,6 +80,20 @@
           parent="rmAction"/>
     <bean id="completeEvent" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction" parent="rmAction"/>
 
+    <!-- Actions to create DOD 5015 custom types -->
+    <bean id="applyScannedRecord" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.ApplyCustomTypeAction" parent="rmAction">
+        <property name="customTypeAspect" value="dod:scannedRecord" />
+    </bean>
+    <bean id="applyPdfRecord" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.ApplyCustomTypeAction" parent="rmAction">
+        <property name="customTypeAspect" value="dod:pdfRecord" />
+    </bean>
+    <bean id="applyDigitalPhotographRecord" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.ApplyCustomTypeAction" parent="rmAction">
+        <property name="customTypeAspect" value="dod:digitalPhotographRecord" />
+    </bean>
+    <bean id="applyWebRecord" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.ApplyCustomTypeAction" parent="rmAction">
+        <property name="customTypeAspect" value="dod:webRecord" />
+    </bean>
+
     <!-- Event types -->
     
     <bean id="rmEventType" init-method="init" abstract="true">
