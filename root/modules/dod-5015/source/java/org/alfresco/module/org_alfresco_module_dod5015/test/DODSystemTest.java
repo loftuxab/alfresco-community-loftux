@@ -65,11 +65,13 @@ import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.cmr.security.PublicServiceAccessService;
 import org.alfresco.service.cmr.site.SiteVisibility;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -104,6 +106,8 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 	private PersonService personService;
 	private AuthorityService authorityService;
 	private PermissionService permissionService;
+
+    private PublicServiceAccessService publicServiceAccessService;
 	
 	// example base test data for supplemental markings list (see also recordsModel.xml)
 	protected final static String NOFORN     = "NOFORN";     // Not Releasable to Foreign Nationals/Governments/Non-US Citizens
@@ -133,6 +137,8 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		
 		this.caveatConfigImpl = (RMCaveatConfigImpl)this.applicationContext.getBean("caveatConfigImpl");
+		
+		this.publicServiceAccessService = (PublicServiceAccessService)this.applicationContext.getBean("PublicServiceAccessService");
 		
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -915,7 +921,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         
         startNewTransaction();
         
-        int expectedChildCount = 0;
+        int expectedChildCount = 1;
         assertEquals(expectedChildCount, nodeService.getChildAssocs(recordFolder).size());
         
         final String RECORD_NAME = "MyRecord.txt";
@@ -963,6 +969,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         // TODO - set supplemental markings list (on record folder)
         
         AuthenticationUtil.setFullyAuthenticatedUser("dfranco");
+        assertEquals(AccessStatus.ALLOWED, publicServiceAccessService.hasAccess("NodeService", "exists", recordFolder));
         
         try
         {

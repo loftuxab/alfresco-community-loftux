@@ -97,7 +97,7 @@
     <!-- The access decision manager asks voters in order if they should allow access    -->
     <!-- Role and group access do not require ACL based access                           -->
     
-    <bean id="accessDecisionManager" class="net.sf.acegisecurity.vote.AffirmativeBased">
+    <bean id="accessDecisionManager" class="org.alfresco.repo.security.permissions.impl.acegi.AffirmativeBasedAccessDecisionManger">
         <property name="allowIfAllAbstainDecisions">
             <value>false</value>
         </property>
@@ -270,7 +270,7 @@
     <!-- getPaths                                                                        -->
     <!--      Requires read for the node                                                 -->
     
-    <bean id="NodeService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="NodeService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -291,11 +291,11 @@
                 org.alfresco.service.cmr.repository.NodeService.setChildAssociationIndex=ACL_PARENT.0.sys:base.WriteProperties,RM_ABSTAIN
                 org.alfresco.service.cmr.repository.NodeService.getType=ACL_ALLOW,RM_ALLOW
                 org.alfresco.service.cmr.repository.NodeService.setType=ACL_NODE.0.sys:base.WriteProperties,RM_ABSTAIN
-                org.alfresco.service.cmr.repository.NodeService.addAspect=ACL_NODE.0.sys:base.WriteProperties,RM.Update.0
-                org.alfresco.service.cmr.repository.NodeService.removeAspect=ACL_NODE.0.sys:base.WriteProperties,RM.Update.0
+                org.alfresco.service.cmr.repository.NodeService.addAspect=ACL_NODE.0.sys:base.WriteProperties,RM.Update.0.1.2
+                org.alfresco.service.cmr.repository.NodeService.removeAspect=ACL_NODE.0.sys:base.WriteProperties,RM.Update.0.1
                 org.alfresco.service.cmr.repository.NodeService.hasAspect=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0
                 org.alfresco.service.cmr.repository.NodeService.getAspects=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0
-                org.alfresco.service.cmr.repository.NodeService.deleteNode=ACL_NODE.0.sys:base.DeleteNode,RM.Read.0
+                org.alfresco.service.cmr.repository.NodeService.deleteNode=ACL_NODE.0.sys:base.DeleteNode,RM.Delete.0
                 org.alfresco.service.cmr.repository.NodeService.addChild=ACL_NODE.0.sys:base.CreateChildren,ACL_NODE.1.sys:base.ReadProperties,RM.Create.0.1
                 org.alfresco.service.cmr.repository.NodeService.removeChild=ACL_NODE.0.sys:base.DeleteChildren,ACL_NODE.1.sys:base.DeleteNode,RM.Delete.0.1
                 org.alfresco.service.cmr.repository.NodeService.removeChildAssociation=ACL_PARENT.0.sys:base.DeleteChildren,ACL_NODE.0.sys:base.DeleteNode,RM.Delete.0
@@ -345,8 +345,8 @@
                 org.alfresco.service.cmr.model.FileFolderService.searchSimple=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.Read,RM.Read.0,AFTER_RM.FilterNode
                 org.alfresco.service.cmr.model.FileFolderService.rename=AFTER_ACL_NODE.sys:base.WriteProperties,RM.Update.0
                 org.alfresco.service.cmr.model.FileFolderService.move=ACL_NODE.0.sys:base.DeleteNode,ACL_NODE.1.sys:base.CreateChildren,RM.Move.0.1
-                org.alfresco.service.cmr.model.FileFolderService.copy=ACL_NODE.0.sys:base.ReadProperties,ACL_NODE.1.sys:base.CreateChildren,RM.Read.0,RM.Create.1
-                org.alfresco.service.cmr.model.FileFolderService.create=ACL_NODE.0.sys:base.CreateChildren,RM.Create.0
+                org.alfresco.service.cmr.model.FileFolderService.copy=ACL_NODE.0.sys:base.ReadProperties,ACL_NODE.1.sys:base.CreateChildren,RM.Read.0,RM.Create.1.0
+                org.alfresco.service.cmr.model.FileFolderService.create=ACL_NODE.0.sys:base.CreateChildren,RM.Create.0.2
                 org.alfresco.service.cmr.model.FileFolderService.delete=ACL_NODE.0.sys:base.DeleteNode,RM.Delete.0
                 org.alfresco.service.cmr.model.FileFolderService.makeFolders=ACL_METHOD.ROLE_ADMINISTRATOR,RM_ABSTAIN
                 org.alfresco.service.cmr.model.FileFolderService.getNamePath=ACL_NODE.1.sys:base.ReadProperties,RM.Read.0
@@ -840,4 +840,19 @@
     <!-- TODO: Add content usage security -->
     <bean id="ContentUsageService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor"/>
     
+	<bean id="PublicServiceAccessService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref local="accessDecisionManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref local="afterInvocationManager"/>
+        </property>
+        <property name="objectDefinitionSource">
+            <value>org.alfresco.service.cmr.security.PublicServiceAccessService.hasAccess=ACL_ALLOW,RM_ALLOW
+			</value>
+        </property>
+    </bean>
 </beans>

@@ -37,7 +37,11 @@ import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
@@ -69,7 +73,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     private static final String RM_DENY = "RM_DENY";
 
     private static final String RM_CAP = "RM_CAP";
-    
+
     private static final String RM_ABSTAIN = "RM_ABSTAIN";
 
     private NamespacePrefixResolver nspr;
@@ -82,12 +86,15 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     private DictionaryService dictionaryService;
 
+    private RecordsManagementService recordsManagementService;
+
     private static HashMap<String, Policy> policies = new HashMap<String, Policy>();
+
+    private static HashMap<QName, String> restrictedProperties = new HashMap<QName, String>();
 
     static
     {
         policies.put("Read", new ReadPolicy());
-        policies.put("ReadRmOrDm", new ReadRmOrDmPolicy());
         policies.put("Create", new CreatePolicy());
         policies.put("Move", new MovePolicy());
         policies.put("Update", new UpdatePolicy());
@@ -97,6 +104,26 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         policies.put("WriteContent", new WriteContentPolicy());
         policies.put("Capability", new CapabilityPolicy());
 
+        // restrictedProperties.put(RecordsManagementModel.PROP_IS_CLOSED, value)
+
+    }
+
+    private static class Key
+    {
+        QName property;
+
+        boolean requiresFiling;
+
+        boolean rejectIfFrozen;
+
+        boolean rejectIfDeclared;
+
+        String byAction;
+    }
+
+    private static class RestrictedKey extends Key
+    {
+        Serializable value;
     }
 
     /**
@@ -134,8 +161,6 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         this.caveatConfigImpl = caveatConfigImpl;
     }
 
-    
-    
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
@@ -144,7 +169,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public boolean supports(ConfigAttribute attribute)
     {
         if ((attribute.getAttribute() != null)
-                && (attribute.getAttribute().equals(RM_ABSTAIN) || attribute.getAttribute().equals(RM_ALLOW) || attribute.getAttribute().equals(RM_DENY) || attribute.getAttribute().startsWith(RM_CAP) || attribute
+                && (attribute.getAttribute().equals(RM_ABSTAIN)
+                        || attribute.getAttribute().equals(RM_ALLOW) || attribute.getAttribute().equals(RM_DENY) || attribute.getAttribute().startsWith(RM_CAP) || attribute
                         .getAttribute().startsWith(RM)))
         {
             return true;
@@ -400,10 +426,6 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
                 }
             }
         }
-        else
-        {
-            throw new ACLEntryVoterException("The specified parameter is not a NodeRef or ChildAssociationRef");
-        }
         return testNodeRef;
     }
 
@@ -559,6 +581,85 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         }
     }
 
+    private static int checkFiling(RMEntryVoter voter, NodeRef nodeRef)
+    {
+        if (voter.nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT))
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("\t\tNode ref is not null");
+            }
+
+            if (isRecord(voter, nodeRef))
+            {
+                //TOTO: Multifiling
+                ChildAssociationRef car = voter.nodeService.getPrimaryParent(nodeRef);
+                if (car != null)
+                {
+                    if (voter.permissionService.hasPermission(voter.nodeService.getPrimaryParent(nodeRef).getParentRef(), RMPermissionModel.DECLARE_RECORDS) == AccessStatus.DENIED)
+                    {
+                        if (logger.isDebugEnabled())
+                        {
+                            logger.debug("\t\tPermission is denied");
+                            Thread.dumpStack();
+                        }
+
+                        return AccessDecisionVoter.ACCESS_DENIED;
+                    }
+                    else
+                    {
+
+                        return AccessDecisionVoter.ACCESS_GRANTED;
+                    }
+                }
+                else
+                {
+                    return AccessDecisionVoter.ACCESS_ABSTAIN;  
+                }
+            }
+            if (isRecordFolder(voter, voter.nodeService.getType(nodeRef)))
+            {
+
+                if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.DECLARE_RECORDS) == AccessStatus.DENIED)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("\t\tPermission is denied");
+                     
+                        Thread.dumpStack();
+                    }
+
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+                else
+                {
+
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
+            }
+            // else other file plan component
+            else
+            {
+                if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA) == AccessStatus.DENIED)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("\t\tPermission is denied");
+                        Thread.dumpStack();
+                    }
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+                else
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
+            }
+        }
+
+        return AccessDecisionVoter.ACCESS_ABSTAIN;
+
+    }
+
     private static int checkCreate(RMEntryVoter voter, NodeRef nodeRef, QName type)
     {
         if (voter.nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT))
@@ -645,6 +746,82 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     }
 
+    private static int checkDelete(RMEntryVoter voter, NodeRef nodeRef)
+    {
+        if (voter.nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT))
+        {
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("\t\tNode ref is not null");
+            }
+
+            if (isRecord(voter, nodeRef))
+            {
+
+                // We can delete anything
+
+                if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.DELETE_RECORDS) == AccessStatus.ALLOWED)
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
+
+                DispositionSchedule dispositionSchedule = voter.recordsManagementService.getDispositionSchedule(nodeRef);
+                for (DispositionActionDefinition dispositionActionDefinition : dispositionSchedule.getDispositionActionDefinitions())
+                {
+                    if (dispositionActionDefinition.getName().equals("destroy"))
+                    {
+                        if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.DESTROY_RECORDS) == AccessStatus.ALLOWED)
+                        {
+                            return AccessDecisionVoter.ACCESS_GRANTED;
+                        }
+                    }
+                }
+
+                // The record is all set up for destruction
+                DispositionAction nextDispositionAction = voter.recordsManagementService.getNextDispositionAction(nodeRef);
+                if (nextDispositionAction != null)
+                {
+                    if (nextDispositionAction.getDispositionActionDefinition().getName().equals("destroy"))
+                    {
+                        if (voter.recordsManagementService.isNextDispositionActionEligible(nodeRef))
+                        {
+                            if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION) == AccessStatus.ALLOWED)
+                            {
+                                return AccessDecisionVoter.ACCESS_GRANTED;
+                            }
+                        }
+                    }
+                }
+
+                return AccessDecisionVoter.ACCESS_DENIED;
+            }
+            else
+            {
+                if (voter.permissionService.hasPermission(nodeRef, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA) == AccessStatus.DENIED)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("\t\tPermission is denied");
+                        Thread.dumpStack();
+                    }
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+                else
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
+            }
+
+        }
+
+        return AccessDecisionVoter.ACCESS_ABSTAIN;
+    }
+
+    private static boolean isRecord(RMEntryVoter voter, NodeRef nodeRef)
+    {
+        return voter.nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_RECORD);
+    }
+
     private static boolean isRecordFolder(RMEntryVoter voter, QName type)
     {
         return voter.dictionaryService.isSubClass(type, RecordsManagementModel.TYPE_RECORD_FOLDER);
@@ -695,7 +872,30 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     }
 
-    private static class ReadRmOrDmPolicy implements Policy
+    private static class CreatePolicy implements Policy
+    {
+
+        public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
+        {
+
+            NodeRef destination = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(0), cad.parent);
+            QName type = getType(voter.nodeService, invocation, params, cad.parameters.get(1), cad.parent);
+            // linkee is not null for creating secondary child assocs
+            NodeRef linkee = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(1), cad.parent);
+            if (linkee != null)
+            {
+                if (checkRead(voter, linkee, false) != AccessDecisionVoter.ACCESS_GRANTED)
+                {
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+            }
+            return checkCreate(voter, destination, type);
+
+        }
+
+    }
+
+    private static class MovePolicy implements Policy
     {
 
         public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
@@ -703,28 +903,31 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             int first = AccessDecisionVoter.ACCESS_ABSTAIN;
             int second = AccessDecisionVoter.ACCESS_ABSTAIN;
 
+            NodeRef movee = null;
             if (cad.parameters.get(0) > -1)
             {
-                NodeRef testNodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(0), cad.parent);
-
-                if (testNodeRef != null)
-                {
-                    // now we know the node - we can abstain for certain types and aspects (eg, rm)
-                    first = checkRead(voter, testNodeRef, true);
-                }
+                movee = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(0), cad.parent);
             }
 
-            if (cad.parameters.get(1) > -1)
+            if (movee != null)
             {
-                NodeRef testNodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(1), cad.parent);
+                // now we know the node - we can abstain for certain types and aspects (eg, rm)
+                first = checkRead(voter, movee, true);
+                // TODO: CHECK DELETE
 
-                if (testNodeRef != null)
+                NodeRef destination = null;
+                if (cad.parameters.get(1) > -1)
                 {
+                    destination = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(1), cad.parent);
+                }
+
+                if (destination != null)
+                {
+                    QName type = voter.nodeService.getType(movee);
                     // now we know the node - we can abstain for certain types and aspects (eg, rm)
-                    second = checkRead(voter, testNodeRef, true);
+                    second = checkCreate(voter, destination, type);
                 }
             }
-
             if ((first == AccessDecisionVoter.ACCESS_DENIED) || (second == AccessDecisionVoter.ACCESS_DENIED))
             {
                 return AccessDecisionVoter.ACCESS_DENIED;
@@ -738,52 +941,6 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             return AccessDecisionVoter.ACCESS_ABSTAIN;
 
         }
-
-    }
-
-    private static class CreatePolicy implements Policy
-    {
-
-        public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
-        {
-            Policy policy = policies.get("Read");
-            if (policy == null)
-            {
-                return AccessDecisionVoter.ACCESS_DENIED;
-            }
-            else
-            {
-                if (policy.evaluate(voter, invocation, params, cad) != AccessDecisionVoter.ACCESS_GRANTED)
-                {
-                    return AccessDecisionVoter.ACCESS_DENIED;
-                }
-                else
-                {
-                    NodeRef nodeRef = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(0), cad.parent);
-                    QName type = getType(voter.nodeService, invocation, params, cad.parameters.get(1), cad.parent);
-                    return checkCreate(voter, nodeRef, type);
-                }
-            }
-        }
-
-    }
-
-    private static class MovePolicy implements Policy
-    {
-
-        public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
-        {
-            Policy policy = policies.get("ReadRmOrDm");
-            if (policy == null)
-            {
-                return AccessDecisionVoter.ACCESS_DENIED;
-            }
-            else
-            {
-                return policy.evaluate(voter, invocation, params, cad);
-            }
-        }
-
     }
 
     private static class UpdatePolicy implements Policy
@@ -809,14 +966,27 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
         {
-            Policy policy = policies.get("Read");
-            if (policy == null)
+            NodeRef deletee = null;
+            if (cad.parameters.get(0) > -1)
             {
-                return AccessDecisionVoter.ACCESS_DENIED;
+                deletee = getTestNode(voter.nodeService, invocation, params, cad.parameters.get(0), cad.parent);
+            }
+            if (deletee != null)
+            {
+
+                if (checkRead(voter, deletee, false) != AccessDecisionVoter.ACCESS_GRANTED)
+                {
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+                else
+                {
+                    return checkDelete(voter, deletee);
+                }
+
             }
             else
             {
-                return policy.evaluate(voter, invocation, params, cad);
+                return AccessDecisionVoter.ACCESS_ABSTAIN;
             }
         }
 
