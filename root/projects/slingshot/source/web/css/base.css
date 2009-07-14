@@ -64,6 +64,7 @@ hr
    margin-bottom: 8px;
    border: 0;
    width: 100%;
+   clear: both;
 }
 
 /* Page title and navigation styles */

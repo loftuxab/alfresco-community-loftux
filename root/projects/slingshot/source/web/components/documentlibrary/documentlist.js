@@ -1435,14 +1435,8 @@
             var clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
             
             // Token replacement
-            clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML),
-            {
-               downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
-               documentDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/document-details?nodeRef=" + record.getData("nodeRef"),
-               folderDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + record.getData("nodeRef"),
-               editMetadataUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + record.getData("nodeRef")
-            });
-            
+            clone.innerHTML = YAHOO.lang.substitute(window.unescape(clone.innerHTML), this.getActionUrls(record));
+
             // Generate an id
             clone.id = elActions.id + "_a";
             
@@ -1517,6 +1511,25 @@
             Dom.removeClass(elActions, "hidden");
             this.deferredActionsMenu = null;
          }
+      },
+
+
+      /**
+       * The urls to be used when creating links in the action cell
+       *
+       * @method getActionUrls
+       * @param record A data source element describing the item in the list
+       * @protected
+       */
+      getActionUrls: function DL_getActionUrls(record)
+      {
+         return {
+            downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
+            documentDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/document-details?nodeRef=" + record.getData("nodeRef"),
+            folderDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + record.getData("nodeRef"),
+            editMetadataUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + record.getData("nodeRef")
+         };
+
       },
 
       /**

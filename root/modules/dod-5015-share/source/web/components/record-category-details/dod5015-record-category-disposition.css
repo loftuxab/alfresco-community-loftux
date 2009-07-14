@@ -1,0 +1,69 @@
+.dod5015-record-category-disposition
+{
+   padding: 1.5em 0 1.5em;
+   border-bottom: 1px dashed #CCCCCC;   
+}
+
+.dod5015-record-category-disposition .heading
+{
+   color:#333333;
+   font-size:131%;
+   padding-bottom:1em;
+}
+
+.dod5015-record-category-disposition .actions
+{
+}
+
+.dod5015-record-category-disposition .actions .action
+{
+   clear: both;
+   margin-bottom: 0.3em;
+   min-height: 2.5em;
+   background-color: #EEEEEE;
+   border:1px solid #D5D5D5;
+}
+
+.dod5015-record-category-disposition .actions .action .no,
+.dod5015-record-category-disposition .actions .action .name,
+.dod5015-record-category-disposition .actions .action .more
+{
+   line-height: 2.5em;
+}
+
+.dod5015-record-category-disposition .actions .action .no
+{
+   position: absolute;
+   margin-left: 0.5em;
+   text-align: center;
+   width: 1.5em;
+   color:#FFFFFF;
+}
+
+.dod5015-record-category-disposition .actions .action .name
+{
+   position: absolute;
+   padding-left: 2.75em;
+   color:#008000;
+}
+
+.dod5015-record-category-disposition .actions .action .more
+{
+   float: right;
+   margin-right:1em;
+}
+
+.dod5015-record-category-disposition .actions .action .more.collapsed
+{
+
+}
+
+
+.dod5015-record-category-disposition .actions .action .description
+{
+   background-color: #FFFFFF;
+   min-height: 2em;
+   padding-left:2.75em;
+   padding-top:0.75em;
+   clear: both;
+}
