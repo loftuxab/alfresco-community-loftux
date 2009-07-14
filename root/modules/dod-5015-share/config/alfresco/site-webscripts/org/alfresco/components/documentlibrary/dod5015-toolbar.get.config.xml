@@ -1,0 +1,10 @@
+<toolbar>
+   <actionSets>
+      <actionSet id="default">
+         <action id="onActionCopyTo" type="action-link" permission="" asset="record-folder,record,undeclared-record" label="menu.selected-items.copy-to" />
+         <action id="onActionMoveTo" type="action-link" permission="delete" asset="record-folder,record,undeclared-record" label="menu.selected-items.move-to" />
+         <action id="onActionFileTo" type="action-link" permission="" asset="record-folder,record,undeclared-record" label="menu.selected-items.file-to" />
+         <action id="onActionDelete" type="action-link" permission="delete" label="menu.selected-items.delete" />
+      </actionSet>
+   </actionSets>
+</toolbar>

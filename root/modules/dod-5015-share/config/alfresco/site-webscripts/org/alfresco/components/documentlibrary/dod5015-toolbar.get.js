@@ -29,6 +29,30 @@ function main()
    }
 
    model.preferences = preferences;
+
+   // Actions
+   var myConfig = new XML(config.script),
+      xmlActionSet = myConfig..actionSet.(@id == "default"),
+      actionSet = [];
+   
+   // Found match?
+   if (xmlActionSet.@id == "default")
+   {
+      for each(var xmlAction in xmlActionSet..action)
+      {
+         actionSet.push(
+         {
+            id: xmlAction.@id.toString(),
+            type: xmlAction.@type.toString(),
+            permission: xmlAction.@permission.toString(),
+            asset: xmlAction.@asset.toString(),
+            href: xmlAction.@href.toString(),
+            label: xmlAction.@label.toString()
+         });
+      }
+   }
+   
+   model.actionSet = actionSet;
 }
 
 main();

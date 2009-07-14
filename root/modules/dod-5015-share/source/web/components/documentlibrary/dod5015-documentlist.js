@@ -900,11 +900,167 @@
          }
          
       },
+
+
+      /**
+       * Public functions
+       *
+       * Functions designed to be called form external sources
+       */
+
+      /**
+       * Public function to select files by specified groups
+       *
+       * @method selectFiles
+       * @param p_selectType {string} Can be one of the following:
+       * <pre>
+       * selectAll - all documents and folders
+       * selectNone - deselect all
+       * selectInvert - invert selection
+       * selectRecords - select all records
+       * selectFolders - select all folders
+       * </pre>
+       */
+      selectFiles: function DL_selectFiles(p_selectType)
+      {
+         var recordSet = this.widgets.dataTable.getRecordSet(),
+            checks = YAHOO.util.Selector.query('input[type="checkbox"]', this.widgets.dataTable.getTbodyEl()),
+            len = checks.length,
+            record, i, fnCheck, typeMap;
+
+         var typeMapping =
+         {
+            selectRecords: "record",
+            selectUndeclaredRecords: "undeclared-record",
+            selectFolders:
+            {
+               "record-folder": true,
+               "record-category": true,
+               "record-series": true
+            }
+         };
+
+         switch (p_selectType)
+         {
+            case "selectAll":
+               fnCheck = function(assetType, isChecked)
+               {
+                  return true;
+               }
+               break;
+            
+            case "selectNone":
+               fnCheck = function(assetType, isChecked)
+               {
+                  return false;
+               }
+               break;
+
+            case "selectInvert":
+               fnCheck = function(assetType, isChecked)
+               {
+                  return !isChecked;
+               }
+               break;
+
+            case "selectRecords":
+            case "selectUndeclaredRecords":
+            case "selectFolders":
+               typeMap = typeMapping[p_selectType];
+               fnCheck = function(assetType, isChecked)
+               {
+                  if (typeof typeMap === "object")
+                  {
+                     return typeMap[assetType];
+                  }
+                  return assetType == typeMap;
+               }
+               break;
+            
+            default:
+               fnCheck = function(assetType, isChecked)
+               {
+                  return isChecked;
+               }
+         }
+
+         for (i = 0; i < len; i++)
+         {
+            record = recordSet.getRecord(i);
+            this.selectedFiles[record.getData("nodeRef")] = checks[i].checked = fnCheck(record.getData("type"), checks[i].checked);
+         }
+         
+         YAHOO.Bubbling.fire("selectedFilesChanged");
+      },
+
    
       /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR ACTIONS
        * Disconnected event handlers for action event notification
        */
+
+      /**
+       * Copy single document or folder.
+       *
+       * @method onActionCopyTo
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionCopyTo: function DL_onActionCopyTo(row)
+      {
+         this._copyMoveFileTo("copy", row)
+      },
+
+      /**
+       * File single document or folder.
+       *
+       * @method onActionFileTo
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionFileTo: function DL_onActionFileTo(row)
+      {
+         this._copyMoveFileTo("file", row)
+      },
+
+      /**
+       * Move single document or folder.
+       *
+       * @method onActionMoveTo
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionMoveTo: function DL_onActionMoveTo(row)
+      {
+         this._copyMoveFileTo("move", row)
+      },
+      
+      /**
+       * Copy/Move/File To implementation.
+       *
+       * @method _copyMoveFileTo
+       * @param mode {String} Operation mode: copy|file|move
+       * @param row {object} DataTable row representing file to be actioned
+       * @private
+       */
+      _copyMoveFileTo: function DL__copyMoveFileTo(mode, row)
+      {
+         var file = this.widgets.dataTable.getRecord(row).getData();
+         
+         if (!this.modules.copyMoveFileTo)
+         {
+            this.modules.copyMoveFileTo = new Alfresco.module.RecordsCopyMoveFileTo(this.id + "-copyMoveFileTo");
+         }
+
+         this.modules.copyMoveFileTo.setOptions(
+         {
+            mode: mode,
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: this.currentPath,
+            files: file
+         });
+
+         this.modules.copyMoveFileTo.showDialog();
+      },
+
 
       /**
        * Freeze action.
@@ -947,6 +1103,18 @@
       {
          this._dod5015Action(row, "cutoff", "message.cutoff");
       },
+
+      /**
+       * Declare Record action.
+       *
+       * @method onActionDeclare
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionDeclare: function DL_onActionDeclare(row)
+      {
+         this._dod5015Action(row, "declareRecord", "message.declare");
+      },
+
 
       /**
        * Destroy action.
@@ -1002,7 +1170,7 @@
             {
                event:
                {
-                  name: "doclistRefresh"
+                  name: "metadataRefresh"
                },
                message: this.msg(i18n + ".success", displayName)
             },

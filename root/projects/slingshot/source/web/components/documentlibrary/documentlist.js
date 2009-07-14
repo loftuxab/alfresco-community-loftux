@@ -1291,10 +1291,10 @@
        */
       selectFiles: function DL_selectFiles(p_selectType)
       {
-         var recordSet = this.widgets.dataTable.getRecordSet();
-         var record, i;
-         var checks = YAHOO.util.Selector.query('input[type="checkbox"]', this.widgets.dataTable.getTbodyEl());
-         var len = checks.length; 
+         var recordSet = this.widgets.dataTable.getRecordSet(),
+            checks = YAHOO.util.Selector.query('input[type="checkbox"]', this.widgets.dataTable.getTbodyEl()),
+            len = checks.length,
+            record, i;
 
          switch (p_selectType)
          {
@@ -2016,22 +2016,17 @@
          
          if (!this.modules.moveTo)
          {
-            this.modules.moveTo = new Alfresco.module.DoclibMoveTo(this.id + "-moveTo").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.currentPath,
-               files: file
-            });
+            this.modules.moveTo = new Alfresco.module.DoclibMoveTo(this.id + "-moveTo")
          }
-         else
+
+         this.modules.moveTo.setOptions(
          {
-            this.modules.moveTo.setOptions(
-            {
-               path: this.currentPath,
-               files: file
-            });
-         }
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: this.currentPath,
+            files: file
+         });
+
          this.modules.moveTo.showDialog();
       },
 

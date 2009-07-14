@@ -491,6 +491,12 @@ body.yui-skin-default .yuimenu .bd ul li.yuimenuitem-selected .yuimenuitemlabel
 {
     color:#FFF;
 }
+
+body.yui-skin-default .yuimenu .bd ul li.yuimenuitem .yuimenuitemlabel-disabled
+{
+   color: #A6A6A6;
+   cursor: default;
+}
 /*end YUI Menu */
 
 /* Doclist */
@@ -543,6 +549,7 @@ body.yui-skin-default .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
 
 .yui-skin-default .filter li.selected,
 .yui-skin-default .tags li.selected,
+.yui-skin-default .treeview .selected,
 .archive li.selected,
 .tool li.selected,
 body.yui-skin-default .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a.yui-columnbrowser-item-selected

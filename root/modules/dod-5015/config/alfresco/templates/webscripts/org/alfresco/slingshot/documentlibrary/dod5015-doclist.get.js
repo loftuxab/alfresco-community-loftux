@@ -28,16 +28,22 @@ function getDocList(filter)
    }
 
    // Try to find a filter query based on the passed-in arguments
-   var allAssets, filterQuery, query;
+   var allAssets = [], filterQuery, query;
    var filterParams = getFilterParams(filter, parsedArgs);
    query = filterParams.query;
 
    // Specialise by passed-in type
    var typeQuery = getTypeFilterQuery(url.templateArgs.type);
-   query += " " + typeQuery;
+   if (typeQuery != "")
+   {
+      query += " " + typeQuery;
+   }
 
-   // Sort the list before trimming to page chunks 
-   allAssets = search.luceneSearch(query, filterParams.sortBy, filterParams.sortByAscending);
+   // Sort the list before trimming to page chunks
+   if (query != "")
+   {
+      allAssets = search.luceneSearch(query, filterParams.sortBy, filterParams.sortByAscending);
+   }
 
    // Limit the resultset?
    if (filterParams.limitResults)
@@ -144,8 +150,8 @@ function getDocList(filter)
             // This asset belongs to a site
             location =
             {
-               site: qnamePaths[3].substr(3),
-               container: qnamePaths[4].substr(3),
+               site: displayPaths[3],
+               container: displayPaths[4],
                path: "/" + displayPaths.slice(5, displayPaths.length).join("/"),
                file: asset.name
             }

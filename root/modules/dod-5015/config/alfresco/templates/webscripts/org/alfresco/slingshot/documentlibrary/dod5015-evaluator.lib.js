@@ -25,10 +25,10 @@ function getAssetType(asset)
       case "cm:content":
          if (asset.hasAspect("rma:record"))
          {
-            assetType = "record";
-            if (asset.hasAspect("rma:undeclaredRecord"))
+            assetType = "undeclared-record";
+            if (asset.hasAspect("rma:declaredRecord"))
             {
-               assetType = "undeclared-record";
+               assetType = "record";
             }
          }
          break;

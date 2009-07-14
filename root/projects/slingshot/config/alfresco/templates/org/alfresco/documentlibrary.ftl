@@ -53,8 +53,9 @@
          <div class="yui-b" id="divDocLibraryFilters">
             <@region id=doclibType + "filter" scope="template" protected=true />
             <@region id=doclibType + "tree" scope="template" protected=true />
-            <@region id=doclibType + "tags" scope="template" protected=true />            
-            <@region id=doclibType + "savedsearch" scope="template" protected=true />            
+            <@region id=doclibType + "tags" scope="template" protected=true />
+            <@region id=doclibType + "fileplan" scope="template" protected=true />
+            <@region id=doclibType + "savedsearch" scope="template" protected=true />
          </div>
       </div>
 

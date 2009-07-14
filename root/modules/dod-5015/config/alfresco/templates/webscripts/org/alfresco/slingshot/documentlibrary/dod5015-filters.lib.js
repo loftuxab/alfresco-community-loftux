@@ -28,6 +28,7 @@ function getFilterParams(filter, parsedArgs, favourites)
    filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}forum\"";
    filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}topic\"";
    filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}post\"";
+   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule\"";
 
    // Create query based on passed-in arguments
    switch (String(filter))
@@ -56,9 +57,38 @@ function getFilterParams(filter, parsedArgs, favourites)
                cleanXml = cleanXml.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // Rhino E4X bug 336551
                cleanXml = cleanXml.replace(/^\s+|\s+$/g, ""); // General Rhino E4X inability to handle leading whitespace
                e4x = new XML(cleanXml);
-               filterParams.query = e4x.query.toString();
+               var filterQuery = e4x.query.toString();
+               // Wrap the query so that only items with the filePlan are returned
+               filterQuery = "+PATH:\"" + parsedArgs.rootNode.qnamePath + "//*\" +(" + filterQuery + ")";
+               filterParams.query = filterQuery + filterQueryDefaults;
             }
          }
+         break;
+      
+      case "transfers":
+         filterParams.variablePath = true;
+         /**
+          * Return list of Transfers which are hopefully nodeRefs to which we can attach the "transfer complete" action
+          */
+         filterParams.query = "";
+         break;
+      
+      case "holds":
+         if (filterData == "")
+         {
+            /**
+             * Return list of Hold folders - might need special-case handling in doclist.get.js (let's hope not)
+             */
+         }
+         else
+         {
+            filterParams.variablePath = true;
+            /**
+             * Get the Hold name from the filterData and then put together a query to list all the Record Folders
+             * and Records associated with that Hold.
+             */
+         }
+         filterParams.query = "";
          break;
       
       default:

@@ -18,7 +18,7 @@
       containerId: "${args.container!"documentLibrary"}",
       initialPath: "${page.url.args["path"]!""}",
       <@initialFilter />
-      usePagination: ${(args.pagination!false)?string},
+      usePagination: false,
       highlightFile: "${page.url.args["file"]!""}",
       showFolders: true,
       simpleView: ${(preferences.simpleView!false)?string},
@@ -35,7 +35,8 @@
             <div id="${args.htmlid}-fileSelect-menu" class="yuimenu">
                <div class="bd">
                   <ul>
-                     <li><span><span class="selectDocuments">${msg("menu.select.records")}</span></span></li>
+                     <li><span><span class="selectRecords">${msg("menu.select.records")}</span></span></li>
+                     <li><span><span class="selectUndeclaredRecords">${msg("menu.select.undeclared-records")}</span></span></li>
                      <li><span><span class="selectFolders">${msg("menu.select.folders")}</span></span></li>
                      <li><span><span class="selectAll">${msg("menu.select.all")}</span></span></li>
                      <li><span><span class="selectInvert">${msg("menu.select.invert")}</span></span></li>

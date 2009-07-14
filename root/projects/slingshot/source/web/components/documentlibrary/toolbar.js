@@ -59,14 +59,9 @@
     */
    Alfresco.DocListToolbar = function(htmlId)
    {
-      // Mandatory properties
-      this.name = "Alfresco.DocListToolbar";
-      this.id = htmlId;
+      Alfresco.DocListToolbar.superclass.constructor.call(this, "Alfresco.DocListToolbar", htmlId, ["button", "menu", "container"]);
       
       // Initialise prototype properties
-      this.widgets = {};
-      this.modules = {};
-      this.services = {};
       this.selectedFiles = [];
       this.currentFilter =
       {
@@ -75,12 +70,6 @@
          filterData: ""
       };
 
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container"], this.onComponentsLoaded, this);
-      
       // Decoupled event listeners
       YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
       YAHOO.Bubbling.on("folderRenamed", this.onPathChanged, this);
@@ -92,7 +81,7 @@
       return this;
    };
    
-   Alfresco.DocListToolbar.prototype =
+   YAHOO.extend(Alfresco.DocListToolbar, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -162,30 +151,6 @@
       fileUpload: null,
 
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
-
-      /**
-       * Object container for storing service instances.
-       * 
-       * @property services
-       * @type object
-       */
-      services: null,
-
-      /**
        * Array of selected states for visible files.
        * 
        * @property selectedFiles
@@ -193,43 +158,6 @@
        */
       selectedFiles: null,
 
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DocListToolbar} returns 'this' for method chaining
-       */
-      setOptions: function DLTB_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocListToolbar} returns 'this' for method chaining
-       */
-      setMessages: function DLTB_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DLTB_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -269,7 +197,7 @@
 
          // Hide/Show NavBar button
          this.widgets.hideNavBar = Alfresco.util.createYUIButton(this, "hideNavBar-button", this.onHideNavBar);
-         this.widgets.hideNavBar.set("label", this._msg(this.options.hideNavBar ? "button.navbar.show" : "button.navbar.hide"));
+         this.widgets.hideNavBar.set("label", this.msg(this.options.hideNavBar ? "button.navbar.show" : "button.navbar.hide"));
          Dom.setStyle(this.id + "-navBar", "display", this.options.hideNavBar ? "none" : "block");
          
          // RSS Feed link button
@@ -363,7 +291,7 @@
                      });
                      Alfresco.util.PopupManager.displayMessage(
                      {
-                        text: this._msg("message.new-folder.success", folder.name)
+                        text: this.msg("message.new-folder.success", folder.name)
                      });
                   },
                   scope: this
@@ -489,22 +417,17 @@
          
          if (!this.modules.copyTo)
          {
-            this.modules.copyTo = new Alfresco.module.DoclibCopyTo(this.id + "-copyTo").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.currentPath,
-               files: files
-            });
+            this.modules.copyTo = new Alfresco.module.DoclibCopyTo(this.id + "-copyTo");
          }
-         else
+
+         this.modules.copyTo.setOptions(
          {
-            this.modules.copyTo.setOptions(
-            {
-               path: this.currentPath,
-               files: files
-            });
-         }
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: this.currentPath,
+            files: files
+         });
+
          this.modules.copyTo.showDialog();
       },
 
@@ -524,23 +447,18 @@
          
          if (!this.modules.moveTo)
          {
-            this.modules.moveTo = new Alfresco.module.DoclibMoveTo(this.id + "-moveTo").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.currentPath,
-               files: files,
-               width: "40em"
-            });
+            this.modules.moveTo = new Alfresco.module.DoclibMoveTo(this.id + "-moveTo");
          }
-         else
+
+         this.modules.moveTo.setOptions(
          {
-            this.modules.moveTo.setOptions(
-            {
-               path: this.currentPath,
-               files: files
-            });
-         }
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: this.currentPath,
+            files: files,
+            width: "40em"
+         });
+
          this.modules.moveTo.showDialog();
       },
 
@@ -565,8 +483,8 @@
             fileNames.push("<span class=\"" + files[i].type + "\">" + files[i].displayName + "</span>");
          }
          
-         var confirmTitle = this._msg("title.multiple-delete.confirm");
-         var confirmMsg = this._msg("message.multiple-delete.confirm", files.length);
+         var confirmTitle = this.msg("title.multiple-delete.confirm");
+         var confirmMsg = this.msg("message.multiple-delete.confirm", files.length);
          confirmMsg += "<div class=\"toolbar-file-list\">" + fileNames.join("") + "</div>";
 
          Alfresco.util.PopupManager.displayPrompt(
@@ -577,7 +495,7 @@
             modal: true,
             buttons: [
             {
-               text: this._msg("button.delete"),
+               text: this.msg("button.delete"),
                handler: function DLTB_onActionDelete_delete()
                {
                   this.destroy();
@@ -585,7 +503,7 @@
                }
             },
             {
-               text: this._msg("button.cancel"),
+               text: this.msg("button.cancel"),
                handler: function DLTB_onActionDelete_cancel()
                {
                   this.destroy();
@@ -604,8 +522,8 @@
        */
       _onActionDeleteConfirm: function DLTB__onActionDeleteConfirm(files)
       {
-         var multipleFiles = [];
-         for (var i = 0, j = files.length; i < j; i++)
+         var multipleFiles = [], i, ii;
+         for (i = 0, ii = files.length; i < ii; i++)
          {
             multipleFiles.push(files[i].nodeRef);
          }
@@ -621,14 +539,14 @@
             {
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: this._msg("message.multiple-delete.failure")
+                  text: this.msg("message.multiple-delete.failure")
                });
                return;
             }
 
             YAHOO.Bubbling.fire("filesDeleted");
 
-            for (var i = 0, j = data.json.totalResults; i < j; i++)
+            for (i = 0, ii = data.json.totalResults; i < ii; i++)
             {
                result = data.json.results[i];
                
@@ -645,13 +563,13 @@
             }
 
             // Activities
-            var activityData, file;
+            var activityData;
             if (successCount > 0)
             {
                if (successCount < this.options.groupActivitiesAt)
                {
                   // Below cutoff for grouping Activities into one
-                  for (var i = 0; i < successCount; i++)
+                  for (i = 0; i < successCount; i++)
                   {
                      activityData =
                      {
@@ -675,7 +593,7 @@
 
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.multiple-delete.success", successCount)
+               text: this.msg("message.multiple-delete.success", successCount)
             });
          };
          
@@ -693,7 +611,7 @@
             },
             failure:
             {
-               message: this._msg("message.multiple-delete.failure")
+               message: this.msg("message.multiple-delete.failure")
             },
             webscript:
             {
@@ -702,7 +620,7 @@
             },
             wait:
             {
-               message: this._msg("message.multiple-delete.please-wait")
+               message: this.msg("message.multiple-delete.please-wait")
             },
             config:
             {
@@ -816,7 +734,7 @@
       onHideNavBar: function DLTB_onHideNavBar(e, p_obj)
       {
          this.options.hideNavBar = !this.options.hideNavBar;
-         p_obj.set("label", this._msg(this.options.hideNavBar ? "button.navbar.show" : "button.navbar.hide"));
+         p_obj.set("label", this.msg(this.options.hideNavBar ? "button.navbar.show" : "button.navbar.hide"));
 
          this.services.preferences.set(PREF_HIDE_NAVBAR, this.options.hideNavBar);
 
@@ -888,15 +806,17 @@
          var obj = args[1];
          if (obj && (typeof obj.filterId !== "undefined"))
          {
-            if (this.currentFilter.filterOwner != obj.filterOwner)
+            if (this.currentFilter.filterOwner != obj.filterOwner || this.currentFilter.filterId != obj.filterId)
             {
-               var owner = obj.filterOwner.split(".")[1];
+               var filterOwner = obj.filterOwner.split(".")[1],
+                  ownerIdClass = filterOwner + "_" + obj.filterId;
+               
                // Obtain array of DIVs we might want to hide
-               var divs = YAHOO.util.Selector.query('div.hideable', Dom.get(this.id + "-body")), div;
+               var divs = YAHOO.util.Selector.query('div.hideable', Dom.get(this.id)), div;
                for (var i = 0, j = divs.length; i < j; i++)
                {
                   div = divs[i];
-                  if (Dom.hasClass(div, owner))
+                  if (Dom.hasClass(div, filterOwner) || Dom.hasClass(div, ownerIdClass))
                   {
                      Dom.removeClass(div, "toolbar-hidden");
                   }
@@ -907,12 +827,16 @@
                }
             }
             
+            Alfresco.logger.debug("DLTB_onFilterChanged", "Old Filter", this.currentFilter);
+            
             this.currentFilter = 
             {
                filterId: obj.filterId,
                filterOwner: obj.filterOwner,
                filterData: obj.filterData
             };
+
+            Alfresco.logger.debug("DLTB_onFilterChanged", "New Filter", this.currentFilter);
             
             this._generateDescription();
             this._generateRSSFeedUrl();
@@ -928,7 +852,7 @@
        */
       onDeactivateAllControls: function DLTB_onDeactivateAllControls(layer, args)
       {
-         var index, widget, fnDisable = Alfresco.util.disableYUIButton;
+         var index, fnDisable = Alfresco.util.disableYUIButton;
          for (index in this.widgets)
          {
             if (this.widgets.hasOwnProperty(index))
@@ -989,21 +913,24 @@
       {
          if (this.modules.docList)
          {
-            var files = this.modules.docList.getSelectedFiles(), fileTypes = [], file;
+            var files = this.modules.docList.getSelectedFiles(), fileTypes = [], file,
+               userAccess = {}, fileAccess, index,
+               menuItems = this.widgets.selectedItems.getMenu().getItems(), menuItem,
+               actionPermissions, typesSupported, disabled,
+               i, ii;
             
-            // Work out what the user has permission to do
-            var finalAccess = {}, userAccess, access;
-            for (var i = 0, ii = files.length; i < ii; i++)
+            // Check each file for user permissions
+            for (i = 0, ii = files.length; i < ii; i++)
             {
                file = files[i];
                
-               // Required user access level
-               userAccess = file.permissions.userAccess;
-               for (access in userAccess)
+               // Required user access level - logical AND of each file's permissions
+               fileAccess = file.permissions.userAccess;
+               for (index in fileAccess)
                {
-                  if (userAccess.hasOwnProperty(access))
+                  if (fileAccess.hasOwnProperty(index))
                   {
-                     finalAccess[access] = (finalAccess[access] === undefined ? userAccess[access] : finalAccess[access] && userAccess[access]);
+                     userAccess[index] = (userAccess[index] === undefined ? fileAccess[index] : userAccess[index] && fileAccess[index]);
                   }
                }
                
@@ -1014,33 +941,52 @@
                   fileTypes.push(file.type);
                }
             }
-            
-            var menuItems = this.widgets.selectedItems.getMenu().getItems(), menuItem, index, accessRequired, typeRequired, disabled;
+
+            // Now go through the menu items, setting the disabled flag appropriately
             for (index in menuItems)
             {
                if (menuItems.hasOwnProperty(index))
                {
                   menuItem = menuItems[index];
+                  disabled = false;
 
-                  // Check permissions required
-                  accessRequired = menuItem.element.firstChild.rel;
-                  disabled = (accessRequired === "") || finalAccess[accessRequired] ? false : true;
-
-                  // Check filetype required
-                  typeRequired = menuItem.element.firstChild.type;
-                  if (typeRequired !== "")
+                  if (menuItem.element.firstChild)
                   {
-                     if (fileTypes.length > 1 || !(typeRequired in fileTypes))
+                     // Check permissions required
+                     if (menuItem.element.firstChild.rel && menuItem.element.firstChild.rel !== "")
                      {
-                        disabled = true;
+                        actionPermissions = menuItem.element.firstChild.rel.split(",");
+                        for (i = 0, ii = actionPermissions.length; i < ii; i++)
+                        {
+                           if (!userAccess[actionPermissions[i]])
+                           {
+                              disabled = true;
+                              break;
+                           }
+                        }
                      }
-                  }
 
-                  menuItem.cfg.setProperty("disabled", disabled);
+                     if (!disabled)
+                     {
+                        // Check filetypes supported
+                        if (menuItem.element.firstChild.type && menuItem.element.firstChild.type !== "")
+                        {
+                           typesSupported = Alfresco.util.arrayToObject(menuItem.element.firstChild.type.split(","));
+
+                           for (i = 0, ii = fileTypes.length; i < ii; i++)
+                           {
+                              if (!(fileTypes[i] in typesSupported))
+                              {
+                                 disabled = true;
+                                 break;
+                              }
+                           }
+                        }
+                     }
+                     menuItem.cfg.setProperty("disabled", disabled);
+                  }
                }
-               
             }
-            
             this.widgets.selectedItems.set("disabled", (files.length === 0));
          }
       },
@@ -1073,6 +1019,15 @@
          // Clone the array and re-use the root node name from the DocListTree
          var displayPaths = paths.concat();
          displayPaths[0] = Alfresco.util.message("node.root", "Alfresco.DocListTree");
+
+         var fnBreadcrumbClick = function DLTB__gB_click(e, path)
+         {
+            YAHOO.Bubbling.fire("pathChanged",
+            {
+               path: path
+            });
+            Event.stopEvent(e);
+         };
          
          var eBreadcrumb = new Element(divBC);
          for (var i = 0, j = paths.length; i < j; ++i)
@@ -1101,14 +1056,7 @@
                   innerHTML: displayPaths[i]
                });
                var newPath = paths.slice(0, i+1).join("/");
-               eLink.on("click", function DLTB__gB_click(e, path)
-               {
-                  YAHOO.Bubbling.fire("pathChanged",
-                  {
-                     path: path
-                  });
-                  Event.stopEvent(e);
-               }, newPath);
+               eLink.on("click", fnBreadcrumbClick, newPath);
                eCrumb.appendChild(eLink);
                eCrumb.appendChild(new Element(document.createElement("span"),
                {
@@ -1128,28 +1076,38 @@
        */
       _generateDescription: function DLTB__generateDescription()
       {
-         var divDesc = Dom.get(this.id + "-description");
+         var divDesc, eDivDesc, eDescMsg, eDescMore;
+         
+         divDesc = Dom.get(this.id + "-description");
          if (divDesc === null)
          {
             return;
          }
-         divDesc.innerHTML = "";
          
-         var eDivDesc = new Element(divDesc);
-
-         var eDescMsg = new Element(document.createElement("span"),
+         while (divDesc.hasChildNodes())
          {
-            innerHTML: this._msg("description." + this.currentFilter.filterId, this.currentFilter.filterData)
+            divDesc.removeChild(divDesc.lastChild);
+         }
+         
+         eDescMsg = new Element(document.createElement("div"),
+         {
+            innerHTML: this.msg("description." + this.currentFilter.filterId, this.currentFilter.filterData)
          });
          eDescMsg.addClass("message");
 
-         var eDescMore = new Element(document.createElement("span"),
+         // Don't display a "more" message that contains the "{0}" placeholder unless filterData is populated
+         if (this.msg("description." + this.currentFilter.filterId + ".more").indexOf("{0}") == -1 || this.currentFilter.filterData !== "")
          {
-            innerHTML: this._msg("description." + this.currentFilter.filterId + ".more", this.currentFilter.filterData)
-         });
-         eDescMore.addClass("more");
-         
-         eDescMsg.appendChild(eDescMore);
+            eDescMore = new Element(document.createElement("span"),
+            {
+               innerHTML: this.msg("description." + this.currentFilter.filterId + ".more", this.currentFilter.filterData)
+            });
+            eDescMore.addClass("more");
+
+            eDescMsg.appendChild(eDescMore);
+         }
+
+         eDivDesc = new Element(divDesc);
          eDivDesc.appendChild(eDescMsg);
       },
       
@@ -1180,19 +1138,6 @@
             
             this.widgets.rssFeed.set("href", Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/documentlibrary/feed/" + params);
          }
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function DLTB__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.DocListToolbar", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();
