@@ -25,7 +25,7 @@
             "periodProperty" : "${action.periodProperty}",
             </#if>
             <#if action.events??>
-            "events" : [<#list action.events as event>${event}<#if event_has_next>,</#if></#list>],
+            "events" : [<#list action.events as event>"${event}"<#if event_has_next>,</#if></#list>],
             </#if>
             "eligibleOnFirstCompleteEvent" : ${action.eligibleOnFirstCompleteEvent?string}
          }<#if action_has_next>,</#if>
