@@ -147,16 +147,17 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertNotNull(actions);
         assertEquals(2, actions.length());
         JSONObject action1 = (JSONObject)actions.get(0);
-        assertEquals(6, action1.length());
+        assertEquals(7, action1.length());
         assertNotNull(action1.get("id"));
         assertNotNull(action1.get("url"));
         assertEquals(0, action1.getInt("index"));
         assertEquals("cutoff", action1.getString("name"));
+        assertEquals("Cutoff", action1.getString("label"));
         assertEquals("monthend|1", action1.getString("period"));
         assertTrue(action1.getBoolean("eligibleOnFirstCompleteEvent"));
         
         JSONObject action2 = (JSONObject)actions.get(1);
-        assertEquals(7, action2.length());
+        assertEquals(8, action2.length());
         assertEquals("rma:cutOffDate", action2.get("periodProperty"));
         
         // Test data structure returned from "Personnel Security Program Records"
@@ -196,16 +197,17 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertNotNull(actions);
         assertEquals(2, actions.length());
         action1 = (JSONObject)actions.get(0);
-        assertEquals(6, action1.length());
+        assertEquals(8, action1.length());
         assertNotNull(action1.get("id"));
         assertNotNull(action1.get("url"));
         assertEquals(0, action1.getInt("index"));
         assertEquals("cutoff", action1.getString("name"));
+        assertEquals("Cutoff", action1.getString("label"));
         assertTrue(action1.getBoolean("eligibleOnFirstCompleteEvent"));
-        /*JSONArray events = action1.getJSONArray("events");
+        JSONArray events = action1.getJSONArray("events");
         assertNotNull(events);
         assertEquals(1, events.length());
-        assertEquals("superseded", events.get(0));*/
+        assertEquals("superseded", events.get(0));
         
         // Test the retrieval of an empty disposition schedule
         NodeRef recordSeries = TestUtilities.getRecordSeries(this.searchService, "Civilian Files");
@@ -282,15 +284,16 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertNotNull(rootDataObject.getString("url"));
         assertEquals(0, rootDataObject.getInt("index"));
         assertEquals(name, rootDataObject.getString("name"));
+        assertEquals("Destroy", rootDataObject.getString("label"));
         assertEquals(desc, rootDataObject.getString("description"));
         assertEquals(period, rootDataObject.getString("period"));
         assertEquals(periodProperty, rootDataObject.getString("periodProperty"));
         assertTrue(rootDataObject.getBoolean("eligibleOnFirstCompleteEvent"));
-        /*JSONArray events = rootDataObject.getJSONArray("events");
+        events = rootDataObject.getJSONArray("events");
         assertNotNull(events);
         assertEquals(2, events.length());
         assertEquals("superseded", events.get(0));
-        assertEquals("no_longer_needed", events.get(1));*/
+        assertEquals("no_longer_needed", events.get(1));
         
         // test the minimum amount of data required to create an action definition
         jsonPostData = new JSONObject();
@@ -330,7 +333,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("recordCategory")), 
                     DOD5015Model.TYPE_RECORD_CATEGORY).getChildRef();
         
-        // create an action definition to then delete
+        // create an action definition to then update
         String categoryNodeUrl = newRecordCategory.toString().replace("://", "/");
         String postRequestUrl = MessageFormat.format(POST_ACTIONDEF_URL_FORMAT, categoryNodeUrl);
         JSONObject jsonPostData = new JSONObject();
@@ -346,9 +349,10 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         JSONObject actionDef = json.getJSONObject("data").getJSONArray("actions").getJSONObject(0);
         String actionDefId = actionDef.getString("id");
         assertEquals("cutoff", actionDef.getString("name"));
+        assertEquals("Cutoff", actionDef.getString("label"));
         assertEquals("none|0", actionDef.getString("period"));
         assertFalse(actionDef.has("description"));
-        //assertEquals(0, actionDef.getJSONArray("events").length());
+        assertFalse(actionDef.has("events"));
         
         // define body for PUT request
         String name = "destroy";
@@ -382,12 +386,14 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         json = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         actionDef = json.getJSONObject("data");
         assertEquals(name, actionDef.getString("name"));
+        assertEquals("Destroy", actionDef.getString("label"));
         assertEquals(desc, actionDef.getString("description"));
         assertEquals(period, actionDef.getString("period"));
         assertEquals(periodProperty, actionDef.getString("periodProperty"));
         assertFalse(actionDef.getBoolean("eligibleOnFirstCompleteEvent"));
-        //assertEquals(2, actionDef.getJSONArray("events").length());
-        //assertEquals("no_longer_needed", actionDef.getJSONArray("events").getJSONObject(1).getString("no_longer_needed"));
+        assertEquals(2, actionDef.getJSONArray("events").length());
+        assertEquals("superseded", actionDef.getJSONArray("events").getString(0));
+        assertEquals("no_longer_needed", actionDef.getJSONArray("events").getString(1));
     }
     
     public void testDeleteDispositionAction() throws Exception

@@ -37,6 +37,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefiniti
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -52,6 +53,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.springframework.util.StringUtils;
 
 /**
  * WebScript java backed bean implementation to create an instance
@@ -152,10 +154,6 @@ public class DispositionActionDefinitionPost extends DeclarativeWebScript
         return model;
     }
     
-    // ******************************************************************
-    // TODO: create a base class containing common bits and pieces
-    // ******************************************************************
-    
     /**
      * Creates a dispositionActionDefinition node in the repo.
      * 
@@ -247,6 +245,8 @@ public class DispositionActionDefinitionPost extends DeclarativeWebScript
         model.put("index", actionDef.getIndex());
         model.put("url", url + "/" + actionDef.getId());
         model.put("name", actionDef.getName());
+        // TODO: get the proper label for the action name
+        model.put("label", StringUtils.capitalize(actionDef.getName()));
         model.put("eligibleOnFirstCompleteEvent", actionDef.eligibleOnFirstCompleteEvent());
         
         if (actionDef.getDescription() != null)
@@ -264,7 +264,7 @@ public class DispositionActionDefinitionPost extends DeclarativeWebScript
             model.put("periodProperty", actionDef.getPeriodProperty().toPrefixString(this.namespaceService));
         }
         
-        /*List<RecordsManagementEvent> events = actionDef.getEvents();
+        List<RecordsManagementEvent> events = actionDef.getEvents();
         if (events != null && events.size() > 0)
         {
             List<String> eventNames = new ArrayList<String>(events.size());
@@ -273,7 +273,7 @@ public class DispositionActionDefinitionPost extends DeclarativeWebScript
                 eventNames.add(event.getName());
             }
             model.put("events", eventNames);
-        }*/
+        }
         
         return model;
     }
