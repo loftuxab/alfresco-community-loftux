@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -255,6 +257,9 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
         System.out.println("Disposition as of: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
         
+        // Check for the search properties having been populated
+        checkSearchAspect(ndNodeRef, recordFolder, 0);
+        
 	    // Test the declaration of a record by editing properties
         Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
 	    propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());	    
@@ -266,6 +271,10 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
 	    propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
 	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());
 	    this.nodeService.setProperties(recordOne, propValues);
+	    
+	    txn.commit(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
         
         // Try and declare, expected failure
         try
@@ -277,6 +286,10 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         {
             // Expected
         }
+        
+        txn.rollback(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
         
         assertTrue("Before test DECLARED aspect was set", 
         		this.nodeService.hasAspect(recordOne, ASPECT_DECLARED_RECORD) == false);    
@@ -290,6 +303,10 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         // Declare the record as we have set everything we should have
         this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
         assertTrue(" the record is not declared", this.nodeService.hasAspect(recordOne, ASPECT_DECLARED_RECORD));
+        
+        txn.commit(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
         
         // Execute the cutoff action (should fail because this is being done at the record level)
         try
@@ -318,10 +335,18 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         
+        txn.rollback();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
         // Clock the asOf date back to ensure eligibility
         ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         this.nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());        
         this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
         
         // Check the disposition action
         assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
@@ -336,6 +361,7 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         System.out.println("Disposition action: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
         assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
         System.out.println("Disposition as of: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+        assertNull(this.nodeService.getProperty(recordFolder, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS));
         
         // Check the previous action details
         // TODO check the history association
@@ -343,6 +369,8 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         //assertNotNull(this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
         //System.out.println("Previous aciont date: " + this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE).toString());
 
+        // Check for the search properties having been populated
+        checkSearchAspect(ndNodeRef, recordFolder, 0);
         
         // Execute the destroy action
         ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
@@ -353,9 +381,29 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         assertFalse(this.nodeService.exists(recordFolder));
         assertFalse(this.nodeService.exists(recordOne));
         
-        txn.rollback();
-        //txn.commit();
+        txn.commit();
     }
+	
+	private void checkSearchAspect(NodeRef dispositionAction, NodeRef record, int eventCount)
+	{
+        assertTrue(this.nodeService.hasAspect(record, RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH));
+        assertEquals(this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_ACTION),
+                     this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_ACTION_NAME));
+        assertEquals(this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_AS_OF),
+                     this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_ACTION_AS_OF));
+        assertEquals(this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_EVENTS_ELIGIBLE),
+                     this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS_ELIGIBLE));
+        
+        Collection<String> events = (Collection<String>)this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS);
+        if (eventCount == 0)
+        {
+            assertNull(events);
+        }
+        else
+        {
+            assertEquals(eventCount, events.size());
+        }
+	}
 
 	
 	public void testDispositionLifecycle_0412_01() throws Exception
@@ -374,31 +422,20 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         NodeRef recordFolder = this.nodeService.createNode(recordCategory, 
                                                            ContentModel.ASSOC_CONTAINS, 
                                                            QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "My Folder"), 
-                                                           TYPE_RECORD_FOLDER).getChildRef();
-        
+                                                           TYPE_RECORD_FOLDER).getChildRef();        
         setComplete();
         endTransaction();
         
         UserTransaction txn = transactionService.getUserTransaction(false);
         txn.begin();
         
-        // Create the document
-        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
-        props.put(ContentModel.PROP_NAME, "MyRecord.txt");
-        NodeRef recordOne = this.nodeService.createNode(recordFolder, 
-                                                        ContentModel.ASSOC_CONTAINS, 
-                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
-                                                        ContentModel.TYPE_CONTENT).getChildRef();
-        
-        // Set the content
-        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
-        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        writer.setEncoding("UTF-8");
-        writer.putContent("There is some content in this record");
+        NodeRef recordOne = createRecord(recordFolder);
         
         txn.commit();
         txn = transactionService.getUserTransaction(false);
         txn.begin();
+        
+        declareRecord(recordOne);
         
         // NOTE the disposition is being managed at a folder level ...
         
@@ -417,6 +454,12 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         assertNotNull(events);
         assertEquals(3, events.size());
         
+        checkSearchAspect(da.getNodeRef(), recordFolder, 3);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
         EventCompletionDetails ecd = events.get(0);
         assertFalse(ecd.isEventComplete());
         assertNull(ecd.getEventCompletedBy());
@@ -427,7 +470,13 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
         
+        checkSearchAspect(da.getNodeRef(), recordFolder, 3);
+        
         this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
         
         assertFalse((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
         assertEquals(false, da.getDispositionActionDefinition().eligibleOnFirstCompleteEvent());
@@ -440,7 +489,13 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
         
+        checkSearchAspect(da.getNodeRef(), recordFolder, 3);
+        
         this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
         
         assertFalse((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
         
@@ -449,7 +504,13 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
         
+        checkSearchAspect(da.getNodeRef(), recordFolder, 3);
+        
         this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
         
         assertTrue((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
         
@@ -463,7 +524,68 @@ public class DODSystemTest extends BaseSpringTest implements DOD5015Model
             assertNotNull(e.getEventCompletedAt());
         }
         
+        checkSearchAspect(da.getNodeRef(), recordFolder, 3);
+        
+        // Do the commit action
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Check events are gone
+        da = rmService.getNextDispositionAction(recordFolder);
+        
+        assertNotNull(da);
+        assertEquals("destroy", da.getDispositionActionDefinition().getName());
+        assertNotNull(da.getAsOfDate());
+        assertFalse((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        events = da.getEventCompletionDetails();
+        assertNotNull(events);
+        assertEquals(0, events.size());
+        
+        checkSearchAspect(da.getNodeRef(), recordFolder, 0);
+        
+        txn.commit();
     }
+	
+	private NodeRef createRecord(NodeRef recordFolder)
+	{
+    	// Create the document
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+        NodeRef recordOne = this.nodeService.createNode(recordFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                        ContentModel.TYPE_CONTENT).getChildRef();
+        
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+        return recordOne;
+	}   
+      
+    private void declareRecord(NodeRef recordOne)
+    {
+        // Declare record
+        Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
+        propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
+        List<String> smList = new ArrayList<String>(2);
+        smList.add(FOUO);
+        smList.add(NOFORN);
+        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
+        propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
+        propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
+        propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());       
+        propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        propValues.put(ContentModel.PROP_TITLE, "titleValue");
+        this.nodeService.setProperties(recordOne, propValues);
+        this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
+	}
     
 
     /**

@@ -612,6 +612,26 @@
          -->
       </aspect>
       
+      <!-- Aspect to facilitate search -->
+      <aspect name="rma:recordSearch">      
+         <title>Record Search</title>               
+         <properties>                
+            <property name="rma:recordSearchDispositionActionName">
+               <type>d:text</type>
+            </property>              
+            <property name="rma:recordSearchDispositionActionAsOf">
+               <type>d:date</type>
+            </property>                          
+            <property name="rma:recordSearchDispositionEventsEligible">
+               <type>d:boolean</type>
+            </property>                          
+            <property name="rma:recordSearchDispositionEvents">
+               <type>d:text</type>           
+               <multiple>true</multiple>   
+            </property>  
+         </properties>
+      </aspect>
+      
    </aspects>
    
 </model>
