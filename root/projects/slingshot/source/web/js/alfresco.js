@@ -140,7 +140,7 @@ Alfresco.util.appendArrayToObject = function(obj, arr)
 {
    if (arr)
    {
-      for (var i = 0; i < arr.length; i++)
+      for (var i = 0, ii = arr.length; i < ii; i++)
       {
          obj[arr[i]] = true;
       }
@@ -160,7 +160,7 @@ Alfresco.util.arrayToObject = function(arr)
    var obj = {};
    if (arr)
    {
-      for (var i = 0; i < arr.length; i++)
+      for (var i = 0, ii = arr.length; i < ii; i++)
       {
          obj[arr[i]] = true;
       }
@@ -1051,6 +1051,39 @@ Alfresco.util.addMessages = function(p_obj, p_messageScope)
 };
 
 /**
+ * Copy one namespace's messages to another's.
+ *
+ * @method Alfresco.util.copyMessages
+ * @param p_source {string} Source namespace
+ * @param p_destination {string} Destination namespace. Will be overwritten with source's messages
+ * @throws {Error}
+ * @static
+ */
+Alfresco.util.copyMessages = function(p_source, p_destination)
+{
+   if (p_source === undefined)
+   {
+      throw new Error("Source must be defined");
+   }
+   else if (Alfresco.messages.scope[p_source] === undefined)
+   {
+      throw new Error("Source namespace doesn't exist");
+   }
+   else if (p_destination === undefined)
+   {
+      throw new Error("Destination must be defined");
+   }
+   else if (p_destination == "global")
+   {
+      throw new Error("Destination cannot be 'global'");
+   }
+   else
+   {
+      Alfresco.messages.scope[p_destination] = YAHOO.lang.merge({}, Alfresco.messages.scope[p_source]);
+   }
+};
+
+/**
  * Resolve a messageId into a message.
  * If a messageScope is supplied, that container will be searched first
  * followed by the "global" message scope.
@@ -1632,14 +1665,27 @@ Alfresco.util.ComponentManager = function()
        */
       unregister: function CM_unregister(p_oComponent)
       {
-         for (var i = 0, j = components.length; i < j; i++)
+         for (var i = 0; i < components.length; i++) // Do not optimize
          {
             if (components[i] == p_oComponent)
             {
-               components[i] = null;
+               components.splice(i, 1);
                delete components[p_oComponent.id];
+               break;
             }
          }
+      },
+
+      /**
+       * Re-register a component with the ComponentManager
+       * Component ID cannot be updated via this function, use separate unregister(), register() calls instead.
+       * @method reregister
+       * @param p_aComponent {object} Component instance to be unregistered, then registered again
+       */
+      reregister: function CM_reregister(p_oComponent)
+      {
+         this.unregister(p_oComponent);
+         this.register(p_oComponent);
       },
 
       /**

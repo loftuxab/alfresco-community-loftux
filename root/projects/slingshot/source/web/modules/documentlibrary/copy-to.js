@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -46,20 +46,13 @@
 
    Alfresco.module.DoclibCopyTo = function(htmlId)
    {
-      // Mandatory properties
-      this.name = "Alfresco.module.DoclibCopyTo";
-      this.id = htmlId;
+      Alfresco.module.DoclibCopyTo.superclass.constructor.call(this, "Alfresco.module.DoclibCopyTo", htmlId, ["button", "container", "connection", "json", "treeview"]);
 
       // Initialise prototype properties
-      this.widgets = {};
-      this.modules = {};
       this.pathsToExpand = [];
 
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json", "treeview"], this.onComponentsLoaded, this);
-
       // Decoupled event listeners
-      if (htmlId != null)
+      if (htmlId != "null")
       {
          YAHOO.Bubbling.on("copyTo-siteChanged", this.onSiteChanged, this);
          YAHOO.Bubbling.on("copyTo-containerChanged", this.onContainerChanged, this);
@@ -96,7 +89,7 @@
       MODE_REPOSITORY: 1
    });
 
-   Alfresco.module.DoclibCopyTo.prototype =
+   YAHOO.extend(Alfresco.module.DoclibCopyTo, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -167,22 +160,6 @@
       },
       
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
-
-      /**
        * Container element for template in DOM.
        * 
        * @property containerDiv
@@ -206,41 +183,6 @@
        */
       selectedNode: null,
 
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.module.DoclibCopyTo} returns 'this' for method chaining
-       */
-      setOptions: function DLCT_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.module.DoclibCopyTo} returns 'this' for method chaining
-       */
-      setMessages: function DLCT_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DLCT_onComponentsLoaded()
-      {
-      },
-      
       /**
        * Main entry point
        * @method showDialog
@@ -435,6 +377,16 @@
        */
       _showDialog: function DLCT__showDialog()
       {
+         // Must have list of files
+         if (this.options.files == null)
+         {
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("message.no-files")
+            });
+            return;
+         }
+
          // Enable buttons
          this.widgets.okButton.set("disabled", false);
          this.widgets.cancelButton.set("disabled", false);
@@ -443,12 +395,12 @@
          var titleDiv = Dom.get(this.id + "-title");
          if (YAHOO.lang.isArray(this.options.files))
          {
-            titleDiv.innerHTML = this._msg("title.multi", this.options.files.length)
+            titleDiv.innerHTML = this.msg("title.multi", this.options.files.length)
          }
          else
          {
             var fileSpan = '<span class="light">' + this.options.files.displayName + '</span>';
-            titleDiv.innerHTML = this._msg("title.single", fileSpan)
+            titleDiv.innerHTML = this.msg("title.single", fileSpan)
          }
 
          // Dialog mode
@@ -560,7 +512,7 @@
                this.options.containerId = obj.container;
                this._buildTree("");
                // Kick-off navigation to current path
-               this.pathChanged(this.options.path);
+               this.onPathChanged(this.options.path);
                var containers = YAHOO.util.Selector.query("a", this.id + "-containerPicker"), container, i, j,
                   picker = Dom.get(this.id + "-containerPicker");
                
@@ -629,7 +581,7 @@
             {
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: this._msg("message.copy-to.failure")
+                  text: this.msg("message.failure")
                });
                return;
             }
@@ -658,7 +610,7 @@
 
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.copy-to.success", successCount)
+               text: this.msg("message.success", successCount)
             });
          }
 
@@ -669,7 +621,7 @@
 
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.copy-to.failure")
+               text: this.msg("message.failure")
             });
          }
 
@@ -723,7 +675,7 @@
             },
             wait:
             {
-               message: this._msg("message.please-wait")
+               message: this.msg("message.please-wait")
             },
             config:
             {
@@ -814,7 +766,7 @@
          
          if ((userAccess && userAccess.create) || (node.data.nodeRef == "") || (node.data.nodeRef == "alfresco://company/home"))
          {
-            this.pathChanged(node.data.path);
+            this.onPathChanged(node.data.path);
             this._updateSelectedNode(node);
          }
          return false;
@@ -823,10 +775,10 @@
       
       /**
        * Update tree when the path has changed
-       * @method pathChanged
+       * @method onPathChanged
        * @param path {string} new path
        */
-      pathChanged: function DLCT_onPathChanged(path)
+      onPathChanged: function DLCT_onPathChanged(path)
       {
          Alfresco.logger.debug("DLCT_onPathChanged");
 
@@ -999,7 +951,7 @@
             [
                {
                   name: this.options.containerId,
-                  description: this._msg("temp.description.container")
+                  description: this.msg("temp.description.container")
                }
             ]
          };
@@ -1020,6 +972,9 @@
          var tree = new YAHOO.widget.TreeView(this.id + "-treeview");
          this.widgets.treeview = tree;
 
+         // Having both focus and highlight are just confusing (YUI 2.7.0 addition)
+         YAHOO.widget.TreeView.FOCUS_CLASS_NAME = "";
+
          // Turn dynamic loading on for entire tree
          tree.setDynamicLoad(this.fnLoadNodeData);
 
@@ -1028,7 +983,7 @@
          // Add default top-level node
          var tempNode = new YAHOO.widget.TextNode(
          {
-            label: this._msg(rootLabel),
+            label: this.msg(rootLabel),
             path: "/",
             nodeRef: p_rootNodeRef
          }, tree.getRoot(), false);
@@ -1041,6 +996,12 @@
          tree.render();
       },
 
+      /**
+       * Highlights the currently selected node.
+       * @method _showHighlight
+       * @param isVisible {boolean} Whether the highlight is visible or not
+       * @private
+       */
       _showHighlight: function DLCT__showHighlight(isVisible)
       {
          Alfresco.logger.debug("DLCT__showHighlight");
@@ -1058,6 +1019,12 @@
          }
       },
       
+      /**
+       * Updates the currently selected node.
+       * @method _updateSelectedNode
+       * @param node {object} New node to set as currently selected one
+       * @private
+       */
       _updateSelectedNode: function DLCT__updateSelectedNode(node)
       {
          Alfresco.logger.debug("DLCT__updateSelectedNode");
@@ -1094,23 +1061,9 @@
           });
 
           return url;
-       },
-
-       /**
-        * Gets a custom message
-        *
-        * @method _msg
-        * @param messageId {string} The messageId to retrieve
-        * @return {string} The custom message
-        * @private
-        */
-       _msg: function DLCT__msg(messageId)
-       {
-          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
        }
-   };
-   
+   });
 })();
 
 /* Dummy instance to load optional YUI components early */
-new Alfresco.module.DoclibCopyTo(null);
+new Alfresco.module.DoclibCopyTo("null");

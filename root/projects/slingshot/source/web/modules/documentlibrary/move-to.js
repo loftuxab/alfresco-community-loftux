@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -46,22 +46,15 @@
 
    Alfresco.module.DoclibMoveTo = function(htmlId)
    {
-      // Mandatory properties
-      this.name = "Alfresco.module.DoclibMoveTo";
-      this.id = htmlId;
+      Alfresco.module.DoclibMoveTo.superclass.constructor.call(this, "Alfresco.module.DoclibMoveTo", htmlId, ["button", "container", "connection", "json", "treeview"]);
 
       // Initialise prototype properties
-      this.widgets = {};
-      this.modules = {};
       this.pathsToExpand = [];
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "json", "treeview"], this.onComponentsLoaded, this);
 
       return this;
    };
    
-   Alfresco.module.DoclibMoveTo.prototype =
+   YAHOO.extend(Alfresco.module.DoclibMoveTo, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -101,7 +94,7 @@
           * @type: integer
           * @default: 30em
           */
-         width: "30em",
+         width: "40em",
          
          /**
           * Files to move
@@ -110,25 +103,36 @@
           * @type: object
           * @default: null
           */
-         files: null
+         files: null,
+         
+         /**
+          * Template URL
+          *
+          * @property templateUrl
+          * @type string
+          * @default "Alfresco.constants.URL_SERVICECONTEXT + modules/documentlibrary/move-to"
+          */
+         templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/move-to",
+
+         /**
+          * Override the default data webscript stem
+          *
+          * @property dataWebScriptStem
+          * @type string
+          * @default null
+          */
+         dataWebScriptStem: null,
+         
+         /**
+          * Override the default data webscript
+          *
+          * @property dataWebScript
+          * @type string
+          * @default "move-to/site"
+          */
+         dataWebScript: "move-to/site"
       },
       
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
-
       /**
        * Container element for template in DOM.
        * 
@@ -154,41 +158,6 @@
       selectedNode: null,
 
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.module.DoclibMoveTo} returns 'this' for method chaining
-       */
-      setOptions: function DLMT_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.module.DoclibMoveTo} returns 'this' for method chaining
-       */
-      setMessages: function DLMT_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DLMT_onComponentsLoaded()
-      {
-      },
-      
-      /**
        * Main entry point
        * @method showDialog
        */
@@ -205,7 +174,7 @@
             // Load the UI template from the server
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/move-to",
+               url: this.options.templateUrl,
                dataObj:
                {
                   htmlid: this.id
@@ -361,6 +330,16 @@
        */
       _showDialog: function DLMT__showDialog()
       {
+         // Must have list of files
+         if (this.options.files == null)
+         {
+            Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("message.no-files")
+            });
+            return;
+         }
+
          // Enable buttons
          this.widgets.okButton.set("disabled", false);
          this.widgets.cancelButton.set("disabled", false);
@@ -369,12 +348,12 @@
          var titleDiv = Dom.get(this.id + "-title");
          if (YAHOO.lang.isArray(this.options.files))
          {
-            titleDiv.innerHTML = this._msg("title.multi", this.options.files.length)
+            titleDiv.innerHTML = this.msg("title.multi", this.options.files.length)
          }
          else
          {
             var fileSpan = '<span class="light">' + this.options.files.displayName + '</span>';
-            titleDiv.innerHTML = this._msg("title.single", fileSpan)
+            titleDiv.innerHTML = this.msg("title.single", fileSpan)
          }
 
          // Build the TreeView widget
@@ -401,9 +380,10 @@
          // Kick-off navigation to initial path
          if (this.options.path !== null)
          {
-            this.pathChanged(this.options.path);
+            this.onPathChanged(this.options.path);
          }
       },
+
       
       /**
        * YUI WIDGET EVENT HANDLERS
@@ -438,9 +418,9 @@
          // Success callback function
          var fnSuccess = function DLMT__onOK_success(p_data)
          {
-            var result;
-            var successCount = p_data.json.successCount;
-            var failureCount = p_data.json.failureCount;
+            var result,
+               successCount = p_data.json.successCount,
+               failureCount = p_data.json.failureCount;
             
             this.widgets.dialog.hide();
 
@@ -449,7 +429,7 @@
             {
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: this._msg("message.move-to.failure")
+                  text: this.msg("message.failure")
                });
                return;
             }
@@ -478,7 +458,7 @@
             
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.move-to.success", successCount)
+               text: this.msg("message.success", successCount)
             });
          }
          
@@ -489,7 +469,7 @@
 
             Alfresco.util.PopupManager.displayMessage(
             {
-               text: this._msg("message.move-to.failure")
+               text: this.msg("message.failure")
             });
          }
 
@@ -515,11 +495,12 @@
             webscript:
             {
                method: Alfresco.util.Ajax.POST,
-               name: $combine("move-to/site", this.options.siteId, this.options.containerId, this.selectedNode.data.path)
+               stem: this.options.dataWebScriptStem,
+               name: $combine(this.options.dataWebScript, this.options.siteId, this.options.containerId, this.selectedNode.data.path)
             },
             wait:
             {
-               message: this._msg("message.please-wait")
+               message: this.msg("message.please-wait")
             },
             config:
             {
@@ -596,7 +577,7 @@
 
          if ((userAccess && userAccess.create) || (node.data.nodeRef == ""))
          {
-            this.pathChanged(node.data.path);
+            this.onPathChanged(node.data.path);
             this._updateSelectedNode(node);
          }
          return false;
@@ -605,10 +586,10 @@
       
       /**
        * Update tree when the path has changed
-       * @method pathChanged
+       * @method onPathChanged
        * @param path {string} new path
        */
-      pathChanged: function DLMT_onPathChanged(path)
+      onPathChanged: function DLMT_onPathChanged(path)
       {
          Alfresco.logger.debug("DLMT_onPathChanged");
 
@@ -682,13 +663,16 @@
          var tree = new YAHOO.widget.TreeView(this.id + "-treeview");
          this.widgets.treeview = tree;
 
+         // Having both focus and highlight are just confusing (YUI 2.7.0 addition)
+         YAHOO.widget.TreeView.FOCUS_CLASS_NAME = "";
+
          // Turn dynamic loading on for entire tree
          tree.setDynamicLoad(this.fnLoadNodeData);
 
          // Add default top-level node
          var tempNode = new YAHOO.widget.TextNode(
          {
-            label: Alfresco.util.message("node.root", this.name),
+            label: this.msg("node.root"),
             path: "/",
             nodeRef: ""
          }, tree.getRoot(), false);
@@ -701,6 +685,12 @@
          tree.render();
       },
 
+      /**
+       * Highlights the currently selected node.
+       * @method _showHighlight
+       * @param isVisible {boolean} Whether the highlight is visible or not
+       * @private
+       */
       _showHighlight: function DLMT__showHighlight(isVisible)
       {
          Alfresco.logger.debug("DLMT__showHighlight");
@@ -718,6 +708,12 @@
          }
       },
       
+      /**
+       * Updates the currently selected node.
+       * @method _updateSelectedNode
+       * @param node {object} New node to set as currently selected one
+       * @private
+       */
       _updateSelectedNode: function DLMT__updateSelectedNode(node)
       {
          Alfresco.logger.debug("DLMT__updateSelectedNode");
@@ -745,22 +741,9 @@
           });
 
           return url;
-       },
-
-       /**
-        * Gets a custom message
-        *
-        * @method _msg
-        * @param messageId {string} The messageId to retrieve
-        * @return {string} The custom message
-        * @private
-        */
-       _msg: function DLTB__msg(messageId)
-       {
-          return Alfresco.util.message.call(this, messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
        }
-   };
+   });
 })();
 
 /* Dummy instance to load optional YUI components early */
-new Alfresco.module.DoclibMoveTo(null);
+new Alfresco.module.DoclibMoveTo("null");

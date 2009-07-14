@@ -117,11 +117,17 @@
 
          // Hide/Show NavBar button
          this.widgets.hideNavBar = Alfresco.util.createYUIButton(this, "hideNavBar-button", this.onHideNavBar);
-         this.widgets.hideNavBar.set("label", this._msg(this.options.hideNavBar ? "button.navbar.show" : "button.navbar.hide"));
+         this.widgets.hideNavBar.set("label", this.msg(this.options.hideNavBar ? "button.navbar.show" : "button.navbar.hide"));
          Dom.setStyle(this.id + "-navBar", "display", this.options.hideNavBar ? "none" : "block");
          
          // Folder Up Navigation button
          this.widgets.folderUp =  Alfresco.util.createYUIButton(this, "folderUp-button", this.onFolderUp,
+         {
+            disabled: true
+         });
+
+         // Holds Folder Up Navigation button
+         this.widgets.holdsFolderUp =  Alfresco.util.createYUIButton(this, "holdsFolderUp-button", this.onHoldsFolderUp,
          {
             disabled: true
          });
@@ -160,8 +166,8 @@
 
          var folderType = p_obj.get("name"),
             label = "label.new-" + p_obj.get("name"),
-            msgTitle = this._msg(label + ".title"),
-            msgHeader = this._msg(label + ".header");
+            msgTitle = this.msg(label + ".title"),
+            msgHeader = this.msg(label + ".header");
 
          // Inject forms validation
          var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
@@ -244,7 +250,7 @@
                   });
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: this._msg("message.new-folder.success", folder.name)
+                     text: this.msg("message.new-folder.success", folder.name)
                   });
                },
                scope: this
@@ -323,6 +329,99 @@
          }
       },
 
+      /**
+       * Holds Folder Up Navigate button click handler
+       *
+       * @method onHoldsFolderUp
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onHoldsFolderUp: function DLTB_onHoldsFolderUp(e, p_obj)
+      {
+         YAHOO.Bubbling.fire("filterChanged",
+         {
+            filterOwner: "DocListFilePlan",
+            filterId: "holds",
+            filterData: ""
+         });
+         Event.preventDefault(e);
+      },
+
+      /**
+       * Copy Multiple Assets.
+       *
+       * @method onActionCopyTo
+       */
+      onActionCopyTo: function DLTB_onActionCopyTo()
+      {
+         this._copyMoveFileTo("copy");
+      },
+
+      /**
+       * File Multiple Assets.
+       *
+       * @method onActionFileTo
+       */
+      onActionFileTo: function DLTB_onActionFileTo()
+      {
+         this._copyMoveFileTo("file");
+      },
+
+      /**
+       * Move Multiple Assets.
+       *
+       * @method onActionMoveTo
+       */
+      onActionMoveTo: function DLTB_onActionMoveTo()
+      {
+         this._copyMoveFileTo("move");
+      },
+
+      /**
+       * Copy/Move/File To Multiple Assets implementation.
+       *
+       * @method _copyMoveFileTo
+       * @param mode {String} Operation mode: copy|file|move
+       * @private
+       */
+      _copyMoveFileTo: function DLTB__copyMoveFileTo(mode)
+      {
+         var allowedModes =
+         {
+            "copy": true,
+            "file": true,
+            "move": true
+         };
+         
+         if (!mode in allowedModes)
+         {
+            return;
+         }
+         
+         if (!this.modules.docList)
+         {
+            return;
+         }
+
+         var files = this.modules.docList.getSelectedFiles();
+         
+         if (!this.modules.copyMoveFileTo)
+         {
+            this.modules.copyMoveFileTo = new Alfresco.module.RecordsCopyMoveFileTo(this.id + "-copyMoveFileTo");
+         }
+
+         this.modules.copyMoveFileTo.setOptions(
+         {
+            mode: mode,
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: this.currentPath,
+            files: files
+         });
+
+         this.modules.copyMoveFileTo.showDialog();
+      },
+   
 
       /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS

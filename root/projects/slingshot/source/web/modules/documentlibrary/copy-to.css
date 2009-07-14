@@ -151,6 +151,18 @@
    width: 18em;
 }
 
+.copy-to .treeview .ygtvspacer
+{
+   display: block;
+   width: 18px;
+}
+
+.copy-to .treeview .ygtvchildren
+{
+   background-color: #ffffff;
+   width: 100%;
+}
+
 .copy-to .treeview .ygtvitem
 {
    overflow-x: visible;
@@ -167,6 +179,8 @@
 .copy-to .ygtvlabel:hover
 {
    background: none;
+   color: #000;
+   white-space: nowrap;
 }
 
 .copy-to .ygtverror,

@@ -12,7 +12,8 @@
    padding: 4px 0.5em 9px;
 }
 
-.toolbar div.hideable
+.toolbar .left div,
+.toolbar .nav-bar div
 {
    float: left;
 }
@@ -128,19 +129,10 @@
    padding-bottom: 8px;
 }
 
-.toolbar .nav-bar-left
-{
-   float: left;
-}
-
-.toolbar .nav-bar-right
-{
-   margin-left: 7em;
-}
-
-.toolbar .breadcrumb
+.toolbar .nav-bar .breadcrumb
 {
    float: none !important;
+   margin-left: 7em;
    padding: 0.3em 0.5em 0;
 }
 
@@ -160,7 +152,7 @@
    background-image: url(images/folder-closed-16.png);
    background-position: left 50%;
    background-repeat: no-repeat;
-   padding: 2px 0 2px 20px;
+   padding: 0.2em 0 0.2em 20px;
 }
 
 .toolbar span.crumb .separator
@@ -172,10 +164,10 @@
 
 .toolbar .description
 {
-   padding: 0.5em;
+   padding: 5px 0.5em;
 }
 
-.toolbar .description span.message
+.toolbar .description div.message
 {
    color: #000;
    font-size: 108%;
