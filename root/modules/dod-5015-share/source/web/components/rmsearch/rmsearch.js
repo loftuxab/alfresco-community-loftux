@@ -94,6 +94,22 @@
          
          // Buttons
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
+         this.widgets.saveButton = Alfresco.util.createYUIButton(this, "savesearch-button", this.onSaveSearch);
+         this.widgets.newButton = Alfresco.util.createYUIButton(this, "newsearch-button", this.onNewSearch);
+         this.widgets.printButton = Alfresco.util.createYUIButton(this, "print-button", this.onPrint);
+         this.widgets.exportButton = Alfresco.util.createYUIButton(this, "export-button", this.onExport);
+         // Saved Searches menu
+         // TODO: load saved searches
+         this.widgets.savedSearchMenu = new YAHOO.widget.Button(this.id + "-savedsearches-button",
+         {
+            type: "menu",
+            menu: [
+                     {text: "My saved search", value: "1234", onclick: {fn: this.onSavedSearchSelected}},
+                     {text: "Another search", value: "12345", onclick: {fn: this.onSavedSearchSelected}},
+                     {text: "Records Due for Cut Off", value: "123456", onclick: {fn: this.onSavedSearchSelected}}
+                  ]
+         });
+         this.widgets.savedSearchMenu.on("click", this.onSavedSearchClick, this, true);
          
          // Call super class onReady() method
          Alfresco.RecordsSearch.superclass.onReady.call(this);
@@ -103,6 +119,22 @@
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
        * Disconnected event handlers for inter-component event notification
        */
+      
+      /**
+       * Saved Search menu click event handler
+       * 
+       * @method onSavedSearchClick
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onSavedSearchClick: function RecordsSearch_onSavedSearchClick(e, args)
+      {
+         var menuItem = args[1];
+         if (menuItem)
+         {
+            //me.widgets.sortMenu1.set("label", menuItem.cfg.getProperty("text"));
+         }
+      },
       
       /**
        * Search button click event handler
@@ -127,6 +159,60 @@
          
          // execute the search and populate the results
          this._performSearch(query, searchTerm);
+      },
+      
+      /**
+       * Save Search button click event handler
+       * 
+       * @method onSaveSearch
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onSaveSearch: function RecordsSearch_onSaveSearch(e, args)
+      {
+         
+      },
+      
+      /**
+       * New Search button click event handler
+       * 
+       * @method onNewSearch
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onNewSearch: function RecordsSearch_onNewSearch(e, args)
+      {
+         
+      },
+      
+      /**
+       * Print button click event handler
+       * 
+       * @method onPrint
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onPrint: function RecordsSearch_onPrint(e, args)
+      {
+         
+      },
+      
+      /**
+       * Export button click event handler
+       * 
+       * @method onExport
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onExport: function RecordsSearch_onExport(e, args)
+      {
+         
+      },
+      
+      onSavedSearchSelected: function RecordsSearch_onSavedSearchSelected(e, args)
+      {
+         // scope is the clicked MenuItem object
+         alert(this.value);
       },
       
       /**
