@@ -75,6 +75,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     private static final String RM_CAP = "RM_CAP";
 
     private static final String RM_ABSTAIN = "RM_ABSTAIN";
+    
+    private static final String RM_QUERY = "RM_QUERY";
 
     private NamespacePrefixResolver nspr;
 
@@ -170,6 +172,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     {
         if ((attribute.getAttribute() != null)
                 && (attribute.getAttribute().equals(RM_ABSTAIN)
+                        || attribute.getAttribute().equals(RM_QUERY)
                         || attribute.getAttribute().equals(RM_ALLOW) || attribute.getAttribute().equals(RM_DENY) || attribute.getAttribute().startsWith(RM_CAP) || attribute
                         .getAttribute().startsWith(RM)))
         {
@@ -217,7 +220,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         if (supportedDefinitions.size() == 0)
         {
-            return AccessDecisionVoter.ACCESS_GRANTED;
+            return AccessDecisionVoter.ACCESS_ABSTAIN;
         }
 
         MethodInvocation invocation = (MethodInvocation) object;
@@ -236,6 +239,10 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
                 return AccessDecisionVoter.ACCESS_DENIED;
             }
             else if (cad.typeString.equals(RM_ALLOW))
+            {
+                return AccessDecisionVoter.ACCESS_GRANTED;
+            }
+            else if (cad.typeString.equals(RM_QUERY))
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }
@@ -487,7 +494,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             }
             typeString = st.nextToken();
 
-            if (!(typeString.equals(RM) || typeString.equals(RM_ALLOW) || typeString.equals(RM_CAP) || typeString.equals(RM_DENY)))
+            if (!(typeString.equals(RM) || typeString.equals(RM_ALLOW) || typeString.equals(RM_CAP) || typeString.equals(RM_DENY) || typeString.equals(RM_QUERY)))
             {
                 throw new ACLEntryVoterException("Invalid type: must be ACL_NODE, ACL_PARENT or ACL_ALLOW");
             }
