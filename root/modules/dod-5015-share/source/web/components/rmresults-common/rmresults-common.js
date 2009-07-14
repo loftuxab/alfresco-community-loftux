@@ -163,7 +163,7 @@
          // Sorting option menus
          this.widgets.sortMenu1 = new YAHOO.widget.Button(this.id + "-sort1",
          {
-            type: "split",
+            type: "menu",
             menu: this.id + "-sort1-menu"
          });
          //this.widgets.sortMenu1.on("click", this.onSortFilterClicked, this, true);
@@ -179,7 +179,7 @@
          
          this.widgets.sortMenu2 = new YAHOO.widget.Button(this.id + "-sort2",
          {
-            type: "split",
+            type: "menu",
             menu: this.id + "-sort2-menu"
          });
          //this.widgets.sortMenu2.on("click", this.onSortFilterClicked, this, true);
@@ -195,7 +195,7 @@
          
          this.widgets.sortMenu3 = new YAHOO.widget.Button(this.id + "-sort3",
          {
-            type: "split",
+            type: "menu",
             menu: this.id + "-sort3-menu"
          });
          //this.widgets.sortMenu3.on("click", this.onSortFilterClicked, this, true);
