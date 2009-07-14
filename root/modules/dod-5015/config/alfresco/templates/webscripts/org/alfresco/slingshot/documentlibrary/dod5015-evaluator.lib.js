@@ -94,6 +94,14 @@ function runEvaluator(asset, assetType)
       permissions.push("permissions");
    }
    
+   /**
+    * Multiple parent assocs
+    */
+   if (asset.parentAssocs["contains"].length > 1)
+   {
+      status.push("multi-parent " + asset.parentAssocs["contains"].length);
+   }
+   
    switch (assetType)
    {
       /**
