@@ -327,7 +327,7 @@
     <!-- FileFolder Service Permissions -->
     <!-- ============================== -->
     
-    <bean id="FileFolderService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="FileFolderService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -366,7 +366,7 @@
     <!-- Reading requires the permission to read content                                 -->
     <!-- Writing required the permission to write conent                                 -->
     
-    <bean id="ContentService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="ContentService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -403,7 +403,7 @@
     <!-- All search results are filtered to exclude nodes that the current user can not        -->
     <!-- read. Other methods restrict queries to those nodes the user can read                 -->
     
-    <bean id="SearchService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="SearchService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -432,7 +432,7 @@
     
     <!-- Uses the public node service for all mutations -  access is allowed here and enforced by the public node service -->
     
-    <bean id="CategoryService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="CategoryService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -474,7 +474,7 @@
     <!-- Lock and Unlock require the related aspect specific permissions. Querying the   -->
     <!-- lock status just requires read access to the node.                              -->
     
-    <bean id="LockService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="LockService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -511,7 +511,7 @@
     <!-- The version service does not have any restrictions applied at the moment. It    -->
     <!-- does not use a node service that would apply any permissions.                   -->
     
-    <bean id="MultilingualContentService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="MultilingualContentService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -543,7 +543,7 @@
     <!-- Edition  Service    -->
     <!-- =================== -->
     
-    <bean id="EditionService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="EditionService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -571,7 +571,7 @@
     <!-- the associated permission, as does cancel check out. See the permission model   -->
     <!-- for how these permissions are granted.                                          -->
     
-    <bean id="CheckoutCheckinService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="CheckoutCheckinService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -624,7 +624,7 @@
     <!-- and ChangePermissions permissions. Access to some methods are not restricted at -->
     <!-- the moment.                                                                     -->
     
-    <bean id="PermissionService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="PermissionService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -662,7 +662,7 @@
     
     <!-- This service currently has no restrictions.                                     -->
     
-    <bean id="AuthorityService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="AuthorityService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -703,7 +703,7 @@
     <!-- NOTE: Authentication is excluded as it sets or clears authentication -->
     <!-- The same for validate ticaket -->
     <!-- Update authentication checks internally -->
-    <bean id="AuthenticationService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="AuthenticationService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -743,7 +743,7 @@
     <!-- This service currently has no restrictions.                                     -->
     <!-- TODO: respect the permissions on the ownable service                            -->
     
-    <bean id="OwnableService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="OwnableService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -764,7 +764,7 @@
     
     <!-- Person Service -->
     
-    <bean id="PersonService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+    <bean id="PersonService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
@@ -840,7 +840,7 @@
     <!-- TODO: Add content usage security -->
     <bean id="ContentUsageService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor"/>
     
-	<bean id="PublicServiceAccessService_security" class="net.sf.acegisecurity.intercept.method.aopalliance.MethodSecurityInterceptor">
+	<bean id="PublicServiceAccessService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
         <property name="authenticationManager">
             <ref bean="authenticationManager"/>
         </property>
