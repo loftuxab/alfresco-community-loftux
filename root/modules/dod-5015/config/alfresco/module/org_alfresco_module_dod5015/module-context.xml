@@ -166,7 +166,7 @@
           <property name="recordsManagementAdminService" ref="RecordsManagementAdminService" />
     </bean>
     
-    <!-- REST impl for Disposition Schedule -->
+    <!-- REST impl for GET Disposition Schedule -->
     <bean id="webscript.org.alfresco.rma.dispositionschedule.get" 
           class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionScheduleGet" 
           parent="webscript">
@@ -175,9 +175,18 @@
         <property name="namespaceService" ref="NamespaceService" />
     </bean>
 
-    <!-- REST impl for Disposition Action Definition -->
+    <!-- REST impl for POST Disposition Action Definition -->
     <bean id="webscript.org.alfresco.rma.dispositionactiondefinitions.post" 
           class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPost" 
+          parent="webscript">
+        <property name="recordsManagementService" ref="RecordsManagementService" />
+        <property name="nodeService" ref="NodeService" />
+        <property name="namespaceService" ref="NamespaceService" />
+    </bean>
+    
+    <!-- REST impl for PUT Disposition Action Definition -->
+    <bean id="webscript.org.alfresco.rma.dispositionactiondefinition.put" 
+          class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPut" 
           parent="webscript">
         <property name="recordsManagementService" ref="RecordsManagementService" />
         <property name="nodeService" ref="NodeService" />
