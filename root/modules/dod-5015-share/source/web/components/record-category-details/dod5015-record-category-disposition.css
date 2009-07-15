@@ -29,6 +29,7 @@
 .dod5015-record-category-disposition .actions .action .more
 {
    line-height: 2.5em;
+   height: 2.5em;
 }
 
 .dod5015-record-category-disposition .actions .action .no
@@ -36,8 +37,11 @@
    position: absolute;
    margin-left: 0.5em;
    text-align: center;
-   width: 1.5em;
+   width: 2em;
    color:#FFFFFF;
+   background-image:url(../images/green-step-circle.png);
+   background-position:center center;
+   background-repeat:no-repeat;
 }
 
 .dod5015-record-category-disposition .actions .action .name
@@ -50,7 +54,7 @@
 .dod5015-record-category-disposition .actions .action .more
 {
    float: right;
-   margin-right:1em;
+   margin-right:0.75em;
 }
 
 .dod5015-record-category-disposition .actions .action .more.collapsed

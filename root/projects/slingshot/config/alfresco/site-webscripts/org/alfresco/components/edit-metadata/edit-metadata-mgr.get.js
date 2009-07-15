@@ -15,7 +15,18 @@ if (result.status == 200)
    var metadata = eval('(' + result + ')');
    if(metadata.data.items[0].isContainer)
    {
-      nodeType = metadata.data.items[0].type == "dod:recordCategory" ? "record-category" : "folder";
+      if(metadata.data.items[0].type == "dod:recordCategory")
+      {
+         nodeType = "record-category";
+      }
+      else if(metadata.data.items[0].type == "dod:recordSeries")
+      {
+         nodeType = "record-series";
+      }
+      else
+      {
+         nodeType = "folder";
+      }
    }
 }
 

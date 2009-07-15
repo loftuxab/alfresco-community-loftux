@@ -66,7 +66,14 @@
 .disposition-edit .action .header
 {
    background-color: #EAEAEA;
-   padding: 1em;
+   height:2.5em;
+   padding:0;
+}
+
+.disposition-edit .action .header div
+{
+   height:2.5em;
+   line-height:2.5em;
 }
 
 .disposition-edit .action .header .no
@@ -75,12 +82,18 @@
    text-align: center;
    width: 3em;
    color: #FFFFFF;
+   background-image:url(../images/green-step-circle.png);
+   background-position:center center;
+   background-repeat:no-repeat;
+   margin-left: 0.25em;   
 }
 
 .disposition-edit .action .header .title
 {
    color: #008000;
+   padding-left: 3.25em;
 }
+
 
 .disposition-edit .action .header .buttons
 {
@@ -171,12 +184,6 @@
 .disposition-edit .action .header .buttons .edit
 {
    background-image:url(../images/edit-16.png);
-}
-
-.disposition-edit .action .header .title
-{
-   padding-left: 3.25em;
-   line-height: 1em;
 }
 
 .disposition-edit .action .action-event-relation

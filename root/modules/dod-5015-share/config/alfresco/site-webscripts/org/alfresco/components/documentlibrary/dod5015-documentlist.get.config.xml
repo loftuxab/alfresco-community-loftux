@@ -3,7 +3,7 @@
       <actionSet id="empty"></actionSet>
 
       <actionSet id="recordSeries">
-         <action id="onActionViewDetails" type="simple-link" href="{folderDetailsUrl}" label="actions.view-details" />
+         <action id="onActionViewDetails" type="simple-link" href="{recordSeriesDetailsUrl}" label="actions.view-details" />
          <action id="onActionEditDetails" permisson="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
