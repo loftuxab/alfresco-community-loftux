@@ -151,7 +151,7 @@
          var query = null;
          if (Dom.get(this.id + "-undeclared").checked === false)
          {
-            query = '+ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}declaredRecord"';
+            query = 'ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}declaredRecord"';
          }
          
          // switch to results tab
@@ -209,6 +209,13 @@
          
       },
       
+      /**
+       * Saved search menu item click event handler
+       * 
+       * @method onSavedSearchSelected
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
       onSavedSearchSelected: function RecordsSearch_onSavedSearchSelected(e, args)
       {
          // scope is the clicked MenuItem object
