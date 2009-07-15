@@ -415,10 +415,10 @@
         </property>
         <property name="objectDefinitionSource">
             <value> org.alfresco.service.cmr.search.SearchService.query=AFTER_ACL_NODE.sys:base.Read,RM_QUERY,AFTER_RM.FilterNode
-                org.alfresco.service.cmr.search.SearchService.selectNodes=AFTER_ACL_NODE.sys:base.Read,RM_ABSTAIN
+                org.alfresco.service.cmr.search.SearchService.selectNodes=AFTER_ACL_NODE.sys:base.Read,RM_QUERY,AFTER_RM.FilterNode
                 org.alfresco.service.cmr.search.SearchService.selectProperties=ACL_NODE.0.sys:base.Read,RM_ABSTAIN
-                org.alfresco.service.cmr.search.SearchService.contains=ACL_NODE.0.sys:base.Read,RM_ABSTAIN
-                org.alfresco.service.cmr.search.SearchService.like=ACL_NODE.0.sys:base.Read,RM_ABSTAIN 
+                org.alfresco.service.cmr.search.SearchService.contains=ACL_NODE.0.sys:base.Read,RM.Read.0
+                org.alfresco.service.cmr.search.SearchService.like=ACL_NODE.0.sys:base.Read,RM.Read.0
                 org.alfresco.service.cmr.search.SearchService.*=ACL_DENY,RM_DENY </value>
         </property>
     </bean>
