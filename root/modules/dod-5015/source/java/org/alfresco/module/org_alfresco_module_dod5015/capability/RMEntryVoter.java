@@ -220,7 +220,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         if (supportedDefinitions.size() == 0)
         {
-            return AccessDecisionVoter.ACCESS_ABSTAIN;
+            return AccessDecisionVoter.ACCESS_GRANTED;
         }
 
         MethodInvocation invocation = (MethodInvocation) object;
