@@ -34,7 +34,6 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -47,7 +46,7 @@ import org.alfresco.util.BaseSpringTest;
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementActionServiceTestImpl extends BaseSpringTest implements RecordsManagementModel
+public class RecordsManagementActionServiceImplTest extends BaseSpringTest implements RecordsManagementModel
 {    
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     

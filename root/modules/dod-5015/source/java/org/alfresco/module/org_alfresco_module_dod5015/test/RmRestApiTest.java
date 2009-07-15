@@ -56,7 +56,7 @@ import org.json.JSONTokener;
  * 
  * @author Neil McErlean
  */
-public class RmRestApiSystemTest extends BaseWebScriptTest implements RecordsManagementModel
+public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagementModel
 {
     private static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
     protected static final String APPLICATION_JSON = "application/json";

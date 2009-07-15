@@ -57,7 +57,7 @@ import org.alfresco.util.BaseSpringTest;
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementServiceTestImpl extends BaseSpringTest implements RecordsManagementModel
+public class RecordsManagementServiceImplTest extends BaseSpringTest implements RecordsManagementModel
 {    
 	protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 	

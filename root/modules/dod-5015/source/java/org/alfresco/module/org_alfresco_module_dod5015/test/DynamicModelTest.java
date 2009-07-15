@@ -48,7 +48,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 
-public class DynamicModelSystemTest extends BaseSpringTest implements DOD5015Model
+public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
 {
     public static final String RMC_CUSTOM_MODEL = "{http://www.alfresco.org/model/rmcustom/1.0}rmcustom";
 
