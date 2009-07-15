@@ -56,6 +56,14 @@ public class DispositionScheduleImpl implements DispositionSchedule,
         this.services = services;
     }
 
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule#getNodeRef()
+     */
+    public NodeRef getNodeRef()
+    {
+        return this.dispositionDefinitionNodeRef;
+    }
+    
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule#getDispositionAuthority()
      */

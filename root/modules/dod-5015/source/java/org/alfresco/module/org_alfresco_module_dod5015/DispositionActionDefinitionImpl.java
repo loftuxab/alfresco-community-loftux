@@ -33,8 +33,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.namespace.QName;
-import org.hibernate.engine.Collections;
-import org.hibernate.util.CollectionHelper;
 
 /**
  * Disposition action implementation
@@ -70,6 +68,14 @@ public class DispositionActionDefinitionImpl implements DispositionActionDefinit
         this.index = index;
     }
     
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition#getNodeRef()
+     */
+    public NodeRef getNodeRef()
+    {
+        return this.dispositionActionNodeRef;
+    }
+
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition#getIndex()
      */
