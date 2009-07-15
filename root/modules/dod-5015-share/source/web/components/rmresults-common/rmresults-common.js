@@ -598,7 +598,7 @@
          var params = YAHOO.lang.substitute("site={site}&query={query}&terms={terms}&maxResults={maxResults}",
          {
             site: encodeURIComponent(this.options.siteId),
-            query : encodeURIComponent(query),
+            query : query !== null ? encodeURIComponent(query) : "",
             terms : encodeURIComponent(terms),
             maxResults : this.options.maxResults + 1 // to be able to know whether we got more results
          });

@@ -41,49 +41,44 @@ function getPersonDisplayName(userId)
  */
 function getRecord(siteId, node)
 {
-   // check whether this is a valid file record
-   var item = null;
-   if (node.hasAspect("rma:record"))
+   var item =
    {
-      item =
+      nodeRef: node.nodeRef.toString(),
+      name: node.name,
+      title: node.properties["cm:title"],
+      description: node.properties["cm:description"],
+      modifiedOn: node.properties["cm:modified"],
+      modifiedByUser: node.properties["cm:modifier"],
+      createdOn: node.properties["cm:created"],
+      createdByUser: node.properties["cm:creator"],
+      size: node.size,
+      properties: {}
+   };
+   
+   // collect up the RMA namespace properties
+   // collect up custom props under the rmc:customProperties marker
+   for (var k in node.properties)
+   {
+      if (k.match("^{http://www.alfresco.org/model/recordsmanagement/1.0}") == "{http://www.alfresco.org/model/recordsmanagement/1.0}")
       {
-         nodeRef: node.nodeRef.toString(),
-         name: node.name,
-         title: node.properties["cm:title"],
-         description: node.properties["cm:description"],
-         modifiedOn: node.properties["cm:modified"],
-         modifiedByUser: node.properties["cm:modifier"],
-         createdOn: node.properties["cm:created"],
-         createdByUser: node.properties["cm:creator"],
-         size: node.size,
-         properties: {}
-      };
-      
-      // collect up the RMA namespace properties
-      // collect up custom props under the rmc:customProperties marker
-      for (var k in node.properties)
-      {
-         if (k.match("^{http://www.alfresco.org/model/recordsmanagement/1.0}") == "{http://www.alfresco.org/model/recordsmanagement/1.0}")
-         {
-            item.properties["rma_" + k.split('}')[1]] = node.properties[k];
-         }
-         else if (k.match("^{http://www.alfresco.org/model/rmcustom/1.0}") == "{http://www.alfresco.org/model/rmcustom/1.0}")
-         {
-            item.properties["rmc_" + k.split('}')[1]] = node.properties[k];
-         }
+         item.properties["rma_" + k.split('}')[1]] = node.properties[k];
       }
-      
-      // generated properties
-      item.modifiedBy = getPersonDisplayName(item.modifiedByUser);
-      item.createdBy = getPersonDisplayName(item.createdByUser);
-      item.browseUrl = "document-details?nodeRef=" + node.nodeRef.toString();
+      else if (k.match("^{http://www.alfresco.org/model/rmcustom/1.0}") == "{http://www.alfresco.org/model/rmcustom/1.0}")
+      {
+         item.properties["rmc_" + k.split('}')[1]] = node.properties[k];
+      }
    }
+   
+   // generated properties
+   item.modifiedBy = getPersonDisplayName(item.modifiedByUser);
+   item.createdBy = getPersonDisplayName(item.createdByUser);
+   item.browseUrl = "document-details?nodeRef=" + node.nodeRef.toString();
    
    return item;
 }
 
 /**
- * Processes the search results. Filters out unnecessary nodes
+ * Processes the search results. Converts to objects and filters out unwanted nodes
  * 
  * @return the final search results object
  */
@@ -112,9 +107,9 @@ function processResults(nodes, maxResults, siteId)
 
 /**
  * Return Search results with the given search terms
- * Terms are split on whitespace characters.
+ * Terms are split on whitespace characters and quotes removed.
  * 
- * AND, OR and NOT are supported - as their Lucene equivalent.
+ * AND, OR and NOT are supported - as their FTS-Alfresco equivalent.
  */
 function getSearchResults(query, terms, maxResults, siteId)
 {
@@ -155,7 +150,7 @@ function getSearchResults(query, terms, maxResults, siteId)
                   break;
                
                default:
-                  alfQuery += '(TEXT:"' + t + '" @cm\\:name:"*' + t + '*")';
+                  alfQuery += '(TEXT:"' + t + '" cm:name:"*' + t + '*") ';
             }
          }
       }
@@ -163,20 +158,20 @@ function getSearchResults(query, terms, maxResults, siteId)
    
    var nodes;
    
-   // suffix the PATH query and the ASPECT clause
-   if (alfQuery.length !== 0)
+   // build up final query components
+   if (alfQuery.length != 0)
    {
-      alfQuery = '+(' + alfQuery + ') ';
+      alfQuery = ' AND (' + alfQuery + ')';
    }
-   if (query != null)
+   if (query != null && query.length != 0)
    {
-      alfQuery += query;
+      alfQuery += ' AND (' + query + ')';
    }
-   alfQuery += ' +ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}record"';
-   alfQuery += ' +PATH:"' + path + '/*"';
-   alfQuery += ' -TYPE:"{http://www.alfresco.org/model/content/1.0}thumbnail"';
+   // suffix the PATH query and the mandatory ASPECT clause
+   alfQuery = 'PATH:"' + path + '/*" AND ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}record"' + alfQuery;
    
-   nodes = search.query({query: alfQuery, language: "lucene"});
+   // perform fts-alfresco language query for records
+   nodes = search.query({query: alfQuery, language: "fts-alfresco"});
    
    return processResults(nodes, maxResults, siteId);
 }
