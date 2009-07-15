@@ -24,9 +24,12 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Records management service interface
@@ -97,6 +100,38 @@ public interface RecordsManagementService
      * @return DispositionInstructions  disposition instructions
      */
     DispositionSchedule getDispositionSchedule(NodeRef nodeRef);
+    
+    /**
+     * Adds a new disposition action definition to the given disposition schedule.
+     * 
+     * @param schedule The DispositionSchedule to add to
+     * @param actionDefinitionParams Map of parameters to use to create the action definition
+     */
+    DispositionActionDefinition addDispositionActionDefinition(DispositionSchedule schedule, 
+                Map<QName, Serializable> actionDefinitionParams);
+    
+    /**
+     * Removes the given disposition action definition from the given disposition
+     * schedule.
+     * 
+     * @param schedule The DispositionSchedule to remove from
+     * @param actionDefinition The DispositionActionDefinition to remove
+     */
+    void removeDispositionActionDefinition(DispositionSchedule schedule, 
+                DispositionActionDefinition actionDefinition);
+    
+    /**
+     * Updates the given disposition action definition belonging to the given disposition
+     * schedule.
+     * 
+     * @param schedule The DispositionSchedule the action belongs to
+     * @param actionDefinition The DispositionActionDefinition to update
+     * @param actionDefinitionParams Map of parameters to use to update the action definition
+     * @return The updated DispositionActionDefinition
+     */
+    DispositionActionDefinition updateDispositionActionDefinition(DispositionSchedule schedule, 
+                DispositionActionDefinition actionDefinition,
+                Map<QName, Serializable> actionDefinitionParams);
     
     /**
      * TODO MOVE THIS FROM THIS API

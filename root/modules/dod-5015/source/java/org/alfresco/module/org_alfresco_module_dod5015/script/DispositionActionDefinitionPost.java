@@ -31,21 +31,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.web.scripts.Cache;
-import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
@@ -53,80 +43,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.springframework.util.StringUtils;
 
 /**
- * WebScript java backed bean implementation to create an instance
- * of a dispostion action definition.
+ * Implementation for Java backed webscript to create a new dispositon action definition.
  * 
  * @author Gavin Cornwell
  */
-public class DispositionActionDefinitionPost extends DeclarativeWebScript
+public class DispositionActionDefinitionPost extends DispositionAbstractBase
 {
-    protected RecordsManagementService rmService;
-    protected NodeService nodeService;
-    protected NamespaceService namespaceService;
-    
-    /**
-     * Sets the RecordsManagementService instance
-     * 
-     * @param rmService The RecordsManagementService instance
-     */
-    public void setRecordsManagementService(RecordsManagementService rmService)
-    {
-        this.rmService = rmService;
-    }
-
-    /**
-     * Sets the NodeService instance
-     * 
-     * @param nodeService The NodeService instance
-     */
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
-    
-    /**
-     * Sets the NamespaceService instance
-     * 
-     * @param namespaceService The NamespaceService instance
-     */
-    public void setNamespaceService(NamespaceService namespaceService)
-    {
-        this.namespaceService = namespaceService;
-    }
-
     /*
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
      */
     @Override
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
-        // get the parameters that represent the NodeRef, we know they are present
-        // otherwise this webscript would not have matched
-        Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
-        String storeType = templateVars.get("store_type");
-        String storeId = templateVars.get("store_id");
-        String nodeId = templateVars.get("id");
-        
-        // create the NodeRef and ensure it is valid
-        StoreRef storeRef = new StoreRef(storeType, storeId);
-        NodeRef nodeRef = new NodeRef(storeRef, nodeId);
-        
-        if (!this.nodeService.exists(nodeRef))
-        {
-            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Unable to find node: " + 
-                        nodeRef.toString());
-        }
-        
-        // make sure the node passed in has a disposition schedule attached
-        DispositionSchedule schedule = this.rmService.getDispositionSchedule(nodeRef);
-        if (schedule == null)
-        {
-            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Node " + 
-                        nodeRef.toString() + " does not have a disposition schedule");
-        }
+        // parse the request to retrieve the schedule object
+        DispositionSchedule schedule = parseRequestForSchedule(req);
 
         // retrieve the rest of the post body and create the action
         //       definition 
@@ -135,7 +67,7 @@ public class DispositionActionDefinitionPost extends DeclarativeWebScript
         try
         {
             json = new JSONObject(new JSONTokener(req.getContent().getContent()));
-            actionDef = createActionDefinition(json, nodeRef);
+            actionDef = createActionDefinition(json, schedule);
         } 
         catch (IOException iox)
         {
@@ -150,7 +82,7 @@ public class DispositionActionDefinitionPost extends DeclarativeWebScript
         
         // create model object with just the action data
         Map<String, Object> model = new HashMap<String, Object>(1);
-        model.put("action", createActionDefModel(actionDef, req.getURL()));
+        model.put("action", createActionDefModel(actionDef, req.getURL() + "/" + actionDef.getId()));
         return model;
     }
     
@@ -158,12 +90,11 @@ public class DispositionActionDefinitionPost extends DeclarativeWebScript
      * Creates a dispositionActionDefinition node in the repo.
      * 
      * @param json The JSON to use to create the action definition
-     * @param scheduleParent The nodeRef of the item the with the disposition schedule the
-     *                new action definition is for
+     * @param schedule The DispositionSchedule the action is for
      * @return The DispositionActionDefinition representing the new action definition
      */
     protected DispositionActionDefinition createActionDefinition(JSONObject json,
-              NodeRef scheduleParent) throws JSONException
+              DispositionSchedule schedule) throws JSONException
     {
         // extract the data from the JSON request
         if (json.has("name") == false)
@@ -171,12 +102,6 @@ public class DispositionActionDefinitionPost extends DeclarativeWebScript
             throw new WebScriptException(Status.STATUS_BAD_REQUEST,
                     "Mandatory 'name' parameter was not provided in request body");
         }
-        
-        // NOTE: we know the disposition schedule is present as it was checked in callee
-        // so go ahead and retrieve the NodeRef for the dispostion schedule
-        NodeRef scheduleNodeRef = this.nodeService.getChildAssocs(scheduleParent, 
-                    RecordsManagementModel.ASSOC_DISPOSITION_SCHEDULE, 
-                    RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         
         // create the properties for the action definition
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(8);
@@ -216,65 +141,7 @@ public class DispositionActionDefinitionPost extends DeclarativeWebScript
             props.put(RecordsManagementModel.PROP_DISPOSITION_EVENT, (Serializable)eventsList);
         }
         
-        // create the child association from the schedule to the action definition
-        NodeRef actionNodeRef = this.nodeService.createNode(scheduleNodeRef, 
-                    RecordsManagementModel.ASSOC_DISPOSITION_ACTION_DEFINITIONS, 
-                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, 
-                    QName.createValidLocalName(name)),
-                    RecordsManagementModel.TYPE_DISPOSITION_ACTION_DEFINITION, props).getChildRef();
-        
-        // use the RM service to fetch the dispostion schedule which will include the 
-        // new action, retriev the details and return
-        DispositionSchedule schedule = this.rmService.getDispositionSchedule(scheduleParent);
-        return schedule.getDispositionActionDefinition(actionNodeRef.getId());
-    }
-    
-    /**
-     * Creates model to represent the given disposition action definition
-     * 
-     * @param actionDef The DispositionActionDefinition instance to generate model for
-     * @param url The URL for the dispositionactiondefinitons collection
-     * @return Map representing the model
-     */
-    protected Map<String, Object> createActionDefModel(DispositionActionDefinition actionDef,
-                String url)
-    {
-        Map<String, Object> model = new HashMap<String, Object>(8);
-        
-        model.put("id", actionDef.getId());
-        model.put("index", actionDef.getIndex());
-        model.put("url", url + "/" + actionDef.getId());
-        model.put("name", actionDef.getName());
-        // TODO: get the proper label for the action name
-        model.put("label", StringUtils.capitalize(actionDef.getName()));
-        model.put("eligibleOnFirstCompleteEvent", actionDef.eligibleOnFirstCompleteEvent());
-        
-        if (actionDef.getDescription() != null)
-        {
-            model.put("description", actionDef.getDescription());
-        }
-        
-        if (actionDef.getPeriod() != null)
-        {
-            model.put("period", actionDef.getPeriod().toString());
-        }
-        
-        if (actionDef.getPeriodProperty() != null)
-        {
-            model.put("periodProperty", actionDef.getPeriodProperty().toPrefixString(this.namespaceService));
-        }
-        
-        List<RecordsManagementEvent> events = actionDef.getEvents();
-        if (events != null && events.size() > 0)
-        {
-            List<String> eventNames = new ArrayList<String>(events.size());
-            for (RecordsManagementEvent event : events)
-            {
-                eventNames.add(event.getName());
-            }
-            model.put("events", eventNames);
-        }
-        
-        return model;
+        // add the action definition to the schedule
+        return this.rmService.addDispositionActionDefinition(schedule, props);
     }
 }

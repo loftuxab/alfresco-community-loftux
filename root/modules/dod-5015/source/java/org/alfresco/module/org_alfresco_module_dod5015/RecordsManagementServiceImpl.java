@@ -331,6 +331,59 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         return di;
     }
     
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#addDispositionActionDefinition(org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule, java.util.Map)
+     */
+    public DispositionActionDefinition addDispositionActionDefinition(DispositionSchedule schedule,
+                Map<QName, Serializable> actionDefinitionParams)
+    {
+        // make sure at least a name has been defined
+        String name = (String)actionDefinitionParams.get(PROP_DISPOSITION_ACTION_NAME);
+        if (name == null || name.length() == 0)
+        {
+            throw new IllegalArgumentException("'name' parameter is manatory when creating a disposition action definition");
+        }
+        
+        // TODO: also check the action name is valid?
+        
+        // create the child association from the schedule to the action definition
+        NodeRef actionNodeRef = this.nodeService.createNode(schedule.getNodeRef(), 
+                    RecordsManagementModel.ASSOC_DISPOSITION_ACTION_DEFINITIONS, 
+                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, 
+                    QName.createValidLocalName(name)),
+                    RecordsManagementModel.TYPE_DISPOSITION_ACTION_DEFINITION, actionDefinitionParams).getChildRef();
+        
+        // get the updated disposition schedule and retrieve the new action definition
+        NodeRef scheduleParent = this.nodeService.getPrimaryParent(schedule.getNodeRef()).getParentRef();
+        DispositionSchedule updatedSchedule = this.getDispositionSchedule(scheduleParent);
+        return updatedSchedule.getDispositionActionDefinition(actionNodeRef.getId());
+    }
+
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#removeDispositionActionDefinition(org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule, org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition)
+     */
+    public void removeDispositionActionDefinition(DispositionSchedule schedule,
+                DispositionActionDefinition actionDefinition)
+    {
+        // remove the child node representing the action definition
+        this.nodeService.removeChild(schedule.getNodeRef(), actionDefinition.getNodeRef());
+    }
+
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#updateDispositionActionDefinition(org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule, org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition, java.util.Map)
+     */
+    public DispositionActionDefinition updateDispositionActionDefinition(DispositionSchedule schedule,
+                DispositionActionDefinition actionDefinition, Map<QName, Serializable> actionDefinitionParams)
+    {
+        // update the node with properties
+        this.nodeService.addProperties(actionDefinition.getNodeRef(), actionDefinitionParams);
+        
+        // get the updated disposition schedule and retrieve the updated action definition
+        NodeRef scheduleParent = this.nodeService.getPrimaryParent(schedule.getNodeRef()).getParentRef();
+        DispositionSchedule updatedSchedule = this.getDispositionSchedule(scheduleParent);
+        return updatedSchedule.getDispositionActionDefinition(actionDefinition.getId());
+    }
+
     /**
      * Get disposition instructions implementation
      * 

@@ -24,113 +24,38 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
-import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.RegexQNamePattern;
-import org.alfresco.web.scripts.AbstractWebScript;
-import org.alfresco.web.scripts.WebScriptException;
+import org.alfresco.web.scripts.Cache;
+import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptResponse;
 
 /**
- * WebScript java backed bean implementation to delete an instance
- * of a dispostion action definition.
+ * Implementation for Java backed webscript to delete a dispostion action definition.
  * 
  * @author Gavin Cornwell
  */
-public class DispositionActionDefinitionDelete extends AbstractWebScript
+public class DispositionActionDefinitionDelete extends DispositionAbstractBase
 {
-    protected RecordsManagementService rmService;
-    protected NodeService nodeService;
-    protected NamespaceService namespaceService;
-    
-    /**
-     * Sets the RecordsManagementService instance
-     * 
-     * @param rmService The RecordsManagementService instance
-     */
-    public void setRecordsManagementService(RecordsManagementService rmService)
-    {
-        this.rmService = rmService;
-    }
-
-    /**
-     * Sets the NodeService instance
-     * 
-     * @param nodeService The NodeService instance
-     */
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
-    
-    /**
-     * Sets the NamespaceService instance
-     * 
-     * @param namespaceService The NamespaceService instance
-     */
-    public void setNamespaceService(NamespaceService namespaceService)
-    {
-        this.namespaceService = namespaceService;
-    }
-
     /*
-     * @see org.alfresco.web.scripts.WebScript#execute(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse)
+     * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
      */
-    public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException
+    @Override
+    protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
-        // get the parameters that represent the NodeRef, we know they are present
-        // otherwise this webscript would not have matched
-        Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
-        String storeType = templateVars.get("store_type");
-        String storeId = templateVars.get("store_id");
-        String nodeId = templateVars.get("id");
-        String actionDefId = templateVars.get("action_def_id");
+        // parse the request to retrieve the schedule object
+        DispositionSchedule schedule = parseRequestForSchedule(req);
         
-        // create the NodeRef and ensure it is valid
-        StoreRef storeRef = new StoreRef(storeType, storeId);
-        NodeRef nodeRef = new NodeRef(storeRef, nodeId);
+        // parse the request to retrieve the action definition object
+        DispositionActionDefinition actionDef = parseRequestForActionDefinition(req, schedule);
         
-        if (!this.nodeService.exists(nodeRef))
-        {
-            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Unable to find node: " + 
-                        nodeRef.toString());
-        }
+        // remove the action definition from the schedule
+        this.rmService.removeDispositionActionDefinition(schedule, actionDef);
         
-        // make sure the node passed in has a disposition schedule attached
-        DispositionSchedule schedule = this.rmService.getDispositionSchedule(nodeRef);
-        if (schedule == null)
-        {
-            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Node " + 
-                        nodeRef.toString() + " does not have a disposition schedule");
-        }
-        
-        // make sure the requested action definition exists
-        DispositionActionDefinition actionDef = schedule.getDispositionActionDefinition(actionDefId);
-        if (actionDef == null)
-        {
-            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, 
-                        "Requested disposition action definition (id:" + actionDefId + ") does not exist");
-        }
-        
-        // remove the action definition
-        NodeRef scheduleNodeRef = this.nodeService.getChildAssocs(nodeRef, 
-                    RecordsManagementModel.ASSOC_DISPOSITION_SCHEDULE, 
-                    RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
-        
-        // we know the id of the action definition is the id from the NodeRef, we can
-        // use that to remove the child association
-        this.nodeService.removeChild(scheduleNodeRef, new NodeRef(nodeRef.getStoreRef(), actionDefId));
+        // return an empty model
+        return new HashMap<String, Object>();
     }
 }

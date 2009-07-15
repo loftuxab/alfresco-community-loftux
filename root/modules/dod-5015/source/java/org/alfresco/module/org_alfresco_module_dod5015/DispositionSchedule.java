@@ -26,6 +26,8 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 
 import java.util.List;
 
+import org.alfresco.service.cmr.repository.NodeRef;
+
 /**
  * Disposition schedule interface
  * 
@@ -33,6 +35,13 @@ import java.util.List;
  */
 public interface DispositionSchedule
 {
+    /**
+     * Get the NodeRef that represents the disposition schedule
+     * 
+     * @return NodeRef of disposition schedule
+     */
+    NodeRef getNodeRef();
+    
     /**
      * Get the disposition authority
      * 
@@ -50,7 +59,7 @@ public interface DispositionSchedule
     /**
      * Indicates whether the disposal occurs at record level or not
      * 
-     * @return  boolean ture if at record level, false otherwise
+     * @return  boolean true if at record level, false otherwise
      */
     boolean isRecordLevelDisposition();
     

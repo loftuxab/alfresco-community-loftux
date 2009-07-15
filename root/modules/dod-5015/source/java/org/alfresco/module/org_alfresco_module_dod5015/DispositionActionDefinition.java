@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 import java.util.List;
 
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.namespace.QName;
 
@@ -37,6 +38,13 @@ import org.alfresco.service.namespace.QName;
  */
 public interface DispositionActionDefinition
 {
+    /**
+     * Get the NodeRef that represents the disposition action definition
+     * 
+     * @return NodeRef of disposition action definition
+     */
+    NodeRef getNodeRef();
+    
     /**
      * Get disposition action id
      * 

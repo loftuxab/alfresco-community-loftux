@@ -113,7 +113,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         String categoryNodeUrl = recordCategory.toString().replace("://", "/");
         String requestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
         rsp = sendRequest(new GetRequest(requestUrl), expectedStatus);
-        System.out.println("GET response: " + rsp.getContentAsString());
         assertEquals("application/json;charset=UTF-8", rsp.getContentType());
         
         // get response as JSON
@@ -166,7 +165,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         categoryNodeUrl = recordCategory.toString().replace("://", "/");
         requestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
         rsp = sendRequest(new GetRequest(requestUrl), expectedStatus);
-        System.out.println("GET response: " + rsp.getContentAsString());
         assertEquals("application/json;charset=UTF-8", rsp.getContentType());
         
         // get response as JSON
@@ -222,7 +220,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         categoryNodeUrl = newRecordCategory.toString().replace("://", "/");
         requestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
         rsp = sendRequest(new GetRequest(requestUrl), expectedStatus);
-        System.out.println("GET response: " + rsp.getContentAsString());
         
         // get response as JSON
         jsonParsedObject = new JSONObject(new JSONTokener(rsp.getContentAsString()));
@@ -274,7 +271,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         // Submit the JSON request.
         String jsonPostString = jsonPostData.toString();
         Response rsp = sendRequest(new PostRequest(requestUrl, jsonPostString, APPLICATION_JSON), 200);
-        System.out.println("POST response: " + rsp.getContentAsString());
         
         // check the returned data is what was expected
         JSONObject jsonResponse = new JSONObject(new JSONTokener(rsp.getContentAsString()));
@@ -300,7 +296,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         jsonPostData.put("name", name);
         jsonPostString = jsonPostData.toString();
         rsp = sendRequest(new PostRequest(requestUrl, jsonPostString, APPLICATION_JSON), 200);
-        System.out.println("POST response: " + rsp.getContentAsString());
         
         // check the returned data is what was expected
         jsonResponse = new JSONObject(new JSONTokener(rsp.getContentAsString()));
@@ -344,7 +339,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         // verify the action definition is present and retrieve it's id
         String getRequestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
         Response rsp = sendRequest(new GetRequest(getRequestUrl), 200);
-        System.out.println("GET response: " + rsp.getContentAsString());
         JSONObject json = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         JSONObject actionDef = json.getJSONObject("data").getJSONArray("actions").getJSONObject(0);
         String actionDefId = actionDef.getString("id");
@@ -382,7 +376,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         rsp = sendRequest(new PutRequest(putRequestUrl, jsonPostString, APPLICATION_JSON), 200);
         
         // check the update happened correctly
-        System.out.println("PUT response: " + rsp.getContentAsString());
         json = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         actionDef = json.getJSONObject("data");
         assertEquals(name, actionDef.getString("name"));
@@ -417,7 +410,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         // verify the action definition is present and retrieve it's id
         String getRequestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
         Response rsp = sendRequest(new GetRequest(getRequestUrl), 200);
-        System.out.println("GET response: " + rsp.getContentAsString());
         JSONObject json = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         String actionDefId = json.getJSONObject("data").getJSONArray("actions").getJSONObject(0).getString("id");
         
@@ -432,7 +424,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         // verify it got deleted
         getRequestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
         rsp = sendRequest(new GetRequest(getRequestUrl), 200);
-        System.out.println("GET response: " + rsp.getContentAsString());
         json = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         JSONArray actions = json.getJSONObject("data").getJSONArray("actions");
         assertEquals(0, actions.length());
