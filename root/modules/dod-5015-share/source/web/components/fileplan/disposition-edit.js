@@ -121,22 +121,6 @@
                   var actions = schedule.actions ? schedule.actions : [];
                   for(var i = 0; i < actions.length; i++)
                   {
-                     // Add action to DOM
-                     /*var action = {
-                        id: i,
-                        name: i % 2 == 0 ? "rma:destroy" : "rma:cutOff",
-                        period : i % 2 == 0 ? "year|1" : "month|12",
-                        periodProperty: i % 2 == 0 ? "rma:cutOff" : "rma:destroy",
-                        description: "Description " + i,
-                        eventCombination: i % 2 == 0 ? "or" : "and",
-                        events:
-                              [
-                                 { event: "superseded", label: "Superseded" },
-                                 { event: "no_longer_needed", label: "No longer needed" },
-                                 { event: "obsolete", label: "Obsolete" }
-                              ]
-                     };
-                     */
                      var action = actions[i];
                      var actionEl = this._createAction(i, action);
                      actionEl = this.widgets.actionListEl.appendChild(actionEl);
@@ -398,7 +382,8 @@
                   Dom.addClass(obj.actionEl, "collapsed");
 
                   // Save new info for future cancels and hide details div
-                  action = YAHOO.lang.merge(action, serverResponse.json);
+                  Dom.getElementsByClassName("id", "input", actionEl)[0].value = serverResponse.json.data.id;
+                  action = YAHOO.lang.merge(action, serverResponse.json.data);
                   var details = Dom.getElementsByClassName("details", "div", actionEl)[0];
                   Dom.setStyle(details, "display", "none");
 
@@ -467,6 +452,8 @@
        */
       _disableEventsSection: function DispositionEdit__disableEventsSection(disabled, actionEl, addEventButton)
       {
+         var eventsDivEl = Dom.getElementsByClassName("events", "div", actionEl)[0];
+         Dom.setStyle(eventsDivEl, "display", disabled ? "none" : "block");
          addEventButton.set("disabled", disabled);
          var eventEls = Dom.getElementsByClassName("action-event-name-value", "select", actionEl);
          for(var i = 0; i < eventEls.length; i++)
@@ -757,15 +744,25 @@
        */
       onCancelActionButtonClick: function DispositionEdit_onCancelActionButtonClick(e, obj)
       {
-         /**
-          * Cancel it by removing the action element from the dom and
-          * insert a new fresh one by using the template and the original data
-          */
-         var newActionEl = this._createAction(obj.no, obj.action)
-         obj.actionEl.parentNode.insertBefore(newActionEl, obj.actionEl);
-         obj.actionEl.parentNode.removeChild(obj.actionEl);
-         this._setupActionForm(obj.no, obj.action, newActionEl);
-         this._refreshActionList();
+         var actionId = Dom.getElementsByClassName("id", "input", obj.actionEl)[0].value;
+         if(actionId && actionId.length > 0)
+         {
+            /**
+             * It is a previous action, cancel it by removing the action element
+             * from the dom and insert a new fresh one by using the template and
+             * the original data.
+             */
+            var newActionEl = this._createAction(obj.no, obj.action)
+            obj.actionEl.parentNode.insertBefore(newActionEl, obj.actionEl);
+            obj.actionEl.parentNode.removeChild(obj.actionEl);
+            this._setupActionForm(obj.no, obj.action, newActionEl);
+            this._refreshActionList();
+         }
+         else
+         {
+            // It was an unsaved action, just remove it
+            obj.actionEl.parentNode.removeChild(obj.actionEl);
+         }
          Dom.removeClass(this.widgets.flowButtons, "hidden");
       },
 
