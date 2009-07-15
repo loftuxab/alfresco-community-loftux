@@ -2240,9 +2240,27 @@
       </zip>
    </target>
 
-   <target name="test-dod5015" 
-           depends="compile-dod5015">
-      <run-tests projectdir="${dir.module.dod5015}" />
+   <target name="test-dod5015" depends="compile-dod5015">
+      <mkdir dir="${dir.module.dod5015}/${dir.name.build}/${dir.name.test.results}" />
+      <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="no" dir="${dir.module.dod5015}">
+         <jvmarg value="-server"/>
+         <classpath>
+            <pathelement location="${dir.module.dod5015.classes}" />
+            <pathelement location="${dir.module.dod5015.config}" />
+            <path refid="classpath.unit.test"/>
+         </classpath>
+         <formatter type="xml" />
+         <batchtest todir="${dir.module.dod5015}/${dir.name.build}/${dir.name.test.results}">
+            <fileset dir="${dir.module.dod5015}/${dir.name.source}/${dir.name.java}">
+               <patternset>
+                  <include name="**/*Test.java" />
+                  <exclude name="**/*SystemTest.java" />
+                  <exclude name="**/*RestApiTest.java" />
+                  <exclude name="**/DOD5015Test.java" />
+               </patternset>
+            </fileset>
+         </batchtest>
+      </junit>
    </target>
 
    <target name="generate-javadocs-dod5015"
