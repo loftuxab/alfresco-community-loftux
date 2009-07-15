@@ -88,7 +88,7 @@ import org.alfresco.util.PropertyMap;
  * 
  * @author Roy Wetherall, Neil McErlean
  */
-public class DODSystemTest extends BaseSpringTest implements DOD5015Model
+public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 {    
 	protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 	
