@@ -68,7 +68,7 @@
 
 .search textarea
 {
-   width: 40em;
+   width: 60em;
    height: 4em;
    border: 1px solid #AAAAAA;
 }
@@ -86,15 +86,20 @@
 
 .search .records
 {
-   height: 7em;
-   border-right: 1px solid #AAAAAA;
-   padding: 0 4em 0 1em;
+   height: 10em;
+   padding: 0 1em 0 1em;
 }
 
 .search .terms
 {
-   height: 7em;
-   padding: 0 1em 0 4em;
+   height: 10em;
+   padding: 0 1em 0 1em;
+   border-right: 1px solid #AAAAAA;
+}
+
+.search .insertLabel
+{
+   vertical-align: 15%;
 }
 
 .search .execute-search

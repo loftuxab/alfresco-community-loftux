@@ -530,6 +530,35 @@ Alfresco.util.toISO8601 = function(date)
 };
 
 /**
+ * Inserts the given string into the supplied text element at the current cursor position.
+ *
+ * @method Alfresco.util.insertAtCursor
+ * @param el {object} The Dom text element to insert into
+ * @param txt {string} The string to insert at current cursor position
+ * @static
+ */
+Alfresco.util.insertAtCursor = function(el, txt)
+{
+   if (document.selection)
+   {
+      el.focus();
+      var sel = document.selection.createRange();
+      sel.text = txt;
+   }
+   else if (el.selectionStart || el.selectionStart == '0')
+   {
+      var startPos = el.selectionStart;
+      var endPos = el.selectionEnd;
+      el.value = el.value.substring(0, startPos) + txt + el.value.substring(endPos, el.value.length);
+   }
+   else
+   {
+      el.value += txt;
+   }
+   el.focus();
+};
+
+/**
  * Decodes an HTML-encoded string
  * Replaces &lt; &gt; and &amp; entities with their character equivalents
  *

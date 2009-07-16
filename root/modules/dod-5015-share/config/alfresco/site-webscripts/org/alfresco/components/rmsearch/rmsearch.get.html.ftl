@@ -48,20 +48,51 @@
             <table cellspacing="0" cellpadding="0" border="0">
                <tr>
                   <td>
+                     <div class="terms">
+                        <span class="header">${msg("label.searchterm")}</span>
+                        <div>
+                           <span class="insertLabel">${msg("label.insertfield")}:</span>
+                           <span>
+                              <input id="${el}-insertfield" type="button" name="insertfield" value="${msg("label.select")}" />
+                              <select id="${el}-insertfield-menu">
+                                 <option value="KEYWORDS">${msg("label.keywords")}</option>
+                                 <option value="rma:identifier">${msg("label.identifier")}</option>
+                                 <option value="cm:name">${msg("label.name")}</option>
+                                 <option value="cm:title">${msg("label.title")}</option>
+                                 <option value="cm:description">${msg("label.description")}</option>
+                                 <option value="cm:creator">${msg("label.creator")}</option>
+                                 <option value="cm:created">${msg("label.created")}</option>
+                                 <option value="cm:modifier">${msg("label.modifier")}</option>
+                                 <option value="cm:modified">${msg("label.modified")}</option>
+                                 <option value="rma:originator">${msg("label.originator")}</option>
+                                 <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
+                                 <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
+                                 <option value="rma:reviewAsOf">${msg("label.reviewDate")}</option>
+                                 <option value="rma:originatingOrganization">${msg("label.originatingOrganization")}</option>
+                                 <option value="rma:mediaType">${msg("label.mediaType")}</option>
+                                 <option value="rma:format">${msg("label.format")}</option>
+                                 <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
+                                 <option value="rma:location">${msg("label.location")}</option>
+                                 <option value="rma:address">${msg("label.address")}</option>
+                                 <option value="rma:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                                 <#list meta as d>
+                                 <option value="${d.name}">${d.title}</option>
+                                 </#list>
+                              </select>
+                           </span>
+                        </div>
+                        <div class="query">
+                           <!-- Query text input -->
+                           <textarea id="${el}-query" rows="2" cols="40"></textarea>
+                        </div>
+                     </div>
+                  </td>
+                  <td>
                      <div class="records">
                         <span class="header">${msg("label.records")}</span>
                         <div>
                            <input type="checkbox" id="${el}-undeclared" />
                            <label for="${el}-undeclared">${msg("label.undeclared")}</label>
-                        </div>
-                     </div>
-                  </td>
-                  <td>
-                     <div class="terms">
-                        <span class="header">${msg("label.searchterm")}</span>
-                        <div class="query">
-                           <!-- Query text input -->
-                           <textarea id="${el}-query" rows="2" cols="40"></textarea>
                         </div>
                      </div>
                   </td>

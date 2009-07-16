@@ -272,7 +272,7 @@
                        "createdOn", "createdByUser", "createdBy", "size", "browseUrl",
                        "properties.rma_identifier", "properties.rma_dateFiled", "properties.rma_publicationDate", "properties.rma_dateReceived",
                        "properties.rma_originatingOrganization", "properties.rma_mediaType", "properties.rma_format", "properties.rma_location",
-                       "properties.rma_supplementalMarkingList", "properties.rma_reviewAsOf"];
+                       "properties.rma_address", "properties.rma_supplementalMarkingList", "properties.rma_reviewAsOf"];
          // add the custom meta fields - 'rmc' namespace
          for (var i=0, j=this.options.customFields.length; i<j; i++)
          {
@@ -440,6 +440,7 @@
             { key: "format", label: me._msg("label.format"), field: "properties.rma_format", sortable: true, resizeable: true, hidden: true },
             { key: "dateReceived", label: me._msg("label.dateReceived"), field: "properties.rma_dateReceived", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true },
             { key: "location", label: me._msg("label.location"), field: "properties.rma_location", sortable: true, resizeable: true, hidden: true },
+            { key: "address", label: me._msg("label.address"), field: "properties.rma_address", sortable: true, resizeable: true, hidden: true },
             { key: "supplementalMarkingList", label: me._msg("label.supplementalMarkingList"), field: "properties.rma_supplementalMarkingList", sortable: true, resizeable: true, hidden: true }
          ];
          
