@@ -57,6 +57,7 @@ public class DispositionScheduleGet extends DispositionAbstractBase
         scheduleModel.put("url", req.getURL());
         String actionsUrl = req.getURL() + "/dispositionactiondefinitions";
         scheduleModel.put("actionsUrl", actionsUrl);
+        scheduleModel.put("nodeRef", schedule.getNodeRef().toString());
         scheduleModel.put("recordLevelDisposition", schedule.isRecordLevelDisposition());
         
         if (schedule.getDispositionAuthority() != null)
