@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 import java.util.Date;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.springframework.util.StringUtils;
 
 /**
  * Event completion details
@@ -88,6 +89,16 @@ public class EventCompletionDetails
     public void setEventName(String eventName)
     {
         this.eventName = eventName;
+    }
+    
+    /**
+     * @return The display label of the event
+     */
+    public String getEventLabel()
+    {
+        // TODO: lookup the I18N string for the event
+        
+        return StringUtils.capitalize(getEventName());
     }
     
     /**

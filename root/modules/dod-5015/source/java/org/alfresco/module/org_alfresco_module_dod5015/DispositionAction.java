@@ -45,13 +45,42 @@ public interface DispositionAction
     DispositionActionDefinition getDispositionActionDefinition();
     
     /**
-     * @return  the dispostion action as of eligibility date
+     * @return the name of the action
      */
-    Date getAsOfDate();    
+    String getName();
     
     /**
-     * 
-     * @return
+     * @return the display label for the action 
+     */
+    String getLabel();
+    
+    /**
+     * @return  the dispostion action as of eligibility date
+     */
+    Date getAsOfDate();
+    
+    /**
+     * @return the user that started the action
+     */
+    String getStartedBy();
+    
+    /**
+     * @return when the action was started
+     */
+    Date getStartedAt();
+    
+    /**
+     * @return the user that completed the action
+     */
+    String getCompletedBy();
+    
+    /**
+     * @return when the action was completed
+     */
+    Date getCompletedAt();
+    
+    /**
+     * @return List of events that need to be completed for the action
      */
     List<EventCompletionDetails> getEventCompletionDetails();
 }

@@ -24,15 +24,26 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -41,6 +52,7 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.web.scripts.TestWebScriptServer.DeleteRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
@@ -59,6 +71,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
 {
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     protected static final String GET_SCHEDULE_URL_FORMAT = "/api/node/{0}/dispositionschedule";
+    protected static final String GET_LIFECYCLE_URL_FORMAT = "/api/node/{0}/nextdispositionaction";
     protected static final String POST_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions";
     protected static final String DELETE_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions/{1}";
     protected static final String PUT_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions/{1}";
@@ -68,19 +81,25 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
     protected ContentService contentService;
     protected SearchService searchService;
     protected ImporterService importService;
-    protected ServiceRegistry services;
     protected PermissionService permissionService;
+    protected TransactionService transactionService;
+    protected ServiceRegistry services;
+    protected RecordsManagementService rmService;
+    protected RecordsManagementActionService rmActionService;
     
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
         this.nodeService = (NodeService) getServer().getApplicationContext().getBean("NodeService");
-        //this.contentService = (ContentService)getServer().getApplicationContext().getBean("ContentService");
+        this.contentService = (ContentService)getServer().getApplicationContext().getBean("ContentService");
         this.searchService = (SearchService)getServer().getApplicationContext().getBean("SearchService");
         this.importService = (ImporterService)getServer().getApplicationContext().getBean("ImporterService");
-        //this.services = (ServiceRegistry)getServer().getApplicationContext().getBean("ServiceRegistry");
         this.permissionService = (PermissionService)getServer().getApplicationContext().getBean("PermissionService");
+        this.transactionService = (TransactionService)getServer().getApplicationContext().getBean("TransactionService");
+        this.services = (ServiceRegistry)getServer().getApplicationContext().getBean("ServiceRegistry");
+        this.rmService = (RecordsManagementService)getServer().getApplicationContext().getBean("RecordsManagementService");
+        this.rmActionService = (RecordsManagementActionService)getServer().getApplicationContext().getBean("RecordsManagementActionService");
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
 
@@ -427,5 +446,101 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         json = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         JSONArray actions = json.getJSONObject("data").getJSONArray("actions");
         assertEquals(0, actions.length());
+    }
+    
+    public void testGetDispositionLifecycle() throws Exception
+    {
+        // create a new recordFolder in a recordCategory
+        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Military Files", 
+                    "Military Assignment Documents");
+        assertNotNull(recordCategory);
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        NodeRef newRecordFolder = this.nodeService.createNode(recordCategory, ContentModel.ASSOC_CONTAINS, 
+                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("recordFolder")), 
+                    DOD5015Model.TYPE_RECORD_FOLDER).getChildRef();
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Create the document
+        NodeRef recordOne = this.nodeService.createNode(newRecordFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "record"), 
+                                                        ContentModel.TYPE_CONTENT).getChildRef();
+        
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+        txn.commit(); // - triggers FileAction
+        
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        declareRecord(recordOne);
+        txn.commit();
+        
+        // there should now be a disposition lifecycle for the record
+        String recordUrl = recordOne.toString().replace("://", "/");
+        String requestUrl = MessageFormat.format(GET_LIFECYCLE_URL_FORMAT, recordUrl);
+        Response rsp = sendRequest(new GetRequest(requestUrl), 200);
+        //System.out.println("GET : " + rsp.getContentAsString());
+        assertEquals("application/json;charset=UTF-8", rsp.getContentType());
+        
+        // get response as JSON
+        JSONObject jsonParsedObject = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        assertNotNull(jsonParsedObject);
+        
+        // check mandatory stuff is present
+        JSONObject dataObj = jsonParsedObject.getJSONObject("data");
+        assertEquals("/alfresco/service" + requestUrl, dataObj.getString("url"));
+        assertEquals("cutoff", dataObj.getString("name"));
+        assertEquals("Cutoff", dataObj.getString("label"));
+        assertFalse(dataObj.getBoolean("eventsEligible"));
+        assertTrue(dataObj.has("events"));
+        JSONArray events = dataObj.getJSONArray("events");
+        assertEquals(1, events.length());
+        JSONObject event1 = events.getJSONObject(0);
+        assertEquals("superseded", event1.get("name"));
+        assertEquals("Superseded", event1.get("label"));
+        assertFalse(event1.getBoolean("complete"));
+        assertFalse(event1.getBoolean("automatic"));
+        
+        // check stuff expected to be missing is missing
+        assertFalse(dataObj.has("asOf"));
+        assertFalse(dataObj.has("startedAt"));
+        assertFalse(dataObj.has("startedBy"));
+        assertFalse(dataObj.has("completedAt"));
+        assertFalse(dataObj.has("completedBy"));
+        assertFalse(event1.has("completedAt"));
+        assertFalse(event1.has("completedBy"));
+        
+        // TODO: complete an event to move things on
+        
+        // TOOD: re-do request and test response
+    }
+    
+    private void declareRecord(NodeRef recordOne)
+    {
+        // Declare record
+        Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
+        propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
+        List<String> smList = new ArrayList<String>(2);
+        smList.add("FOUO");
+        smList.add("NOFORN");
+        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
+        propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
+        propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
+        propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());       
+        propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        propValues.put(ContentModel.PROP_TITLE, "titleValue");
+        this.nodeService.setProperties(recordOne, propValues);
+        this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
     }
 }

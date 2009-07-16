@@ -34,6 +34,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Roy Wetherall
@@ -87,12 +88,62 @@ public class DispositionActionImpl implements DispositionAction,
        return this.dispositionNodeRef;
     }
     
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getLabel()
+     */
+    public String getLabel()
+    {
+        // TODO: Do proper lookup of I18N string for disposition action
+        
+        return StringUtils.capitalize(getName());
+    }
+
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getName()
+     */
+    public String getName()
+    {
+        return (String)this.services.getNodeService().getProperty(this.dispositionNodeRef, PROP_DISPOSITION_ACTION);
+    }
+    
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getAsOfDate()
      */
     public Date getAsOfDate()
     {
         return (Date)this.services.getNodeService().getProperty(this.dispositionNodeRef, PROP_DISPOSITION_AS_OF);
+    }
+    
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getCompletedAt()
+     */
+    public Date getCompletedAt()
+    {
+        return (Date)this.services.getNodeService().getProperty(this.dispositionNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT);
+    }
+
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getCompletedBy()
+     */
+    public String getCompletedBy()
+    {
+        return (String)this.services.getNodeService().getProperty(this.dispositionNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY);
+    }
+
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getStartedAt()
+     */
+    public Date getStartedAt()
+    {
+        return (Date)this.services.getNodeService().getProperty(this.dispositionNodeRef, PROP_DISPOSITION_ACTION_STARTED_AT);
+    }
+
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getStartedBy()
+     */
+    public String getStartedBy()
+    {
+        return (String)this.services.getNodeService().getProperty(this.dispositionNodeRef, PROP_DISPOSITION_ACTION_STARTED_BY);
     }
 
     /**

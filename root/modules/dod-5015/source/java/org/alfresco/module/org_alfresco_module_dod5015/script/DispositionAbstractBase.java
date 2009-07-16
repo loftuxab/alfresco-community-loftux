@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -43,7 +42,6 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
-import org.springframework.util.StringUtils;
 
 /**
  * Abstract base class for all disposition related java backed webscripts.
@@ -87,12 +85,12 @@ public class DispositionAbstractBase extends DeclarativeWebScript
     }
     
     /**
-     * Parses the request and providing it's valid returns the DispositionSchedule object.
+     * Parses the request and providing it's valid returns the NodeRef.
      * 
      * @param req The webscript request
-     * @return The DispositionSchedule object the request is aimed at
+     * @return The NodeRef passed in the request
      */
-    protected DispositionSchedule parseRequestForSchedule(WebScriptRequest req)
+    protected NodeRef parseRequestForNodeRef(WebScriptRequest req)
     {
         // get the parameters that represent the NodeRef, we know they are present
         // otherwise this webscript would not have matched
@@ -110,6 +108,20 @@ public class DispositionAbstractBase extends DeclarativeWebScript
             throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Unable to find node: " + 
                         nodeRef.toString());
         }
+        
+        return nodeRef;
+    }
+    
+    /**
+     * Parses the request and providing it's valid returns the DispositionSchedule object.
+     * 
+     * @param req The webscript request
+     * @return The DispositionSchedule object the request is aimed at
+     */
+    protected DispositionSchedule parseRequestForSchedule(WebScriptRequest req)
+    {
+        // get the NodeRef from the request
+        NodeRef nodeRef = parseRequestForNodeRef(req);
         
         // make sure the node passed in has a disposition schedule attached
         DispositionSchedule schedule = this.rmService.getDispositionSchedule(nodeRef);
@@ -161,8 +173,7 @@ public class DispositionAbstractBase extends DeclarativeWebScript
         model.put("index", actionDef.getIndex());
         model.put("url", url);
         model.put("name", actionDef.getName());
-        // TODO: get the proper label for the action name
-        model.put("label", StringUtils.capitalize(actionDef.getName()));
+        model.put("label", actionDef.getLabel());
         model.put("eligibleOnFirstCompleteEvent", actionDef.eligibleOnFirstCompleteEvent());
         
         if (actionDef.getDescription() != null)

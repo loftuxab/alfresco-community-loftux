@@ -33,6 +33,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.namespace.QName;
+import org.springframework.util.StringUtils;
 
 /**
  * Disposition action implementation
@@ -106,6 +107,16 @@ public class DispositionActionDefinitionImpl implements DispositionActionDefinit
     public String getName()
     {
         return (String)nodeService.getProperty(this.dispositionActionNodeRef, PROP_DISPOSITION_ACTION_NAME);
+    }
+    
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition#getLabel()
+     */
+    public String getLabel()
+    {
+        // TODO: Do proper lookup of I18N string for disposition action
+        
+        return StringUtils.capitalize(getName());
     }
 
     /**
