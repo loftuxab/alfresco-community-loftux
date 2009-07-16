@@ -67,6 +67,13 @@ public interface DispositionActionDefinition
     String getName();
     
     /**
+     * Get the display label of the disposition action
+     * 
+     * @return String name's display label
+     */
+    String getLabel();
+    
+    /**
      * Get the description of the disposition action
      * 
      * @return  String  description
