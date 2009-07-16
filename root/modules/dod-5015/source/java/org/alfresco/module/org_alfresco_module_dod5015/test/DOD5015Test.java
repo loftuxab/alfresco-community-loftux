@@ -90,6 +90,10 @@ import org.alfresco.util.PropertyMap;
  */
 public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 {    
+	private static final Period weeklyReview = new Period("week|1");
+    private static final Period dailyReview = new Period("day|1");
+    public static final long TWENTY_FOUR_HOURS_IN_MS = 24 * 60 * 60 * 1000; // hours * minutes * seconds * millis
+
 	protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 	
 	private NodeRef filePlan;
@@ -158,7 +162,11 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	
 	private void setUpTestData()
 	{
-        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService);
+	    // Don't reload the fileplan data on each test method.
+	    if (retrieveJanuaryAISVitalFolders().size() != 1)
+	    {
+            filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService);
+	    }
 	}
 
     @Override
@@ -190,7 +198,163 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         // NOOP
     }    
 
-	public void testDispositionLifecycle_0318_01_basictest() throws Exception
+    /**
+     * This test method creates a non-vital record and then moves it to a vital folder
+     * (triggering a refile) and then moves it a second time to another vital record
+     * having different metadata.
+     * 
+     * Moving a Record within the FilePlan should trigger a "refile". Refiling a record
+     * will lead to the reconsideration of its disposition, vital and transfer/accession
+     * metadata, with potential changes therein.
+     */
+    public void testMoveRefileRecord() throws Exception
+    {
+        // Create a record folder under a "non-vital" category
+        NodeRef nonVitalRecordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "Unit Manning Documents");    
+        assertNotNull(nonVitalRecordCategory);
+
+        NodeRef nonVitalFolder = createRecFolderNode(nonVitalRecordCategory);
+        // Commit in order to trigger the setUpRecordFolder behaviour
+        setComplete();
+        endTransaction();
+        
+        UserTransaction tx1 = transactionService.getUserTransaction(false);
+        tx1.begin();
+        
+        // Create a (non-vital) record under the above folder
+        NodeRef recordUnderTest = createRecordNode(nonVitalFolder);
+
+        rmActionService.executeRecordsManagementAction(recordUnderTest, "file");
+        this.declareRecord(recordUnderTest);
+
+        // No need to commit the transaction here as the record is non-vital and
+        // there is no metadata to copy down.
+        
+        NodeRef vitalFolder = retrieveJanuaryAISVitalFolder();
+        
+        // Move the non-vital record under the vital folder.
+        serviceRegistry.getFileFolderService().move(recordUnderTest, vitalFolder, null);
+
+        tx1.commit();
+        UserTransaction tx2 = transactionService.getUserTransaction(false);
+        tx2.begin();
+        
+        // At this point, the formerly nonVitalRecord is now actually vital.
+        assertTrue("Expected record.", rmService.isRecord(recordUnderTest));
+        assertTrue("Expected declared.", rmService.isRecordDeclared(recordUnderTest));
+        
+        final VitalRecordDefinition recordVrd = rmService.getVitalRecordDefinition(recordUnderTest);
+        assertNotNull("Moved record should now have a Vital Rec Defn", recordVrd);
+        assertEquals("Moved record had wrong review period",
+                rmService.getVitalRecordDefinition(vitalFolder).getReviewPeriod(), recordVrd.getReviewPeriod());
+        assertNotNull("Moved record should now have a review-as-of date", nodeService.getProperty(recordUnderTest, PROP_REVIEW_AS_OF));
+        
+        // Create another folder with different vital/disposition instructions
+        //TODO Change disposition instructions
+        NodeRef vitalRecordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");    
+        assertNotNull(vitalRecordCategory);
+        NodeRef secondVitalFolder = createRecFolderNode(vitalRecordCategory);
+
+        tx2.commit();
+        UserTransaction tx3 = transactionService.getUserTransaction(false);
+        tx3.begin();
+        
+        Map<QName, Serializable> props = nodeService.getProperties(secondVitalFolder);
+        final Serializable secondVitalFolderReviewPeriod = props.get(PROP_REVIEW_PERIOD);
+        assertEquals("Unexpected review period.", weeklyReview, secondVitalFolderReviewPeriod);
+        
+        // We are changing the review period of this second record folder.
+        props.put(PROP_REVIEW_PERIOD, dailyReview);
+        this.nodeService.setProperties(secondVitalFolder, props);
+        
+        Date reviewDate = (Date)nodeService.getProperty(recordUnderTest, PROP_REVIEW_AS_OF);
+        
+        // Move the newly vital record under the second vital folder. I expect the reviewPeriod
+        // for the record to be changed again.
+        serviceRegistry.getFileFolderService().move(recordUnderTest, secondVitalFolder, null);
+        
+        // Commit to trigger the copy-down behaviour. Necessary?
+        tx3.commit();
+        UserTransaction tx4 = transactionService.getUserTransaction(false);
+        tx4.begin();
+
+        Period newReviewPeriod = rmService.getVitalRecordDefinition(recordUnderTest).getReviewPeriod();
+        assertEquals("Unexpected review period.", dailyReview, newReviewPeriod);
+        
+        Date updatedReviewDate = (Date)nodeService.getProperty(recordUnderTest, PROP_REVIEW_AS_OF);
+        // The reviewAsOf date should have changed to "24 hours from now".
+        assertFalse("reviewAsOf date was unchanged", reviewDate.equals(updatedReviewDate));
+        long millisecondsUntilNextReview = updatedReviewDate.getTime() - new Date().getTime();
+        assertTrue("new reviewAsOf date was not within 24 hours of now.",
+                millisecondsUntilNextReview <= TWENTY_FOUR_HOURS_IN_MS);
+
+        nodeService.deleteNode(recordUnderTest);
+        nodeService.deleteNode(nonVitalFolder);
+        nodeService.deleteNode(secondVitalFolder);
+        tx4.commit();
+    }
+
+    public void off_testMoveRefileRecordFolder() throws Exception
+    {
+        //TODO Impl me
+        fail("Not yet impl'd.");
+    }
+
+    public void off_testCopyRefileRecordFolder() throws Exception
+    {
+        //TODO Impl me
+        fail("Not yet impl'd.");
+    }
+
+    public void off_testCopyRefileRecord() throws Exception
+    {
+        //TODO Impl me
+        fail("Not yet impl'd.");
+    }
+
+    private NodeRef createRecFolderNode(NodeRef parentRecordCategory)
+    {
+        NodeRef newFolder = this.nodeService.createNode(parentRecordCategory,
+                                   ContentModel.ASSOC_CONTAINS,
+                                   QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "Test folder " + System.currentTimeMillis()),
+                                   TYPE_RECORD_FOLDER).getChildRef();
+        return newFolder;
+    }
+
+    private NodeRef createRecordNode(NodeRef parentFolder)
+    {
+        NodeRef newRecord = this.nodeService.createNode(parentFolder,
+                                    ContentModel.ASSOC_CONTAINS,
+                                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI,
+                                            "Record" + System.currentTimeMillis() + ".txt"),
+                                    ContentModel.TYPE_CONTENT).getChildRef();
+        ContentWriter writer = this.contentService.getWriter(newRecord, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("Irrelevant content");
+        return newRecord;
+    }
+    
+    private NodeRef retrieveJanuaryAISVitalFolder()
+    {
+        final List<NodeRef> resultNodeRefs = retrieveJanuaryAISVitalFolders();
+        final int folderCount = resultNodeRefs.size();
+        assertTrue("There should only be one 'January AIS Audit Records' folder. Were " + folderCount, folderCount == 1);
+        
+        // This nodeRef should have rma:VRI=true, rma:reviewPeriod=week|1, rma:isClosed=false
+        return resultNodeRefs.get(0);
+    }
+
+    private List<NodeRef> retrieveJanuaryAISVitalFolders()
+    {
+        String typeQuery = "TYPE:\"" + TYPE_RECORD_FOLDER + "\" AND @cm\\:name:\"January AIS Audit Records\"";
+        ResultSet types = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, typeQuery);
+        
+        final List<NodeRef> resultNodeRefs = types.getNodeRefs();
+        return resultNodeRefs;
+    }
+
+    public void testDispositionLifecycle_0318_01_basictest() throws Exception
 	{	    
 	    NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
 	    assertNotNull(recordCategory);
@@ -771,6 +935,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         //
         // Create a record folder under a "vital" category
         //
+        
+        // TODO Don't think I need to do this. Can I reuse the existing January one?
+        
         NodeRef vitalRecCategory =
             TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
         
