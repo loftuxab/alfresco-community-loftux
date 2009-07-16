@@ -1046,6 +1046,10 @@
             // Last crumb shouldn't be rendered as a link
             if (j - i < 2)
             {
+               if (j > 1)
+               {
+                  eCrumb.addClass("last");
+               }
                eCrumb.set("innerHTML", displayPaths[i]);
             }
             else

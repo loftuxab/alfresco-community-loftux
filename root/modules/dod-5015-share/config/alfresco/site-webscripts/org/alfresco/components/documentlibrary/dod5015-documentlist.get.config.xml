@@ -15,7 +15,7 @@
       </actionSet>
 
       <actionSet id="recordFolder">
-         <action id="onActionViewDetails" type="simple-link" href="{folderDetailsUrl}" label="actions.view-details" />
+         <action id="onActionViewDetails" type="simple-link" href="{recordFolderDetailsUrl}" label="actions.view-details" />
          <action id="onActionEditDetails" permisson="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
          <action id="onActionClose" permission="close" type="action-link" label="actions.close" />
          <action id="onActionReopen" permission="reopen" type="action-link" label="actions.reopen" />

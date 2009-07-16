@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <component>
    <scope>template</scope>
-   <region-id>dod5015-record-category-info</region-id>
+   <region-id>dod5015-folder-metadata-header</region-id>
    <source-id>record-category-details</source-id>
-   <url>/components/folder-details/dod5015/folder-info</url>
+   <url>/components/folder-details/folder-metadata-header</url>
 </component>

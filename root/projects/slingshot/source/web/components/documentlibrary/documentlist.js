@@ -324,30 +324,6 @@
       fileUpload: null,
 
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
-       * Object container for storing module instances.
-       * 
-       * @property modules
-       * @type object
-       */
-      modules: null,
-
-      /**
-       * Object container for storing service instances.
-       * 
-       * @property services
-       * @type object
-       */
-      services: null,
-
-      /**
        * Object container for storing action markup elements.
        * 
        * @property actions
@@ -418,43 +394,6 @@
       doclistMetadata: null,
 
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DocumentList} returns 'this' for method chaining
-       */
-      setOptions: function DL_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocumentList} returns 'this' for method chaining
-       */
-      setMessages: function DL_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DL_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Initial History Manager event registration
        *
@@ -494,6 +433,7 @@
                // Unexpected navigation - source event needs to be pathChanged event handler
                YAHOO.Bubbling.fire("pathChanged",
                {
+                  doclistSourcedEvent: true,
                   path: newPath
                });
             }
@@ -1513,23 +1453,22 @@
          }
       },
 
-
       /**
        * The urls to be used when creating links in the action cell
        *
        * @method getActionUrls
-       * @param record A data source element describing the item in the list
-       * @protected
+       * @param record {object} A data source element describing the item in the list
+       * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
       getActionUrls: function DL_getActionUrls(record)
       {
-         return {
+         return (
+         {
             downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
             documentDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/document-details?nodeRef=" + record.getData("nodeRef"),
             folderDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + record.getData("nodeRef"),
             editMetadataUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + record.getData("nodeRef")
-         };
-
+         });
       },
 
       /**
@@ -2144,6 +2083,14 @@
          if (obj && (typeof obj.path !== "undefined"))
          {
             Alfresco.logger.debug("DL_onPathChanged: ", obj);
+            if (obj.doclibFirstTimeNav)
+            {
+               this._updateDocList.call(this,
+               {
+                  path: obj.path
+               });
+               return;
+            }
             if (!obj.doclistSourcedEvent)
             {
                /**
@@ -2189,6 +2136,14 @@
                      path: obj.path
                   });
                }
+            }
+            else
+            {
+               // The HistoryManager won't fire in this case although we do need to update the DocList
+               this._updateDocList.call(this,
+               {
+                  path: obj.path
+               });
             }
          }
       },

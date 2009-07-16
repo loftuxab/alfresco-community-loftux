@@ -1005,19 +1005,21 @@
        * The urls to be used when creating links in the action cell
        *
        * @method getActionUrls
-       * @param record A data source element describing the item in the list
-       * @protected
+       * @param record {object} A data source element describing the item in the list
+       * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
       getActionUrls: function DL_getActionUrls(record)
       {
-         return {
+         return (
+         {
             downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
             documentDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/document-details?nodeRef=" + record.getData("nodeRef"),
             folderDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + record.getData("nodeRef"),
+            recordFolderDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/record-folder-details?nodeRef=" + record.getData("nodeRef"),
             recordCategoryDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/record-category-details?nodeRef=" + record.getData("nodeRef"),
             recordSeriesDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/record-series-details?nodeRef=" + record.getData("nodeRef"),
             editMetadataUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + record.getData("nodeRef")
-         };
+         });
 
       },
 
