@@ -623,6 +623,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         rmActionService.executeRecordsManagementAction(testDocument, "applyScannedRecord", props);
 
         assertTrue("Custom type should have ScannedRecord aspect.", nodeService.hasAspect(testDocument, DOD5015Model.ASPECT_SCANNED_RECORD));
+        
+        txn.rollback();
     }
 
     /**
@@ -725,12 +727,12 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertTrue("Expected non-electronic record to be a record.", rmService.isRecord(testRecord));
         assertFalse("Expected non-electronic record not to be declared yet.", rmService.isRecordDeclared(testRecord));
         
-        // Try to declare it and see what's required.
+        rmActionService.executeRecordsManagementAction(testRecord, "file");
         rmActionService.executeRecordsManagementAction(testRecord, "declareRecord");
         
         assertTrue("Non-electronic record should now be declared.", rmService.isRecordDeclared(testRecord));
         
-        // These properties are added automatically
+        // These properties are added automatically when the record is filed
         assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_IDENTIFIER));
         assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_DATE_FILED));
         
@@ -771,6 +773,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         //
         NodeRef vitalRecCategory =
             TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
+        
         assertNotNull(vitalRecCategory);
         assertEquals("AIS Audit Records",
                 this.nodeService.getProperty(vitalRecCategory, ContentModel.PROP_NAME));
@@ -780,13 +783,10 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                                                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI,
                                                             "March AIS Audit Records"), 
                                                     TYPE_RECORD_FOLDER).getChildRef();
-        
         setComplete();
         endTransaction();
-
-        
-        UserTransaction txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        UserTransaction txn1 = transactionService.getUserTransaction(false);
+        txn1.begin();
         
         // Check the Vital Record data
         VitalRecordDefinition vitalRecCatDefinition = rmService.getVitalRecordDefinition(vitalRecCategory);
@@ -804,7 +804,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         // Create a vital record
         NodeRef vitalRecord = this.nodeService.createNode(vitalRecFolder, 
                                                         ContentModel.ASSOC_CONTAINS, 
-                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyVitalRecord.txt"), 
                                                         ContentModel.TYPE_CONTENT).getChildRef();
         
         // Set the content
@@ -813,10 +813,10 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         writer.setEncoding("UTF-8");
         writer.putContent("There is some content in this record");
         
-        txn.commit();
+        txn1.commit();
         
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        UserTransaction txn2 = transactionService.getUserTransaction(false);
+        txn2.begin();
         
         // Check the review schedule
         assertTrue(this.nodeService.hasAspect(vitalRecord, ASPECT_VITAL_RECORD));
@@ -838,14 +838,14 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                                                            TYPE_RECORD_FOLDER).getChildRef();
         
 
-        txn.commit();
+        txn2.commit();
 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        UserTransaction txn3 = transactionService.getUserTransaction(false);
+        txn3.begin();
         
         // Check the Vital Record data
-        assertTrue(rmService.getVitalRecordDefinition(nonVitalRecordCategory).isVitalRecord() == false);
-        assertTrue(rmService.getVitalRecordDefinition(nonVitalFolder).isVitalRecord() == false);
+        assertFalse(rmService.getVitalRecordDefinition(nonVitalRecordCategory).isVitalRecord());
+        assertFalse(rmService.getVitalRecordDefinition(nonVitalFolder).isVitalRecord());
         assertEquals("The Vital Record reviewPeriod in the folder did not match its parent category",
                 rmService.getVitalRecordDefinition(nonVitalFolder).getReviewPeriod(),
                 rmService.getVitalRecordDefinition(nonVitalRecordCategory).getReviewPeriod());
@@ -863,9 +863,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         writer.setEncoding("UTF-8");
         writer.putContent("There is some content in this record");
         
-        txn.commit();
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        txn3.commit();
+        UserTransaction txn4 = transactionService.getUserTransaction(false);
+        txn4.begin();
         
         // Check the review schedule
         assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_VITAL_RECORD) == false);
@@ -911,10 +911,10 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         nonVitalFolderProps.put(PROP_REVIEW_PERIOD, "week|1");
         this.nodeService.setProperties(nonVitalFolder, nonVitalFolderProps);
         
-        txn.commit();
+        txn4.commit();
         
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        UserTransaction txn5 = transactionService.getUserTransaction(false);
+        txn5.begin();
         
         NodeRef formerlyNonVitalRecord = nonVitalRecord;
 
@@ -933,10 +933,10 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         vitalFolderProps.put(PROP_VITAL_RECORD_INDICATOR, false);
         this.nodeService.setProperties(vitalRecFolder, vitalFolderProps);
         
-        txn.commit();
+        txn5.commit();
         
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        UserTransaction txn6 = transactionService.getUserTransaction(false);
+        txn6.begin();
         
         NodeRef formerlyVitalRecord = vitalRecord;
 
@@ -956,9 +956,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         vitalFolderProps.put(PROP_VITAL_RECORD_INDICATOR, true);
         this.nodeService.setProperties(vitalRecFolder, vitalFolderProps);
         
-        txn.commit();
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        txn6.commit();
+        UserTransaction txn7 = transactionService.getUserTransaction(false);
+        txn7.begin();
         
         assertTrue("Unexpected VitalRecord aspect present",
                 nodeService.hasAspect(vitalRecord, ASPECT_VITAL_RECORD));
@@ -970,13 +970,15 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 
         // Change some of the VitalRecordDefinition in Record Category
         Map<QName, Serializable> recCatProps = this.nodeService.getProperties(vitalRecCategory);
+        
+        // Run this test twice (after a clean db) and it fails at the below line.
         assertEquals(new Period("week|1"), recCatProps.get(PROP_REVIEW_PERIOD));
         recCatProps.put(PROP_REVIEW_PERIOD, new Period("day|1"));
         this.nodeService.setProperties(vitalRecCategory, recCatProps);
         
-        txn.commit();
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        txn7.commit();
+        UserTransaction txn8 = transactionService.getUserTransaction(false);
+        txn8.begin();
 
         assertEquals(new Period("day|1"), rmService.getVitalRecordDefinition(vitalRecCategory).getReviewPeriod());
         assertEquals(new Period("day|1"), rmService.getVitalRecordDefinition(vitalRecFolder).getReviewPeriod());
@@ -988,17 +990,17 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         folderProps.put(PROP_REVIEW_PERIOD, new Period("month|1"));
         this.nodeService.setProperties(vitalRecFolder, folderProps);
 
-        txn.commit();
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        txn8.commit();
+        UserTransaction txn9 = transactionService.getUserTransaction(false);
+        txn9.begin();
 
         assertEquals(new Period("day|1"), rmService.getVitalRecordDefinition(vitalRecCategory).getReviewPeriod());
         assertEquals(new Period("month|1"), rmService.getVitalRecordDefinition(vitalRecFolder).getReviewPeriod());
 
         // Need to commit the transaction to trigger the behaviour that handles changes to VitalRecord Definition.
-        txn.commit();
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        txn9.commit();
+        UserTransaction txn10 = transactionService.getUserTransaction(false);
+        txn10.begin();
         
         Date newReviewAsOfDate = (Date)nodeService.getProperty(vitalRecord, PROP_REVIEW_AS_OF);
         assertNotNull("record should have a reviewAsOf date.", initialReviewAsOfDate);
@@ -1006,10 +1008,13 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 initialReviewAsOfDate.toString().equals(newReviewAsOfDate.toString()) == false);
         
         // Now clean up after this test.
+        nodeService.deleteNode(vitalRecord);
         nodeService.deleteNode(vitalRecFolder);
+        nodeService.deleteNode(nonVitalRecord);
         nodeService.deleteNode(nonVitalFolder);
+        nodeService.setProperty(vitalRecCategory, PROP_REVIEW_PERIOD, new Period("week|1"));
         
-        txn.commit();
+        txn10.commit();
     }
     
     /**
