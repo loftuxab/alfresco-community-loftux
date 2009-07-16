@@ -1,12 +1,38 @@
-/* Actions: Icons */
+/**
+ * Actions: Common
+ */
+.doclist .onActionEditDetails a
+{
+   background-image: url(images/edit-metadata-16.png);
+}
+
+.doclist .onActionViewDetails a
+{
+   background-image: url(images/metadata-16.png);
+}
+
+.doclist .onActionExport a
+{
+   background-image: url(images/export-16.png);
+}
+
+.doclist .onActionImport a
+{
+   background-image: url(images/import-16.png);
+}
+
+
+/**
+ * Actions: Records
+ */
 .doclist .record .onActionAddReference a
 {
    background-image: url(images/record-add-ref-16.png);
 }
 
-.doclist .record-folder .onActionClose a
+.doclist .record .onActionCopyTo a
 {
-   background-image: url(images/record-folder-close-16.png);
+   background-image: url(images/copy-record-to-16.png);
 }
 
 .doclist .record .onActionCutoff a
@@ -14,9 +40,9 @@
    background-image: url(images/cutoff-record-16.png);
 }
 
-.doclist .undeclared-record .onActionDeclare a
+.doclist .record .onActionDelete a
 {
-   background-image: url(images/declare-record-16.png);
+   background-image: url(images/delete-record-16.png);
 }
 
 .doclist .record .onActionDestroy a
@@ -24,9 +50,9 @@
    background-image: url(images/destroy-record-16.png);
 }
 
-.doclist .onActionEditDetails a
+.doclist .record .onActionFileTo a
 {
-   background-image: url(images/edit-metadata-16.png);
+   background-image: url(images/file-to-16.png);
 }
 
 .doclist .record .onActionFreeze a
@@ -34,9 +60,9 @@
    background-image: url(images/freeze-record-16.png);
 }
 
-.doclist .record-folder .onActionReopen a
+.doclist .record .onActionMoveTo a
 {
-   background-image: url(images/record-folder-open-16.png);
+   background-image: url(images/move-record-to-16.png);
 }
 
 .doclist .record .onActionReviewed a
@@ -49,16 +75,50 @@
    background-image: url(images/transfer-record-16.png);
 }
 
+.doclist .record .onActionTransferConfirm a
+{
+   background-image: url(images/transfer-confirm-16.png);
+}
+
+.doclist .record .onActionUndeclareRecord a
+{
+   background-image: url(images/undeclare-record-16.png);
+}
+
+.doclist .record .onActionUndoCutoff a
+{
+   background-image: url(images/undo-cutoff-16.png);
+}
+
 .doclist .record .onActionUnfreeze a
 {
    background-image: url(images/unfreeze-record-16.png);
 }
 
-.doclist .onActionViewDetails a
+
+/**
+ * Actions: Undeclared Records
+ */
+.doclist .undeclared-record .onActionDeclare a
 {
-   background-image: url(images/metadata-16.png);
+   background-image: url(images/declare-record-16.png);
 }
 
+/**
+ * Actions: Record Folder
+ */
+.doclist .record-folder .onActionClose a
+{
+   background-image: url(images/record-folder-close-16.png);
+}
+
+.doclist .record-folder .onActionReopen a
+{
+   background-image: url(images/record-folder-open-16.png);
+}
+
+
+/* Undeclared Record Banner */
 
 .doclist .undeclared-record-info
 {
@@ -71,4 +131,26 @@
    font-weight: bold;
    margin-bottom: 4px;
    padding: 5px 0px 3px 28px;
+}
+
+/* DocList bar Select menu */
+
+.doclist .file-select .selectRecords
+{
+   background-image: url(images/select-records-16.png);
+}
+
+.doclist .file-select .selectUndeclaredRecords
+{
+   background-image: url(images/select-undeclared-16.png);
+}
+
+.doclist .file-select .selectAll
+{
+   background-image: url(images/select-all-rm-16.png);
+}
+
+.doclist .file-select .selectNone
+{
+   background-image: url(images/select-none-rm-16.png);
 }

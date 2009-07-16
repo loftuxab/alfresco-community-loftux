@@ -1,33 +1,47 @@
-// Need to know what type of node this is - document or folder
-var query =
+function fromContainerType(repoType)
 {
-   items: [page.url.args.nodeRef]
-};
-
-var connector = remote.connect("alfresco");
-result = connector.post("/api/forms/picker/items", jsonUtils.toJSONString(query), "application/json");
-
-// Assume document
-var nodeType = "document";
-
-if (result.status == 200)
-{
-   var metadata = eval('(' + result + ')');
-   if(metadata.data.items[0].isContainer)
+   var type = "folder";
+   switch (String(repoType))
    {
-      if(metadata.data.items[0].type == "dod:recordCategory")
-      {
-         nodeType = "record-category";
-      }
-      else if(metadata.data.items[0].type == "dod:recordSeries")
-      {
-         nodeType = "record-series";
-      }
-      else
-      {
-         nodeType = "folder";
-      }
+      case "dod:recordSeries":
+         type = "record-series";
+         break;
+
+      case "dod:recordCategory":
+         type = "record-series";
+         break;
+
+      case "dod:recordFolder":
+         type = "record-series";
+         break;
    }
+   return type;
 }
 
-model.nodeType = nodeType;
+function main()
+{
+   // Need to know what type of node this is - document or folder
+   var query =
+   {
+      items: [page.url.args.nodeRef]
+   };
+
+   var connector = remote.connect("alfresco");
+   result = connector.post("/api/forms/picker/items", jsonUtils.toJSONString(query), "application/json");
+
+   // Assume document
+   var nodeType = "document";
+
+   if (result.status == 200)
+   {
+      var metadata = eval('(' + result + ')');
+      if (metadata.data.items[0].isContainer)
+      {
+         nodeType = fromContainerType(metadata.data.items[0].type);
+      }
+   }
+
+   model.nodeType = nodeType;
+}
+
+main();

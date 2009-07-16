@@ -50,6 +50,7 @@
 
       // Initialise prototype properties
       this.pathsToExpand = [];
+      this.containers = {};
 
       // Decoupled event listeners
       if (htmlId != "null")
@@ -112,6 +113,15 @@
           * @default "documentLibrary"
           */
          containerId: "documentLibrary",
+
+         /**
+          * ContainerType representing root container in site mode
+          *
+          * @property containerType
+          * @type string
+          * @default "cm:folder"
+          */
+         containerType: "cm:folder",
 
          /**
           * NodeRef representing root container in repository mode
@@ -182,6 +192,14 @@
        * @type {YAHOO.widget.Node}
        */
       selectedNode: null,
+
+      /**
+       * Current list of containers.
+       * 
+       * @property containers
+       * @type {object}
+       */
+      containers: null,
 
       /**
        * Main entry point
@@ -510,6 +528,8 @@
             if (obj.container !== null)
             {
                this.options.containerId = obj.container;
+               var container = this.containers[obj.container];
+               this.options.containerType = container.type;
                this._buildTree("");
                // Kick-off navigation to current path
                this.onPathChanged(this.options.path);
@@ -905,17 +925,23 @@
          
          var fnSuccess = function DLCT__pSP_fnSuccess(response, containerPicker)
          {
-            var containers = response.json, element, container, onclick, i, j;
+            var containers = response.json.containers, element, container, onclick, i, j;
+            this.containers = {};
             
             for (i = 0, j = containers.length; i < j; i++)
             {
                container = containers[i];
+               this.containers[container.name] = container;
                element = document.createElement("div");
                if (i == j - 1)
                {
                   Dom.addClass(element, "last");
                }
                onclick = "YAHOO.Bubbling.fire('copyTo-containerChanged', {container: '" + container.name.replace(/[']/g, "\\'") + "'}); return false;";
+               if (container.description == "")
+               {
+                  container.description = this.msg("default.container.description");
+               }
                element.innerHTML = '<a rel="' + container.name + '" href="#" onclick="' + onclick + '"><h4>' + container.name + '</h4>' + '<span>' + container.description + '</span></a>';
                containerPicker.appendChild(element);
             }
@@ -930,7 +956,7 @@
          
          var config =
          {
-            url: Alfresco.constants.PROXY_URI + "api/site/containers",
+            url: Alfresco.constants.PROXY_URI + "slingshot/doclib/containers/" + this.options.siteId,
             responseContentType: Alfresco.util.Ajax.JSON,
             successCallback:
             {
@@ -941,21 +967,7 @@
             failureCallback: null
          }
          
-         /**
-          * The containers API doesn't exist yet, so let's hardcode the response
-          */
-         // Alfresco.util.Ajax.request(config);
-         var response =
-         {
-            json:
-            [
-               {
-                  name: this.options.containerId,
-                  description: this.msg("temp.description.container")
-               }
-            ]
-         };
-         fnSuccess.call(this, response, config.successCallback.obj);
+         Alfresco.util.Ajax.request(config);
       },
 
       /**
@@ -978,7 +990,7 @@
          // Turn dynamic loading on for entire tree
          tree.setDynamicLoad(this.fnLoadNodeData);
 
-         var rootLabel = (this.options.mode == DLCT.MODE_SITE ? "node.root-sites" : "node.root-repository" )
+         var rootLabel = (this.options.mode == DLCT.MODE_SITE ? (this.options.containerType == "dod:filePlan" ? "node.root-filePlan" : "node.root-sites") : "node.root-repository" )
 
          // Add default top-level node
          var tempNode = new YAHOO.widget.TextNode(
@@ -1045,7 +1057,14 @@
           var uriTemplate = Alfresco.constants.PROXY_URI;
           if (this.options.mode == DLCT.MODE_SITE)
           {
-             uriTemplate += "slingshot/doclib/treenode/site/{site}/{container}{path}";
+             if (this.options.containerType == "dod:filePlan")
+             {
+                uriTemplate += "slingshot/doclib/dod5015/treenode/site/{site}/{container}{path}";
+             }
+             else
+             {
+                uriTemplate += "slingshot/doclib/treenode/site/{site}/{container}{path}";
+             }
           }
           else
           {

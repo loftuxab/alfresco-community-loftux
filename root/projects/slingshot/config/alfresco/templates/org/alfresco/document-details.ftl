@@ -18,7 +18,7 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <@region id="path" scope="template" protected=true />
+      <@region id=doclibType + "path" scope="template" protected=true />
 
       <div class="yui-g">
          <div class="yui-g first">

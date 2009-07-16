@@ -149,10 +149,15 @@
 
 .toolbar span.folder
 {
-   background-image: url(images/folder-closed-16.png);
+   background-image: url(images/folder-open-16.png);
    background-position: left 50%;
    background-repeat: no-repeat;
    padding: 0.2em 0 0.2em 20px;
+}
+
+.toolbar span.last
+{
+   background-image: url(images/folder-closed-16.png);
 }
 
 .toolbar span.crumb .separator

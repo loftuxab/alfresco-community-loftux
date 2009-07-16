@@ -4,6 +4,8 @@
 <#if activePage = "links-linkedit" || activePage = "links-view"><#assign activePage="links"></#if>
 <#if activePage = "discussions-topicview" || activePage = "discussions-createtopic"><#assign activePage="discussions-topiclist"></#if>
 <#if activePage = "document-details" || activePage = "folder-details" || activePage = "edit-metadata"><#assign activePage="documentlibrary"></#if>
+<#-- Records Management -->
+<#if activePage = "record-series-details" || activePage = "record-category-details" || activePage = "record-folder-details"><#assign activePage="documentlibrary"></#if>
 <#if activePage = "wiki-create"><#assign activePage="wiki"></#if>
 <div class="site-navigation">
 <#if siteExists??>

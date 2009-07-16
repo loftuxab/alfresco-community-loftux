@@ -612,16 +612,15 @@ Alfresco.util.activateLinks = function(text)
  */
 Alfresco.util.setSelectedIndex = function(selectEl, value)
 {
-   var l = selectEl.options.length;
-   for(var i = 0; i < l; i++)
+   for (var i = 0, l = selectEl.options.length; i < l; i++)
    {
-      if(selectEl.options[i].value == value)
+      if (selectEl.options[i].value == value)
       {
          selectEl.selectedIndex = i;
          return selectEl.options[i].text;
       }
    }
-   return false;
+   return null;
 };
 
 /**
@@ -3667,7 +3666,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
          this.options = YAHOO.lang.merge(this.options, obj);
          return this;
       },
-      
+
       /**
        * Set messages for this component.
        *
@@ -3681,7 +3680,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
          return this;
       },
 
-      /**    
+      /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        *
@@ -3839,7 +3838,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
 
                args[1].stop = true;
             }
-      		 
+
             return true;
          });
       },

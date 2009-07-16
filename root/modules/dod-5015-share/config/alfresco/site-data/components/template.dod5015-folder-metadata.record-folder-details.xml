@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <component>
    <scope>template</scope>
-   <region-id>dod5015-record-category-metadata</region-id>
-   <source-id>record-category-details</source-id>
+   <region-id>dod5015-folder-metadata</region-id>
+   <source-id>record-folder-details</source-id>
    <url>/components/form</url>
    <properties>
       <itemKind>node</itemKind>

@@ -85,8 +85,9 @@
          var folderData = args[1],
             pathHtml = "",
             rootLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary",
-            baseLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary{file}#path=",
-            pathUrl = "/";
+            baseLinkUrl = rootLinkUrl + "{file}#path=",
+            pathUrl = "/",
+            folders = [];
          
          // create an array of paths
          var path = folderData.location.path;
@@ -96,38 +97,48 @@
             {
                file: "?file=" + encodeURIComponent(folderData.fileName)
             });
-            pathHtml += '">' + Alfresco.util.message("path.documents", this.name) + '</a></span>';
+            pathHtml += '">' + this.msg("path.documents") + '</a></span>';
          }
          else
          {
             // Document Library root node
-            pathHtml += '<span class="path-link"><a href="' + rootLinkUrl + '">' + Alfresco.util.message("path.documents", this.name) + '</a></span>';
+            pathHtml += '<span class="path-link"><a href="' + rootLinkUrl + '">' + this.msg("path.documents") + '</a></span>';
+
+            folders = path.substring(1, path.length).split("/");
+         }   
+
+         folders.push(folderData.fileName);
+         
+         pathHtml += '<span class="separator"> &gt; </span>';
+         
+         for (var x = 0, y = folders.length; x < y; x++)
+         {
+            pathUrl += window.escape(folders[x]);
             
-            var folders = path.substring(1, path.length).split("/");
-            folders.push(folderData.fileName);
-            
-            pathHtml += '<span class="separator"> &gt; </span>';
-            
-            for (var x = 0, y = folders.length; x < y; x++)
+            pathHtml += '<span class="path-link ' + (y - x == 1 ? "self" : "folder") + '"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
             {
-               pathUrl += window.escape(folders[x]);
-               
-               pathHtml += '<span class="path-link ' + (y - x == 1 ? "self" : "folder") + '"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
-               {
-                  file: (y - x == 2) ? "?file=" + encodeURIComponent(folderData.fileName) : ""
-               });
-               pathHtml += pathUrl + '">' + $html(folders[x]) + '</a></span>';
-               
-               if (y - x > 1)
-               {
-                  pathHtml += '<span class="separator"> &gt; </span>';
-                  pathUrl += "/";
-               }
+               file: (y - x == 2) ? "?file=" + encodeURIComponent(folderData.fileName) : ""
+            });
+            pathHtml += pathUrl + '">' + $html(folders[x]) + '</a></span>';
+            
+            if (y - x > 1)
+            {
+               pathHtml += '<span class="separator"> &gt; </span>';
+               pathUrl += "/";
             }
          }
+
          
          Dom.setStyle(this.id + "-defaultPath", "display", "none");
          Dom.get(this.id + "-path").innerHTML = pathHtml;
+         
+         var iconTypeHtml = YAHOO.lang.substitute('<img src="{iconContext}{icon}-48.png" width="48" height="48" /><span class="type">{type}</span>',
+         {
+            iconContext: Alfresco.constants.URL_CONTEXT + "components/documentlibrary/images/",
+            icon: folderData.type,
+            type: this.msg("type." + folderData.type)
+         })
+         Dom.get(this.id + "-iconType").innerHTML = iconTypeHtml;
       }
    });
 })();
