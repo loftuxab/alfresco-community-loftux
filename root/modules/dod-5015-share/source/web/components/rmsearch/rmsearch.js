@@ -98,15 +98,33 @@
          this.widgets.newButton = Alfresco.util.createYUIButton(this, "newsearch-button", this.onNewSearch);
          this.widgets.printButton = Alfresco.util.createYUIButton(this, "print-button", this.onPrint);
          this.widgets.exportButton = Alfresco.util.createYUIButton(this, "export-button", this.onExport);
+         
+         // Field insert menu
+         this.widgets.insertFieldMenu = new YAHOO.widget.Button(this.id + "-insertfield",
+         {
+            type: "menu",
+            menu: this.id + "-insertfield-menu"
+         });
+         this.widgets.insertFieldMenu.getMenu().subscribe("click", function(p_sType, p_aArgs)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
+            {
+               // get the namespaced attribute name (e.g. rma:location)
+               var attribute = ' ' + menuItem.value + ':';
+               Alfresco.util.insertAtCursor(Dom.get(me.id + "-query"), attribute);
+            }
+         });
+         
          // Saved Searches menu
-         // TODO: load saved searches
+         // TODO: load saved searches from repo!
          this.widgets.savedSearchMenu = new YAHOO.widget.Button(this.id + "-savedsearches-button",
          {
             type: "menu",
             menu: [
-                     {text: "My saved search", value: "1234", onclick: {fn: this.onSavedSearchSelected}},
-                     {text: "Another search", value: "12345", onclick: {fn: this.onSavedSearchSelected}},
-                     {text: "Records Due for Cut Off", value: "123456", onclick: {fn: this.onSavedSearchSelected}}
+                     {text: "My saved search", value: "1", onclick: {fn: this.onSavedSearchSelected}},
+                     {text: "Another search", value: "2", onclick: {fn: this.onSavedSearchSelected}},
+                     {text: "Records Due for Cut Off", value: "3", onclick: {fn: this.onSavedSearchSelected}}
                   ]
          });
          this.widgets.savedSearchMenu.on("click", this.onSavedSearchClick, this, true);
@@ -151,7 +169,7 @@
          var query = null;
          if (Dom.get(this.id + "-undeclared").checked === false)
          {
-            query = 'ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}declaredRecord"';
+            query = 'ASPECT:"rma:declaredRecord"';
          }
          
          // switch to results tab
@@ -219,7 +237,7 @@
       onSavedSearchSelected: function RecordsSearch_onSavedSearchSelected(e, args)
       {
          // scope is the clicked MenuItem object
-         alert(this.value);
+         //alert(this.value);
       },
       
       /**

@@ -117,7 +117,8 @@ function getSearchResults(query, terms, maxResults, siteId)
    var path = SITES_SPACE_QNAME_PATH + "cm:" + search.ISO9075Encode(siteId) + "/cm:documentLibrary/";
 	
    // query for records only
-   var alfQuery = "";
+   var alfQuery = terms;
+   /*var alfQuery = "";
    if (terms !== null && terms.length !== 0)
    {
       var tokens = terms.split(/\s/), i, j, t;
@@ -154,7 +155,7 @@ function getSearchResults(query, terms, maxResults, siteId)
             }
          }
       }
-   }
+   }*/
    
    var nodes;
    
@@ -168,10 +169,17 @@ function getSearchResults(query, terms, maxResults, siteId)
       alfQuery += ' AND (' + query + ')';
    }
    // suffix the PATH query and the mandatory ASPECT clause
-   alfQuery = 'PATH:"' + path + '/*" AND ASPECT:"{http://www.alfresco.org/model/recordsmanagement/1.0}record"' + alfQuery;
+   alfQuery = 'PATH:"' + path + '/*" AND ASPECT:"rma:record"' + alfQuery;
+   
+   // TODO: add sorting
    
    // perform fts-alfresco language query for records
-   nodes = search.query({query: alfQuery, language: "fts-alfresco"});
+   var queryDef = {
+      query: alfQuery,
+      language: "fts-alfresco",
+      templates: [ {field: "KEYWORDS", template: "%(cm:name cm:title cm:description TEXT)"} ]
+   };
+   nodes = search.query(queryDef);
    
    return processResults(nodes, maxResults, siteId);
 }

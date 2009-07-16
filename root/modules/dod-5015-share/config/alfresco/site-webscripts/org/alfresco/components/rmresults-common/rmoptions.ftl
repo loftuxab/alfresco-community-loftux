@@ -58,6 +58,10 @@
                         <label for="${el}-metadata-location">${msg("label.location")}</label>
                      </li>
                      <li>
+                        <input type="checkbox" id="${el}-metadata-address" />
+                        <label for="${el}-metadata-address">${msg("label.address")}</label>
+                     </li>
+                     <li>
                         <input type="checkbox" id="${el}-metadata-supplementalMarkingList" />
                         <label for="${el}-metadata-supplementalMarkingList">${msg("label.supplementalMarkingList")}</label>
                      </li>
@@ -85,13 +89,17 @@
                            <option value="originator">${msg("label.originator")}</option>
                            <option value="dateFiled">${msg("label.dateFiled")}</option>
                            <option value="publicationDate">${msg("label.publicationDate")}</option>
-                           <option value="vitalRecord">${msg("label.vitalRecord")}</option>
+                           <option value="reviewAsOf">${msg("label.reviewDate")}</option>
                            <option value="originatingOrganization">${msg("label.originatingOrganization")}</option>
                            <option value="mediaType">${msg("label.mediaType")}</option>
                            <option value="format">${msg("label.format")}</option>
                            <option value="dateReceived">${msg("label.dateReceived")}</option>
                            <option value="location">${msg("label.location")}</option>
+                           <option value="address">${msg("label.address")}</option>
                            <option value="supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                           <#list meta as d>
+                           <option value="${d.name?substring(4)}">${d.title}</option>
+                           </#list>
                         </select>
                      </span>
                   </div>
@@ -107,13 +115,17 @@
                            <option value="originator">${msg("label.originator")}</option>
                            <option value="dateFiled">${msg("label.dateFiled")}</option>
                            <option value="publicationDate">${msg("label.publicationDate")}</option>
-                           <option value="vitalRecord">${msg("label.vitalRecord")}</option>
+                           <option value="reviewAsOf">${msg("label.reviewDate")}</option>
                            <option value="originatingOrganization">${msg("label.originatingOrganization")}</option>
                            <option value="mediaType">${msg("label.mediaType")}</option>
                            <option value="format">${msg("label.format")}</option>
                            <option value="dateReceived">${msg("label.dateReceived")}</option>
                            <option value="location">${msg("label.location")}</option>
+                           <option value="address">${msg("label.address")}</option>
                            <option value="supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                           <#list meta as d>
+                           <option value="${d.name?substring(4)}">${d.title}</option>
+                           </#list>
                         </select>
                      </span>
                   </div>
@@ -129,13 +141,17 @@
                            <option value="originator">${msg("label.originator")}</option>
                            <option value="dateFiled">${msg("label.dateFiled")}</option>
                            <option value="publicationDate">${msg("label.publicationDate")}</option>
-                           <option value="vitalRecord">${msg("label.vitalRecord")}</option>
+                           <option value="reviewAsOf">${msg("label.reviewDate")}</option>
                            <option value="originatingOrganization">${msg("label.originatingOrganization")}</option>
                            <option value="mediaType">${msg("label.mediaType")}</option>
                            <option value="format">${msg("label.format")}</option>
                            <option value="dateReceived">${msg("label.dateReceived")}</option>
                            <option value="location">${msg("label.location")}</option>
+                           <option value="address">${msg("label.address")}</option>
                            <option value="supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                           <#list meta as d>
+                           <option value="${d.name?substring(4)}">${d.title}</option>
+                           </#list>
                         </select>
                      </span>
                   </div>
