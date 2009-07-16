@@ -60,11 +60,11 @@ public class FileAction extends RMActionExecuterAbstractBase
         
         // TODO if this is a declared record already .. what do we do? .. it's a re-file!
         
-        // Get the disposition instrcutions for the actioned upon record
-        DispositionSchedule di = this.recordsManagementService.getDispositionSchedule(actionedUponNodeRef);
-                
         // Add the record and undeclared aspect
         nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_RECORD, null);
+        
+        // Get the disposition instrcutions for the actioned upon record
+        DispositionSchedule di = this.recordsManagementService.getDispositionSchedule(actionedUponNodeRef);
         
         // Get the records properties
         Map<QName, Serializable> recordProperties = this.nodeService.getProperties(actionedUponNodeRef);
