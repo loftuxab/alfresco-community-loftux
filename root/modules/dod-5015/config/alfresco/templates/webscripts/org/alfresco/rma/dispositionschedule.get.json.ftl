@@ -8,6 +8,7 @@
    "data" :
    {
       "url" : "${schedule.url}",
+      "nodeRef" : "${schedule.nodeRef}",
       <#if schedule.authority??>"authority" : "${schedule.authority}",</#if>
       <#if schedule.instructions??>"instructions" : "${schedule.instructions}",</#if>
       "recordLevelDisposition" : ${schedule.recordLevelDisposition?string},

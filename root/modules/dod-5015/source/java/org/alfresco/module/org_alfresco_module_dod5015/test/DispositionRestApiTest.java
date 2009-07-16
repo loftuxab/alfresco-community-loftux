@@ -132,6 +132,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         String categoryNodeUrl = recordCategory.toString().replace("://", "/");
         String requestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
         rsp = sendRequest(new GetRequest(requestUrl), expectedStatus);
+        //System.out.println("GET response: " + rsp.getContentAsString());
         assertEquals("application/json;charset=UTF-8", rsp.getContentType());
         
         // get response as JSON
@@ -142,7 +143,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         JSONObject dataObj = jsonParsedObject.getJSONObject("data");
         assertNotNull(dataObj);
         JSONObject rootDataObject = (JSONObject)dataObj;
-        assertEquals(6, rootDataObject.length());
+        assertEquals(7, rootDataObject.length());
         
         // check individual data items
         String serviceUrl = "/alfresco/service" + requestUrl;
@@ -178,6 +179,11 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertEquals(8, action2.length());
         assertEquals("rma:cutOffDate", action2.get("periodProperty"));
         
+        // make sure the disposition schedule node ref is present and valid
+        String scheduleNodeRefJSON = rootDataObject.getString("nodeRef");
+        NodeRef scheduleNodeRef = new NodeRef(scheduleNodeRefJSON);
+        assertTrue(this.nodeService.exists(scheduleNodeRef));
+        
         // Test data structure returned from "Personnel Security Program Records"
         recordCategory = TestUtilities.getRecordCategory(this.searchService, "Civilian Files", "Employee Performance File System Records");
         assertNotNull(recordCategory);
@@ -194,7 +200,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         dataObj = jsonParsedObject.getJSONObject("data");
         assertNotNull(dataObj);
         rootDataObject = (JSONObject)dataObj;
-        assertEquals(6, rootDataObject.length());
+        assertEquals(7, rootDataObject.length());
         
         // check individual data items
         serviceUrl = "/alfresco/service" + requestUrl;
@@ -248,7 +254,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         dataObj = jsonParsedObject.getJSONObject("data");
         assertNotNull(dataObj);
         rootDataObject = (JSONObject)dataObj;
-        assertEquals(4, rootDataObject.length());
+        assertEquals(5, rootDataObject.length());
         actions = rootDataObject.getJSONArray("actions");
         assertNotNull(actions);
         assertEquals(0, actions.length());
