@@ -38,14 +38,15 @@ import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
@@ -75,6 +76,8 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
     protected static final String POST_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions";
     protected static final String DELETE_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions/{1}";
     protected static final String PUT_ACTIONDEF_URL_FORMAT = "/api/node/{0}/dispositionschedule/dispositionactiondefinitions/{1}";
+    protected static final String GET_LIST_URL = "/api/rma/admin/listofvalues";
+    protected static final String SERVICE_URL_PREFIX = "/alfresco/service";
     protected static final String APPLICATION_JSON = "application/json";
     
     protected NodeService nodeService;
@@ -83,9 +86,9 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
     protected ImporterService importService;
     protected PermissionService permissionService;
     protected TransactionService transactionService;
-    protected ServiceRegistry services;
     protected RecordsManagementService rmService;
     protected RecordsManagementActionService rmActionService;
+    protected RecordsManagementEventService rmEventService;
     
     @Override
     protected void setUp() throws Exception
@@ -97,9 +100,9 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         this.importService = (ImporterService)getServer().getApplicationContext().getBean("ImporterService");
         this.permissionService = (PermissionService)getServer().getApplicationContext().getBean("PermissionService");
         this.transactionService = (TransactionService)getServer().getApplicationContext().getBean("TransactionService");
-        this.services = (ServiceRegistry)getServer().getApplicationContext().getBean("ServiceRegistry");
         this.rmService = (RecordsManagementService)getServer().getApplicationContext().getBean("RecordsManagementService");
         this.rmActionService = (RecordsManagementActionService)getServer().getApplicationContext().getBean("RecordsManagementActionService");
+        this.rmEventService = (RecordsManagementEventService)getServer().getApplicationContext().getBean("RecordsManagementEventService");
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
 
@@ -146,7 +149,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertEquals(7, rootDataObject.length());
         
         // check individual data items
-        String serviceUrl = "/alfresco/service" + requestUrl;
+        String serviceUrl = SERVICE_URL_PREFIX + requestUrl;
         String url = rootDataObject.getString("url");
         assertEquals(serviceUrl, url);
         
@@ -203,7 +206,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertEquals(7, rootDataObject.length());
         
         // check individual data items
-        serviceUrl = "/alfresco/service" + requestUrl;
+        serviceUrl = SERVICE_URL_PREFIX + requestUrl;
         url = rootDataObject.getString("url");
         assertEquals(serviceUrl, url);
         
@@ -504,7 +507,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         
         // check mandatory stuff is present
         JSONObject dataObj = jsonParsedObject.getJSONObject("data");
-        assertEquals("/alfresco/service" + requestUrl, dataObj.getString("url"));
+        assertEquals(SERVICE_URL_PREFIX + requestUrl, dataObj.getString("url"));
         assertEquals("cutoff", dataObj.getString("name"));
         assertEquals("Cutoff", dataObj.getString("label"));
         assertFalse(dataObj.getBoolean("eventsEligible"));
@@ -525,6 +528,64 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertFalse(dataObj.has("completedBy"));
         assertFalse(event1.has("completedAt"));
         assertFalse(event1.has("completedBy"));
+    }
+    
+    public void testGetListOfValues() throws Exception
+    {
+        // call the list service
+        Response rsp = sendRequest(new GetRequest(GET_LIST_URL), 200);
+        //System.out.println("GET : " + rsp.getContentAsString());
+        assertEquals("application/json;charset=UTF-8", rsp.getContentType());
+        
+        // get response as JSON
+        JSONObject jsonParsedObject = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        assertNotNull(jsonParsedObject);
+        JSONObject data = jsonParsedObject.getJSONObject("data");
+        
+        // check dispostion actions
+        JSONObject actions = data.getJSONObject("dispositionActions");
+        assertEquals(SERVICE_URL_PREFIX + GET_LIST_URL + "/dispositionactions", actions.getString("url"));
+        JSONArray items = actions.getJSONArray("items");
+        assertEquals(this.rmActionService.getDispositionActions().size(), items.length());
+        assertTrue(items.length() > 0);
+        JSONObject item = items.getJSONObject(0);
+        assertTrue(item.length() == 2);
+        assertTrue(item.has("label"));
+        assertTrue(item.has("value"));
+        
+        // check events
+        JSONObject events = data.getJSONObject("events");
+        assertEquals(SERVICE_URL_PREFIX + GET_LIST_URL + "/events", events.getString("url"));
+        items = events.getJSONArray("items");
+        assertEquals(this.rmEventService.getEvents().size(), items.length());
+        assertTrue(items.length() > 0);
+        item = items.getJSONObject(0);
+        assertTrue(item.length() == 3);
+        assertTrue(item.has("label"));
+        assertTrue(item.has("value"));
+        assertTrue(item.has("automatic"));
+        
+        // check period types
+        JSONObject periodTypes = data.getJSONObject("periodTypes");
+        assertEquals(SERVICE_URL_PREFIX + GET_LIST_URL + "/periodtypes", periodTypes.getString("url"));
+        items = periodTypes.getJSONArray("items");
+        assertEquals(Period.getProviderNames().size()-1, items.length());
+        assertTrue(items.length() > 0);
+        item = items.getJSONObject(0);
+        assertTrue(item.length() == 2);
+        assertTrue(item.has("label"));
+        assertTrue(item.has("value"));
+        
+        // check period properties
+        JSONObject periodProperties = data.getJSONObject("periodProperties");
+        assertEquals(SERVICE_URL_PREFIX + GET_LIST_URL + "/periodproperties", periodProperties.getString("url"));
+        items = periodProperties.getJSONArray("items");
+        assertEquals(3, items.length());
+        assertTrue(items.length() > 0);
+        item = items.getJSONObject(0);
+        assertTrue(item.length() == 2);
+        assertTrue(item.has("label"));
+        assertTrue(item.has("value"));
     }
     
     private void declareRecord(NodeRef recordOne)
