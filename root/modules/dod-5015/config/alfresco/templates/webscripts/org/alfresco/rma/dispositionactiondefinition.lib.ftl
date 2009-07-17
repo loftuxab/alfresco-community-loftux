@@ -1,10 +1,5 @@
-<#macro encodedActionJSON action>
-<#escape x as jsonUtils.encodeJSONString(x)>
-<@actionJSON action=action />
-</#escape>
-</#macro>
-
 <#macro actionJSON action>
+<#escape x as jsonUtils.encodeJSONString(x)>
    {
       "id" : "${action.id}",
       "url" : "${action.url}",
@@ -25,4 +20,5 @@
       </#if>
       "eligibleOnFirstCompleteEvent" : ${action.eligibleOnFirstCompleteEvent?string}
    }
+</#escape>
 </#macro>
