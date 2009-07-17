@@ -158,10 +158,11 @@ public class DispositionActionImpl implements DispositionAction,
         List<EventCompletionDetails> result = new ArrayList<EventCompletionDetails>(assocs.size());
         for (ChildAssociationRef assoc : assocs)
         {
-            Map<QName, Serializable> props = this.services.getNodeService().getProperties(assoc.getChildRef());                     
+            Map<QName, Serializable> props = this.services.getNodeService().getProperties(assoc.getChildRef()); 
+            String eventName = (String)props.get(PROP_EVENT_EXECUTION_NAME); 
             EventCompletionDetails ecd = new EventCompletionDetails(
-                    assoc.getChildRef(),
-                    (String)props.get(PROP_EVENT_EXECUTION_NAME),
+                    assoc.getChildRef(), eventName, 
+                    this.services.getRecordsManagementEventService().getEvent(eventName).getDisplayLabel(),
                     getBooleanValue(props.get(PROP_EVENT_EXECUTION_AUTOMATIC), false),
                     getBooleanValue(props.get(PROP_EVENT_EXECUTION_COMPLETE), false),
                     (Date)props.get(PROP_EVENT_EXECUTION_COMPLETED_AT),

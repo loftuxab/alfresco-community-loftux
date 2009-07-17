@@ -38,6 +38,7 @@ public class EventCompletionDetails
 {
     private NodeRef nodeRef;
     private String eventName;
+    private String eventLabel;
     private boolean eventExecutionAutomatic;
     private boolean eventComplete;
     private Date eventCompletedAt;
@@ -47,6 +48,7 @@ public class EventCompletionDetails
     /**
      * @param nodeRef
      * @param eventName
+     * @param eventLabel
      * @param eventExecutionAutomatic
      * @param eventComplete
      * @param eventCompletedAt
@@ -54,6 +56,7 @@ public class EventCompletionDetails
      */
     public EventCompletionDetails(  NodeRef nodeRef,
                                     String eventName,
+                                    String eventLabel,
                                     boolean eventExecutionAutomatic, 
                                     boolean eventComplete,
                                     Date eventCompletedAt, 
@@ -61,6 +64,7 @@ public class EventCompletionDetails
     {
         this.nodeRef = nodeRef;
         this.eventName = eventName;
+        this.eventLabel = eventLabel;
         this.eventExecutionAutomatic = eventExecutionAutomatic;
         this.eventComplete = eventComplete;
         this.eventCompletedAt = eventCompletedAt;
@@ -96,9 +100,7 @@ public class EventCompletionDetails
      */
     public String getEventLabel()
     {
-        // TODO: lookup the I18N string for the event
-        
-        return StringUtils.capitalize(getEventName());
+        return this.eventLabel;
     }
     
     /**
