@@ -83,22 +83,22 @@
                      <span>
                         <input id="${el}-sort1" type="button" name="sort1" value="${msg("label.identifier")}" />
                         <select id="${el}-sort1-menu">
-                           <option value="identifier">${msg("label.identifier")}</option>
-                           <option value="name">${msg("label.name")}</option>
-                           <option value="title">${msg("label.title")}</option>
-                           <option value="originator">${msg("label.originator")}</option>
-                           <option value="dateFiled">${msg("label.dateFiled")}</option>
-                           <option value="publicationDate">${msg("label.publicationDate")}</option>
-                           <option value="reviewAsOf">${msg("label.reviewDate")}</option>
-                           <option value="originatingOrganization">${msg("label.originatingOrganization")}</option>
-                           <option value="mediaType">${msg("label.mediaType")}</option>
-                           <option value="format">${msg("label.format")}</option>
-                           <option value="dateReceived">${msg("label.dateReceived")}</option>
-                           <option value="location">${msg("label.location")}</option>
-                           <option value="address">${msg("label.address")}</option>
-                           <option value="supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                           <option value="rma:identifier">${msg("label.identifier")}</option>
+                           <option value="cm:name">${msg("label.name")}</option>
+                           <option value="cm:title">${msg("label.title")}</option>
+                           <option value="rma:originator">${msg("label.originator")}</option>
+                           <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
+                           <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
+                           <option value="rma:reviewAsOf">${msg("label.reviewDate")}</option>
+                           <option value="rma:originatingOrganization">${msg("label.originatingOrganization")}</option>
+                           <option value="rma:mediaType">${msg("label.mediaType")}</option>
+                           <option value="rma:format">${msg("label.format")}</option>
+                           <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
+                           <option value="rma:location">${msg("label.location")}</option>
+                           <option value="rma:address">${msg("label.address")}</option>
+                           <option value="rma:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
                            <#list meta as d>
-                           <option value="${d.name?substring(4)}">${d.title}</option>
+                           <option value="${d.name}">${d.title}</option>
                            </#list>
                         </select>
                      </span>
@@ -109,22 +109,22 @@
                         <input id="${el}-sort2" type="button" name="sort2" value="${msg("label.sortNone")}" />
                         <select id="${el}-sort2-menu">
                            <option value="">${msg("label.sortNone")}</option>
-                           <option value="identifier">${msg("label.identifier")}</option>
-                           <option value="name">${msg("label.name")}</option>
-                           <option value="title">${msg("label.title")}</option>
-                           <option value="originator">${msg("label.originator")}</option>
-                           <option value="dateFiled">${msg("label.dateFiled")}</option>
-                           <option value="publicationDate">${msg("label.publicationDate")}</option>
-                           <option value="reviewAsOf">${msg("label.reviewDate")}</option>
-                           <option value="originatingOrganization">${msg("label.originatingOrganization")}</option>
-                           <option value="mediaType">${msg("label.mediaType")}</option>
-                           <option value="format">${msg("label.format")}</option>
-                           <option value="dateReceived">${msg("label.dateReceived")}</option>
-                           <option value="location">${msg("label.location")}</option>
-                           <option value="address">${msg("label.address")}</option>
-                           <option value="supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                           <option value="rma:identifier">${msg("label.identifier")}</option>
+                           <option value="cm:name">${msg("label.name")}</option>
+                           <option value="cm:title">${msg("label.title")}</option>
+                           <option value="rma:originator">${msg("label.originator")}</option>
+                           <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
+                           <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
+                           <option value="rma:reviewAsOf">${msg("label.reviewDate")}</option>
+                           <option value="rma:originatingOrganization">${msg("label.originatingOrganization")}</option>
+                           <option value="rma:mediaType">${msg("label.mediaType")}</option>
+                           <option value="rma:format">${msg("label.format")}</option>
+                           <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
+                           <option value="rma:location">${msg("label.location")}</option>
+                           <option value="rma:address">${msg("label.address")}</option>
+                           <option value="rma:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
                            <#list meta as d>
-                           <option value="${d.name?substring(4)}">${d.title}</option>
+                           <option value="${d.name}">${d.title}</option>
                            </#list>
                         </select>
                      </span>
@@ -135,22 +135,22 @@
                         <input id="${el}-sort3" type="button" name="sort3" value="${msg("label.sortNone")}" />
                         <select id="${el}-sort3-menu">
                            <option value="">${msg("label.sortNone")}</option>
-                           <option value="identifier">${msg("label.identifier")}</option>
-                           <option value="name">${msg("label.name")}</option>
-                           <option value="title">${msg("label.title")}</option>
-                           <option value="originator">${msg("label.originator")}</option>
-                           <option value="dateFiled">${msg("label.dateFiled")}</option>
-                           <option value="publicationDate">${msg("label.publicationDate")}</option>
-                           <option value="reviewAsOf">${msg("label.reviewDate")}</option>
-                           <option value="originatingOrganization">${msg("label.originatingOrganization")}</option>
-                           <option value="mediaType">${msg("label.mediaType")}</option>
-                           <option value="format">${msg("label.format")}</option>
-                           <option value="dateReceived">${msg("label.dateReceived")}</option>
-                           <option value="location">${msg("label.location")}</option>
-                           <option value="address">${msg("label.address")}</option>
-                           <option value="supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                           <option value="rma:identifier">${msg("label.identifier")}</option>
+                           <option value="cm:name">${msg("label.name")}</option>
+                           <option value="cm:title">${msg("label.title")}</option>
+                           <option value="rma:originator">${msg("label.originator")}</option>
+                           <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
+                           <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
+                           <option value="rma:reviewAsOf">${msg("label.reviewDate")}</option>
+                           <option value="rma:originatingOrganization">${msg("label.originatingOrganization")}</option>
+                           <option value="rma:mediaType">${msg("label.mediaType")}</option>
+                           <option value="rma:format">${msg("label.format")}</option>
+                           <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
+                           <option value="rma:location">${msg("label.location")}</option>
+                           <option value="rma:address">${msg("label.address")}</option>
+                           <option value="rma:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
                            <#list meta as d>
-                           <option value="${d.name?substring(4)}">${d.title}</option>
+                           <option value="${d.name}">${d.title}</option>
                            </#list>
                         </select>
                      </span>

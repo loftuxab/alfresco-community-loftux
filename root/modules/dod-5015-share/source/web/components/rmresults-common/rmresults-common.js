@@ -54,6 +54,8 @@
       /* Mandatory properties */
       this.id = htmlId;
       
+      this.sortby = ["rma:identifier", null, null];
+      
       return this;
    };
    
@@ -90,7 +92,15 @@
           * @property customFields
           * @type Array
           */
-         customFields: []
+         customFields: [],
+         
+         /**
+          * Saved searches
+          * 
+          * @property savedSearches
+          * @type Array
+          */
+         savedSearches: []
       },
 
       /**
@@ -110,11 +120,6 @@
       modules: {},
 
       /**
-       * Used defined full text search terms for the search or report.
-       */
-      searchTerms: "",
-
-      /**
        * Number of search results.
        */
       resultsCount: 0,
@@ -123,6 +128,8 @@
        * True if there are more results than the ones listed in the table.
        */
       hasMoreResults: false,
+      
+      sortby: null,
       
       /**
        * Set multiple initialization options at once.
@@ -166,14 +173,13 @@
             type: "menu",
             menu: this.id + "-sort1-menu"
          });
-         //this.widgets.sortMenu1.on("click", this.onSortFilterClicked, this, true);
          this.widgets.sortMenu1.getMenu().subscribe("click", function(p_sType, p_aArgs)
          {
             var menuItem = p_aArgs[1];
             if (menuItem)
             {
                me.widgets.sortMenu1.set("label", menuItem.cfg.getProperty("text"));
-               //me.onSortFilterClicked.call(me, p_aArgs[1]);
+               me.sortby[0] = menuItem.value;
             }
          });
          
@@ -182,14 +188,13 @@
             type: "menu",
             menu: this.id + "-sort2-menu"
          });
-         //this.widgets.sortMenu2.on("click", this.onSortFilterClicked, this, true);
          this.widgets.sortMenu2.getMenu().subscribe("click", function(p_sType, p_aArgs)
          {
             var menuItem = p_aArgs[1];
             if (menuItem)
             {
                me.widgets.sortMenu2.set("label", menuItem.cfg.getProperty("text"));
-               //me.onSortFilterClicked.call(me, p_aArgs[1]);
+               me.sortby[1] = menuItem.value;
             }
          });
          
@@ -198,14 +203,13 @@
             type: "menu",
             menu: this.id + "-sort3-menu"
          });
-         //this.widgets.sortMenu3.on("click", this.onSortFilterClicked, this, true);
          this.widgets.sortMenu3.getMenu().subscribe("click", function(p_sType, p_aArgs)
          {
             var menuItem = p_aArgs[1];
             if (menuItem)
             {
                me.widgets.sortMenu3.set("label", menuItem.cfg.getProperty("text"));
-               //me.onSortFilterClicked.call(me, p_aArgs[1]);
+               me.sortby[2] = menuItem.value;
             }
          });
          
@@ -263,7 +267,7 @@
          Dom.setStyle(this.id + "-options-toggle", "url(" + Alfresco.constants.URL_CONTEXT + "components/images/expanded.png)");
          
          // DataSource definition
-         var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/rmsearch?";
+         var uriSearchResults = Alfresco.constants.PROXY_URI + "slingshot/rmsearch/" + this.options.siteId + "?";
          this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
@@ -520,7 +524,7 @@
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
        * Disconnected event handlers for inter-component event notification
        */
-
+      
       /**
        * Resets the YUI DataTable errors to our custom messages
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
@@ -540,9 +544,8 @@
        * 
        * @method _performSearch
        * @param query {string} Query to execute
-       * @param terms {string} Full text search terms
        */
-      _performSearch: function RecordsResults__performSearch(query, terms)
+      _performSearch: function RecordsResults__performSearch(query)
       {
          // empty results table
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
@@ -552,7 +555,6 @@
          
          function successHandler(sRequest, oResponse, oPayload)
          {
-            this.searchTerms = terms;
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          }
          
@@ -579,7 +581,7 @@
             }
          }
          
-         this.widgets.dataSource.sendRequest(this._buildSearchParams(query, terms),
+         this.widgets.dataSource.sendRequest(this._buildSearchParams(query),
          {
             success: successHandler,
             failure: failureHandler,
@@ -592,15 +594,14 @@
        *
        * @method _buildSearchParams
        * @param query {string} Query to execute
-       * @param terms {string} Full text search terms
        */
-      _buildSearchParams: function RecordsResults__buildSearchParams(query, terms)
+      _buildSearchParams: function RecordsResults__buildSearchParams(query)
       {
-         var params = YAHOO.lang.substitute("site={site}&query={query}&terms={terms}&maxResults={maxResults}",
+         var params = YAHOO.lang.substitute("site={site}&query={query}&sortby={sortby}&maxResults={maxResults}",
          {
             site: encodeURIComponent(this.options.siteId),
             query : query !== null ? encodeURIComponent(query) : "",
-            terms : encodeURIComponent(terms),
+            sortby : encodeURIComponent(this.sortby.join(",")),
             maxResults : this.options.maxResults + 1 // to be able to know whether we got more results
          });
          

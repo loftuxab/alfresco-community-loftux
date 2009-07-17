@@ -117,15 +117,21 @@
          });
          
          // Saved Searches menu
-         // TODO: load saved searches from repo!
+         var searches = [];
+         for (var i=0, j=this.options.savedSearches.length; i<j; i++)
+         {
+            var search = this.options.savedSearches[i];
+            searches.push(
+            {
+               text: search.label,
+               value: search.id,
+               onclick: {fn: this.onSavedSearchSelected}
+            });
+         }
          this.widgets.savedSearchMenu = new YAHOO.widget.Button(this.id + "-savedsearches-button",
          {
             type: "menu",
-            menu: [
-                     {text: "My saved search", value: "1", onclick: {fn: this.onSavedSearchSelected}},
-                     {text: "Another search", value: "2", onclick: {fn: this.onSavedSearchSelected}},
-                     {text: "Records Due for Cut Off", value: "3", onclick: {fn: this.onSavedSearchSelected}}
-                  ]
+            menu: searches
          });
          this.widgets.savedSearchMenu.on("click", this.onSavedSearchClick, this, true);
          
@@ -163,20 +169,20 @@
        */
       onSearchClick: function RecordsSearch_onSearchClick(e, args)
       {
-         var searchTermElem = Dom.get(this.id + "-query");
-         var searchTerm = searchTermElem.value;
+         var queryElem = Dom.get(this.id + "-query");
+         var userQuery = YAHOO.lang.trim(queryElem.value);
          
-         var query = null;
+         var query = userQuery;
          if (Dom.get(this.id + "-undeclared").checked === false)
          {
-            query = 'ASPECT:"rma:declaredRecord"';
+            query = 'ASPECT:"rma:declaredRecord" AND (' + userQuery + ')';
          }
          
          // switch to results tab
          this.widgets.tabs.selectTab(1);
          
          // execute the search and populate the results
-         this._performSearch(query, searchTerm);
+         this._performSearch(query);
       },
       
       /**

@@ -9,7 +9,7 @@
  * Outputs:
  *  data.items/data.error - object containing list of search results
  */
-const DEFAULT_MAX_RESULTS = 100;
+const DEFAULT_MAX_RESULTS = 500;
 const SITES_SPACE_QNAME_PATH = "/app:company_home/st:sites/";
 
 
@@ -82,20 +82,19 @@ function getRecord(siteId, node)
  * 
  * @return the final search results object
  */
-function processResults(nodes, maxResults, siteId)
+function processResults(nodes, siteId)
 {    
    var results = [],
       added = 0,
       item,
       i, j;
    
-   for (i = 0, j = nodes.length; i < j && added < maxResults; i++)
+   for (i = 0, j = nodes.length; i < j; i++)
    {
       item = getRecord(siteId, nodes[i]);
       if (item !== null)
       {
          results.push(item);
-         added++;
       }
    }
    
@@ -106,99 +105,68 @@ function processResults(nodes, maxResults, siteId)
 }
 
 /**
- * Return Search results with the given search terms
- * Terms are split on whitespace characters and quotes removed.
- * 
- * AND, OR and NOT are supported - as their FTS-Alfresco equivalent.
+ * Return Search results with the given FTS-Alfresco search query.
  */
-function getSearchResults(query, terms, maxResults, siteId)
+function getSearchResults(query, sort, maxResults, siteId)
 {
-   // rm doclib fileplan site path
-   var path = SITES_SPACE_QNAME_PATH + "cm:" + search.ISO9075Encode(siteId) + "/cm:documentLibrary/";
-	
-   // query for records only
-   var alfQuery = terms;
-   /*var alfQuery = "";
-   if (terms !== null && terms.length !== 0)
-   {
-      var tokens = terms.split(/\s/), i, j, t;
-      
-      for (i = 0, j = tokens.length; i < j; i++)
-      {
-         t = tokens[i];
-         // TODO: add support for quoted terms later
-         // remove quotes
-         t = t.replace(/\"/g, "");
-         if (t.length !== 0)
-         {
-            switch (t.toLowerCase())
-            {
-               case "and":
-                  if (i < j - 1 && terms[i + 1].length !== 0)
-                  {
-                     alfQuery += "AND ";
-                  }
-                  break;
-               
-               case "or":
-                  break;
-               
-               case "not":
-                  if (i < j - 1 && terms[i + 1].length !== 0)
-                  {
-                     alfQuery += "NOT ";
-                  }
-                  break;
-               
-               default:
-                  alfQuery += '(TEXT:"' + t + '" cm:name:"*' + t + '*") ';
-            }
-         }
-      }
-   }*/
-   
    var nodes;
    
+   // suffix the rm doclib fileplan site PATH query and the mandatory ASPECT clause
+   var path = SITES_SPACE_QNAME_PATH + "cm:" + search.ISO9075Encode(siteId) + "/cm:documentLibrary/";
+   var alfQuery = 'PATH:"' + path + '/*" AND ASPECT:"rma:record"';
+   
    // build up final query components
-   if (alfQuery.length != 0)
-   {
-      alfQuery = ' AND (' + alfQuery + ')';
-   }
    if (query != null && query.length != 0)
    {
       alfQuery += ' AND (' + query + ')';
    }
-   // suffix the PATH query and the mandatory ASPECT clause
-   alfQuery = 'PATH:"' + path + '/*" AND ASPECT:"rma:record"' + alfQuery;
    
-   // TODO: add sorting
+   // gather up the sort by fields
+   var sorts = [];
+   for (var i=0; i<sort.length; i++)
+   {
+      if (sort[i].length != 0)
+      {
+         sorts.push(
+         {
+            column: sort[i]
+         });
+      }
+   }
    
    // perform fts-alfresco language query for records
    var queryDef = {
       query: alfQuery,
       language: "fts-alfresco",
+      page: {maxItems: maxResults},
+      sort: sorts,
+      // we define RM helper query templates
       templates: [ {field: "KEYWORDS", template: "%(cm:name cm:title cm:description TEXT)"} ]
    };
    nodes = search.query(queryDef);
    
-   return processResults(nodes, maxResults, siteId);
+   return processResults(nodes, siteId);
 }
-
 
 function main()
 {
-   var siteId = args.site;
+   var siteId = url.templateArgs.site;
    
-   // query is direct lucene format
+   // query is in fts-alfresco format
    var query = args.query;
    
-   // terms are full text search terms
-   var terms = args.terms;
+   // sort is comma separated list of sort attributes in sort order
+   var sort = [];
+   var sortby = args.sortby;
+   if (sortby != null && sortby.length != 0)
+   {
+      sort = sortby.split(",");
+   }
    
    // maximum results to return - or use default
    var maxResults = (args.maxResults !== null) ? parseInt(args.maxResults) : DEFAULT_MAX_RESULTS;
    
-   model.data = getSearchResults(query, terms, maxResults, siteId);
+   model.data = getSearchResults(query, sort, maxResults, siteId);
 }
 
 main();
