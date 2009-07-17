@@ -124,8 +124,7 @@
             searches.push(
             {
                text: search.label,
-               value: search.id,
-               onclick: {fn: this.onSavedSearchSelected}
+               value: search.query
             });
          }
          this.widgets.savedSearchMenu = new YAHOO.widget.Button(this.id + "-savedsearches-button",
@@ -133,7 +132,16 @@
             type: "menu",
             menu: searches
          });
-         this.widgets.savedSearchMenu.on("click", this.onSavedSearchClick, this, true);
+         this.widgets.savedSearchMenu.getMenu().subscribe("click", function(p_sType, p_aArgs)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
+            {
+               me.widgets.savedSearchMenu.set("label", menuItem.cfg.getProperty("text"));
+               var queryElem = Dom.get(me.id + "-query");
+               queryElem.value = menuItem.value;
+            }
+         });
          
          // Call super class onReady() method
          Alfresco.RecordsSearch.superclass.onReady.call(this);
@@ -143,22 +151,6 @@
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
        * Disconnected event handlers for inter-component event notification
        */
-      
-      /**
-       * Saved Search menu click event handler
-       * 
-       * @method onSavedSearchClick
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onSavedSearchClick: function RecordsSearch_onSavedSearchClick(e, args)
-      {
-         var menuItem = args[1];
-         if (menuItem)
-         {
-            //me.widgets.sortMenu1.set("label", menuItem.cfg.getProperty("text"));
-         }
-      },
       
       /**
        * Search button click event handler
@@ -172,10 +164,14 @@
          var queryElem = Dom.get(this.id + "-query");
          var userQuery = YAHOO.lang.trim(queryElem.value);
          
-         var query = userQuery;
+         var query = "";
          if (Dom.get(this.id + "-undeclared").checked === false)
          {
-            query = 'ASPECT:"rma:declaredRecord" AND (' + userQuery + ')';
+            query = 'ASPECT:"rma:declaredRecord"';
+         }
+         if (userQuery.length != 0)
+         {
+            query = query + (query.length != 0 ? (' AND (' + userQuery + ')') : userQuery);
          }
          
          // switch to results tab
@@ -231,19 +227,6 @@
       onExport: function RecordsSearch_onExport(e, args)
       {
          
-      },
-      
-      /**
-       * Saved search menu item click event handler
-       * 
-       * @method onSavedSearchSelected
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onSavedSearchSelected: function RecordsSearch_onSavedSearchSelected(e, args)
-      {
-         // scope is the clicked MenuItem object
-         //alert(this.value);
       },
       
       /**

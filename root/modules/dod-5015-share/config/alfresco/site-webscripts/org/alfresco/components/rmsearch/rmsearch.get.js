@@ -18,7 +18,7 @@ function main()
    
    // retrieve the public saved searches
    // TODO: user specific searches?
-   res = conn.get("/slingshot/doclib/dod5015/savedsearches/site/" + siteId);
+   res = conn.get("/slingshot/rmsavedsearches/site/" + siteId);
    if (res.status == 200)
    {
       var s, ss = eval('(' + res + ')');
@@ -30,7 +30,8 @@ function main()
             {
                id: s.name,
                label: s.name,
-               description: s.description
+               description: s.description,
+               query: s.query
             });
          }
       }
