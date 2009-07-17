@@ -6,6 +6,8 @@ function getFilterParams(filter, parsedArgs, favourites)
       limitResults: null,
       sortBy: "@{http://www.alfresco.org/model/content/1.0}name",
       sortByAscending: true,
+      language: "lucene",
+      templates: null,
       variablePath: false
    }
 
@@ -48,19 +50,16 @@ function getFilterParams(filter, parsedArgs, favourites)
          var searchNode = parsedArgs.location.siteNode.getContainer("Saved Searches");
          if (searchNode != null)
          {
-            var ssNode = searchNode.childByNamePath(filterData),
-               cleanXml, e4x;
+            var ssNode = searchNode.childByNamePath(filterData);
 
             if (ssNode != null)
             {
-               cleanXml = new String(ssNode.content);
-               cleanXml = cleanXml.replace(/^<\?xml\s+version\s*=\s*(["'])[^\1]+\1[^?]*\?>/, ""); // Rhino E4X bug 336551
-               cleanXml = cleanXml.replace(/^\s+|\s+$/g, ""); // General Rhino E4X inability to handle leading whitespace
-               e4x = new XML(cleanXml);
-               var filterQuery = e4x.query.toString();
-               // Wrap the query so that only items with the filePlan are returned
-               filterQuery = "+PATH:\"" + parsedArgs.rootNode.qnamePath + "//*\" +(" + filterQuery + ")";
-               filterParams.query = filterQuery + filterQueryDefaults;
+               var ssJson = eval('(' + ssNode.content + ')');
+               var filterQuery = ssJson.query;
+               // Wrap the query so that only items within the filePlan are returned
+               filterParams.query = 'PATH:"' + parsedArgs.rootNode.qnamePath + '//*" AND ASPECT:"rma:record" AND (' + filterQuery + ')';
+               filterParams.templates = [ {field: "KEYWORDS", template: "%(cm:name cm:title cm:description TEXT)"} ];
+               filterParams.language = "fts-alfresco";
             }
          }
          break;
