@@ -2,5 +2,5 @@
 
 {
    "data" :
-   <@actionDefLib.encodedActionJSON action=action/>
+   <@actionDefLib.actionJSON action=action/>
 }

@@ -525,10 +525,6 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertFalse(dataObj.has("completedBy"));
         assertFalse(event1.has("completedAt"));
         assertFalse(event1.has("completedBy"));
-        
-        // TODO: complete an event to move things on
-        
-        // TOOD: re-do request and test response
     }
     
     private void declareRecord(NodeRef recordOne)
