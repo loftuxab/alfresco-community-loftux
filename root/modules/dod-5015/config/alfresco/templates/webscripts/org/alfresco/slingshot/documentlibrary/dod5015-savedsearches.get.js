@@ -1,8 +1,9 @@
 function main()
 {
    var savedSearches = [],
-      siteId = url.templateArgs.site,
-      siteNode = siteService.getSite(siteId);
+       siteId = url.templateArgs.site,
+       siteNode = siteService.getSite(siteId),
+       bPublic = args.p;
 
    if (siteNode === null)
    {
@@ -13,17 +14,37 @@ function main()
    var searchNode = siteNode.getContainer("Saved Searches");
    if (searchNode != null)
    {
-      var kids = searchNode.children,
-         ssNode;
+      var kids, ssNode;
       
-      for (var i = 0, ii = kids.length; i < ii; i++)
+      if (bPublic == null || bPublic == "true")
       {
-         ssNode = kids[i];
-         savedSearches.push(
+         // public searches are in the root of the folder
+         kids = searchNode.children;
+      }
+      else
+      {
+         // user specific searches are in a sub-folder of username
+         var userNode = searchNode.childByNamePath(person.properties.userName);
+         if (userNode != null)
          {
-            name: ssNode.name,
-            description: ssNode.properties.description
-         });
+            kids = userNode.children;
+         }
+      }
+      
+      if (kids)
+      {
+         for (var i = 0, ii = kids.length; i < ii; i++)
+         {
+            ssNode = kids[i];
+            if (ssNode.isDocument)
+            {
+               savedSearches.push(
+               {
+                  name: ssNode.name,
+                  description: ssNode.properties.description
+               });
+            }
+         }
       }
    }
    
