@@ -1,3 +1,4 @@
+<#include "common/utils.inc.ftl" />
 <div class="form-field">
    <#if form.mode == "view">
       <div class="viewmode-field">
@@ -17,10 +18,10 @@
                <#if field.disabled>disabled="true"</#if>>
                <#list field.control.params.options?split(",") as nameValue>
                   <#if nameValue?index_of("|") == -1>
-                     <option value="${nameValue}"<#if nameValue == field.value> selected="selected"</#if>>${nameValue}</option>
+                     <option value="${nameValue}"<#if nameValue == field.value?string> selected="selected"</#if>>${nameValue}</option>
                   <#else>
                      <#assign choice=nameValue?split("|")>
-                     <option value="${choice[0]}"<#if choice[0] == field.value> selected="selected"</#if>>${choice[1]}</option>
+                     <option value="${choice[0]}"<#if choice[0] == field.value?string> selected="selected"</#if>>${msgValue(choice[1])}</option>
                   </#if>
                </#list>
          </select>

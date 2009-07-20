@@ -24,10 +24,10 @@
  */
 
 /**
- * RecordCategoryDisposition component.
+ * Disposition component.
  *
  * @namespace Alfresco
- * @class Alfresco.RecordCategoryDisposition
+ * @class Alfresco.Disposition
  */
 (function()
 {
@@ -43,28 +43,66 @@
    var $html = Alfresco.util.encodeHTML;
 
    /**
-    * RecordCategoryDisposition constructor.
+    * Disposition constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.RecordCategoryDisposition} The new component instance
+    * @return {Alfresco.Disposition} The new component instance
     * @constructor
     */
-   Alfresco.RecordCategoryDisposition = function RecordCategoryDisposition_constructor(htmlId)
+   Alfresco.Disposition = function Disposition_constructor(htmlId)
    {
-      Alfresco.RecordCategoryDisposition.superclass.constructor.call(this, "Alfresco.RecordCategoryDisposition", htmlId, ["button", "container"]);
+      Alfresco.Disposition.superclass.constructor.call(this, "Alfresco.Disposition", htmlId, ["button", "container"]);
 
       return this;
    };
 
-   YAHOO.extend(Alfresco.RecordCategoryDisposition, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.Disposition, Alfresco.component.Base,
    {
+
+
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * The nodeRef to the object that owns the disposition schedule that is configured
+          *
+          * @property nodeRef
+          * @type {string}
+          */
+         nodeRef: null,
+
+         /**
+          * The siteId to the site that this disposition belongs to
+          *
+          * @property siteId
+          * @type {string}
+          */
+         siteId: null,
+
+         /**
+          * The nodeRef for the dispostion schedule
+          *
+          * @property dipositionScheduleNodeRef
+          * @type {string}
+          */
+         dipositionScheduleNodeRef: null
+      },
 
       /**
        * Fired by YUI when parent element is available for scripting
        * @method onReady
        */
-      onReady: function RecordCategoryDisposition_onReady()
+      onReady: function Disposition_onReady()
       {
+         // Create buttons
+         this.widgets.editPropertiesButton = Alfresco.util.createYUIButton(this, "editproperties-button", this.onEditPropertiesButtonClick);
+         this.widgets.editScheduleButton = Alfresco.util.createYUIButton(this, "editschedule-button", this.onEditScheduleButtonClick);
+
          // Add listeners that displays/hides the description
          var actionsEl = Dom.get(this.id + "-actions");
          var actionEls = Dom.getElementsByClassName("action", "div", actionsEl);
@@ -99,6 +137,39 @@
                }, this);
             }
          }
+      },
+
+      /**
+       * Fired when the user clicks the edit properties button.
+       * Takes the user to the edit page.
+       *
+       * @method onEditPropertiesButtonClick
+       * @param event {object} a "click" event
+       */
+      onEditPropertiesButtonClick: function Disposition_onEditPropertiesButtonClick(event)
+      {
+         // Disable buttons to avoid double submits or cancel during post
+         this.widgets.editPropertiesButton.set("disabled", true);
+
+         // Send the user to the edit proprties page
+         document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/edit-metadata?nodeRef=" + this.options.dipositionScheduleNodeRef;
+      },
+
+
+      /**
+       * Fired when the user clicks the edit schedule button.
+       * Takes the user to the edit page.
+       *
+       * @method onEditScheduleButtonClick
+       * @param event {object} a "click" event
+       */
+      onEditScheduleButtonClick: function Disposition_onEditScheduleButtonClick(event)
+      {
+         // Disable buttons to avoid double submits or cancel during post
+         this.widgets.editScheduleButton.set("disabled", true);
+
+         // Send the user to the edit schedule page
+         document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/disposition-edit?nodeRef=" + this.options.nodeRef;
       }
 
    });

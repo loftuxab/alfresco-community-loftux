@@ -1,9 +1,10 @@
+<#include "common/utils.inc.ftl" />
 <#if field.control.params.size?exists><#assign size=field.control.params.size><#else><#assign size=5></#if>
 
 <div class="form-field">
    <#if form.mode == "view">
       <div class="viewmode-field">
-         <#if field.mandatory && field.value == "">
+         <#if field.mandatory && field.value?string == "">
             <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>
@@ -11,7 +12,7 @@
       </div>
    <#else>
       <label for="${fieldHtmlId}-entry">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
-      <input id="${fieldHtmlId}" type="hidden" name="${field.name}" value="${field.value}" />
+      <input id="${fieldHtmlId}" type="hidden" name="${field.name}" value="${field.value?string}" />
       <#if field.control.params.options?exists && field.control.params.options != "">
          <select id="${fieldHtmlId}-entry" name="-" multiple="multiple" size="${size}"
                onchange="javascript:Alfresco.util.updateMultiSelectListValue('${fieldHtmlId}-entry', '${fieldHtmlId}', <#if field.mandatory>true<#else>false</#if>);"
@@ -20,10 +21,10 @@
                <#if field.disabled>disabled="true"</#if>>
                <#list field.control.params.options?split(",") as nameValue>
                   <#if nameValue?index_of("|") == -1>
-                     <option value="${nameValue}"<#if (field.value?index_of(nameValue) != -1)> selected="selected"</#if>>${nameValue}</option>
+                     <option value="${nameValue}"<#if (field.value?string?index_of(nameValue) != -1)> selected="selected"</#if>>${nameValue}</option>
                   <#else>
                      <#assign choice=nameValue?split("|")>
-                     <option value="${choice[0]}"<#if (field.value?index_of(choice[0]) != -1)> selected="selected"</#if>>${choice[1]}</option>
+                     <option value="${choice[0]}"<#if (field.value?string?index_of(choice[0]) != -1)> selected="selected"</#if>>${msgValue(choice[1])}</option>
                   </#if>
                </#list>
          </select>

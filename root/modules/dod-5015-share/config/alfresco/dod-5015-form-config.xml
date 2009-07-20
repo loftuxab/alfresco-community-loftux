@@ -58,7 +58,26 @@
          </form>
       </forms>
    </config>
-   
+
+   <config evaluator="node-type" condition="rma:dispositionSchedule">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="rma:authority" />
+               <show id="rma:instructions" />
+               <show id="rma:recordLevelDisposition" />
+            </field-visibility>
+            <appearance>
+               <field id="rma:recordLevelDisposition" label-id="label.recordLevelDisposition">
+                  <control template="controls/selectone.ftl">
+                     <control-param name="options">true|{label.record},false|{label.folder}</control-param>
+                  </control>
+               </field>
+            </appearance>
+         </form>
+      </forms>
+   </config>
+
    <!-- Records Management Editing Forms -->
    <config evaluator="node-type" condition="dod:filePlan">
       <forms>

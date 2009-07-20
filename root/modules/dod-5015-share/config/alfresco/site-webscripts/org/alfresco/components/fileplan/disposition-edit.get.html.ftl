@@ -91,9 +91,9 @@
                            </span>
                            <hr/>
                         </div>
-                        <select class="relation">
-                           <option value="or">${msg("relation.option.or")}</option>
-                           <option value="and">${msg("relation.option.and")}</option>
+                        <select name="eligibleOnFirstCompleteEvent" class="relation">
+                           <option value="false">${msg("relation.option.and")}</option>
+                           <option value="true">${msg("relation.option.or")}</option>
                         </select>
                      </div>
                      <div class="section">

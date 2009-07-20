@@ -23,7 +23,21 @@ function main()
       // Check if we got a positive result
       if (repoJSON.data)
       {
-         var actions = repoJSON.data.actions;
+         var schedule = repoJSON.data;
+         if(schedule.instructions)
+         {
+            model.instructions = schedule.instructions;
+         }
+         if(schedule.authority)
+         {
+            model.authority = schedule.authority;                     
+         }
+         if(schedule.nodeRef)
+         {
+            model.dipositionScheduleNodeRef = schedule.nodeRef;            
+         }
+         model.recordLevelDisposition = schedule.recordLevelDisposition;
+         var actions = schedule.actions;
          for(var i = 0; i < actions.length; i++)
          {
             var action = actions[i];
