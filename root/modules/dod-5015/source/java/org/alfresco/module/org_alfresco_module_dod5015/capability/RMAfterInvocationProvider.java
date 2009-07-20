@@ -47,7 +47,6 @@ import org.alfresco.repo.search.SimpleResultSetMetaData;
 import org.alfresco.repo.search.impl.lucene.PagingLuceneResultSet;
 import org.alfresco.repo.search.impl.querymodel.QueryEngineResults;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.repo.security.permissions.impl.acegi.ACLEntryAfterInvocationProvider;
 import org.alfresco.repo.security.permissions.impl.acegi.ACLEntryVoterException;
 import org.alfresco.repo.security.permissions.impl.acegi.FilteringResultSet;
@@ -60,11 +59,9 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.LimitBy;
 import org.alfresco.service.cmr.search.PermissionEvaluationMode;
 import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
-import org.alfresco.service.namespace.QName;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -368,11 +365,11 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
             return null;
         }
 
-        if(isUnfitered(returnedObject))
+        if (isUnfitered(returnedObject))
         {
             return returnedObject;
         }
-        
+
         List<ConfigAttributeDefintion> supportedDefinitions = extractSupportedDefinitions(config);
 
         if (supportedDefinitions.size() == 0)
@@ -393,7 +390,7 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                 testNodeRef = returnedObject;
             }
 
-            if (entryVoter.checkRead(testNodeRef) == AccessDecisionVoter.ACCESS_DENIED)
+            if (entryVoter.viewRecordsCapability.checkRead(testNodeRef) == AccessDecisionVoter.ACCESS_DENIED)
             {
                 throw new AccessDeniedException("Access Denied");
             }
@@ -405,9 +402,9 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
     private boolean isUnfitered(NodeRef nodeRef)
     {
         return !nodeService.hasAspect(nodeRef, RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT);
-        
+
     }
-    
+
     private FileInfo decide(Authentication authentication, Object object, ConfigAttributeDefinition config, FileInfo returnedObject) throws AccessDeniedException
 
     {
@@ -469,12 +466,12 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
 
             // Enforce Read Policy
 
-            if(isUnfitered(testNodeRef))
+            if (isUnfitered(testNodeRef))
             {
-               continue;
+                continue;
             }
-            
-            if (entryVoter.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED)
+
+            if (entryVoter.viewRecordsCapability.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED)
             {
                 throw new AccessDeniedException("Access Denied");
             }
@@ -513,12 +510,12 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                 testNodeRef = returnedObject.getTargetRef();
             }
 
-            if(isUnfitered(testNodeRef))
+            if (isUnfitered(testNodeRef))
             {
-               continue;
+                continue;
             }
-            
-            if (entryVoter.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED)
+
+            if (entryVoter.viewRecordsCapability.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED)
             {
                 throw new AccessDeniedException("Access Denied");
             }
@@ -634,12 +631,12 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                     testNodeRef = returnedObject.getNodeRef(i);
                 }
 
-                if(isUnfitered(testNodeRef))
+                if (isUnfitered(testNodeRef))
                 {
-                   continue;
+                    continue;
                 }
-                
-                if (inclusionMask.get(i) && (testNodeRef != null) && (entryVoter.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
+
+                if (inclusionMask.get(i) && (testNodeRef != null) && (entryVoter.viewRecordsCapability.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
                 {
                     inclusionMask.set(i, false);
                 }
@@ -791,12 +788,12 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                         logger.debug("\t" + cad.typeString + " test on " + testNodeRef + " from " + nextObject.getClass().getName());
                     }
 
-                    if(isUnfitered(testNodeRef))
+                    if (isUnfitered(testNodeRef))
                     {
-                       continue;
+                        continue;
                     }
-                    
-                    if (allowed && (testNodeRef != null) && (entryVoter.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
+
+                    if (allowed && (testNodeRef != null) && (entryVoter.viewRecordsCapability.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
                     {
                         allowed = false;
                     }
@@ -891,12 +888,12 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                     logger.debug("\t" + cad.typeString + " test on " + testNodeRef + " from " + current.getClass().getName());
                 }
 
-                if(isUnfitered(testNodeRef))
+                if (isUnfitered(testNodeRef))
                 {
-                   continue;
+                    continue;
                 }
-                
-                if (incudedSet.get(i) && (testNodeRef != null) && (entryVoter.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
+
+                if (incudedSet.get(i) && (testNodeRef != null) && (entryVoter.viewRecordsCapability.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
                 {
                     incudedSet.set(i, false);
                 }
@@ -918,7 +915,7 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
             return answer;
         }
     }
-    
+
     private Map decide(Authentication authentication, Object object, ConfigAttributeDefinition config, Map returnedObject) throws AccessDeniedException
 
     {

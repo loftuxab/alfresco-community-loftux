@@ -35,7 +35,9 @@ public interface RecordsManagementModel
 {	
 	// Namespace details
 	public static String RM_URI = "http://www.alfresco.org/model/recordsmanagement/1.0";
+	public static String DOD_URI ="http://www.alfresco.org/model/dod5015/1.0";
 	public static String RM_PREFIX = "rma";
+	public static String DOD_PREFIX = "dod";
     
     // Model
     public static QName RM_MODEL = QName.createQName(RM_URI, "recordsmanagement");
@@ -142,4 +144,10 @@ public interface RecordsManagementModel
 	
     // Non-electronic document
 	public static QName TYPE_NON_ELECTRONIC_DOCUMENT = QName.createQName(RM_URI, "nonElectronicDocument");
+	
+    // Record category
+	public static QName TYPE_RECORD_CATEGORY = QName.createQName(DOD_URI, "recordCategory");
+	
+	// Frozen
+    public static QName ASPECT_FROZEN = QName.createQName(RM_URI, "frozen");
 }
