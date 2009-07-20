@@ -63,8 +63,8 @@
       <forms>
          <form>
             <field-visibility>
-               <show id="rma:authority" />
-               <show id="rma:instructions" />
+               <show id="rma:dispositionAuthority" />
+               <show id="rma:dispositionInstructions" />
                <show id="rma:recordLevelDisposition" />
             </field-visibility>
             <appearance>
