@@ -45,7 +45,7 @@ function getDocList(filter)
       var queryDef = {
             query: query,
             language: filterParams.language,
-            page: {maxItems: (filterParams.limitResults ? filterParams.limitResults : 0)},
+            page: {maxItems: (filterParams.limitResults ? parseInt(filterParams.limitResults) : 0)},
             sort: [{column: filterParams.sortBy, ascending: filterParams.sortByAscending}],
             templates: filterParams.templates
          };
