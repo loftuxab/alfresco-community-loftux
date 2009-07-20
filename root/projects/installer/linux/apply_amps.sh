@@ -13,5 +13,5 @@ echo "About to clean out tomcat/webapps/alfresco directory and temporary files..
 echo "Press control-c to stop this script . . ."
 echo "Press any other key to continue . . ."
 read DUMMY
-rm -rf tomcat/webapps/alfresco
+rm -rf $CATALINA_HOME/webapps/alfresco
 sh ./bin/clean_tomcat.sh
