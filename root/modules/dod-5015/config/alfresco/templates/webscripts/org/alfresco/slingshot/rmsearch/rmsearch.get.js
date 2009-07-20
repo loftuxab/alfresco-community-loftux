@@ -122,14 +122,17 @@ function getSearchResults(query, sort, maxResults, siteId)
    }
    
    // gather up the sort by fields
+   // they are encoded as "property/dir" i.e. "cm:name/asc"
    var sorts = [];
-   for (var i=0; i<sort.length; i++)
+   for (var i=0, j; i<sort.length; i++)
    {
       if (sort[i].length != 0)
       {
+         j = sort[i].indexOf("/");
          sorts.push(
          {
-            column: sort[i]
+            column: sort[i].substring(0, j),
+            ascending: (sort[i].substring(j+1) == "asc")
          });
       }
    }
