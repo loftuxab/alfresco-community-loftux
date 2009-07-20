@@ -14,7 +14,21 @@
    </div>
    <div id="bd">
       <@region id=doclibType + "path" scope="template" protected=true />
-
+      <#if (true)>
+      <div class="yui-gb">
+         <div class="yui-u first">
+            <@region id=doclibType + "events" scope="template" protected=true />
+         </div>
+         <div class="yui-u">
+            <@region id=doclibType + "folder-metadata-header" scope="template" protected=true />
+            <@region id=doclibType + "folder-metadata" scope="template" protected=true />
+         </div>
+         <div class="yui-u">
+            <@region id=doclibType + "folder-actions" scope="template" protected=true />
+            <@region id=doclibType + "folder-links" scope="template" protected=true />
+         </div>
+      </div>
+      <#else>
       <div class="yui-g"> 
          <div class="yui-u first">
             <@region id=doclibType + "folder-metadata-header" scope="template" protected=true />
@@ -25,7 +39,7 @@
             <@region id=doclibType + "folder-links" scope="template" protected=true />
          </div>
       </div>
-
+      </#if>
    </div>
    
    <script type="text/javascript">//<![CDATA[

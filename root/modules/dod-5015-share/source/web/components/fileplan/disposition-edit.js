@@ -245,11 +245,8 @@
 
          // Relation
          var relationSelect = Dom.getElementsByClassName("relation", "select", actionEl)[0];
-         Dom.addClass(actionEl, action.eventCombination == "and" ? "and" : "or");
-         if(action.eventCombination)
-         {
-            Alfresco.util.setSelectedIndex(relationSelect, action.eventCombination);
-         }
+         Dom.addClass(actionEl, action.eligibleOnFirstCompleteEvent ? "or" : "and");
+         Alfresco.util.setSelectedIndex(relationSelect, action.eligibleOnFirstCompleteEvent + "");
          Event.addListener(relationSelect, "change", this.onRelationSelectChange,
          {
             actionEl: actionEl,
@@ -616,7 +613,7 @@
          var relation = obj.relationSelect.options[obj.relationSelect.selectedIndex].value;
          Dom.removeClass(obj.actionEl, "or");
          Dom.removeClass(obj.actionEl, "and");
-         Dom.addClass(obj.actionEl, relation);
+         Dom.addClass(obj.actionEl, relation == "true" ? "or" : "and");
       },
 
       /**
@@ -644,7 +641,14 @@
       {
          var eventListEl = Dom.getElementsByClassName("events-list", "ul", actionEl)[0];
          var no = eventListEl.getElementsByTagName("li").length + 1;
-         eventListEl.appendChild(this._createEvent(no, {event: 0, type: "" }));
+
+         // Create new event
+         var eventEl = this._createEvent(no, {event: 0, type: "" })
+         eventListEl.appendChild(eventEl);
+
+         // Find last event
+         var eventNameSelect = Dom.getElementsByClassName("action-event-name-value", "select", eventEl)[0]; 
+         this.onEventNameSelectChange(null, { eventEl: eventEl, eventNameSelect: eventNameSelect });
       },
 
       /**
@@ -810,7 +814,7 @@
             period : null,
             periodProperty: null,
             description: "",
-            eventCombination: "",
+            eligibleOnFirstCompleteEvent: true,
             events: []
          };
          var newActionEl = this._createAction(action);

@@ -23,7 +23,7 @@
             </div>
          </div>
          <div class="yui-u">
-            <@region id=doclibType + "record-category-disposition" scope="template" protected=true />                        
+            <@region id=doclibType + "disposition" scope="template" protected=true />                        
          </div>
          <div class="yui-u">
             <@region id=doclibType + "folder-actions" scope="template" protected=true />

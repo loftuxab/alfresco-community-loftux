@@ -72,7 +72,19 @@
           * @type string
           */
          nodeRef: null,
-         
+
+         /**
+          * The nodeRef to the node to be used in a backlink for the node being edited.
+          * I.e. If a disposition schedule is being edited tha back link will contain the
+          * nodeRef to the record category that owns the dispositions schedule,
+          * However if it's the record-category that shall be edited the backLinkNodeRef
+          * will be the same as nodeRef.
+          *
+          * @property backLinkNodeRef
+          * @type string
+          */
+         backLinkNodeRef: null,
+
          /**
           * Current node type.
           * The manager needs to know whether the following page is document-details or folder-details
@@ -208,7 +220,7 @@
          {
             // go back to the appropriate details page for the node
             var pageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
-               "/" + this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
+               "/" + this.options.nodeType + "-details?nodeRef=" + this.options.backLinkNodeRef;
 
             window.location.href = pageUrl;
          }
