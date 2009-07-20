@@ -68,6 +68,14 @@
       options:
       {
          /**
+          * The nodeRef to the object that owns the disposition schedule that is configured
+          *
+          * @property nodeRef
+          * @type {string}
+          */
+         nodeRef: null,
+
+         /**
           * The url to the filePlan that is configured
           *
           * @property fileplanUrl
@@ -86,7 +94,6 @@
          this.widgets.actionListEl = Dom.get(this.id + "-actionList");
          this.widgets.flowButtons = Dom.get(this.id + "-flowButtons");
 
-
          // Save reference to buttons so we can change label and such later
          this.widgets.createButton = Alfresco.util.createYUIButton(this, "createaction-button", this.onCreateActionButtonClick);
          this.widgets.doneButton = Alfresco.util.createYUIButton(this, "done-button", this.onDoneActionsButtonClick);
@@ -94,10 +101,8 @@
          // Get the templates and remove them from the DOM
          this.widgets.eventTemplateEl = Dom.get(this.id + "-event-template");
          this.widgets.eventTemplateEl.parentNode.removeChild(this.widgets.eventTemplateEl);
-
          this.widgets.actionTemplateEl = Dom.get(this.id + "-action-template");
          this.widgets.actionTemplateEl.parentNode.removeChild(this.widgets.actionTemplateEl);
-
 
          this._loadActions();
       },
@@ -117,14 +122,17 @@
             {
                fn: function(response)
                {
-                  var schedule = response.json.data;
-                  var actions = schedule.actions ? schedule.actions : [];
-                  for(var i = 0; i < actions.length; i++)
+                  if(response.json)
                   {
-                     var action = actions[i];
-                     var actionEl = this._createAction(i, action);
-                     actionEl = this.widgets.actionListEl.appendChild(actionEl);
-                     this._setupActionForm(i, action, actionEl);
+                     var schedule = response.json.data;
+                     var actions = schedule.actions ? schedule.actions : [];
+                     for(var i = 0; i < actions.length; i++)
+                     {
+                        var action = actions[i];
+                        var actionEl = this._createAction(action);
+                        actionEl = this.widgets.actionListEl.appendChild(actionEl);
+                        this._setupActionForm(action, actionEl);
+                     }
                   }
                },
                scope: this
@@ -147,9 +155,10 @@
        * Create a action in the list
        *
        * @method _createAction
+       * @param action The action info object
        * @private
        */
-      _createAction: function DispositionEdit__createAction(no, action)
+      _createAction: function DispositionEdit__createAction(action)
       {
          // Clone template
          var actionEl = this.widgets.actionTemplateEl.cloneNode(true);
@@ -163,7 +172,7 @@
          var period = action.period ? action.period.split("|") : [];
 
          // No
-         Dom.getElementsByClassName("no", "div", actionEl)[0].innerHTML = no;
+         Dom.getElementsByClassName("no", "div", actionEl)[0].innerHTML = action.index + 1;
 
          // Description
          Dom.getElementsByClassName("description", "textarea", actionEl)[0].value = action.description;
@@ -283,9 +292,11 @@
        * Create an action in the list
        *
        * @method _setupActionForm
+       * @param action The action info object
+       * @param actionEl The action HTMLElement
        * @private
        */
-      _setupActionForm: function DispositionEdit__setupActionForm(no, action, actionEl)
+      _setupActionForm: function DispositionEdit__setupActionForm(action, actionEl)
       {
          // Find id
          var elId = actionEl.getAttribute("id");
@@ -304,12 +315,10 @@
          {
             type: "submit"
          }, saveActionEl);
-         //saveActionButton.on("click", this.onSaveActionButtonClick, actionEl, this)
          var cancelEl = Dom.getElementsByClassName("cancel", "span", actionEl)[0];
          var cancelActionButton = Alfresco.util.createYUIButton(this, "cancel-button", null, {}, cancelEl);
          cancelActionButton.on("click", this.onCancelActionButtonClick,
          {
-            no: no,
             action: action,
             actionEl: actionEl
          }, this);
@@ -372,10 +381,6 @@
                fn: function(serverResponse, obj)
                {
                   this.widgets.feedbackMessage.destroy();
-                  Alfresco.util.PopupManager.displayMessage(
-                  {
-                     text: this.msg("message.saveActionSuccess", this.name)
-                  });
                   obj.saveButton.set("disabled", false);
                   obj.cancelButton.set("disabled", false);
                   Dom.removeClass(obj.actionEl, "expanded");
@@ -423,8 +428,8 @@
        * Set the title header
        *
        * @method _setTitle
-       * @param title THe title to use
-       * @param actionEl The action HTML element
+       * @param title The title to use
+       * @param actionEl The action HTMLElement
        */
       _setTitle: function DispositionEdit__createEvent(title, actionEl)
       {
@@ -436,6 +441,7 @@
        *
        * @method _disablePeriodSection
        * @param disabled
+       * @param actionEl The action HTMLElement
        */
       _disablePeriodSection: function DispositionEdit__disablePeriodSection(disabled, actionEl)
       {
@@ -449,6 +455,8 @@
        *
        * @method _disableEventsSection
        * @param disabled
+       * @param actionEl The action HTMLElement
+       * @param addEventButton the add event button to be enabled or disabled
        */
       _disableEventsSection: function DispositionEdit__disableEventsSection(disabled, actionEl, addEventButton)
       {
@@ -557,6 +565,7 @@
        * Refreshes the event list so first event doesn't display the relation.
        *
        * @method _refreshEventList
+       * @param eventList The event list HTMLElement
        * @private
        */
       _refreshEventList: function DispositionEdit__refreshEventList(eventList)
@@ -579,6 +588,8 @@
        * Called when user toggles one of the checkboxes related to
        *
        * @method onRelationEnablingCheckBoxClick
+       * @param e click event object
+       * @param obj callback object containg action info & HTMLElements
        */
       onRelationEnablingCheckBoxClick: function DispositionEdit_onRelationEnablingCheckBoxClick(e, obj)
       {
@@ -597,6 +608,8 @@
        * Called when user changes the relation option select
        *
        * @method onRelationSelectChange
+       * @param e click event object
+       * @param obj callback object containg action info & HTMLElements
        */
       onRelationSelectChange: function DispositionEdit_onRelationSelectChange(e, obj)
       {
@@ -610,6 +623,8 @@
        * Called when user changes the event name option select
        *
        * @method onEventNameSelectChange
+       * @param e click event object
+       * @param obj callback object containg action info & HTMLElements
        */
       onEventNameSelectChange: function DispositionEdit_onEventNameSelectChange(e, obj)
       {
@@ -622,6 +637,8 @@
        * Called when user clicks the add event icon
        *
        * @method onAddEventButtonClick
+       * @param e click event object
+       * @param actionEl The action HTMLElement
        */
       onAddEventButtonClick: function DispositionEdit_onAddEventButtonClick(e, actionEl)
       {
@@ -634,6 +651,8 @@
        * Called when user clicks the delete event icon
        *
        * @method onDeleteEventClick
+       * @param e click event object
+       * @param eventEl The event HTMLElement
        */
       onDeleteEventClick: function DispositionEdit_onEditClick(e, eventEl)
       {
@@ -646,6 +665,8 @@
        * Called when user clicks the edit action icon
        *
        * @method onEditClick
+       * @param e click event object
+       * @param obj callback object containg action info & HTMLElements
        */
       onEditActionClick: function DispositionEdit_onEditClick(e, obj)
       {
@@ -658,6 +679,8 @@
        * Called when user clicks the delete action icon
        *
        * @method onDeleteActionClick
+       * @param e click event object
+       * @param actionEl THe action HTMLElement
        */
       onDeleteActionClick: function DispositionEdit_onDeleteActionClick(e, actionEl)
       {
@@ -692,6 +715,7 @@
        * Called when user clicks the delete action icon
        *
        * @method onDeleteActionClick
+       * @param actionEl THe action HTMLElement
        */
       _onDeleteActionConfirmedClick: function DispositionEdit_onDeleteActionClick(actionEl)
       {
@@ -741,6 +765,8 @@
        * Called when user clicks the cancel action button
        *
        * @method onCancelActionButtonClick
+       * @param e click event object
+       * @param obj callback object containg action info & HTMLElements
        */
       onCancelActionButtonClick: function DispositionEdit_onCancelActionButtonClick(e, obj)
       {
@@ -752,10 +778,10 @@
              * from the dom and insert a new fresh one by using the template and
              * the original data.
              */
-            var newActionEl = this._createAction(obj.no, obj.action)
+            var newActionEl = this._createAction(obj.action)
             obj.actionEl.parentNode.insertBefore(newActionEl, obj.actionEl);
             obj.actionEl.parentNode.removeChild(obj.actionEl);
-            this._setupActionForm(obj.no, obj.action, newActionEl);
+            this._setupActionForm(obj.action, newActionEl);
             this._refreshActionList();
          }
          else
@@ -767,28 +793,17 @@
       },
 
       /**
-       * Called when user clicks the save action button
-       *
-       * @method onSaveActionButtonClick
-       */
-      onSaveActionButtonClick: function DispositionEdit_onSaveActionButtonClick(e, actionEl)
-      {
-         // todo make form submit instead
-         
-         // Hide the details and display the header
-         Dom.removeClass(this.widgets.flowButtons, "hidden");
-      },
-
-      /**
        * Called when user clicks the cancel action button
        *
        * @method onCreateActionButtonClick
+       * @param e click event object
+       * @param obj callback object containg action info & HTMLElements
        */
       onCreateActionButtonClick: function DispositionEdit_onCreateActionButtonClick(e, obj)
       {
-         var no = this.widgets.actionListEl.childNodes.length - 1;
          var action = {
             id: "",
+            index: this.widgets.actionListEl.childNodes.length - 2,
             title: this.msg("label.title.new"),
             name: "",
             type: "",
@@ -798,9 +813,9 @@
             eventCombination: "",
             events: []
          };
-         var newActionEl = this._createAction(no, action);
+         var newActionEl = this._createAction(action);
          this.widgets.actionListEl.appendChild(newActionEl);
-         this._setupActionForm(no, action, newActionEl);
+         this._setupActionForm(action, newActionEl);
          this.onEditActionClick(null,
          {
             detailsEl: Dom.getElementsByClassName("details", "div", newActionEl)[0],

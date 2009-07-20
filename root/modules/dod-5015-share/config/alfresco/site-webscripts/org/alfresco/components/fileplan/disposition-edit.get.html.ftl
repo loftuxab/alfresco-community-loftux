@@ -31,8 +31,9 @@
                      <div class="section">
                         ${msg("label.action")}
                         <select name="name" class="action-type">
-                           <option value="destroy">${msg("action.option.destroy")}</option>
-                           <option value="cutOff">${msg("action.option.cutOff")}</option>
+                           <#list dispositionActions as action>
+                           <option value="${action.value}">${action.label}</option>
+                           </#list>
                         </select>
                      </div>
                      <div class="section">
@@ -40,13 +41,15 @@
                         ${msg("label.after")}
                         <input type="text" class="period-amount"/>
                         <select class="period-unit">
-                           <option value="year">${msg("period.unit.option.year")}</option>
-                           <option value="month">${msg("period.unit.option.month")}</option>
+                           <#list periodTypes as periodType>
+                           <option value="${periodType.value}">${periodType.label}</option>
+                           </#list>
                         </select>
                         ${msg("label.from")}
                         <select name="periodProperty" class="period-action">
-                           <option value="rma:destroy">${msg("period.action.option.destroy")}</option>
-                           <option value="rma:cutOff">${msg("period.action.option.cutoff")}</option>
+                           <#list periodProperties as periodProperty>
+                           <option value="${periodProperty.value}">${periodProperty.label}</option>
+                           </#list>
                         </select>
                         <span class="or-relation">${msg("label.or")}</span>
                         <span class="and-relation">${msg("label.and")}</span>
@@ -69,9 +72,9 @@
                               </div>
                               <div class="action-event-name">
                                  <select name="events[]" class="action-event-name-value">
-                                    <option value="no_longer_needed">${msg("event.type.option.no_longer_needed")}</option>
-                                    <option value="superseded">${msg("event.type.option.superseded")}</option>
-                                    <option value="obsolete">${msg("event.type.option.obsolete")}</option>
+                                    <#list events as event>
+                                    <option value="${event.value}">${event.label}</option>
+                                    </#list>
                                  </select>
                               </div>
                               <div class="action-event-type"></div>
