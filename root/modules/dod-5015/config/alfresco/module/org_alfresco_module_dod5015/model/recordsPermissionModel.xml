@@ -67,7 +67,7 @@
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ManageAccessRights"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="MoveRecords"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ChangeOrDeleteReferences"/>
-            <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ChangeOrDeleteLinks"/>
+            <includePermissionGroup type="rma:filePlanComponent" permissionGroup="DeleteLinks"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="EditDeclaredRecordMetadata"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ManuallyChangeDispositionDates"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ApproveRecordsScheduledForCutoff"/>
@@ -127,7 +127,7 @@
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ManageAccessRights"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="MoveRecords"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ChangeOrDeleteReferences"/>
-            <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ChangeOrDeleteLinks"/>
+            <includePermissionGroup type="rma:filePlanComponent" permissionGroup="DeleteLinks"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="EditDeclaredRecordMetadata"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ManuallyChangeDispositionDates"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ApproveRecordsScheduledForCutoff"/>
@@ -187,7 +187,7 @@
         <permissionGroup name="ManageAccessRights" expose="false" allowFullControl="false"/>
         <permissionGroup name="MoveRecords" expose="false" allowFullControl="false"/>
         <permissionGroup name="ChangeOrDeleteReferences" expose="false" allowFullControl="false"/>
-        <permissionGroup name="ChangeOrDeleteLinks" expose="false" allowFullControl="false"/>
+        <permissionGroup name="DeleteLinks" expose="false" allowFullControl="false"/>
         <permissionGroup name="EditDeclaredRecordMetadata" expose="false" allowFullControl="false"/>
         <permissionGroup name="ManuallyChangeDispositionDates" expose="false" allowFullControl="false"/>
         <permissionGroup name="ApproveRecordsScheduledForCutoff" expose="false" allowFullControl="false"/>
@@ -295,8 +295,8 @@
             <grantedToGroup permissionGroup="ChangeOrDeleteReferences"/>
         </permission>
         
-        <permission name="_ChangeOrDeleteLinks" expose="false">
-            <grantedToGroup permissionGroup="ChangeOrDeleteLinks"/>
+        <permission name="_DeleteLinks" expose="false">
+            <grantedToGroup permissionGroup="DeleteLinks"/>
         </permission>
         
         <permission name="_EditDeclaredRecordMetadata" expose="false">

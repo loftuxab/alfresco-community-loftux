@@ -78,7 +78,7 @@ public interface RMPermissionModel
 
     public static final String CHANGE_OR_DELETE_REFERENCES = "ChangeOrDeleteReferences";
 
-    public static final String CHANGE_OR_DELETE_LINKS = "ChangeOrDeleteLinks";
+    public static final String DELETE_LINKS = "DeleteLinks";
 
     public static final String EDIT_DECLARED_RECORD_METADATA = "EditDeclaredRecordMetadata";
 
@@ -161,4 +161,5 @@ public interface RMPermissionModel
     public static final String MAP_CLASSIFICATION_GUIDE_METADATA = "MapClassificationGuideMetadata";
 
     public static final String MANAGE_ACCESS_CONTROLS = "ManageAccessControls";
+
 }
