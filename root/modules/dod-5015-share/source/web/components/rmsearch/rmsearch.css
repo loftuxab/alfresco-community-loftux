@@ -1,11 +1,12 @@
 .search
 {
    color: #000;
+   visibility: hidden;
 }
 
 .search .hidden
 {
-  display: none;
+   display: none;
 }
 
 .search .title
@@ -27,17 +28,7 @@
    text-align: right;
 }
 
-.search .newsearch-button
-{
-   float: right;
-}
-
-.search .savesearch-button
-{
-   float: right;
-}
-
-.search .savedsearches-button
+.search .right-button
 {
    float: right;
 }
@@ -52,7 +43,7 @@
    border-color: #808080;
    margin: 0 -10px;
    background-color: #DDDDDD;
-   padding: 10px 24px 16px;
+   padding: 10px 20px 14px;
    line-height: 2em;
 }
 
@@ -84,17 +75,8 @@
    font-size: 108%;
 }
 
-.search .records
-{
-   height: 10em;
-   padding: 0 1em 0 1em;
-}
-
 .search .terms
 {
-   height: 10em;
-   padding: 0 1em 0 1em;
-   border-right: 1px solid #AAAAAA;
 }
 
 .search .insertLabel
@@ -105,5 +87,6 @@
 .search .execute-search
 {
    border-top: 1px solid #AAAAAA;
+   margin-top: 8px;
    padding-top: 12px;
 }
