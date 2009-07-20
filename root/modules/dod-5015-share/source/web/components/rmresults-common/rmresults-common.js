@@ -54,7 +54,7 @@
       /* Mandatory properties */
       this.id = htmlId;
       
-      this.sortby = ["rma:identifier", null, null];
+      this.sortby = [{"field": "rma:identifier", "order": "asc"}, {"field": "", "order": "asc"}, {"field": "", "order": "asc"}];
       
       return this;
    };
@@ -168,50 +168,9 @@
          var me = this;
          
          // Sorting option menus
-         this.widgets.sortMenu1 = new YAHOO.widget.Button(this.id + "-sort1",
-         {
-            type: "menu",
-            menu: this.id + "-sort1-menu"
-         });
-         this.widgets.sortMenu1.getMenu().subscribe("click", function(p_sType, p_aArgs)
-         {
-            var menuItem = p_aArgs[1];
-            if (menuItem)
-            {
-               me.widgets.sortMenu1.set("label", menuItem.cfg.getProperty("text"));
-               me.sortby[0] = menuItem.value;
-            }
-         });
-         
-         this.widgets.sortMenu2 = new YAHOO.widget.Button(this.id + "-sort2",
-         {
-            type: "menu",
-            menu: this.id + "-sort2-menu"
-         });
-         this.widgets.sortMenu2.getMenu().subscribe("click", function(p_sType, p_aArgs)
-         {
-            var menuItem = p_aArgs[1];
-            if (menuItem)
-            {
-               me.widgets.sortMenu2.set("label", menuItem.cfg.getProperty("text"));
-               me.sortby[1] = menuItem.value;
-            }
-         });
-         
-         this.widgets.sortMenu3 = new YAHOO.widget.Button(this.id + "-sort3",
-         {
-            type: "menu",
-            menu: this.id + "-sort3-menu"
-         });
-         this.widgets.sortMenu3.getMenu().subscribe("click", function(p_sType, p_aArgs)
-         {
-            var menuItem = p_aArgs[1];
-            if (menuItem)
-            {
-               me.widgets.sortMenu3.set("label", menuItem.cfg.getProperty("text"));
-               me.sortby[2] = menuItem.value;
-            }
-         });
+         this.widgets.sortMenus = [];
+         this.widgets.sortOrderMenus = [];
+         this._setupSortControls(3);
          
          // Column hide/show meta-data options
          var onMetadataClick = function onMetadataClick(e)
@@ -521,11 +480,6 @@
       },
 
       /**
-       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
-       * Disconnected event handlers for inter-component event notification
-       */
-      
-      /**
        * Resets the YUI DataTable errors to our custom messages
        * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
@@ -537,6 +491,48 @@
          var msg = Alfresco.util.message;
          dataTable.set("MSG_EMPTY", "");
          dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.RecordsResults"));
+      },
+      
+      /**
+       * Initialises a number of paired sort order asc/des menu controls.
+       * 
+       * @method _setupSortControls
+       * @param count {string} Number of control pairs to initialise
+       */
+      _setupSortControls: function RecordResults__setupSortControls(count)
+      {
+         var me = this;
+         for (var i=0; i<count; i++)
+         {
+            this.widgets.sortMenus[i] = new YAHOO.widget.Button(this.id + "-sort" + (i+1),
+            {
+               type: "menu",
+               menu: this.id + "-sort" + (i+1) + "-menu"
+            });
+            this.widgets.sortMenus[i].getMenu().subscribe("click", function(p_sType, p_aArgs, index)
+            {
+               var menuItem = p_aArgs[1];
+               if (menuItem)
+               {
+                  me.widgets.sortMenus[index].set("label", menuItem.cfg.getProperty("text"));
+                  me.sortby[index].field = menuItem.value;
+               }
+            }, i);
+            this.widgets.sortOrderMenus[i] = new YAHOO.widget.Button(this.id + "-sort" + (i+1) + "-order",
+            {
+               type: "menu",
+               menu: this.id + "-sort" + (i+1) + "-order-menu"
+            });
+            this.widgets.sortOrderMenus[i].getMenu().subscribe("click", function(p_sType, p_aArgs, index)
+            {
+               var menuItem = p_aArgs[1];
+               if (menuItem)
+               {
+                  me.widgets.sortOrderMenus[index].set("label", menuItem.cfg.getProperty("text"));
+                  me.sortby[index].order = menuItem.value;
+               }
+            }, i);
+         }
       },
       
       /**
@@ -597,11 +593,28 @@
        */
       _buildSearchParams: function RecordsResults__buildSearchParams(query)
       {
+         // encode and pack the sort fields as "property/dir" i.e. "cm:name/asc"
+         // comma separated between each property and direction pair
+         var sort = "";
+         for (var i in this.sortby)
+         {
+            var field = this.sortby[i].field;
+            if (field && field.length !== 0)
+            {
+               if (sort.length !== 0)
+               {
+                  sort += ",";
+               }
+               sort += field + '/' + this.sortby[i].order;
+            }
+         }
+         
+         // build the parameter string and encode each value
          var params = YAHOO.lang.substitute("site={site}&query={query}&sortby={sortby}&maxResults={maxResults}",
          {
             site: encodeURIComponent(this.options.siteId),
             query : query !== null ? encodeURIComponent(query) : "",
-            sortby : encodeURIComponent(this.sortby.join(",")),
+            sortby : encodeURIComponent(sort),
             maxResults : this.options.maxResults + 1 // to be able to know whether we got more results
          });
          

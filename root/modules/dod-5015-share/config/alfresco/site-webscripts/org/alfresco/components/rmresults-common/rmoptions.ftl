@@ -78,11 +78,13 @@
             <td>
                <div class="sort">
                   <span>${msg("label.order")}:</span>
+                  <#list 1..3 as i>
                   <div>
-                     <span class="sortlabel">${msg("label.sortFirst")}</span>
+                     <span class="sortlabel"><#if i=1>${msg("label.sortFirst")}<#else>${msg("label.sortNext")}</#if></span>
                      <span>
-                        <input id="${el}-sort1" type="button" name="sort1" value="${msg("label.identifier")}" />
-                        <select id="${el}-sort1-menu">
+                        <input id="${el}-sort${i}" type="button" name="sort${i}" value="<#if i=1>${msg("label.identifier")}<#else>${msg("label.sortNone")}</#if>" />
+                        <select id="${el}-sort${i}-menu">
+                           <#if i!=1><option value="">${msg("label.sortNone")}</option></#if>
                            <option value="rma:identifier">${msg("label.identifier")}</option>
                            <option value="cm:name">${msg("label.name")}</option>
                            <option value="cm:title">${msg("label.title")}</option>
@@ -102,59 +104,15 @@
                            </#list>
                         </select>
                      </span>
-                  </div>
-                  <div>
-                     <span class="sortlabel">${msg("label.sortNext")}</span>
                      <span>
-                        <input id="${el}-sort2" type="button" name="sort2" value="${msg("label.sortNone")}" />
-                        <select id="${el}-sort2-menu">
-                           <option value="">${msg("label.sortNone")}</option>
-                           <option value="rma:identifier">${msg("label.identifier")}</option>
-                           <option value="cm:name">${msg("label.name")}</option>
-                           <option value="cm:title">${msg("label.title")}</option>
-                           <option value="rma:originator">${msg("label.originator")}</option>
-                           <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
-                           <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
-                           <option value="rma:reviewAsOf">${msg("label.reviewDate")}</option>
-                           <option value="rma:originatingOrganization">${msg("label.originatingOrganization")}</option>
-                           <option value="rma:mediaType">${msg("label.mediaType")}</option>
-                           <option value="rma:format">${msg("label.format")}</option>
-                           <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
-                           <option value="rma:location">${msg("label.location")}</option>
-                           <option value="rma:address">${msg("label.address")}</option>
-                           <option value="rma:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
-                           <#list meta as d>
-                           <option value="${d.name}">${d.title}</option>
-                           </#list>
+                        <input id="${el}-sort${i}-order" type="button" name="sort${i}-order" value="${msg("label.sortAscending")}" />
+                        <select id="${el}-sort${i}-order-menu">
+                           <option value="asc">${msg("label.sortAscending")}</option>
+                           <option value="dsc">${msg("label.sortDescending")}</option>
                         </select>
                      </span>
                   </div>
-                  <div>
-                     <span class="sortlabel">${msg("label.sortNext")}</span>
-                     <span>
-                        <input id="${el}-sort3" type="button" name="sort3" value="${msg("label.sortNone")}" />
-                        <select id="${el}-sort3-menu">
-                           <option value="">${msg("label.sortNone")}</option>
-                           <option value="rma:identifier">${msg("label.identifier")}</option>
-                           <option value="cm:name">${msg("label.name")}</option>
-                           <option value="cm:title">${msg("label.title")}</option>
-                           <option value="rma:originator">${msg("label.originator")}</option>
-                           <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
-                           <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
-                           <option value="rma:reviewAsOf">${msg("label.reviewDate")}</option>
-                           <option value="rma:originatingOrganization">${msg("label.originatingOrganization")}</option>
-                           <option value="rma:mediaType">${msg("label.mediaType")}</option>
-                           <option value="rma:format">${msg("label.format")}</option>
-                           <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
-                           <option value="rma:location">${msg("label.location")}</option>
-                           <option value="rma:address">${msg("label.address")}</option>
-                           <option value="rma:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
-                           <#list meta as d>
-                           <option value="${d.name}">${d.title}</option>
-                           </#list>
-                        </select>
-                     </span>
-                  </div>
+                  </#list>
                </div>
             </td>
          </tr>
