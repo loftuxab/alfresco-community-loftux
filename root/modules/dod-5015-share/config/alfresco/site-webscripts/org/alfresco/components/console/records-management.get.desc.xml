@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>Admin Console Records Management</shortname>
+  <description>Administration Console - Records Management Tool</description>
+  <url>/components/console/records-management</url>
+  <family>admin-console</family>
+</webscript>

@@ -1,0 +1,108 @@
+#assignRoles 
+{
+  text-align: left;
+  padding:1em;
+}
+#assignRoles h2
+{
+  font-size:118%;
+  margin:0.5em 0 0;
+  clear:left;
+}
+#newRole
+{
+  float:right;
+  margin-bottom:1em;        
+}
+#defaultRole
+{
+  clear:both;
+  border:1px solid black;
+  margin-top:1em;
+}
+#roleContent
+{
+  text-align:right;
+  border-left:1px solid black;
+}
+#roleContent .title
+{
+  float:left;
+}
+#roleContent *
+{
+  text-align:left;
+}
+.title,
+#editRole,
+#deleteRole
+{
+  margin:0.5em
+}
+#roles ul
+{
+  margin: 0.5em;
+}
+#roles ul li
+{
+  margin:0.5em 0;
+}    
+#roles a {
+  text-decoration: none;
+}
+#roles
+{
+  border-top:1px solid #999;
+  width:107%;     
+}
+#roles,
+.roleCapabilities
+{
+  overflow:auto;
+  height:10em;
+}
+#roleContent h4
+{
+  margin-top:1em;
+}
+.roleCapabilities
+{
+  margin-left:0.5em;
+  display:none;
+}
+ul.capabilities
+{
+  border-top:1px solid #999;
+  margin-right: 0.5em;
+}
+ul.capabilities li
+{
+  padding-left:1em;
+  margin:0.5em 0;
+}
+#assignRoles .yui-dt table
+{
+ width:100%;
+}
+#assignRoles form#searchRolesFrm
+{
+   float:left;
+   margin-top:1em;
+}
+.active
+{
+  display:block;
+}
+#assignRoles-showType {
+ float:right;
+ clear:right;
+ margin-top:0.5em;
+}
+#assignRoleDT {
+ clear:both;
+ padding-top:1em;
+}
+#assignRoles .yuimenuitemlabel, .yuimenubaritemlabel
+{
+ font-size:100%;
+}
