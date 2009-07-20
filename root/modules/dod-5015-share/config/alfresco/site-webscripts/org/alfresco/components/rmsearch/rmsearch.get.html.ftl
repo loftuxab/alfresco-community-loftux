@@ -17,21 +17,21 @@
       </div>
       <div class="yui-u topmargin">
          <!-- New Search button -->
-         <div class="newsearch-button">
+         <div class="right-button">
             <span class="yui-button yui-push-button" id="${el}-newsearch-button">
                <span class="first-child"><button>${msg("button.newsearch")}</button></span>
             </span>
          </div>
          
          <!-- Save Search button -->
-         <div class="savesearch-button">
+         <div class="right-button">
             <span class="yui-button yui-push-button" id="${el}-savesearch-button">
                <span class="first-child"><button>${msg("button.savesearch")}</button></span>
             </span>
          </div>
          
          <!-- Saved Searches menu button -->
-         <div class="savedsearches-button">
+         <div class="right-button">
             <span class="yui-button yui-push-button" id="${el}-savedsearches-button">
                <span class="first-child"><button>${msg("button.savedsearches")}</button></span>
             </span>
@@ -45,72 +45,51 @@
          <li><a href="#${el}-results-tab"><em>${msg("label.results")}</em></a></li>
       </ul>            
       <div class="yui-content tab-content">
-         <div id="${el}-critera-tab">
-            <table cellspacing="0" cellpadding="0" border="0">
-               <tr>
-                  <td>
-                     <div class="terms">
-                        <span class="header">${msg("label.searchterm")}</span>
-                        <div>
-                           <span class="insertLabel">${msg("label.insertfield")}:</span>
-                           <span>
-                              <input id="${el}-insertfield" type="button" name="insertfield" value="${msg("label.select")}" />
-                              <select id="${el}-insertfield-menu">
-                                 <option value="KEYWORDS">${msg("label.keywords")}</option>
-                                 <option value="rma:identifier">${msg("label.identifier")}</option>
-                                 <option value="cm:name">${msg("label.name")}</option>
-                                 <option value="cm:title">${msg("label.title")}</option>
-                                 <option value="cm:description">${msg("label.description")}</option>
-                                 <option value="cm:creator">${msg("label.creator")}</option>
-                                 <option value="cm:created">${msg("label.created")}</option>
-                                 <option value="cm:modifier">${msg("label.modifier")}</option>
-                                 <option value="cm:modified">${msg("label.modified")}</option>
-                                 <option value="rma:originator">${msg("label.originator")}</option>
-                                 <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
-                                 <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
-                                 <option value="rma:reviewAsOf">${msg("label.reviewDate")}</option>
-                                 <option value="rma:originatingOrganization">${msg("label.originatingOrganization")}</option>
-                                 <option value="rma:mediaType">${msg("label.mediaType")}</option>
-                                 <option value="rma:format">${msg("label.format")}</option>
-                                 <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
-                                 <option value="rma:location">${msg("label.location")}</option>
-                                 <option value="rma:address">${msg("label.address")}</option>
-                                 <option value="rma:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
-                                 <#list meta as d>
-                                 <option value="${d.name}">${d.title}</option>
-                                 </#list>
-                              </select>
-                           </span>
-                        </div>
-                        <div class="query">
-                           <!-- Query text input -->
-                           <textarea id="${el}-query" rows="2" cols="40"></textarea>
-                        </div>
-                     </div>
-                  </td>
-                  <td>
-                     <div class="records">
-                        <span class="header">${msg("label.records")}</span>
-                        <div>
-                           <input type="checkbox" id="${el}-undeclared" />
-                           <label for="${el}-undeclared">${msg("label.undeclared")}</label>
-                        </div>
-                     </div>
-                  </td>
-               </tr>
-               <tr>
-                  <td colspan="2">
-                     <div class="execute-search">
-                        <div class="search-button">
-                           <span class="yui-button yui-push-button" id="${el}-search-button">
-                              <span class="first-child"><button>${msg("button.search")}</button></span>
-                           </span>
-                        </div>
-                     </div>
-                  </td>
-               </tr>
-            </table>
+         <div id="${el}-critera-tab" class="terms">
+            <span class="header">${msg("label.searchterm")}</span>
+            <div>
+               <span class="insertLabel">${msg("label.insertfield")}:</span>
+               <span>
+                  <input id="${el}-insertfield" type="button" name="insertfield" value="${msg("label.select")}" />
+                  <select id="${el}-insertfield-menu">
+                     <option value="KEYWORDS">${msg("label.keywords")}</option>
+                     <option value="rma:identifier">${msg("label.identifier")}</option>
+                     <option value="cm:name">${msg("label.name")}</option>
+                     <option value="cm:title">${msg("label.title")}</option>
+                     <option value="cm:description">${msg("label.description")}</option>
+                     <option value="cm:creator">${msg("label.creator")}</option>
+                     <option value="cm:created">${msg("label.created")}</option>
+                     <option value="cm:modifier">${msg("label.modifier")}</option>
+                     <option value="cm:modified">${msg("label.modified")}</option>
+                     <option value="rma:originator">${msg("label.originator")}</option>
+                     <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
+                     <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
+                     <option value="rma:reviewAsOf">${msg("label.reviewDate")}</option>
+                     <option value="rma:originatingOrganization">${msg("label.originatingOrganization")}</option>
+                     <option value="rma:mediaType">${msg("label.mediaType")}</option>
+                     <option value="rma:format">${msg("label.format")}</option>
+                     <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
+                     <option value="rma:location">${msg("label.location")}</option>
+                     <option value="rma:address">${msg("label.address")}</option>
+                     <option value="rma:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                     <#list meta as d>
+                     <option value="${d.name}">${d.title}</option>
+                     </#list>
+                  </select>
+               </span>
+            </div>
+            <div class="query">
+               <!-- Query text input -->
+               <textarea id="${el}-query" rows="2" cols="40"></textarea>
+            </div>
             <#include "../rmresults-common/rmoptions.ftl" />
+            <div class="execute-search">
+               <div class="search-button">
+                  <span class="yui-button yui-push-button" id="${el}-search-button">
+                     <span class="first-child"><button>${msg("button.search")}</button></span>
+                  </span>
+               </div>
+            </div>
          </div>
          
          <div id="${el}-results-tab">

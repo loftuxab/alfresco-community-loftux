@@ -208,15 +208,15 @@
          {
             var elToggle = Dom.get(me.id + "-options-toggle");
             var el = Dom.get(me.id + "-options");
-            if (el.style.display === "none")
-            {
-               el.style.display = "block";
-               Dom.setStyle(elToggle, "background-image", "url(" + Alfresco.constants.URL_CONTEXT + "components/images/expanded.png)");
-            }
-            else
+            if (el.style.display === "block")
             {
                el.style.display = "none";
                Dom.setStyle(elToggle, "background-image", "url(" + Alfresco.constants.URL_CONTEXT + "components/images/collapsed.png)");
+            }
+            else
+            {
+               el.style.display = "block";
+               Dom.setStyle(elToggle, "background-image", "url(" + Alfresco.constants.URL_CONTEXT + "components/images/expanded.png)");
             }
          };
          

@@ -1,3 +1,8 @@
+.rmoptions
+{
+   width: 70em;
+}
+
 .rmoptions .metadata
 {
    border: 1px solid #AAAAAA;
@@ -23,7 +28,7 @@
 
 .rmoptions .separator
 {
-   background: transparent url(../rmresults-common/images/expanded.png) no-repeat 4px 8px;
+   background: transparent url(../rmresults-common/images/collapsed.png) no-repeat 4px 8px;
    cursor: pointer;
 }
 
@@ -34,7 +39,11 @@
    display: block;
 }
 
+.rmoptions .options-hidden
+{
+   display: none;
+}
+
 .rmoptions .sort
 {
-   padding-left: 10em;
 }
