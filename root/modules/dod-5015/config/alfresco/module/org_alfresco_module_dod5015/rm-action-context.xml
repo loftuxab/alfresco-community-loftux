@@ -308,7 +308,7 @@
     <bean id="freeze_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
         <property name="objectDefinitionSource">
             <value>
-                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.ExtendRetentionPeriodOrFreeze
                    org.alfresco.service.cmr.security.PublicServiceAccessService.*=RM_ALLOW
             </value>
         </property>
@@ -316,6 +316,45 @@
     
     <bean id="freeze" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction" parent="rmAction" init-method="hashCode"/>    
 
+    <!-- Unfreeze record -->
+
+    <bean id="unfreeze_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="unfreeze"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="unfreeze_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="unfreeze_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
+        <property name="objectDefinitionSource">
+            <value>
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.Unfreeze
+                   org.alfresco.service.cmr.security.PublicServiceAccessService.*=RM_ALLOW
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="unfreeze" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.UnfreezeAction" parent="rmAction" init-method="hashCode"/>    
+    
+    <!-- Relinquish Hold Action-->
+
+    <bean id="relinquishHold_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="relinquishHold"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="unfreeze_security"/>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="relinquishHold" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.RelinquishHoldAction" parent="rmAction" init-method="hashCode"/>    
+    
     
     <!-- broadcast vital record definition -->
     <!-- bound to policy: allow -->

@@ -353,7 +353,7 @@
                 <title>Frozen Records</title>
                 <source>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </source>
                 <target>
                     <class>rma:filePlanComponent</class>
