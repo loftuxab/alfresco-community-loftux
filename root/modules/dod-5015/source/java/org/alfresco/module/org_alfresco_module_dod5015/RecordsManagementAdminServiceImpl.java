@@ -62,8 +62,14 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         this.serviceRegistry = serviceRegistry;
     }
     
+    /**
+     * TODO Remove this method in favour of the 'typed' methods.
+     */
+    @Deprecated
     public Map<QName, CustomProperty> getAvailableCustomProperties()
     {
+        // TODO I don't need to open the content to get the properties here.
+        //      Aren't they in the dataDictionary now? But see below.
         CustomModelUtil customModelUtil = new CustomModelUtil();
         customModelUtil.setContentService(serviceRegistry.getContentService());
         

@@ -44,22 +44,27 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * TODO Add a String/QName 'rmtype' parameter - maps to RM aspect
  * 
  * @author Neil McErlean
  */
 public class DefineCustomPropertyAction extends RMActionExecuterAbstractBase
 {
     private static Log logger = LogFactory.getLog(DefineCustomPropertyAction.class);
-    private static final String PARAM_NAME = "name";
-    private static final String PARAM_TYPE = "type";
-    private static final String PARAM_TITLE = "title";
-    private static final String PARAM_DESCRIPTION = "description";
-    private static final String PARAM_DEFAULT_VALUE = "defaultValue";
-    private static final String PARAM_MANDATORY = "mandatory";
-    private static final String PARAM_MULTI_VALUED = "multiValued";
-    private static final String PARAM_PROTECTED = "protected";
 
-	/**
+    public static final String PARAM_NAME = "name";
+    public static final String PARAM_TYPE = "type";
+    public static final String PARAM_TITLE = "title";
+    public static final String PARAM_DESCRIPTION = "description";
+    public static final String PARAM_DEFAULT_VALUE = "defaultValue";
+    public static final String PARAM_MULTI_VALUED = "multiValued";
+    public static final String PARAM_MANDATORY = "mandatory";
+    public static final String PARAM_PROTECTED = "protected";
+    //TODO Currently the following params are not handled. Are they needed?
+    // containerClass, mandatoryEnforced, indexed, storedInIndex, indexedAtomically
+    // indexTokenisationMode, override, constraints
+
+    /**
 	 * 
 	 * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
 	 *      org.alfresco.service.cmr.repository.NodeRef)
@@ -67,32 +72,34 @@ public class DefineCustomPropertyAction extends RMActionExecuterAbstractBase
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
+	    Map<String, Serializable> params = action.getParameterValues();
         if (logger.isDebugEnabled())
         {
             StringBuilder msg = new StringBuilder();
-            msg.append("Creating custom property: ")
-                .append(action.getParameterValue(PARAM_NAME))
-                .append(", ")
-                .append(action.getParameterValue(PARAM_TYPE));
+            msg.append("Creating custom property: ");
+            for (String n : params.keySet())
+            {
+                msg.append(n).append(" = ");
+                msg.append(params.get(n));
+                msg.append(LINE_SEPARATOR);
+            }
             logger.debug(msg.toString());
         }
 
         CustomModelUtil customModelUtil = new CustomModelUtil();
         customModelUtil.setContentService(contentService);
 
-        Map<String, Serializable> params = action.getParameterValues();
-
         M2Model deserializedModel = customModelUtil.readCustomContentModel();
         M2Aspect customPropsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_PROPS);
 
-        QName propQName = QName.createQName(name, namespaceService);
+        QName propQName = QName.createQName((String)params.get(PARAM_NAME), namespaceService);
         String propQNameAsString = propQName.toPrefixString(namespaceService);
         
         M2Property newProp = customPropsAspect.createProperty(propQNameAsString);
         newProp.setName((String)params.get(PARAM_NAME));
 
         // Special handling for type param as it's a QName.
-        // TODO Refactor this out into a method.
+        // TODO Refactor this out into a method?
         Serializable serializableType = params.get(PARAM_TYPE);
         QName type = null;
         if (serializableType instanceof String)
@@ -127,7 +134,6 @@ public class DefineCustomPropertyAction extends RMActionExecuterAbstractBase
             Boolean bool = (Boolean)serializableParam;
             newProp.setMultiValued(bool);
         }
-        //TODO Other params?
 
         customModelUtil.writeCustomContentModel(deserializedModel);
     }
@@ -139,7 +145,15 @@ public class DefineCustomPropertyAction extends RMActionExecuterAbstractBase
 	@Override
 	protected void addParameterDefinitions(List<ParameterDefinition> paramList)
 	{
-        paramList.add(new ParameterDefinitionImpl(PARAM_NAME, DataTypeDefinition.TEXT, true, "nameLabel"));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TYPE, DataTypeDefinition.QNAME, true, "typeLabel"));
+        paramList.add(new ParameterDefinitionImpl(PARAM_NAME, DataTypeDefinition.TEXT, true, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_TITLE, DataTypeDefinition.TEXT, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, DataTypeDefinition.TEXT, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_DEFAULT_VALUE, DataTypeDefinition.TEXT, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_TYPE, DataTypeDefinition.QNAME, true, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_MULTI_VALUED, DataTypeDefinition.BOOLEAN, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_MANDATORY, DataTypeDefinition.BOOLEAN, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_PROTECTED, DataTypeDefinition.BOOLEAN, false, null));
  	}
+	
+	private static String LINE_SEPARATOR = System.getProperty("line.separator");
 }
