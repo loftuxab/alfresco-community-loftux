@@ -26,11 +26,13 @@ package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
@@ -43,16 +45,20 @@ import org.alfresco.service.namespace.QName;
  */
 public class FreezeAction extends RMActionExecuterAbstractBase
 {
+    /** Parameter names */
     public static final String PARAM_REASON = "freeze.reason";
     
+    /** Hold node reference key */
+    private static final String KEY_HOLD_NODEREF = "holdNodeRef";
+    
+    /**
+     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
+     */
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {
-        QName nodeType = this.nodeService.getType(actionedUponNodeRef);
-        
-        // Check the existance of the node and that it is a disposition lifecycle node
-        if (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_RECORD) == true ||
-            this.dictionaryService.isSubClass(nodeType, TYPE_RECORD_FOLDER) == true)
+        if (this.recordsManagementService.isRecord(actionedUponNodeRef) == true ||
+            this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
         {
             // Get the property values
             String reason = (String)action.getParameterValue(PARAM_REASON);
@@ -65,25 +71,29 @@ public class FreezeAction extends RMActionExecuterAbstractBase
             NodeRef root = this.recordsManagementService.getRecordsManagementRoot(actionedUponNodeRef);
             
             // Get the hold object
-            // TODO check to see if there is a related hold in the transaction context
-            
-            // Calculate a transfer name
-            QName nodeDbid = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "node-dbid");
-            Long dbId = (Long)this.nodeService.getProperty(actionedUponNodeRef, nodeDbid);
-            String transferName = "Transfer -" + padString(dbId.toString(), 10);
-            
-            // Create the hold object
-            Map<QName, Serializable> holdProps = new HashMap<QName, Serializable>(2);
-            holdProps.put(ContentModel.PROP_NAME, transferName);
-            holdProps.put(PROP_HOLD_REASON, reason);
-            NodeRef holdNodeRef = this.nodeService.createNode(  root, 
-                                                                ASSOC_HOLDS, 
-                                                                QName.createQName(RM_URI, transferName), 
-                                                                TYPE_HOLD,
-                                                                holdProps).getChildRef();
-            
+            NodeRef holdNodeRef = (NodeRef)AlfrescoTransactionSupport.getResource(KEY_HOLD_NODEREF);            
+            if (holdNodeRef == null)
+            {
+                // Calculate a transfer name
+                QName nodeDbid = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "node-dbid");
+                Long dbId = (Long)this.nodeService.getProperty(actionedUponNodeRef, nodeDbid);
+                String transferName = "Transfer -" + padString(dbId.toString(), 10);
+                
+                // Create the hold object
+                Map<QName, Serializable> holdProps = new HashMap<QName, Serializable>(2);
+                holdProps.put(ContentModel.PROP_NAME, transferName);
+                holdProps.put(PROP_HOLD_REASON, reason);
+                holdNodeRef = this.nodeService.createNode(root, 
+                                                          ASSOC_HOLDS, 
+                                                          QName.createQName(RM_URI, transferName), 
+                                                          TYPE_HOLD,
+                                                          holdProps).getChildRef();
+                
+                // Bind the hold node reference to the transaction
+                AlfrescoTransactionSupport.bindResource(KEY_HOLD_NODEREF, holdNodeRef);
+            }
+                
             // Link the record to the hold
-            // TODO what should we do about the assoc names?
             this.nodeService.addChild(  holdNodeRef, 
                                         actionedUponNodeRef, 
                                         ASSOC_FROZEN_RECORDS, 
@@ -92,13 +102,19 @@ public class FreezeAction extends RMActionExecuterAbstractBase
             // Apply the freeze aspect
             this.nodeService.addAspect(actionedUponNodeRef, ASPECT_FROZEN, null);
             
-            // TODO if the actioned upon node is a container (or records folder) do we need to traverse
-            //      down the tree marking stuff as frozen
+            // Mark all the folders contents as frozen
+            if (this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
+            {
+                List<NodeRef> records = this.recordsManagementService.getRecords(actionedUponNodeRef);
+                for (NodeRef record : records)
+                {
+                    this.nodeService.addAspect(record, ASPECT_FROZEN, null);
+                }
+            }
         }
         else
         {
             throw new AlfrescoRuntimeException("Can only freeze records or record folders.");
-        }
-        
+        }        
     }
 }

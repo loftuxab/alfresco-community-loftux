@@ -548,6 +548,185 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         txn.commit();
     }
+    
+    public void testFreeze() throws Exception
+    {      
+        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
+        assertNotNull(recordCategory);
+        assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+        
+        // Before we start just remove any outstanding holds
+        NodeRef rootNode = this.rmService.getRecordsManagementRoot(recordCategory);
+        List<ChildAssociationRef> tempAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+        for (ChildAssociationRef tempAssoc : tempAssocs)
+        {
+            this.nodeService.deleteNode(tempAssoc.getChildRef());
+        }
+        
+        NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
+        
+        setComplete();
+        endTransaction();
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        createRecord(recordFolder);
+        
+        NodeRef recordOne = createRecord(recordFolder, "one.txt");
+        NodeRef recordTwo = createRecord(recordFolder, "two.txt");
+        NodeRef recordThree = createRecord(recordFolder, "three.txt");
+        
+        txn.commit(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_RECORD));
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FILE_PLAN_COMPONENT));
+        
+        // Freeze the record
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        this.rmActionService.executeRecordsManagementAction(recordOne, "freeze", params);
+        
+        txn.commit(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Check the hold exists 
+        List<ChildAssociationRef> holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(holdAssocs);
+        assertEquals(1, holdAssocs.size());        
+        NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
+        assertEquals("one", this.nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+        List<ChildAssociationRef> freezeAssocs = this.nodeService.getChildAssocs(holdNodeRef);
+        assertNotNull(freezeAssocs);
+        assertEquals(1, freezeAssocs.size());
+        
+        // Check the nodes are frozen
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+        assertFalse(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+        assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+        
+        // Freeze a number of records
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "two");
+        List<NodeRef> records = new ArrayList<NodeRef>(2);
+        records.add(recordOne);
+        records.add(recordTwo);
+        records.add(recordThree);
+        this.rmActionService.executeRecordsManagementAction(records, "freeze", params);
+        
+        txn.commit(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Check the holds exist
+        holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(holdAssocs);
+        assertEquals(2, holdAssocs.size());
+        for (ChildAssociationRef holdAssoc : holdAssocs)
+        {
+            String reason = (String)this.nodeService.getProperty(holdAssoc.getChildRef(), PROP_HOLD_REASON);
+            if (reason.equals("two") == true)
+            {
+                freezeAssocs = this.nodeService.getChildAssocs(holdAssoc.getChildRef());
+                assertNotNull(freezeAssocs);
+                assertEquals(3, freezeAssocs.size());
+            }
+            else if (reason.equals("one") == true)
+            {
+                freezeAssocs = this.nodeService.getChildAssocs(holdAssoc.getChildRef());
+                assertNotNull(freezeAssocs);
+                assertEquals(1, freezeAssocs.size());
+            }
+        }
+        
+        // Check the nodes are frozen
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+        assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+        assertTrue(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+        
+        // Unfreeze a node
+        this.rmActionService.executeRecordsManagementAction(recordThree, "unfreeze");
+        
+        // Check the holds
+        holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(holdAssocs);
+        assertEquals(2, holdAssocs.size());
+        for (ChildAssociationRef holdAssoc : holdAssocs)
+        {
+            String reason = (String)this.nodeService.getProperty(holdAssoc.getChildRef(), PROP_HOLD_REASON);
+            if (reason.equals("two") == true)
+            {
+                freezeAssocs = this.nodeService.getChildAssocs(holdAssoc.getChildRef());
+                assertNotNull(freezeAssocs);
+                assertEquals(2, freezeAssocs.size());
+            }
+            else if (reason.equals("one") == true)
+            {
+                freezeAssocs = this.nodeService.getChildAssocs(holdAssoc.getChildRef());
+                assertNotNull(freezeAssocs);
+                assertEquals(1, freezeAssocs.size());
+            }
+        }
+        
+        // Check the nodes are frozen
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+        assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+        assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+        
+        // Relinquish the first hold
+        this.rmActionService.executeRecordsManagementAction(holdNodeRef, "relinquishHold");
+        
+        // Check the holds
+        holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(holdAssocs);
+        assertEquals(1, holdAssocs.size());
+        holdNodeRef = holdAssocs.get(0).getChildRef();
+        assertEquals("two", this.nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+        freezeAssocs = this.nodeService.getChildAssocs(holdNodeRef);
+        assertNotNull(freezeAssocs);
+        assertEquals(2, freezeAssocs.size());
+        
+        // Check the nodes are frozen
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+        assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+        assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+        
+        // Unfreeze
+        this.rmActionService.executeRecordsManagementAction(recordOne, "unfreeze");
+        
+        // Check the holds
+        holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(holdAssocs);
+        assertEquals(1, holdAssocs.size());
+        holdNodeRef = holdAssocs.get(0).getChildRef();
+        assertEquals("two", this.nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+        freezeAssocs = this.nodeService.getChildAssocs(holdNodeRef);
+        assertNotNull(freezeAssocs);
+        assertEquals(1, freezeAssocs.size());
+        
+        // Check the nodes are frozen
+        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+        assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+        assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+        
+        // Unfreeze
+        this.rmActionService.executeRecordsManagementAction(recordTwo, "unfreeze");
+        
+        // Check the holds
+        holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(holdAssocs);
+        assertEquals(0, holdAssocs.size());
+        
+        // Check the nodes are frozen
+        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+        assertFalse(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+        assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+        
+        txn.commit();         
+    }
 	
 	private void checkSearchAspect(NodeRef dispositionAction, NodeRef record, int eventCount)
 	{
@@ -716,12 +895,17 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	
 	private NodeRef createRecord(NodeRef recordFolder)
 	{
+	    return createRecord(recordFolder, "MyRecord.txt");
+	}
+	
+	private NodeRef createRecord(NodeRef recordFolder, String name)
+	{
     	// Create the document
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
-        props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+        props.put(ContentModel.PROP_NAME, name);
         NodeRef recordOne = this.nodeService.createNode(recordFolder, 
                                                         ContentModel.ASSOC_CONTAINS, 
-                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name), 
                                                         ContentModel.TYPE_CONTENT).getChildRef();
         
         // Set the content
@@ -1716,66 +1900,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // This test formerly tested a single RecordCategory like so:
         // NodeRef recordCategory = this.getRecordCategory("Miscellaneous Files", "Civilian Employee Training Program Records");
-    }
-    
-    public void testFreeze() throws Exception
-    {      
-        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
-        assertNotNull(recordCategory);
-        assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
-                
-        NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
-        
-        setComplete();
-        endTransaction();
-        
-        UserTransaction txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        // Create the document
-        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
-        props.put(ContentModel.PROP_NAME, "MyRecord.txt");
-        NodeRef recordOne = this.nodeService.createNode(recordFolder, 
-                                                        ContentModel.ASSOC_CONTAINS, 
-                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
-                                                        ContentModel.TYPE_CONTENT).getChildRef();
-        
-        // Set the content
-        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
-        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        writer.setEncoding("UTF-8");
-        writer.putContent("There is some content in this record");
-        
-        txn.commit(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_RECORD));
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FILE_PLAN_COMPONENT));
-        
-        // Freeze the record
-        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        params.put(FreezeAction.PARAM_REASON, "freeze reason");
-        this.rmActionService.executeRecordsManagementAction(recordOne, "freeze", params);
-        
-        // Check the hold exists 
-        NodeRef rootNode = this.rmService.getRecordsManagementRoot(recordOne);
-        List<ChildAssociationRef> holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
-        assertNotNull(holdAssocs);
-        assertEquals(1, holdAssocs.size());        
-        NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
-        assertEquals("freeze reason", this.nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
-        
-        
-        
-        txn.commit(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        this.nodeService.deleteNode(holdNodeRef);
-        
-        txn.commit();
-        
     }
     
     /**
