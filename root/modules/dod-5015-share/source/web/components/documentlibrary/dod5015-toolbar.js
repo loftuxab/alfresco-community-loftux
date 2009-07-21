@@ -162,36 +162,16 @@
        */
       onNewContainer: function DLTB_onNewContainer(e, p_obj)
       {
-         var actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/dod5015/action/folder/site", this.options.siteId, this.options.containerId, this.currentPath);
+         if (!this.modules.docList)
+         {
+            return;
+         }
 
-         var folderType = p_obj.get("name"),
-            label = "label.new-" + p_obj.get("name"),
+         var destination = this.modules.docList.doclistMetadata.parent,
+            folderType = p_obj.get("name"),
+            label = "label.new-" + p_obj.get("name").replace(":", "_"),
             msgTitle = this.msg(label + ".title"),
             msgHeader = this.msg(label + ".header");
-
-         // Inject forms validation
-         var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
-         {
-            // Validation
-            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.mandatory, null, "blur");
-            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.nodeName, null, "keyup");
-            p_form.addValidation(this.id + "-createFolder-name", Alfresco.forms.validation.length,
-            {
-               max: 256,
-               crop: true
-            }, "keyup");
-            p_form.addValidation(this.id + "-createFolder-title", Alfresco.forms.validation.length,
-            {
-               max: 256,
-               crop: true
-            }, "keyup");
-            p_form.addValidation(this.id + "-createFolder-description", Alfresco.forms.validation.length,
-            {
-               max: 512,
-               crop: true
-            }, "keyup");
-            p_form.setShowSubmitStateDynamically(true, false);
-         };
 
          // Intercept before dialog show
          var doBeforeDialogShow = function DLTB_oNF_doBeforeDialogShow(p_form, p_dialog)
@@ -200,63 +180,46 @@
             Dom.get(p_dialog.id + "-dialogHeader").innerHTML = msgHeader;
          };
          
-         // Intercept before ajax request
-         var doBeforeAjaxRequest = function DLTB_oNF_doBeforeAjaxRequest(p_config, p_obj)
+         var templateUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind={itemKind}&itemId={itemId}&destination={destination}&mode={mode}&submitType={submitType}&showCancelButton=true",
          {
-            p_config.dataObj.type = p_obj.folderType;
-            return true;
-         };
+            itemKind: "type",
+            itemId: folderType,
+            destination: destination,
+            mode: "create",
+            submitType: "json"
+         });
 
-         if (!this.modules.createFolder)
+         // Using Forms Service, so always create new instance
+         var createFolder = new Alfresco.module.SimpleDialog(this.id + "-createFolder");
+
+         createFolder.setOptions(
          {
-            this.modules.createFolder = new Alfresco.module.SimpleDialog(this.id + "-createFolder");
-         }
-         this.modules.createFolder.setOptions(
-         {
-            width: "30em",
-            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/create-folder",
-            actionUrl: actionUrl,
-            doSetupFormsValidation:
-            {
-               fn: doSetupFormsValidation,
-               scope: this
-            },
+            width: "33em",
+            templateUrl: templateUrl,
+            actionUrl: null,
             doBeforeDialogShow:
             {
                fn: doBeforeDialogShow,
                scope: this
             },
-            doBeforeAjaxRequest:
-            {
-               fn: doBeforeAjaxRequest,
-               obj:
-               {
-                  folderType: folderType
-               },
-               scope: this
-            },
-            clearForm: true,
-            firstFocus: this.id + "-createFolder-name",
             onSuccess:
             {
                fn: function DLTB_onNewFolder_callback(response)
                {
-                  var folder = response.json.results[0];
+                  var folderName = response.config.dataObj["prop_cm_name"];
                   YAHOO.Bubbling.fire("folderCreated",
                   {
-                     name: folder.name,
-                     parentPath: folder.parentPath,
-                     nodeRef: folder.nodeRef
+                     name: folderName,
+                     parentPath: this.currentPath
                   });
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: this.msg("message.new-folder.success", folder.name)
+                     text: this.msg("message.new-folder.success", folderName)
                   });
                },
                scope: this
             }
-         });
-         this.modules.createFolder.show();
+         }).show();
       },
 
       /**

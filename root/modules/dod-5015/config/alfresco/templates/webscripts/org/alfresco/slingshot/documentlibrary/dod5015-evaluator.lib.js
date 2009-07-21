@@ -45,16 +45,36 @@ function getAssetType(asset)
  */
 function getMetadata(asset)
 {
-   var metadata = {},
-      index;
-      
-   for (index in asset.properties)
+   var metadata = {};
+
+   var fnExtract = function(asset)
    {
-      if (index.indexOf("{http://www.alfresco.org/model/recordsmanagement/1.0}") == 0)
+      for (var index in asset.properties)
       {
-         metadata[index.replace("{http://www.alfresco.org/model/recordsmanagement/1.0}", "rma:")] = asset.properties[index];
+         if (index.indexOf("{http://www.alfresco.org/model/recordsmanagement/1.0}") == 0)
+         {
+            metadata[index.replace("{http://www.alfresco.org/model/recordsmanagement/1.0}", "rma:")] = asset.properties[index];
+         }
+         else if (index.indexOf("{http://www.alfresco.org/model/dod5015/1.0}") == 0)
+         {
+            metadata[index.replace("{http://www.alfresco.org/model/dod5015/1.0}", "dod:")] = asset.properties[index];
+         }
+      }
+   };
+   
+   // General
+   fnExtract(asset);
+   
+   // Disposition Instructions
+   if (asset.hasAspect("rma:scheduled"))
+   {
+      var diNode = asset.childAssocs["rma:dispositionSchedule"][0];
+      if (diNode !== null)
+      {
+         fnExtract(diNode);
       }
    }
+   
    return metadata;
 }
 
@@ -97,9 +117,10 @@ function runEvaluator(asset, assetType)
    /**
     * Multiple parent assocs
     */
-   if (asset.parentAssocs["contains"].length > 1)
+   var parents = asset.parentAssocs["contains"];
+   if (parents !== null && parents.length > 1)
    {
-      status.push("multi-parent " + asset.parentAssocs["contains"].length);
+      status.push("multi-parent " + parents.length);
    }
    
    switch (assetType)
@@ -109,7 +130,6 @@ function runEvaluator(asset, assetType)
        */
       case "fileplan":
          permissions.push("new-series");
-         permissions.push("new-category");
          break;
 
 
@@ -184,6 +204,7 @@ function runEvaluator(asset, assetType)
                permissions.push(asset.properties["rma:dispositionAction"]);
             }
          }
+         permissions.push("undeclare");
          break;
 
 
@@ -192,6 +213,7 @@ function runEvaluator(asset, assetType)
        */
       case "undeclared-record":
          actionSet = "undeclaredRecord";
+         permissions.push("declare");
          break;
 
 
@@ -208,6 +230,6 @@ function runEvaluator(asset, assetType)
       actionSet: actionSet,
       permissions: permissions,
       status: status,
-      metadata: getMetadata(asset)
+      metadata: getMetadata(asset, assetType)
    });
 }

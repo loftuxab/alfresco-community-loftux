@@ -519,7 +519,7 @@
       onFolderCreated: function DLT_onFolderCreated(layer, args)
       {
          var obj = args[1];
-         if (obj && (obj.path !== null))
+         if (obj && (obj.parentPath !== null))
          {
             // ensure path starts with leading slash
             var parentNode = this.widgets.treeview.getNodeByProperty("path", $combine("/", obj.parentPath));

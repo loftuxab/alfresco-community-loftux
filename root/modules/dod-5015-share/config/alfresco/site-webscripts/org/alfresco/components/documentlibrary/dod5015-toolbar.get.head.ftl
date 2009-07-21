@@ -1,4 +1,4 @@
-<#include "../component.head.inc">
+<#include "../form/form.get.head.ftl">
 <!-- Document Library Toolbar -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/documentlibrary/toolbar.css" />
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/documentlibrary/dod5015-toolbar.css" />

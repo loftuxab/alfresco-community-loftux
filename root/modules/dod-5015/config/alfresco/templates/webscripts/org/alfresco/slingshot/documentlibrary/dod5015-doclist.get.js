@@ -42,13 +42,21 @@ function getDocList(filter)
    // Query the assets - passing in sort and result limit parameters
    if (query != "")
    {
-      var queryDef = {
-            query: query,
-            language: filterParams.language,
-            page: {maxItems: (filterParams.limitResults ? parseInt(filterParams.limitResults) : 0)},
-            sort: [{column: filterParams.sortBy, ascending: filterParams.sortByAscending}],
-            templates: filterParams.templates
-         };
+      var queryDef =
+      {
+         query: query,
+         language: filterParams.language,
+         page:
+         {
+            maxItems: (filterParams.limitResults ? parseInt(filterParams.limitResults) : 0)
+         },
+         sort: [
+         {
+            column: filterParams.sortBy,
+            ascending: filterParams.sortByAscending
+         }],
+         templates: filterParams.templates
+      };
       allAssets = search.query(queryDef);
    }
 
@@ -107,7 +115,7 @@ function getDocList(filter)
       container: parsedArgs.location.container,
       path: parsedArgs.location.path,
       file: null
-   }
+   };
    
    // User permissions and role
    var user =
@@ -219,6 +227,7 @@ function getDocList(filter)
          totalRecords: totalRecords
       },
       user: user,
-      items: items
+      items: items,
+      parent: filterParams.variablePath ? null : parsedArgs.parentNode
    });
 }

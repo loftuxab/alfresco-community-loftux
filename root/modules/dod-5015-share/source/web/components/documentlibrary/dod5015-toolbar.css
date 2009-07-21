@@ -25,12 +25,65 @@
    float: left;
 }
 
+/* Multi-Select Actions */
+
 .toolbar .onActionFileTo
 {
-   background-image: url(images/generic-16.png);
+   background-image: url(images/file-to-16.png);
 }
-.toolbar .yuimenuitem-disabled .onActionFileTo
+
+.toolbar .onActionCutoff
+{
+   background-image: url(images/cutoff-record-16.png);
+}
+
+.toolbar .onActionDestroy
+{
+   background-image: url(images/destroy-record-16.png);
+}
+
+.toolbar .onActionFreeze
+{
+   background-image: url(images/freeze-record-16.png);
+}
+
+.toolbar .onActionTransfer
+{
+   background-image: url(images/transfer-record-16.png);
+}
+
+.toolbar .onActionTransferConfirm
+{
+   background-image: url(images/transfer-confirm-16.png);
+}
+
+.toolbar .onActionUndoCutoff
+{
+   background-image: url(images/undo-cutoff-16.png);
+}
+
+.toolbar .onActionUnfreeze
+{
+   background-image: url(images/unfreeze-record-16.png);
+}
+
+
+/* Messages (e.g. Delete confirmation) */
+.toolbar-file-list span.record-series,
+.toolbar-file-list span.record-category,
+.toolbar-file-list span.record-folder
+{
+   background-image: url(images/folder-open-16.png);
+}
+
+.toolbar-file-list span.record,
+.toolbar-file-list span.undeclared-record
 {
    background-image: url(images/generic-16.png);
 }
 
+.form-container .form-fields
+{
+   border-bottom: medium none;
+   padding: 1em;
+}
