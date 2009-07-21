@@ -77,6 +77,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.EditSelec
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.EnableDisableAuditByTypesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ExportAuditCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ExtendRetentionPeriodOrFreezeCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.FileRecordsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.MakeOptionalPropertiesMandatoryCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ManageAccessControlsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ManageAccessRightsCapability;
@@ -95,7 +96,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.UpdateExe
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.UpdateTriggerDatesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.UpdateVitalRecordCycleInformationCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.UpgradeDowngradeAndDeclassifyRecordsCapability;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ViewRecordsCapabilty;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ViewRecordsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ViewUpdateReasonsForFreezeCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -149,124 +150,126 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     private static HashMap<QName, String> restrictedProperties = new HashMap<QName, String>();
 
     //
-    
-    public ViewRecordsCapabilty viewRecordsCapability = new ViewRecordsCapabilty(this);
 
-    public DeclareRecordsCapability declareRecordsCapability = new DeclareRecordsCapability(this);
+    private ViewRecordsCapability viewRecordsCapability;
 
-    public CreateModifyDestroyFoldersCapability createModifyDestroyFoldersCapability = new CreateModifyDestroyFoldersCapability(this);
+    private FileRecordsCapability fileRecordsCapability;
 
-    public EditRecordMetadataCapability editRecordMetadataCapability = new EditRecordMetadataCapability(this);
+    private DeclareRecordsCapability declareRecordsCapability;
 
-    public EditNonRecordMetadataCapability editNonRecordMetadataCapability = new EditNonRecordMetadataCapability(this);
+    private CreateModifyDestroyFoldersCapability createModifyDestroyFoldersCapability;
 
-    public AddModifyEventDatesCapability addModifyEventDatesCapability = new AddModifyEventDatesCapability(this);
+    private EditRecordMetadataCapability editRecordMetadataCapability;
 
-    public CloseFoldersCapability closeFoldersCapability = new CloseFoldersCapability(this);
+    private EditNonRecordMetadataCapability editNonRecordMetadataCapability;
 
-    public DeclareRecordsInClosedFoldersCapability declareRecordsInClosedFoldersCapability = new DeclareRecordsInClosedFoldersCapability(this);
+    private AddModifyEventDatesCapability addModifyEventDatesCapability;
 
-    public ReOpenFoldersCapability reOpenFoldersCapability = new ReOpenFoldersCapability(this);
+    private CloseFoldersCapability closeFoldersCapability;
 
-    public CycleVitalRecordsCapability cycleVitalRecordsCapability = new CycleVitalRecordsCapability(this);
+    private DeclareRecordsInClosedFoldersCapability declareRecordsInClosedFoldersCapability;
 
-    public PlanningReviewCyclesCapability planningReviewCyclesCapability = new PlanningReviewCyclesCapability(this);
+    private ReOpenFoldersCapability reOpenFoldersCapability;
 
-    public UpdateTriggerDatesCapability updateTriggerDatesCapability = new UpdateTriggerDatesCapability(this);
+    public CycleVitalRecordsCapability cycleVitalRecordsCapability;
 
-    public CreateModifyDestroyEventsCapability createModifyDestroyEventsCapability = new CreateModifyDestroyEventsCapability(this);
+    public PlanningReviewCyclesCapability planningReviewCyclesCapability;
 
-    public ManageAccessRightsCapability manageAccessRightsCapability = new ManageAccessRightsCapability(this);
+    public UpdateTriggerDatesCapability updateTriggerDatesCapability;
 
-    public MoveRecordsCapability moveRecordsCapability = new MoveRecordsCapability(this);
+    public CreateModifyDestroyEventsCapability createModifyDestroyEventsCapability;
 
-    public ChangeOrDeleteReferencesCapability changeOrDeleteReferencesCapability = new ChangeOrDeleteReferencesCapability(this);
+    public ManageAccessRightsCapability manageAccessRightsCapability;
 
-    public DeleteLinksCapability deleteLinksCapability = new DeleteLinksCapability(this);
+    public MoveRecordsCapability moveRecordsCapability;
 
-    public EditDeclaredRecordMetadataCapability editDeclaredRecordMetadataCapability = new EditDeclaredRecordMetadataCapability(this);
-    
-    public ManuallyChangeDispositionDatesCapability manuallyChangeDispositionDatesCapability = new ManuallyChangeDispositionDatesCapability(this);
+    public ChangeOrDeleteReferencesCapability changeOrDeleteReferencesCapability;
 
-    public ApproveRecordsScheduledForCutoffCapability approveRecordsScheduledForCutoffCapability = new ApproveRecordsScheduledForCutoffCapability(this);
-    
-    public CreateModifyRecordsInCuttoffFoldersCapability createModifyRecordsInCuttoffFoldersCapability = new CreateModifyRecordsInCuttoffFoldersCapability(this);
-    
-    public  ExtendRetentionPeriodOrFreezeCapability extendRetentionPeriodOrFreezeCapability = new ExtendRetentionPeriodOrFreezeCapability(this);
-    
-    public UnfreezeCapability unfreezeCapability = new UnfreezeCapability(this);
-    
-    public ViewUpdateReasonsForFreezeCapability viewUpdateReasonsForFreezeCapability = new ViewUpdateReasonsForFreezeCapability(this);
-    
-    public DestroyRecordsScheduledForDestructionCapability destroyRecordsScheduledForDestructionCapability = new DestroyRecordsScheduledForDestructionCapability(this);
-    
-    public DestroyRecordsCapability destroyRecordsCapability = new DestroyRecordsCapability(this);
-    
-    public UpdateVitalRecordCycleInformationCapability updateVitalRecordCycleInformationCapability = new UpdateVitalRecordCycleInformationCapability(this);
-    
-    public UndeclareRecordsCapability undeclareRecordsCapability = new UndeclareRecordsCapability(this);
-    
-    public DeclareAuditAsRecordCapability declareAuditAsRecordCapability = new DeclareAuditAsRecordCapability(this);
-    
-    public DeleteAuditCapability deleteAuditCapability = new DeleteAuditCapability(this);
-    
-    public CreateModifyDestroyTimeframesCapability createModifyDestroyTimeframesCapability = new CreateModifyDestroyTimeframesCapability(this);
-    
-    public AuthorizeNominatedTransfersCapability authorizeNominatedTransfersCapability = new AuthorizeNominatedTransfersCapability(this);
-    
-    public EditSelectionListsCapability editSelectionListsCapability = new EditSelectionListsCapability(this);
-    
-    public AuthorizeAllTransfersCapability authorizeAllTransfersCapability = new AuthorizeAllTransfersCapability(this);
-    
-    public CreateModifyDestroyFileplanMetadataCapability createModifyDestroyFileplanMetadataCapability = new CreateModifyDestroyFileplanMetadataCapability(this);
-    
-    public CreateAndAssociateSelectionListsCapability createAndAssociateSelectionListsCapability = new CreateAndAssociateSelectionListsCapability(this);
-    
-    public AttachRulesToMetadataPropertiesCapability attachRulesToMetadataPropertiesCapability = new AttachRulesToMetadataPropertiesCapability(this);
-    
-    public CreateModifyDestroyFileplanTypesCapability createModifyDestroyFileplanTypesCapability = new CreateModifyDestroyFileplanTypesCapability(this);
-    
-    public CreateModifyDestroyRecordTypesCapability createModifyDestroyRecordTypesCapability = new CreateModifyDestroyRecordTypesCapability(this);
-    
-    public MakeOptionalPropertiesMandatoryCapability makeOptionalPropertiesMandatoryCapability = new MakeOptionalPropertiesMandatoryCapability(this);
-    
-    public MapEmailMetadataCapability mapEmailMetadataCapability = new MapEmailMetadataCapability(this);
-    
-    public DeleteRecordsCapability deleteRecordsCapability = new DeleteRecordsCapability(this);
-    
-    public CreateModifyDestroyRolesCapability createModifyDestroyRolesCapability = new CreateModifyDestroyRolesCapability(this);
-    
-    public CreateModifyDestroyUsersAndGroupsCapability createModifyDestroyUsersAndGroupsCapability = new CreateModifyDestroyUsersAndGroupsCapability(this);
-    
-    public PasswordControlCapability passwordControlCapability = new PasswordControlCapability(this);
-    
-    public EnableDisableAuditByTypesCapability enableDisableAuditByTypesCapability = new EnableDisableAuditByTypesCapability(this);
-    
-    public SelectAuditMetadataCapability selectAuditMetadataCapability = new SelectAuditMetadataCapability(this);
-    
-    public DisplayRightsReportCapability displayRightsReportCapability = new DisplayRightsReportCapability(this);
-    
-    public AccessAuditCapability accessAuditCapability = new AccessAuditCapability(this);
-    
-    public ExportAuditCapability exportAuditCapability = new ExportAuditCapability(this);
-    
-    public CreateModifyDestroyReferenceTypesCapability createModifyDestroyReferenceTypesCapability = new CreateModifyDestroyReferenceTypesCapability(this);
-    
-    public UpdateClassificationDatesCapability updateClassificationDatesCapability = new UpdateClassificationDatesCapability(this);
-    
-    public CreateModifyDestroyClassificationGuidesCapability createModifyDestroyClassificationGuidesCapability = new CreateModifyDestroyClassificationGuidesCapability(this);
-    
-    public UpgradeDowngradeAndDeclassifyRecordsCapability upgradeDowngradeAndDeclassifyRecordsCapability = new UpgradeDowngradeAndDeclassifyRecordsCapability(this);
-    
-    public UpdateExemptionCategoriesCapability updateExemptionCategoriesCapability = new UpdateExemptionCategoriesCapability(this);
-    
-    public MapClassificationGuideMetadataCapability mapClassificationGuideMetadataCapability = new MapClassificationGuideMetadataCapability(this);
-    
-    public ManageAccessControlsCapability manageAccessControlsCapability = new ManageAccessControlsCapability(this);
-    
+    public DeleteLinksCapability deleteLinksCapability;
+
+    public EditDeclaredRecordMetadataCapability editDeclaredRecordMetadataCapability;
+
+    public ManuallyChangeDispositionDatesCapability manuallyChangeDispositionDatesCapability;
+
+    public ApproveRecordsScheduledForCutoffCapability approveRecordsScheduledForCutoffCapability;
+
+    public CreateModifyRecordsInCuttoffFoldersCapability createModifyRecordsInCuttoffFoldersCapability;
+
+    public ExtendRetentionPeriodOrFreezeCapability extendRetentionPeriodOrFreezeCapability;
+
+    public UnfreezeCapability unfreezeCapability;
+
+    public ViewUpdateReasonsForFreezeCapability viewUpdateReasonsForFreezeCapability;
+
+    public DestroyRecordsScheduledForDestructionCapability destroyRecordsScheduledForDestructionCapability;
+
+    public DestroyRecordsCapability destroyRecordsCapability;
+
+    public UpdateVitalRecordCycleInformationCapability updateVitalRecordCycleInformationCapability;
+
+    public UndeclareRecordsCapability undeclareRecordsCapability;
+
+    public DeclareAuditAsRecordCapability declareAuditAsRecordCapability;
+
+    public DeleteAuditCapability deleteAuditCapability;
+
+    public CreateModifyDestroyTimeframesCapability createModifyDestroyTimeframesCapability;
+
+    public AuthorizeNominatedTransfersCapability authorizeNominatedTransfersCapability;
+
+    public EditSelectionListsCapability editSelectionListsCapability;
+
+    public AuthorizeAllTransfersCapability authorizeAllTransfersCapability;
+
+    public CreateModifyDestroyFileplanMetadataCapability createModifyDestroyFileplanMetadataCapability;
+
+    public CreateAndAssociateSelectionListsCapability createAndAssociateSelectionListsCapability;
+
+    public AttachRulesToMetadataPropertiesCapability attachRulesToMetadataPropertiesCapability;
+
+    public CreateModifyDestroyFileplanTypesCapability createModifyDestroyFileplanTypesCapability;
+
+    public CreateModifyDestroyRecordTypesCapability createModifyDestroyRecordTypesCapability;
+
+    public MakeOptionalPropertiesMandatoryCapability makeOptionalPropertiesMandatoryCapability;
+
+    public MapEmailMetadataCapability mapEmailMetadataCapability;
+
+    public DeleteRecordsCapability deleteRecordsCapability;
+
+    public CreateModifyDestroyRolesCapability createModifyDestroyRolesCapability;
+
+    public CreateModifyDestroyUsersAndGroupsCapability createModifyDestroyUsersAndGroupsCapability;
+
+    public PasswordControlCapability passwordControlCapability;
+
+    public EnableDisableAuditByTypesCapability enableDisableAuditByTypesCapability;
+
+    public SelectAuditMetadataCapability selectAuditMetadataCapability;
+
+    public DisplayRightsReportCapability displayRightsReportCapability;
+
+    public AccessAuditCapability accessAuditCapability;
+
+    public ExportAuditCapability exportAuditCapability;
+
+    public CreateModifyDestroyReferenceTypesCapability createModifyDestroyReferenceTypesCapability;
+
+    public UpdateClassificationDatesCapability updateClassificationDatesCapability;
+
+    public CreateModifyDestroyClassificationGuidesCapability createModifyDestroyClassificationGuidesCapability;
+
+    public UpgradeDowngradeAndDeclassifyRecordsCapability upgradeDowngradeAndDeclassifyRecordsCapability;
+
+    public UpdateExemptionCategoriesCapability updateExemptionCategoriesCapability;
+
+    public MapClassificationGuideMetadataCapability mapClassificationGuideMetadataCapability;
+
+    public ManageAccessControlsCapability manageAccessControlsCapability;
+
     //
 
-    public CreateCapability createCapability = new CreateCapability(this);
+    public CreateCapability createCapability;
 
     static
     {
@@ -282,24 +285,6 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         // restrictedProperties.put(RecordsManagementModel.PROP_IS_CLOSED, value)
 
-    }
-
-    private static class Key
-    {
-        QName property;
-
-        boolean requiresFiling;
-
-        boolean rejectIfFrozen;
-
-        boolean rejectIfDeclared;
-
-        String byAction;
-    }
-
-    private static class RestrictedKey extends Key
-    {
-        Serializable value;
     }
 
     /**
@@ -340,6 +325,596 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
+    }
+
+    public ViewRecordsCapability getViewRecordsCapability()
+    {
+        return viewRecordsCapability;
+    }
+
+    public FileRecordsCapability getFileRecordsCapability()
+    {
+        return fileRecordsCapability;
+    }
+
+    public void setFileRecordsCapability(FileRecordsCapability fileRecordsCapability)
+    {
+        this.fileRecordsCapability = fileRecordsCapability;
+    }
+
+    public void setViewRecordsCapability(ViewRecordsCapability viewRecordsCapability)
+    {
+        this.viewRecordsCapability = viewRecordsCapability;
+    }
+
+    public DeclareRecordsCapability getDeclareRecordsCapability()
+    {
+        return declareRecordsCapability;
+    }
+
+    public void setDeclareRecordsCapability(DeclareRecordsCapability declareRecordsCapability)
+    {
+        this.declareRecordsCapability = declareRecordsCapability;
+    }
+
+    public CreateModifyDestroyFoldersCapability getCreateModifyDestroyFoldersCapability()
+    {
+        return createModifyDestroyFoldersCapability;
+    }
+
+    public void setCreateModifyDestroyFoldersCapability(CreateModifyDestroyFoldersCapability createModifyDestroyFoldersCapability)
+    {
+        this.createModifyDestroyFoldersCapability = createModifyDestroyFoldersCapability;
+    }
+
+    public EditRecordMetadataCapability getEditRecordMetadataCapability()
+    {
+        return editRecordMetadataCapability;
+    }
+
+    public void setEditRecordMetadataCapability(EditRecordMetadataCapability editRecordMetadataCapability)
+    {
+        this.editRecordMetadataCapability = editRecordMetadataCapability;
+    }
+
+    public EditNonRecordMetadataCapability getEditNonRecordMetadataCapability()
+    {
+        return editNonRecordMetadataCapability;
+    }
+
+    public void setEditNonRecordMetadataCapability(EditNonRecordMetadataCapability editNonRecordMetadataCapability)
+    {
+        this.editNonRecordMetadataCapability = editNonRecordMetadataCapability;
+    }
+
+    public AddModifyEventDatesCapability getAddModifyEventDatesCapability()
+    {
+        return addModifyEventDatesCapability;
+    }
+
+    public void setAddModifyEventDatesCapability(AddModifyEventDatesCapability addModifyEventDatesCapability)
+    {
+        this.addModifyEventDatesCapability = addModifyEventDatesCapability;
+    }
+
+    public CloseFoldersCapability getCloseFoldersCapability()
+    {
+        return closeFoldersCapability;
+    }
+
+    public void setCloseFoldersCapability(CloseFoldersCapability closeFoldersCapability)
+    {
+        this.closeFoldersCapability = closeFoldersCapability;
+    }
+
+    public DeclareRecordsInClosedFoldersCapability getDeclareRecordsInClosedFoldersCapability()
+    {
+        return declareRecordsInClosedFoldersCapability;
+    }
+
+    public void setDeclareRecordsInClosedFoldersCapability(DeclareRecordsInClosedFoldersCapability declareRecordsInClosedFoldersCapability)
+    {
+        this.declareRecordsInClosedFoldersCapability = declareRecordsInClosedFoldersCapability;
+    }
+
+    public ReOpenFoldersCapability getReOpenFoldersCapability()
+    {
+        return reOpenFoldersCapability;
+    }
+
+    public void setReOpenFoldersCapability(ReOpenFoldersCapability reOpenFoldersCapability)
+    {
+        this.reOpenFoldersCapability = reOpenFoldersCapability;
+    }
+
+    public CycleVitalRecordsCapability getCycleVitalRecordsCapability()
+    {
+        return cycleVitalRecordsCapability;
+    }
+
+    public void setCycleVitalRecordsCapability(CycleVitalRecordsCapability cycleVitalRecordsCapability)
+    {
+        this.cycleVitalRecordsCapability = cycleVitalRecordsCapability;
+    }
+
+    public PlanningReviewCyclesCapability getPlanningReviewCyclesCapability()
+    {
+        return planningReviewCyclesCapability;
+    }
+
+    public void setPlanningReviewCyclesCapability(PlanningReviewCyclesCapability planningReviewCyclesCapability)
+    {
+        this.planningReviewCyclesCapability = planningReviewCyclesCapability;
+    }
+
+    public UpdateTriggerDatesCapability getUpdateTriggerDatesCapability()
+    {
+        return updateTriggerDatesCapability;
+    }
+
+    public void setUpdateTriggerDatesCapability(UpdateTriggerDatesCapability updateTriggerDatesCapability)
+    {
+        this.updateTriggerDatesCapability = updateTriggerDatesCapability;
+    }
+
+    public CreateModifyDestroyEventsCapability getCreateModifyDestroyEventsCapability()
+    {
+        return createModifyDestroyEventsCapability;
+    }
+
+    public void setCreateModifyDestroyEventsCapability(CreateModifyDestroyEventsCapability createModifyDestroyEventsCapability)
+    {
+        this.createModifyDestroyEventsCapability = createModifyDestroyEventsCapability;
+    }
+
+    public ManageAccessRightsCapability getManageAccessRightsCapability()
+    {
+        return manageAccessRightsCapability;
+    }
+
+    public void setManageAccessRightsCapability(ManageAccessRightsCapability manageAccessRightsCapability)
+    {
+        this.manageAccessRightsCapability = manageAccessRightsCapability;
+    }
+
+    public MoveRecordsCapability getMoveRecordsCapability()
+    {
+        return moveRecordsCapability;
+    }
+
+    public void setMoveRecordsCapability(MoveRecordsCapability moveRecordsCapability)
+    {
+        this.moveRecordsCapability = moveRecordsCapability;
+    }
+
+    public ChangeOrDeleteReferencesCapability getChangeOrDeleteReferencesCapability()
+    {
+        return changeOrDeleteReferencesCapability;
+    }
+
+    public void setChangeOrDeleteReferencesCapability(ChangeOrDeleteReferencesCapability changeOrDeleteReferencesCapability)
+    {
+        this.changeOrDeleteReferencesCapability = changeOrDeleteReferencesCapability;
+    }
+
+    public DeleteLinksCapability getDeleteLinksCapability()
+    {
+        return deleteLinksCapability;
+    }
+
+    public void setDeleteLinksCapability(DeleteLinksCapability deleteLinksCapability)
+    {
+        this.deleteLinksCapability = deleteLinksCapability;
+    }
+
+    public EditDeclaredRecordMetadataCapability getEditDeclaredRecordMetadataCapability()
+    {
+        return editDeclaredRecordMetadataCapability;
+    }
+
+    public void setEditDeclaredRecordMetadataCapability(EditDeclaredRecordMetadataCapability editDeclaredRecordMetadataCapability)
+    {
+        this.editDeclaredRecordMetadataCapability = editDeclaredRecordMetadataCapability;
+    }
+
+    public ManuallyChangeDispositionDatesCapability getManuallyChangeDispositionDatesCapability()
+    {
+        return manuallyChangeDispositionDatesCapability;
+    }
+
+    public void setManuallyChangeDispositionDatesCapability(ManuallyChangeDispositionDatesCapability manuallyChangeDispositionDatesCapability)
+    {
+        this.manuallyChangeDispositionDatesCapability = manuallyChangeDispositionDatesCapability;
+    }
+
+    public ApproveRecordsScheduledForCutoffCapability getApproveRecordsScheduledForCutoffCapability()
+    {
+        return approveRecordsScheduledForCutoffCapability;
+    }
+
+    public void setApproveRecordsScheduledForCutoffCapability(ApproveRecordsScheduledForCutoffCapability approveRecordsScheduledForCutoffCapability)
+    {
+        this.approveRecordsScheduledForCutoffCapability = approveRecordsScheduledForCutoffCapability;
+    }
+
+    public CreateModifyRecordsInCuttoffFoldersCapability getCreateModifyRecordsInCuttoffFoldersCapability()
+    {
+        return createModifyRecordsInCuttoffFoldersCapability;
+    }
+
+    public void setCreateModifyRecordsInCuttoffFoldersCapability(CreateModifyRecordsInCuttoffFoldersCapability createModifyRecordsInCuttoffFoldersCapability)
+    {
+        this.createModifyRecordsInCuttoffFoldersCapability = createModifyRecordsInCuttoffFoldersCapability;
+    }
+
+    public ExtendRetentionPeriodOrFreezeCapability getExtendRetentionPeriodOrFreezeCapability()
+    {
+        return extendRetentionPeriodOrFreezeCapability;
+    }
+
+    public void setExtendRetentionPeriodOrFreezeCapability(ExtendRetentionPeriodOrFreezeCapability extendRetentionPeriodOrFreezeCapability)
+    {
+        this.extendRetentionPeriodOrFreezeCapability = extendRetentionPeriodOrFreezeCapability;
+    }
+
+    public UnfreezeCapability getUnfreezeCapability()
+    {
+        return unfreezeCapability;
+    }
+
+    public void setUnfreezeCapability(UnfreezeCapability unfreezeCapability)
+    {
+        this.unfreezeCapability = unfreezeCapability;
+    }
+
+    public ViewUpdateReasonsForFreezeCapability getViewUpdateReasonsForFreezeCapability()
+    {
+        return viewUpdateReasonsForFreezeCapability;
+    }
+
+    public void setViewUpdateReasonsForFreezeCapability(ViewUpdateReasonsForFreezeCapability viewUpdateReasonsForFreezeCapability)
+    {
+        this.viewUpdateReasonsForFreezeCapability = viewUpdateReasonsForFreezeCapability;
+    }
+
+    public DestroyRecordsScheduledForDestructionCapability getDestroyRecordsScheduledForDestructionCapability()
+    {
+        return destroyRecordsScheduledForDestructionCapability;
+    }
+
+    public void setDestroyRecordsScheduledForDestructionCapability(DestroyRecordsScheduledForDestructionCapability destroyRecordsScheduledForDestructionCapability)
+    {
+        this.destroyRecordsScheduledForDestructionCapability = destroyRecordsScheduledForDestructionCapability;
+    }
+
+    public DestroyRecordsCapability getDestroyRecordsCapability()
+    {
+        return destroyRecordsCapability;
+    }
+
+    public void setDestroyRecordsCapability(DestroyRecordsCapability destroyRecordsCapability)
+    {
+        this.destroyRecordsCapability = destroyRecordsCapability;
+    }
+
+    public UpdateVitalRecordCycleInformationCapability getUpdateVitalRecordCycleInformationCapability()
+    {
+        return updateVitalRecordCycleInformationCapability;
+    }
+
+    public void setUpdateVitalRecordCycleInformationCapability(UpdateVitalRecordCycleInformationCapability updateVitalRecordCycleInformationCapability)
+    {
+        this.updateVitalRecordCycleInformationCapability = updateVitalRecordCycleInformationCapability;
+    }
+
+    public UndeclareRecordsCapability getUndeclareRecordsCapability()
+    {
+        return undeclareRecordsCapability;
+    }
+
+    public void setUndeclareRecordsCapability(UndeclareRecordsCapability undeclareRecordsCapability)
+    {
+        this.undeclareRecordsCapability = undeclareRecordsCapability;
+    }
+
+    public DeclareAuditAsRecordCapability getDeclareAuditAsRecordCapability()
+    {
+        return declareAuditAsRecordCapability;
+    }
+
+    public void setDeclareAuditAsRecordCapability(DeclareAuditAsRecordCapability declareAuditAsRecordCapability)
+    {
+        this.declareAuditAsRecordCapability = declareAuditAsRecordCapability;
+    }
+
+    public DeleteAuditCapability getDeleteAuditCapability()
+    {
+        return deleteAuditCapability;
+    }
+
+    public void setDeleteAuditCapability(DeleteAuditCapability deleteAuditCapability)
+    {
+        this.deleteAuditCapability = deleteAuditCapability;
+    }
+
+    public CreateModifyDestroyTimeframesCapability getCreateModifyDestroyTimeframesCapability()
+    {
+        return createModifyDestroyTimeframesCapability;
+    }
+
+    public void setCreateModifyDestroyTimeframesCapability(CreateModifyDestroyTimeframesCapability createModifyDestroyTimeframesCapability)
+    {
+        this.createModifyDestroyTimeframesCapability = createModifyDestroyTimeframesCapability;
+    }
+
+    public AuthorizeNominatedTransfersCapability getAuthorizeNominatedTransfersCapability()
+    {
+        return authorizeNominatedTransfersCapability;
+    }
+
+    public void setAuthorizeNominatedTransfersCapability(AuthorizeNominatedTransfersCapability authorizeNominatedTransfersCapability)
+    {
+        this.authorizeNominatedTransfersCapability = authorizeNominatedTransfersCapability;
+    }
+
+    public EditSelectionListsCapability getEditSelectionListsCapability()
+    {
+        return editSelectionListsCapability;
+    }
+
+    public void setEditSelectionListsCapability(EditSelectionListsCapability editSelectionListsCapability)
+    {
+        this.editSelectionListsCapability = editSelectionListsCapability;
+    }
+
+    public AuthorizeAllTransfersCapability getAuthorizeAllTransfersCapability()
+    {
+        return authorizeAllTransfersCapability;
+    }
+
+    public void setAuthorizeAllTransfersCapability(AuthorizeAllTransfersCapability authorizeAllTransfersCapability)
+    {
+        this.authorizeAllTransfersCapability = authorizeAllTransfersCapability;
+    }
+
+    public CreateModifyDestroyFileplanMetadataCapability getCreateModifyDestroyFileplanMetadataCapability()
+    {
+        return createModifyDestroyFileplanMetadataCapability;
+    }
+
+    public void setCreateModifyDestroyFileplanMetadataCapability(CreateModifyDestroyFileplanMetadataCapability createModifyDestroyFileplanMetadataCapability)
+    {
+        this.createModifyDestroyFileplanMetadataCapability = createModifyDestroyFileplanMetadataCapability;
+    }
+
+    public CreateAndAssociateSelectionListsCapability getCreateAndAssociateSelectionListsCapability()
+    {
+        return createAndAssociateSelectionListsCapability;
+    }
+
+    public void setCreateAndAssociateSelectionListsCapability(CreateAndAssociateSelectionListsCapability createAndAssociateSelectionListsCapability)
+    {
+        this.createAndAssociateSelectionListsCapability = createAndAssociateSelectionListsCapability;
+    }
+
+    public AttachRulesToMetadataPropertiesCapability getAttachRulesToMetadataPropertiesCapability()
+    {
+        return attachRulesToMetadataPropertiesCapability;
+    }
+
+    public void setAttachRulesToMetadataPropertiesCapability(AttachRulesToMetadataPropertiesCapability attachRulesToMetadataPropertiesCapability)
+    {
+        this.attachRulesToMetadataPropertiesCapability = attachRulesToMetadataPropertiesCapability;
+    }
+
+    public CreateModifyDestroyFileplanTypesCapability getCreateModifyDestroyFileplanTypesCapability()
+    {
+        return createModifyDestroyFileplanTypesCapability;
+    }
+
+    public void setCreateModifyDestroyFileplanTypesCapability(CreateModifyDestroyFileplanTypesCapability createModifyDestroyFileplanTypesCapability)
+    {
+        this.createModifyDestroyFileplanTypesCapability = createModifyDestroyFileplanTypesCapability;
+    }
+
+    public CreateModifyDestroyRecordTypesCapability getCreateModifyDestroyRecordTypesCapability()
+    {
+        return createModifyDestroyRecordTypesCapability;
+    }
+
+    public void setCreateModifyDestroyRecordTypesCapability(CreateModifyDestroyRecordTypesCapability createModifyDestroyRecordTypesCapability)
+    {
+        this.createModifyDestroyRecordTypesCapability = createModifyDestroyRecordTypesCapability;
+    }
+
+    public MakeOptionalPropertiesMandatoryCapability getMakeOptionalPropertiesMandatoryCapability()
+    {
+        return makeOptionalPropertiesMandatoryCapability;
+    }
+
+    public void setMakeOptionalPropertiesMandatoryCapability(MakeOptionalPropertiesMandatoryCapability makeOptionalPropertiesMandatoryCapability)
+    {
+        this.makeOptionalPropertiesMandatoryCapability = makeOptionalPropertiesMandatoryCapability;
+    }
+
+    public MapEmailMetadataCapability getMapEmailMetadataCapability()
+    {
+        return mapEmailMetadataCapability;
+    }
+
+    public void setMapEmailMetadataCapability(MapEmailMetadataCapability mapEmailMetadataCapability)
+    {
+        this.mapEmailMetadataCapability = mapEmailMetadataCapability;
+    }
+
+    public DeleteRecordsCapability getDeleteRecordsCapability()
+    {
+        return deleteRecordsCapability;
+    }
+
+    public void setDeleteRecordsCapability(DeleteRecordsCapability deleteRecordsCapability)
+    {
+        this.deleteRecordsCapability = deleteRecordsCapability;
+    }
+
+    public CreateModifyDestroyRolesCapability getCreateModifyDestroyRolesCapability()
+    {
+        return createModifyDestroyRolesCapability;
+    }
+
+    public void setCreateModifyDestroyRolesCapability(CreateModifyDestroyRolesCapability createModifyDestroyRolesCapability)
+    {
+        this.createModifyDestroyRolesCapability = createModifyDestroyRolesCapability;
+    }
+
+    public CreateModifyDestroyUsersAndGroupsCapability getCreateModifyDestroyUsersAndGroupsCapability()
+    {
+        return createModifyDestroyUsersAndGroupsCapability;
+    }
+
+    public void setCreateModifyDestroyUsersAndGroupsCapability(CreateModifyDestroyUsersAndGroupsCapability createModifyDestroyUsersAndGroupsCapability)
+    {
+        this.createModifyDestroyUsersAndGroupsCapability = createModifyDestroyUsersAndGroupsCapability;
+    }
+
+    public PasswordControlCapability getPasswordControlCapability()
+    {
+        return passwordControlCapability;
+    }
+
+    public void setPasswordControlCapability(PasswordControlCapability passwordControlCapability)
+    {
+        this.passwordControlCapability = passwordControlCapability;
+    }
+
+    public EnableDisableAuditByTypesCapability getEnableDisableAuditByTypesCapability()
+    {
+        return enableDisableAuditByTypesCapability;
+    }
+
+    public void setEnableDisableAuditByTypesCapability(EnableDisableAuditByTypesCapability enableDisableAuditByTypesCapability)
+    {
+        this.enableDisableAuditByTypesCapability = enableDisableAuditByTypesCapability;
+    }
+
+    public SelectAuditMetadataCapability getSelectAuditMetadataCapability()
+    {
+        return selectAuditMetadataCapability;
+    }
+
+    public void setSelectAuditMetadataCapability(SelectAuditMetadataCapability selectAuditMetadataCapability)
+    {
+        this.selectAuditMetadataCapability = selectAuditMetadataCapability;
+    }
+
+    public DisplayRightsReportCapability getDisplayRightsReportCapability()
+    {
+        return displayRightsReportCapability;
+    }
+
+    public void setDisplayRightsReportCapability(DisplayRightsReportCapability displayRightsReportCapability)
+    {
+        this.displayRightsReportCapability = displayRightsReportCapability;
+    }
+
+    public AccessAuditCapability getAccessAuditCapability()
+    {
+        return accessAuditCapability;
+    }
+
+    public void setAccessAuditCapability(AccessAuditCapability accessAuditCapability)
+    {
+        this.accessAuditCapability = accessAuditCapability;
+    }
+
+    public ExportAuditCapability getExportAuditCapability()
+    {
+        return exportAuditCapability;
+    }
+
+    public void setExportAuditCapability(ExportAuditCapability exportAuditCapability)
+    {
+        this.exportAuditCapability = exportAuditCapability;
+    }
+
+    public CreateModifyDestroyReferenceTypesCapability getCreateModifyDestroyReferenceTypesCapability()
+    {
+        return createModifyDestroyReferenceTypesCapability;
+    }
+
+    public void setCreateModifyDestroyReferenceTypesCapability(CreateModifyDestroyReferenceTypesCapability createModifyDestroyReferenceTypesCapability)
+    {
+        this.createModifyDestroyReferenceTypesCapability = createModifyDestroyReferenceTypesCapability;
+    }
+
+    public UpdateClassificationDatesCapability getUpdateClassificationDatesCapability()
+    {
+        return updateClassificationDatesCapability;
+    }
+
+    public void setUpdateClassificationDatesCapability(UpdateClassificationDatesCapability updateClassificationDatesCapability)
+    {
+        this.updateClassificationDatesCapability = updateClassificationDatesCapability;
+    }
+
+    public CreateModifyDestroyClassificationGuidesCapability getCreateModifyDestroyClassificationGuidesCapability()
+    {
+        return createModifyDestroyClassificationGuidesCapability;
+    }
+
+    public void setCreateModifyDestroyClassificationGuidesCapability(CreateModifyDestroyClassificationGuidesCapability createModifyDestroyClassificationGuidesCapability)
+    {
+        this.createModifyDestroyClassificationGuidesCapability = createModifyDestroyClassificationGuidesCapability;
+    }
+
+    public UpgradeDowngradeAndDeclassifyRecordsCapability getUpgradeDowngradeAndDeclassifyRecordsCapability()
+    {
+        return upgradeDowngradeAndDeclassifyRecordsCapability;
+    }
+
+    public void setUpgradeDowngradeAndDeclassifyRecordsCapability(UpgradeDowngradeAndDeclassifyRecordsCapability upgradeDowngradeAndDeclassifyRecordsCapability)
+    {
+        this.upgradeDowngradeAndDeclassifyRecordsCapability = upgradeDowngradeAndDeclassifyRecordsCapability;
+    }
+
+    public UpdateExemptionCategoriesCapability getUpdateExemptionCategoriesCapability()
+    {
+        return updateExemptionCategoriesCapability;
+    }
+
+    public void setUpdateExemptionCategoriesCapability(UpdateExemptionCategoriesCapability updateExemptionCategoriesCapability)
+    {
+        this.updateExemptionCategoriesCapability = updateExemptionCategoriesCapability;
+    }
+
+    public MapClassificationGuideMetadataCapability getMapClassificationGuideMetadataCapability()
+    {
+        return mapClassificationGuideMetadataCapability;
+    }
+
+    public void setMapClassificationGuideMetadataCapability(MapClassificationGuideMetadataCapability mapClassificationGuideMetadataCapability)
+    {
+        this.mapClassificationGuideMetadataCapability = mapClassificationGuideMetadataCapability;
+    }
+
+    public ManageAccessControlsCapability getManageAccessControlsCapability()
+    {
+        return manageAccessControlsCapability;
+    }
+
+    public void setManageAccessControlsCapability(ManageAccessControlsCapability manageAccessControlsCapability)
+    {
+        this.manageAccessControlsCapability = manageAccessControlsCapability;
+    }
+
+    public CreateCapability getCreateCapability()
+    {
+        return createCapability;
+    }
+
+    public void setCreateCapability(CreateCapability createCapability)
+    {
+        this.createCapability = createCapability;
     }
 
     public boolean supports(ConfigAttribute attribute)

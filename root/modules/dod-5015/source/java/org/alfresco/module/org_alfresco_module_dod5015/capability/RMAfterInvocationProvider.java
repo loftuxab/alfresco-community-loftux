@@ -390,7 +390,7 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                 testNodeRef = returnedObject;
             }
 
-            if (entryVoter.viewRecordsCapability.checkRead(testNodeRef) == AccessDecisionVoter.ACCESS_DENIED)
+            if (entryVoter.getViewRecordsCapability().checkRead(testNodeRef) == AccessDecisionVoter.ACCESS_DENIED)
             {
                 throw new AccessDeniedException("Access Denied");
             }
@@ -471,7 +471,7 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                 continue;
             }
 
-            if (entryVoter.viewRecordsCapability.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED)
+            if (entryVoter.getViewRecordsCapability().checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED)
             {
                 throw new AccessDeniedException("Access Denied");
             }
@@ -515,7 +515,7 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                 continue;
             }
 
-            if (entryVoter.viewRecordsCapability.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED)
+            if (entryVoter.getViewRecordsCapability().checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED)
             {
                 throw new AccessDeniedException("Access Denied");
             }
@@ -636,7 +636,7 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                     continue;
                 }
 
-                if (inclusionMask.get(i) && (testNodeRef != null) && (entryVoter.viewRecordsCapability.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
+                if (inclusionMask.get(i) && (testNodeRef != null) && (entryVoter.getViewRecordsCapability().checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
                 {
                     inclusionMask.set(i, false);
                 }
@@ -793,7 +793,7 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                         continue;
                     }
 
-                    if (allowed && (testNodeRef != null) && (entryVoter.viewRecordsCapability.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
+                    if (allowed && (testNodeRef != null) && (entryVoter.getViewRecordsCapability().checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
                     {
                         allowed = false;
                     }
@@ -893,7 +893,7 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
                     continue;
                 }
 
-                if (incudedSet.get(i) && (testNodeRef != null) && (entryVoter.viewRecordsCapability.checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
+                if (incudedSet.get(i) && (testNodeRef != null) && (entryVoter.getViewRecordsCapability().checkRead(testNodeRef) != AccessDecisionVoter.ACCESS_GRANTED))
                 {
                     incudedSet.set(i, false);
                 }

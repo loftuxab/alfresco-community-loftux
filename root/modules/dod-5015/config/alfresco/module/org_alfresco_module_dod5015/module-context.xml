@@ -2,7 +2,7 @@
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
 <beans>
-
+    
     <!-- Bootstrap Records Management Models -->
     
     <bean id="org_alfresco_module_dod5015_dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
@@ -18,17 +18,17 @@
     <!-- Bootstrap the permission model -->
     
     <bean id="org_alfresco_module_dod5015_permissionBootstrap" parent="permissionModelBootstrap">
-    	<property name="model" value="alfresco/module/org_alfresco_module_dod5015/model/recordsPermissionModel.xml"/>
+        <property name="model" value="alfresco/module/org_alfresco_module_dod5015/model/recordsPermissionModel.xml"/>
     </bean>
     
     <!-- Bootstrap records management data -->
     
     <bean id="org_alfresco_module_dod5015_bootstrapData" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
-        <property name="moduleId" value="org_alfresco_module_dod5015" />
-        <property name="name" value="org_alfresco_module_dod5015_bootstrapData" />
-        <property name="description" value="Bootstrap records management data" />
-        <property name="sinceVersion" value="1.0" />
-        <property name="appliesFromVersion" value="1.0" />
+        <property name="moduleId" value="org_alfresco_module_dod5015"/>
+        <property name="name" value="org_alfresco_module_dod5015_bootstrapData"/>
+        <property name="description" value="Bootstrap records management data"/>
+        <property name="sinceVersion" value="1.0"/>
+        <property name="appliesFromVersion" value="1.0"/>
         <!-- Data properties -->
         <property name="importer" ref="spacesBootstrap"/>
         <property name="bootstrapViews">
@@ -46,51 +46,53 @@
     
     <!-- Import the RM service's -->
     <import resource="classpath:alfresco/module/org_alfresco_module_dod5015/rm-service-context.xml"/>
-      
+    
+    <!-- Import capabilities -->
+    <import resource="classpath:alfresco/module/org_alfresco_module_dod5015/rm-capabilities-context.xml"/>
+    
     <!-- Import the RM action's -->
     <import resource="classpath:alfresco/module/org_alfresco_module_dod5015/rm-action-context.xml"/>
-     
-
+    
     <!-- Event types -->
     
     <bean id="rmEventType" init-method="init" abstract="true">
-      <property name="recordsManagementEventService" ref="RecordsManagementEventService"/>
+        <property name="recordsManagementEventService" ref="RecordsManagementEventService"/>
     </bean>
     
     <bean id="rmEventType.simple" class="org.alfresco.module.org_alfresco_module_dod5015.event.SimpleRecordsManagementEventTypeImpl" parent="rmEventType"/>
-
+    
     <!-- Scheduled actions -->
     
     <!--
     <bean id="scheduledDispositionJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
-        <property name="jobClass">
-            <value>org.alfresco.module.org_alfresco_module_dod5015.action.ScheduledDispositionJob</value>
-        </property>
-        <property name="jobDataAsMap">
-            <map>
-                <entry key="nodeService">
-                    <ref bean="nodeService" />
-                </entry>
-                <entry key="searchService">
-                    <ref bean="searchService"/>
-                </entry>
-                <entry key="recordsManagementActionService">
-                    <ref bean="recordsManagementActionService" />
-                </entry>
-            </map>
-        </property>
+    <property name="jobClass">
+    <value>org.alfresco.module.org_alfresco_module_dod5015.action.ScheduledDispositionJob</value>
+    </property>
+    <property name="jobDataAsMap">
+    <map>
+    <entry key="nodeService">
+    <ref bean="nodeService" />
+    </entry>
+    <entry key="searchService">
+    <ref bean="searchService"/>
+    </entry>
+    <entry key="recordsManagementActionService">
+    <ref bean="recordsManagementActionService" />
+    </entry>
+    </map>
+    </property>
     </bean>
     
     <bean id="scheduledDispositionTrigger" class="org.alfresco.util.CronTriggerBean">
-        <property name="jobDetail">
-            <ref bean="scheduledDispositionJobDetail" />
-        </property>
-        <property name="scheduler">
-            <ref bean="schedulerFactory" />
-        </property>
-        <property name="cronExpression">
-            <value>0,30 * * ? * *</value>
-        </property>
+    <property name="jobDetail">
+    <ref bean="scheduledDispositionJobDetail" />
+    </property>
+    <property name="scheduler">
+    <ref bean="schedulerFactory" />
+    </property>
+    <property name="cronExpression">
+    <value>0,30 * * ? * *</value>
+    </property>
     </bean>
     -->
     
@@ -105,7 +107,7 @@
     
     <!-- RM caveats -->
     <!-- Caveat read veto is now enforced via the security wrappers for RM -->
-
+    
     <bean id="caveatConfigImpl" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl">
         <property name="policyComponent" ref="policyComponent"/>
         <property name="contentService" ref="contentService"/>
@@ -121,75 +123,60 @@
     </bean>
     
     <!-- REST impl for RM Action Service -->
-    <bean id="webscript.org.alfresco.rma.rmaction.post"
-          class="org.alfresco.module.org_alfresco_module_dod5015.script.RmActionPost" parent="webscript">
-          <property name="recordsManagementActionService" ref="RecordsManagementActionService" />
-          <property name="nodeService" ref="NodeService" />
+    <bean id="webscript.org.alfresco.rma.rmaction.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.RmActionPost" parent="webscript">
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
+        <property name="nodeService" ref="NodeService"/>
     </bean>
     
     <!-- REST impl for RM Admin Service -->
-    <bean id="webscript.org.alfresco.rma.customassocs.get"
-          class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssocsGet" parent="webscript">
-          <property name="recordsManagementAdminService" ref="RecordsManagementAdminService" />
+    <bean id="webscript.org.alfresco.rma.customassocs.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssocsGet" parent="webscript">
+        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
-    <bean id="webscript.org.alfresco.rma.customprops.get"
-          class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropsGet" parent="webscript">
-          <property name="recordsManagementAdminService" ref="RecordsManagementAdminService" />
+    <bean id="webscript.org.alfresco.rma.customprops.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropsGet" parent="webscript">
+        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
     
     <!-- REST impl for GET Disposition Schedule -->
-    <bean id="webscript.org.alfresco.rma.dispositionschedule.get" 
-          class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionScheduleGet" 
-          parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService" />
-        <property name="nodeService" ref="NodeService" />
-        <property name="namespaceService" ref="NamespaceService" />
+    <bean id="webscript.org.alfresco.rma.dispositionschedule.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionScheduleGet" parent="webscript">
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
+        <property name="nodeService" ref="NodeService"/>
+        <property name="namespaceService" ref="NamespaceService"/>
     </bean>
-
+    
     <!-- REST impl for POST Disposition Action Definition -->
-    <bean id="webscript.org.alfresco.rma.dispositionactiondefinitions.post" 
-          class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPost" 
-          parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService" />
-        <property name="nodeService" ref="NodeService" />
-        <property name="namespaceService" ref="NamespaceService" />
+    <bean id="webscript.org.alfresco.rma.dispositionactiondefinitions.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPost" parent="webscript">
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
+        <property name="nodeService" ref="NodeService"/>
+        <property name="namespaceService" ref="NamespaceService"/>
     </bean>
     
     <!-- REST impl for PUT Disposition Action Definition -->
-    <bean id="webscript.org.alfresco.rma.dispositionactiondefinition.put" 
-          class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPut" 
-          parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService" />
-        <property name="nodeService" ref="NodeService" />
-        <property name="namespaceService" ref="NamespaceService" />
+    <bean id="webscript.org.alfresco.rma.dispositionactiondefinition.put" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPut" parent="webscript">
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
+        <property name="nodeService" ref="NodeService"/>
+        <property name="namespaceService" ref="NamespaceService"/>
     </bean>
     
     <!-- REST impl for DELETE Disposition Action Definition -->
-    <bean id="webscript.org.alfresco.rma.dispositionactiondefinition.delete" 
-          class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionDelete" 
-          parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService" />
-        <property name="nodeService" ref="NodeService" />
-        <property name="namespaceService" ref="NamespaceService" />
+    <bean id="webscript.org.alfresco.rma.dispositionactiondefinition.delete" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionDelete" parent="webscript">
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
+        <property name="nodeService" ref="NodeService"/>
+        <property name="namespaceService" ref="NamespaceService"/>
     </bean>
     
     <!-- REST impl for GET Disposition Lifecycle -->
-    <bean id="webscript.org.alfresco.rma.dispositionlifecycle.get" 
-          class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionLifecycleGet" 
-          parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService" />
-        <property name="nodeService" ref="NodeService" />
-        <property name="namespaceService" ref="NamespaceService" />
+    <bean id="webscript.org.alfresco.rma.dispositionlifecycle.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionLifecycleGet" parent="webscript">
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
+        <property name="nodeService" ref="NodeService"/>
+        <property name="namespaceService" ref="NamespaceService"/>
     </bean>
     
     <!-- REST impl for GET List Of Values -->
-    <bean id="webscript.org.alfresco.rma.listofvalues.get" 
-          class="org.alfresco.module.org_alfresco_module_dod5015.script.ListOfValuesGet" 
-          parent="webscript">
-        <property name="recordsManagementActionService" ref="RecordsManagementActionService" />
-        <property name="recordsManagementEventService" ref="RecordsManagementEventService" />
-        <property name="dictionaryService" ref="DictionaryService" />
-        <property name="namespaceService" ref="NamespaceService" />
+    <bean id="webscript.org.alfresco.rma.listofvalues.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.ListOfValuesGet" parent="webscript">
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
+        <property name="recordsManagementEventService" ref="RecordsManagementEventService"/>
+        <property name="dictionaryService" ref="DictionaryService"/>
+        <property name="namespaceService" ref="NamespaceService"/>
     </bean>
     
 </beans>

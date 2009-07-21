@@ -26,7 +26,6 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability.impl;
 
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
-import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessStatus;
@@ -35,12 +34,12 @@ import org.alfresco.service.cmr.security.AccessStatus;
  * @author andyh
  *
  */
-public class FileRecord extends AbstractCapability
+public class FileRecordsCapability extends AbstractCapability
 {
 
-    public FileRecord(RMEntryVoter voter)
+    public FileRecordsCapability()
     {
-        super(voter);
+        super();
     }
 
     @Override

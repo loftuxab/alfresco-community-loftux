@@ -26,7 +26,6 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability.impl;
 
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
-import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessStatus;
@@ -34,9 +33,9 @@ import org.alfresco.service.cmr.security.AccessStatus;
 public class UpdateVitalRecordCycleInformationCapability extends AbstractCapability
 {
 
-    public UpdateVitalRecordCycleInformationCapability(RMEntryVoter voter)
+    public UpdateVitalRecordCycleInformationCapability()
     {
-        super(voter);
+        super();
     }
 
     @Override

@@ -32,6 +32,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -52,9 +53,21 @@ public abstract class AbstractCapability
 
     protected RMEntryVoter voter;
 
-    protected AbstractCapability(RMEntryVoter voter)
+    protected RecordsManagementAction action;
+
+    public AbstractCapability()
+    {
+        super();
+    }
+
+    public void setVoter(RMEntryVoter voter)
     {
         this.voter = voter;
+    }
+
+    public void setAction(RecordsManagementAction action)
+    {
+        this.action = action;
     }
 
     AccessStatus translate(int vote)
@@ -128,7 +141,7 @@ public abstract class AbstractCapability
         }
         return checkUndeclared(nodeRef);
     }
-    
+
     public int checkFilingUnfrozenUncutoffUndeclared(NodeRef nodeRef)
     {
         int status;
