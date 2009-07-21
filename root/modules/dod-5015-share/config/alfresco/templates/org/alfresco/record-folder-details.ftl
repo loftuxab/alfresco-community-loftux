@@ -14,7 +14,7 @@
    </div>
    <div id="bd">
       <@region id=doclibType + "path" scope="template" protected=true />
-      <#if (true)>
+      <#if (nextDispositionAction != "")>
       <div class="yui-gb">
          <div class="yui-u first">
             <@region id=doclibType + "events" scope="template" protected=true />
