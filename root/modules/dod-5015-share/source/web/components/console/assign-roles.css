@@ -84,19 +84,32 @@ ul.capabilities li
 {
  width:100%;
 }
+#assignRoles
+{
+   zoom:1;
+}
 #assignRoles form#searchRolesFrm
 {
    float:left;
    margin-top:1em;
 }
+#searchRolesFrm .yui-button
+{
+   vertical-align: bottom;
+}
 .active
 {
-  display:block;
+   display:block;
 }
-#assignRoles-showType {
- float:right;
- clear:right;
- margin-top:0.5em;
+#assignRoles-showType 
+{
+   float:right;
+   clear:right;
+   margin-top:0.5em;
+}
+#assignRoles-showTypeMenu
+{
+   display:none;
 }
 #assignRoleDT {
  clear:both;

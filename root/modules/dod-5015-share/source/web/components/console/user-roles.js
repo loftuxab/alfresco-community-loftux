@@ -98,6 +98,14 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
          
          return this;
       },
+      /**
+      * Event handler for select all/deselect all button.
+      * (De)Selects all relevant checkboxes
+      * 
+      * @param {e} Event object
+      * @method
+      * 
+      */
       onSelectAll : function Admin_RM_ManageRoles_onSelectAll(e, args)
       {
          var elTarget = Event.getTarget(e), 
@@ -228,8 +236,6 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
        */
       initEvents : function Admin_RM_View_Roles_initEvents()
       {
-         //requires EventProvider
-         //this.createEvent('newReference')
          
          Event.on(this.id,'click',this.onInteractionEvent,null,this);         
          
@@ -280,23 +286,51 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
             this.widgets[id]._button.className=button.className;
          }
       },
+      /**
+      * Event handler for role selection
+      * 
+      * @param {e} Event object
+      * @method
+      * 
+      */
       onRoleSelect : function Admin_RM_View_Roles_onRoleSelect(e)
       {
         alert('switch tabs');
       },
+      /**
+      * Event handler for new role button
+      * 
+      * @param {e} Event object
+      * @method
+      * 
+      */      
       onNewRole: function Admin_RM_View_Roles_onNewRole(e)
       {
          window.location.href=Alfresco.constants.URL_CONTEXT+'page/console/admin-console/define-roles?action=new';
       },
-
+      
+      /**
+      * Event handler for edit role button
+      * 
+      * @param {e} Event object
+      * @method
+      * 
+      */
       onEditRole: function Admin_RM_View_Roles_onEditRole(e)
       {
          var el = Event.getTarget(e);
          //get roleid from button value
          var roleId = this.widgets[el.id.replace('-button','')].get('value');
-window.location.href=Alfresco.constants.URL_CONTEXT+'page/console/admin-console/define-roles?action=edit&roleId='+roleId;
+         window.location.href=Alfresco.constants.URL_CONTEXT+'page/console/admin-console/define-roles?action=edit&roleId='+roleId;
       }, 
 
+      /**
+      * Event handler for delete role button
+      * 
+      * @param {e} Event object
+      * @method
+      * 
+      */
       onDeleteRole: function Admin_RM_View_Roles_onDeleteRole(e)
       {
          var el = Event.getTarget(e);
@@ -305,7 +339,8 @@ window.location.href=Alfresco.constants.URL_CONTEXT+'page/console/admin-console/
          var performDelete = this.performDelete;
          var me = this;
 
-         Alfresco.util.PopupManager.displayPrompt({
+         Alfresco.util.PopupManager.displayPrompt(
+         {
            title: this.msg('label.confirm-delete-title'),
            text: this.msg('label.confirm-delete-message'),
            modal: true, 
@@ -328,7 +363,15 @@ window.location.href=Alfresco.constants.URL_CONTEXT+'page/console/admin-console/
               }
          ]
         });
-      }, 
+      },
+      
+      /**
+      * Method that calls the webservice to delete role
+      * 
+      * @param {roleId} role id
+      * @method
+      * 
+      */ 
       performDelete: function(roleId)
       {
          alert('role deleted');
@@ -351,20 +394,6 @@ window.location.href=Alfresco.constants.URL_CONTEXT+'page/console/admin-console/
          //       scope: this
          //    }
          // });
-      },   
-      onRoleSelect: function Admin_RM_View_Roles_onRoleSelect(e)
-      {
-         var el = Event.getTarget(e);
-         var currentRole = window.location.hash;
-         if (currentRole!='')
-         {
-            var roleEl = Dom.get(currentRole);
-            if (roleEl)
-            {
-               roleEl.addClass('hiddenRole');
-            }
-               
-         }
       }
    });
 })();

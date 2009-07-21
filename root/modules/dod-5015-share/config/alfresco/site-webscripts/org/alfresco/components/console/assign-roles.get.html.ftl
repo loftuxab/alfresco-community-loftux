@@ -4,7 +4,7 @@
   
   <div id="assignRoles">
     <h2>${msg('label.assign-roles-title')}</h2>
-    <form id="searchRolesFrm"><input type="text" name="q" value="q" id="searchQuery" /><input type="submit" name="search" value="Search" id="search" /></form>
+    <form id="searchRolesFrm"><input type="text" name="q" value="q" id="searchQuery" /><input type="submit" name="search" value="Search" id="search" /></form>    
     <button id="assignRoles-showType" name="assignRoles-showType">${msg('label.show')}</button>
     <div id="assignRoles-showTypeMenu" class="yuimenu">
        <div class="bd">

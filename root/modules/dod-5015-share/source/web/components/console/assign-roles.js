@@ -47,6 +47,13 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
          
          return this;
       },
+      /**
+      * Event handler for show type
+      * 
+      * @param {e} Event object
+      * @method
+      * 
+      */      
       onShowType: function RM_Assign_Roles_onShowType(sType, aArgs, p_obj)
       {
          var domEvent = aArgs[0];
@@ -61,14 +68,35 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
          }
          Event.preventDefault(domEvent);
       },
+      /**
+      * Event handler for show groups
+      * 
+      * @param {e} Event object
+      * @method
+      * 
+      */
       onShowGroups: function RM_Assign_Roles_onShowGroups()
       {
          alert('showGroups');
       },
+      /**
+      * Event handler for show users
+      * 
+      * @param {e} Event object
+      * @method
+      * 
+      */      
       onShowUsers: function RM_Assign_Roles_onShowUsers()
       {
          alert('showUsers');
       },
+      /**
+      * Event handler for menu show users and groups
+      * 
+      * @param {e} Event object
+      * @method
+      * 
+      */      
       onShowUsersGroups: function RM_Assign_Roles_onShowUsersAndGroups()
       {
          alert('showUsersGroups');
@@ -81,6 +109,7 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
       onReady: function RM_Assign_Roles_onReady()
       {
          this.initEvents();
+         // create menu object
          var showTypeMenu  = this.widgets['showType'] = Alfresco.util.createYUIButton(this, "showType", this.onShowType,
            {
               type: "menu", 
@@ -93,6 +122,7 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
          showTypeMenu.getMenu().lazyLoad = false;
          showTypeMenu.getMenu().initEvent.fire();
          showTypeMenu.getMenu().render();
+         document.getElementById('assignRoles-showTypeMenu').style.display='block';
          var buttons = Sel.query('button',this.id).concat(Sel.query('input[type=submit]',this.id));;;
          // Create widget button while reassigning classname to src element (since YUI removes classes). 
          // We need the classname so we can identify what action to take when it is interacted with (event delegation).
@@ -105,6 +135,8 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
               this.widgets[id] = new YAHOO.widget.Button(button.id)._button.className=button.className;
           }
          }
+         //create data source for data table. 
+         // This will be replaced by json ajax data
          var DS = this.widgets['rolesDataSource'] =new YAHOO.util.DataSource(
          [
               {name:"role name", role:"role1"},
@@ -116,6 +148,7 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
          DS.responseSchema = {
             fields: ["name","role"]
          };
+         //create data table with a select dropdown editor for role column
          var DT = this.widgets['rolesDataTable'] = new YAHOO.widget.DataTable("assignRoleDT",
              [
                {key:"name", label:this.msg('label.name'),sortable:true, resizeable:true},
