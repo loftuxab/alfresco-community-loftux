@@ -4,7 +4,7 @@
   Gets the list of existing custom association types.<br/>
   ]]>
   </description>
-  <url>/api/rma/admin/customassocs</url>
+  <url>/api/rma/admin/customassociations</url>
   <format default="json"/>
   <authentication>user</authentication>
   <transaction>required</transaction>

@@ -227,19 +227,19 @@ public class DefineCustomAssociationAction extends RMActionExecuterAbstractBase
 	protected void addParameterDefinitions(List<ParameterDefinition> paramList)
 	{
 	    //TODO Could separate defineCustomChildAssociation out into a separate action.
-        paramList.add(new ParameterDefinitionImpl(PARAM_IS_CHILD, DataTypeDefinition.BOOLEAN, true, "isChildLabel"));
+        paramList.add(new ParameterDefinitionImpl(PARAM_IS_CHILD, DataTypeDefinition.BOOLEAN, true, null));
 
-        paramList.add(new ParameterDefinitionImpl(PARAM_NAME, DataTypeDefinition.TEXT, true, "nameLabel"));
-        paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_ROLE_NAME, DataTypeDefinition.TEXT, true, "sourceRoleNameLabel"));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_ROLE_NAME, DataTypeDefinition.TEXT, true, "targetRoleNameLabel"));
+        paramList.add(new ParameterDefinitionImpl(PARAM_NAME, DataTypeDefinition.TEXT, true, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_ROLE_NAME, DataTypeDefinition.TEXT, true, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_ROLE_NAME, DataTypeDefinition.TEXT, true, null));
 	    
-        paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, DataTypeDefinition.TEXT, false, "descriptionLabel"));
-        paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_MANDATORY, DataTypeDefinition.BOOLEAN, false, "sourceMandatoryLabel"));
-        paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_MANY, DataTypeDefinition.BOOLEAN, false, "sourceManyLabel"));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_MANDATORY, DataTypeDefinition.BOOLEAN, false, "targetMandatoryLabel"));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_MANDATORY_ENFORCED, DataTypeDefinition.BOOLEAN, false, "targetMandatoryEnforcedLabel"));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_MANY, DataTypeDefinition.BOOLEAN, false, "targetManyLabel"));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TITLE, DataTypeDefinition.TEXT, false, "titleLabel"));
-        paramList.add(new ParameterDefinitionImpl(PARAM_PROTECTED, DataTypeDefinition.BOOLEAN, false, "protectedLabel"));
+        paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, DataTypeDefinition.TEXT, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_MANDATORY, DataTypeDefinition.BOOLEAN, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_MANY, DataTypeDefinition.BOOLEAN, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_MANDATORY, DataTypeDefinition.BOOLEAN, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_MANDATORY_ENFORCED, DataTypeDefinition.BOOLEAN, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_MANY, DataTypeDefinition.BOOLEAN, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_TITLE, DataTypeDefinition.TEXT, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_PROTECTED, DataTypeDefinition.BOOLEAN, false, null));
 	}
 }
