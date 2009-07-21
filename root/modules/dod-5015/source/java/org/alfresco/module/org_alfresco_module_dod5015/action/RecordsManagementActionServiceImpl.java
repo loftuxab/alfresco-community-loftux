@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -77,6 +78,24 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
     {
         List<String> result = new ArrayList<String>(this.rmActions.size());
         result.addAll(this.rmActions.keySet());
+        return Collections.unmodifiableList(result);
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService#getDispositionActions(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public List<String> getDispositionActions(NodeRef nodeRef)
+    {
+        String userName = AuthenticationUtil.getFullyAuthenticatedUser();
+        List<String> result = new ArrayList<String>(this.rmActions.size());
+        
+        for (RecordsManagementAction action : this.rmActions.values())
+        {
+            // TODO check the permissions on the action ...
+            
+            // Check the 
+        }
+        
         return Collections.unmodifiableList(result);
     }
     

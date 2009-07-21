@@ -181,6 +181,32 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     }
     
     /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getRecordsManagementRoot(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public NodeRef getRecordsManagementRoot(NodeRef nodeRef)
+    {
+        NodeRef result = null;
+        
+        if (this.nodeService.hasAspect(nodeRef, ASPECT_FILE_PLAN_COMPONENT) == true)
+        {
+            if (this.nodeService.hasAspect(nodeRef, ASPECT_RECRODS_MANAGEMENT_ROOT) == true)
+            {
+                result = nodeRef;
+            }
+            else
+            {
+                result = getRecordsManagementRoot(this.nodeService.getPrimaryParent(nodeRef).getParentRef());
+            }
+        }
+        else
+        {
+            throw new AlfrescoRuntimeException("Can not find the records management root for a node that is not a file plan component");
+        }
+        
+        return result;
+    }
+    
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#isRecord(org.alfresco.service.cmr.repository.NodeRef)
      */
     public boolean isRecord(NodeRef nodeRef)
@@ -489,7 +515,9 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                         
                         if (contextDate == null)
                         {
-                            throw new AlfrescoRuntimeException("Date used to calculate disposition action asOf date is not set for property " + periodProperty.toString());
+                            // TODO For now we will use NOW to resolve MOB-1184
+                            //throw new AlfrescoRuntimeException("Date used to calculate disposition action asOf date is not set for property " + periodProperty.toString());
+                            contextDate = new Date();
                         }
                     }
                     

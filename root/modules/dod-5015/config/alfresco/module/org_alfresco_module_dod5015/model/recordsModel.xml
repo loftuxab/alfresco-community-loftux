@@ -356,7 +356,7 @@
                     <many>false</many>
                 </source>
                 <target>
-                    <class>rma:dispositionLifecycle</class>
+                    <class>rma:filePlanComponent</class>
                     <mandatory>false</mandatory>
                     <many>true</many>
                 </target>
@@ -412,6 +412,43 @@
       <aspect name="rma:filePlanComponent">
           <title>File Plan Component</title>
       </aspect>  
+      
+      <aspect name="rma:recordsManagementRoot">
+        <title>Records Management Root</title>         
+         <associations>
+            
+            <child-association name="rma:holds">
+                <title>Holds</title>
+                <source>
+                    <mandatory>false</mandatory>
+                    <many>false</many>
+                </source>
+                <target>
+                    <class>rma:hold</class>
+                    <mandatory>false</mandatory>
+                    <many>true</many>
+                </target>
+            </child-association>
+            
+             
+            <child-association name="rma:transfers">
+                <title>Transfers</title>
+                <source>
+                    <mandatory>false</mandatory>
+                    <many>false</many>
+                </source>
+                <target>
+                    <class>rma:transfer</class>
+                    <mandatory>false</mandatory>
+                    <many>true</many>
+                </target>
+            </child-association>
+         
+         </associations>
+         <mandatory-aspects>
+            <aspect>rma:filePlanComponent</aspect>
+         </mandatory-aspects>
+      </aspect>
 	   
       <aspect name="rma:declaredRecord">
          <title>Declared Record</title>  
@@ -643,7 +680,7 @@
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
-      </aspect>
+      </aspect>      
    
       <!-- TODO rename to cutOffAs and add cutOffBy properties -->
       <aspect name="rma:cutOff">

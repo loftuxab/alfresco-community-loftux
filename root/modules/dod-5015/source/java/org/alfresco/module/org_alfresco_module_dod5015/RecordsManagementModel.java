@@ -145,9 +145,23 @@ public interface RecordsManagementModel
     // Non-electronic document
 	public static QName TYPE_NON_ELECTRONIC_DOCUMENT = QName.createQName(RM_URI, "nonElectronicDocument");
 	
+	// Records management root aspect
+	public static QName ASPECT_RECRODS_MANAGEMENT_ROOT = QName.createQName(RM_URI, "recordsManagementRoot");
+    public static QName ASSOC_HOLDS = QName.createQName(RM_URI, "holds");
+	public static QName ASSOC_TRANSFERS = QName.createQName(RM_URI, "transfers");
+	
+	// Hold type
+	public static QName TYPE_HOLD = QName.createQName(RM_URI, "hold");
+	public static QName PROP_HOLD_REASON = QName.createQName(RM_URI, "holdReason");
+	public static QName ASSOC_FROZEN_RECORDS = QName.createQName(RM_URI, "frozenRecords");
+	
+	// Frozen aspect
+	public static QName ASPECT_FROZEN = QName.createQName(RM_URI, "frozen");
+	public static QName PROP_FROZEN_AT = QName.createQName(RM_URI, "frozenAt");
+	public static QName PROP_FROZEN_BY = QName.createQName(RM_URI, "frozenBy");
+	
     // Record category
 	public static QName TYPE_RECORD_CATEGORY = QName.createQName(DOD_URI, "recordCategory");
 	
-	// Frozen
-    public static QName ASPECT_FROZEN = QName.createQName(RM_URI, "frozen");
+
 }

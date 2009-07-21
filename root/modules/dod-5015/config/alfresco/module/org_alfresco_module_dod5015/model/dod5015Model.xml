@@ -43,7 +43,12 @@
    
       <type name="dod:filePlan">      
          <title>File Plan</title>
-         <parent>rma:recordsManagementContainer</parent>                  
+         <parent>rma:recordsManagementContainer</parent>          
+         
+         <mandatory-aspects>         
+            <aspect>rma:recordsManagementRoot</aspect>
+         </mandatory-aspects>
+                 
       </type>
       
       <type name="dod:recordSeries">
