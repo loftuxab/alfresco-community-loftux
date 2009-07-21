@@ -19,6 +19,14 @@
    display: block;
 }
 
+.form-container label.checkbox
+{
+   clear: both;
+   display: inline;
+   margin-left: 0.2em;
+   vertical-align: top;
+}
+
 .form-container input
 {
    clear: both;
