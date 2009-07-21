@@ -26,16 +26,15 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability.impl;
 
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
-import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 
-public final class ViewRecordsCapabilty extends AbstractCapability
+public final class ViewRecordsCapability extends AbstractCapability
 {
 
-    public ViewRecordsCapabilty(RMEntryVoter voter)
+    public ViewRecordsCapability()
     {
-        super(voter);
+        super();
     }
 
     @Override

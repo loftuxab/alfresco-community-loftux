@@ -34,9 +34,9 @@ import org.alfresco.service.namespace.QName;
 public class CreateCapability extends AbstractCapability
 {
 
-    public CreateCapability(RMEntryVoter voter)
+    public CreateCapability()
     {
-        super(voter);
+        super();
     }
 
     @Override
@@ -49,20 +49,20 @@ public class CreateCapability extends AbstractCapability
     {
         if (linkee != null)
         {
-            if (voter.viewRecordsCapability.checkRead(linkee, true) != AccessDecisionVoter.ACCESS_GRANTED)
+            if (voter.getViewRecordsCapability().checkRead(linkee, true) != AccessDecisionVoter.ACCESS_GRANTED)
             {
                 return AccessDecisionVoter.ACCESS_DENIED;
             }
         }
-        if (voter.declareRecordsCapability.evaluate(destination) == AccessDecisionVoter.ACCESS_GRANTED)
+        if (voter.getDeclareRecordsCapability().evaluate(destination) == AccessDecisionVoter.ACCESS_GRANTED)
         {
             return AccessDecisionVoter.ACCESS_GRANTED;
         }
-        if (voter.createModifyDestroyFoldersCapability.evaluate(destination, type) == AccessDecisionVoter.ACCESS_GRANTED)
+        if (voter.getCreateModifyDestroyFoldersCapability().evaluate(destination, type) == AccessDecisionVoter.ACCESS_GRANTED)
         {
             return AccessDecisionVoter.ACCESS_GRANTED;
         }
-        if (voter.declareRecordsInClosedFoldersCapability.evaluate(destination) == AccessDecisionVoter.ACCESS_GRANTED)
+        if (voter.getDeclareRecordsInClosedFoldersCapability().evaluate(destination) == AccessDecisionVoter.ACCESS_GRANTED)
         {
             return AccessDecisionVoter.ACCESS_GRANTED;
         }
