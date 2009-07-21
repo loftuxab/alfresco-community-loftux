@@ -1,6 +1,13 @@
 <toolbar>
    <actionSets>
       <actionSet id="default">
+         <action id="onActionCutoff" type="action-link" permission="cutoff" asset="record-folder,record" label="menu.selected-items.cutoff" />
+         <action id="onActionUndoCutoff" type="action-link" permission="undo-cutoff" asset="record-folder,record" label="menu.selected-items.undo-cutoff" />
+         <action id="onActionFreeze" type="action-link" permission="freeze" asset="record-folder,record" label="menu.selected-items.freeze" />
+         <action id="onActionUnfreeze" type="action-link" permission="unfreeze" asset="record-folder,record" label="menu.selected-items.unfreeze" />
+         <action id="onActionTransfer" type="action-link" permission="transfer" asset="record-folder,record" label="menu.selected-items.transfer" />
+         <action id="onActionTransferConfirm" type="action-link" permission="transfer-confirm" asset="transfer" label="menu.selected-items.transfer-confirm" />
+         <action id="onActionDestroy" type="action-link" permission="destroy" label="menu.selected-items.destroy" />
          <action id="onActionCopyTo" type="action-link" permission="" asset="record-folder,record,undeclared-record" label="menu.selected-items.copy-to" />
          <action id="onActionMoveTo" type="action-link" permission="delete" asset="record-folder,record,undeclared-record" label="menu.selected-items.move-to" />
          <action id="onActionFileTo" type="action-link" permission="" asset="record-folder,record,undeclared-record" label="menu.selected-items.file-to" />

@@ -58,7 +58,11 @@ function getFilterParams(filter, parsedArgs, favourites)
                var filterQuery = ssJson.query;
                // Wrap the query so that only items within the filePlan are returned
                filterParams.query = 'PATH:"' + parsedArgs.rootNode.qnamePath + '//*" AND ASPECT:"rma:record" AND (' + filterQuery + ')';
-               filterParams.templates = [ {field: "KEYWORDS", template: "%(cm:name cm:title cm:description TEXT)"} ];
+               filterParams.templates = [
+               {
+                  field: "KEYWORDS",
+                  template: "%(cm:name cm:title cm:description TEXT)"
+               }];
                filterParams.language = "fts-alfresco";
             }
          }

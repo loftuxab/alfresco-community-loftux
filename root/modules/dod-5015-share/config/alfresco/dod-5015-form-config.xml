@@ -23,6 +23,7 @@
                <show id="cm:description" />
                <show id="rma:identifier" />
             </field-visibility>
+            <create-form template="dod5015-create-container.ftl" />
          </form>
       </forms>
    </config>
@@ -39,6 +40,7 @@
                <show id="rma:reviewPeriod" />
                <show id="rma:vitalRecordIndicator" />
             </field-visibility>
+            <create-form template="dod5015-create-container.ftl" />
          </form>
       </forms>
    </config>
@@ -55,6 +57,7 @@
                <show id="rma:location" />
                <show id="rma:supplementalMarkingList" />
             </field-visibility>
+            <create-form template="dod5015-create-container.ftl" />
          </form>
       </forms>
    </config>

@@ -432,14 +432,31 @@
             width: this.options.width
          });
          this.dialog.render(document.body);
-         
-         // OK button
-         this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok", null,
+
+         // Are we controlling a Forms Service-supplied form?
+         if (Dom.get(this.id + "-form-submit"))
          {
-            type: "submit"
-         });
-         // Cancel button
-         this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
+            // Yes - OK button is "normal" button
+            this.widgets.okButton = Alfresco.util.createYUIButton(this, "form-submit", null);
+
+            // Cancel button?
+            if (Dom.get(this.id + "-form-cancel"))
+            {
+               this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "form-cancel", this.onCancel);
+            }
+         }
+         else
+         {
+            // OK button needs to be "submit" type
+            this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok", null,
+            {
+               type: "submit"
+            });
+
+            // Cancel button
+            this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
+         }
+
          // Form definition
          this.form = new Alfresco.forms.Form(this.id + "-form");
          this.form.setSubmitElements(this.widgets.okButton);

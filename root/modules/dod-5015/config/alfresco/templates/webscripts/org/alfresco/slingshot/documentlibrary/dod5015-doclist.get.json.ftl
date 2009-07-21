@@ -9,6 +9,9 @@
    "startIndex": ${paging.startIndex?c},
    "metadata":
    {
+      <#if doclist.parent??>
+      "parent": "${doclist.parent.nodeRef}",
+      </#if>
       "permissions":
       {
          "userRole": "${user.role!""}",

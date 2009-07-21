@@ -1135,6 +1135,7 @@
 
       /**
        * Declare Record action.
+       * Special case handling due to the ability to jump to the Edit Metadata page if the action failed.
        *
        * @method onActionDeclare
        * @param row {object} DataTable row representing file to be actioned
@@ -1215,6 +1216,18 @@
       {
          this._dod5015Action(row, "reviewed", "message.review");
       },
+
+      /**
+       * Undeclare record.
+       *
+       * @method onActionUndeclare
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionUndeclare: function DL_onActionUndeclare(row)
+      {
+         this._dod5015Action(row, "undeclareRecord", "message.undeclare");
+      },
+
 
       /**
        * DOD5015 action.

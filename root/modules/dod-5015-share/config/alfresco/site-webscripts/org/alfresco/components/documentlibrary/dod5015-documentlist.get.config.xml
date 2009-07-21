@@ -29,19 +29,18 @@
          <action id="onActionReviewed" permission="reviewed" type="action-link" label="actions.reviewed" />
          <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
          <action id="onActionTransfer" permission="transfer" type="action-link" label="actions.transfer" />
-         <action id="onActionTransferNARA" permission="transferNARA" type="action-link" label="actions.transferNARA" />
-         <action id="onActionAddReference" permission="add-reference" type="action-link" label="actions.add-reference" />
          <action id="onActionFreeze" permission="freeze" type="action-link" label="actions.freeze" />
          <action id="onActionUnfreeze" permission="unfreeze" type="action-link" label="actions.unfreeze" />
-         <action id="onActionDestroy" permission="destroy" type="action-link" label="actions.destroy" />
+         <action id="onActionUndeclare" permission="undeclare" type="action-link" label="actions.undeclare" />
          <action id="onActionCopyTo" type="action-link" permission="" label="actions.copy-to" />
          <action id="onActionMoveTo" type="action-link" permission="delete" label="actions.move-to" />
          <action id="onActionFileTo" type="action-link" permission="" label="actions.file-to" />
+         <action id="onActionDestroy" permission="destroy" type="action-link" label="actions.destroy" />
       </actionSet>
 
       <actionSet id="undeclaredRecord">
          <action id="onActionEditDetails" permisson="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
-         <action id="onActionDeclare" permission="" type="action-link" label="actions.declare" />
+         <action id="onActionDeclare" permission="declare" type="action-link" label="actions.declare" />
          <action id="onActionUploadNewVersion" permission="HIDDEN" type="action-link" label="actions.upload-new-version" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
          <action id="onActionCopyTo" type="action-link" permission="" label="actions.copy-to" />

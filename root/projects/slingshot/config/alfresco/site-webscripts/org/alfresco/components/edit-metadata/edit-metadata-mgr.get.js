@@ -12,7 +12,7 @@ function fromContainerType(repoType)
          break;
 
       case "dod:recordFolder":
-         type = "record-series";
+         type = "record-folder";
          break;
    }
    return type;
