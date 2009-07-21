@@ -47,6 +47,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
 import org.alfresco.repo.content.MimetypeMap;
@@ -1715,6 +1716,66 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // This test formerly tested a single RecordCategory like so:
         // NodeRef recordCategory = this.getRecordCategory("Miscellaneous Files", "Civilian Employee Training Program Records");
+    }
+    
+    public void testFreeze() throws Exception
+    {      
+        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
+        assertNotNull(recordCategory);
+        assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+                
+        NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
+        
+        setComplete();
+        endTransaction();
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Create the document
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+        NodeRef recordOne = this.nodeService.createNode(recordFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                        ContentModel.TYPE_CONTENT).getChildRef();
+        
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+        txn.commit(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_RECORD));
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FILE_PLAN_COMPONENT));
+        
+        // Freeze the record
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "freeze reason");
+        this.rmActionService.executeRecordsManagementAction(recordOne, "freeze", params);
+        
+        // Check the hold exists 
+        NodeRef rootNode = this.rmService.getRecordsManagementRoot(recordOne);
+        List<ChildAssociationRef> holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(holdAssocs);
+        assertEquals(1, holdAssocs.size());        
+        NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
+        assertEquals("freeze reason", this.nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+        
+        
+        
+        txn.commit(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        this.nodeService.deleteNode(holdNodeRef);
+        
+        txn.commit();
+        
     }
     
     /**
