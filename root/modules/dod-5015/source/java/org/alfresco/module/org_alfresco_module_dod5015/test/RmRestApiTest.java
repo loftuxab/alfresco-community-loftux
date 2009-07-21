@@ -60,8 +60,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 {
     private static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
     protected static final String APPLICATION_JSON = "application/json";
-    protected static final String RMA_CUSTOM_ASSOCS_URL = "/api/rma/admin/customassocs";
-    protected static final String RMA_CUSTOM_PROPS_URL = "/api/rma/admin/customprops";
+    protected static final String RMA_CUSTOM_ASSOCS_URL = "/api/rma/admin/customassociations";
+    protected static final String RMA_CUSTOM_PROPS_URL = "/api/rma/admin/customproperties";
     protected NodeService nodeService;
     protected ContentService contentService;
     protected SearchService searchService;
@@ -202,15 +202,14 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         // 2. Non-child or standard association.
         final String stdAssocName = "rmc:customAssocStandard" + System.currentTimeMillis();
         
-        jsonString = new JSONStringer().object()
+        String secondJsonString = new JSONStringer().object()
             .key("name").value("defineCustomAssociation")
             .key("nodeRef").value(customModelNodeRef.toString()) // The nodeRef doesn't matter!
             .key("params").object()
                 .key("name").value(stdAssocName)
                 .key("isChild").value(false)
                 .key("title").value("Cross-references link")
-                //TODO Use a proper DOD 5015 link below.
-                .key("description").value("Not sure this is a 'proper' DOD relationship.")
+                .key("description").value("cross")
                 .key("sourceRoleName").value("cross-referencing")
                 .key("targetRoleName").value("cross-referenced")
                 .key("sourceMandatory").value(true)
@@ -225,7 +224,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         // Submit the JSON request.
         rsp = sendRequest(new PostRequest(RMA_ACTIONS_URL,
-                                 jsonString, APPLICATION_JSON), expectedStatus);
+                secondJsonString, APPLICATION_JSON), expectedStatus);
         
         rspContent = rsp.getContentAsString();
         assertTrue(rspContent.contains("Successfully queued action [defineCustomAssociation]"));
@@ -297,7 +296,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         JSONObject customPropsObj = (JSONObject)dataObj.get("customProperties");
         assertNotNull("JSON 'customProperties' object was null", customPropsObj);
-        
+
         final int customPropsCount = customPropsObj.length();
         assertTrue("There should be at least one custom property. Found " + customPropsObj, customPropsCount > 0);
     }

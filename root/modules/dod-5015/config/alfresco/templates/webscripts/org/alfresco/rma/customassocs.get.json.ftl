@@ -8,17 +8,16 @@
          "${assoc.name}" :
          {
             "isChildAssociation" : ${assoc.childAssociation?string},
-            <#if assoc.type??>"type" : "${assoc.type}",</#if>
-            <#if assoc.title??>"title" : "${assoc.title}",</#if>
-            <#if assoc.description??>"description" : "${assoc.description}",</#if>
-            <#if assoc.sourceRoleName??>"sourceRoleName" : "${assoc.sourceRoleName}",</#if>
-            <#if assoc.sourceMandatory??>"sourceMandatory" : ${assoc.sourceMandatory?string},</#if>
-            <#if assoc.sourceMany??>"sourceMany" : ${assoc.sourceMany?string},</#if>
-            <#if assoc.targetRoleName??>"targetRoleName" : "${assoc.targetRoleName}",</#if>
-            <#if assoc.targetMandatory??>"targetMandatory" : ${assoc.targetMandatory?string},</#if>
-            <#if assoc.targetMandatoryEnforced??>"targetMandatoryEnforced" : ${assoc.targetMandatoryEnforced?string},</#if>
-            <#if assoc.targetMany??>"targetMany" : ${assoc.targetMany?string},</#if>
-            <#if assoc.protected??>"protected" : ${assoc.protected?string},</#if>
+            "title" : <#if assoc.title??>"${assoc.title}"<#else>""</#if>,
+            "description" : <#if assoc.description??>"${assoc.description}"<#else>""</#if>,
+            "sourceRoleName" : <#if assoc.sourceRoleName??>"${assoc.sourceRoleName}"<#else>""</#if>,
+            "sourceMandatory" : <#if assoc.sourceMandatory??>${assoc.sourceMandatory?string}<#else>""</#if>,
+            "sourceMany" : <#if assoc.sourceMany??>${assoc.sourceMany?string}<#else>""</#if>,
+            "targetRoleName" : <#if assoc.targetRoleName??>"${assoc.targetRoleName}"<#else>""</#if>,
+            "targetMandatory" : <#if assoc.targetMandatory??>${assoc.targetMandatory?string}<#else>""</#if>,
+            "targetMandatoryEnforced" : <#if assoc.targetMandatoryEnforced??>${assoc.targetMandatoryEnforced?string}<#else>""</#if>,
+            "targetMany" : <#if assoc.targetMany??>${assoc.targetMany?string}<#else>""</#if>,
+            "protected" : <#if assoc.protected??>${assoc.protected?string}<#else>""</#if>,
          }<#if assoc_has_next>,</#if>
          </#list>
       }

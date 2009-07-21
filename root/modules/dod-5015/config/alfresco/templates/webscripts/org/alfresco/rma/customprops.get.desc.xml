@@ -4,7 +4,7 @@
   Gets the list of existing custom property types.<br/>
   ]]>
   </description>
-  <url>/api/rma/admin/customprops</url>
+  <url>/api/rma/admin/customproperties</url>
   <format default="json"/>
   <authentication>user</authentication>
   <transaction>required</transaction>
