@@ -38,6 +38,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomPropertyAction;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -59,6 +60,7 @@ import org.alfresco.util.BaseSpringTest;
 public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
 {
     public static final String RMC_CUSTOM_MODEL = "{http://www.alfresco.org/model/rmcustom/1.0}rmcustom";
+    private static final String DEFINE_CUSTOM_ASSOCIATION = "defineCustomAssociation";
 
     private NodeRef filePlan;
     private NodeRef testRecord;
@@ -130,7 +132,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
     {
         Set<QName> availableCustomAssocs = this.rmAdminService.getAvailableCustomAssociations().keySet();
         final int initialCustomAssocCount = availableCustomAssocs.size();
-        
+
         String childAssocName = "rmc:dynamicAssocChild" + System.currentTimeMillis();
         
         HashMap<String, Serializable> actionParams = new HashMap<String, Serializable>();
@@ -139,7 +141,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         actionParams.put("targetRoleName", "superseded");
         actionParams.put("isChild", Boolean.TRUE);
         this.rmActionService.executeRecordsManagementAction(RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF, 
-                "defineCustomAssociation", actionParams);
+                DEFINE_CUSTOM_ASSOCIATION, actionParams);
 
         String assocName = "rmc:dynamicAssocStandard" + System.currentTimeMillis();
         actionParams.clear();
@@ -148,7 +150,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         actionParams.put("targetRoleName", "supported");
         actionParams.put("isChild", Boolean.FALSE);
         this.rmActionService.executeRecordsManagementAction(RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF, 
-                "defineCustomAssociation", actionParams);
+                DEFINE_CUSTOM_ASSOCIATION, actionParams);
         
         Map<QName, CustomAssociation> updatedCustomAssocs = rmAdminService.getAvailableCustomAssociations();
         final int updatedCount = updatedCustomAssocs.size();
@@ -159,6 +161,9 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         assertTrue("Custom assoc missing", updatedCustomAssocs.containsKey(assocQName));
         assertEquals("rma:record", updatedCustomAssocs.get(assocQName).getTargetClassName());
         assertEquals("rmc:superseding", updatedCustomAssocs.get(assocQName).getSourceRoleName());
+        
+        //TODO Now use these associations.
+        // Need to create two records and link them.
     }
 
     public void testCreateCustomProperties() throws Exception
@@ -169,7 +174,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         // Define a new custom property.
         String propLocalName = "rmc:dynamicProperty" + System.currentTimeMillis();
         Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
-        actionParams.put(DefineCustomPropertyAction.PARAM_NAME, propLocalName);
+        actionParams.put(DefineCustomElementAbstractAction.PARAM_NAME, propLocalName);
         actionParams.put(DefineCustomPropertyAction.PARAM_TYPE, DataTypeDefinition.BOOLEAN);
         actionParams.put(DefineCustomPropertyAction.PARAM_MANDATORY, Boolean.TRUE);
 

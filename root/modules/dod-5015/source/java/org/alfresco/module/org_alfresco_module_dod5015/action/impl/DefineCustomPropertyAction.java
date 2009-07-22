@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
-import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2Model;
@@ -48,11 +47,10 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Neil McErlean
  */
-public class DefineCustomPropertyAction extends RMActionExecuterAbstractBase
+public class DefineCustomPropertyAction extends DefineCustomElementAbstractAction
 {
     private static Log logger = LogFactory.getLog(DefineCustomPropertyAction.class);
 
-    public static final String PARAM_NAME = "name";
     public static final String PARAM_TYPE = "type";
     public static final String PARAM_TITLE = "title";
     public static final String PARAM_DESCRIPTION = "description";
@@ -72,7 +70,9 @@ public class DefineCustomPropertyAction extends RMActionExecuterAbstractBase
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
-	    Map<String, Serializable> params = action.getParameterValues();
+        super.executeImpl(action, actionedUponNodeRef);
+
+        Map<String, Serializable> params = action.getParameterValues();
         if (logger.isDebugEnabled())
         {
             StringBuilder msg = new StringBuilder();
