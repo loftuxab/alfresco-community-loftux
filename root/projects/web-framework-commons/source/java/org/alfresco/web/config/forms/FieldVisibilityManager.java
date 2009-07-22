@@ -297,7 +297,14 @@ class FieldVisibilityManager
                 }
             }
             
-            return Collections.unmodifiableList(new ArrayList<String>(result));
+            if (result.size() == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return Collections.unmodifiableList(new ArrayList<String>(result));
+            }
         }
     }
 }

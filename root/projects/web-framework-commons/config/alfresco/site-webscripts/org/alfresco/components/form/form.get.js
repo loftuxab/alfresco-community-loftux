@@ -30,9 +30,7 @@ function main()
       var formId = getArgument("formId");
 
       if (logger.isLoggingEnabled())
-      {
          logger.log("Showing form (id=" + formId + ") for item: [" + itemKind + "]" + itemId);
-      }
       
       // get the config for the form
       var formConfig = getFormConfig(itemId, formId);
@@ -49,9 +47,7 @@ function main()
             jsonUtils.toJSONString(postBody), "application/json");
       
       if (logger.isLoggingEnabled())
-      {
          logger.log("json = " + json);
-      }
       
       var formModel = eval('(' + json + ')');
       
@@ -85,7 +81,7 @@ function main()
    }
    
    // log the model
-   //dumpFormUIModel(formUIModel);
+   dumpFormUIModel(formUIModel);
    
    // pass form ui model to FTL
    model.form = formUIModel;
@@ -174,9 +170,7 @@ function getArgument(argName, defValue)
    }
    
    if (logger.isLoggingEnabled())
-   {
       logger.log("Returning \"" + result + "\" from getArgument for \"" + argName + "\"");
-   }
    
    return result;
 }
@@ -271,7 +265,7 @@ function getVisibleFields(mode, formConfig)
 {
    var visibleFields = null;
    
-   if (formConfig != null)
+   if (formConfig !== null)
    {
       // get visible fields for the current mode
       switch (mode)
@@ -293,7 +287,12 @@ function getVisibleFields(mode, formConfig)
    
    if (logger.isLoggingEnabled())
    {
-      logger.log("Fields configured to be visible for " + mode + " mode = " + visibleFields);
+      var listOfVisibleFields = visibleFields;
+      if (visibleFields !== null)
+      {
+         listOfVisibleFields = "[" + visibleFields.join(",") + "]";
+      }
+      logger.log("Fields configured to be visible for " + mode + " mode = " + listOfVisibleFields);
    }
          
    return visibleFields;
@@ -343,9 +342,7 @@ function createPostBody(itemKind, itemId, visibleFields, formConfig)
    }
    
    if (logger.isLoggingEnabled())
-   {
       logger.log("postBody = " + jsonUtils.toJSONString(postBody));
-   }
       
    return postBody;
 }
@@ -481,7 +478,7 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
       var rootSets = formConfig.rootSets;      
       for (var s = 0; s < rootSets.length; s++)
       {
-         var set = setupSet(mode, rootSets[s], formModel, formConfig);
+         var set = setupSetUsingVisibleFields(mode, rootSets[s], formModel, formConfig);
          // if the set got created (as it contained fields or other sets) add to items list
          if (set !== null)
          {
@@ -491,19 +488,39 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
    }
    else
    {
-      // as we have no visible fields and potentially no config the
-      // default behaviour is to show all known fields for the item
+      if (formConfig === null)
+      {
+         // if there is no config at all just show all fields in the default set
+         formUIItems.push(createDefaultSetFromServerFields(mode, formModel));
+      }
+      else
+      {
+         model.error = "No visible fields found for item \"" + formModel.data.type + "\", when configuration is defined at least one &lt;show&gt; element must be present.";
+         
+         // TODO: iterate around all fields returned from the server
+         //       and determine if there is some 'appearance' config it,
+         //       if there is, see if there is a set specified, this
+         //       will build a flat list of set membership
+         
+         //var fieldsSetMembership = getFieldsSetMembership(mode, formModel, formConfig);
+         
+         // TODO: get root sets from config and build set structure using
+         //       config and lists built above
+         
+         /*var rootSets = formConfig.rootSets;      
+         for (var s = 0; s < rootSets.length; s++)
+         {
+            var set = setupSetUsingServerFields(mode, rootSets[s], formModel, formConfig, fieldsSetMembership);
+            // if the set got created (as it contained fields or other sets) add to items list
+            if (set !== null)
+            {
+               formUIItems.push(set);
+            }
+         }*/
+      }
       
-      // TODO: if there is no config at all just show all fields
-      
-      // TODO: iterate around all fields returned from the server
-      //       and determine what set they belong to
-      
-      // TODO: get root sets from config and build set structure using
-      //       config and list built above
-      
-      // for now return an error message
-      model.error = "Not enough configuration found for item \"" + formModel.data.type + "\", at least one &lt;show&gt; element must be present.";
+      // TODO: Once the server has some form implementations that return
+      //       field group information we'll need to parse those first!
    }
    
    return formUIItems;
@@ -514,13 +531,13 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
  * The item returned represents the set and field structure
  * defined in the form config.
  *
- * @method createSetItem
+ * @method setupSetUsingVisibleFields
  * @param mode The mode of the form
  * @param setConfig The set configuration
  * @param formModel The model returned from the server 
  * @param formConfig The form configuration
  */
-function setupSet(mode, setConfig, formModel, formConfig)
+function setupSetUsingVisibleFields(mode, setConfig, formModel, formConfig)
 {
    var set = null;
    
@@ -547,39 +564,14 @@ function setupSet(mode, setConfig, formModel, formConfig)
    if ((fieldsForSet !== null && fieldsForSet.length > 0) || setConfig.children.length > 0)
    {
       // setup the basic set object
-      set = {};
-      set.kind = "set";
-      set.id = setConfig.setId;
-      set.appearance = setConfig.appearance;
-      set.children = [];
-      
-      // work out label to use
-      var label = null;
-            
-      if (setConfig.labelId !== null)
+      set = 
       {
-         label = msg.get(setConfig.labelId);
-      }
-      else if (setConfig.label !== null)
-      {
-         label = setConfig.label;
-      }
-      else
-      {
-         // if there is no label specified in the config,
-         // use the label from the properties file otherwise
-         // use the set id
-         if (setConfig.setId + "" === "")
-         {
-            label = msg.get("form.default.set.label");
-         }
-         else
-         {
-            label = setConfig.setId;
-         }
-      }
-      
-      set.label = label;
+         kind: "set",
+         id: setConfig.setId,
+         appearance: setConfig.appearance,
+         label: getSetLabel(setConfig),
+         children: []
+      };
       
       // add all the fields to the set
       for (var f = 0; f < fieldsForSet.length; f++)
@@ -596,23 +588,105 @@ function setupSet(mode, setConfig, formModel, formConfig)
             set.children.push(field);
             
             if (logger.isLoggingEnabled())
-            {
                logger.log("Added field \"" + fieldName + "\" to set \"" + set.id + "\": " + 
                      jsonUtils.toJSONString(field));
-            }
          }
       }
       
       // recursively setup child sets
       for (var c = 0; c < setConfig.children.length; c++)
       {
-         var childSet = setupSet(mode, setConfig.children[c], formModel, formConfig);
+         var childSet = setupSetUsingVisibleFields(mode, setConfig.children[c], formModel, formConfig);
          set.children.push(childSet);
       }
    }
    else if (logger.isLoggingEnabled())
    {
       logger.log("Ignoring set \"" + setConfig.setId + "\" as it does not have any fields or child sets.");
+   }
+   
+   return set;
+}
+
+/**
+ * Gets the label to use for the given set configuration.
+ * 
+ * @method getSetLabel
+ * @param setConfig Object representing the set configuration
+ * @return The label
+ */
+function getSetLabel(setConfig)
+{
+   var label = null;
+   
+   if (setConfig.labelId !== null)
+   {
+      label = msg.get(setConfig.labelId);
+   }
+   else if (setConfig.label !== null)
+   {
+      label = setConfig.label;
+   }
+   else
+   {
+      // if there is no label specified in the config,
+      // use the label from the properties file otherwise
+      // use the set id
+      if (setConfig.setId + "" === "")
+      {
+         label = msg.get("form.default.set.label");
+      }
+      else
+      {
+         label = setConfig.setId;
+      }
+   }
+   
+   logger.log("Returning label for set: " + label);
+   
+   return label;
+}
+
+/**
+ * Creates a default set containing all the fields the server returned.
+ * 
+ * @method createDefaultSetFromServerFields
+ * @param mode The mode of the form
+ * @param formModel The form model returned from the server
+ * @return Object representing the default set
+ */
+function createDefaultSetFromServerFields(mode, formModel)
+{
+   if (logger.isLoggingEnabled())
+      logger.log("No configuration was found for \"" + formModel.data.type + "\", therefore showing all fields in the default set...");
+   
+   // setup the default set object
+   var set = 
+   {
+      kind: "set",
+      id: "",
+      label: msg.get("form.default.set.label"),
+      children: []
+   };
+   
+   // add all the fields from the server to the default set
+   var fieldsFromServer = formModel.data.definition.fields;
+   for (var idx = 0; idx < fieldsFromServer.length; idx++)
+   {
+      var fieldName = fieldsFromServer[idx].name;
+      
+      // setup the field
+      var field = setupField(mode, formModel, fieldName, null);
+      
+      // if a field was created add to the set's list of children
+      if (field !== null)
+      {
+         set.children.push(field);
+         
+         if (logger.isLoggingEnabled())
+            logger.log("Added field \"" + fieldName + "\" to set \"" + set.id + "\": " + 
+                  jsonUtils.toJSONString(field));
+      }
    }
    
    return set;
@@ -1031,9 +1105,7 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
       }
       
       if (logger.isLoggingEnabled())
-      {
          logger.log("Built constraint: " + jsonUtils.toJSONString(constraint));
-      }
       
       if (constraintId === "LIST")
       {

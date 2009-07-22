@@ -111,7 +111,7 @@
           <form>
              <appearance>
                 <field id="cm:name" label="Name From Config" />
-                <field id="xx:irrelevant" label="label-text" />
+                <field id="xx:irrelevant" label="label-text" set="optional" />
              </appearance>
           </form>
       </forms>
@@ -136,4 +136,18 @@
          </form>
       </forms>
    </config>
+   
+   <config evaluator="string-compare" condition="hidden-fields">
+      <forms>
+          <form>
+             <field-visibility>
+               <hide id="cm:title" />
+               <hide id="cm:description" />
+               <hide id="sys:dbid" for-mode="edit, create" />
+            </field-visibility>
+          </form>
+      </forms>
+   </config>
+   
+   
 </alfresco-config>
