@@ -5,7 +5,12 @@
       ${messages}
    ).setOptions({
       nodeRef: "${page.url.args.nodeRef}",
-      siteId: "${page.url.templateArgs.site!""}"
+      siteId: "${page.url.templateArgs.site!""}",
+      events: {
+         <#list events as event>
+         ${event.value}: { label: "${event.label}", automatic: ${event.automatic?string} }<#if (event_has_next)>, </#if>
+         </#list>
+      }
    });
    //]]></script>
 
@@ -61,7 +66,7 @@
                      <div class="section events">
                         <div class="events-header">
                            <div class="event-name-header">${msg("header.event")}</div>
-                           <div class="event-type-header">${msg("header.type")}</div>
+                           <div class="event-completion-header">${msg("header.completion")}</div>
                            <hr/>
                         </div>
                         <ul class="events-list">
@@ -77,7 +82,7 @@
                                     </#list>
                                  </select>
                               </div>
-                              <div class="action-event-type"></div>
+                              <div class="action-event-completion"></div>
                               <div class="action-event-buttons">
                                  <span class="delete" title="${msg("icon.deleteevent")}">&nbsp;</span>
                               </div>

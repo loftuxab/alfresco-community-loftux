@@ -19,7 +19,7 @@
       <div class="header">
          <div class="title">${msg("title.properties")}</div>
          <div class="buttons">
-            <span id="${el}-editproperties-button" class="yui-button">
+            <span id="${el}-editproperties-button" class="yui-button inline-button">
                <span class="first-child">
                   <button type="button">${msg("button.edit")}</button>
                </span>
@@ -51,7 +51,7 @@
       <div class="header">
          <div class="title">${msg("title.actions")}</div>
          <div class="buttons">
-            <span id="${el}-editschedule-button" class="yui-button">
+            <span id="${el}-editschedule-button" class="yui-button inline-button">
                <span class="first-child">
                   <button type="button">${msg("button.edit")}</button>
                </span>
@@ -66,7 +66,13 @@
             <div class="no">${action.index + 1}</div>
             <div class="more collapsed"><a href="#">${msg("link.description")}</a></div>
             <div class="name">${action.title}</div>
-            <div class="description" style="display: none;">${action.description!""}</div>
+            <div class="description" style="display: none;">
+               <#if (action.description?has_content)>
+               ${action.description}
+               <#else>
+               ${msg("label.nodescription")}
+               </#if>
+            </div>
          </div>
          </#list>
          <#else>

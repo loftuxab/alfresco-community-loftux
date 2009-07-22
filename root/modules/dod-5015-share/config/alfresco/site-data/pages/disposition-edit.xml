@@ -1,7 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
    <id>disposition-edit</id>
-   <page-type>disposition-edit</page-type>
    <title>Edit Disposition Schedule</title>
    <title-id>page.dispositionEdit.title</title-id>
    <description>Page for editing the disposition schedule</description>
