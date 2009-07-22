@@ -54,8 +54,8 @@
       
       return this;
    };
-   
-   Alfresco.EditMetadataMgr.prototype =
+
+   YAHOO.extend(Alfresco.EditMetadataMgr, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -72,18 +72,6 @@
           * @type string
           */
          nodeRef: null,
-
-         /**
-          * The nodeRef to the node to be used in a backlink for the node being edited.
-          * I.e. If a disposition schedule is being edited tha back link will contain the
-          * nodeRef to the record category that owns the dispositions schedule,
-          * However if it's the record-category that shall be edited the backLinkNodeRef
-          * will be the same as nodeRef.
-          *
-          * @property backLinkNodeRef
-          * @type string
-          */
-         backLinkNodeRef: null,
 
          /**
           * Current node type.
@@ -103,33 +91,7 @@
           */
          siteId: null
       },
-      
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setOptions: function EditMetadataMgr_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setMessages: function EditMetadataMgr_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
+
       /**
        * Event handler called when the "formContentReady" event is received
        */
@@ -137,7 +99,7 @@
       {
          // change the default 'Submit' label to be 'Save'
          var submitButton = args[1].buttons.submit;
-         submitButton.set("label", this._msg("edit-metadata-mgr.button.save"));
+         submitButton.set("label", this.msg("edit-metadata-mgr.button.save"));
          
          // add a handler to the cancel button
          var cancelButton = args[1].buttons.cancel;
@@ -185,8 +147,8 @@
       {
          Alfresco.util.PopupManager.displayPrompt(
          {
-            title: this._msg("message.failure"),
-            text: this._msg("edit-metadata-mgr.update.failed")
+            title: this.msg("message.failure"),
+            text: this.msg("edit-metadata-mgr.update.failed")
          });
       },
       
@@ -220,23 +182,10 @@
          {
             // go back to the appropriate details page for the node
             var pageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
-               "/" + this.options.nodeType + "-details?nodeRef=" + this.options.backLinkNodeRef;
+               "/" + this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
 
             window.location.href = pageUrl;
          }
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function EditMetadataMgr__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.EditMetadataMgr", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+   });
 })();
