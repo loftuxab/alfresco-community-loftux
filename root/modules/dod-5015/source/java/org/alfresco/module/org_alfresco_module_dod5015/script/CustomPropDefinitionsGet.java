@@ -39,11 +39,11 @@ import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
 
 /**
- * This class provides the implementation for the customprops.get webscript.
+ * This class provides the implementation for the custompropdefinitions.get webscript.
  * 
  * @author Neil McErlean
  */
-public class CustomPropsGet extends DeclarativeWebScript
+public class CustomPropDefinitionsGet extends DeclarativeWebScript
 {
     private RecordsManagementAdminService rmAdminService;
     
