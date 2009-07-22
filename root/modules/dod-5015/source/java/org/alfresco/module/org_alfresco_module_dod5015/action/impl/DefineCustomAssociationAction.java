@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
-import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2Association;
@@ -48,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Neil McErlean
  */
-public class DefineCustomAssociationAction extends RMActionExecuterAbstractBase
+public class DefineCustomAssociationAction extends DefineCustomElementAbstractAction
 {
     private static final String PARAM_TARGET_MANDATORY_ENFORCED = "targetMandatoryEnforced";
     private static final String PARAM_TITLE = "title";
@@ -61,8 +60,6 @@ public class DefineCustomAssociationAction extends RMActionExecuterAbstractBase
     private static final String PARAM_TARGET_ROLE_NAME = "targetRoleName";
     private static final String PARAM_SOURCE_ROLE_NAME = "sourceRoleName";
     private static final String PARAM_IS_CHILD = "isChild";
-    private static final String PARAM_NAME = "name";
-    
     private static Log logger = LogFactory.getLog(DefineCustomAssociationAction.class);
 
 	/**
@@ -73,6 +70,8 @@ public class DefineCustomAssociationAction extends RMActionExecuterAbstractBase
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
+	    super.executeImpl(action, actionedUponNodeRef);
+	    
 	    // isChild defaults to false
 	    Serializable serializableParam = action.getParameterValue(PARAM_IS_CHILD);
 	    boolean isChildValue = serializableParam == null ? false : (Boolean)serializableParam;
