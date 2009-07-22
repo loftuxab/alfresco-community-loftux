@@ -83,6 +83,10 @@ public final class CustomAssociation
         return result;
     }
 
+    /**
+     * Returns true if the association is a Parent/Child association, false if it
+     * is a bi-directional association.
+     */
     public boolean isChildAssociation()
     {
         return isChild;

@@ -94,7 +94,6 @@ public class CustomModelUtil
         final String updatedModelXml = baos.toString();
         
         writer.putContent(updatedModelXml);
-        
-        // TODO Is it my responsibility to close the writer stream?
+        // putContent closes all resources.
     }
 }

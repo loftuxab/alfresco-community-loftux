@@ -111,7 +111,7 @@ public class DefineCustomAssociationAction extends RMActionExecuterAbstractBase
         M2Model deserializedModel = customModelUtil.readCustomContentModel();
         M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
 
-        QName assocQName = QName.createQName((String)params.get(PARAM_NAME));
+        QName assocQName = QName.createQName((String)params.get(PARAM_NAME), namespaceService);
         String assocQNameAsString = assocQName.toPrefixString(this.namespaceService);
         
         M2Association newAssoc = customAssocsAspect.createAssociation(assocQNameAsString);
@@ -170,7 +170,7 @@ public class DefineCustomAssociationAction extends RMActionExecuterAbstractBase
         M2Model deserializedModel = customModelUtil.readCustomContentModel();
         M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
 
-        QName assocQName = QName.createQName((String)params.get(PARAM_NAME));
+        QName assocQName = QName.createQName((String)params.get(PARAM_NAME), namespaceService);
         String assocQNameAsString = assocQName.toPrefixString(this.namespaceService);
 
         M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(assocQNameAsString);
