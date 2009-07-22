@@ -5,6 +5,7 @@
   The body of the post should be in the form<br/>
   {<br/>
   &nbsp;&nbsp;&nbsp;"nodeRef" : nodeRef for target Record,<br/>
+  &nbsp;&nbsp;&nbsp;"nodeRefs" : array of nodeRef for target Records (either this or "nodeRef" should be present),<br/>
   &nbsp;&nbsp;&nbsp;"name" : actionName,<br/>
   &nbsp;&nbsp;&nbsp;"params" : {actionParameters}<br/>
   }<br/>
