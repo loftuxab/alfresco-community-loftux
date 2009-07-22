@@ -164,6 +164,89 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         		pristineReviewAsOf.equals(newReviewAsOfDate));
     }
 
+    public void testPostMultiReviewedAction() throws IOException, JSONException
+    {
+        // Get the recordCategory under which we will create the testNode.
+        NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");     
+        assertNotNull(recordCategory);
+
+        NodeRef recordFolder = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");
+        assertNotNull(recordFolder);
+
+        // Create a testNode/file which is to be declared as a record.
+        NodeRef testRecord = this.nodeService.createNode(recordFolder, 
+                ContentModel.ASSOC_CONTAINS, 
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
+                ContentModel.TYPE_CONTENT).getChildRef();
+
+        // Set some dummy content.
+        ContentWriter writer = this.contentService.getWriter(testRecord, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+        NodeRef testRecord2 = this.nodeService.createNode(recordFolder, 
+                ContentModel.ASSOC_CONTAINS, 
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord2.txt"),
+                ContentModel.TYPE_CONTENT).getChildRef();
+
+        // Set some dummy content.
+        writer = this.contentService.getWriter(testRecord2, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+        NodeRef testRecord3 = this.nodeService.createNode(recordFolder, 
+                ContentModel.ASSOC_CONTAINS, 
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord3.txt"),
+                ContentModel.TYPE_CONTENT).getChildRef();
+
+        // Set some dummy content.
+        writer = this.contentService.getWriter(testRecord3, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+        // In this test, this property has a date-value equal to the model import time.
+        Serializable pristineReviewAsOf = this.nodeService.getProperty(testRecord, PROP_REVIEW_AS_OF);
+        Serializable pristineReviewAsOf2 = this.nodeService.getProperty(testRecord2, PROP_REVIEW_AS_OF);
+        Serializable pristineReviewAsOf3 = this.nodeService.getProperty(testRecord3, PROP_REVIEW_AS_OF);
+        
+        // Construct the JSON request for 'reviewed'.
+        String jsonString = new JSONStringer().object()
+            .key("name").value("reviewed")
+            .key("nodeRefs").array()    
+                .value(testRecord.toString())
+                .value(testRecord2.toString())
+                .value(testRecord3.toString())
+                .endArray()
+            // These JSON params are just to test the submission of params. They'll be ignored.
+            .key("params").object()
+                .key("param1").value("one")
+                .key("param2").value("two")
+            .endObject()
+        .endObject()
+        .toString();
+        
+        // Submit the JSON request.
+        final int expectedStatus = 200;
+        Response rsp = sendRequest(new PostRequest(RMA_ACTIONS_URL,
+                                 jsonString, APPLICATION_JSON), expectedStatus);
+        
+        String rspContent = rsp.getContentAsString();
+        assertTrue(rspContent.contains("Successfully queued action [reviewed]"));
+        
+        Serializable newReviewAsOfDate = this.nodeService.getProperty(testRecord, PROP_REVIEW_AS_OF);
+        assertFalse("The reviewAsOf property should have changed. Was " + pristineReviewAsOf,
+                pristineReviewAsOf.equals(newReviewAsOfDate));
+        Serializable newReviewAsOfDate2 = this.nodeService.getProperty(testRecord2, PROP_REVIEW_AS_OF);
+        assertFalse("The reviewAsOf property should have changed. Was " + pristineReviewAsOf2,
+                pristineReviewAsOf2.equals(newReviewAsOfDate2));
+        Serializable newReviewAsOfDate3 = this.nodeService.getProperty(testRecord3, PROP_REVIEW_AS_OF);
+        assertFalse("The reviewAsOf property should have changed. Was " + pristineReviewAsOf3,
+                pristineReviewAsOf3.equals(newReviewAsOfDate3));
+    }
+    
     public void testPostCustomAssoc() throws IOException, JSONException
     {
         NodeRef customModelNodeRef = RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF;

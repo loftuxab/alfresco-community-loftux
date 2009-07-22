@@ -26,8 +26,10 @@ package org.alfresco.module.org_alfresco_module_dod5015.script;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -40,6 +42,7 @@ import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -55,13 +58,14 @@ public class RmActionPost extends DeclarativeWebScript
     
     private static final String PARAM_NAME = "name";
     private static final String PARAM_NODE_REF = "nodeRef";
+    private static final String PARAM_NODE_REFS = "nodeRefs";
     private static final String PARAM_PARAMS = "params";
     
     private NodeService nodeService;
     private RecordsManagementActionService rmActionService;
     
     private String actionName;
-    private NodeRef targetNodeRef;
+    private List<NodeRef> targetNodeRefs;
     private Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
     
     public void setNodeService(NodeService nodeService)
@@ -90,16 +94,33 @@ public class RmActionPost extends DeclarativeWebScript
         initJsonParams(reqContentAsString);
         
         // validate input: check for mandatory params, valid nodeRef.
-        if (this.actionName == null || this.targetNodeRef == null)
+        if (this.actionName == null || this.targetNodeRefs == null)
         {
             throw new WebScriptException(Status.STATUS_BAD_REQUEST,
                 "A mandatory parameter has not been provided in URL");
         }
 
-        if (nodeService.exists(this.targetNodeRef) == false)
+        // Check that all the nodes provided exist and build report string
+        StringBuffer targetNodeRefsString = new StringBuffer(30);
+        boolean firstTime = true;
+        for (NodeRef targetNodeRef : this.targetNodeRefs)
         {
-            throw new WebScriptException(Status.STATUS_NOT_FOUND,
-                "The targetNode does not exist");
+            if (nodeService.exists(targetNodeRef) == false)
+            {
+                throw new WebScriptException(Status.STATUS_NOT_FOUND,
+                    "The targetNode does not exist (" + targetNodeRef.toString() + ")");
+            }
+            
+            // Build the string
+            if (firstTime == true)
+            {
+                firstTime = false;
+            }
+            else
+            {
+                targetNodeRefsString.append(", ");
+            }
+            targetNodeRefsString.append(targetNodeRef.toString());
         }
 
         // Proceed to execute the specified action on the specified node.
@@ -108,17 +129,17 @@ public class RmActionPost extends DeclarativeWebScript
             StringBuilder msg = new StringBuilder();
             msg.append("Executing Record Action ")
                .append(this.actionName)
-               .append(", ")
-               .append(this.targetNodeRef)
-               .append(", ")
+               .append(", (")
+               .append(targetNodeRefsString.toString())
+               .append("), ")
                .append(this.actionParams);
             logger.debug(msg.toString());
         }
         
-        this.rmActionService.executeRecordsManagementAction(targetNodeRef, actionName, actionParams);
+        this.rmActionService.executeRecordsManagementAction(targetNodeRefs, actionName, actionParams);
         
         Map<String, Object> model = new HashMap<String, Object>();
-        model.put("message", "Successfully queued action [" + actionName + "] on " + targetNodeRef);
+        model.put("message", "Successfully queued action [" + actionName + "] on " + targetNodeRefsString.toString());
 
         return model;
     }
@@ -130,8 +151,29 @@ public class RmActionPost extends DeclarativeWebScript
         {
             JSONObject jsonObj = new JSONObject(new JSONTokener(reqContentAsString));
             
+            // Get the action name
             this.actionName = jsonObj.getString(PARAM_NAME);
-            this.targetNodeRef = new NodeRef(jsonObj.getString(PARAM_NODE_REF));
+            
+            // Get the target references
+            if (jsonObj.has(PARAM_NODE_REF) == true)
+            {
+                NodeRef nodeRef = new NodeRef(jsonObj.getString(PARAM_NODE_REF));
+                this.targetNodeRefs = new ArrayList<NodeRef>(1);
+                this.targetNodeRefs.add(nodeRef);
+            }
+            if (jsonObj.has(PARAM_NODE_REFS) == true)
+            {
+                JSONArray jsonArray = jsonObj.getJSONArray(PARAM_NODE_REFS);
+                if (jsonArray.length() != 0)
+                {
+                    this.targetNodeRefs = new ArrayList(jsonArray.length());
+                    for (int i = 0; i < jsonArray.length(); i++)
+                    {
+                        NodeRef nodeRef = new NodeRef(jsonArray.getString(i));
+                        this.targetNodeRefs.add(nodeRef);
+                    }
+                }
+            }
             
             // params are optional.
             if (jsonObj.has(PARAM_PARAMS))
