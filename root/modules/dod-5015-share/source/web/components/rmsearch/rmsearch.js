@@ -190,7 +190,26 @@
        */
       onSaveSearch: function RecordsSearch_onSaveSearch(e, args)
       {
+         // get values to pass to the module
+         var queryElem = Dom.get(this.id + "-query");
+         var userQuery = YAHOO.lang.trim(queryElem.value);
          
+         // TODO: need to pass "complete" query as well as all the elements that make
+         //       up the query for reconstruction in the UI! doclib etc. need completed query!
+         
+         // TODO: prepopulate dialog with current saved search name if any selected
+         
+         // display the SaveSearch module dialog
+         var module = Alfresco.module.getSaveSearchInstance();
+         module.setOptions(
+            {
+               siteId: this.options.siteId,
+               query: userQuery,
+               params: {"undeclared": Dom.get(this.id + "-undeclared").checked}
+            });
+         module.show();
+         
+         // TODO: once save complete, refresh Saved Searches list menu
       },
       
       /**
