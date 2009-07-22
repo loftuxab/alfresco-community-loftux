@@ -66,4 +66,9 @@
     <bean id="rmUpgradeDowngradeAndDeclassifyRecordsCapability" parent="rmBaseCapability" class="org.alfresco.module.org_alfresco_module_dod5015.capability.impl.UpgradeDowngradeAndDeclassifyRecordsCapability"/>
     <bean id="rmViewRecordsCapability" parent="rmBaseCapability" class="org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ViewRecordsCapability"/>
     <bean id="rmViewUpdateReasonsForFreezeCapability" parent="rmBaseCapability" class="org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ViewUpdateReasonsForFreezeCapability"/>
+
+    <!-- public service "roles" -->
+    
+    <bean id="rmCreate" parent="rmBaseCapability" class="org.alfresco.module.org_alfresco_module_dod5015.capability.group.CreateCapability" />
+
 </beans>

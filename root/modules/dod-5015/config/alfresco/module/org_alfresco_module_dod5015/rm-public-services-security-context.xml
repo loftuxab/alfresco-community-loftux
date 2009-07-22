@@ -137,6 +137,9 @@
         <property name="upgradeDowngradeAndDeclassifyRecordsCapability" ref="rmUpgradeDowngradeAndDeclassifyRecordsCapability"/>
         <property name="viewRecordsCapability" ref="rmViewRecordsCapability"/>
         <property name="viewUpdateReasonsForFreezeCapability" ref="rmViewUpdateReasonsForFreezeCapability"/>
+        <!-- public service "roles" -->
+        <property name="createCapability" ref="rmCreate"/>
+        
     </bean>
     
     <!-- ======================= -->
