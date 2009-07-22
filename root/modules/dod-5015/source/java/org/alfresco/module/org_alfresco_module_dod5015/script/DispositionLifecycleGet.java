@@ -25,7 +25,6 @@
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,12 +74,12 @@ public class DispositionLifecycleGet extends DispositionAbstractBase
         
         if (nextAction.getAsOfDate() != null)
         {
-            nextActionModel.put("asOf", nextAction.getAsOfDate());
+            nextActionModel.put("asOf", ISO8601DateFormat.format(nextAction.getAsOfDate()));
         }
         
         if (nextAction.getStartedAt() != null)
         {
-            nextActionModel.put("startedAt", ISO8601DateFormat.format(new Date()));
+            nextActionModel.put("startedAt", ISO8601DateFormat.format(nextAction.getStartedAt()));
         }
         
         if (nextAction.getStartedBy() != null)
@@ -90,7 +89,7 @@ public class DispositionLifecycleGet extends DispositionAbstractBase
         
         if (nextAction.getCompletedAt() != null)
         {
-            nextActionModel.put("completedAt", ISO8601DateFormat.format(new Date()));
+            nextActionModel.put("completedAt", ISO8601DateFormat.format(nextAction.getCompletedAt()));
         }
         
         if (nextAction.getCompletedBy() != null)
