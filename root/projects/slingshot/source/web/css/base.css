@@ -67,6 +67,11 @@ hr
    clear: both;
 }
 
+.yui-button.inline-button span button
+{
+   min-height: 1.5em;
+}
+
 /* Page title and navigation styles */
 
 .page-title

@@ -69,18 +69,6 @@
          // remember the data for the folder
          this.folderData = args[1];
 
-         // update the href for the edit disposition schedule link
-         var editDispositionScheduleUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId +
-            "/disposition-edit?nodeRef=" + this.folderData.nodeRef;
-         try
-         {
-            Dom.get(this.id + "-edit-dispositionSchedule-action").href = editDispositionScheduleUrl;
-         }
-         catch (e)
-         {
-            // Edit disposition schedule action missing from config
-         }
-
          // Hook action events
          var fnActionHandler = function RFA_oFDA_fnActionHandler(layer, args)
          {

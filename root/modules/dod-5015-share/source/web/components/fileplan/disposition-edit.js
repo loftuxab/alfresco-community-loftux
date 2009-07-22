@@ -81,7 +81,15 @@
           * @property fileplanUrl
           * @type {string}
           */
-         siteId: null
+         siteId: null,
+
+         /**
+          * The events available
+          *
+          * @property events
+          * @type {array} with objects like { label: string, automatic: boolean}
+          */
+         events: []
       },
 
       /**
@@ -96,6 +104,7 @@
 
          // Save reference to buttons so we can change label and such later
          this.widgets.createButton = Alfresco.util.createYUIButton(this, "createaction-button", this.onCreateActionButtonClick);
+         this.widgets.createButton.set("disabled", true);
          this.widgets.doneButton = Alfresco.util.createYUIButton(this, "done-button", this.onDoneActionsButtonClick);
 
          // Get the templates and remove them from the DOM
@@ -134,6 +143,7 @@
                         this._setupActionForm(action, actionEl);
                      }
                   }
+                  this.widgets.createButton.set("disabled", false);                  
                },
                scope: this
             },
@@ -224,7 +234,7 @@
          Event.addListener(periodEnabledCheckBox, "click", function(e, obj)
          {
             var disabled = obj.periodEnabledCheckBox.checked ? false : true;
-            this._disablePeriodSection(disabled, actionEl)
+            this._disablePeriodSection(disabled, actionEl);
          },
          {
             periodEnabledCheckBox: periodEnabledCheckBox
@@ -389,7 +399,11 @@
                   var details = Dom.getElementsByClassName("details", "div", actionEl)[0];
                   Dom.setStyle(details, "display", "none");
 
+                  // Refresh the title from the choices
                   this._refreshTitle(obj.actionEl);
+
+                  // Display add step button
+                  Dom.removeClass(this.widgets.flowButtons, "hidden");
                },
                obj: {
                   saveButton: saveActionButton,
@@ -530,7 +544,13 @@
          }, this);
 
          // Display data
-         Dom.getElementsByClassName("action-event-type", "div", eventEl)[0].innerHTML = eventType ? eventType : "";
+         var automatic = this.options.events[event] ? this.options.events[event].automatic + "" : null;
+         var completion = "";
+         if(automatic)
+         {
+            completion = this.msg("label.automatic." + automatic);
+         }
+         Dom.getElementsByClassName("action-event-completion", "div", eventEl)[0].innerHTML = completion;
 
          // Add listener to delete event
          var deleteEventEl = Dom.getElementsByClassName("delete", "span", eventEl)[0];
@@ -625,8 +645,14 @@
        */
       onEventNameSelectChange: function DispositionEdit_onEventNameSelectChange(e, obj)
       {
-         var eventTypeLabel = obj.eventNameSelect.options[obj.eventNameSelect.selectedIndex].text;
-         Dom.getElementsByClassName("action-event-type", "div", obj.eventEl)[0].innerHTML = eventTypeLabel;
+         var eventName = obj.eventNameSelect.options[obj.eventNameSelect.selectedIndex].value;
+         var automatic = this.options.events[eventName] ? this.options.events[eventName].automatic + "" : "";
+         var completion = "";
+         if(automatic)
+         {
+            completion = this.msg("label.automatic." + automatic);
+         }
+         Dom.getElementsByClassName("action-event-completion", "div", obj.eventEl)[0].innerHTML = completion;
 
       },
 

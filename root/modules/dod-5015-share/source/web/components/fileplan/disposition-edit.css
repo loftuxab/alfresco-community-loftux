@@ -131,7 +131,7 @@
 }
 
 .disposition-edit .action .section.events .event-name-header,
-.disposition-edit .action .section.events .event-type-header
+.disposition-edit .action .section.events .event-completion-header
 {
    float: left;
    width: 18em;
@@ -221,7 +221,7 @@
    padding-left: 0.5em
 }
 
-.disposition-edit .action .action-event-type
+.disposition-edit .action .action-event-completion
 {
    position: absolute;
    margin-left: 22.25em;
@@ -256,7 +256,7 @@
 }
 
 .disposition-edit .action .events-list li.even .action-event-name,
-.disposition-edit .action .events-list li.even .action-event-type,
+.disposition-edit .action .events-list li.even .action-event-completion,
 .disposition-edit .action .events-list li.even .action-event-buttons
 {
    background-color: #EFEFEF;   
