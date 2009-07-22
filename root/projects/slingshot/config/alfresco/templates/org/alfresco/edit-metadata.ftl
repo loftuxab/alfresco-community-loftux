@@ -12,8 +12,8 @@
    </div>
    <div id="bd">
       <div class="metadata">
-         <@region id="edit-metadata-mgr" scope="template" protected=true />
-         <@region id="edit-metadata" scope="template" protected=true />
+         <@region id=doclibType + "edit-metadata-mgr" scope="template" protected=true />
+         <@region id=doclibType + "edit-metadata" scope="template" protected=true />
       </div>
    </div>
    
