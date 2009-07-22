@@ -60,6 +60,8 @@ public class FormConfigBasicTest extends BaseTest
     protected FormConfigElement noAppearanceDefaultForm;
     protected FormsConfigElement noVisibilityFormsConfigElement;
     protected FormConfigElement noVisibilityDefaultForm;
+    protected FormsConfigElement hiddenFieldsFormsConfigElement;
+    protected FormConfigElement hiddenFieldsDefaultForm;
     protected DefaultControlsConfigElement defltCtrlsConfElement;
 
     protected List<String> getConfigFiles()
@@ -136,6 +138,17 @@ public class FormConfigBasicTest extends BaseTest
         noVisibilityFormsConfigElement = (FormsConfigElement) noVisibilityFormsConfigObj;
         noVisibilityDefaultForm = noVisibilityFormsConfigElement.getDefaultForm();
         assertNotNull(noVisibilityDefaultForm);
+        
+        Config hiddenFieldsConfigObj = configService.getConfig("hidden-fields");
+        assertNotNull(hiddenFieldsConfigObj);
+    
+        ConfigElement hiddenFieldsFormsConfigObj = noVisibilityConfigObj.getConfigElement("forms");
+        assertNotNull(hiddenFieldsFormsConfigObj);
+        assertTrue("hiddenFieldsFormsConfigObj should be instanceof FormsConfigElement.",
+                    hiddenFieldsFormsConfigObj instanceof FormsConfigElement);
+        hiddenFieldsFormsConfigElement = (FormsConfigElement) hiddenFieldsFormsConfigObj;
+        hiddenFieldsDefaultForm = hiddenFieldsFormsConfigElement.getDefaultForm();
+        assertNotNull(hiddenFieldsDefaultForm);
         
         globalConfig = configService.getGlobalConfig();
     
@@ -481,5 +494,53 @@ public class FormConfigBasicTest extends BaseTest
 
         assertEquals(Arrays.asList(expectedCssDependencies), Arrays.asList(depsCE.getCss()));
         assertEquals(Arrays.asList(expectedJsDependencies), Arrays.asList(depsCE.getJs()));
+    }
+    
+    /**
+     * This test checks that appearance config can be accessed when there is no visibility element. 
+     */
+    public void testNoVisibility() throws Exception
+    {
+        // test that appearance data can be retrieved
+        FormField nameField = noVisibilityDefaultForm.getFields().get("cm:name");
+        assertNotNull(nameField);
+        assertEquals("Name From Config", nameField.getLabel());
+        assertNull(nameField.getDescription());
+        
+        FormField xxField = noVisibilityDefaultForm.getFields().get("xx:irrelevant");
+        assertNotNull(xxField);
+        assertEquals("label-text", xxField.getLabel());
+        assertEquals("optional", xxField.getSet());
+        assertNull(xxField.getDescription());
+        
+        // make sure that get visible field methods return null
+        assertNull(noVisibilityDefaultForm.getVisibleCreateFieldNamesAsList());
+        assertNull(noVisibilityDefaultForm.getVisibleCreateFieldNames());
+        assertNull(noVisibilityDefaultForm.getVisibleEditFieldNamesAsList());
+        assertNull(noVisibilityDefaultForm.getVisibleEditFieldNames());
+        assertNull(noVisibilityDefaultForm.getVisibleViewFieldNamesAsList());
+        assertNull(noVisibilityDefaultForm.getVisibleViewFieldNames());
+        
+        // make sure that get hidden field methods return null
+        assertNull(noVisibilityDefaultForm.getHiddenCreateFieldNamesAsList());
+        assertNull(noVisibilityDefaultForm.getHiddenCreateFieldNames());
+        assertNull(noVisibilityDefaultForm.getHiddenEditFieldNamesAsList());
+        assertNull(noVisibilityDefaultForm.getHiddenEditFieldNames());
+        assertNull(noVisibilityDefaultForm.getHiddenViewFieldNamesAsList());
+        assertNull(noVisibilityDefaultForm.getHiddenViewFieldNames());
+    }
+
+    /**
+     * This test checks the lookup of explicitly listed hidden fields
+     */
+    public void testHiddenFields() throws Exception
+    {
+        // make sure that get hidden field methods do NOT return null
+        /*assertNotNull(hiddenFieldsDefaultForm.getHiddenCreateFieldNamesAsList());
+        assertNotNull(hiddenFieldsDefaultForm.getHiddenCreateFieldNames());
+        assertNotNull(hiddenFieldsDefaultForm.getHiddenEditFieldNamesAsList());
+        assertNotNull(hiddenFieldsDefaultForm.getHiddenEditFieldNames());
+        assertNotNull(hiddenFieldsDefaultForm.getHiddenViewFieldNamesAsList());
+        assertNotNull(hiddenFieldsDefaultForm.getHiddenViewFieldNames());*/
     }
 }

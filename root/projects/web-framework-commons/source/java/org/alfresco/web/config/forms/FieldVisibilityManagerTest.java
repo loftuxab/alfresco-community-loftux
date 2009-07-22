@@ -76,11 +76,11 @@ public class FieldVisibilityManagerTest extends TestCase
         assertEquals(null,
                 emptyFVM.getFieldNamesVisibleInMode(Mode.VIEW));
 
-        assertEquals(Collections.emptyList(),
+        assertEquals(null,
                 emptyFVM.getFieldNamesHiddenInMode(Mode.CREATE));
-        assertEquals(Collections.emptyList(),
+        assertEquals(null,
                 emptyFVM.getFieldNamesHiddenInMode(Mode.EDIT));
-        assertEquals(Collections.emptyList(),
+        assertEquals(null,
                 emptyFVM.getFieldNamesHiddenInMode(Mode.VIEW));
     }
     

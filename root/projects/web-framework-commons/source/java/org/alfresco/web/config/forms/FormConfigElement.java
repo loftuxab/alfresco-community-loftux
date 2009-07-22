@@ -324,32 +324,80 @@ public class FormConfigElement extends ConfigElementAdapter
     
     public String[] getHiddenCreateFieldNames()
     {
-        return this.getHiddenCreateFieldNamesAsList().toArray(new String[0]);
+        List<String> names = this.getHiddenCreateFieldNamesAsList();
+        if (names != null)
+        {
+            return names.toArray(new String[0]);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public String[] getHiddenEditFieldNames()
     {
-        return this.getHiddenEditFieldNamesAsList().toArray(new String[0]);
+        List<String> names = this.getHiddenEditFieldNamesAsList();
+        if (names != null)
+        {
+            return names.toArray(new String[0]);
+        }
+        else
+        {
+            return null;
+        }
     }
     
     public String[] getHiddenViewFieldNames()
     {
-        return this.getHiddenViewFieldNamesAsList().toArray(new String[0]);
+        List<String> names = this.getHiddenViewFieldNamesAsList();
+        if (names != null)
+        {
+            return names.toArray(new String[0]);
+        }
+        else
+        {
+            return null;
+        }
     }
     
     public String[] getVisibleCreateFieldNames()
     {
-        return this.getVisibleCreateFieldNamesAsList().toArray(new String[0]);
+        List<String> names = this.getVisibleCreateFieldNamesAsList();
+        if (names != null)
+        {
+            return names.toArray(new String[0]);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public String[] getVisibleEditFieldNames()
     {
-        return this.getVisibleEditFieldNamesAsList().toArray(new String[0]);
+        List<String> names = this.getVisibleEditFieldNamesAsList();
+        if (names != null)
+        {
+            return names.toArray(new String[0]);
+        }
+        else
+        {
+            return null;
+        }
     }
     
     public String[] getVisibleViewFieldNames()
     {
-        return this.getVisibleViewFieldNamesAsList().toArray(new String[0]);
+        List<String> names = this.getVisibleViewFieldNamesAsList();
+        if (names != null)
+        {
+            return names.toArray(new String[0]);
+        }
+        else
+        {
+            return null;
+        }
     }
     
     /**
