@@ -39,11 +39,11 @@ import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
 
 /**
- * This class provides the implementation for the customassocs.get webscript.
+ * This class provides the implementation for the customassocdefinitions.get webscript.
  * 
  * @author Neil McErlean
  */
-public class CustomAssocsGet extends DeclarativeWebScript
+public class CustomAssocDefinitionsGet extends DeclarativeWebScript
 {
     private RecordsManagementAdminService rmAdminService;
     

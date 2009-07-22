@@ -129,10 +129,10 @@
     </bean>
     
     <!-- REST impl for RM Admin Service -->
-    <bean id="webscript.org.alfresco.rma.customassocs.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssocsGet" parent="webscript">
+    <bean id="webscript.org.alfresco.rma.customassocdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssocDefinitionsGet" parent="webscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
-    <bean id="webscript.org.alfresco.rma.customprops.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropsGet" parent="webscript">
+    <bean id="webscript.org.alfresco.rma.custompropdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropDefinitionsGet" parent="webscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
     

@@ -34,7 +34,9 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -60,10 +62,12 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 {
     private static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
     protected static final String APPLICATION_JSON = "application/json";
-    protected static final String RMA_CUSTOM_ASSOCS_URL = "/api/rma/admin/customassociations";
-    protected static final String RMA_CUSTOM_PROPS_URL = "/api/rma/admin/customproperties";
+    protected static final String RMA_CUSTOM_ASSOCS_URL = "/api/rma/admin/customassociationdefinitions";
+    protected static final String RMA_CUSTOM_PROPS_URL = "/api/rma/admin/custompropertydefinitions";
+    protected NamespaceService namespaceService;
     protected NodeService nodeService;
     protected ContentService contentService;
+    protected DictionaryService dictionaryService;
     protected SearchService searchService;
     protected ImporterService importService;
     protected ServiceRegistry services;
@@ -72,8 +76,10 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     protected void setUp() throws Exception
     {
         super.setUp();
+        this.namespaceService = (NamespaceService) getServer().getApplicationContext().getBean("NamespaceService");
         this.nodeService = (NodeService) getServer().getApplicationContext().getBean("NodeService");
         this.contentService = (ContentService)getServer().getApplicationContext().getBean("ContentService");
+        this.dictionaryService = (DictionaryService)getServer().getApplicationContext().getBean("DictionaryService");
         this.searchService = (SearchService)getServer().getApplicationContext().getBean("SearchService");
         this.importService = (ImporterService)getServer().getApplicationContext().getBean("ImporterService");
         this.services = (ServiceRegistry)getServer().getApplicationContext().getBean("ServiceRegistry");
@@ -253,7 +259,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         // Construct the JSON request for 'defineCustomAssociation'.
         // 1. Child association.
         final String childAssocName = "rmc:customAssocChild" + System.currentTimeMillis();
-        
+
         String jsonString = new JSONStringer().object()
             .key("name").value("defineCustomAssociation")
             .key("nodeRef").value(customModelNodeRef.toString()) // The nodeRef doesn't matter!
@@ -261,7 +267,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
                 .key("name").value(childAssocName)
                 .key("isChild").value(true)
                 .key("title").value("Supersedes link")
-                .key("description").value("Child supersedes parent or is it the other way round?")
+                .key("description").value("Descriptive text")
                 .key("sourceRoleName").value("superseding")
                 .key("targetRoleName").value("superseded")
                 .key("sourceMandatory").value(true)
@@ -311,6 +317,13 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         rspContent = rsp.getContentAsString();
         assertTrue(rspContent.contains("Successfully queued action [defineCustomAssociation]"));
+        
+        AspectDefinition customAssocsAspect =
+            dictionaryService.getAspect(QName.createQName(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS, namespaceService));
+        assertNotNull("Missing customAssocs aspect", customAssocsAspect);
+        QName newAssocQname = QName.createQName(childAssocName, namespaceService);
+        //TODO The dataDictionary isn't giving back custom props/assocs. Should reload models on commit.
+//        assertTrue("New custom assoc not returned by dataDictionary.", customAssocsAspect.getAssociations().containsKey(newAssocQname));
     }
 
     public void testGetCustomAssociations() throws IOException, JSONException
