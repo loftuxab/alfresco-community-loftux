@@ -50,4 +50,6 @@ public interface Capability
      * @return
      */
     public String getActionName();
+    
+    public int hasPermissionRaw(NodeRef nodeRef);
 }

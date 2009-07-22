@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import net.sf.acegisecurity.AccessDecisionManager;
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
@@ -148,6 +149,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     private static HashMap<String, Policy> policies = new HashMap<String, Policy>();
 
     private static HashMap<QName, String> restrictedProperties = new HashMap<QName, String>();
+
+    private static HashMap<String, Capability> capabilities = new HashMap<String, Capability>();
 
     //
 
@@ -332,6 +335,12 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         return viewRecordsCapability;
     }
 
+    public void setViewRecordsCapability(ViewRecordsCapability viewRecordsCapability)
+    {
+        this.viewRecordsCapability = viewRecordsCapability;
+        capabilities.put(viewRecordsCapability.getName(), viewRecordsCapability);
+    }
+
     public FileRecordsCapability getFileRecordsCapability()
     {
         return fileRecordsCapability;
@@ -340,11 +349,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setFileRecordsCapability(FileRecordsCapability fileRecordsCapability)
     {
         this.fileRecordsCapability = fileRecordsCapability;
-    }
-
-    public void setViewRecordsCapability(ViewRecordsCapability viewRecordsCapability)
-    {
-        this.viewRecordsCapability = viewRecordsCapability;
+        capabilities.put(fileRecordsCapability.getName(), fileRecordsCapability);
     }
 
     public DeclareRecordsCapability getDeclareRecordsCapability()
@@ -355,6 +360,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDeclareRecordsCapability(DeclareRecordsCapability declareRecordsCapability)
     {
         this.declareRecordsCapability = declareRecordsCapability;
+        capabilities.put(declareRecordsCapability.getName(), declareRecordsCapability);
     }
 
     public CreateModifyDestroyFoldersCapability getCreateModifyDestroyFoldersCapability()
@@ -365,6 +371,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyDestroyFoldersCapability(CreateModifyDestroyFoldersCapability createModifyDestroyFoldersCapability)
     {
         this.createModifyDestroyFoldersCapability = createModifyDestroyFoldersCapability;
+        capabilities.put(createModifyDestroyFoldersCapability.getName(), createModifyDestroyFoldersCapability);
     }
 
     public EditRecordMetadataCapability getEditRecordMetadataCapability()
@@ -375,6 +382,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setEditRecordMetadataCapability(EditRecordMetadataCapability editRecordMetadataCapability)
     {
         this.editRecordMetadataCapability = editRecordMetadataCapability;
+        capabilities.put(editRecordMetadataCapability.getName(), editRecordMetadataCapability);
     }
 
     public EditNonRecordMetadataCapability getEditNonRecordMetadataCapability()
@@ -385,6 +393,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setEditNonRecordMetadataCapability(EditNonRecordMetadataCapability editNonRecordMetadataCapability)
     {
         this.editNonRecordMetadataCapability = editNonRecordMetadataCapability;
+        capabilities.put(editNonRecordMetadataCapability.getName(), editNonRecordMetadataCapability);
     }
 
     public AddModifyEventDatesCapability getAddModifyEventDatesCapability()
@@ -395,6 +404,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setAddModifyEventDatesCapability(AddModifyEventDatesCapability addModifyEventDatesCapability)
     {
         this.addModifyEventDatesCapability = addModifyEventDatesCapability;
+        capabilities.put(addModifyEventDatesCapability.getName(), addModifyEventDatesCapability);
     }
 
     public CloseFoldersCapability getCloseFoldersCapability()
@@ -405,6 +415,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCloseFoldersCapability(CloseFoldersCapability closeFoldersCapability)
     {
         this.closeFoldersCapability = closeFoldersCapability;
+        capabilities.put(closeFoldersCapability.getName(), closeFoldersCapability);
     }
 
     public DeclareRecordsInClosedFoldersCapability getDeclareRecordsInClosedFoldersCapability()
@@ -415,6 +426,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDeclareRecordsInClosedFoldersCapability(DeclareRecordsInClosedFoldersCapability declareRecordsInClosedFoldersCapability)
     {
         this.declareRecordsInClosedFoldersCapability = declareRecordsInClosedFoldersCapability;
+        capabilities.put(declareRecordsInClosedFoldersCapability.getName(), declareRecordsInClosedFoldersCapability);
     }
 
     public ReOpenFoldersCapability getReOpenFoldersCapability()
@@ -425,6 +437,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setReOpenFoldersCapability(ReOpenFoldersCapability reOpenFoldersCapability)
     {
         this.reOpenFoldersCapability = reOpenFoldersCapability;
+        capabilities.put(reOpenFoldersCapability.getName(), reOpenFoldersCapability);
     }
 
     public CycleVitalRecordsCapability getCycleVitalRecordsCapability()
@@ -435,6 +448,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCycleVitalRecordsCapability(CycleVitalRecordsCapability cycleVitalRecordsCapability)
     {
         this.cycleVitalRecordsCapability = cycleVitalRecordsCapability;
+        capabilities.put(cycleVitalRecordsCapability.getName(), cycleVitalRecordsCapability);
     }
 
     public PlanningReviewCyclesCapability getPlanningReviewCyclesCapability()
@@ -445,6 +459,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setPlanningReviewCyclesCapability(PlanningReviewCyclesCapability planningReviewCyclesCapability)
     {
         this.planningReviewCyclesCapability = planningReviewCyclesCapability;
+        capabilities.put(planningReviewCyclesCapability.getName(), planningReviewCyclesCapability);
     }
 
     public UpdateTriggerDatesCapability getUpdateTriggerDatesCapability()
@@ -455,6 +470,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setUpdateTriggerDatesCapability(UpdateTriggerDatesCapability updateTriggerDatesCapability)
     {
         this.updateTriggerDatesCapability = updateTriggerDatesCapability;
+        capabilities.put(updateTriggerDatesCapability.getName(), updateTriggerDatesCapability);
     }
 
     public CreateModifyDestroyEventsCapability getCreateModifyDestroyEventsCapability()
@@ -465,6 +481,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyDestroyEventsCapability(CreateModifyDestroyEventsCapability createModifyDestroyEventsCapability)
     {
         this.createModifyDestroyEventsCapability = createModifyDestroyEventsCapability;
+        capabilities.put(createModifyDestroyEventsCapability.getName(), createModifyDestroyEventsCapability);
     }
 
     public ManageAccessRightsCapability getManageAccessRightsCapability()
@@ -475,6 +492,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setManageAccessRightsCapability(ManageAccessRightsCapability manageAccessRightsCapability)
     {
         this.manageAccessRightsCapability = manageAccessRightsCapability;
+        capabilities.put(manageAccessRightsCapability.getName(), manageAccessRightsCapability);
     }
 
     public MoveRecordsCapability getMoveRecordsCapability()
@@ -485,6 +503,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setMoveRecordsCapability(MoveRecordsCapability moveRecordsCapability)
     {
         this.moveRecordsCapability = moveRecordsCapability;
+        capabilities.put(moveRecordsCapability.getName(), moveRecordsCapability);
     }
 
     public ChangeOrDeleteReferencesCapability getChangeOrDeleteReferencesCapability()
@@ -495,6 +514,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setChangeOrDeleteReferencesCapability(ChangeOrDeleteReferencesCapability changeOrDeleteReferencesCapability)
     {
         this.changeOrDeleteReferencesCapability = changeOrDeleteReferencesCapability;
+        capabilities.put(changeOrDeleteReferencesCapability.getName(), changeOrDeleteReferencesCapability);
     }
 
     public DeleteLinksCapability getDeleteLinksCapability()
@@ -505,6 +525,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDeleteLinksCapability(DeleteLinksCapability deleteLinksCapability)
     {
         this.deleteLinksCapability = deleteLinksCapability;
+        capabilities.put(deleteLinksCapability.getName(), deleteLinksCapability);
     }
 
     public EditDeclaredRecordMetadataCapability getEditDeclaredRecordMetadataCapability()
@@ -515,6 +536,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setEditDeclaredRecordMetadataCapability(EditDeclaredRecordMetadataCapability editDeclaredRecordMetadataCapability)
     {
         this.editDeclaredRecordMetadataCapability = editDeclaredRecordMetadataCapability;
+        capabilities.put(editDeclaredRecordMetadataCapability.getName(), editDeclaredRecordMetadataCapability);
     }
 
     public ManuallyChangeDispositionDatesCapability getManuallyChangeDispositionDatesCapability()
@@ -525,6 +547,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setManuallyChangeDispositionDatesCapability(ManuallyChangeDispositionDatesCapability manuallyChangeDispositionDatesCapability)
     {
         this.manuallyChangeDispositionDatesCapability = manuallyChangeDispositionDatesCapability;
+        capabilities.put(manuallyChangeDispositionDatesCapability.getName(), manuallyChangeDispositionDatesCapability);
     }
 
     public ApproveRecordsScheduledForCutoffCapability getApproveRecordsScheduledForCutoffCapability()
@@ -535,6 +558,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setApproveRecordsScheduledForCutoffCapability(ApproveRecordsScheduledForCutoffCapability approveRecordsScheduledForCutoffCapability)
     {
         this.approveRecordsScheduledForCutoffCapability = approveRecordsScheduledForCutoffCapability;
+        capabilities.put(approveRecordsScheduledForCutoffCapability.getName(), approveRecordsScheduledForCutoffCapability);
     }
 
     public CreateModifyRecordsInCuttoffFoldersCapability getCreateModifyRecordsInCuttoffFoldersCapability()
@@ -545,6 +569,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyRecordsInCuttoffFoldersCapability(CreateModifyRecordsInCuttoffFoldersCapability createModifyRecordsInCuttoffFoldersCapability)
     {
         this.createModifyRecordsInCuttoffFoldersCapability = createModifyRecordsInCuttoffFoldersCapability;
+        capabilities.put(createModifyRecordsInCuttoffFoldersCapability.getName(), createModifyRecordsInCuttoffFoldersCapability);
     }
 
     public ExtendRetentionPeriodOrFreezeCapability getExtendRetentionPeriodOrFreezeCapability()
@@ -555,6 +580,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setExtendRetentionPeriodOrFreezeCapability(ExtendRetentionPeriodOrFreezeCapability extendRetentionPeriodOrFreezeCapability)
     {
         this.extendRetentionPeriodOrFreezeCapability = extendRetentionPeriodOrFreezeCapability;
+        capabilities.put(extendRetentionPeriodOrFreezeCapability.getName(), extendRetentionPeriodOrFreezeCapability);
     }
 
     public UnfreezeCapability getUnfreezeCapability()
@@ -565,6 +591,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setUnfreezeCapability(UnfreezeCapability unfreezeCapability)
     {
         this.unfreezeCapability = unfreezeCapability;
+        capabilities.put(unfreezeCapability.getName(), unfreezeCapability);
     }
 
     public ViewUpdateReasonsForFreezeCapability getViewUpdateReasonsForFreezeCapability()
@@ -575,6 +602,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setViewUpdateReasonsForFreezeCapability(ViewUpdateReasonsForFreezeCapability viewUpdateReasonsForFreezeCapability)
     {
         this.viewUpdateReasonsForFreezeCapability = viewUpdateReasonsForFreezeCapability;
+        capabilities.put(viewUpdateReasonsForFreezeCapability.getName(), viewUpdateReasonsForFreezeCapability);
     }
 
     public DestroyRecordsScheduledForDestructionCapability getDestroyRecordsScheduledForDestructionCapability()
@@ -585,6 +613,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDestroyRecordsScheduledForDestructionCapability(DestroyRecordsScheduledForDestructionCapability destroyRecordsScheduledForDestructionCapability)
     {
         this.destroyRecordsScheduledForDestructionCapability = destroyRecordsScheduledForDestructionCapability;
+        capabilities.put(destroyRecordsScheduledForDestructionCapability.getName(), destroyRecordsScheduledForDestructionCapability);
     }
 
     public DestroyRecordsCapability getDestroyRecordsCapability()
@@ -595,6 +624,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDestroyRecordsCapability(DestroyRecordsCapability destroyRecordsCapability)
     {
         this.destroyRecordsCapability = destroyRecordsCapability;
+        capabilities.put(destroyRecordsCapability.getName(), destroyRecordsCapability);
     }
 
     public UpdateVitalRecordCycleInformationCapability getUpdateVitalRecordCycleInformationCapability()
@@ -605,6 +635,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setUpdateVitalRecordCycleInformationCapability(UpdateVitalRecordCycleInformationCapability updateVitalRecordCycleInformationCapability)
     {
         this.updateVitalRecordCycleInformationCapability = updateVitalRecordCycleInformationCapability;
+        capabilities.put(updateVitalRecordCycleInformationCapability.getName(), updateVitalRecordCycleInformationCapability);
     }
 
     public UndeclareRecordsCapability getUndeclareRecordsCapability()
@@ -615,6 +646,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setUndeclareRecordsCapability(UndeclareRecordsCapability undeclareRecordsCapability)
     {
         this.undeclareRecordsCapability = undeclareRecordsCapability;
+        capabilities.put(undeclareRecordsCapability.getName(), undeclareRecordsCapability);
     }
 
     public DeclareAuditAsRecordCapability getDeclareAuditAsRecordCapability()
@@ -625,6 +657,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDeclareAuditAsRecordCapability(DeclareAuditAsRecordCapability declareAuditAsRecordCapability)
     {
         this.declareAuditAsRecordCapability = declareAuditAsRecordCapability;
+        capabilities.put(declareAuditAsRecordCapability.getName(), declareAuditAsRecordCapability);
     }
 
     public DeleteAuditCapability getDeleteAuditCapability()
@@ -635,6 +668,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDeleteAuditCapability(DeleteAuditCapability deleteAuditCapability)
     {
         this.deleteAuditCapability = deleteAuditCapability;
+        capabilities.put(deleteAuditCapability.getName(), deleteAuditCapability);
     }
 
     public CreateModifyDestroyTimeframesCapability getCreateModifyDestroyTimeframesCapability()
@@ -645,6 +679,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyDestroyTimeframesCapability(CreateModifyDestroyTimeframesCapability createModifyDestroyTimeframesCapability)
     {
         this.createModifyDestroyTimeframesCapability = createModifyDestroyTimeframesCapability;
+        capabilities.put(createModifyDestroyTimeframesCapability.getName(), createModifyDestroyTimeframesCapability);
     }
 
     public AuthorizeNominatedTransfersCapability getAuthorizeNominatedTransfersCapability()
@@ -655,6 +690,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setAuthorizeNominatedTransfersCapability(AuthorizeNominatedTransfersCapability authorizeNominatedTransfersCapability)
     {
         this.authorizeNominatedTransfersCapability = authorizeNominatedTransfersCapability;
+        capabilities.put(authorizeNominatedTransfersCapability.getName(), authorizeNominatedTransfersCapability);
     }
 
     public EditSelectionListsCapability getEditSelectionListsCapability()
@@ -665,6 +701,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setEditSelectionListsCapability(EditSelectionListsCapability editSelectionListsCapability)
     {
         this.editSelectionListsCapability = editSelectionListsCapability;
+        capabilities.put(editSelectionListsCapability.getName(), editSelectionListsCapability);
     }
 
     public AuthorizeAllTransfersCapability getAuthorizeAllTransfersCapability()
@@ -675,6 +712,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setAuthorizeAllTransfersCapability(AuthorizeAllTransfersCapability authorizeAllTransfersCapability)
     {
         this.authorizeAllTransfersCapability = authorizeAllTransfersCapability;
+        capabilities.put(authorizeAllTransfersCapability.getName(), authorizeAllTransfersCapability);
     }
 
     public CreateModifyDestroyFileplanMetadataCapability getCreateModifyDestroyFileplanMetadataCapability()
@@ -685,6 +723,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyDestroyFileplanMetadataCapability(CreateModifyDestroyFileplanMetadataCapability createModifyDestroyFileplanMetadataCapability)
     {
         this.createModifyDestroyFileplanMetadataCapability = createModifyDestroyFileplanMetadataCapability;
+        capabilities.put(createModifyDestroyFileplanMetadataCapability.getName(), createModifyDestroyFileplanMetadataCapability);
     }
 
     public CreateAndAssociateSelectionListsCapability getCreateAndAssociateSelectionListsCapability()
@@ -695,6 +734,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateAndAssociateSelectionListsCapability(CreateAndAssociateSelectionListsCapability createAndAssociateSelectionListsCapability)
     {
         this.createAndAssociateSelectionListsCapability = createAndAssociateSelectionListsCapability;
+        capabilities.put(createAndAssociateSelectionListsCapability.getName(), createAndAssociateSelectionListsCapability);
     }
 
     public AttachRulesToMetadataPropertiesCapability getAttachRulesToMetadataPropertiesCapability()
@@ -705,6 +745,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setAttachRulesToMetadataPropertiesCapability(AttachRulesToMetadataPropertiesCapability attachRulesToMetadataPropertiesCapability)
     {
         this.attachRulesToMetadataPropertiesCapability = attachRulesToMetadataPropertiesCapability;
+        capabilities.put(attachRulesToMetadataPropertiesCapability.getName(), attachRulesToMetadataPropertiesCapability);
     }
 
     public CreateModifyDestroyFileplanTypesCapability getCreateModifyDestroyFileplanTypesCapability()
@@ -715,6 +756,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyDestroyFileplanTypesCapability(CreateModifyDestroyFileplanTypesCapability createModifyDestroyFileplanTypesCapability)
     {
         this.createModifyDestroyFileplanTypesCapability = createModifyDestroyFileplanTypesCapability;
+        capabilities.put(createModifyDestroyFileplanTypesCapability.getName(), createModifyDestroyFileplanTypesCapability);
     }
 
     public CreateModifyDestroyRecordTypesCapability getCreateModifyDestroyRecordTypesCapability()
@@ -725,6 +767,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyDestroyRecordTypesCapability(CreateModifyDestroyRecordTypesCapability createModifyDestroyRecordTypesCapability)
     {
         this.createModifyDestroyRecordTypesCapability = createModifyDestroyRecordTypesCapability;
+        capabilities.put(createModifyDestroyRecordTypesCapability.getName(), createModifyDestroyRecordTypesCapability);
     }
 
     public MakeOptionalPropertiesMandatoryCapability getMakeOptionalPropertiesMandatoryCapability()
@@ -735,6 +778,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setMakeOptionalPropertiesMandatoryCapability(MakeOptionalPropertiesMandatoryCapability makeOptionalPropertiesMandatoryCapability)
     {
         this.makeOptionalPropertiesMandatoryCapability = makeOptionalPropertiesMandatoryCapability;
+        capabilities.put(makeOptionalPropertiesMandatoryCapability.getName(), makeOptionalPropertiesMandatoryCapability);
     }
 
     public MapEmailMetadataCapability getMapEmailMetadataCapability()
@@ -745,6 +789,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setMapEmailMetadataCapability(MapEmailMetadataCapability mapEmailMetadataCapability)
     {
         this.mapEmailMetadataCapability = mapEmailMetadataCapability;
+        capabilities.put(mapEmailMetadataCapability.getName(), mapEmailMetadataCapability);
     }
 
     public DeleteRecordsCapability getDeleteRecordsCapability()
@@ -755,6 +800,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDeleteRecordsCapability(DeleteRecordsCapability deleteRecordsCapability)
     {
         this.deleteRecordsCapability = deleteRecordsCapability;
+        capabilities.put(deleteRecordsCapability.getName(), deleteRecordsCapability);
     }
 
     public CreateModifyDestroyRolesCapability getCreateModifyDestroyRolesCapability()
@@ -765,6 +811,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyDestroyRolesCapability(CreateModifyDestroyRolesCapability createModifyDestroyRolesCapability)
     {
         this.createModifyDestroyRolesCapability = createModifyDestroyRolesCapability;
+        capabilities.put(createModifyDestroyRolesCapability.getName(), createModifyDestroyRolesCapability);
     }
 
     public CreateModifyDestroyUsersAndGroupsCapability getCreateModifyDestroyUsersAndGroupsCapability()
@@ -775,6 +822,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyDestroyUsersAndGroupsCapability(CreateModifyDestroyUsersAndGroupsCapability createModifyDestroyUsersAndGroupsCapability)
     {
         this.createModifyDestroyUsersAndGroupsCapability = createModifyDestroyUsersAndGroupsCapability;
+        capabilities.put(createModifyDestroyUsersAndGroupsCapability.getName(), createModifyDestroyUsersAndGroupsCapability);
     }
 
     public PasswordControlCapability getPasswordControlCapability()
@@ -785,6 +833,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setPasswordControlCapability(PasswordControlCapability passwordControlCapability)
     {
         this.passwordControlCapability = passwordControlCapability;
+        capabilities.put(passwordControlCapability.getName(), passwordControlCapability);
     }
 
     public EnableDisableAuditByTypesCapability getEnableDisableAuditByTypesCapability()
@@ -795,6 +844,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setEnableDisableAuditByTypesCapability(EnableDisableAuditByTypesCapability enableDisableAuditByTypesCapability)
     {
         this.enableDisableAuditByTypesCapability = enableDisableAuditByTypesCapability;
+        capabilities.put(enableDisableAuditByTypesCapability.getName(), enableDisableAuditByTypesCapability);
     }
 
     public SelectAuditMetadataCapability getSelectAuditMetadataCapability()
@@ -805,6 +855,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setSelectAuditMetadataCapability(SelectAuditMetadataCapability selectAuditMetadataCapability)
     {
         this.selectAuditMetadataCapability = selectAuditMetadataCapability;
+        capabilities.put(selectAuditMetadataCapability.getName(), selectAuditMetadataCapability);
     }
 
     public DisplayRightsReportCapability getDisplayRightsReportCapability()
@@ -815,6 +866,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDisplayRightsReportCapability(DisplayRightsReportCapability displayRightsReportCapability)
     {
         this.displayRightsReportCapability = displayRightsReportCapability;
+        capabilities.put(displayRightsReportCapability.getName(), displayRightsReportCapability);
     }
 
     public AccessAuditCapability getAccessAuditCapability()
@@ -825,6 +877,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setAccessAuditCapability(AccessAuditCapability accessAuditCapability)
     {
         this.accessAuditCapability = accessAuditCapability;
+        capabilities.put(accessAuditCapability.getName(), accessAuditCapability);
     }
 
     public ExportAuditCapability getExportAuditCapability()
@@ -835,6 +888,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setExportAuditCapability(ExportAuditCapability exportAuditCapability)
     {
         this.exportAuditCapability = exportAuditCapability;
+        capabilities.put(exportAuditCapability.getName(), exportAuditCapability);
     }
 
     public CreateModifyDestroyReferenceTypesCapability getCreateModifyDestroyReferenceTypesCapability()
@@ -845,6 +899,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyDestroyReferenceTypesCapability(CreateModifyDestroyReferenceTypesCapability createModifyDestroyReferenceTypesCapability)
     {
         this.createModifyDestroyReferenceTypesCapability = createModifyDestroyReferenceTypesCapability;
+        capabilities.put(createModifyDestroyReferenceTypesCapability.getName(), createModifyDestroyReferenceTypesCapability);
     }
 
     public UpdateClassificationDatesCapability getUpdateClassificationDatesCapability()
@@ -855,6 +910,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setUpdateClassificationDatesCapability(UpdateClassificationDatesCapability updateClassificationDatesCapability)
     {
         this.updateClassificationDatesCapability = updateClassificationDatesCapability;
+        capabilities.put(updateClassificationDatesCapability.getName(), updateClassificationDatesCapability);
     }
 
     public CreateModifyDestroyClassificationGuidesCapability getCreateModifyDestroyClassificationGuidesCapability()
@@ -865,6 +921,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateModifyDestroyClassificationGuidesCapability(CreateModifyDestroyClassificationGuidesCapability createModifyDestroyClassificationGuidesCapability)
     {
         this.createModifyDestroyClassificationGuidesCapability = createModifyDestroyClassificationGuidesCapability;
+        capabilities.put(createModifyDestroyClassificationGuidesCapability.getName(), createModifyDestroyClassificationGuidesCapability);
     }
 
     public UpgradeDowngradeAndDeclassifyRecordsCapability getUpgradeDowngradeAndDeclassifyRecordsCapability()
@@ -875,6 +932,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setUpgradeDowngradeAndDeclassifyRecordsCapability(UpgradeDowngradeAndDeclassifyRecordsCapability upgradeDowngradeAndDeclassifyRecordsCapability)
     {
         this.upgradeDowngradeAndDeclassifyRecordsCapability = upgradeDowngradeAndDeclassifyRecordsCapability;
+        capabilities.put(upgradeDowngradeAndDeclassifyRecordsCapability.getName(), upgradeDowngradeAndDeclassifyRecordsCapability);
     }
 
     public UpdateExemptionCategoriesCapability getUpdateExemptionCategoriesCapability()
@@ -885,6 +943,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setUpdateExemptionCategoriesCapability(UpdateExemptionCategoriesCapability updateExemptionCategoriesCapability)
     {
         this.updateExemptionCategoriesCapability = updateExemptionCategoriesCapability;
+        capabilities.put(updateExemptionCategoriesCapability.getName(), updateExemptionCategoriesCapability);
     }
 
     public MapClassificationGuideMetadataCapability getMapClassificationGuideMetadataCapability()
@@ -895,6 +954,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setMapClassificationGuideMetadataCapability(MapClassificationGuideMetadataCapability mapClassificationGuideMetadataCapability)
     {
         this.mapClassificationGuideMetadataCapability = mapClassificationGuideMetadataCapability;
+        capabilities.put(mapClassificationGuideMetadataCapability.getName(), mapClassificationGuideMetadataCapability);
     }
 
     public ManageAccessControlsCapability getManageAccessControlsCapability()
@@ -905,6 +965,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setManageAccessControlsCapability(ManageAccessControlsCapability manageAccessControlsCapability)
     {
         this.manageAccessControlsCapability = manageAccessControlsCapability;
+        capabilities.put(manageAccessControlsCapability.getName(), manageAccessControlsCapability);
     }
 
     public CreateCapability getCreateCapability()
@@ -1011,38 +1072,16 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     private int checkCapability(MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
     {
         NodeRef testNodeRef = getTestNode(getNodeService(), invocation, params, cad.parameters.get(0), cad.parent);
-
-        if (testNodeRef != null)
+        if (testNodeRef == null)
         {
-            if (getNodeService().hasAspect(testNodeRef, RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT))
-            {
-                // now we know the node - we can abstain for certain types and aspects (eg, rm)
-
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("\t\tNode ref is not null");
-                }
-                if (getPermissionService().hasPermission(testNodeRef, cad.required.toString()) == AccessStatus.DENIED)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("\t\tPermission is denied");
-                        Thread.dumpStack();
-                    }
-                    return AccessDecisionVoter.ACCESS_DENIED;
-                }
-                else
-                {
-                    return AccessDecisionVoter.ACCESS_GRANTED;
-                }
-            }
-            else
-            {
-                return AccessDecisionVoter.ACCESS_ABSTAIN;
-            }
+            return AccessDecisionVoter.ACCESS_ABSTAIN;
         }
-
-        return AccessDecisionVoter.ACCESS_ABSTAIN;
+        Capability capability = capabilities.get(cad.required.getName());
+        if (capability == null)
+        {
+            return AccessDecisionVoter.ACCESS_DENIED;
+        }
+        return capability.hasPermissionRaw(testNodeRef);
 
     }
 
@@ -1329,7 +1368,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
         {
             NodeRef testNodeRef = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(0), cad.parent);
-            return voter.viewRecordsCapability.evaluate(testNodeRef);
+            return voter.getViewRecordsCapability().evaluate(testNodeRef);
         }
 
     }
@@ -1345,7 +1384,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             // linkee is not null for creating secondary child assocs
             NodeRef linkee = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(1), cad.parent);
 
-            return voter.createCapability.evaluate(destination, linkee, type);
+            return voter.getCreateCapability().evaluate(destination, linkee, type);
         }
 
     }
@@ -1370,7 +1409,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
             if ((movee != null) && (destination != null))
             {
-                return voter.moveRecordsCapability.evaluate(movee, destination);
+                return voter.getMoveRecordsCapability().evaluate(movee, destination);
             }
             else
             {

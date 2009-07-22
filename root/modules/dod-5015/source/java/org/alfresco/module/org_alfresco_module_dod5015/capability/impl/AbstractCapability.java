@@ -33,6 +33,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefiniti
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -47,7 +48,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * @author andyh
  */
-public abstract class AbstractCapability
+public abstract class AbstractCapability implements Capability
 {
     private static Log logger = LogFactory.getLog(AbstractCapability.class);
 
@@ -90,6 +91,11 @@ public abstract class AbstractCapability
         return translate(hasPermissionImpl(nodeRef));
     }
 
+    public int hasPermissionRaw(NodeRef nodeRef)
+    {
+        return hasPermissionImpl(nodeRef);
+    }
+    
     protected abstract int hasPermissionImpl(NodeRef nodeRef);
 
     public String getActionName()
