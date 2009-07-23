@@ -196,6 +196,30 @@ class FieldVisibilityManager
     }
     
     /**
+     * This method checks whether the specified field is hidden in the specified mode.
+     * 
+     * @param fieldId
+     * @param m the mode
+     * @return true if the field is hidden in the specified mode, else false.
+     */
+    public boolean isFieldHidden(String fieldId, Mode m)
+    {
+        // iterate through instructions, looking for hide instructions
+        // for the field and the requested mode
+        for (FieldVisibilityInstruction fvi : visibilityInstructions)
+        {
+            if (fvi.getFieldId().equals(fieldId) && 
+                fvi.getShowOrHide().equals(Visibility.HIDE) && 
+                fvi.getModes().contains(m))
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
      * Finds the index of the first "show" instruction.
      * 
      * @return an int index of the first "show" instruction, or -1 if none exists.

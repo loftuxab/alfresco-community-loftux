@@ -141,10 +141,13 @@
       <forms>
           <form>
              <field-visibility>
-               <hide id="cm:title" />
-               <hide id="cm:description" />
+               <hide id="custom:first" />
+               <hide id="custom:second" />
                <hide id="sys:dbid" for-mode="edit, create" />
             </field-visibility>
+            <appearance>
+                <field id="custom:name" set="main" />
+             </appearance>
           </form>
       </forms>
    </config>
