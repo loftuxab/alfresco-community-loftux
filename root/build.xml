@@ -511,7 +511,9 @@
                     clean-php,
                     clean-rm, 
                     clean-sharepoint,
-                    clean-truncatemalformedxml" />
+                    clean-truncatemalformedxml,
+                    clean-dod5015,
+                    clean-dod5015-share" />
    
    <target name ="clean-tomcat-deployments" 
            description="Cleans all Tomcat server deployments"

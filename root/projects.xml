@@ -2269,7 +2269,24 @@
                          windowtitle="DOD 5015 Records Management"
                          projectdir="${dir.module.dod5015}"/>
    </target>
+   
+   <!-- ******************************** -->
+   <!-- ** DOD 5015 Share Project ** -->
+   <!-- ******************************** -->
 
+   <target name="clean-dod5015-share" depends="init">
+      <clean projectdir="${dir.module.dod5015.share}" />
+   </target>
+   
+   <target name="package-dod5015-share-extension" depends="init">
+      <mkdir dir="${dir.module.dod5015.share.dist}" />
+      <zip destfile="${dir.module.dod5015.share.dist}/${file.name.zip.dod5015.share}" 
+           update="true">
+         <zipfileset dir="${dir.module.dod5015.share.config}" prefix="WEB-INF/classes" />
+         <zipfileset dir="${dir.module.dod5015.share.src.web}" />
+      </zip>
+   </target>
+    
    <!-- ******************************************************************* -->
    <!-- Note: avmCompare and truncateMalformedXml have a nearly identical   -->
    <!--       set of tasks.   It would be very nice if we could use a macro -->
