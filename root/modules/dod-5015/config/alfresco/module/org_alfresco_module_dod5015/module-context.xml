@@ -135,6 +135,14 @@
     <bean id="webscript.org.alfresco.rma.custompropdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropDefinitionsGet" parent="webscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
+
+    <!-- REST impl for GET Custom Associations -->
+    <bean id="webscript.org.alfresco.rma.customassociations.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssociationsGet" parent="webscript">
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
+        <property name="nodeService" ref="NodeService"/>
+        <property name="namespaceService" ref="NamespaceService"/>
+        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
+    </bean>
     
     <!-- REST impl for GET Disposition Schedule -->
     <bean id="webscript.org.alfresco.rma.dispositionschedule.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionScheduleGet" parent="webscript">
