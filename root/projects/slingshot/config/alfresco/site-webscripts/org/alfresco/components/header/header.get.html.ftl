@@ -77,7 +77,7 @@
          <#assign addFavDisplay><#if (page.url.templateArgs.site?? && !currentSiteIsFav)>block<#else>none</#if></#assign>
          <ul id="${args.htmlid}-addFavourite" class="add-favourite-menuitem separator" style="display: ${addFavDisplay}">
             <li>
-               <a href="#" onclick="thisHeader.addAsFavourite(); return false;">${msg("link.add-favourite", siteTitle)}</a>
+               <a href="#" onclick="thisHeader.addAsFavourite(); return false;">${msg("link.add-favourite", siteTitle?html)}</a>
             </li>
          </ul>
          <ul class="site-finder-menuitem<#if !isGuest> separator</#if>">
