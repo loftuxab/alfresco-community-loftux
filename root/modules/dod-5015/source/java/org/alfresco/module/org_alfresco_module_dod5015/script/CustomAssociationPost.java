@@ -45,8 +45,7 @@ import org.json.JSONTokener;
  * 
  * @author Neil McErlean
  */
-//TODO Change superclass
-public class CustomAssociationPost extends DispositionAbstractBase
+public class CustomAssociationPost extends AbstractRmWebScript
 {
     private static final String TARGET_ID = "targetId";
     private static final String TARGET_STORE_ID = "targetStoreId";

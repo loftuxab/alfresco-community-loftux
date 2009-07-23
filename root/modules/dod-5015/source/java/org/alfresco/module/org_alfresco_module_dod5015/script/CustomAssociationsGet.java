@@ -45,7 +45,7 @@ import org.alfresco.web.scripts.WebScriptRequest;
  * 
  * @author Neil McErlean
  */
-public class CustomAssociationsGet extends DispositionAbstractBase
+public class CustomAssociationsGet extends AbstractRmWebScript
 {
     private RecordsManagementAdminService recordsManagementAdminService;
     
@@ -61,9 +61,14 @@ public class CustomAssociationsGet extends DispositionAbstractBase
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
         NodeRef record = parseRequestForNodeRef(req);
-        //TODO Check the node is a record
+        if (rmService.isRecord(record) == false)
+        {
+            // TODO Bad request?
+        }
         
-        //TODO Filter for 'rmc:' assocs only.
+        //TODO Use this filter for 'rmc:' assocs only.
+        RegexQNamePattern customElementsPattern = new RegexQNamePattern("http://www.alfresco.org/model/rmcustom/1.0", ".*");
+        
         List<AssociationRef> sourceAssocs = nodeService.getSourceAssocs(record, RegexQNamePattern.MATCH_ALL);
         List<AssociationRef> targetAssocs = nodeService.getTargetAssocs(record, RegexQNamePattern.MATCH_ALL);
         
