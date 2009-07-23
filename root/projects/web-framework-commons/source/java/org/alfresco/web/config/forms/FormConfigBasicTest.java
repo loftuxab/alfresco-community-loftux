@@ -142,7 +142,7 @@ public class FormConfigBasicTest extends BaseTest
         Config hiddenFieldsConfigObj = configService.getConfig("hidden-fields");
         assertNotNull(hiddenFieldsConfigObj);
     
-        ConfigElement hiddenFieldsFormsConfigObj = noVisibilityConfigObj.getConfigElement("forms");
+        ConfigElement hiddenFieldsFormsConfigObj = hiddenFieldsConfigObj.getConfigElement("forms");
         assertNotNull(hiddenFieldsFormsConfigObj);
         assertTrue("hiddenFieldsFormsConfigObj should be instanceof FormsConfigElement.",
                     hiddenFieldsFormsConfigObj instanceof FormsConfigElement);
@@ -536,11 +536,66 @@ public class FormConfigBasicTest extends BaseTest
     public void testHiddenFields() throws Exception
     {
         // make sure that get hidden field methods do NOT return null
-        /*assertNotNull(hiddenFieldsDefaultForm.getHiddenCreateFieldNamesAsList());
+        assertNotNull(hiddenFieldsDefaultForm.getHiddenCreateFieldNamesAsList());
         assertNotNull(hiddenFieldsDefaultForm.getHiddenCreateFieldNames());
         assertNotNull(hiddenFieldsDefaultForm.getHiddenEditFieldNamesAsList());
         assertNotNull(hiddenFieldsDefaultForm.getHiddenEditFieldNames());
         assertNotNull(hiddenFieldsDefaultForm.getHiddenViewFieldNamesAsList());
-        assertNotNull(hiddenFieldsDefaultForm.getHiddenViewFieldNames());*/
+        assertNotNull(hiddenFieldsDefaultForm.getHiddenViewFieldNames());
+        
+        // make sure that the correct fields are hidden for view mode
+        List<String> hiddenViewFields = hiddenFieldsDefaultForm.getHiddenViewFieldNamesAsList();
+        String[] hiddenViewFieldsArray = hiddenFieldsDefaultForm.getHiddenViewFieldNames();
+        assertEquals(2, hiddenViewFieldsArray.length);
+        assertEquals(2, hiddenViewFields.size());
+        assertEquals("custom:first", hiddenViewFields.get(0));
+        assertEquals("custom:second", hiddenViewFields.get(1));
+        
+        // make sure that the correct fields are hidden for edit mode
+        List<String> hiddenEditFields = hiddenFieldsDefaultForm.getHiddenEditFieldNamesAsList();
+        String[] hiddenEditFieldsArray = hiddenFieldsDefaultForm.getHiddenEditFieldNames();
+        assertEquals(3, hiddenEditFieldsArray.length);
+        assertEquals(3, hiddenEditFields.size());
+        assertEquals("custom:first", hiddenEditFields.get(0));
+        assertEquals("custom:second", hiddenEditFields.get(1));
+        assertEquals("sys:dbid", hiddenEditFields.get(2));
+        
+        // make sure that the correct fields are hidden for edit mode
+        List<String> hiddenCreateFields = hiddenFieldsDefaultForm.getHiddenCreateFieldNamesAsList();
+        String[] hiddenCreateFieldsArray = hiddenFieldsDefaultForm.getHiddenCreateFieldNames();
+        assertEquals(3, hiddenCreateFieldsArray.length);
+        assertEquals(3, hiddenCreateFields.size());
+        assertEquals("custom:first", hiddenCreateFields.get(0));
+        assertEquals("custom:second", hiddenCreateFields.get(1));
+        assertEquals("sys:dbid", hiddenCreateFields.get(2));
+        
+        // check that the appaearance data can be retrieved
+        Map<String, FormField> fields = hiddenFieldsDefaultForm.getFields();
+        assertNotNull(fields);
+        FormField nameField = fields.get("custom:name");
+        assertNotNull(nameField);
+        assertEquals("main", nameField.getSet());
+        
+        // check that the hidden status for fields are correct
+        assertTrue(hiddenFieldsDefaultForm.isFieldHidden("custom:first", Mode.VIEW));
+        assertTrue(hiddenFieldsDefaultForm.isFieldHidden("custom:first", Mode.EDIT));
+        assertTrue(hiddenFieldsDefaultForm.isFieldHidden("custom:first", Mode.CREATE));
+        assertTrue(hiddenFieldsDefaultForm.isFieldHidden("custom:second", Mode.VIEW));
+        assertTrue(hiddenFieldsDefaultForm.isFieldHidden("custom:second", Mode.EDIT));
+        assertTrue(hiddenFieldsDefaultForm.isFieldHidden("custom:second", Mode.CREATE));
+        assertFalse(hiddenFieldsDefaultForm.isFieldHidden("sys:dbid", Mode.VIEW));
+        assertTrue(hiddenFieldsDefaultForm.isFieldHidden("sys:dbid", Mode.EDIT));
+        assertTrue(hiddenFieldsDefaultForm.isFieldHidden("sys:dbid", Mode.CREATE));
+        
+        // check the string version 
+        assertFalse(hiddenFieldsDefaultForm.isFieldHiddenInMode("sys:dbid", "view"));
+        assertTrue(hiddenFieldsDefaultForm.isFieldHiddenInMode("sys:dbid", "edit"));
+        assertTrue(hiddenFieldsDefaultForm.isFieldHiddenInMode("sys:dbid", "create"));
+        
+        // check the status for non-existent fields
+        assertFalse(hiddenFieldsDefaultForm.isFieldHidden("non:existent", Mode.VIEW));
+        assertFalse(hiddenFieldsDefaultForm.isFieldHidden("non:existent", Mode.EDIT));
+        assertFalse(hiddenFieldsDefaultForm.isFieldHidden("non:existent", Mode.CREATE));
+        
     }
 }

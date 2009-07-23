@@ -471,8 +471,7 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
    // setup the set and field structure
    if (visibleFields !== null && visibleFields.length > 0)
    {
-      // if we have visible fields we can presume there is
-      // config present!
+      // if we have visible fields we can presume there is config present!
       
       // get the root sets
       var rootSets = formConfig.rootSets;      
@@ -488,6 +487,9 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
    }
    else
    {
+      // TODO: Once the server has some form implementations that return
+      //       field group information we'll need to parse those first!
+      
       if (formConfig === null)
       {
          // if there is no config at all just show all fields in the default set
@@ -495,32 +497,22 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
       }
       else
       {
-         model.error = "No visible fields found for item \"" + formModel.data.type + "\", when configuration is defined at least one &lt;show&gt; element must be present.";
+         // iterate through the fields from the server and determine which set each
+         // field belongs to according to the appearnace config and whether they are hidden
+         var setMembership = getFieldsSetMembership(mode, formModel, formConfig);
          
-         // TODO: iterate around all fields returned from the server
-         //       and determine if there is some 'appearance' config it,
-         //       if there is, see if there is a set specified, this
-         //       will build a flat list of set membership
-         
-         //var fieldsSetMembership = getFieldsSetMembership(mode, formModel, formConfig);
-         
-         // TODO: get root sets from config and build set structure using
-         //       config and lists built above
-         
-         /*var rootSets = formConfig.rootSets;      
+         // get root sets from config and build set structure using config and lists built above
+         var rootSets = formConfig.rootSets;      
          for (var s = 0; s < rootSets.length; s++)
          {
-            var set = setupSetUsingServerFields(mode, rootSets[s], formModel, formConfig, fieldsSetMembership);
+            var set = setupSetUsingServerFields(mode, rootSets[s], formModel, formConfig, setMembership);
             // if the set got created (as it contained fields or other sets) add to items list
             if (set !== null)
             {
                formUIItems.push(set);
             }
-         }*/
+         }
       }
-      
-      // TODO: Once the server has some form implementations that return
-      //       field group information we'll need to parse those first!
    }
    
    return formUIItems;
@@ -536,6 +528,7 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
  * @param setConfig The set configuration
  * @param formModel The model returned from the server 
  * @param formConfig The form configuration
+ * @return Object representing the set
  */
 function setupSetUsingVisibleFields(mode, setConfig, formModel, formConfig)
 {
@@ -563,35 +556,8 @@ function setupSetUsingVisibleFields(mode, setConfig, formModel, formConfig)
    // if there is something to show in the set create the set object
    if ((fieldsForSet !== null && fieldsForSet.length > 0) || setConfig.children.length > 0)
    {
-      // setup the basic set object
-      set = 
-      {
-         kind: "set",
-         id: setConfig.setId,
-         appearance: setConfig.appearance,
-         label: getSetLabel(setConfig),
-         children: []
-      };
-      
-      // add all the fields to the set
-      for (var f = 0; f < fieldsForSet.length; f++)
-      {
-         var fieldName = fieldsForSet[f];
-         var fieldConfig = formConfig.fields[fieldName];
-         
-         // setup the field
-         var field = setupField(mode, formModel, fieldName, fieldConfig);
-         
-         // if a field was created add to the set's list of children
-         if (field !== null)
-         {
-            set.children.push(field);
-            
-            if (logger.isLoggingEnabled())
-               logger.log("Added field \"" + fieldName + "\" to set \"" + set.id + "\": " + 
-                     jsonUtils.toJSONString(field));
-         }
-      }
+      // create the set
+      set = createSetUsingFields(mode, setConfig, formModel, formConfig, fieldsForSet);
       
       // recursively setup child sets
       for (var c = 0; c < setConfig.children.length; c++)
@@ -602,7 +568,7 @@ function setupSetUsingVisibleFields(mode, setConfig, formModel, formConfig)
    }
    else if (logger.isLoggingEnabled())
    {
-      logger.log("Ignoring set \"" + setConfig.setId + "\" as it does not have any fields or child sets.");
+      logger.log("Ignoring set \"" + setConfig.setId + "\" as it does not have any fields or child sets");
    }
    
    return set;
@@ -682,10 +648,151 @@ function createDefaultSetFromServerFields(mode, formModel)
       if (field !== null)
       {
          set.children.push(field);
+      }
+   }
+   
+   return set;
+}
+
+/**
+ * Build an object representing each set and the fields from the 
+ * server that are in that set according to the 'appearance' and
+ * the visibility status specified by the configuration provided.
+ * 
+ * @method getFieldsSetMembership
+ * @param mode The mode of the form
+ * @param formModel The form model returned from the server
+ * @param formConfig Object representing the UI configuration
+ * @return Object representing the fields in each set
+ */
+function getFieldsSetMembership(mode, formModel, formConfig)
+{
+   var setMemberships = {};
+   
+   var fields = formConfig.fields;
+   var fieldsFromServer = formModel.data.definition.fields;
+   var fieldName, fieldConfig, fieldsForSet, set = null;
+   for (var idx = 0; idx < fieldsFromServer.length; idx++)
+   {
+      fieldName = fieldsFromServer[idx].name;
+      
+      // determine if this field should even be shown
+      if (formConfig.isFieldHiddenInMode(fieldName, mode) == false)
+      {
+         // if its visible determine its set membership
+         fieldConfig = fields[fieldName];
+         if (fieldConfig != null)
+         {
+            set = fieldConfig.set;
+         }
+         else
+         {
+            set = "";
+         }
          
-         if (logger.isLoggingEnabled())
-            logger.log("Added field \"" + fieldName + "\" to set \"" + set.id + "\": " + 
-                  jsonUtils.toJSONString(field));
+         // get the array for the set and add the field to it
+         var fieldsForSet = setMemberships[set];
+         if (typeof fieldsForSet === "undefined")
+         {
+            // setup array for the set
+            setMemberships[set] = new Array(fieldName);
+         }
+         else
+         {
+            fieldsForSet.push(fieldName);
+         }
+      }
+      else if (logger.isLoggingEnabled())
+      {
+         logger.log("Ignoring \"" + fieldName + "\" as it is configured to be hidden");
+      }
+   }
+   
+   if (logger.isLoggingEnabled())
+      logger.log("Set membership = " + jsonUtils.toJSONString(setMemberships));
+   
+   return setMemberships;
+}
+
+/**
+ * Sets up the item to represent the given set definition.
+ * The item returned represents the combination of the fields
+ * returned from the server and the set & field structure
+ * defined in the form config.
+ *
+ * @method setupSetUsingServerFields
+ * @param mode The mode of the form
+ * @param setConfig The set configuration
+ * @param formModel The model returned from the server 
+ * @param formConfig The form configuration
+ * @param setMembership Object containing lists of which fields
+ *        belong to which set for the 'mode'
+ * @return Object representing the set
+ */
+function setupSetUsingServerFields(mode, setConfig, formModel, formConfig, setMembership)
+{
+   var set = null;
+   
+   // get the fields to display in this set
+   var fieldsForSet = setMembership[setConfig.setId];
+   
+   // if there is something to show in the set create the set object
+   if ((typeof fieldsForSet !== "undefined" && fieldsForSet.length > 0) || setConfig.children.length > 0)
+   {
+      // create the set
+      set = createSetUsingFields(mode, setConfig, formModel, formConfig, fieldsForSet);
+      
+      // recursively setup child sets
+      for (var c = 0; c < setConfig.children.length; c++)
+      {
+         var childSet = setupSetUsingServerFields(mode, setConfig.children[c], formModel, formConfig, setMembership);
+         set.children.push(childSet);
+      }
+   }
+   else if (logger.isLoggingEnabled())
+   {
+      logger.log("Ignoring set \"" + setConfig.setId + "\" as it does not have any fields or child sets.");
+   }
+   
+   return set;
+}
+
+/**
+ * Creates an object representing the given set configuration and containing the
+ * list of provided fields.
+ * 
+ * @param mode The mode of the form
+ * @param setConfig The set configuration
+ * @param formModel The model returned from the server 
+ * @param formConfig The form configuration
+ * @param fieldsForSet The list of field names that belong to the set
+ * @return Object representing the set and it's fields
+ */
+function createSetUsingFields(mode, setConfig, formModel, formConfig, fieldsForSet)
+{
+   // setup the basic set object
+   var set = 
+   {
+      kind: "set",
+      id: setConfig.setId,
+      appearance: setConfig.appearance,
+      label: getSetLabel(setConfig),
+      children: []
+   };
+   
+   // add all the fields to the set
+   for (var f = 0; f < fieldsForSet.length; f++)
+   {
+      var fieldName = fieldsForSet[f];
+      var fieldConfig = formConfig.fields[fieldName];
+      
+      // setup the field
+      var field = setupField(mode, formModel, fieldName, fieldConfig);
+      
+      // if a field was created add to the set's list of children
+      if (field !== null)
+      {
+         set.children.push(field);
       }
    }
    
@@ -706,6 +813,9 @@ function createDefaultSetFromServerFields(mode, formModel)
  */
 function setupField(mode, formModel, fieldName, fieldConfig)
 {
+   if (logger.isLoggingEnabled())
+      logger.log("Setting up field \"" + fieldName + "\"");
+   
    var fieldDef = null;
    
    // look in both caches for the field
@@ -891,7 +1001,6 @@ function setupFieldControl(fieldDef, fieldConfig)
    // send any type parameters returned from the server to the control
    if (isPropertyField && typeof fieldDef.dataTypeParameters !== "undefined")
    {
-      logger.log("dataTypeParameters = " + fieldDef.dataTypeParameters);
       control.params.dataTypeParameters = fieldDef.dataTypeParameters;
    }
    
@@ -1103,9 +1212,6 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
       {
          constraint.message = constraintMsg;
       }
-      
-      if (logger.isLoggingEnabled())
-         logger.log("Built constraint: " + jsonUtils.toJSONString(constraint));
       
       if (constraintId === "LIST")
       {

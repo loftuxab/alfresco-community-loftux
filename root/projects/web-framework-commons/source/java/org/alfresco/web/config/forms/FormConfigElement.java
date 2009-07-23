@@ -572,11 +572,23 @@ public class FormConfigElement extends ConfigElementAdapter
      * 
      * @param fieldId the id of the field
      * @param m a mode.
-     * @return
+     * @return true if the field is configured to be visible
      */
     public boolean isFieldVisible(String fieldId, Mode m)
     {
         return fieldVisibilityManager.isFieldVisible(fieldId, m);
+    }
+    
+    /**
+     * This method checks whether the specified field is specifically hidden in the specified mode.
+     * 
+     * @param fieldId the id of the field
+     * @param m a mode.
+     * @return true if the field is configured to be hidden
+     */
+    public boolean isFieldHidden(String fieldId, Mode m)
+    {
+        return fieldVisibilityManager.isFieldHidden(fieldId, m);
     }
 
     /**
@@ -595,6 +607,23 @@ public class FormConfigElement extends ConfigElementAdapter
         // is not supported.
         Mode m = Mode.modeFromString(modeString);
         return this.isFieldVisible(fieldId, m);
+    }
+    
+    /**
+     * This method checks whether the specified field is specifically hidden in the specified mode.
+     * This is added as a convenience for JavaScript clients.
+     * 
+     * @param fieldId
+     * @param modeString
+     * @return #isFieldHidden(String, Mode)
+     */
+    public boolean isFieldHiddenInMode(String fieldId, String modeString)
+    {
+        // Note. We cannot have the same method name as isFieldHidden(String, Mode)
+        // as this is intended for use by JavaScript clients where method overloading
+        // is not supported.
+        Mode m = Mode.modeFromString(modeString);
+        return this.isFieldHidden(fieldId, m);
     }
     
     /**
