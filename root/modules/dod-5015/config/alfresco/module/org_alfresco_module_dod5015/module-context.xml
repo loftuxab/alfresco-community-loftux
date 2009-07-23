@@ -136,55 +136,41 @@
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
 
-    <!-- REST impl for GET Custom Associations -->
-    <bean id="webscript.org.alfresco.rma.customassociations.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssociationsGet" parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService"/>
+    <!-- Abstract parent bean for many RM get and post beans -->
+    <bean id="rmBaseWebscript" parent="webscript" abstract="true">
         <property name="nodeService" ref="NodeService"/>
         <property name="namespaceService" ref="NamespaceService"/>
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
+    </bean>
+
+    <!-- REST impl for GET Custom Associations -->
+    <bean id="webscript.org.alfresco.rma.customassociations.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssociationsGet" parent="rmBaseWebscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
 
     <!-- REST impl for POST Custom Associations -->
-    <bean id="webscript.org.alfresco.rma.customassociation.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssociationPost" parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService"/>
-        <property name="nodeService" ref="NodeService"/>
-        <property name="namespaceService" ref="NamespaceService"/>
+    <bean id="webscript.org.alfresco.rma.customassociation.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssociationPost" parent="rmBaseWebscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
     
     <!-- REST impl for GET Disposition Schedule -->
-    <bean id="webscript.org.alfresco.rma.dispositionschedule.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionScheduleGet" parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService"/>
-        <property name="nodeService" ref="NodeService"/>
-        <property name="namespaceService" ref="NamespaceService"/>
+    <bean id="webscript.org.alfresco.rma.dispositionschedule.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionScheduleGet" parent="rmBaseWebscript">
     </bean>
     
     <!-- REST impl for POST Disposition Action Definition -->
-    <bean id="webscript.org.alfresco.rma.dispositionactiondefinitions.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPost" parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService"/>
-        <property name="nodeService" ref="NodeService"/>
-        <property name="namespaceService" ref="NamespaceService"/>
+    <bean id="webscript.org.alfresco.rma.dispositionactiondefinitions.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPost" parent="rmBaseWebscript">
     </bean>
     
     <!-- REST impl for PUT Disposition Action Definition -->
-    <bean id="webscript.org.alfresco.rma.dispositionactiondefinition.put" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPut" parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService"/>
-        <property name="nodeService" ref="NodeService"/>
-        <property name="namespaceService" ref="NamespaceService"/>
+    <bean id="webscript.org.alfresco.rma.dispositionactiondefinition.put" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionPut" parent="rmBaseWebscript">
     </bean>
     
     <!-- REST impl for DELETE Disposition Action Definition -->
-    <bean id="webscript.org.alfresco.rma.dispositionactiondefinition.delete" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionDelete" parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService"/>
-        <property name="nodeService" ref="NodeService"/>
-        <property name="namespaceService" ref="NamespaceService"/>
+    <bean id="webscript.org.alfresco.rma.dispositionactiondefinition.delete" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionActionDefinitionDelete" parent="rmBaseWebscript">
     </bean>
     
     <!-- REST impl for GET Disposition Lifecycle -->
-    <bean id="webscript.org.alfresco.rma.dispositionlifecycle.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionLifecycleGet" parent="webscript">
-        <property name="recordsManagementService" ref="RecordsManagementService"/>
-        <property name="nodeService" ref="NodeService"/>
-        <property name="namespaceService" ref="NamespaceService"/>
+    <bean id="webscript.org.alfresco.rma.dispositionlifecycle.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionLifecycleGet" parent="rmBaseWebscript">
     </bean>
     
     <!-- REST impl for GET List Of Values -->

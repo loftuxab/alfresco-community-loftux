@@ -33,13 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
 
@@ -48,70 +43,8 @@ import org.alfresco.web.scripts.WebScriptRequest;
  * 
  * @author Gavin Cornwell
  */
-public class DispositionAbstractBase extends DeclarativeWebScript
+public class DispositionAbstractBase extends AbstractRmWebScript
 {
-    protected RecordsManagementService rmService;
-    protected NodeService nodeService;
-    protected NamespaceService namespaceService;
-    
-    /**
-     * Sets the RecordsManagementService instance
-     * 
-     * @param rmService The RecordsManagementService instance
-     */
-    public void setRecordsManagementService(RecordsManagementService rmService)
-    {
-        this.rmService = rmService;
-    }
-
-    /**
-     * Sets the NodeService instance
-     * 
-     * @param nodeService The NodeService instance
-     */
-    public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
-    
-    /**
-     * Sets the NamespaceService instance
-     * 
-     * @param namespaceService The NamespaceService instance
-     */
-    public void setNamespaceService(NamespaceService namespaceService)
-    {
-        this.namespaceService = namespaceService;
-    }
-    
-    /**
-     * Parses the request and providing it's valid returns the NodeRef.
-     * 
-     * @param req The webscript request
-     * @return The NodeRef passed in the request
-     */
-    protected NodeRef parseRequestForNodeRef(WebScriptRequest req)
-    {
-        // get the parameters that represent the NodeRef, we know they are present
-        // otherwise this webscript would not have matched
-        Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
-        String storeType = templateVars.get("store_type");
-        String storeId = templateVars.get("store_id");
-        String nodeId = templateVars.get("id");
-        
-        // create the NodeRef and ensure it is valid
-        StoreRef storeRef = new StoreRef(storeType, storeId);
-        NodeRef nodeRef = new NodeRef(storeRef, nodeId);
-        
-        if (!this.nodeService.exists(nodeRef))
-        {
-            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Unable to find node: " + 
-                        nodeRef.toString());
-        }
-        
-        return nodeRef;
-    }
-    
     /**
      * Parses the request and providing it's valid returns the DispositionSchedule object.
      * 
