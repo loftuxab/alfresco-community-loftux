@@ -1,0 +1,9 @@
+<webscript>
+  <shortname>Get Custom Associations on Record</shortname>
+  <description>Returns custom associations attached to the given record node</description>
+  <url>/api/node/{store_type}/{store_id}/{id}/customassociations</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+  <lifecycle>internal</lifecycle>
+</webscript>
