@@ -348,7 +348,7 @@ public class Convert
                 {
                     continue;
                 }
-                String filename = line.substring(7);
+                String filename = line.substring(7).trim();
                 if (filename.length() < 1)
                 {
                     continue;
