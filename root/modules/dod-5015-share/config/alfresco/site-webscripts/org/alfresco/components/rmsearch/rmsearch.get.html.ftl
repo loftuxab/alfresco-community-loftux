@@ -2,8 +2,7 @@
    new Alfresco.RecordsSearch("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      customFields: YAHOO.lang.JSON.parse('[<#list meta as d>{"id": "${d.name?substring(4)}", "title": "${d.title?js_string}", "datatype": "${d.dataType}"}<#if d_has_next>,</#if></#list>]'),
-      savedSearches: YAHOO.lang.JSON.parse('[<#list searches as s>{"id": "${s.id?js_string}", "label": "${s.label?js_string}", "description": "${s.description?js_string}", "query": "${s.query?js_string}"}<#if s_has_next>,</#if></#list>]')
+      customFields: YAHOO.lang.JSON.parse('[<#list meta as d>{"id": "${d.name?substring(4)}", "title": "${d.title?js_string}", "datatype": "${d.dataType}"}<#if d_has_next>,</#if></#list>]')
    }).setMessages(
       ${messages}
    );
@@ -79,8 +78,8 @@
                </span>
             </div>
             <div class="query">
-               <!-- Query text input -->
-               <textarea id="${el}-query" rows="2" cols="40"></textarea>
+               <!-- Query terms text input -->
+               <textarea id="${el}-terms" rows="2" cols="40"></textarea>
             </div>
             <#include "../rmresults-common/rmoptions.ftl" />
             <div class="execute-search">

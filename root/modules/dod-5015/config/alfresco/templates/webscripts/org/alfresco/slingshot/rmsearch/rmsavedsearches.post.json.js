@@ -12,20 +12,17 @@ function main()
       return null;
    }
    
-   // Confirm format of posted Saved Search JSON:
+   // Example format of posted Saved Search JSON:
    /*
       {
          "name": "search name",
          "description": "the search description",
-         "query": "the search query string",
+         "query": "the complete search query string",
          "public": boolean,
-         "params":
-         {
-            "name1": "value1",
-            "name2": "value2"
-            ...
-         }
+         "params": "terms=keywords:xyz&undeclared=true"
       }
+      
+      where name and query values are mandatory and params are in URL encoded name/value pair format
    */
    if (json.isNull("name") || json.get("name").length() == 0)
    {

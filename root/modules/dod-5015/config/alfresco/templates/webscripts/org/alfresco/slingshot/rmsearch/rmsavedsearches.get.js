@@ -43,7 +43,8 @@ function main()
                {
                   name: ssNode.name,
                   description: ssNode.properties.description,
-                  query: ssJson.query
+                  query: ssJson.query,
+                  params: ssJson.params
                });
             }
          }

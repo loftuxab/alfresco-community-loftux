@@ -4,8 +4,7 @@
 function main()
 {
    var siteId = page.url.templateArgs.site,
-       meta = [],
-       searches = [];
+       meta = [];
    
    var conn = remote.connect("alfresco");
    
@@ -16,31 +15,6 @@ function main()
       meta = eval('(' + res + ')');
    }
    
-   // retrieve the public saved searches
-   // TODO: user specific searches?
-   res = conn.get("/slingshot/rmsavedsearches/site/" + siteId);
-   if (res.status == 200)
-   {
-      var s, ss = eval('(' + res + ')');
-      try
-      {
-         for each (s in ss.items)
-         {
-            searches.push(
-            {
-               id: s.name,
-               label: s.name,
-               description: s.description,
-               query: s.query
-            });
-         }
-      }
-      catch (e)
-      {
-      }
-   }
-   
-   model.searches = searches;
    model.meta = meta;
 }
 
