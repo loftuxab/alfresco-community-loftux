@@ -35,6 +35,7 @@ import java.util.Map;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
@@ -94,22 +95,22 @@ public class RmActionPost extends DeclarativeWebScript
         initJsonParams(reqContentAsString);
         
         // validate input: check for mandatory params, valid nodeRef.
-        if (this.actionName == null || this.targetNodeRefs == null)
-        {
-            throw new WebScriptException(Status.STATUS_BAD_REQUEST,
-                "A mandatory parameter has not been provided in URL");
-        }
+//        if (this.actionName == null || this.targetNodeRefs == null)
+//        {
+//            throw new WebScriptException(Status.STATUS_BAD_REQUEST,
+//                "A mandatory parameter has not been provided in URL");
+//        }
 
         // Check that all the nodes provided exist and build report string
         StringBuffer targetNodeRefsString = new StringBuffer(30);
         boolean firstTime = true;
         for (NodeRef targetNodeRef : this.targetNodeRefs)
         {
-            if (nodeService.exists(targetNodeRef) == false)
-            {
-                throw new WebScriptException(Status.STATUS_NOT_FOUND,
-                    "The targetNode does not exist (" + targetNodeRef.toString() + ")");
-            }
+//            if (nodeService.exists(targetNodeRef) == false)
+//            {
+//                throw new WebScriptException(Status.STATUS_NOT_FOUND,
+//                    "The targetNode does not exist (" + targetNodeRef.toString() + ")");
+//            }
             
             // Build the string
             if (firstTime == true)
@@ -184,6 +185,17 @@ public class RmActionPost extends DeclarativeWebScript
                     Object nextKey = iter.next();
                     String nextKeyString = (String)nextKey;
                     Object nextValue = paramsObj.get(nextKeyString);
+                    
+                    // Check for date values
+                    if (nextValue instanceof JSONObject)
+                    {
+                        if (((JSONObject)nextValue).has("iso8601") == true)
+                        {
+                            String dateStringValue = ((JSONObject)nextValue).getString("iso8601");
+                            nextValue = ISO8601DateFormat.parse(dateStringValue);
+                        }
+                    } 
+                    
                     this.actionParams.put(nextKeyString, (Serializable)nextValue);
                 }
             }
