@@ -456,6 +456,31 @@
     
     <bean id="completeEvent" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction" parent="rmAction" init-method="hashCode"/>
     
+    <!-- undo event -->
+    
+    <bean id="undoEvent_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="undoEvent"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="undoEvent_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="undoEvent_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
+        <property name="objectDefinitionSource">
+            <value>
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.AddModifyEventDates
+                   org.alfresco.service.cmr.security.PublicServiceAccessService.*=RM_ALLOW
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="undoEvent" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.UndoEventAction" parent="rmAction" init-method="hashCode"/>
+    
+    
     <!-- Actions to create DOD 5015 custom types -->
     <bean id="applyScannedRecord" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.ApplyCustomTypeAction" parent="rmAction">
         <property name="customTypeAspect" value="dod:scannedRecord" />
