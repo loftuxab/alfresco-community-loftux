@@ -26,6 +26,10 @@
 /**
  * DispositionEdit component.
  *
+ * User can add, edit and remove action (steps) in the disposition schedule
+ * and to each action ad and remove events.
+ * Meta data properties can be edited on a different page.
+ *
  * @namespace Alfresco
  * @class Alfresco.DispositionEdit
  */
@@ -84,12 +88,13 @@
          siteId: null,
 
          /**
-          * The events available
+          * The events available and information about if they are autmatic or not
           *
           * @property events
-          * @type {array} with objects like { label: string, automatic: boolean}
+          * @type {object} with objects like { label: string, automatic: boolean}
+          *       and the event name {string} as the key.
           */
-         events: []
+         events: {}
       },
 
       /**
@@ -315,6 +320,16 @@
 
          // Add validation
          actionForm.addValidation(elId + "-periodAmount", Alfresco.forms.validation.number, null, "keyup");
+         actionForm.addValidation(elId + "-periodAmount", this._mandatoryPeriodAmount, { actionEl: actionEl }, "keyup");
+         var periodEnabledCheckBox = Dom.getElementsByClassName("period-enabled", "input", actionEl)[0];
+         Event.addListener(periodEnabledCheckBox, "click", function(e, obj)
+         {
+            // Make sure save button is updated
+            obj.form.updateSubmitElements();
+         },
+         {
+            form: actionForm
+         }, this);
 
          // Create buttons
          var saveActionEl = Dom.getElementsByClassName("saveaction", "span", actionEl)[0];
@@ -445,6 +460,12 @@
       _setTitle: function DispositionEdit__createEvent(title, actionEl)
       {
          Dom.getElementsByClassName("title", "div", actionEl)[0].innerHTML = title;
+      },
+
+      _mandatoryPeriodAmount: function _mandatoryPeriodAmount(field, args, event, form, silent, message)
+      {
+         var periodEnabledCheckBox = Dom.getElementsByClassName("period-enabled", "input", args.actionEl)[0];
+         return !periodEnabledCheckBox.checked ? true : Alfresco.forms.validation.mandatory(field, args, event, form, silent, message);
       },
 
       /**

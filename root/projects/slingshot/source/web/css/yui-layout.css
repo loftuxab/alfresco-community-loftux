@@ -48,6 +48,12 @@
    text-align: right;
 }
 
+
+#Share .yui-panel .bd.yui-calcontainer
+{
+   padding:0.5em;
+}
+
 /* Style the default message  */
 
 #Share #message

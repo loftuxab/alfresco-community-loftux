@@ -23,10 +23,14 @@
       <div class="yui-g">
          <div class="yui-g first">
             <@region id=doclibType + "web-preview" scope="template" protected=true />
+            <#if doclibType?starts_with("dod5015")>
+            <@region id=doclibType + "events" scope="template" protected=true />
+            <#else>
             <div class="document-details-comments">
                <@region id=doclibType + "comments" scope="template" protected=true />
                <@region id=doclibType + "createcomment" scope="template" protected=true />
             </div>
+            </#if>
          </div>
          <div class="yui-g"> 
             <div class="yui-u first">

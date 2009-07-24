@@ -1,9 +1,10 @@
 <#include "include/alfresco-template.ftl" />
+<#assign doclibType="dod5015-">
 <@templateHeader>
    <@link rel="stylesheet" type="text/css" href="${url.context}/templates/folder-details/folder-details.css" />
    <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/templates/folder-details/folder-details.js"></@script>
-   <#if doclibType != ""><@script type="text/javascript" src="${page.url.context}/templates/folder-details/${doclibType}folder-details.js"></@script></#if>
+   <@script type="text/javascript" src="${page.url.context}/templates/folder-details/${doclibType}folder-details.js"></@script>
 </@>
 
 <@templateBody>
@@ -34,7 +35,7 @@
    </div>
 
    <script type="text/javascript">//<![CDATA[
-   new ${jsType}().setOptions(
+   new Alfresco.RecordsFolderDetails().setOptions(
    {
       nodeRef: "${url.args.nodeRef}",
       siteId: "${page.url.templateArgs.site!""}"

@@ -44,6 +44,12 @@
    var $html = Alfresco.util.encodeHTML;
 
    /**
+    * Internal date formats
+    */
+   var DATE_LONG = "dddd, d mmmm yyyy",
+      DATE_SHORT = "yyyy/mm/dd";
+
+   /**
     * Events constructor.
     *
     * @param {String} htmlId The HTML id of the parent element
@@ -59,6 +65,7 @@
 
    YAHOO.extend(Alfresco.Events, Alfresco.component.Base,
    {
+
 
       /**
        * Object container for initialization options
@@ -84,7 +91,10 @@
       onReady: function Events_onReady()
       {
          // Save a reference to important elements
+         this.widgets.messageEl = Dom.get(this.id + "-message");
+         this.widgets.completedEl = Dom.get(this.id + "-completed");
          this.widgets.completedEventsEl = Dom.get(this.id + "-completed-events");
+         this.widgets.incompleteEl = Dom.get(this.id + "-incomplete");
          this.widgets.incompleteEventsEl = Dom.get(this.id + "-incomplete-events");
 
          // Get the templates and remove them from the DOM
@@ -92,6 +102,9 @@
          this.widgets.completedEventTemplate.parentNode.removeChild(this.widgets.completedEventTemplate);
          this.widgets.incompleteEventTemplate = Dom.get(this.id + "-incompleteEventTemplate");
          this.widgets.incompleteEventTemplate.parentNode.removeChild(this.widgets.incompleteEventTemplate);
+
+         // Setup complete event dialog
+         this._setupEventDialog();
 
          // Load events data
          this._refreshEvents();
@@ -103,38 +116,8 @@
        * @method _refreshEvents
        * @private
        */
-      _refreshEvents: function Events__refreshEvents()
+      _refreshEvents: function Events__refreshEvents(response)
       {
-         // TEMPORARY FOR TEST
-         var nextDispositionAction = {
-            asOf: "2009-12-12",
-            events: [
-               {
-                  label: "Test event 1",
-                  automatic: true,
-                  completedAt: "2007-01-01",
-                  completedBy: "Erik H",
-                  complete: true
-               },
-               {
-                  label: "Test event 2",
-                  automatic: true,
-                  completedAt: "2007-12-12",
-                  completedBy: "Erik W",
-                  complete: true
-               },
-               {
-                  label: "Test event 3",
-                  automatic: false,
-                  asOf: "2008-12-12",
-                  complete: false
-               }
-            ]
-         };
-         this._onEventsLoaded(nextDispositionAction);
-
-         // TODO USE THIS INSTEAD WHEN IT WORKS
-         return;
          Alfresco.util.Ajax.jsonGet(
          {
             url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.replace(":/", "") + "/nextdispositionaction",
@@ -142,12 +125,52 @@
             {
                fn: function(response)
                {
-                  this._onEventsLoaded(response.json.data);
+                  var nextDispositionAction = response.json.data;
+                  if(nextDispositionAction && nextDispositionAction.events.length == 0 && nextDispositionAction.label)
+                  {
+                     this._displayMessage(this.msg("label.noEventsInDispositionSchedule", nextDispositionAction.label));
+                  }
+                  else
+                  {
+                     Dom.addClass(this.widgets.messageEl, "hidden");
+                     this._onEventsLoaded(nextDispositionAction);
+                  }
                },
                scope: this
             },
-            failureMessage: this.msg("message.getEventFailure")
+            failureCallback:
+            {
+               fn: function(response)
+               {
+                  if(response.serverResponse.status == 404)
+                  {
+                     this._displayMessage(this.msg("label.noDispositionSchedule"));
+                  }
+                  else{
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        text: this.msg("message.getEventFailure")
+                     });
+                  }
+               },
+               scope: this
+            }
          });
+      },
+
+      /**
+       * Called when the events information has been loaded
+       *
+       * @method _onEventsLoaded
+       * @param msg THe message to display
+       * @private
+       */
+      _displayMessage: function Events__onEventsLoaded(msg)
+      {
+         Dom.removeClass(this.widgets.messageEl, "hidden");
+         this.widgets.messageEl.innerHTML = this.msg(msg);
+         Dom.addClass(this.widgets.completedEl, "hidden");
+         Dom.addClass(this.widgets.incompleteEl, "hidden");
       },
 
       /**
@@ -158,31 +181,58 @@
        */
       _onEventsLoaded: function Events__onEventsLoaded(nextDispositionAction)
       {
+         if(this.widgets.feedbackMessage)
+         {
+            this.widgets.feedbackMessage.destroy();
+            this.widgets.feedbackMessage = null;
+         }
          this.widgets.completedEventsEl.innerHTML = "";
          this.widgets.incompleteEventsEl.innerHTML = "";
          var events = nextDispositionAction.events ? nextDispositionAction.events : [];
+         var completed = 0;
+         var incomplete = 0;
          for(var i = 0; i < events.length; i++)
          {
             var event = events[i];
             if(event.complete)
             {
+               var completedAt = Alfresco.util.fromISO8601(event.completedAt);
                var eventEl = this._createEvent(event, [
                   { "name" : event.label },
                   { "automatic" : event.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
-                  { "completed-at" : event.completedAt },
-                  { "completed-by" : event.completedBy }
-               ], "undo-button", this.onCompleteEventButtonClick, this.widgets.completedEventTemplate);
+                  { "completed-at" : completedAt ? Alfresco.util.formatDate(completedAt) : "" },
+                  { "completed-by" : event.completedByFirstName + " " + event.completedByLastName }
+               ], "undo-button", this.onUndoEventButtonClick, this.widgets.completedEventTemplate);
                eventEl = this.widgets.completedEventsEl.appendChild(eventEl);
+               completed++;
             }
             else
             {
+               var asOf = Alfresco.util.fromISO8601(nextDispositionAction.asOf);
                var eventEl = this._createEvent(event, [
                   { "name" : event.label },
                   { "automatic" : event.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
-                  { "asof" : nextDispositionAction.asOf }
-               ], "complete-button", this.onUndoEventButtonClick, this.widgets.incompleteEventTemplate);
+                  { "asof" : asOf ? Alfresco.util.formatDate(asOf) : "" }
+               ], "complete-button", this.onCompleteEventButtonClick, this.widgets.incompleteEventTemplate);
                eventEl = this.widgets.incompleteEventsEl.appendChild(eventEl);
+               incomplete++;
             }
+         }
+         if(completed == 0)
+         {
+            Dom.addClass(this.widgets.completedEl, "hidden");
+         }
+         else
+         {
+            Dom.removeClass(this.widgets.completedEl, "hidden");
+         }
+         if(incomplete == 0)
+         {
+            Dom.addClass(this.widgets.incompleteEl, "hidden");
+         }
+         else
+         {
+            Dom.removeClass(this.widgets.incompleteEl, "hidden");
          }
       },
 
@@ -217,7 +267,6 @@
          eventButton.on("click", clickHandler,
          {
             event: event,
-            eventEl: eventEl,
             button: eventButton
          }, this);
 
@@ -230,16 +279,16 @@
        * @method onCompleteEventButtonClick
        * @param e {object} a "click" event
        * @param obj.event {object} object with event info
-       * @param obj.eventEl {HTMLElement} The html element representing an event
        * @param obj.button {YAHOO.widget.Button} The button that was clicked
        */
       onCompleteEventButtonClick: function Events_onCompleteEventButtonClick(e, obj)
       {
-         // Disable buttons to avoid double submits or cancel during post
-         obj.button.set("disabled", true);
+         Dom.get(this.id + "-eventName").value = obj.event.name;
 
-         alert('Not timplemented yet');
+         Dom.get(this.id + "-completedAtTime").value = "12:00";
+         Dom.get(this.id + "-completedAtDate").value = Alfresco.util.formatDate(new Date(), DATE_LONG);
 
+         this.widgets.completeEventPanel.show();
       },
 
       /**
@@ -248,7 +297,6 @@
        * @method onUndoEventButtonClick
        * @param e {object} a "click" event
        * @param obj.event {object} object with event info
-       * @param obj.eventEl {HTMLElement} The html element representing an event
        * @param obj.button {YAHOO.widget.Button} The button that was clicked
        */
       onUndoEventButtonClick: function Events_onUndoEventButtonClick(e, obj)
@@ -256,7 +304,10 @@
          // Disable buttons to avoid double submits or cancel during post
          obj.button.set("disabled", true);
 
-         alert('Not timplemented yet');
+         // Undo event and refresh events afterwards
+         this._doEventAction("undoEvent", {
+            eventName: obj.event.name
+         }, "message.revokingEvent", "message.revokeEventFailure");
 
       },
 
@@ -264,12 +315,15 @@
        * Fired when the user clicks the undo button for an event.
        *
        * @method _doEventAction
+       * @param params the params to the action
        * @param action The name of action the action to be invoked
-       * @param nodeRef the nodeRef to the event to perform the aciton on
+       * @param pendingMessage Message displayed durint action invocation and
+       *        the event data is refreshed afterwards
+       * @param failureMessage DIsplayed if the action failed
        */
-      _doEventAction: function Events__doEventAction(action, nodeRef, pendingMessage, failureMessage)
+      _doEventAction: function Events__doEventAction(action, params, pendingMessage, failureMessage)
       {
-         var feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+         this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
          {
             text: this.msg(pendingMessage),
             spanClass: "wait",
@@ -280,21 +334,171 @@
          {
             url: Alfresco.constants.PROXY_URI_RELATIVE + "api/rma/actions/ExecutionQueue",
             dataObj: {
-               nodeRef : nodeRef,
+               nodeRef : this.options.nodeRef,
                name : action,
-               params : {}
+               params : params
             },
-            successHandler:
+            successCallback:
             {
-               fn: function(serverReponse)
-               {
-                  feedbackMessage.destroy();
-                  this._refreshEvents();
-               },
+               fn: this._refreshEvents,
                scope: this
             },
-            failureMessage: failureMessage
+            failureCallback:
+            {
+               fn: function()
+               {
+                  this.widgets.feedbackMessage.destroy();
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     text: this.msg(failureMessage)
+                  });                  
+               },
+               scope: this
+            }
          });
+      },
+
+      _setupEventDialog: function Events__setupEventDialog()
+      {
+
+         // TODO stop using a static id after RM, needed now so the text-align in #Share .yui-panel .bd .yui-u.first can be overriden
+         // The panel is created from the HTML returned in the XHR request, not the container
+         this.widgets.completeEventPanel = new YAHOO.widget.Panel("complete-event-panel",
+         {
+            modal: true,
+            draggable: false,
+            fixedcenter: true,
+            close: false,
+            visible: false
+         });
+
+         // Add it to the Dom
+         this.widgets.completeEventPanel.render(document.body);
+
+         // Buttons
+         this.widgets.completeEventOkButton = Alfresco.util.createYUIButton(this, "completeEvent-ok-button", this.onCompleteEventOkClick);
+         this.widgets.completeEventCancelButton = Alfresco.util.createYUIButton(this, "completeEvent-cancel-button", this.onCompleteEventCancelClick);
+         var completedAtPickerEl = Dom.get(this.id + "-completedAtPicker");
+         Event.addListener(completedAtPickerEl, "click", this.onCompletedAtPickerButtonClick, completedAtPickerEl, this);
+
+         // Form definition
+         var form = new Alfresco.forms.Form(this.id + "-completeEvent-form");
+         form.setSubmitElements(this.widgets.completeEventOkButton);
+         form.setShowSubmitStateDynamically(true);
+
+         // Setup date validation
+         form.addValidation(this.id + "-completedAtTime", Alfresco.forms.validation.time, null, "keyup");         
+
+         // Initialise the form
+         form.init();
+
+         // Register the ESC key to close the panel
+         var escapeListener = new YAHOO.util.KeyListener(document,
+         {
+            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+         },
+         {
+            fn: function(id, keyEvent)
+            {
+               this.onCompleteEventCancelClick();
+            },
+            scope: this,
+            correctScope: true
+         });
+         escapeListener.enable();         
+
+         this.widgets.completeEventForm = form;
+      },
+
+      /**
+       * Event handler that gets fired when a user clicks on the date selection
+       * button in the compelte event form. Displays a mini YUI calendar.
+       *
+       * @method onCompletedAtPickerButtonClick
+       * @param e {object} DomEvent
+       */
+      onCompletedAtPickerButtonClick: function Events_onCompletedAtPickerButtonClick(e, completedAtPickerEl)
+      {
+         var me = this;
+         var oCalendarMenu = new YAHOO.widget.Overlay(this.id + "-calendarmenu");
+         oCalendarMenu.setBody("&#32;");
+         oCalendarMenu.body.id = this.id + "-calendarcontainer";
+
+         // Render the Overlay instance into the Button's parent element
+         oCalendarMenu.render(completedAtPickerEl.parentNode);
+
+         // Align the Overlay to the Button instance
+         oCalendarMenu.align();
+
+         var oCalendar = new YAHOO.widget.Calendar("buttoncalendar", oCalendarMenu.body.id);
+         oCalendar.render();
+
+         oCalendar.changePageEvent.subscribe(function () {
+            window.setTimeout(function ()
+            {
+               oCalendarMenu.show();
+            }, 0);
+         });
+
+         oCalendar.selectEvent.subscribe(function (type, args)
+         {
+            if (args)
+            {
+               var date = args[0][0];
+               var selectedDate = new Date(date[0], (date[1]-1), date[2]);
+
+               var elem = Dom.get(me.id + "-completedAtDate");
+               elem.value = Alfresco.util.formatDate(selectedDate, DATE_LONG);
+               elem.focus();
+            }
+
+            oCalendarMenu.hide();
+         }, this);
+      },
+
+      /**
+       * Event handler that gets fired when a user clicks
+       * on the ok button in the complete event panel.
+       *
+       * @method onCompleteEventOkClick
+       * @param e {object} DomEvent
+       * @param obj {object} Object passed back from addListener method
+       */
+      onCompleteEventOkClick: function AddEvent_onCompleteEventOkClick(e, obj)
+      {
+         // Get values and Hide panel
+         var completedAt = Alfresco.util.formatDate(Dom.get(this.id + "-completedAtDate").value, DATE_SHORT);
+         completedAt = new Date(completedAt + " " + Dom.get(this.id + "-completedAtTime").value);
+         var completedAtIso = Alfresco.util.toISO8601(completedAt);
+
+         var eventName = Dom.get(this.id + "-eventName").value;
+         this.widgets.completeEventPanel.hide();
+
+         // Complete event and refresh events afterwards
+         this._doEventAction("completeEvent",
+         {
+            "eventName": eventName,
+            "eventCompletedBy": Alfresco.constants.USERNAME,
+            "dateParam" :
+            {
+               "iso8601" : completedAtIso
+            }
+         }, "message.completingEvent", "message.completeEventFailure");
+
+      },
+
+      /**
+       * Event handler that gets fired when a user clicks
+       * on the cancel button in the complete event panel.
+       *
+       * @method onCompleteEventCancelClick
+       * @param e {object} DomEvent
+       * @param obj {object} Object passed back from addListener method
+       */
+      onCompleteEventCancelClick: function AddEvent_onCompleteEventCancelClick(e, obj)
+      {
+         // Hide panel
+         this.widgets.completeEventPanel.hide();
       }
 
    });

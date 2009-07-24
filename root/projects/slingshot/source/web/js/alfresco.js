@@ -3259,7 +3259,7 @@ Alfresco.thirdparty.toISO8601 = function()
       	{
       		var time = [_(dateObject[getter+"Hours"]()), _(dateObject[getter+"Minutes"]()), _(dateObject[getter+"Seconds"]())].join(':');
       		var millis = dateObject[getter+"Milliseconds"]();
-      		if (options.milliseconds)
+      		if (options.milliseconds == undefined || options.milliseconds) 
       		{
       			time += "."+ (millis < 100 ? "0" : "") + _(millis);
       		}

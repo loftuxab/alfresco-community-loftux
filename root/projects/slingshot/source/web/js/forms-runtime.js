@@ -1260,6 +1260,35 @@ Alfresco.forms.validation.email = function email(field, args, event, form, silen
    return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
 };
 
+
+/**
+ * Time validation handler, tests that the given field's value is a valid time value.
+ *
+ * @method time
+ * @param field {object} The element representing the field the validation is for
+ * @param args {object} Not used
+ * @param event {object} The event that caused this handler to be called, maybe null
+ * @param form {object} The forms runtime class instance the field is being managed by
+ * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @param message {string} Message to display when validation fails, maybe null
+ * @static
+ */
+Alfresco.forms.validation.time = function time(field, args, event, form, silent, message)
+{
+   if (Alfresco.logger.isDebugEnabled())
+      Alfresco.logger.debug("Validating field '" + field.id + "' is a valid time value");
+
+   if (!args)
+   {
+      args = {};
+   }
+
+   args.pattern = /^[0-2]\d:[0-5]\d(:[0-5]\d)?$/;
+   args.match = true;
+
+   return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);
+};
+
 /**
  * URL validation handler, tests that the given field's value is a valid URL
  *

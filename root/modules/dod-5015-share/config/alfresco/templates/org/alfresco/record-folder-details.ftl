@@ -1,9 +1,10 @@
 <#include "include/alfresco-template.ftl" />
+<#assign doclibType="dod5015-">
 <@templateHeader>
    <@link rel="stylesheet" type="text/css" href="${url.context}/templates/folder-details/folder-details.css" />
    <@script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></@script>
    <@script type="text/javascript" src="${page.url.context}/templates/folder-details/folder-details.js"></@script>   
-   <#if doclibType != ""><@script type="text/javascript" src="${page.url.context}/templates/folder-details/${doclibType}folder-details.js"></@script></#if>
+   <@script type="text/javascript" src="${page.url.context}/templates/folder-details/${doclibType}folder-details.js"></@script>
 </@>
 
 <@templateBody>
@@ -14,7 +15,6 @@
    </div>
    <div id="bd">
       <@region id=doclibType + "path" scope="template" protected=true />
-      <#if (nextDispositionAction != "")>
       <div class="yui-gb">
          <div class="yui-u first">
             <@region id=doclibType + "events" scope="template" protected=true />
@@ -28,22 +28,10 @@
             <@region id=doclibType + "folder-links" scope="template" protected=true />
          </div>
       </div>
-      <#else>
-      <div class="yui-g"> 
-         <div class="yui-u first">
-            <@region id=doclibType + "folder-metadata-header" scope="template" protected=true />
-            <@region id=doclibType + "folder-metadata" scope="template" protected=true />
-         </div>
-         <div class="yui-u">
-            <@region id=doclibType + "folder-actions" scope="template" protected=true />
-            <@region id=doclibType + "folder-links" scope="template" protected=true />
-         </div>
-      </div>
-      </#if>
    </div>
    
    <script type="text/javascript">//<![CDATA[
-   new ${jsType}().setOptions(
+   new Alfresco.RecordsFolderDetails().setOptions(
    {
       nodeRef: "${url.args.nodeRef}",
       siteId: "${page.url.templateArgs.site!""}"
