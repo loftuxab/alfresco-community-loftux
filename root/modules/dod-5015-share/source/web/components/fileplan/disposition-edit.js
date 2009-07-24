@@ -345,6 +345,20 @@
             actionEl: actionEl
          }, this);
 
+
+         // Set form url
+         var actionId = Dom.getElementsByClassName("id", "input", formEl)[0].value;
+         if(actionId && actionId.length > 0)
+         {
+            actionForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
+            formEl.attributes.action.nodeValue = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.replace(":/", "") + "/dispositionschedule/dispositionactiondefinitions/" + actionId;
+         }
+         else
+         {
+            actionForm.setAjaxSubmitMethod(Alfresco.util.Ajax.POST);
+            formEl.attributes.action.nodeValue = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.replace(":/", "") + "/dispositionschedule/dispositionactiondefinitions";
+         }
+
          // Setup form buttons
          actionForm.setShowSubmitStateDynamically(true, false);
          actionForm.setSubmitElements(saveActionButton);
@@ -359,20 +373,6 @@
                {
                   var periodEl = Dom.getElementsByClassName("period", "input", formEl)[0];
                   periodEl.value = puEl.options[puEl.selectedIndex].value + "|" + paEl.value;
-               }
-               // Set form url
-               var actionId = Dom.getElementsByClassName("id", "input", formEl)[0].value;
-               if(actionId && actionId.length > 0)
-               {
-                  obj.actionForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
-                  formEl.attributes.method.nodeValue = Alfresco.util.Ajax.PUT;
-                  formEl.attributes.action.nodeValue = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.replace(":/", "") + "/dispositionschedule/dispositionactiondefinitions/" + actionId;
-               }
-               else
-               {
-                  obj.actionForm.setAjaxSubmitMethod(Alfresco.util.Ajax.POST);
-                  formEl.attributes.method.nodeValue = Alfresco.util.Ajax.POST;
-                  formEl.attributes.action.nodeValue = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.replace(":/", "") + "/dispositionschedule/dispositionactiondefinitions";
                }
 
                // Disable buttons during submit
@@ -854,7 +854,7 @@
       {
          var action = {
             id: "",
-            index: this.widgets.actionListEl.childNodes.length - 2,
+            index: Dom.getElementsByClassName("action", "li", this.widgets.actionListEl).length,
             title: this.msg("label.title.new"),
             name: "",
             type: "",
