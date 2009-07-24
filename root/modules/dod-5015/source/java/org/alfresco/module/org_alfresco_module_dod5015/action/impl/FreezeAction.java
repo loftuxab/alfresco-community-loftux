@@ -77,7 +77,7 @@ public class FreezeAction extends RMActionExecuterAbstractBase
                 // Calculate a transfer name
                 QName nodeDbid = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "node-dbid");
                 Long dbId = (Long)this.nodeService.getProperty(actionedUponNodeRef, nodeDbid);
-                String transferName = "Transfer -" + padString(dbId.toString(), 10);
+                String transferName = padString(dbId.toString(), 10);
                 
                 // Create the hold object
                 Map<QName, Serializable> holdProps = new HashMap<QName, Serializable>(2);

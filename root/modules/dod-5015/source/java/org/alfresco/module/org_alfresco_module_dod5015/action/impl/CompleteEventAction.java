@@ -45,9 +45,9 @@ import org.alfresco.service.namespace.QName;
  */
 public class CompleteEventAction extends RMActionExecuterAbstractBase
 {
-    public static final String PARAM_EVENT_NAME = "completeEvent.eventName";
-    public static final String PARAM_EVENT_COMPLETED_BY = "completeEvent.eventCompletedBy";
-    public static final String PARAM_EVENT_COMPLETED_AT = "completeEvent.eventCompletedAt";
+    public static final String PARAM_EVENT_NAME = "eventName";
+    public static final String PARAM_EVENT_COMPLETED_BY = "eventCompletedBy";
+    public static final String PARAM_EVENT_COMPLETED_AT = "eventCompletedAt";
     
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)

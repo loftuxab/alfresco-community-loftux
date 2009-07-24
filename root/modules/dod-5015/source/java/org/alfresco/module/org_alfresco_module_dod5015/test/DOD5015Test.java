@@ -870,6 +870,31 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         checkSearchAspect(da.getNodeRef(), recordFolder, 3);
         
+        // Test undo
+        
+        params = new HashMap<String, Serializable>(1);
+        params.put(CompleteEventAction.PARAM_EVENT_NAME, events.get(2).getEventName());
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "undoEvent", params);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        assertFalse((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        
+        params = new HashMap<String, Serializable>(3);
+        params.put(CompleteEventAction.PARAM_EVENT_NAME, events.get(2).getEventName());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
+                
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        assertTrue((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        
         // Do the commit action
         this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
         
