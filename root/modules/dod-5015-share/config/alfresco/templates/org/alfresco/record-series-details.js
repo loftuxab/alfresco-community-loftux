@@ -1,1 +1,0 @@
-<import resource="classpath:/alfresco/templates/org/alfresco/folder-details.js">
