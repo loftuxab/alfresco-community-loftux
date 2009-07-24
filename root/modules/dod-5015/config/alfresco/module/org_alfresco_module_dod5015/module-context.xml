@@ -122,6 +122,13 @@
         <property name="caveatConfigImpl" ref="caveatConfigImpl"/>
     </bean>
     
+    <!-- Form Processor Filters to process RM nodes and types -->
+    <bean id="rmTypeFormFilter" parent="baseFormFilter"
+          class="org.alfresco.module.org_alfresco_module_dod5015.forms.RecordsManagementTypeFormFilter">
+       <property name="filterRegistry" ref="typeFilterRegistry" />
+       <property name="namespaceService" ref="NamespaceService"/>
+    </bean>
+    
     <!-- REST impl for RM Action Service -->
     <bean id="webscript.org.alfresco.rma.rmaction.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.RmActionPost" parent="webscript">
         <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
