@@ -74,7 +74,7 @@
          
          query: "",
          
-         params: {}
+         params: ""
       },
       
       /**
@@ -154,7 +154,8 @@
          // Configure the forms runtime
          var form = new Alfresco.forms.Form(this.id + "-form");
          
-         // Name is mandatory and has a maximum length
+         // Name is a node, mandatory and has a maximum length
+         form.addValidation(this.id + "-name", Alfresco.forms.validation.nodeName, null, "keyup");
          form.addValidation(this.id + "-name", Alfresco.forms.validation.mandatory, null, "keyup");
          form.addValidation(this.id + "-name", Alfresco.forms.validation.length,
          {
@@ -186,12 +187,7 @@
                
                // apply hidden field values for query via module options
                Dom.get(this.id + "-query").value = this.options.query;
-               var params = "";
-               for (var i in this.options.params)
-               {
-                  params += i + '=' + this.options.params[i] + '&';
-               }
-               Dom.get(this.id + "-params").value = params;
+               Dom.get(this.id + "-params").value = this.options.params;
             },
             obj: null,
             scope: this
@@ -242,7 +238,16 @@
       {
          if (response.json !== undefined && response.json.success)
          {
-            // TODO: fire bubbling event to inform caller search saved
+            // Fire bubbling event to inform caller search saved
+            var name = Dom.get(this.id + "-name").value;
+            var obj = {
+               id: name,
+               label: name,
+               description: Dom.get(this.id + "-description").value,
+               query: this.options.query,
+               params: this.options.params
+            };
+            YAHOO.Bubbling.fire("savedSearchAdded", obj);
             this.widgets.panel.hide();
          }
          else

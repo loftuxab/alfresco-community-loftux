@@ -6,7 +6,8 @@
 		{
 			"name": "${s.name}",
 			"description": "${s.description!""}",
-			"query": "${s.query}"
+			"query": "${s.query}",
+			"params": "${s.params}"
 		}<#if s_has_next>,</#if>
 	</#list>
 	]

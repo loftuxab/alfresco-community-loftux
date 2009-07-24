@@ -426,6 +426,7 @@
          
          // show initial message
          this._setDefaultDataTableErrors(this.widgets.dataTable);
+         this.widgets.dataTable.render();
          
          // Override abstract function within DataTable to set custom error message
          this.widgets.dataTable.doBeforeLoadData = function RecordsResults_doBeforeLoadData(sRequest, oResponse, oPayload)
@@ -472,6 +473,8 @@
                      el.innerHTML = me._msg("message.foundresults", me.resultsCount);
                   }
                }
+               
+               YAHOO.Bubbling.fire("searchComplete", {count: me.resultsCount});
             }
             
             // Must return true to have the "Loading..." message replaced by the error message
@@ -488,9 +491,8 @@
        */
       _setDefaultDataTableErrors: function RecordsResults__setDefaultDataTableErrors(dataTable)
       {
-         var msg = Alfresco.util.message;
          dataTable.set("MSG_EMPTY", "");
-         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.RecordsResults"));
+         dataTable.set("MSG_ERROR", Alfresco.util.message("message.error", "Alfresco.RecordsResults"));
       },
       
       /**
