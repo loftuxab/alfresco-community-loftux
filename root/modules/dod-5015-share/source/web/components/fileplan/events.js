@@ -449,9 +449,7 @@
 
                var elem = Dom.get(me.id + "-completedAtDate");
                elem.value = Alfresco.util.formatDate(selectedDate, DATE_LONG);
-               elem.focus();
             }
-
             oCalendarMenu.hide();
          }, this);
       },
