@@ -31,9 +31,11 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
@@ -48,6 +50,18 @@ import org.alfresco.web.scripts.WebScriptRequest;
  */
 public class DispositionLifecycleGet extends DispositionAbstractBase
 {
+    PersonService personService;
+    
+    /**
+     * Sets the PersonService instance
+     * 
+     * @param personService The PersonService instance
+     */
+    public void setPersonService(PersonService personService)
+    {
+        this.personService = personService;
+    }
+    
     /*
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
      */
@@ -82,9 +96,11 @@ public class DispositionLifecycleGet extends DispositionAbstractBase
             nextActionModel.put("startedAt", ISO8601DateFormat.format(nextAction.getStartedAt()));
         }
         
-        if (nextAction.getStartedBy() != null)
+        String startedBy = nextAction.getStartedBy();
+        if (startedBy != null)
         {
-            nextActionModel.put("startedBy", "gavinc");
+            nextActionModel.put("startedBy", startedBy);
+            addUsersRealName(nextActionModel, startedBy, "startedBy");
         }
         
         if (nextAction.getCompletedAt() != null)
@@ -92,9 +108,11 @@ public class DispositionLifecycleGet extends DispositionAbstractBase
             nextActionModel.put("completedAt", ISO8601DateFormat.format(nextAction.getCompletedAt()));
         }
         
-        if (nextAction.getCompletedBy() != null)
+        String completedBy = nextAction.getCompletedBy();
+        if (completedBy != null)
         {
-            nextActionModel.put("completedBy", "gavinc");
+            nextActionModel.put("completedBy", completedBy);
+            addUsersRealName(nextActionModel, completedBy, "completedBy");
         }
         
         List<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
@@ -125,9 +143,11 @@ public class DispositionLifecycleGet extends DispositionAbstractBase
         model.put("automatic", event.isEventExecutionAutomatic());
         model.put("complete", event.isEventComplete());
         
-        if (event.getEventCompletedBy() != null)
+        String completedBy = event.getEventCompletedBy();
+        if (completedBy != null)
         {
-            model.put("completedBy", event.getEventCompletedBy());
+            model.put("completedBy", completedBy);
+            addUsersRealName(model, completedBy, "completedBy");
         }
         
         if (event.getEventCompletedAt() != null)
@@ -136,5 +156,31 @@ public class DispositionLifecycleGet extends DispositionAbstractBase
         }
         
         return model;
+    }
+    
+    /**
+     * Adds the given username's first and last name to the given model.
+     * 
+     * @param model The model to add the first and last name to
+     * @param userName The username of the user to lookup
+     * @param propertyPrefix The prefix of the property name to use when adding to the model
+     */
+    protected void addUsersRealName(Map<String, Object> model, String userName, String propertyPrefix)
+    {
+        NodeRef user = this.personService.getPerson(userName);
+        if (user != null)
+        {
+            String firstName = (String)this.nodeService.getProperty(user, ContentModel.PROP_FIRSTNAME);
+            if (firstName != null)
+            {
+                model.put(propertyPrefix + "FirstName", firstName);
+            }
+            
+            String lastName = (String)this.nodeService.getProperty(user, ContentModel.PROP_LASTNAME);
+            if (lastName != null)
+            {
+                model.put(propertyPrefix + "LastName", lastName);
+            }
+        }
     }
 }

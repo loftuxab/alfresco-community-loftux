@@ -171,6 +171,7 @@
     
     <!-- REST impl for GET Disposition Lifecycle -->
     <bean id="webscript.org.alfresco.rma.dispositionlifecycle.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionLifecycleGet" parent="rmBaseWebscript">
+       <property name="personService" ref="PersonService"/>
     </bean>
     
     <!-- REST impl for GET List Of Values -->
