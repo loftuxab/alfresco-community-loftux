@@ -295,7 +295,8 @@ public class Convert
             if (!quiet)
             {
                 System.out.print("Converting files matching " + matchPattern);
-                System.out.println(ignorePattern == null ? "" : " but not " + ignorePattern);
+                System.out.print(ignorePattern == null ? "" : " but not " + ignorePattern);
+                System.out.println(dryRun ? " [DRY RUN]" : "");
             }
             if (!svnStatus)
             {
