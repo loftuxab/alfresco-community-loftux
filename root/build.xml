@@ -1154,6 +1154,27 @@
       <echoproperties />
    </target>
 
+   <target name="file-format-check" description="Find modified text files that are not WINDOWS, UTF-8.  Look in directory -Ddir=[dir]" depends="init" >
+      <fail unless="dir" 
+            message="You must supply a directory to run against using -Ddir=[dir]"/>
+      <java fork="yes" 
+            classname="org.alfresco.util.Convert" 
+            dir="." >
+         <classpath refid="classpath.unit.test" />
+         <arg line="--dry-run --svn-status --encoding=UTF-8 --line-ending=WINDOWS --match=(.java|.xml|.jsp|.properties|.txt|.sql)$ --ignore=(.svn|classes) ${dir}"/>
+      </java> 
+   </target> 
+
+   <target name="file-format-fix" description="Fix modified text files that are not WINDOWS, UTF-8.  Look in directory -Ddir=[dir]" depends="init" >
+      <fail unless="dir" 
+            message="You must supply a directory to run against using -Ddir=[dir]"/>
+      <java fork="yes" 
+            classname="org.alfresco.util.Convert" 
+            dir="." >
+         <classpath refid="classpath.unit.test" />
+         <arg line="--no-backup --svn-status --encoding=UTF-8 --line-ending=WINDOWS --match=(.java|.xml|.jsp|.properties|.txt|.sql)$ --ignore=(.svn|classes) ${dir}"/>
+      </java> 
+   </target> 
 
    <!-- ****************************************************** -->
    <!-- ************** DOD5015 Exploded targets ************** -->
