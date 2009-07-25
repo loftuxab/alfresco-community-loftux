@@ -115,11 +115,6 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
 		
 		// Get the test data
 		setUpTestData();
-        
-        URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig1.json"); // from test-resources
-        assertNotNull(url);
-        File file = new File(url.getFile());
-        assertTrue(file.exists());
 	}
 	
 	private void setUpTestData()
