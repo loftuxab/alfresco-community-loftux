@@ -12,82 +12,84 @@ function main()
       collapsedTwisters = "",
       currentSiteIsFav = false,
       siteTitle = "",
-      prefs;
+      prefs,
+      favourites;
    
    // Call the repo for the user's favourite sites
    // TODO: Clean-up old favourites here?
    var result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
-   if (result.status == 200 && result != "{}")
+   if (result.status == 200)
    {
       prefs = eval('(' + result + ')');
       
       // Populate the favourites object literal for easy look-up later
       favourites = eval('try{(prefs.' + PREF_FAVOURITE_SITES + ')}catch(e){}');
-      if (typeof favourites != "object")
+   }
+
+   if (typeof favourites != "object")
+   {
+      favourites = {};
+   }
+   
+   // Call the repo to return a specific list of site metadata i.e. those in the fav list
+   // and ensure the current user is a member of each before adding to fav list
+   var query =
+   {
+      shortName:
       {
-         favourites = {};
+         match: "exact",
+         values: []
       }
-      
-      // Call the repo to return a specific list of site metadata i.e. those in the fav list
-      // and ensure the current user is a member of each before adding to fav list
-      var query =
+   };
+   var currentSite = page.url.templateArgs.site || "",
+      ignoreCurrentSite = false,
+      shortName;
+   
+   for (shortName in favourites)
+   {
+      if (favourites[shortName])
       {
-         shortName:
-         {
-            match: "exact",
-            values: []
-         }
-      };
-      var currentSite = page.url.templateArgs.site || "",
-         ignoreCurrentSite = false,
-         shortName;
-      
-      for (shortName in favourites)
-      {
-         if (favourites[shortName])
-         {
-            query.shortName.values.push(shortName);
-         }
+         query.shortName.values.push(shortName);
       }
+   }
+   
+   // Also tack the current site onto the query, so we can pass the Site Title to header.js
+   if (currentSite !== "" && !favourites[currentSite])
+   {
+      query.shortName.values.push(currentSite);
+      ignoreCurrentSite = true;
+   }
+   
+   var connector = remote.connect("alfresco");
+   result = connector.post("/api/sites/query", jsonUtils.toJSONString(query), "application/json");
+   
+   if (result.status == 200)
+   {
+      var i, ii;
       
-      // Also tack the current site onto the query, so we can pass the Site Title to header.js
-      if (currentSite !== "" && !favourites[currentSite])
+      // Create javascript objects from the server response
+      // Each item is a favourite site that the user is a member of
+      var sites = eval('(' + result + ')'), site;
+      
+      if (sites.length != 0)
       {
-         query.shortName.values.push(currentSite);
-         ignoreCurrentSite = true;
-      }
-      
-      var connector = remote.connect("alfresco");
-      result = connector.post("/api/sites/query", jsonUtils.toJSONString(query), "application/json");
-      
-      if (result.status == 200)
-      {
-         var i, ii;
+         // Sort the sites by title
+         sites.sort(sortByTitle);
          
-         // Create javascript objects from the server response
-         // Each item is a favourite site that the user is a member of
-         var sites = eval('(' + result + ')'), site;
-         
-         if (sites.length != 0)
+         for (i = 0, ii = sites.length; i < ii; i++)
          {
-            // Sort the sites by title
-            sites.sort(sortByTitle);
-            
-            for (i = 0, ii = sites.length; i < ii; i++)
+            site = sites[i];
+            if (site.shortName == currentSite)
             {
-               site = sites[i];
-               if (site.shortName == currentSite)
+               siteTitle = site.title;
+               if (ignoreCurrentSite)
                {
-                  siteTitle = site.title;
-                  if (ignoreCurrentSite)
-                  {
-                     // The current site was piggy-backing the query call; it's not a favourite
-                     continue;
-                  }
-                  currentSiteIsFav = true;
+                  // The current site was piggy-backing the query call; it's not a favourite
+                  continue;
                }
-               favouriteSites.push(site);
+               currentSiteIsFav = true;
             }
+            favouriteSites.push(site);
          }
       }
    }
