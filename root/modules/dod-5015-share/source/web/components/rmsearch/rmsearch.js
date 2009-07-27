@@ -148,13 +148,19 @@
        * Disconnected event handlers for inter-component event notification
        */
       
+      /**
+       * Saved Searches AJAX success callback
+       * 
+       * @method onSavedSearchesLoaded
+       * @param res {object} Server response
+       */
       onSavedSearchesLoaded: function RecordsSearch_onSavedSearchesLoaded(res)
       {
          var me = this;
          
          var searches = this.options.savedSearches,
-            obj = YAHOO.lang.JSON.parse(res.serverResponse.responseText),
-            items = obj.items;
+             items = YAHOO.lang.JSON.parse(res.serverResponse.responseText).items,
+             index;
          
          for (index in items)
          {
@@ -172,48 +178,10 @@
             }
          }
          
-         // Saved Searches menu
-         this.widgets.savedSearchMenu = new YAHOO.widget.Button(this.id + "-savedsearches-button",
+         if (items.length !== 0)
          {
-            type: "menu",
-            menu: this._buildSavedSearchesMenu()
-         });
-         // Click handler for Saved Search menu items
-         this.widgets.savedSearchMenu.getMenu().subscribe("click", function(p_sType, p_aArgs)
-         {
-            var menuItem = p_aArgs[1];
-            if (menuItem)
-            {
-               // Update the menu button label to be the selected Saved Search
-               me.widgets.savedSearchMenu.set("label", menuItem.cfg.getProperty("text"));
-               
-               // Rebuild search UI based on saved search parameters
-               // Params are packed into a single string URL encoded
-               var searchObj = me.options.savedSearches[menuItem.value];
-               var params = (searchObj.params ? searchObj.params.split("&") : []);
-               for (var i in params)
-               {
-                  var pair = params[i].split("=");
-                  switch (pair[0])
-                  {
-                     case "undeclared":
-                     {
-                        Dom.get(me.id + "-undeclared").checked = (pair[1] === "true");
-                        break;
-                     }
-                     
-                     case "terms":
-                     {
-                        Dom.get(me.id + "-terms").value = decodeURIComponent(pair[1]);
-                        break;
-                     }
-                  }
-               }
-               
-               me.widgets.saveButton.set("disabled", false);
-               me.widgets.searchButton.set("disabled", false);
-            }
-         });
+            this._initSavedSearchMenu();
+         }
       },
       
       /**
@@ -289,7 +257,10 @@
       onNewSearch: function RecordsSearch_onNewSearch(e, args)
       {
          // reset fields and clear values
-         this.widgets.savedSearchMenu.set("label", this._msg("button.savedsearches"));
+         if (this.widgets.savedSearchMenu)
+         {
+            this.widgets.savedSearchMenu.set("label", this._msg("button.savedsearches"));
+         }
          Dom.get(this.id + "-undeclared").checked = false;
          Dom.get(this.id + "-terms").value = "";
          
@@ -312,18 +283,25 @@
             // add to our search to the list
             this.options.savedSearches.push(searchObj);
             
+            if (this.options.savedSearches.length === 1)
+            {
+               // first generation of the menu
+               this._initSavedSearchMenu();
+            }
+            else
+            {
+               // update existing menu
+               var menu = this.widgets.savedSearchMenu.getMenu();
+               menu.clearContent();
+               menu.addItems(this._buildSavedSearchesMenu());
+               // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
+               menu.lazyLoad = false;
+               menu.initEvent.fire();
+               menu.render();
+            }
+            
             // refresh Saved Searches list menu
             this.widgets.savedSearchMenu.set("label", searchObj.label);
-            var menu = this.widgets.savedSearchMenu.getMenu();
-            with (menu)
-            {
-               clearContent();
-               addItems(this._buildSavedSearchesMenu());
-               // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
-               lazyLoad = false;
-               initEvent.fire();
-               render();
-            }
          }
       },
       
@@ -389,6 +367,63 @@
          }
          
          return query;
+      },
+      
+      /**
+       * Inits the Saved Searches menu component and handlers.
+       *
+       * @method _initSavedSearchMenu
+       * @private
+       */
+      _initSavedSearchMenu: function RecordsSearch__initSavedSearchMenu()
+      {
+         var me = this;
+         
+         // Saved Searches menu
+         this.widgets.savedSearchMenu = new YAHOO.widget.Button(this.id + "-savedsearches-button",
+         {
+            type: "menu",
+            menu: this._buildSavedSearchesMenu()
+         });
+         
+         // Click handler for Saved Search menu items
+         this.widgets.savedSearchMenu.getMenu().subscribe("click", function(p_sType, p_aArgs)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
+            {
+               // Update the menu button label to be the selected Saved Search
+               me.widgets.savedSearchMenu.set("label", menuItem.cfg.getProperty("text"));
+               
+               // Rebuild search UI based on saved search parameters
+               // Params are packed into a single string URL encoded
+               var searchObj = me.options.savedSearches[menuItem.value];
+               var params = (searchObj.params ? searchObj.params.split("&") : []);
+               for (var i in params)
+               {
+                  var pair = params[i].split("=");
+                  switch (pair[0])
+                  {
+                     case "undeclared":
+                     {
+                        Dom.get(me.id + "-undeclared").checked = (pair[1] === "true");
+                        break;
+                     }
+                     
+                     case "terms":
+                     {
+                        Dom.get(me.id + "-terms").value = decodeURIComponent(pair[1]);
+                        break;
+                     }
+                  }
+               }
+               
+               me.widgets.saveButton.set("disabled", false);
+               me.widgets.searchButton.set("disabled", false);
+            }
+         });
+         
+         this.widgets.savedSearchMenu.set("disabled", false);
       },
       
       /**

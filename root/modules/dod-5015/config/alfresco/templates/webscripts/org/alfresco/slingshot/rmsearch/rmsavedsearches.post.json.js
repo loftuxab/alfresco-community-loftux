@@ -47,6 +47,10 @@ function main()
    
    // locate the Saved Searches container and commit the saved search JSON node
    var searchNode = siteNode.getContainer("Saved Searches");
+   if (searchNode == null)
+   {
+      searchNode = siteNode.createContainer("Saved Searches");
+   }
    if (searchNode != null)
    {
       // public searches are stored in the root of the folder

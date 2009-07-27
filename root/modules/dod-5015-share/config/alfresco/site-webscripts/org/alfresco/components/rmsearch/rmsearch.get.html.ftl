@@ -31,7 +31,7 @@
          
          <!-- Saved Searches menu button -->
          <div class="right-button">
-            <span class="yui-button yui-push-button" id="${el}-savedsearches-button">
+            <span class="yui-button yui-push-button yui-button-disabled yui-push-button-disabled" id="${el}-savedsearches-button">
                <span class="first-child"><button>${msg("button.savedsearches")}</button></span>
             </span>
          </div>
