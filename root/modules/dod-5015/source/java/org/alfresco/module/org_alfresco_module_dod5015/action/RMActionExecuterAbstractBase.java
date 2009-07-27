@@ -32,6 +32,8 @@ import java.util.Set;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
@@ -81,6 +83,8 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     
     /** Records management event service */
     protected RecordsManagementEventService recordsManagementEventService;
+    
+    protected AbstractCapability capability;
     
     /**
      * Set node service
@@ -162,16 +166,23 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
         this.recordsManagementEventService = recordsManagementEventService;
     }
     
+    
+    
+    public void setCapability(AbstractCapability capability)
+    {
+        this.capability = capability;
+    }
+
     /**
      * Init method
      */
     @Override
     public void init()
     {
-        super.init();
-        
-        // Do the RM action registration
-        this.recordsManagementActionService.register(this);
+        if(this.capability != null)
+        {
+            this.capability.registerAction(this);
+        }
     }
     
     /**

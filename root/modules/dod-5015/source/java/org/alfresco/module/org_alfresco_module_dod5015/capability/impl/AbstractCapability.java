@@ -25,6 +25,8 @@
 package org.alfresco.module.org_alfresco_module_dod5015.capability.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
@@ -54,7 +56,9 @@ public abstract class AbstractCapability implements Capability
 
     protected RMEntryVoter voter;
 
-    protected RecordsManagementAction action;
+    protected List<RecordsManagementAction> actions = new ArrayList<RecordsManagementAction>(1);
+
+    protected List<String> actionNames = new ArrayList<String>(1);
 
     public AbstractCapability()
     {
@@ -66,9 +70,10 @@ public abstract class AbstractCapability implements Capability
         this.voter = voter;
     }
 
-    public void setAction(RecordsManagementAction action)
+    public void registerAction(RecordsManagementAction action)
     {
-        this.action = action;
+        this.actions.add(action);
+        this.actionNames.add(action.getName());
     }
 
     AccessStatus translate(int vote)
@@ -95,12 +100,12 @@ public abstract class AbstractCapability implements Capability
     {
         return hasPermissionImpl(nodeRef);
     }
-    
+
     protected abstract int hasPermissionImpl(NodeRef nodeRef);
 
-    public String getActionName()
+    public List<String> getActionNames()
     {
-        return null;
+        return actionNames;
     }
 
     public int checkFilingUnfrozen(NodeRef nodeRef)

@@ -28,6 +28,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementA
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.repo.action.RuntimeActionService;
 import org.alfresco.repo.action.executer.ActionExecuter;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.springframework.aop.framework.ProxyFactoryBean;
 
 public class RMActionProxyFactoryBean extends ProxyFactoryBean
@@ -59,6 +60,15 @@ public class RMActionProxyFactoryBean extends ProxyFactoryBean
     public void registerAction()
     {
         runtimeActionService.registerActionExecuter((ActionExecuter) getObject());
-        recordsManagementActionService.register((RecordsManagementAction) getObject());
+        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>()
+        {
+
+            public Void doWork() throws Exception
+            {
+                recordsManagementActionService.register((RecordsManagementAction) getObject());
+                return null;
+            }
+        }, AuthenticationUtil.getSystemUserName());
+        
     }
 }
