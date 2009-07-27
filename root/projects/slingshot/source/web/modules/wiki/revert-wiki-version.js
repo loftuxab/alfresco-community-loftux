@@ -52,7 +52,7 @@
       this.id = containerId;
 
       var instance = Alfresco.util.ComponentManager.get(this.id);
-      if (typeof instance !== "undefined")
+      if (instance !== null)
       {
          throw new Error("An instance of Alfresco.module.RevertWikiVersion already exists.");
       }
@@ -412,12 +412,6 @@
 
 Alfresco.module.getRevertWikiVersionInstance = function()
 {
-   var instanceId = "alfresco-revertWikiVersion-instance",
-      instance = Alfresco.util.ComponentManager.get(instanceId);
-   
-   if (typeof instance == "undefined")
-   {
-      instance = new Alfresco.module.RevertWikiVersion(instanceId);
-   }
-   return instance;
+   var instanceId = "alfresco-revertWikiVersion-instance";
+   return Alfresco.util.ComponentManager.get(instanceId) || new Alfresco.module.RevertWikiVersion(instanceId);
 }

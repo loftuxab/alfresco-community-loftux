@@ -283,7 +283,8 @@
          var inputs = formElem.getElementsByTagName("input"),
             x, xx;
          
-         for (x = 0, xx = inputs.length; x < xx; x++)
+         // IMPORTANT: Do NOT optimize loop - loop bounds are modified inside
+         for (x = 0; x < inputs.length; x++)
          {
             if (inputs[x].name == fullFieldName)
             {

@@ -772,15 +772,21 @@ Alfresco.util.stripUnsafeHTMLTags.safeTags =
  *
  * @method Alfresco.util.getDomId
  * @param p_prefix {string} Optional prefix instead of "alf-id" default
+ * @param p_el {HTMLElement} Applies new ID to element
  * @return {string} Dom Id guaranteed to be unique on the current page
  */
-Alfresco.util.getDomId = function(p_prefix)
+Alfresco.util.getDomId = function(p_prefix, p_el)
 {
    var domId, prefix = (p_prefix && p_prefix !== "undefined" ? p_prefix : "alf-id");
    do
    {
       domId = prefix + Alfresco.util.getDomId._nId++;
    } while (YUIDom.get(domId) !== null);
+
+   if (p_el)
+   {
+      p_el.id = domId;
+   }
    
    return domId;
 };
@@ -1539,6 +1545,37 @@ Alfresco.util.getTags = function(str)
 };
 
 /**
+ * The YUI Bubbling Library augments callback objects with its own built-in fields.
+ * This function strips those out, so the remainder of the object is "clean"
+ *
+ * @method cleanBubblingObject
+ * @param callbackObj {object} Object literal as passed to the event handler
+ * @return {object} Object stripped of Bubbling Library fields
+ * @static
+ */
+Alfresco.util.cleanBubblingObject = function(callbackObj)
+{
+   // See Bubbling Library, fire() function. These fields are correct for v2.1.
+   var augmented =
+   {
+	   action: true,
+	   flagged: true,
+	   decrepitate: true,
+	   stop: true
+   },
+      cleanObj = {};
+   
+   for (index in callbackObj)
+   {
+      if (callbackObj.hasOwnProperty(index) && augmented[index] !== true)
+      {
+         cleanObj[index] = callbackObj[index];
+      }
+   }
+   return cleanObj;
+};
+
+/**
  * Wrapper for helping components specify their YUI components.
  * @class Alfresco.util.YUILoaderHelper
  */
@@ -1698,8 +1735,8 @@ Alfresco.util.ComponentManager = function()
     */
    var components = [];
    
-   return {
-      
+   return (
+   {
       /**
        * Main entrypoint for components wishing to register themselves with the ComponentManager
        * @method register
@@ -1798,9 +1835,9 @@ Alfresco.util.ComponentManager = function()
        */
       get: function CM_get(p_sId)
       {
-         return (components[p_sId]);
+         return (components[p_sId] || null);
       }
-   };
+   });
 }();
 
 /**
@@ -1927,8 +1964,8 @@ Alfresco.util.PopupManager = function()
       },
 
       /**
-       * The default config for the displaying messages, can be overriden
-       * when calling displayPromp()
+       * The default config for displaying "prompt" messages, can be overriden
+       * when calling displayPrompt()
        *
        * @property defaultDisplayPromptConfig
        * @type object
@@ -1945,7 +1982,7 @@ Alfresco.util.PopupManager = function()
          noEscape: false,
          buttons: [
          {
-            text: null, // To early to localize at this time, do it when called instead
+            text: null, // Too early to localize at this time, do it when called instead
             handler: function()
             {
                this.destroy();
@@ -2012,10 +2049,10 @@ Alfresco.util.PopupManager = function()
             prompt.setHeader($html(c.title));
          }
 
-         // Show the actual text taht should be prompted for the user
+         // Show the prompt text
          prompt.setBody(c.noEscape ? c.text : $html(c.text));
 
-         // Show the title if it exists
+         // Show the icon if it exists
          if (c.icon)
          {
             prompt.cfg.setProperty("icon", c.icon);
@@ -2031,9 +2068,228 @@ Alfresco.util.PopupManager = function()
          prompt.render(document.body);
          prompt.center();
          prompt.show();
-      }
+      },
+      
+      /**
+       * The default config for the getting user input, can be overriden
+       * when calling getUserInput()
+       *
+       * @property defaultGetUserInputConfig
+       * @type object
+       */
+      defaultGetUserInputConfig:
+      {
+         title: null,
+         text: null,
+         icon: null,
+         effect: null,
+         effectDuration: 0.5,
+         modal: true,
+         close: true,
+         noEscape: true,
+         html: null,
+         callback: null,
+         buttons: [
+         {
+            text: null, // OK button. Too early to localize at this time, do it when called instead
+            handler: null,
+            isDefault: true
+         },
+         {
+            text: null, // Cancel button. Too early to localize at this time, do it when called instead
+            handler: function()
+            {
+               this.destroy();
+            }
+         }]
+      },
 
+      /**
+       * Intended usage: To ask the user for a simple text input, similar to JavaScript's prompt() function.
+       *
+       * @method getUserInput
+       * @param config {object}
+       * The config object is in the form of:
+       * {
+       *    title: {string},       // the title of the dialog, default is null
+       *    text: {string},        // optional label next to input box
+       *    callback: {object}     // Object literal specifying function callback to receive user input. Only called if default button config used.
+       *                           // fn: function, obj: optional pass-thru object, scope: callback scope
+       *    icon: null,            // the icon to display next to the text, default is null
+       *    effect: {YAHOO.widget.ContainerEffect}, // the effect to use when showing and hiding the prompt, default is null
+       *    effectDuration: {int}, // the time in seconds that the effect should run, default is 0.5
+       *    modal: {boolean},      // if a grey transparent overlay should be displayed in the background
+       *    close: {boolean},      // if a close icon should be displayed in the right upper corner, default is true
+       *    buttons: []            // an array of button configs as described by YUI:s SimpleDialog, default is a single OK button
+       *    okButtonText: {string} // Allows just the label of the OK button to be overridden
+       *    noEscape: {boolean}    // indicates the the text property has already been escaped (e.g. to display HTML-based messages)
+       *    html: {string},        // optional override for function-generated HTML <input> field. Note however that you must supply your own
+       *                           //    button handlers in this case in order to get the user's input from the Dom.
+       * }
+       */
+      getUserInput: function(config)
+      {
+         if (this.defaultGetUserInputConfig.buttons[0].text === null)
+         {
+            /**
+             * This default value could not be set at instantion time since the
+             * localized messages weren't present at that time
+             */
+            this.defaultGetUserInputConfig.buttons[0].text = Alfresco.util.message("button.ok", this.name);
+         }
+         if (this.defaultGetUserInputConfig.buttons[1].text === null)
+         {
+            this.defaultGetUserInputConfig.buttons[1].text = Alfresco.util.message("button.cancel", this.name);
+         }
+         
+         // Merge users config and the default config and check manadatory properties
+         var c = YAHOO.lang.merge(this.defaultGetUserInputConfig, config);
+
+         // Create the SimpleDialog that will display the text
+         var prompt = new YAHOO.widget.SimpleDialog("userInput",
+         {
+            visible: false,
+            draggable: false,
+            effect: c.effect,
+            modal: c.modal,
+            close: c.close,
+            zIndex: this.zIndex++
+         });
+
+         // Show the title if it exists
+         if (c.title)
+         {
+            prompt.setHeader($html(c.title));
+         }
+
+         // Generate the HTML mark-up if not overridden
+         var html = c.html,
+            id = Alfresco.util.getDomId();
+         if (html === null)
+         {
+            html = "";
+            if (c.text)
+            {
+               html += '<label for="' + id + '">' + (c.noEscape ? c.text : $html(c.text)) + '</label>';
+            }
+            html += '<textarea id="' + id + '"></textarea>';
+         }
+         prompt.setBody(html);
+
+         // Show the icon if it exists
+         if (c.icon)
+         {
+            prompt.cfg.setProperty("icon", c.icon);
+         }
+
+         // Add the buttons to the dialog
+         if (c.buttons)
+         {
+            if (c.okButtonText)
+            {
+               // Override OK button label
+               c.buttons[0].text = c.okButtonText;
+            }
+            
+            // Default handler if no custom button passed-in
+            if (typeof config.buttons == "undefined" || typeof config.buttons[0] == "undefined")
+            {
+               // OK button click handler
+               c.buttons[0].handler = 
+               {
+                  fn: function(event, obj)
+                  {
+                     // Grab the input, destroy the pop-up, then callback with the value
+                     var value = null;
+                     if (YUIDom.get(obj.id))
+                     {
+                        value = YUIDom.get(obj.id).value;
+                     }
+                     this.destroy();
+                     if (obj.callback.fn)
+                     {
+                        obj.callback.fn.call(obj.callback.scope || window, value, obj.callback.obj);
+                     }
+                  },
+                  obj:
+                  {
+                     id: id,
+                     callback: c.callback
+                  }
+               };
+            }
+            prompt.cfg.queueProperty("buttons", c.buttons);
+         }
+
+         // Add the dialog to the dom, center it and show it.
+         prompt.render(document.body);
+         prompt.center();
+         prompt.show();
+         
+         if (YUIDom.get(id))
+         {
+            YUIDom.get(id).focus();
+         }
+      }
    };
+}();
+
+
+/**
+ * Keeps track of multiple filters on a page. Filters should register() upon creation to be compliant.
+ * @class Alfresco.util.FilterManager
+ */
+Alfresco.util.FilterManager = function()
+{
+   /**
+    * Array of registered filters.
+    * 
+    * @property filters
+    * @type Array
+    */
+   var filters = [];
+   
+   return (
+   {
+      /**
+       * Main entrypoint for filters wishing to register themselves with the FilterManager
+       * @method register
+       * @param p_filterOwner {string} Name of the owner registering this filter. Used when owning exclusive filters.
+       * @param p_filterIds {string|Array} Single or multiple filterIds this filter owns
+       */
+      register: function FM_register(p_filterOwner, p_filterIds)
+      {
+         var i, ii, filterId;
+         
+         if (typeof p_filterIds == "string")
+         {
+            p_filterIds = [p_filterIds];
+         }
+         
+         for (i = 0, ii = p_filterIds.length; i < ii; i++)
+         {
+            filterId = p_filterIds[i];
+            filters.push(
+            {
+               filterOwner: p_filterOwner,
+               filterId: filterId
+            });
+            filters[filterId] = p_filterOwner;
+         }
+      },
+
+      /**
+       * Get filterOwner by filterId
+       *
+       * @method getOwner
+       * @param p_filterId {string} FilterId
+       * @return {string|null} filterOwner that has registered for the given filterId
+       */
+      getOwner: function FM_getOwner(p_filterId)
+      {
+         return (filters[p_filterId] || null);
+      }
+   });
 }();
 
 
@@ -3802,6 +4058,18 @@ Alfresco.util.RichEditor = function(editorName,id,config)
       uniqueEventKey: null,
 
       /**
+       * Set the filterId(s) this filter will be owning.
+       *
+       * @method setFilterIds
+       * @param p_aFilterIds {array} Array of filterIds this filter will be owning
+       */
+      setFilterIds: function BaseFilter_setFilterIds(p_aFilterIds)
+      {
+         // Register the filter
+         Alfresco.util.FilterManager.register(this.name, p_aFilterIds);
+      },
+
+      /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
        *
@@ -3889,6 +4157,8 @@ Alfresco.util.RichEditor = function(editorName,id,config)
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
          {
+            obj.filterOwner = obj.filterOwner || Alfresco.util.FilterManager.getOwner(obj.filterId);
+            
             if (obj.filterOwner == this.name)
             {
                // Remove the old highlight, as it might no longer be correct

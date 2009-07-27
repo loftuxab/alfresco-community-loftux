@@ -19,8 +19,7 @@ function getFilterParams(filter, parsedArgs, favourites)
    }
 
    // Create query based on passed-in arguments
-   var filterId = String(filter),
-      filterData = String(args["filterData"]);
+   var filterData = args["filterData"];
 
    // Common types and aspects to filter from the UI
    var filterQueryDefaults = " -ASPECT:\"{http://www.alfresco.org/model/content/1.0}workingcopy\"";
@@ -31,6 +30,8 @@ function getFilterParams(filter, parsedArgs, favourites)
    filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}topic\"";
    filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}post\"";
    filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule\"";
+   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}hold\"";
+   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer\"";
 
    // Create query based on passed-in arguments
    switch (String(filter))
@@ -77,21 +78,19 @@ function getFilterParams(filter, parsedArgs, favourites)
          break;
       
       case "holds":
-         if (filterData == "")
+         var filterQuery;
+         
+         if (filterData == null)
          {
-            /**
-             * Return list of Hold folders - might need special-case handling in doclist.get.js (let's hope not)
-             */
+            filterQuery = "+PATH:\"" + parsedArgs.rootNode.qnamePath + "//*\"";
+            filterQuery += " +TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}hold\"";
+            filterParams.query = filterQuery;
          }
          else
          {
             filterParams.variablePath = true;
-            /**
-             * Get the Hold name from the filterData and then put together a query to list all the Record Folders
-             * and Records associated with that Hold.
-             */
+            filterParams.query = "+PARENT:\"" + filterData + "\"";
          }
-         filterParams.query = "";
          break;
       
       default:

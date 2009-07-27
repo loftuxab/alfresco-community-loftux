@@ -21,6 +21,9 @@
          <action id="onActionReopen" permission="reopen" type="action-link" label="actions.reopen" />
          <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
          <action id="onActionUncutoff" permission="uncutoff" type="action-link" label="actions.uncutoff" />
+         <action id="onActionTransfer" permission="transfer" type="action-link" label="actions.transfer" />
+         <action id="onActionFreeze" permission="freeze" type="action-link" label="actions.freeze" />
+         <action id="onActionUnfreeze" permission="unfreeze" type="action-link" label="actions.unfreeze" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 
@@ -49,6 +52,10 @@
       </actionSet>
 
       <actionSet id="nonElectronicRecord">
+      </actionSet>
+
+      <actionSet id="holdContainer">
+         <action id="onActionRelinquish" permission="relinquish" type="action-link" label="actions.relinquish" />
       </actionSet>
 
       <actionSet id="folder">

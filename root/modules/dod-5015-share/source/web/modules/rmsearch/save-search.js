@@ -47,7 +47,7 @@
    Alfresco.module.SaveSearch = function(containerId)
    {
       var instance = Alfresco.util.ComponentManager.get(this.id);
-      if (instance !== undefined)
+      if (instance !== null)
       {
          throw new Error("An instance of Alfresco.module.SaveSearch already exists.");
       }
@@ -327,12 +327,6 @@
 
 Alfresco.module.getSaveSearchInstance = function()
 {
-   var instanceId = "alfresco-SaveSearch-instance",
-       instance = Alfresco.util.ComponentManager.get(instanceId);
-   
-   if (typeof instance == "undefined")
-   {
-      instance = new Alfresco.module.SaveSearch(instanceId);
-   }
-   return instance;
+   var instanceId = "alfresco-SaveSearch-instance";
+   return Alfresco.util.ComponentManager.get(instanceId) || new Alfresco.module.SaveSearch(instanceId);
 };

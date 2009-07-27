@@ -32,6 +32,9 @@ function getAssetType(asset)
             }
          }
          break;
+      case "rma:hold":
+         assetType = "hold-container";
+         break;
       default:
          assetType = asset.isContainer ? "folder" : "document";
          break;
@@ -47,31 +50,31 @@ function getMetadata(asset)
 {
    var metadata = {};
 
-   var fnExtract = function(asset)
+   var fnExtract = function(p_asset)
    {
-      for (var index in asset.properties)
+      for (var index in p_asset.properties)
       {
          if (index.indexOf("{http://www.alfresco.org/model/recordsmanagement/1.0}") == 0)
          {
-            metadata[index.replace("{http://www.alfresco.org/model/recordsmanagement/1.0}", "rma:")] = asset.properties[index];
+            metadata[index.replace("{http://www.alfresco.org/model/recordsmanagement/1.0}", "rma:")] = p_asset.properties[index];
          }
          else if (index.indexOf("{http://www.alfresco.org/model/dod5015/1.0}") == 0)
          {
-            metadata[index.replace("{http://www.alfresco.org/model/dod5015/1.0}", "dod:")] = asset.properties[index];
+            metadata[index.replace("{http://www.alfresco.org/model/dod5015/1.0}", "dod:")] = p_asset.properties[index];
          }
       }
    };
    
-   // General
+   // General Records Management properties
    fnExtract(asset);
    
-   // Disposition Instructions
+   // Disposition Instructions, if relevant
    if (asset.hasAspect("rma:scheduled"))
    {
-      var diNode = asset.childAssocs["rma:dispositionSchedule"][0];
-      if (diNode !== null)
+      var dsNode = asset.childAssocs["rma:dispositionSchedule"][0];
+      if (dsNode !== null)
       {
-         fnExtract(diNode);
+         fnExtract(dsNode);
       }
    }
    
@@ -156,6 +159,9 @@ function runEvaluator(asset, assetType)
        */
       case "record-folder":
          actionSet = "recordFolder";
+         /**
+          * Open/Close
+          */
          if (asset.properties["rma:isClosed"])
          {
             permissions.push("reopen");
@@ -166,6 +172,18 @@ function runEvaluator(asset, assetType)
             permissions.push("file");
             permissions.push("close");
             status.push("open");
+         }
+         /**
+          * Freeze/Unfreeze
+          */
+         if (asset.hasAspect("rma:frozen"))
+         {
+            permissions.push("unfreeze");
+            status.push("frozen");
+         }
+         else
+         {
+            permissions.push("freeze");
          }
          break;
  
@@ -204,6 +222,18 @@ function runEvaluator(asset, assetType)
                permissions.push(asset.properties["rma:dispositionAction"]);
             }
          }
+         /**
+          * Freeze/Unfreeze
+          */
+         if (asset.hasAspect("rma:frozen"))
+         {
+            permissions.push("unfreeze");
+            status.push("frozen");
+         }
+         else
+         {
+            permissions.push("freeze");
+         }
          permissions.push("undeclare");
          break;
 
@@ -216,6 +246,13 @@ function runEvaluator(asset, assetType)
          permissions.push("declare");
          break;
 
+      /**
+       * SPECIFIC TO: HOLD CONTAINERS
+       */
+      case "hold-container":
+         actionSet = "holdContainer";
+         permissions.push("relinquish");
+         break;
 
       /**
        * SPECIFIC TO: LEGACY TYPES

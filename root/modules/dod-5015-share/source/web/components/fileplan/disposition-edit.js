@@ -136,14 +136,17 @@
             {
                fn: function(response)
                {
-                  if(response.json)
+                  if (response.json)
                   {
-                     var schedule = response.json.data;
-                     var actions = schedule.actions ? schedule.actions : [];
-                     for(var i = 0; i < actions.length; i++)
+                     var schedule = response.json.data,
+                        actions = schedule.actions ? schedule.actions : [],
+                        action,
+                        actionEl;
+                     
+                     for (var i = 0, ii = actions.length; i < ii; i++)
                      {
-                        var action = actions[i];
-                        var actionEl = this._createAction(action);
+                        action = actions[i];
+                        actionEl = this._createAction(action);
                         actionEl = this.widgets.actionListEl.appendChild(actionEl);
                         this._setupActionForm(action, actionEl);
                      }

@@ -144,6 +144,21 @@
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
+
+      /**
+       * Filter Changed event handler
+       *
+       * @method onFilterChanged
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onFilterChanged: function DLTB_onFilterChanged(layer, args)
+      {
+         Alfresco.RecordsDocListToolbar.superclass.onFilterChanged.apply(this, arguments);
+         
+         var holdsFolderEnabled = (this.currentFilter.filterId == "holds" && this.currentFilter.filterData !== "");
+         this.widgets.holdsFolderUp.set("disabled", !holdsFolderEnabled);
+      },
       
 
       /**
@@ -223,76 +238,6 @@
       },
 
       /**
-       * File Upload button click handler
-       *
-       * @method onFileUpload
-       * @param e {object} DomEvent
-       * @param p_obj {object} Object passed back from addListener method
-       */
-      onFileUpload: function DLTB_onFileUpload(e, p_obj)
-      {
-         if (this.fileUpload === null)
-         {
-            this.fileUpload = Alfresco.getFileUploadInstance(); 
-         }
-         
-         // Show uploader for multiple files
-         var multiUploadConfig =
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            uploadDirectory: this.currentPath,
-            filter: [],
-            mode: this.fileUpload.MODE_MULTI_UPLOAD,
-            thumbnails: "doclib",
-            onFileUploadComplete:
-            {
-               fn: this.onFileUploadComplete,
-               scope: this
-            }
-         };
-         this.fileUpload.show(multiUploadConfig);
-      },
-      
-      /**
-       * File Upload complete event handler
-       *
-       * @method onFileUploadComplete
-       * @param complete {object} Object literal containing details of successful and failed uploads
-       */
-      onFileUploadComplete: function DLTB_onFileUploadComplete(complete)
-      {
-         var success = complete.successful.length, activityData, file;
-         if (success > 0)
-         {
-            if (success < this.options.groupActivitiesAt)
-            {
-               // Below cutoff for grouping Activities into one
-               for (var i = 0; i < success; i++)
-               {
-                  file = complete.successful[i];
-                  activityData =
-                  {
-                     fileName: file.fileName,
-                     nodeRef: file.nodeRef
-                  };
-                  this.modules.actions.postActivity(this.options.siteId, "file-added", "document-details", activityData);
-               }
-            }
-            else
-            {
-               // grouped into one message
-               activityData =
-               {
-                  fileCount: success,
-                  path: this.currentPath
-               };
-               this.modules.actions.postActivity(this.options.siteId, "files-added", "documentlibrary", activityData);
-            }
-         }
-      },
-
-      /**
        * Holds Folder Up Navigate button click handler
        *
        * @method onHoldsFolderUp
@@ -303,7 +248,6 @@
       {
          YAHOO.Bubbling.fire("filterChanged",
          {
-            filterOwner: "DocListFilePlan",
             filterId: "holds",
             filterData: ""
          });
@@ -383,6 +327,119 @@
          });
 
          this.modules.copyMoveFileTo.showDialog();
-      }
+      },
+      
+      /**
+       * Freeze action.
+       *
+       * @method onActionFreeze
+       */
+      onActionFreeze: function DLTB_onActionFreeze()
+      {
+         if (!this.modules.docList)
+         {
+            return;
+         }
+
+         var files = this.modules.docList.getSelectedFiles();
+
+         Alfresco.util.PopupManager.getUserInput(
+         {
+            title: this.msg("message.freeze.reason.title", files.length),
+            text: this.msg("message.freeze.reason.label"),
+            okButtonText: this.msg("button.freeze.record"),
+            callback:
+            {
+               fn: function DLTB_oAF_callback(value)
+               {
+                  this._dod5015Action("message.freeze", files, "freeze",
+                  {
+                     "reason": value
+                  });
+               },
+               scope: this
+            }
+         });
+      },
+
+      /**
+       * Unfreeze action.
+       *
+       * @method onActionUnfreeze
+       */
+      onActionUnfreeze: function DL_onActionUnfreeze()
+      {
+         if (!this.modules.docList)
+         {
+            return;
+         }
+
+         this._dod5015Action("message.unfreeze", this.modules.docList.getSelectedFiles(), "unfreeze");
+      },
+      
+      
+      /**
+       * DOD5015 action.
+       *
+       * @method _dod5015Action
+       * @param i18n {string} Will be appended with ".success" or ".failure" depending on action outcome
+       * @param files {array} Array containig file objects to be actioned
+       * @param actionName {string} Name of repository action to run
+       * @param actionParams {object} Optional object literal to pass parameters to the action
+       * @param configOverride {object} Optional object literal to override default configuration parameters
+       * @private
+       */
+      _dod5015Action: function DL__dod5015Action(i18n, files, actionName, actionParams, configOverride)
+      {
+         var dataObj =
+         {
+            name: actionName,
+            nodeRefs: []
+         };
+         
+         for (var i = 0, ii = files.length; i < ii; i++)
+         {
+            dataObj.nodeRefs.push(files[i].nodeRef);
+         }
+         
+         if (YAHOO.lang.isObject(actionParams))
+         {
+            dataObj.params = actionParams;
+         }
+         
+         var config =
+         {
+            success:
+            {
+               event:
+               {
+                  name: "metadataRefresh"
+               },
+               message: this.msg(i18n + ".success", files.length)
+            },
+            failure:
+            {
+               message: this.msg(i18n + ".failure", files.length)
+            },
+            webscript:
+            {
+               method: Alfresco.util.Ajax.POST,
+               stem: Alfresco.constants.PROXY_URI + "api/rma/actions/",
+               name: "ExecutionQueue"
+            },
+            config:
+            {
+               requestContentType: Alfresco.util.Ajax.JSON,
+               dataObj: dataObj
+            }
+         };
+         
+         if (YAHOO.lang.isObject(configOverride))
+         {
+            config = YAHOO.lang.merge(config, configOverride);
+         }
+
+         this.modules.actions.genericAction(config);
+      }      
    });
 })();

@@ -50,7 +50,7 @@
       this.id = containerId;
 
       var instance = Alfresco.util.ComponentManager.get(this.id);
-      if (typeof instance !== "undefined")
+      if (instance !== null)
       {
          throw new Error("An instance of Alfresco.module.RevertVersion already exists.");
       }
@@ -383,12 +383,6 @@
 
 Alfresco.module.getRevertVersionInstance = function()
 {
-   var instanceId = "alfresco-revertVersion-instance",
-      instance = Alfresco.util.ComponentManager.get(instanceId);
-
-   if (typeof instance == "undefined")
-   {
-      instance = new Alfresco.module.RevertVersion(instanceId);
-   }
-   return instance;
+   var instanceId = "alfresco-revertVersion-instance";
+   return Alfresco.util.ComponentManager.get(instanceId) || new Alfresco.module.RevertVersion(instanceId);
 }

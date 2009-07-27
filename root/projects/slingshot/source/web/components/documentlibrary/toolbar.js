@@ -63,16 +63,9 @@
       
       // Initialise prototype properties
       this.selectedFiles = [];
-      this.currentFilter =
-      {
-         filterId: "",
-         filterOwner: "",
-         filterData: ""
-      };
+      this.currentFilter = {};
 
       // Decoupled event listeners
-      YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
-      YAHOO.Bubbling.on("folderRenamed", this.onPathChanged, this);
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       YAHOO.Bubbling.on("selectedFilesChanged", this.onSelectedFilesChanged, this);
@@ -474,17 +467,17 @@
             return;
          }
 
-         var me = this;
-         var files = this.modules.docList.getSelectedFiles();
+         var me = this,
+            files = this.modules.docList.getSelectedFiles(),
+            fileNames = [];
          
-         var fileNames = [];
          for (var i = 0, j = files.length; i < j; i++)
          {
             fileNames.push("<span class=\"" + files[i].type + "\">" + files[i].displayName + "</span>");
          }
          
-         var confirmTitle = this.msg("title.multiple-delete.confirm");
-         var confirmMsg = this.msg("message.multiple-delete.confirm", files.length);
+         var confirmTitle = this.msg("title.multiple-delete.confirm"),
+            confirmMsg = this.msg("message.multiple-delete.confirm", files.length);
          confirmMsg += "<div class=\"toolbar-file-list\">" + fileNames.join("") + "</div>";
 
          Alfresco.util.PopupManager.displayPrompt(
@@ -751,13 +744,35 @@
        */
       onFolderUp: function DLTB_onFolderUp(e, p_obj)
       {
-         var newPath = this.currentPath.substring(0, this.currentPath.lastIndexOf("/"));
+         var newPath = this.currentPath.substring(0, this.currentPath.lastIndexOf("/")),
+            filter = this.currentFilter;
+         
+         filter.filterData = newPath;
 
-         YAHOO.Bubbling.fire("pathChanged",
-         {
-            path: newPath
-         });
+         YAHOO.Bubbling.fire("filterChanged", filter);
          Event.preventDefault(e);
+      },
+
+      /**
+       * Path Changed handler
+       *
+       * @method pathChanged
+       * @param path {string} New path
+       */
+      pathChanged: function DLTB_pathChanged(path)
+      {
+         this.currentPath = path;
+         this._generateBreadcrumb();
+         this._generateRSSFeedUrl();
+         
+         // Enable/disable the Folder Up button
+         var paths = this.currentPath.split("/");
+         // Check for root path special case
+         if (this.currentPath === "/")
+         {
+            paths = ["/"];
+         }
+         this.widgets.folderUp.set("disabled", paths.length < 2);
       },
       
 
@@ -765,34 +780,6 @@
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
        * Disconnected event handlers for inter-component event notification
        */
-
-      /**
-       * Path Changed event handler
-       *
-       * @method onPathChanged
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onPathChanged: function DLTB_onPathChanged(layer, args)
-      {
-         var obj = args[1];
-         if (obj && (typeof obj.path !== "undefined"))
-         {
-            // Should be a path in the arguments
-            this.currentPath = obj.path;
-            this._generateBreadcrumb();
-            this._generateRSSFeedUrl();
-            
-            // Enable/disable the Folder Up button
-            var paths = this.currentPath.split("/");
-            // Check for root path special case
-            if (this.currentPath === "/")
-            {
-               paths = ["/"];
-            }
-            this.widgets.folderUp.set("disabled", paths.length < 2);
-         }
-      },
 
       /**
        * Filter Changed event handler
@@ -806,6 +793,8 @@
          var obj = args[1];
          if (obj && (typeof obj.filterId !== "undefined"))
          {
+            obj.filterOwner = obj.filterOwner || Alfresco.util.FilterManager.getOwner(obj.filterId);
+
             if (this.currentFilter.filterOwner != obj.filterOwner || this.currentFilter.filterId != obj.filterId)
             {
                var filterOwner = obj.filterOwner.split(".")[1],
@@ -828,18 +817,18 @@
             }
             
             Alfresco.logger.debug("DLTB_onFilterChanged", "Old Filter", this.currentFilter);
-            
-            this.currentFilter = 
-            {
-               filterId: obj.filterId,
-               filterOwner: obj.filterOwner,
-               filterData: obj.filterData
-            };
-
+            this.currentFilter = Alfresco.util.cleanBubblingObject(obj);
             Alfresco.logger.debug("DLTB_onFilterChanged", "New Filter", this.currentFilter);
             
-            this._generateDescription();
-            this._generateRSSFeedUrl();
+            if (this.currentFilter.filterId == "path")
+            {
+               this.pathChanged(this.currentFilter.filterData);
+            }
+            else
+            {
+               this._generateDescription();
+               this._generateRSSFeedUrl();
+            }
          }
       },
 
@@ -1017,15 +1006,17 @@
             paths = ["/"];
          }
          // Clone the array and re-use the root node name from the DocListTree
-         var displayPaths = paths.concat();
+         var me = this,
+            displayPaths = paths.concat();
+         
          displayPaths[0] = Alfresco.util.message("node.root", "Alfresco.DocListTree");
 
          var fnBreadcrumbClick = function DLTB__gB_click(e, path)
          {
-            YAHOO.Bubbling.fire("pathChanged",
-            {
-               path: path
-            });
+            var filter = me.currentFilter;
+            filter.filterData = path;
+            
+            YAHOO.Bubbling.fire("filterChanged", filter);
             Event.stopEvent(e);
          };
          
@@ -1080,7 +1071,7 @@
        */
       _generateDescription: function DLTB__generateDescription()
       {
-         var divDesc, eDivDesc, eDescMsg, eDescMore;
+         var divDesc, eDivDesc, eDescMsg, eDescMore, filterDisplay;
          
          divDesc = Dom.get(this.id + "-description");
          if (divDesc === null)
@@ -1093,18 +1084,21 @@
             divDesc.removeChild(divDesc.lastChild);
          }
          
+         // If filterDisplay is provided, then use that instead (e.g. for cases where filterData is a nodeRef)
+         filterDisplay = typeof this.currentFilter.filterDisplay !== "undefined" ? this.currentFilter.filterDisplay : this.currentFilter.filterData;
+         
          eDescMsg = new Element(document.createElement("div"),
          {
-            innerHTML: this.msg("description." + this.currentFilter.filterId, this.currentFilter.filterData)
+            innerHTML: this.msg("description." + this.currentFilter.filterId, filterDisplay)
          });
          eDescMsg.addClass("message");
 
          // Don't display a "more" message that contains the "{0}" placeholder unless filterData is populated
-         if (this.msg("description." + this.currentFilter.filterId + ".more").indexOf("{0}") == -1 || this.currentFilter.filterData !== "")
+         if (this.msg("description." + this.currentFilter.filterId + ".more").indexOf("{0}") == -1 || filterDisplay !== "")
          {
             eDescMore = new Element(document.createElement("span"),
             {
-               innerHTML: this.msg("description." + this.currentFilter.filterId + ".more", this.currentFilter.filterData)
+               innerHTML: this.msg("description." + this.currentFilter.filterId + ".more", filterDisplay)
             });
             eDescMore.addClass("more");
 

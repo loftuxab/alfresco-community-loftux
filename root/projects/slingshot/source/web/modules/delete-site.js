@@ -47,7 +47,7 @@
    Alfresco.module.DeleteSite = function(containerId)
    {
       var instance = Alfresco.util.ComponentManager.get(containerId);
-      if (typeof instance !== "undefined")
+      if (instance !== null)
       {
          throw new Error("An instance of Alfresco.module.DeleteSite already exists.");
       }
@@ -284,12 +284,6 @@
 
 Alfresco.module.getDeleteSiteInstance = function()
 {
-   var instanceId = "alfresco-deletesite-instance",
-      instance = Alfresco.util.ComponentManager.get(instanceId);
-
-   if (typeof instance == "undefined")
-   {
-      instance = new Alfresco.module.DeleteSite(instanceId);
-   }
-   return instance;
+   var instanceId = "alfresco-deletesite-instance";
+   return Alfresco.util.ComponentManager.get(instanceId) || new Alfresco.module.DeleteSite(instanceId);
 };

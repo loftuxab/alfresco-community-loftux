@@ -189,7 +189,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         
         if (this.nodeService.hasAspect(nodeRef, ASPECT_FILE_PLAN_COMPONENT) == true)
         {
-            if (this.nodeService.hasAspect(nodeRef, ASPECT_RECRODS_MANAGEMENT_ROOT) == true)
+            if (this.nodeService.hasAspect(nodeRef, ASPECT_RECORDS_MANAGEMENT_ROOT) == true)
             {
                 result = nodeRef;
             }

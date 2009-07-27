@@ -22,7 +22,7 @@ function getTreenode(siteId, path)
       // Look for folders in the parentNode
       for each(item in parsedArgs.parentNode.children)
       {
-         if (item.isSubType("cm:folder"))
+         if (itemIsAllowed(item))
          {
             items.push(item);
          }
@@ -47,4 +47,20 @@ function getTreenode(siteId, path)
 function sortByName(a, b)
 {
    return (b.name.toLowerCase() > a.name.toLowerCase() ? -1 : 1);
+}
+
+/* Filter allowed types, etc. */
+function itemIsAllowed(item)
+{
+   if (!item.isSubType("cm:folder"))
+   {
+      return false;
+   }
+   
+   if (item.typeShort == "rma:hold" || item.typeShort == "rma:transfer")
+   {
+      return false;
+   }
+   
+   return true;
 }

@@ -129,12 +129,12 @@
 
 .doclist .record-folder .onActionCopyTo a
 {
-   background-image: url(images/copy-record-to-16.png);
+   background-image: url(images/copy-folder-to-16.png);
 }
 
 .doclist .record-folder .onActionCutoff a
 {
-   background-image: url(images/cutoff-record-16.png);
+   background-image: url(images/record-folder-cutoff-16.png);
 }
 
 .doclist .record-folder .onActionDestroy a
@@ -144,12 +144,12 @@
 
 .doclist .record-folder .onActionFreeze a
 {
-   background-image: url(images/freeze-record-16.png);
+   background-image: url(images/freeze-folder-16.png);
 }
 
 .doclist .record-folder .onActionMoveTo a
 {
-   background-image: url(images/move-record-to-16.png);
+   background-image: url(images/move-folder-to-16.png);
 }
 
 .doclist .record-folder .onActionReopen a
@@ -159,7 +159,7 @@
 
 .doclist .record-folder .onActionTransfer a
 {
-   background-image: url(images/transfer-record-16.png);
+   background-image: url(images/transfer-16.png);
 }
 
 .doclist .record-folder .onActionTransferConfirm a
@@ -174,7 +174,15 @@
 
 .doclist .record-folder .onActionUnfreeze a
 {
-   background-image: url(images/unfreeze-record-16.png);
+   background-image: url(images/unfreeze-folder-16.png);
+}
+
+/**
+ * Actions: Hold Container
+ */
+.doclist .hold-container .onActionRelinquish a
+{
+   background-image: url(images/relinquish-hold-16.png);
 }
 
 
@@ -213,4 +221,19 @@
 .doclist .file-select .selectNone
 {
    background-image: url(images/select-none-rm-16.png);
+}
+
+/* FilePlan Filter Styling */
+.fileplan-filter span.holds
+{
+   background-image: url(images/freeze-record-16.png);
+   background-repeat: no-repeat;
+   padding-left: 20px;
+}
+
+.fileplan-filter span.transfers
+{
+   background-image: url(images/transfer-record-16.png);
+   background-repeat: no-repeat;
+   padding-left: 20px;
 }
