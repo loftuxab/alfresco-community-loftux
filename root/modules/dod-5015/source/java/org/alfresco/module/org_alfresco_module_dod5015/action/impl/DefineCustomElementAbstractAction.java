@@ -24,6 +24,9 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
+import java.io.Serializable;
+import java.util.Map;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
@@ -33,14 +36,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This superclass of DefineCustomPropertyAction and DefineCustomAssociationAction
- * provides handling of bad 'name' parameters, which is consistent across both subtypes.
+ * This superclass of DefineCustomPropertyAction and DefineCustomAssociationAction provides handling of bad 'name'
+ * parameters, which is consistent across both subtypes.
  * 
  * @author Neil McErlean
  */
 public abstract class DefineCustomElementAbstractAction extends RMActionExecuterAbstractBase
 {
     public static final String PARAM_NAME = "name";
+
     private static Log logger = LogFactory.getLog(DefineCustomElementAbstractAction.class);
 
     /**
@@ -51,7 +55,7 @@ public abstract class DefineCustomElementAbstractAction extends RMActionExecuter
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {
         // The name of the new custom type must be prefixed with a namespace e.g. rmc:foo
-        String nameParam = (String)action.getParameterValue(PARAM_NAME);
+        String nameParam = (String) action.getParameterValue(PARAM_NAME);
         if (nameParam.startsWith(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX) == false)
         {
             // It might seem reasonable at this point to prepend the prefix if it is not there.
@@ -59,12 +63,9 @@ public abstract class DefineCustomElementAbstractAction extends RMActionExecuter
             // got right first time, the decision was made to throw an exception.
 
             StringBuilder msg = new StringBuilder();
-            msg.append("Cannot create custom type '")
-                .append(nameParam)
-                .append("' as required prefix (")
-                .append(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX)
-                .append(") is missing.");
-            
+            msg.append("Cannot create custom type '").append(nameParam).append("' as required prefix (").append(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX).append(
+                    ") is missing.");
+
             if (logger.isWarnEnabled())
             {
                 logger.warn(msg.toString());
@@ -72,4 +73,11 @@ public abstract class DefineCustomElementAbstractAction extends RMActionExecuter
             throw new AlfrescoRuntimeException(msg.toString());
         }
     }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        return true;
+    }
+
 }

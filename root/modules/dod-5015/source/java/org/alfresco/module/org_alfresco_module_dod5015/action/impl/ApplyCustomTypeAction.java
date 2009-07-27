@@ -68,10 +68,6 @@ public class ApplyCustomTypeAction extends RMActionExecuterAbstractBase
             logger.debug("Executing action [" + action.getActionDefinitionName() + "] on " + actionedUponNodeRef);
         }
         
-        if (recordsManagementService.isRecord(actionedUponNodeRef) == false)
-        {
-            throw new AlfrescoRuntimeException("Can only execute this action [" + this.getClass().getSimpleName() + "] on a Record. (" + actionedUponNodeRef.toString() + ")");
-        }
         
         // TODO Should we prevent the application of a custom type to a record
         //      that has already been declared?
@@ -115,4 +111,27 @@ public class ApplyCustomTypeAction extends RMActionExecuterAbstractBase
     
         return result;
     }
+
+    @Override
+    public boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+
+        if (recordsManagementService.isRecord(filePlanComponent))
+        {
+            return true;
+        }
+        else
+        {
+            if (throwException)
+            {
+                throw new AlfrescoRuntimeException("Can only execute this action [" + this.getClass().getSimpleName() + "] on a Record. (" + filePlanComponent.toString() + ")");
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    
+    
 }

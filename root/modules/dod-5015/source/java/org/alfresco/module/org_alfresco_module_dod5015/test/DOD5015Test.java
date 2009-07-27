@@ -1061,6 +1061,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         // Check the review schedule
         assertTrue(this.nodeService.hasAspect(testDocument, ASPECT_VITAL_RECORD));
         assertNotNull(this.nodeService.getProperty(testDocument, PROP_REVIEW_AS_OF));
+        
+        txn.commit();
     }
 
     /**

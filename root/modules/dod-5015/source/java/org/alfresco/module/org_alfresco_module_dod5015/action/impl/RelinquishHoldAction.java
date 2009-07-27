@@ -24,7 +24,11 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
+import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
@@ -92,4 +96,36 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
             this.nodeService.removeAspect(nodeRef, ASPECT_FROZEN);
         }
     }
+    
+    @Override
+    public Set<QName> getProtectedAspects()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(ASPECT_FROZEN);
+        return qnames;
+    }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        QName nodeType = this.nodeService.getType(filePlanComponent);
+        if (this.dictionaryService.isSubClass(nodeType, TYPE_HOLD) == true)
+        {
+            return true;
+        }
+        else
+        {
+            if(throwException)
+            {
+                throw new AlfrescoRuntimeException("Can not relinquish a hold on a node that is not of type " + TYPE_HOLD.toString() + 
+                    "(" + filePlanComponent.toString() + ")");
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
+    
 }

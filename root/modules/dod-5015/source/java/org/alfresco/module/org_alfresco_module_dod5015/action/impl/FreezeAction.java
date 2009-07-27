@@ -26,8 +26,10 @@ package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
@@ -117,4 +119,56 @@ public class FreezeAction extends RMActionExecuterAbstractBase
             throw new AlfrescoRuntimeException("Can only freeze records or record folders.");
         }        
     }
+    
+    @Override
+    public Set<QName> getProtectedAspects()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(ASPECT_FROZEN);
+        return qnames;
+    }
+
+    @Override
+    public Set<QName> getProtectedProperties()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(PROP_HOLD_REASON);
+        return qnames;
+    }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        if (this.recordsManagementService.isRecord(filePlanComponent) == true ||
+                this.recordsManagementService.isRecordFolder(filePlanComponent) == true)
+        {
+            // Get the property values
+            String reason = (String)parameters.get(PARAM_REASON);
+            if (reason == null || reason.length() == 0)
+            {
+                if(throwException)
+                {
+                    throw new AlfrescoRuntimeException("Can not freeze a record without a reason.");
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        else
+        {
+            if(throwException)
+            {
+                throw new AlfrescoRuntimeException("Can only freeze records or record folders.");
+            }
+            else
+            {
+                return false;
+            }
+        }        
+    }
+
+    
 }

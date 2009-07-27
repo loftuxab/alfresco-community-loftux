@@ -81,4 +81,10 @@ public class SetupRecordFolderAction extends RMActionExecuterAbstractBase
         // TODO Auto-generated method stub
     }
 
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        return true;
+    }
+
 }

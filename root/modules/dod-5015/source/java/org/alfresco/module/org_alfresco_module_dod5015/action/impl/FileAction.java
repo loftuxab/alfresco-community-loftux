@@ -28,8 +28,10 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
@@ -57,6 +59,8 @@ public class FileAction extends RMActionExecuterAbstractBase
         // TODO check the record is within a folder?     
         
         // TODO check that the folder we are filing into is not closed
+        
+        // The above are done by permissions ...
         
         // TODO if this is a declared record already .. what do we do? .. it's a re-file!
         
@@ -105,6 +109,31 @@ public class FileAction extends RMActionExecuterAbstractBase
     protected void addParameterDefinitions(List<ParameterDefinition> paramList)
     {              
         // No parameters
+    }
+
+    @Override
+    public Set<QName> getProtectedAspects()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(ASPECT_RECORD);
+        qnames.add(ASPECT_VITAL_RECORD);
+        return qnames;
+    }
+
+    @Override
+    public Set<QName> getProtectedProperties()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(PROP_DATE_FILED);
+        qnames.add(PROP_IDENTIFIER);
+        qnames.add(PROP_REVIEW_AS_OF);
+        return qnames;
+    }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        return true;
     }
 
 }
