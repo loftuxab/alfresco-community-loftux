@@ -146,7 +146,7 @@ public interface RecordsManagementModel
 	public static QName TYPE_NON_ELECTRONIC_DOCUMENT = QName.createQName(RM_URI, "nonElectronicDocument");
 	
 	// Records management root aspect
-	public static QName ASPECT_RECRODS_MANAGEMENT_ROOT = QName.createQName(RM_URI, "recordsManagementRoot");
+	public static QName ASPECT_RECORDS_MANAGEMENT_ROOT = QName.createQName(RM_URI, "recordsManagementRoot");
     public static QName ASSOC_HOLDS = QName.createQName(RM_URI, "holds");
 	public static QName ASSOC_TRANSFERS = QName.createQName(RM_URI, "transfers");
 	

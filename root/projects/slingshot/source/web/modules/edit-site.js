@@ -49,7 +49,7 @@
       this.id = containerId;
 
       var instance = Alfresco.util.ComponentManager.get(this.id);
-      if (typeof instance !== "undefined")
+      if (instance !== null)
       {
          throw new Error("An instance of Alfresco.module.EditSite already exists.");
       }
@@ -408,12 +408,6 @@
 
 Alfresco.module.getEditSiteInstance = function()
 {
-   var instanceId = "alfresco-editSite-instance",
-      instance = Alfresco.util.ComponentManager.get(instanceId);
-   
-   if (typeof instance == "undefined")
-   {
-      instance = new Alfresco.module.EditSite(instanceId);
-   }
-   return instance;
+   var instanceId = "alfresco-editSite-instance";
+   return Alfresco.util.ComponentManager.get(instanceId) || new Alfresco.module.EditSite(instanceId);
 }

@@ -211,19 +211,22 @@ hr
 
 /* Style the default prompt */
 
-.yui-skin-greenTheme #prompt
+.yui-skin-greenTheme #prompt,
+.yui-skin-greenTheme #userInput
 {
    border-top: 1px solid #C4C5C5;
    border-bottom: 1px solid #C4C5C5;
    background-color: #E3EBEC;
 }
 
-.yui-skin-greenTheme #prompt .bd
+.yui-skin-greenTheme #prompt .bd,
+.yui-skin-greenTheme #userInput .bd
 {
    background-color: #e3ebec;
 }
 
-.yui-skin-greenTheme #prompt .ft
+.yui-skin-greenTheme #prompt .ft,
+.yui-skin-greenTheme #userInput .ft
 {
    border-left: 1px solid #c4c5c5;
    border-right: 1px solid #c4c5c5;

@@ -81,7 +81,8 @@
             description: p_oData.description
          }, p_oParent, p_expanded);
          
-         // Override YUI getStyle() function to allow our own folder nodes to be rendered
+         // Override YUI getStyle() function to allow our own folder nodes to be rendered.
+         // NOTE: Not currently in active use - this code is simply a copy of the YUI code
          treeNode.getStyle = function()
          {
             if (this.isLoading)
@@ -93,7 +94,7 @@
                 // location top or bottom, middle nodes also get the top style
                 var loc = (this.nextSibling) ? "t" : "l";
 
-                // type p=plus(expand), m=minus(collapase), n=none(no children)
+                // type p=plus(expand), m=minus(collapse), n=none(no children)
                 var type = "n";
                 if (this.hasChildren(true) || (this.isDynamic() && !this.getIconMode()))
                 {

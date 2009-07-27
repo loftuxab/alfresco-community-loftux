@@ -217,21 +217,23 @@ hr
    background-repeat: no-repeat;
 }
 
-/* Style the default prompt */
+/* Style the default prompt and user input pop-ups */
 
-.yui-skin-default #prompt
+.yui-skin-default #prompt,
+.yui-skin-default #userInput
 {
    border-top: 1px solid #C4C5C5;
    border-bottom: 1px solid #C4C5C5;
    background-color: #E3EBEC;
 }
 
-.yui-skin-default #prompt .bd
+.yui-skin-default #prompt .bd,
+.yui-skin-default #userInput .bd
 {
-   background-color: #e3ebec;
 }
 
-.yui-skin-default #prompt .ft
+.yui-skin-default #prompt .ft,
+.yui-skin-default #userInput .ft
 {
    border-left: 1px solid #c4c5c5;
    border-right: 1px solid #c4c5c5;

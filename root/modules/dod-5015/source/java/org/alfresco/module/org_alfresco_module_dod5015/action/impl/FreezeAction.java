@@ -46,7 +46,7 @@ import org.alfresco.service.namespace.QName;
 public class FreezeAction extends RMActionExecuterAbstractBase
 {
     /** Parameter names */
-    public static final String PARAM_REASON = "freeze.reason";
+    public static final String PARAM_REASON = "reason";
     
     /** Hold node reference key */
     private static final String KEY_HOLD_NODEREF = "holdNodeRef";

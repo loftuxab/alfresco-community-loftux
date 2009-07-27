@@ -48,7 +48,7 @@
    Alfresco.module.CreateSite = function(containerId)
    {
       var instance = Alfresco.util.ComponentManager.get(this.id);
-      if (instance !== undefined)
+      if (instance !== null)
       {
          throw new Error("An instance of Alfresco.module.CreateSite already exists.");
       }
@@ -345,12 +345,6 @@
 
 Alfresco.module.getCreateSiteInstance = function()
 {
-   var instanceId = "alfresco-createSite-instance",
-      instance = Alfresco.util.ComponentManager.get(instanceId);
-
-   if (typeof instance == "undefined")
-   {
-      instance = new Alfresco.module.CreateSite(instanceId);
-   }
-   return instance;
+   var instanceId = "alfresco-createSite-instance";
+   return Alfresco.util.ComponentManager.get(instanceId) || new Alfresco.module.CreateSite(instanceId);
 };

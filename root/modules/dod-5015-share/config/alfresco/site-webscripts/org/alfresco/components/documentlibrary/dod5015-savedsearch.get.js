@@ -20,7 +20,6 @@ function main()
          {
             savedSearches.push(
             {
-               id: "savedsearch",
                data: s.name,
                label: s.name,
                description: s.description

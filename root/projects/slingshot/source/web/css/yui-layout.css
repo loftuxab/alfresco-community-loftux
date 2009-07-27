@@ -72,29 +72,38 @@
    visibility: visible;
 }
 
-/* Style the default prompt */
+/* Style the default prompt and user input pop-ups */
 
-#Share #prompt .hd
+#Share #prompt .hd,
+#Share #userInput .hd
 {
-   border-bottom: medium none;
 }
 
-#Share #prompt .bd
+#Share #prompt .bd,
+#Share #userInput .bd
 {
    padding: 1em;
    text-align: center;
 }
 
-#Share #prompt .ft .button-group
+#Share #userInput .bd label
+{
+   padding-right: 0.5em;
+   position: relative;
+   top: 0.2em;
+   vertical-align: top;
+}
+
+#Share #prompt .ft .button-group,
+#Share #userInput .ft .button-group
 {
    display: block;
-   padding-top: 0.5em;
    text-align: center;
 }
 
-#Share #prompt .ft
+#Share #prompt .ft,
+#Share #userInput .ft
 {
-   border-top: none;
 }
 
 

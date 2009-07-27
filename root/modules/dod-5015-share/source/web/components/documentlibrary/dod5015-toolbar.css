@@ -27,11 +27,6 @@
 
 /* Multi-Select Actions */
 
-.toolbar .onActionFileTo
-{
-   background-image: url(images/file-to-16.png);
-}
-
 .toolbar .onActionCutoff
 {
    background-image: url(images/cutoff-record-16.png);
@@ -42,6 +37,16 @@
    background-image: url(images/destroy-record-16.png);
 }
 
+.toolbar .onActionDownloadZip
+{
+   background-image: url(images/download-zip-16.png);
+}
+
+.toolbar .onActionFileTo
+{
+   background-image: url(images/file-to-16.png);
+}
+
 .toolbar .onActionFreeze
 {
    background-image: url(images/freeze-record-16.png);
@@ -49,7 +54,7 @@
 
 .toolbar .onActionTransfer
 {
-   background-image: url(images/transfer-record-16.png);
+   background-image: url(images/transfer-16.png);
 }
 
 .toolbar .onActionTransferConfirm

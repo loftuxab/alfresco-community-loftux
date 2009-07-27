@@ -463,11 +463,11 @@
             this.widgets.overwrite.value = this.showConfig.overwrite;
             this.widgets.thumbnails.value = this.showConfig.thumbnails;
          }
-         var success = "window.parent.Alfresco.util.ComponentManager.get('" + this.id + "'";
+         var success = "window.parent.Alfresco.util.ComponentManager.get('" + this.id + "')";
          this.widgets.successCallback.value = success + ".onUploadSuccess";
          this.widgets.successScope.value = success;
 
-         var failure = "window.parent.Alfresco.util.ComponentManager.get('" + this.id + "'";
+         var failure = "window.parent.Alfresco.util.ComponentManager.get('" + this.id + "')";
          this.widgets.failureCallback.value = failure + ".onUploadFailure";
          this.widgets.failureScope.value = failure;
       },

@@ -55,17 +55,14 @@
    {
       Alfresco.DocListTree.superclass.constructor.call(this, "Alfresco.DocListTree", htmlId, ["treeview", "json"]);
       
+      // Register with Filter Manager
+      Alfresco.util.FilterManager.register(this.name, "path");
+      
       // Initialise prototype properties
-      this.currentFilter =
-      {
-         filterId: null,
-         filterOwner: null,
-         filterData: null
-      };
+      this.currentFilter = {};
       this.pathsToExpand = [];
 
       // Decoupled event listeners
-      YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
       YAHOO.Bubbling.on("folderCopied", this.onFolderCopied, this);
       YAHOO.Bubbling.on("folderCreated", this.onFolderCreated, this);
       YAHOO.Bubbling.on("folderDeleted", this.onFolderDeleted, this);
@@ -271,18 +268,12 @@
          this.isReady = true;
          if (this.initialPath !== null)
          {
-            // We missed the pathChanged event, so fake it here
-            this.onPathChanged("pathChanged",
-            [
-               null,
-               {
-                  path: this.initialPath
-               }
-            ]);
+            // We missed the filterChanged event, so fake it here
+            this.pathChanged(this.initialPath);
          }
          if (this.initialFilter !== null)
          {
-            // We missed the pathChanged event, so fake it here
+            // We weren't ready for the first filterChanged event, so fake it here
             this.onFilterChanged("filterChanged",
             [
                null,
@@ -315,6 +306,7 @@
                {
                   this._updateSelectedNode(node);
                }
+               Alfresco.logger.debug("node.expand: DLT_onExpandComplete");
                node.expand();
             }
          }
@@ -350,105 +342,94 @@
          // Fire the filter changed event
          YAHOO.Bubbling.fire("filterChanged",
          {
-            filterId: "path",
             filterOwner: this.name,
-            filterdata: node.data.path
-         });
-         // Fire the path changed event
-         YAHOO.Bubbling.fire("pathChanged",
-         {
-            path: node.data.path
+            filterId: "path",
+            filterData: node.data.path
          });
          
          // Prevent the tree node from expanding (TODO: user preference?)
          return false;
       },
 
-      
+      /**
+       * Path changed handler
+       * @method pathChanged
+       * @param path {string} New path
+       * @param flags {object} Logic control flags
+       */
+      pathChanged: function DLT_pathChanged(path, flags)
+      {
+         // ensure path starts with leading slash
+         path = $combine("/", path);
+         // Defer if event received before we're ready
+         if (!this.isReady)
+         {
+            this.initialPath = path;
+            return;
+         }
+         
+         this.currentPath = path;
+
+         // Search the tree to see if this path's node is expanded
+         var node = this.widgets.treeview.getNodeByProperty("path", path);
+         if (node !== null)
+         {
+            // Node found
+            this._updateSelectedNode(node);
+            if (!node.expanded)
+            {
+               Alfresco.logger.debug("node.expand: DLT_pathChanged", path);
+               node.expand();
+            }
+            while (node.parent !== null)
+            {
+               node = node.parent;
+               if (!node.expanded)
+               {
+                  Alfresco.logger.debug("node.expand: DLT_onPathChanged (parent)", path);
+                  node.expand();
+               }
+            }
+            return;
+         }
+         
+         /**
+          * The path's node hasn't been loaded into the tree. Create a stack
+          * of parent paths that we need to expand one-by-one in order to
+          * eventually display the current path's node
+          */
+         var paths = path.split("/"),
+            expandPath = "/";
+         // Check for root path special case (split will have created 2 empty array members)
+         if (path === "/")
+         {
+            paths = [""];
+         }
+         for (var i = 0; i < paths.length; i++)
+         {
+            // Push the path onto the list of paths to be expanded
+            expandPath = $combine(expandPath, paths[i]);
+            this.pathsToExpand.push(expandPath);
+         }
+         
+         // Kick off the expansion process by expanding the first unexpanded path
+         do
+         {
+            node = this.widgets.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
+         } while (this.pathsToExpand.length > 0 && node.expanded);
+         
+         if (node !== null)
+         {
+            Alfresco.logger.debug("node.expand: DLT_onPathChanged (pathsToExpand)", this.pathsToExpand);
+            node.expand();
+         }
+      },
+
+
       /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
        * Disconnected event handlers for inter-component event notification
        */
-
-      /**
-       * Fired when the path has changed
-       * @method onPathChanged
-       * @param layer {string} the event source
-       * @param args {object} arguments object
-       */
-      onPathChanged: function DLT_onPathChanged(layer, args)
-      {
-         var obj = args[1];
-         if (obj && (obj.path !== null))
-         {
-            // ensure path starts with leading slash if not the root node
-            obj.path = $combine("/", obj.path);
-            // Defer if event received before we're ready
-            if (!this.isReady)
-            {
-               this.initialPath = obj.path;
-               return;
-            }
-            
-            this.currentPath = obj.path;
-            
-            // check we're the current filter owner
-            if (this.currentFilter.filterOwner != this.name)
-            {
-               YAHOO.Bubbling.fire("filterChanged",
-               {
-                  filterOwner: this.name,
-                  filterId: "path",
-                  filterdata: this.currentPath
-               });
-            }
-
-            // Search the tree to see if this path's node is expanded
-            var node = this.widgets.treeview.getNodeByProperty("path", obj.path);
-            if (node !== null)
-            {
-               // Node found
-               this._updateSelectedNode(node);
-               node.expand();
-               while (node.parent !== null)
-               {
-                  node = node.parent;
-                  node.expand();
-               }
-               return;
-            }
-            
-            /**
-             * The path's node hasn't been loaded into the tree. Create a stack
-             * of parent paths that we need to expand one-by-one in order to
-             * eventually display the current path's node
-             */
-            var paths = obj.path.split("/"),
-               expandPath = "/";
-            // Check for root path special case
-            if (obj.path === "/")
-            {
-               paths = [""];
-            }
-            for (var i = 0; i < paths.length; i++)
-            {
-               // Push the path onto the list of paths to be expanded
-               expandPath = $combine(expandPath, paths[i]);
-               this.pathsToExpand.push(expandPath);
-            }
-            
-            // Kick off the expansion process by expanding the first unexpanded path
-            do
-            {
-               node = this.widgets.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
-            } while (this.pathsToExpand.length > 0 && node.expanded);
-            
-            if (node !== null)
-            {
-               node.expand();
-            }
-         }
-      },
       
       /**
        * Fired when a folder has been renamed
@@ -639,42 +620,25 @@
          var obj = args[1];
          if ((obj !== null) && (obj.filterId !== null))
          {
+            obj.filterOwner = obj.filterOwner || Alfresco.util.FilterManager.getOwner(obj.filterId);
+            
             // Defer if event received before we're ready
             if (!this.isReady)
             {
-               this.initialFilter =
-               {
-                  filterId: obj.filterId,
-                  filterOwner: obj.filterOwner,
-                  filterData: obj.filterData
-               };
+               this.initialFilter = Alfresco.util.cleanBubblingObject(obj);
+               Alfresco.logger.debug("DLT_onFilterChanged (deferring)", this.initialFilter);
                return;
             }
             
+            Alfresco.logger.debug("DLT_onFilterChanged", obj);
             this.initialFilter = null;
             
-            /**
-             * If this is the first filterChanged event and it's not a path then we
-             * need to kick off the the expansion process by expanding the root node.
-             */
-            if ((this.currentFilter.filterOwner === null) && (obj.filterId != "path"))
-            {
-               var node = this.widgets.treeview.getNodeByProperty("path", "/");
-               if (node !== null)
-               {
-                  node.expand();
-               }
-            }
-            
-            // Should be a filterId in the arguments
-            this.currentFilter =
-            {
-               filterId: obj.filterId,
-               filterOwner: obj.filterOwner,
-               filterData: obj.filterData
-            };
-
+            this.currentFilter = Alfresco.util.cleanBubblingObject(obj);
             this.isFilterOwner = (obj.filterOwner == this.name);
+            if (this.isFilterOwner)
+            {
+               this.pathChanged(this.currentFilter.filterData, obj);
+            }
             this._showHighlight(this.isFilterOwner);
          }
       },
@@ -839,6 +803,12 @@
          YAHOO.util.Connect.asyncRequest('GET', uri, callback);
       },
 
+      /**
+       * Highlights the currently selected node.
+       * @method _showHighlight
+       * @param isVisible {boolean} Whether the highlight is visible or not
+       * @private
+       */
       _showHighlight: function DLT__showHighlight(isVisible)
       {
          if (this.selectedNode !== null)
@@ -854,6 +824,12 @@
          }
       },
       
+      /**
+       * Updates the currently selected node.
+       * @method _updateSelectedNode
+       * @param node {object} New node to set as currently selected one
+       * @private
+       */
       _updateSelectedNode: function DLT__updateSelectedNode(node)
       {
          if (this.isFilterOwner)

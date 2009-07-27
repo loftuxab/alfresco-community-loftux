@@ -232,19 +232,21 @@ body.yui-skin-hcBlack .dashlet .body a:hover {
 
 /* Style the default prompt */
 
-.yui-skin-hcBlack #prompt
+.yui-skin-hcBlack #prompt,
+.yui-skin-hcBlack #userInput
 {
    border-top: 1px solid #C4C5C5;
    border-bottom: 1px solid #C4C5C5;
    background-color: #E3EBEC;
 }
 
-.yui-skin-hcBlack #prompt .bd
+.yui-skin-hcBlack #prompt .bd,
+.yui-skin-hcBlack #userInput .bd
 {
-   background-color: #e3ebec;
 }
 
-.yui-skin-hcBlack #prompt .ft
+.yui-skin-hcBlack #prompt .ft,
+.yui-skin-hcBlack #userInput .ft
 {
    border-left: 1px solid #c4c5c5;
    border-right: 1px solid #c4c5c5;

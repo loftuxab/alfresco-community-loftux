@@ -1,10 +1,8 @@
 <#macro initialFilter>
    <#assign filterId = page.url.args["filter"]!"path">
-   <#assign filterOwner>Alfresco.DocList<#if filterId == "path">Tree<#elseif filterId == "tag">Tags<#else>Filter</#if></#assign>
       initialFilter:
       {
-         filterId: "${filterId}",
-         filterOwner: "${filterOwner}"
+         filterId: "${filterId}"
       },
 </#macro>
 <!--[if IE]>
