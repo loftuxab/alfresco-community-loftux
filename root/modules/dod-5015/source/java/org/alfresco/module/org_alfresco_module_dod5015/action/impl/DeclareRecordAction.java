@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,7 +51,8 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
     private static Log logger = LogFactory.getLog(DeclareRecordAction.class);
 
     /**
-     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
+     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
+     *      org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
@@ -59,7 +61,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
         {
             if (recordsManagementService.isRecordDeclared(actionedUponNodeRef) == false)
             {
-            	//Aspect not already defined - check mandatory properties then add
+                // Aspect not already defined - check mandatory properties then add
                 if (mandatoryPropertiesSet(actionedUponNodeRef) == true)
                 {
                     // Add the declared aspect
@@ -67,7 +69,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
                 }
                 else
                 {
-                	throw new AlfrescoRuntimeException("Can not declare record as not all mandatory properties have been set. (" + actionedUponNodeRef.toString() + ")");
+                    throw new AlfrescoRuntimeException("Can not declare record as not all mandatory properties have been set. (" + actionedUponNodeRef.toString() + ")");
                 }
             }
         }
@@ -76,21 +78,22 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
             throw new AlfrescoRuntimeException("Can only undeclare a record. (" + actionedUponNodeRef.toString() + ")");
         }
     }
-    
+
     /**
      * Helper method to check whether all the mandatory properties of the node have been set
      * 
-     * @param nodeRef   node reference
-     * @return boolean  true if all mandatory properties are set, false otherwise
+     * @param nodeRef
+     *            node reference
+     * @return boolean true if all mandatory properties are set, false otherwise
      */
     private boolean mandatoryPropertiesSet(NodeRef nodeRef)
     {
         boolean result = true;
-        
+
         Map<QName, Serializable> nodeRefProps = this.nodeService.getProperties(nodeRef);
-        
+
         QName nodeRefType = this.nodeService.getType(nodeRef);
-        
+
         TypeDefinition typeDef = this.dictionaryService.getType(nodeRefType);
         for (PropertyDefinition propDef : typeDef.getProperties().values())
         {
@@ -105,7 +108,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
                 }
             }
         }
-        
+
         if (result != false)
         {
             Set<QName> aspects = this.nodeService.getAspects(nodeRef);
@@ -127,7 +130,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -136,9 +139,59 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
         if (logger.isWarnEnabled())
         {
             StringBuilder msg = new StringBuilder();
-            msg.append("Mandatory property missing: ")
-               .append(propDef.getName());
+            msg.append("Mandatory property missing: ").append(propDef.getName());
             logger.warn(msg.toString());
         }
     }
+
+    @Override
+    public Set<QName> getProtectedAspects()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(ASPECT_DECLARED_RECORD);
+        return qnames;
+    }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        if (recordsManagementService.isRecord(filePlanComponent) == true)
+        {
+            if (recordsManagementService.isRecordDeclared(filePlanComponent) == false)
+            {
+                // Aspect not already defined - check mandatory properties then add
+                if (mandatoryPropertiesSet(filePlanComponent) == true)
+                {
+                    return true;
+                }
+                else
+                {
+                    if (throwException)
+                    {
+                        throw new AlfrescoRuntimeException("Can not declare record as not all mandatory properties have been set. (" + filePlanComponent.toString() + ")");
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (throwException)
+            {
+                throw new AlfrescoRuntimeException("Can only undeclare a record. (" + filePlanComponent.toString() + ")");
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+
 }

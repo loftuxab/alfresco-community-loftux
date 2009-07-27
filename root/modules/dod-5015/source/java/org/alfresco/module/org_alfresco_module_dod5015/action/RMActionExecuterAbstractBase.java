@@ -25,8 +25,10 @@
 package org.alfresco.module.org_alfresco_module_dod5015.action;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
@@ -40,6 +42,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.springframework.beans.factory.BeanNameAware;
 
 /**
@@ -203,6 +206,8 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
      */
     public void execute(NodeRef filePlanComponent, Map<String, Serializable> parameters)
     {
+        isExecutableImpl(filePlanComponent, parameters, true);
+        
         // Create the action
         Action action = this.actionService.createAction(name);
         action.setParameterValues(parameters);
@@ -239,4 +244,32 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     {
         // No parameters
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction#getProtectedProperties()
+     */
+    public Set<QName> getProtectedProperties()
+    {
+       return Collections.<QName>emptySet();
+    }
+    
+
+    /*
+     * (non-Javadoc)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction#getProtectedAspects()
+     */
+    public Set<QName> getProtectedAspects()
+    {
+        return Collections.<QName>emptySet();
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction#isExecutable(org.alfresco.service.cmr.repository.NodeRef, java.util.Map)
+     */
+    public boolean isExecutable(NodeRef filePlanComponent, Map<String, Serializable> parameters)
+    {
+        return isExecutableImpl(filePlanComponent, parameters, false);
+    }
+    
+    protected abstract boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException);
 }

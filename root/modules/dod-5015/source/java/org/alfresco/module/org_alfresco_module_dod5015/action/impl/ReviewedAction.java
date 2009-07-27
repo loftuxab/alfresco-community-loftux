@@ -24,14 +24,19 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -87,4 +92,20 @@ public class ReviewedAction extends RMActionExecuterAbstractBase
 	{
 		// Intentionally empty
 	}
+	
+	@Override
+    public Set<QName> getProtectedProperties()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(PROP_REVIEW_AS_OF);
+        return qnames;
+    }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        return true;
+    }
+	
+	
 }

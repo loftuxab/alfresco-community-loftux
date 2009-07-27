@@ -24,13 +24,18 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
+import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Action to close the records folder
@@ -71,4 +76,31 @@ public class CloseRecordFolderAction extends RMActionExecuterAbstractBase
 
     }
 
+    @Override
+    public Set<QName> getProtectedProperties()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(PROP_IS_CLOSED);
+        return qnames;
+    }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        if (this.recordsManagementService.isRecordFolder(filePlanComponent))
+        {
+            return true;
+        }
+        else
+        {
+            if (throwException)
+            {
+                throw new AlfrescoRuntimeException("Can not close a node unless it is a record folder. (" + filePlanComponent.toString() + ")");
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
 }

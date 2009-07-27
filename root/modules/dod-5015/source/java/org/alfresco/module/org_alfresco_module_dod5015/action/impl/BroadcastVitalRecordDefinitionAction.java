@@ -26,8 +26,10 @@ package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
@@ -42,23 +44,23 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 
 /**
- * Action to implement the consequences of a change to the value of the VitalRecordDefinition
- * properties. When the VitalRecordIndicator or the reviewPeriod properties are changed on a record
- * container, then any descendant folders or records must be updated as a consequence.
- * Descendant folders should have their reviewPeriods and/or vitalRecordIndicators updated to match
- * the new value. Descendant records should have their reviewAsOf date updated.
+ * Action to implement the consequences of a change to the value of the VitalRecordDefinition properties. When the
+ * VitalRecordIndicator or the reviewPeriod properties are changed on a record container, then any descendant folders or
+ * records must be updated as a consequence. Descendant folders should have their reviewPeriods and/or
+ * vitalRecordIndicators updated to match the new value. Descendant records should have their reviewAsOf date updated.
  * 
  * @author Neil McErlean
  */
 public class BroadcastVitalRecordDefinitionAction extends RMActionExecuterAbstractBase
 {
     /**
-     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
+     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
+     *      org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {
-            this.propagateChangeToChildrenOf(actionedUponNodeRef);
+        this.propagateChangeToChildrenOf(actionedUponNodeRef);
     }
 
     /**
@@ -69,19 +71,18 @@ public class BroadcastVitalRecordDefinitionAction extends RMActionExecuterAbstra
     {
         // Intentionally empty
     }
-    
+
     private void propagateChangeToChildrenOf(NodeRef actionedUponNodeRef)
     {
         Map<QName, Serializable> parentProps = nodeService.getProperties(actionedUponNodeRef);
-        boolean parentVri = (Boolean)parentProps.get(PROP_VITAL_RECORD_INDICATOR);
-        Period parentReviewPeriod = (Period)parentProps.get(PROP_REVIEW_PERIOD);
-        
-        List<ChildAssociationRef> assocs =
-            this.nodeService.getChildAssocs(actionedUponNodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+        boolean parentVri = (Boolean) parentProps.get(PROP_VITAL_RECORD_INDICATOR);
+        Period parentReviewPeriod = (Period) parentProps.get(PROP_REVIEW_PERIOD);
+
+        List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionedUponNodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
         for (ChildAssociationRef nextAssoc : assocs)
         {
             NodeRef nextChild = nextAssoc.getChildRef();
-            
+
             // If the child is a record, then the VitalRecord aspect needs to be applied or updated
             if (recordsManagementService.isRecord(nextChild))
             {
@@ -98,14 +99,15 @@ public class BroadcastVitalRecordDefinitionAction extends RMActionExecuterAbstra
                     nodeService.removeAspect(nextChild, RecordsManagementModel.ASPECT_VITAL_RECORD);
                 }
             }
-            else // copy the vitalRecordDefinition properties from the parent to the child
+            else
+            // copy the vitalRecordDefinition properties from the parent to the child
             {
                 Map<QName, Serializable> childProps = nodeService.getProperties(nextChild);
                 childProps.put(PROP_REVIEW_PERIOD, parentReviewPeriod);
                 childProps.put(PROP_VITAL_RECORD_INDICATOR, parentVri);
                 nodeService.setProperties(nextChild, childProps);
             }
-            
+
             // Recurse down the containment hierarchy to all containers
             if (recordsManagementService.isRecord(nextChild) == false)
             {
@@ -113,4 +115,29 @@ public class BroadcastVitalRecordDefinitionAction extends RMActionExecuterAbstra
             }
         }
     }
+
+    @Override
+    public boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        return true;
+    }
+
+    @Override
+    public Set<QName> getProtectedProperties()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(PROP_REVIEW_PERIOD);
+        qnames.add(PROP_VITAL_RECORD_INDICATOR);
+        qnames.add(PROP_REVIEW_AS_OF);
+        return qnames;
+    }
+
+    @Override
+    public Set<QName> getProtectedAspects()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(RecordsManagementModel.ASPECT_VITAL_RECORD);
+        return qnames;
+    }
+
 }

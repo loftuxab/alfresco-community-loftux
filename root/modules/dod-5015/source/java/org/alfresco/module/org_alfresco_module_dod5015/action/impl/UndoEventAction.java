@@ -25,8 +25,10 @@
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
@@ -156,4 +158,52 @@ public class UndoEventAction extends RMActionExecuterAbstractBase
 
     }
 
+    @Override
+    public Set<QName> getProtectedAspects()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(ASPECT_DISPOSITION_LIFECYCLE);
+        return qnames;
+    }
+
+    @Override
+    public Set<QName> getProtectedProperties()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(PROP_EVENT_EXECUTION_COMPLETE);
+        qnames.add(PROP_EVENT_EXECUTION_COMPLETED_AT);
+        qnames.add(PROP_EVENT_EXECUTION_COMPLETED_BY);
+        return qnames;
+    }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        String eventName = (String)parameters.get(PARAM_EVENT_NAME);
+        if (this.nodeService.hasAspect(filePlanComponent, ASPECT_DISPOSITION_LIFECYCLE) == true)
+        {
+            // Get the next disposition action
+            DispositionAction da = this.recordsManagementService.getNextDispositionAction(filePlanComponent);
+            if (da != null)
+            {
+                // Get the disposition event
+                EventCompletionDetails event = getEvent(da, eventName);
+                if (event != null)
+                {
+                    return true;
+                }
+                else
+                {
+                    if(throwException)
+                    {
+                        throw new AlfrescoRuntimeException("The event " + eventName + " can not be undone, because it is not defined on the disposition lifecycle.");
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    
+    
 }

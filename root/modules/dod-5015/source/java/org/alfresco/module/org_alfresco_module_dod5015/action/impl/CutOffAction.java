@@ -27,9 +27,12 @@ package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -87,4 +90,43 @@ public class CutOffAction extends RMDispositionActionExecuterAbstractBase
             this.nodeService.addAspect(nodeRef, ASPECT_CUT_OFF, cutOffProps);
         }
     }
+    
+    @Override
+    public Set<QName> getProtectedProperties()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(PROP_CUT_OFF_DATE);
+        return qnames;
+    }
+
+    @Override
+    public Set<QName> getProtectedAspects()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(ASPECT_CUT_OFF);
+        return qnames;
+    }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        // dupicates code from close .. it should get the closed action somehow?
+        if (this.recordsManagementService.isRecordFolder(filePlanComponent))
+        {
+            return true;
+        }
+        else
+        {
+            if (throwException)
+            {
+                throw new AlfrescoRuntimeException("Can not close a node unless it is a record folder. (" + filePlanComponent.toString() + ")");
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    
+    
  }

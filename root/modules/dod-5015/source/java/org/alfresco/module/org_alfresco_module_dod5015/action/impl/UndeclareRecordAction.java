@@ -24,10 +24,16 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Undeclare record action
@@ -55,4 +61,38 @@ public class UndeclareRecordAction extends RMActionExecuterAbstractBase
             throw new AlfrescoRuntimeException("Can only undeclare a record. (" + actionedUponNodeRef.toString() + ")");
         }
     }
+    
+    @Override
+    public Set<QName> getProtectedAspects()
+    {
+        HashSet<QName> qnames = new HashSet<QName>();
+        qnames.add(ASPECT_DECLARED_RECORD);
+        return qnames;
+    }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        if (recordsManagementService.isRecord(filePlanComponent) == true)
+        {
+            if (recordsManagementService.isRecordDeclared(filePlanComponent) == true)
+            {
+               return true;
+            }
+            return false;
+        }
+        else
+        {
+            if(throwException)
+            {
+                throw new AlfrescoRuntimeException("Can only undeclare a record. (" + filePlanComponent.toString() + ")");
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
+    
+    
 }

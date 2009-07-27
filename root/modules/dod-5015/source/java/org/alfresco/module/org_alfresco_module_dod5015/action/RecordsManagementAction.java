@@ -26,8 +26,10 @@ package org.alfresco.module.org_alfresco_module_dod5015.action;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 
 /**
@@ -58,4 +60,31 @@ public interface RecordsManagementAction
      * @param parameters            action parameters
      */
     public void execute(NodeRef filePlanComponent, Map<String, Serializable> parameters);
+    
+    
+    /**
+     * Can this action be executed?
+     * Does it meet all of its entry requirements - EXCEPT permission checks.
+     * 
+     * @param filePlanComponent     file plan component the action is executed upon
+     * @param parameters            action parameters
+     * @return
+     */
+    public boolean isExecutable(NodeRef filePlanComponent, Map<String, Serializable> parameters);
+    
+    
+    /**
+     * Get a set of properties that should only be updated via this or other action.
+     * These properties will be rejected by updates via the generic public services, such as the NodeService.
+     * 
+     * @return the set of protected properties
+     */
+    public Set<QName> getProtectedProperties();
+    
+    /**
+     * Get a set of aspects that should be updated via this or other actions.
+     * The aspect can not be added via public services, such as the NodeService.
+     * @return
+     */
+    public Set<QName> getProtectedAspects();
 }
