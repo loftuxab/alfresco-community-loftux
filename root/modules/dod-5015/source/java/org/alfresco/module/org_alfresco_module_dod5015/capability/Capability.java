@@ -24,6 +24,8 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.capability;
 
+import java.util.List;
+
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessStatus;
 
@@ -46,10 +48,10 @@ public interface Capability
     public String getName();
 
     /**
-     * Get the name of an optional action tied to this capability
+     * Get the name of optional actions tied to this capability
      * @return
      */
-    public String getActionName();
+    public List<String> getActionNames();
     
     public int hasPermissionRaw(NodeRef nodeRef);
 }
