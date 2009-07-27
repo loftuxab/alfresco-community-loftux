@@ -329,7 +329,24 @@
        */
       onPrint: function RecordsSearch_onPrint(e, args)
       {
-         
+         // simple and quick way to give a "print friendly" layout - the YUI grid print output
+         // is acceptable, so remove the header and footer areas from Share and Search screen
+         if (Dom.getStyle("alf-hd", "display") !== "none")
+         {
+            this.widgets.printButton.set("label", this._msg("button.screen"));
+            Dom.setStyle("alf-hd", "display", "none");
+            Dom.setStyle("alf-ft", "display", "none");
+            Dom.setStyle(this.id + "-tabset", "display", "none");
+            Dom.setStyle(this.id + "-header", "display", "none");
+         }
+         else
+         {
+            this.widgets.printButton.set("label", this._msg("button.print"));
+            Dom.setStyle("alf-hd", "display", "");
+            Dom.setStyle("alf-ft", "display", "");
+            Dom.setStyle(this.id + "-tabset", "display", "");
+            Dom.setStyle(this.id + "-header", "display", "");
+         }
       },
       
       /**

@@ -10,7 +10,7 @@
 
 <#assign el=args.htmlid>
 <div id="${el}-body" class="search">
-   <div class="yui-g">
+   <div class="yui-g" id="${el}-header">
       <div class="yui-u first">
          <div class="title">${msg("label.searchtitle")}</div>
       </div>
@@ -39,7 +39,7 @@
    </div>
    
    <div id="${el}-tabs" class="yui-navset">
-      <ul class="yui-nav">
+      <ul class="yui-nav" id="${el}-tabset">
          <li class="selected"><a href="#${el}-critera-tab"><em>${msg("label.criteria")}</em></a></li>
          <li><a href="#${el}-results-tab"><em>${msg("label.results")}</em></a></li>
       </ul>            

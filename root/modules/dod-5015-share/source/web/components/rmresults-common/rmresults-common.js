@@ -317,6 +317,7 @@
           */
          var renderCellURI = function RecordsResults_renderCellURI(elCell, oRecord, oColumn, oData)
          {
+            Dom.setStyle(elCell.parentNode, "white-space", "nowrap");
             var url = me._getBrowseUrlForRecord(oRecord);
             elCell.innerHTML = '<span><a href="' + encodeURI(url) + '">' + oRecord.getData("properties.rma_identifier") + '</a></span>';
          };
