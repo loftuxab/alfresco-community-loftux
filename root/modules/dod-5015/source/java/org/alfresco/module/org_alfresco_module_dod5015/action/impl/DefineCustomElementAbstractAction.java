@@ -43,9 +43,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class DefineCustomElementAbstractAction extends RMActionExecuterAbstractBase
 {
-    public static final String PARAM_NAME = "name";
-
     private static Log logger = LogFactory.getLog(DefineCustomElementAbstractAction.class);
+
+    public static final String PARAM_NAME = "name";
+    /**
+     * This is the hard-coded NodeRef where the RMC Custom Model is stored.
+     */
+    public static final NodeRef RM_CUSTOM_MODEL_NODE_REF = new NodeRef("workspace://SpacesStore/records_management_custom_model");
 
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
@@ -80,4 +84,9 @@ public abstract class DefineCustomElementAbstractAction extends RMActionExecuter
         return true;
     }
 
+    @Override
+    public NodeRef getImplicitTargetNodeRef()
+    {
+        return DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF;
+    }
 }

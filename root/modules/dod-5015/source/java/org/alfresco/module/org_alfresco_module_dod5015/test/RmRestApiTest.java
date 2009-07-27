@@ -32,6 +32,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
@@ -288,7 +289,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     
     public void testPostCustomAssoc() throws IOException, JSONException
     {
-        NodeRef customModelNodeRef = RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF;
+        NodeRef customModelNodeRef = DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF;
         // Construct the JSON request for 'defineCustomAssociation'.
         // 1. Child association.
         final String childAssocName = "rmc:customAssocChild" + System.currentTimeMillis();
@@ -381,7 +382,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     
     public void testPostCustomProperty() throws Exception
     {
-        NodeRef customModelNodeRef = RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF;
+        NodeRef customModelNodeRef = DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF;
         // Construct the JSON request for 'defineCustomProperty'.
         final String propertyName = "rmc:customProperty" + System.currentTimeMillis();
         

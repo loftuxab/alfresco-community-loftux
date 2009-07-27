@@ -153,6 +153,32 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
     }
 
     /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#executeRecordsManagementAction(java.lang.String, java.util.Map)
+     */
+    public void executeRecordsManagementAction(String name, Map<String, Serializable> parameters)
+    {
+        RecordsManagementAction rmAction = this.rmActions.get(name);
+        
+        NodeRef implicitTargetNode = rmAction.getImplicitTargetNodeRef();
+        if (implicitTargetNode == null)
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("Cannot execute rmAction ")
+                .append(name)
+                .append(" as the action implementation does not provide an implicit nodeRef.");
+            if (logger.isWarnEnabled())
+            {
+                logger.warn(msg.toString());
+            }
+            throw new AlfrescoRuntimeException(msg.toString());
+        }
+        else
+        {
+            this.executeRecordsManagementAction(implicitTargetNode, name, parameters);
+        }
+    }
+
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#executeRecordsManagementAction(java.util.List, java.lang.String, java.util.Map)
      */
     public void executeRecordsManagementAction(List<NodeRef> nodeRefs, String name, Map<String, Serializable> parameters)

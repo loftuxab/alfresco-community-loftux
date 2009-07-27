@@ -33,7 +33,6 @@ import org.alfresco.repo.dictionary.M2ClassAssociation;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,8 +51,6 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     public static final String RMA_RECORD = "rma:record";
     public static final String RMC_CUSTOM_PROPS = CUSTOM_MODEL_PREFIX + ":customProperties";
     public static final String RMC_CUSTOM_ASSOCS = CUSTOM_MODEL_PREFIX + ":customAssocs";
-
-    public static final NodeRef RM_CUSTOM_MODEL_NODE_REF = new NodeRef("workspace://SpacesStore/records_management_custom_model");
 
     private ServiceRegistry serviceRegistry;
 

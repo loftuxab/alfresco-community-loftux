@@ -87,4 +87,12 @@ public interface RecordsManagementAction
      * @return
      */
     public Set<QName> getProtectedAspects();
+
+    /**
+     * Some admin-related rmActions execute against a target nodeRef which is not provided
+     * by the calling code, but is instead an implementation detail of the action.
+     * 
+     * @return the target nodeRef
+     */
+    public NodeRef getImplicitTargetNodeRef();
 }

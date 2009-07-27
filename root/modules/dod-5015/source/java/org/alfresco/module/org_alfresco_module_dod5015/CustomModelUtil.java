@@ -30,6 +30,7 @@ import java.io.InputStream;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -55,7 +56,7 @@ public class CustomModelUtil
     
     public M2Model readCustomContentModel()
     {
-        ContentReader reader = this.contentService.getReader(RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF,
+        ContentReader reader = this.contentService.getReader(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF,
                                                              ContentModel.TYPE_CONTENT);
         
         if (reader.exists() == false) {throw new AlfrescoRuntimeException("RM CustomModel has no content.");}
@@ -83,7 +84,7 @@ public class CustomModelUtil
 
     public void writeCustomContentModel(M2Model deserializedModel)
     {
-        ContentWriter writer = this.contentService.getWriter(RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF,
+        ContentWriter writer = this.contentService.getWriter(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF,
                                                              ContentModel.TYPE_CONTENT, true);
         writer.setMimetype(MimetypeMap.MIMETYPE_XML);
         writer.setEncoding("UTF-8");
