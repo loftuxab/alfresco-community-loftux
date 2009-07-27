@@ -110,6 +110,10 @@
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="MapClassificationGuideMetadata"/>
         </permissionGroup>
         
+        <!-- An RM administrator does not have admin rights to the full DM repo -->
+        <!-- On no account should allowFullControl="true" be set here -->
+        <!-- In addition, the admin role is editable and may not have all permissions - as defined -->
+        <!-- RM roles do not have any DM rights; they do not need them within the RM type structure  -->
         <permissionGroup name="Administrator" allowFullControl="false" expose="true">
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="DeclareRecords"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ViewRecords"/>
