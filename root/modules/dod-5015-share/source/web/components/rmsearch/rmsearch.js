@@ -152,18 +152,24 @@
       {
          var me = this;
          
-         var searches = this.options.savedSearches;
-         var obj = YAHOO.lang.JSON.parse(res.serverResponse.responseText);
-         for each (s in obj.items)
+         var searches = this.options.savedSearches,
+            obj = YAHOO.lang.JSON.parse(res.serverResponse.responseText),
+            items = obj.items;
+         
+         for (index in items)
          {
-            searches.push(
+            if (items.hasOwnProperty(index))
             {
-               id: s.name,
-               label: s.name,
-               description: s.description,
-               query: s.query,
-               params: s.params
-            });
+               s = items[index];
+               searches.push(
+               {
+                  id: s.name,
+                  label: s.name,
+                  description: s.description,
+                  query: s.query,
+                  params: s.params
+               });
+            }
          }
          
          // Saved Searches menu
