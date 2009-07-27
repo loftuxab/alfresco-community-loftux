@@ -81,7 +81,8 @@ public class DispositionLifecycleGet extends DispositionAbstractBase
 
         // add all the next action data to Map
         Map<String, Object> nextActionModel = new HashMap<String, Object>(8);
-        nextActionModel.put("url", req.getURL());
+        String serviceUrl = req.getServiceContextPath() + req.getPathInfo();
+        nextActionModel.put("url", serviceUrl);
         nextActionModel.put("name", nextAction.getName());
         nextActionModel.put("label", nextAction.getLabel());
         nextActionModel.put("eventsEligible", this.rmService.isNextDispositionActionEligible(nodeRef));

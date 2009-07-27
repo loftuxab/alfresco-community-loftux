@@ -54,8 +54,11 @@ public class DispositionScheduleGet extends DispositionAbstractBase
 
         // add all the schedule data to Map
         Map<String, Object> scheduleModel = new HashMap<String, Object>(8);
-        scheduleModel.put("url", req.getURL());
-        String actionsUrl = req.getURL() + "/dispositionactiondefinitions";
+        
+        // build url
+        String serviceUrl = req.getServiceContextPath() + req.getPathInfo();
+        scheduleModel.put("url", serviceUrl);
+        String actionsUrl = serviceUrl + "/dispositionactiondefinitions";
         scheduleModel.put("actionsUrl", actionsUrl);
         scheduleModel.put("nodeRef", schedule.getNodeRef().toString());
         scheduleModel.put("recordLevelDisposition", schedule.isRecordLevelDisposition());
