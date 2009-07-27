@@ -272,4 +272,12 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     }
     
     protected abstract boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException);
+
+    /**
+     * By default, rmActions do not provide an implicit target nodeRef.
+     */
+    public NodeRef getImplicitTargetNodeRef()
+    {
+        return null;
+    }
 }

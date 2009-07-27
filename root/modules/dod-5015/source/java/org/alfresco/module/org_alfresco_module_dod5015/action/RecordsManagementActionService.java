@@ -77,7 +77,7 @@ public interface RecordsManagementActionService
      * @param parameters  action parameters
      */
     void executeRecordsManagementAction(NodeRef nodeRef, String name, Map<String, Serializable> parameters);
-    
+
     /**
      * Execute a records management action against several nodes
      * 
@@ -87,6 +87,15 @@ public interface RecordsManagementActionService
      */
     void executeRecordsManagementAction(List<NodeRef> nodeRefs, String name, Map<String, Serializable> parameters);
     
+    /**
+     * Execute a records management action. The nodeRef against which the action is to be
+     * executed must be provided by the RecordsManagementAction implementation.
+     * 
+     * @param name        action name
+     * @param parameters  action parameters
+     */
+    void executeRecordsManagementAction(String name, Map<String, Serializable> parameters);
+
     /**
      * Register records management action
      * 

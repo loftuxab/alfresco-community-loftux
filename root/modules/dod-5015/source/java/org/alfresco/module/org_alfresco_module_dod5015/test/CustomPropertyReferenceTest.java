@@ -24,10 +24,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
-import java.io.File;
 import java.io.Serializable;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,11 +37,10 @@ import org.alfresco.module.org_alfresco_module_dod5015.CustomAssociation;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomProperty;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
@@ -163,7 +159,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         Map <String, Serializable> params = new HashMap<String, Serializable>();
         params.put("name", propName);
         params.put("type", DataTypeDefinition.BOOLEAN);
-        rmActionService.executeRecordsManagementAction(RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF, "defineCustomProperty", params);
+        rmActionService.executeRecordsManagementAction("defineCustomProperty", params);
         
         // We need to commit the transaction to trigger behaviour that should reload the data dictionary model.
         txn1.commit();
@@ -232,7 +228,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         params.put("description", "Descriptive text");
         params.put("sourceRoleName", "superseding");
         params.put("targetRoleName", "superseded");
-        rmActionService.executeRecordsManagementAction(RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF,
+        rmActionService.executeRecordsManagementAction(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF,
                 "defineCustomAssociation", params);
         
         // We need to commit the transaction to trigger behaviour that should reload the data dictionary model.
@@ -332,10 +328,10 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         // Declare record
         Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
         propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
-        List<String> smList = new ArrayList<String>(2);
-        smList.add(FOUO);
-        smList.add(NOFORN);
-        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
+//        List<String> smList = new ArrayList<String>(2);
+//        smList.add(FOUO);
+//        smList.add(NOFORN);
+//        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
         propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
         propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
         propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());       

@@ -36,7 +36,6 @@ import org.alfresco.module.org_alfresco_module_dod5015.CustomAssociation;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomProperty;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomPropertyAction;
@@ -140,7 +139,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         actionParams.put("sourceRoleName", "superseding");
         actionParams.put("targetRoleName", "superseded");
         actionParams.put("isChild", Boolean.TRUE);
-        this.rmActionService.executeRecordsManagementAction(RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF, 
+        this.rmActionService.executeRecordsManagementAction(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF, 
                 DEFINE_CUSTOM_ASSOCIATION, actionParams);
 
         String assocName = "rmc:dynamicAssocStandard" + System.currentTimeMillis();
@@ -149,7 +148,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         actionParams.put("sourceRoleName", "supporting");
         actionParams.put("targetRoleName", "supported");
         actionParams.put("isChild", Boolean.FALSE);
-        this.rmActionService.executeRecordsManagementAction(RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF, 
+        this.rmActionService.executeRecordsManagementAction(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF, 
                 DEFINE_CUSTOM_ASSOCIATION, actionParams);
         
         Map<QName, CustomAssociation> updatedCustomAssocs = rmAdminService.getAvailableCustomAssociations();
@@ -179,7 +178,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         actionParams.put(DefineCustomPropertyAction.PARAM_MANDATORY, Boolean.TRUE);
 
         // Submit an action to have it created.
-        this.rmActionService.executeRecordsManagementAction(RecordsManagementAdminServiceImpl.RM_CUSTOM_MODEL_NODE_REF, 
+        this.rmActionService.executeRecordsManagementAction(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF, 
                 "defineCustomProperty", actionParams);
 
         // Retrieve the updated custom property set from the Admin Service.
