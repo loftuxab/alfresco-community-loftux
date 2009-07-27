@@ -110,7 +110,7 @@
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="MapClassificationGuideMetadata"/>
         </permissionGroup>
         
-        <permissionGroup name="Administrator" allowFullControl="true" expose="true">
+        <permissionGroup name="Administrator" allowFullControl="false" expose="true">
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="DeclareRecords"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ViewRecords"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="CreateModifyDestroyFolders"/>
