@@ -150,6 +150,14 @@
         <property name="recordsManagementService" ref="RecordsManagementService"/>
     </bean>
 
+    <!-- REST impl for GET Custom Properties -->
+    <bean id="webscript.org.alfresco.rma.customproperties.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropertiesGet" parent="rmBaseWebscript">
+    </bean>
+
+    <!-- REST impl for POST Custom Properties -->
+    <bean id="webscript.org.alfresco.rma.customproperties.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropertiesPost" parent="rmBaseWebscript">
+    </bean>
+    
     <!-- REST impl for GET Custom Associations -->
     <bean id="webscript.org.alfresco.rma.customassociations.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssociationsGet" parent="rmBaseWebscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
