@@ -2,4 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/site-members</template-type>
    <description>Site members page</description>
+   <properties>
+      <pageFamily>site-members</pageFamily>
+   </properties>
 </template-instance>

@@ -2,4 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/invite</template-type>
    <description>Invite users page</description>
+   <properties>
+      <pageFamily>site-members</pageFamily>
+   </properties>
 </template-instance>

@@ -2,6 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/links-view</template-type>
    <properties>
+      <pageFamily>links</pageFamily>
       <container>links</container>
    </properties>
 </template-instance>

@@ -3,6 +3,7 @@
    <template-type>org/alfresco/links</template-type>
    <description>Links</description>
    <properties>
+      <pageFamily>links</pageFamily>
       <container>links</container>
    </properties>
 </template-instance>

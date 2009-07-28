@@ -2,4 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/pending-invites</template-type>
    <description>Pending invites page</description>
+   <properties>
+      <pageFamily>site-members</pageFamily>
+   </properties>
 </template-instance>
