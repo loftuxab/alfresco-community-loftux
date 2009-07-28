@@ -94,6 +94,11 @@
    vertical-align: top;
 }
 
+#Share #userInput .bd textarea
+{
+   position: relative;
+}
+
 #Share #prompt .ft .button-group,
 #Share #userInput .ft .button-group
 {

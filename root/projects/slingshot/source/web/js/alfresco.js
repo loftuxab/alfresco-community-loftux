@@ -768,29 +768,37 @@ Alfresco.util.stripUnsafeHTMLTags.safeTags =
 };
 
 /**
- * Returns a unique DOM ID for dynamically-created content
+ * Returns a unique DOM ID for dynamically-created content. Optionally applies the new ID to an element.
  *
- * @method Alfresco.util.getDomId
- * @param p_prefix {string} Optional prefix instead of "alf-id" default
+ * @method Alfresco.util.generateDomId
  * @param p_el {HTMLElement} Applies new ID to element
+ * @param p_prefix {string} Optional prefix instead of "alf-id" default
  * @return {string} Dom Id guaranteed to be unique on the current page
  */
-Alfresco.util.getDomId = function(p_prefix, p_el)
+Alfresco.util.generateDomId = function(p_el, p_prefix)
 {
-   var domId, prefix = (p_prefix && p_prefix !== "undefined" ? p_prefix : "alf-id");
+   var domId, prefix = p_prefix || "alf-id";
    do
    {
-      domId = prefix + Alfresco.util.getDomId._nId++;
+      domId = prefix + Alfresco.util.generateDomId._nId++;
    } while (YUIDom.get(domId) !== null);
 
    if (p_el)
    {
-      p_el.id = domId;
+      if (p_el.id)
+      {
+         // MSIE-safe method
+         p_el.attributes["id"].value = domId;
+      }
+      else
+      {
+         p_el.setAttribute("id", domId);
+      }
    }
    
    return domId;
 };
-Alfresco.util.getDomId._nId = 0;
+Alfresco.util.generateDomId._nId = 0;
 
 /**
  * Converts "rel" attributes on <a> tags to "target" attributes.
@@ -2164,7 +2172,7 @@ Alfresco.util.PopupManager = function()
 
          // Generate the HTML mark-up if not overridden
          var html = c.html,
-            id = Alfresco.util.getDomId();
+            id = Alfresco.util.generateDomId();
          if (html === null)
          {
             html = "";
@@ -2225,6 +2233,21 @@ Alfresco.util.PopupManager = function()
          prompt.render(document.body);
          prompt.center();
          prompt.show();
+
+         // Register the ESC key to close the panel
+         var escapeListener = new YAHOO.util.KeyListener(document,
+         {
+            keys: YAHOO.util.KeyListener.KEY.ESCAPE
+         },
+         {
+            fn: function(id, keyEvent)
+            {
+               this.destroy();
+            },
+            scope: prompt,
+            correctScope: true
+         });
+         escapeListener.enable();         
          
          if (YUIDom.get(id))
          {
@@ -3879,7 +3902,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
    {
       // Mandatory properties
       this.name = (typeof name == "undefined" || name === null) ? "Alfresco.component.Base" : name;
-      this.id = (typeof id == "undefined" || id === null) ? Alfresco.util.getDomId() : id;
+      this.id = (typeof id == "undefined" || id === null) ? Alfresco.util.generateDomId() : id;
 
       // Initialise default prototype properties
       this.widgets = {};
@@ -4014,7 +4037,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
       
       this.filterName = this.name.substring(this.name.lastIndexOf(".") + 1);
       this.controlsDeactivated = false;
-      this.uniqueEventKey = Alfresco.util.getDomId("filter");
+      this.uniqueEventKey = Alfresco.util.generateDomId(null, "filter");
 
       // Decoupled event listeners
       YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);

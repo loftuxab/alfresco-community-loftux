@@ -58,8 +58,6 @@
 
    YAHOO.extend(Alfresco.Disposition, Alfresco.component.Base,
    {
-
-
       /**
        * Object container for initialization options
        *
@@ -104,18 +102,19 @@
          this.widgets.editScheduleButton = Alfresco.util.createYUIButton(this, "editschedule-button", this.onEditScheduleButtonClick);
 
          // Add listeners that displays/hides the description
-         var actionsEl = Dom.get(this.id + "-actions");
-         var actionEls = Dom.getElementsByClassName("action", "div", actionsEl);
-         for(var i = 0; i < actionEls.length; i++)
+         var actionsEl = Dom.get(this.id + "-actions"),
+            actionEls = Dom.getElementsByClassName("action", "div", actionsEl),
+            actionEl, more, a, description;
+         
+         for (var i = 0, ii = actionEls.length; i < ii; i++)
          {
-            var actionEl = actionEls[i];
-
-            var more = Dom.getElementsByClassName("more", "div", actionEl)[0],
-               a = document.getElementsByTagName("a", more)[0],
-               description = Dom.getElementsByClassName("description", "div", actionEl)[0];
+            actionEl = actionEls[i];
+            more = Dom.getElementsByClassName("more", "div", actionEl)[0];
+            a = document.getElementsByTagName("a", more)[0];
 
             if (a)
             {
+               description = Dom.getElementsByClassName("description", "div", actionEl)[0];
                Event.addListener(more, "click", function (event, obj)
                {
                   if (obj.description && Dom.hasClass(obj.more, "collapsed"))
@@ -155,7 +154,6 @@
          document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/edit-metadata?nodeRef=" + this.options.dipositionScheduleNodeRef;
       },
 
-
       /**
        * Fired when the user clicks the edit schedule button.
        * Takes the user to the edit page.
@@ -171,6 +169,5 @@
          // Send the user to the edit schedule page
          document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/disposition-edit?nodeRef=" + this.options.nodeRef;
       }
-
    });
 })();

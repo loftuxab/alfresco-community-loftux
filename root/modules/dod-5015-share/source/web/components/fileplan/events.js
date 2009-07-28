@@ -65,8 +65,6 @@
 
    YAHOO.extend(Alfresco.Events, Alfresco.component.Base,
    {
-
-
       /**
        * Object container for initialization options
        *
@@ -126,7 +124,7 @@
                fn: function(response)
                {
                   var nextDispositionAction = response.json.data;
-                  if(nextDispositionAction && nextDispositionAction.events.length == 0 && nextDispositionAction.label)
+                  if (nextDispositionAction && nextDispositionAction.events.length === 0 && nextDispositionAction.label)
                   {
                      this._displayMessage(this.msg("label.noEventsInDispositionSchedule", nextDispositionAction.label));
                   }
@@ -142,7 +140,7 @@
             {
                fn: function(response)
                {
-                  if(response.serverResponse.status == 404)
+                  if (response.serverResponse.status == 404)
                   {
                      this._displayMessage(this.msg("label.noDispositionSchedule"));
                   }
@@ -181,44 +179,50 @@
        */
       _onEventsLoaded: function Events__onEventsLoaded(nextDispositionAction)
       {
-         if(this.widgets.feedbackMessage)
+         if (this.widgets.feedbackMessage)
          {
             this.widgets.feedbackMessage.destroy();
             this.widgets.feedbackMessage = null;
          }
          this.widgets.completedEventsEl.innerHTML = "";
          this.widgets.incompleteEventsEl.innerHTML = "";
-         var events = nextDispositionAction.events ? nextDispositionAction.events : [];
-         var completed = 0;
-         var incomplete = 0;
-         for(var i = 0; i < events.length; i++)
+         var events = nextDispositionAction.events ? nextDispositionAction.events : [],
+            completed = 0,
+            incomplete = 0,
+            ev, completedAt, eventEl, asOf;
+         
+         for (var i = 0, ii = events.length; i < ii; i++)
          {
-            var event = events[i];
-            if(event.complete)
+            ev = events[i];
+            if (ev.complete)
             {
-               var completedAt = Alfresco.util.fromISO8601(event.completedAt);
-               var eventEl = this._createEvent(event, [
+               completedAt = Alfresco.util.fromISO8601(event.completedAt);
+               eventEl = this._createEvent(event, [
                   { "name" : event.label },
                   { "automatic" : event.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
                   { "completed-at" : completedAt ? Alfresco.util.formatDate(completedAt) : "" },
                   { "completed-by" : event.completedByFirstName + " " + event.completedByLastName }
-               ], "undo-button", this.onUndoEventButtonClick, this.widgets.completedEventTemplate);
+               ],
+                  "undo-button", this.onUndoEventButtonClick, this.widgets.completedEventTemplate);
+               
                eventEl = this.widgets.completedEventsEl.appendChild(eventEl);
                completed++;
             }
             else
             {
-               var asOf = Alfresco.util.fromISO8601(nextDispositionAction.asOf);
-               var eventEl = this._createEvent(event, [
+               asOf = Alfresco.util.fromISO8601(nextDispositionAction.asOf);
+               eventEl = this._createEvent(event, [
                   { "name" : event.label },
                   { "automatic" : event.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
                   { "asof" : asOf ? Alfresco.util.formatDate(asOf) : "" }
-               ], "complete-button", this.onCompleteEventButtonClick, this.widgets.incompleteEventTemplate);
+               ],
+                  "complete-button", this.onCompleteEventButtonClick, this.widgets.incompleteEventTemplate);
+               
                eventEl = this.widgets.incompleteEventsEl.appendChild(eventEl);
                incomplete++;
             }
          }
-         if(completed == 0)
+         if (completed === 0)
          {
             Dom.addClass(this.widgets.completedEl, "hidden");
          }
@@ -226,7 +230,7 @@
          {
             Dom.removeClass(this.widgets.completedEl, "hidden");
          }
-         if(incomplete == 0)
+         if (incomplete === 0)
          {
             Dom.addClass(this.widgets.incompleteEl, "hidden");
          }
@@ -246,24 +250,29 @@
       _createEvent: function Events__createEvent(event, attributes, buttonClass, clickHandler, template)
       {
          // Clone template
-         var eventEl = template.cloneNode(true);
-         var elId = Dom.generateId();
-         eventEl.setAttribute("id", elId);
+         var eventEl = template.cloneNode(true),
+            attribute;
+
+         Alfresco.util.generateDomId(eventEl);
 
          // Display data
-         for(var i = 0; i < attributes.length; i++)
+         for (var i = 0, ii = attributes.length; i < ii; i++)
          {
-            var attribute = attributes[i];
-            for(var key in attribute)
+            attribute = attributes[i];
+            for (var key in attribute)
             {
-               Selector.query("." + key + " .value", eventEl, true).innerHTML = attribute[key];
-               break;
+               if (attribute.hasOwnProperty(key))
+               {
+                  Selector.query("." + key + " .value", eventEl, true).innerHTML = attribute[key];
+                  break;
+               }
             }
          }
 
          // Create button
-         var buttonEl = Dom.getElementsByClassName(buttonClass, "span", eventEl)[0];
-         var eventButton = Alfresco.util.createYUIButton(this, buttonClass, null, {}, buttonEl);
+         var buttonEl = Dom.getElementsByClassName(buttonClass, "span", eventEl)[0],
+            eventButton = Alfresco.util.createYUIButton(this, buttonClass, null, {}, buttonEl);
+         
          eventButton.on("click", clickHandler,
          {
             event: event,
@@ -284,7 +293,6 @@
       onCompleteEventButtonClick: function Events_onCompleteEventButtonClick(e, obj)
       {
          Dom.get(this.id + "-eventName").value = obj.event.name;
-
          Dom.get(this.id + "-completedAtTime").value = "12:00";
          Dom.get(this.id + "-completedAtDate").value = Alfresco.util.formatDate(new Date(), DATE_LONG);
 
@@ -305,7 +313,8 @@
          obj.button.set("disabled", true);
 
          // Undo event and refresh events afterwards
-         this._doEventAction("undoEvent", {
+         this._doEventAction("undoEvent",
+         {
             eventName: obj.event.name
          }, "message.revokingEvent", "message.revokeEventFailure");
 
@@ -320,6 +329,7 @@
        * @param pendingMessage Message displayed durint action invocation and
        *        the event data is refreshed afterwards
        * @param failureMessage DIsplayed if the action failed
+       * @private
        */
       _doEventAction: function Events__doEventAction(action, params, pendingMessage, failureMessage)
       {
@@ -333,7 +343,8 @@
          Alfresco.util.Ajax.jsonPost(
          {
             url: Alfresco.constants.PROXY_URI_RELATIVE + "api/rma/actions/ExecutionQueue",
-            dataObj: {
+            dataObj:
+            {
                nodeRef : this.options.nodeRef,
                name : action,
                params : params
@@ -358,9 +369,14 @@
          });
       },
 
+      /**
+       * Setup UI components and form for event dialog
+       *
+       * @method _setupEventDialog
+       * @private
+       */
       _setupEventDialog: function Events__setupEventDialog()
       {
-
          // TODO stop using a static id after RM, needed now so the text-align in #Share .yui-panel .bd .yui-u.first can be overriden
          // The panel is created from the HTML returned in the XHR request, not the container
          this.widgets.completeEventPanel = new YAHOO.widget.Panel("complete-event-panel",
@@ -433,8 +449,9 @@
          var oCalendar = new YAHOO.widget.Calendar("buttoncalendar", oCalendarMenu.body.id);
          oCalendar.render();
 
-         oCalendar.changePageEvent.subscribe(function () {
-            window.setTimeout(function ()
+         oCalendar.changePageEvent.subscribe(function()
+         {
+            window.setTimeout(function()
             {
                oCalendarMenu.show();
             }, 0);
@@ -444,10 +461,10 @@
          {
             if (args)
             {
-               var date = args[0][0];
-               var selectedDate = new Date(date[0], (date[1]-1), date[2]);
-
-               var elem = Dom.get(me.id + "-completedAtDate");
+               var date = args[0][0],
+                  selectedDate = new Date(date[0], (date[1]-1), date[2]),
+                  elem = Dom.get(me.id + "-completedAtDate");
+               
                elem.value = Alfresco.util.formatDate(selectedDate, DATE_LONG);
             }
             oCalendarMenu.hide();
@@ -475,11 +492,11 @@
          // Complete event and refresh events afterwards
          this._doEventAction("completeEvent",
          {
-            "eventName": eventName,
-            "eventCompletedBy": Alfresco.constants.USERNAME,
-            "dateParam" :
+            eventName: eventName,
+            eventCompletedBy: Alfresco.constants.USERNAME,
+            dateParam:
             {
-               "iso8601" : completedAtIso
+               iso8601: completedAtIso
             }
          }, "message.completingEvent", "message.completeEventFailure");
 
@@ -498,6 +515,5 @@
          // Hide panel
          this.widgets.completeEventPanel.hide();
       }
-
    });
 })();

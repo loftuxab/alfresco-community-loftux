@@ -4,7 +4,7 @@
  * Patches: YUI 2.6.0, YUI 2.7.0
  * Escalated: Yes, but closed as "by design"
  */
-(function ()
+(function()
 {
    var Lang = YAHOO.lang,
       Dom = YAHOO.util.Dom,
@@ -113,7 +113,7 @@
 
    	return returnVal;
    };
-}());
+})();
 
 /**
  * Patch to Container to prevent IE6 trying to set properties on elements that have been removed from the DOM.
@@ -140,4 +140,67 @@
            }
        }
    }
-}());
+})();
+
+/**
+ * Patch to Dom.get for the case where a form has an element with a name="id".
+ * Required by: DoD 5015 module, Disposition Schedule Edit component.
+ * Patches: YUI 2.7.0
+ * Known bug: Yes. See http://yuilibrary.com/projects/yui2/ticket/2527744
+ */
+(function()
+{
+   var Y = YAHOO.util,
+      NODE_TYPE = 'nodeType';
+   
+   /**
+    * Returns an HTMLElement reference.
+    * @method get
+    * @param {String | HTMLElement |Array} el Accepts a string to use as an ID for getting a DOM reference, an actual DOM reference, or an Array of IDs and/or HTMLElements.
+    * @return {HTMLElement | Array} A DOM reference to an HTML element or an array of HTMLElements.
+    */
+   YAHOO.util.Dom.get = function(el)
+   {
+       var id, nodes, c, i, len;
+
+       if (el) {
+           if (el[NODE_TYPE] || el.item) { // Node, or NodeList
+               return el;
+           }
+
+           if (typeof el === 'string') { // id
+               id = el;
+               el = document.getElementById(el);
+               if (el && el.attributes["id"].value === id) { // IE: avoid false match on "name" attribute
+               return el;
+               } else if (el && document.all) { // filter by name
+                   el = null;
+                   nodes = document.all[id];
+                   for (i = 0, len = nodes.length; i < len; ++i) {
+                       if (nodes[i].id === id) {
+                           return nodes[i];
+                       }
+                   }
+               }
+               return el;
+           }
+           
+           if (el.DOM_EVENTS) { // YAHOO.util.Element
+               el = el.get('element');
+           }
+
+           if ('length' in el) { // array-like 
+               c = [];
+               for (i = 0, len = el.length; i < len; ++i) {
+                   c[c.length] = Y.Dom.get(el[i]);
+               }
+               
+               return c;
+           }
+
+           return el; // some other object, just pass it back
+       }
+
+       return null;
+   }
+})();

@@ -155,7 +155,7 @@
          /**
           * Favourite Documents custom datacell formatter
           */
-         var favEventClass = Alfresco.util.getDomId("fav-doc");
+         var favEventClass = Alfresco.util.generateDomId(null, "fav-doc");
          var renderCellFavourite = function MD_renderCellFavourite(elCell, oRecord, oColumn, oData)
          {
             var nodeRef = oRecord.getData("nodeRef"),
