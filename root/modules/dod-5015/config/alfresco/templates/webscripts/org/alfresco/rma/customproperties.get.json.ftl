@@ -8,7 +8,8 @@
           <#list properties as property>
              {
              "qname" : "${property.qname}",
-             "value" : "${property.value}",
+             "value" : "${property.value}"
+             }
              <#if property_has_next>,</#if>
           </#list>
       ]
