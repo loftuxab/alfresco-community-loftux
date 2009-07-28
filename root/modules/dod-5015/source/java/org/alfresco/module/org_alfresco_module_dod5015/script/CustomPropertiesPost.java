@@ -91,7 +91,7 @@ public class CustomPropertiesPost extends AbstractRmWebScript
         for (Iterator iter = json.keys(); iter.hasNext(); )
         {
             String nextKeyString = (String)iter.next();
-            String nextValueString = (String)json.get(nextKeyString);
+            String nextValueString = json.getString(nextKeyString);
             
             QName propProperQName = QName.createQName(nextKeyString, namespaceService);
             Map<QName, Serializable> existingProps = nodeService.getProperties(recordNode);
