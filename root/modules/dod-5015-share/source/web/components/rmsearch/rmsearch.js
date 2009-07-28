@@ -178,10 +178,7 @@
             }
          }
          
-         if (items.length !== 0)
-         {
-            this._initSavedSearchMenu();
-         }
+         this._initSavedSearchMenu();
       },
       
       /**
@@ -283,24 +280,10 @@
             // add to our search to the list
             this.options.savedSearches.push(searchObj);
             
-            if (this.options.savedSearches.length === 1)
-            {
-               // first generation of the menu
-               this._initSavedSearchMenu();
-            }
-            else
-            {
-               // update existing menu
-               var menu = this.widgets.savedSearchMenu.getMenu();
-               menu.clearContent();
-               menu.addItems(this._buildSavedSearchesMenu());
-               // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
-               menu.lazyLoad = false;
-               menu.initEvent.fire();
-               menu.render();
-            }
+            // rebuild the menu component
+            this._initSavedSearchMenu();
             
-            // refresh Saved Searches list menu
+            // refresh Saved Searches menu button label to the selected item
             this.widgets.savedSearchMenu.set("label", searchObj.label);
          }
       },
@@ -439,8 +422,6 @@
                me.widgets.searchButton.set("disabled", false);
             }
          });
-         
-         this.widgets.savedSearchMenu.set("disabled", false);
       },
       
       /**
@@ -475,7 +456,8 @@
        */
       _sortByLabel: function RecordsSearch__sortByLabel(s1, s2)
       {
-         return (s1.label > s2.label) ? 1 : (s1.label < s2.label) ? -1 : 0;
+         var ss1 = s1.label.toLowerCase(), ss2 = s2.label.toLowerCase();
+         return (ss1 > ss2) ? 1 : (ss1 < ss2) ? -1 : 0;
       },
       
       /**
