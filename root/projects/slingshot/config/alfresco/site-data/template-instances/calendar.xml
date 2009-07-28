@@ -2,6 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/calendar</template-type>
    <properties>
+      <pageFamily>calendar</pageFamily>
       <container>calendar</container>
    </properties>
 </template-instance>

@@ -2,6 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/record-folder-details</template-type>
    <properties>
+      <pageFamily>documentlibrary</pageFamily>
       <container>documentLibrary</container>
    </properties>
 </template-instance>

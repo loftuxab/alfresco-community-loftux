@@ -2,6 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/wiki-create</template-type>
    <properties>
+      <pageFamily>wiki</pageFamily>
       <container>wiki</container>
    </properties>
 </template-instance>

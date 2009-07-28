@@ -2,6 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/blog-postview</template-type>
    <properties>
+      <pageFamily>blog-postlist</pageFamily>
       <container>blog</container>
    </properties>
 </template-instance>

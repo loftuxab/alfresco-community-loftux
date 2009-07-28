@@ -2,4 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/site-groups</template-type>
    <description>Site Groups page</description>
+   <properties>
+      <pageFamily>site-members</pageFamily>
+   </properties>
 </template-instance>

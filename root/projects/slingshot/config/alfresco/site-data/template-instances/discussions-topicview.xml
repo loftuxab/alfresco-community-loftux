@@ -2,6 +2,7 @@
 <template-instance>
    <template-type>org/alfresco/discussions-topicview</template-type>
    <properties>
+      <pageFamily>discussions-topiclist</pageFamily>
       <container>discussions</container>
    </properties>
 </template-instance>

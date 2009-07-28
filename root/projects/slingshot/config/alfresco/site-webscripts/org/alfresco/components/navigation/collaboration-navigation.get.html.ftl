@@ -1,12 +1,5 @@
 <#assign activeSite = page.url.templateArgs.site!"">
-<#assign activePage = page.url.templateArgs.pageid!"dashboard">
-<#if activePage = "blog-postview" || activePage = "blog-postedit"><#assign activePage="blog-postlist"></#if>
-<#if activePage = "links-linkedit" || activePage = "links-view"><#assign activePage="links"></#if>
-<#if activePage = "discussions-topicview" || activePage = "discussions-createtopic"><#assign activePage="discussions-topiclist"></#if>
-<#if activePage = "document-details" || activePage = "folder-details" || activePage = "edit-metadata"><#assign activePage="documentlibrary"></#if>
-<#-- Records Management -->
-<#if activePage = "record-series-details" || activePage = "record-category-details" || activePage = "record-folder-details"><#assign activePage="documentlibrary"></#if>
-<#if activePage = "wiki-create"><#assign activePage="wiki"></#if>
+<#assign pageFamily = template.properties.pageFamily!"dashboard">
 <div class="site-navigation">
 <#if siteExists??>
    <#if url.context + "/page/site/" + activeSite + "/dashboard" == page.url.uri>
@@ -17,7 +10,7 @@
    <span class="navigation-item"><a href="${url.context}/page/site/${activeSite}/dashboard" ${linkClass}>${msg("link.siteDashboard")}</a></span>
    <#list pages as p>
       <#assign linkPage><#if p.pageUrl??>${p.pageUrl}<#else>${p.pageId}</#if></#assign>
-      <#if linkPage?index_of(activePage) != -1>
+      <#if linkPage?index_of(pageFamily) != -1>
          <#assign linkClass>class="active-page theme-color-4"</#assign>      
       <#else>
          <#assign linkClass>class="theme-color-4"</#assign>
@@ -28,7 +21,7 @@
    </a></span>
    </#list>
 <span class="navigation-separator-alt">&nbsp;</span>
-   <#if activePage = "site-members" || activePage = "pending-invites" || activePage = "invite" || activePage = "site-groups" || activePage = "add-groups">
+   <#if pageFamily = "site-members">
       <#assign linkClass>class="active-page theme-color-4"</#assign>      
    <#else>
       <#assign linkClass>class="theme-color-4"</#assign>
