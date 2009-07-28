@@ -74,11 +74,14 @@
     </bean>
     
     <bean id="rmEntryVoter" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter">
+        <!-- Services -->
         <property name="permissionService" ref="permissionService"/>
         <property name="namespacePrefixResolver" ref="namespaceService"/>
         <property name="nodeService" ref="nodeService"/>
         <property name="caveatConfigImpl" ref="caveatConfigImpl"/>
         <property name="dictionaryService" ref="dictionaryService"/>
+        <property name="recordsManagementService" ref="recordsManagementService"/>
+        <!-- Capabilities -->
         <property name="accessAuditCapability" ref="rmAccessAuditCapability"/>
         <property name="addModifyEventDatesCapability" ref="rmAddModifyEventDatesCapability"/>
         <property name="approveRecordsScheduledForCutoffCapability" ref="rmApproveRecordsScheduledForCutoffCapability"/>
@@ -334,7 +337,7 @@
         <property name="objectDefinitionSource">
             <value>
                 <![CDATA[ 
-                org.alfresco.service.cmr.repository.NodeService.getStores=AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN 
+                org.alfresco.service.cmr.repository.NodeService.getStores=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN 
                 org.alfresco.service.cmr.repository.NodeService.createStore=ACL_METHOD.ROLE_ADMINISTRATOR,RM_ABSTAIN 
                 org.alfresco.service.cmr.repository.NodeService.exists=ACL_ALLOW,RM_ALLOW
                 org.alfresco.service.cmr.repository.NodeService.getNodeStatus=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0 
@@ -400,14 +403,14 @@
                 org.alfresco.service.cmr.model.FileFolderService.listFolders=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.ReadProperties,RM.Read.0,AFTER_RM.FilterNode 
                 org.alfresco.service.cmr.model.FileFolderService.search=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.Read,RM.Read.0,AFTER_RM.FilterNode
                 org.alfresco.service.cmr.model.FileFolderService.searchSimple=ACL_NODE.0.sys:base.ReadChildren,AFTER_ACL_NODE.sys:base.Read,RM.Read.0,AFTER_RM.FilterNode 
-                org.alfresco.service.cmr.model.FileFolderService.rename=AFTER_ACL_NODE.sys:base.WriteProperties,RM.Update.0
+                org.alfresco.service.cmr.model.FileFolderService.rename=ACL_ALLOW,AFTER_ACL_NODE.sys:base.WriteProperties,RM.Update.0
                 org.alfresco.service.cmr.model.FileFolderService.move=ACL_NODE.0.sys:base.DeleteNode,ACL_NODE.1.sys:base.CreateChildren,RM.Move.0.1 
                 org.alfresco.service.cmr.model.FileFolderService.copy=ACL_NODE.0.sys:base.ReadProperties,ACL_NODE.1.sys:base.CreateChildren,RM.Read.0,RM.Create.1.0
                 org.alfresco.service.cmr.model.FileFolderService.create=ACL_NODE.0.sys:base.CreateChildren,RM.Create.0.2 
                 org.alfresco.service.cmr.model.FileFolderService.delete=ACL_NODE.0.sys:base.DeleteNode,RM.Delete.0 
                 org.alfresco.service.cmr.model.FileFolderService.makeFolders=ACL_METHOD.ROLE_ADMINISTRATOR,RM_ABSTAIN
                 org.alfresco.service.cmr.model.FileFolderService.getNamePath=ACL_NODE.1.sys:base.ReadProperties,RM.Read.0 
-                org.alfresco.service.cmr.model.FileFolderService.resolveNamePath=AFTER_ACL_NODE.sys:base.ReadProperties,RM.Read.0 
+                org.alfresco.service.cmr.model.FileFolderService.resolveNamePath=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties,RM.Read.0 
                 org.alfresco.service.cmr.model.FileFolderService.getFileInfo=ACL_NODE.0.sys:base.ReadProperties,RM.Read.0
                 org.alfresco.service.cmr.model.FileFolderService.getReader=ACL_NODE.0.sys:base.ReadContent,RM.Read.0 
                 org.alfresco.service.cmr.model.FileFolderService.getWriter=ACL_NODE.0.sys:base.WriteContent,RM.WriteContent.0 
@@ -480,8 +483,8 @@
         <property name="objectDefinitionSource">
             <value>
                 <![CDATA[ 
-                org.alfresco.service.cmr.search.SearchService.query=AFTER_ACL_NODE.sys:base.Read,RM_QUERY,AFTER_RM.FilterNode 
-                org.alfresco.service.cmr.search.SearchService.selectNodes=AFTER_ACL_NODE.sys:base.Read,RM_QUERY,AFTER_RM.FilterNode 
+                org.alfresco.service.cmr.search.SearchService.query=ACL_ALLOW,AFTER_ACL_NODE.sys:base.Read,RM_QUERY,AFTER_RM.FilterNode 
+                org.alfresco.service.cmr.search.SearchService.selectNodes=ACL_ALLOW,AFTER_ACL_NODE.sys:base.Read,RM_QUERY,AFTER_RM.FilterNode 
                 org.alfresco.service.cmr.search.SearchService.selectProperties=ACL_NODE.0.sys:base.Read,RM_ABSTAIN
                 org.alfresco.service.cmr.search.SearchService.contains=ACL_NODE.0.sys:base.Read,RM.Read.0 
                 org.alfresco.service.cmr.search.SearchService.like=ACL_NODE.0.sys:base.Read,RM.Read.0 
@@ -513,10 +516,10 @@
         <property name="objectDefinitionSource">
             <value>
                 <![CDATA[ 
-                org.alfresco.service.cmr.search.CategoryService.getChildren=AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN 
-                org.alfresco.service.cmr.search.CategoryService.getCategories=AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN 
-                org.alfresco.service.cmr.search.CategoryService.getClassifications=AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN
-                org.alfresco.service.cmr.search.CategoryService.getRootCategories=AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN 
+                org.alfresco.service.cmr.search.CategoryService.getChildren=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN 
+                org.alfresco.service.cmr.search.CategoryService.getCategories=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN 
+                org.alfresco.service.cmr.search.CategoryService.getClassifications=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN
+                org.alfresco.service.cmr.search.CategoryService.getRootCategories=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties,RM_ABSTAIN 
                 org.alfresco.service.cmr.search.CategoryService.getClassificationAspects=ACL_ALLOW,RM_ABSTAIN 
                 org.alfresco.service.cmr.search.CategoryService.createClassifiction=ACL_ALLOW,RM_ABSTAIN
                 org.alfresco.service.cmr.search.CategoryService.createRootCategory=ACL_ALLOW,RM_ABSTAIN 
@@ -880,7 +883,7 @@
         <property name="objectDefinitionSource">
             <value>
                 <![CDATA[ 
-                org.alfresco.service.cmr.security.PersonService.getPerson=AFTER_ACL_NODE.sys:base.ReadProperties 
+                org.alfresco.service.cmr.security.PersonService.getPerson=ACL_ALLOW,AFTER_ACL_NODE.sys:base.ReadProperties 
                 org.alfresco.service.cmr.security.PersonService.personExists=ACL_ALLOW 
                 org.alfresco.service.cmr.security.PersonService.createMissingPeople=ACL_ALLOW
                 org.alfresco.service.cmr.security.PersonService.setCreateMissingPeople=ACL_METHOD.ROLE_ADMINISTRATOR 

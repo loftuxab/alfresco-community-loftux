@@ -47,6 +47,7 @@ import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+
 /**
  * @author andyh
  */
@@ -91,13 +92,37 @@ public abstract class AbstractCapability implements Capability
         }
     }
 
+    public int checkActionConditionsIfPresent(NodeRef nodeRef)
+    {
+        if(actions.size() > 0)
+        {
+            for(RecordsManagementAction action : actions)
+            {
+                if(action.isExecutable(nodeRef, null))
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
+            }
+            return AccessDecisionVoter.ACCESS_DENIED;
+        }
+        else
+        {
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
+    }
+    
     public AccessStatus hasPermission(NodeRef nodeRef)
     {
-        return translate(hasPermissionImpl(nodeRef));
+       
+        return translate(hasPermissionRaw(nodeRef));
     }
 
     public int hasPermissionRaw(NodeRef nodeRef)
     {
+        if(checkActionConditionsIfPresent(nodeRef) == AccessDecisionVoter.ACCESS_DENIED)
+        {
+            return AccessDecisionVoter.ACCESS_DENIED;
+        }
         return hasPermissionImpl(nodeRef);
     }
 

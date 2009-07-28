@@ -59,12 +59,11 @@ public class RMActionProxyFactoryBean extends ProxyFactoryBean
 
     public void registerAction()
     {
-        runtimeActionService.registerActionExecuter((ActionExecuter) getObject());
         AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Void>()
         {
-
             public Void doWork() throws Exception
             {
+                runtimeActionService.registerActionExecuter((ActionExecuter) getObject());
                 recordsManagementActionService.register((RecordsManagementAction) getObject());
                 return null;
             }
