@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
+import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.dictionary.M2Aspect;
@@ -43,14 +44,17 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * TODO Add a String/QName 'rmtype' parameter - maps to RM aspect
- * 
  * @author Neil McErlean
  */
 public class DefineCustomPropertyAction extends DefineCustomElementAbstractAction
 {
     private static Log logger = LogFactory.getLog(DefineCustomPropertyAction.class);
 
+    //TODO Need a better name than this
+    public static final String PARAM_CUSTOMISE_ELEMENT = "customiseElement";
+
+    
+    //TODO Many of these parameters are unnecessary and should be deleted.
     public static final String PARAM_TYPE = "type";
     public static final String PARAM_TITLE = "title";
     public static final String PARAM_DESCRIPTION = "description";
@@ -58,9 +62,6 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
     public static final String PARAM_MULTI_VALUED = "multiValued";
     public static final String PARAM_MANDATORY = "mandatory";
     public static final String PARAM_PROTECTED = "protected";
-    //TODO Currently the following params are not handled. Are they needed?
-    // containerClass, mandatoryEnforced, indexed, storedInIndex, indexedAtomically
-    // indexTokenisationMode, override, constraints
 
     /**
 	 * 
@@ -82,6 +83,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
                 msg.append(n).append(" = ");
                 msg.append(params.get(n));
                 msg.append(LINE_SEPARATOR);
+                //TODO Log where I'm putting it.
             }
             logger.debug(msg.toString());
         }
@@ -90,7 +92,24 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         customModelUtil.setContentService(contentService);
 
         M2Model deserializedModel = customModelUtil.readCustomContentModel();
-        M2Aspect customPropsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_PROPS);
+
+        // Need to select the correct aspect in the customModel to which we'll add the property.
+        String customisableElement = (String)params.get(PARAM_CUSTOMISE_ELEMENT);
+        CustomisableRmElement ce = CustomisableRmElement.getEnumFor(customisableElement);
+        String aspectName = null;
+        if (ce != null)
+        {
+            aspectName = ce.getCorrespondingAspect();
+        }
+        if (aspectName == null)
+        {
+            // Do what we did before.
+            //TODO When all custom properties are defined in one of the 4 typed aspects,
+            //     delete this if clause
+            aspectName = RecordsManagementAdminServiceImpl.RMC_CUSTOM_PROPS;
+        }
+
+        M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
 
         QName propQName = QName.createQName((String)params.get(PARAM_NAME), namespaceService);
         String propQNameAsString = propQName.toPrefixString(namespaceService);
@@ -104,7 +123,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         QName type = null;
         if (serializableType instanceof String)
         {
-            type = QName.createQName((String)serializableType);
+            type = QName.createQName((String)serializableType, this.namespaceService);
         }
         else
         {
@@ -138,13 +157,21 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         customModelUtil.writeCustomContentModel(deserializedModel);
     }
 
-	/**
-	 * 
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        return true;
+    }
+
+    /**
 	 * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefinitions(java.util.List)
 	 */
 	@Override
 	protected void addParameterDefinitions(List<ParameterDefinition> paramList)
 	{
+	    //TODO Make the customisable element param mandatory
+	    paramList.add(new ParameterDefinitionImpl(PARAM_CUSTOMISE_ELEMENT, DataTypeDefinition.TEXT, false, null));
+	    
         paramList.add(new ParameterDefinitionImpl(PARAM_NAME, DataTypeDefinition.TEXT, true, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_TITLE, DataTypeDefinition.TEXT, false, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, DataTypeDefinition.TEXT, false, null));

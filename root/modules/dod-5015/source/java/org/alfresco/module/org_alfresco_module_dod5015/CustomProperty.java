@@ -35,6 +35,7 @@ import org.alfresco.service.namespace.QName;
  */
 public final class CustomProperty
 {
+
     private String defaultValue;
     private String description;
     private boolean mandatory;
@@ -142,12 +143,4 @@ public final class CustomProperty
     {
         this.type = type;
     }
-
-    // TODO There are various other property metadata that we could set here.
-    // newProp.setIndexed(boolean)
-    // newProp.setIndexedAtomically(boolean)
-    // newProp.setIndexTokenisationMode(IndexTokenisationMode)
-    // newProp.setMandatoryEnforced(boolean)
-    // newProp.setOverride(boolean)
-    // newProp.setStoredInIndex(boolean)
 }

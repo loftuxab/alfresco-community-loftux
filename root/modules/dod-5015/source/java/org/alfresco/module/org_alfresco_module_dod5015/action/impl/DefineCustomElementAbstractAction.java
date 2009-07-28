@@ -24,9 +24,6 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
@@ -76,12 +73,6 @@ public abstract class DefineCustomElementAbstractAction extends RMActionExecuter
             }
             throw new AlfrescoRuntimeException(msg.toString());
         }
-    }
-
-    @Override
-    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
-    {
-        return true;
     }
 
     @Override

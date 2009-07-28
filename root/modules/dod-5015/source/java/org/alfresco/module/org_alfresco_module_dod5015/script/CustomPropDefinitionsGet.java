@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.alfresco.module.org_alfresco_module_dod5015.CustomProperty;
+import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.Cache;
@@ -56,8 +57,11 @@ public class CustomPropDefinitionsGet extends DeclarativeWebScript
     public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
         Map<String, Object> model = new HashMap<String, Object>();
+        
+        String elementName = req.getParameter("elementName");
+        CustomisableRmElement elem = CustomisableRmElement.getEnumFor(elementName);
 
-        Map<QName, CustomProperty> currentCustomProps = rmAdminService.getAvailableCustomProperties();
+        Map<QName, CustomProperty> currentCustomProps = rmAdminService.getAvailableCustomProperties(elem);
 
         List<CustomProperty> propData = new ArrayList<CustomProperty>(currentCustomProps.size());
         for (Entry<QName, CustomProperty> entry : currentCustomProps.entrySet())
