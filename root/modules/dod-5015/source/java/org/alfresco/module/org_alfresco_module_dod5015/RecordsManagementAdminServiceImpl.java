@@ -49,6 +49,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 
     public static final String CUSTOM_MODEL_PREFIX = "rmc";
     public static final String RMA_RECORD = "rma:record";
+    @Deprecated
     public static final String RMC_CUSTOM_PROPS = CUSTOM_MODEL_PREFIX + ":customProperties";
     public static final String RMC_CUSTOM_ASSOCS = CUSTOM_MODEL_PREFIX + ":customAssocs";
 
@@ -65,8 +66,6 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     @Deprecated
     public Map<QName, CustomProperty> getAvailableCustomProperties()
     {
-        // TODO I don't need to open the content to get the properties here.
-        //      Aren't they in the dataDictionary now? But see below.
         CustomModelUtil customModelUtil = new CustomModelUtil();
         customModelUtil.setContentService(serviceRegistry.getContentService());
         
@@ -105,6 +104,33 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
             CustomAssociation cA = CustomAssociation.createInstance(a, serviceRegistry);
 
             result.put(n, cA);
+        }
+        return result;
+    }
+
+    public Map<QName, CustomProperty> getAvailableCustomProperties(CustomisableRmElement rmElement)
+    {
+        //TODO Delete this delgation when the other method is removed.
+        if (rmElement == null) {
+            return this.getAvailableCustomProperties();
+        }
+        //TODO When ongoing datadictionary issues are resolved, this method should retrieve
+        //     the custom properties from the data dictionary directly.
+        CustomModelUtil customModelUtil = new CustomModelUtil();
+        customModelUtil.setContentService(serviceRegistry.getContentService());
+        
+        M2Model customModel = customModelUtil.readCustomContentModel();
+        M2Aspect customPropsAspect = customModel.getAspect(rmElement.getCorrespondingAspect());
+        List<M2Property> allProps = customPropsAspect.getProperties();
+        
+        Map<QName, CustomProperty> result = new HashMap<QName, CustomProperty>(allProps.size());
+        for (M2Property prop : allProps)
+        {
+            QName n = QName.createQName(prop.getName(), serviceRegistry.getNamespaceService());
+
+            CustomProperty rmcp = CustomProperty.createInstance(prop, serviceRegistry);
+
+            result.put(n, rmcp);
         }
         return result;
     }

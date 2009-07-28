@@ -35,11 +35,13 @@ import javax.transaction.UserTransaction;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomAssociation;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomProperty;
+import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomPropertyAction;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
@@ -159,6 +161,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         Map <String, Serializable> params = new HashMap<String, Serializable>();
         params.put("name", propName);
         params.put("type", DataTypeDefinition.BOOLEAN);
+        params.put(DefineCustomPropertyAction.PARAM_CUSTOMISE_ELEMENT, "recordFolder");
         rmActionService.executeRecordsManagementAction("defineCustomProperty", params);
         
         // We need to commit the transaction to trigger behaviour that should reload the data dictionary model.
@@ -170,7 +173,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         // Confirm the custom property is included in the list from rmAdminService.
         final QName propQName = QName.createQName(propName, namespaceService);
 
-        Map<QName, CustomProperty> customPropDefinitions = rmAdminService.getAvailableCustomProperties();
+        Map<QName, CustomProperty> customPropDefinitions = rmAdminService.getAvailableCustomProperties(CustomisableRmElement.RECORD_FOLDER);
         CustomProperty propDefn = customPropDefinitions.get(propQName);
         assertNotNull("Custom property definition from rmAdminService was null.", propDefn);
         assertEquals(propName, propDefn.getName());
@@ -180,7 +183,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         // So we apply the aspect containing it to our test record.
         Map<QName, Serializable> customPropValue = new HashMap<QName, Serializable>();
         customPropValue.put(propQName, true);
-        QName aspectQName = QName.createQName("rmc:customProperties", namespaceService);
+        QName aspectQName = QName.createQName("rmc:customRecordFolderProperties", namespaceService);
         nodeService.addAspect(testRecord, aspectQName, customPropValue);
         
         txn2.commit();

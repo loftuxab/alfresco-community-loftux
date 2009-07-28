@@ -100,6 +100,13 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
         // The subsequent part of the role name is just a string and is not validated.
 	}
 	
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+        return true;
+    }
+
     private void createCustomStandardAssoc(Action action, NodeRef actionedUponNodeRef)
     {
         CustomModelUtil customModelUtil = new CustomModelUtil();

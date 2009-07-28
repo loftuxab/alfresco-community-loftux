@@ -24,34 +24,49 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
-import java.util.Map;
-
-import org.alfresco.service.namespace.QName;
-
 /**
- * Records management custom model service interface.
- * 
- * @author Neil McErlean
+ * This enum gives the set of allowed customisable types (aspects) where a custom
+ * property can be defined.
  */
-public interface RecordsManagementAdminService
+public enum CustomisableRmElement
 {
-    /**
-     * This method retrieves the custom properties that have been defined in the customProperties aspect.
-     * This method will be deleted and all properties should now be defined in one of the four
-     * customisable RM elements: RS, RC, RF, R.
-     * @return
-     */
-    @Deprecated
-    public Map<QName, CustomProperty> getAvailableCustomProperties();
+    RECORD_SERIES   ("rmc:customRecordSeriesProperties"),
+    RECORD_CATEGORY ("rmc:customRecordCategoryProperties"),
+    RECORD_FOLDER   ("rmc:customRecordFolderProperties"),
+    RECORD          ("rmc:customRecordProperties");
 
-    /**
-     * This method returns the custom properties that have been defined for the specified
-     * customisable RM element.
-     * 
-     * @param customisedElement
-     * @return
-     */
-    public Map<QName, CustomProperty> getAvailableCustomProperties(CustomisableRmElement customisedElement);
-
-    public Map<QName, CustomAssociation> getAvailableCustomAssociations();
+    private final String aspectName;
+    private CustomisableRmElement(String aspectName)
+    {
+        this.aspectName = aspectName;
+    }
+    
+    public static CustomisableRmElement getEnumFor(String elementName)
+    {
+        if ("recordSeries".equalsIgnoreCase(elementName))
+        {
+            return RECORD_SERIES;
+        }
+        else if ("recordCategory".equalsIgnoreCase(elementName))
+        {
+            return RECORD_CATEGORY;
+        }
+        else if ("recordFolder".equalsIgnoreCase(elementName))
+        {
+            return RECORD_FOLDER;
+        }
+        else if ("record".equalsIgnoreCase(elementName))
+        {
+            return RECORD;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    
+    public String getCorrespondingAspect()
+    {
+        return aspectName;
+    }
 }

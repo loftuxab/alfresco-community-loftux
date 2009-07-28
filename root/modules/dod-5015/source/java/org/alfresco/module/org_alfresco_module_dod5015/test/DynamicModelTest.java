@@ -42,10 +42,8 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomP
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -178,8 +176,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         actionParams.put(DefineCustomPropertyAction.PARAM_MANDATORY, Boolean.TRUE);
 
         // Submit an action to have it created.
-        this.rmActionService.executeRecordsManagementAction(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF, 
-                "defineCustomProperty", actionParams);
+        this.rmActionService.executeRecordsManagementAction("defineCustomProperty", actionParams);
 
         // Retrieve the updated custom property set from the Admin Service.
         Map<QName, CustomProperty> updatedCustomProps = rmAdminService.getAvailableCustomProperties();

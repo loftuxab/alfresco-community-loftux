@@ -2,9 +2,10 @@
   <shortname>Records Management Custom Model Property Definitions</shortname>
   <description><![CDATA[
   Gets the list of existing custom property types.<br/>
+  Supported values for the 'element' are 'recordSeries', 'recordCategory', 'recordFolder' or 'record'.
   ]]>
   </description>
-  <url>/api/rma/admin/custompropertydefinitions</url>
+  <url>/api/rma/admin/custompropertydefinitions?element={elementName?}</url>
   <format default="json"/>
   <authentication>user</authentication>
   <transaction>required</transaction>
