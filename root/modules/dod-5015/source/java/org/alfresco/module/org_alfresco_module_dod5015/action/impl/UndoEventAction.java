@@ -179,7 +179,11 @@ public class UndoEventAction extends RMActionExecuterAbstractBase
     @Override
     protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
     {
-        String eventName = (String)parameters.get(PARAM_EVENT_NAME);
+        String eventName = null;
+        if(parameters != null)
+        {
+            eventName = (String)parameters.get(PARAM_EVENT_NAME);
+        }
         if (this.nodeService.hasAspect(filePlanComponent, ASPECT_DISPOSITION_LIFECYCLE) == true)
         {
             // Get the next disposition action
@@ -187,17 +191,24 @@ public class UndoEventAction extends RMActionExecuterAbstractBase
             if (da != null)
             {
                 // Get the disposition event
-                EventCompletionDetails event = getEvent(da, eventName);
-                if (event != null)
+                if(parameters != null)
                 {
-                    return true;
+                    EventCompletionDetails event = getEvent(da, eventName);
+                    if (event != null)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if(throwException)
+                        {
+                            throw new AlfrescoRuntimeException("The event " + eventName + " can not be undone, because it is not defined on the disposition lifecycle.");
+                        }
+                    }
                 }
                 else
                 {
-                    if(throwException)
-                    {
-                        throw new AlfrescoRuntimeException("The event " + eventName + " can not be undone, because it is not defined on the disposition lifecycle.");
-                    }
+                    return true;
                 }
             }
         }

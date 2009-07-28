@@ -143,16 +143,19 @@ public class FreezeAction extends RMActionExecuterAbstractBase
                 this.recordsManagementService.isRecordFolder(filePlanComponent) == true)
         {
             // Get the property values
-            String reason = (String)parameters.get(PARAM_REASON);
-            if (reason == null || reason.length() == 0)
+            if(parameters != null)
             {
-                if(throwException)
+                String reason = (String)parameters.get(PARAM_REASON);
+                if (reason == null || reason.length() == 0)
                 {
-                    throw new AlfrescoRuntimeException("Can not freeze a record without a reason.");
-                }
-                else
-                {
-                    return false;
+                    if(throwException)
+                    {
+                        throw new AlfrescoRuntimeException("Can not freeze a record without a reason.");
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
             return true;

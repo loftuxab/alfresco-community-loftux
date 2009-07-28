@@ -186,7 +186,11 @@ public class CompleteEventAction extends RMActionExecuterAbstractBase
     @Override
     protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
     {
-        String eventName = (String) parameters.get(PARAM_EVENT_NAME);
+        String eventName = null;
+        if(parameters != null)
+        {
+            eventName = (String) parameters.get(PARAM_EVENT_NAME);
+        }
 
         if (this.nodeService.hasAspect(filePlanComponent, ASPECT_DISPOSITION_LIFECYCLE))
         {
@@ -195,21 +199,28 @@ public class CompleteEventAction extends RMActionExecuterAbstractBase
             if (da != null)
             {
                 // Get the disposition event
-                EventCompletionDetails event = getEvent(da, eventName);
-                if (event != null)
+                if(parameters != null)
                 {
-                    return true;
-                }
-                else
-                {
-                    if (throwException)
+                    EventCompletionDetails event = getEvent(da, eventName);
+                    if (event != null)
                     {
-                        throw new AlfrescoRuntimeException("The event " + eventName + " can not be completed, because it is not defined on the disposition lifecycle.");
+                        return true;
                     }
                     else
                     {
-                        return false;
+                        if (throwException)
+                        {
+                            throw new AlfrescoRuntimeException("The event " + eventName + " can not be completed, because it is not defined on the disposition lifecycle.");
+                        }
+                        else
+                        {
+                            return false;
+                        }
                     }
+                }
+                else
+                {
+                    return true;
                 }
             }
         }
