@@ -66,7 +66,7 @@ public class RmActionPost extends DeclarativeWebScript
     private RecordsManagementActionService rmActionService;
     
     private String actionName;
-    private List<NodeRef> targetNodeRefs;
+    private List<NodeRef> targetNodeRefs = new ArrayList<NodeRef>();
     private Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
     
     public void setNodeService(NodeService nodeService)
@@ -94,23 +94,24 @@ public class RmActionPost extends DeclarativeWebScript
 
         initJsonParams(reqContentAsString);
         
-        // validate input: check for mandatory params, valid nodeRef.
-//        if (this.actionName == null || this.targetNodeRefs == null)
-//        {
-//            throw new WebScriptException(Status.STATUS_BAD_REQUEST,
-//                "A mandatory parameter has not been provided in URL");
-//        }
+        // validate input: check for mandatory params.
+        // Some RM actions can be posted without a nodeRef.
+        if (this.actionName == null)
+        {
+            throw new WebScriptException(Status.STATUS_BAD_REQUEST,
+                "A mandatory parameter has not been provided in URL");
+        }
 
         // Check that all the nodes provided exist and build report string
         StringBuffer targetNodeRefsString = new StringBuffer(30);
         boolean firstTime = true;
         for (NodeRef targetNodeRef : this.targetNodeRefs)
         {
-//            if (nodeService.exists(targetNodeRef) == false)
-//            {
-//                throw new WebScriptException(Status.STATUS_NOT_FOUND,
-//                    "The targetNode does not exist (" + targetNodeRef.toString() + ")");
-//            }
+            if (nodeService.exists(targetNodeRef) == false)
+            {
+                throw new WebScriptException(Status.STATUS_NOT_FOUND,
+                    "The targetNode does not exist (" + targetNodeRef.toString() + ")");
+            }
             
             // Build the string
             if (firstTime == true)
@@ -137,7 +138,14 @@ public class RmActionPost extends DeclarativeWebScript
             logger.debug(msg.toString());
         }
         
-        this.rmActionService.executeRecordsManagementAction(targetNodeRefs, actionName, actionParams);
+        if (this.targetNodeRefs.isEmpty())
+        {
+            this.rmActionService.executeRecordsManagementAction(actionName, actionParams);
+        }
+        else
+        {
+            this.rmActionService.executeRecordsManagementAction(targetNodeRefs, actionName, actionParams);
+        }
         
         Map<String, Object> model = new HashMap<String, Object>();
         model.put("message", "Successfully queued action [" + actionName + "] on " + targetNodeRefsString.toString());
