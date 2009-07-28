@@ -1,0 +1,9 @@
+<webscript>
+  <shortname>Get Custom Properties on an RM node</shortname>
+  <description>Returns custom properties attached to the given RM node</description>
+  <url>/api/node/{store_type}/{store_id}/{id}/customproperties</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+  <lifecycle>internal</lifecycle>
+</webscript>

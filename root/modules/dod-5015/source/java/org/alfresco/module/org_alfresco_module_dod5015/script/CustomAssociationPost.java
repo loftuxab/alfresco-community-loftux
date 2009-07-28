@@ -129,13 +129,4 @@ public class CustomAssociationPost extends AbstractRmWebScript
         
         return assocDefinition;
     }
-
-    private void checkMandatoryJsonParam(JSONObject json, String paramName)
-    {
-        if (json.has(paramName) == false)
-        {
-            throw new WebScriptException(Status.STATUS_BAD_REQUEST,
-                    "Mandatory '" + paramName + "' parameter was not provided in request body");
-        }
-    }
 }

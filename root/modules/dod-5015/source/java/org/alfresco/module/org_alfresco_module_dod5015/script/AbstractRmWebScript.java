@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -34,8 +35,10 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.web.scripts.DeclarativeWebScript;
+import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
+import org.json.JSONObject;
 
 /**
  * 
@@ -107,4 +110,34 @@ public abstract class AbstractRmWebScript extends DeclarativeWebScript
         this.namespaceService = namespaceService;
     }
 
+    /**
+     * This method checks if the json object contains an entry with the specified name.
+     * 
+     * @param json the json object.
+     * @param paramName the name to check for.
+     * @throws WebScriptException if the specified entry is missing.
+     */
+    protected void checkMandatoryJsonParam(JSONObject json, String paramName)
+    {
+        if (json.has(paramName) == false)
+        {
+            throw new WebScriptException(Status.STATUS_BAD_REQUEST,
+                    "Mandatory '" + paramName + "' parameter was not provided in request body");
+        }
+    }
+
+    /**
+     * This method checks if the json object contains entries with the specified names.
+     * 
+     * @param json the json object.
+     * @param paramNames the names to check for.
+     * @throws WebScriptException if any of the specified entries are missing.
+     */
+    protected void checkMandatoryJsonParams(JSONObject json, List<String> paramNames)
+    {
+        for (String name : paramNames)
+        {
+            this.checkMandatoryJsonParam(json, name);
+        }
+    }
 }
