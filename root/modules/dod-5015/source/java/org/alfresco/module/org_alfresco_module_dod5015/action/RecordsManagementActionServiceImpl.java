@@ -49,7 +49,7 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
 
     /** Registered records management actions */
     private Map<String, RecordsManagementAction> rmActions = new HashMap<String, RecordsManagementAction>(6);
-    private List<String> dispositionActions = new ArrayList<String>(6);
+    private Map<String, RecordsManagementAction> dispositionActions = new HashMap<String, RecordsManagementAction>(4);
     
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#register(org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction)
@@ -66,7 +66,7 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
             
             if (rmAction.isDispositionAction() == true)
             {
-                this.dispositionActions.add(rmAction.getName());
+                this.dispositionActions.put(rmAction.getName(), rmAction);
             }
         }
     }
@@ -74,20 +74,20 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#getRecordsManagementActions()
      */
-    public List<String> getRecordsManagementActions()
+    public List<RecordsManagementAction> getRecordsManagementActions()
     {
-        List<String> result = new ArrayList<String>(this.rmActions.size());
-        result.addAll(this.rmActions.keySet());
+        List<RecordsManagementAction> result = new ArrayList<RecordsManagementAction>(this.rmActions.size());
+        result.addAll(this.rmActions.values());
         return Collections.unmodifiableList(result);
     }
-    
+
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService#getDispositionActions(org.alfresco.service.cmr.repository.NodeRef)
      */
-    public List<String> getDispositionActions(NodeRef nodeRef)
+    public List<RecordsManagementAction> getDispositionActions(NodeRef nodeRef)
     {
         String userName = AuthenticationUtil.getFullyAuthenticatedUser();
-        List<String> result = new ArrayList<String>(this.rmActions.size());
+        List<RecordsManagementAction> result = new ArrayList<RecordsManagementAction>(this.rmActions.size());
         
         for (RecordsManagementAction action : this.rmActions.values())
         {
@@ -102,9 +102,27 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#getDispositionActionDefinitions()
      */
-    public List<String> getDispositionActions()
+    public List<RecordsManagementAction> getDispositionActions()
     {
-        return this.dispositionActions;
+        List<RecordsManagementAction> result = new ArrayList<RecordsManagementAction>(this.rmActions.size());
+        result.addAll(this.dispositionActions.values());
+        return Collections.unmodifiableList(result);
+    }
+    
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService#getDispositionAction(java.lang.String)
+     */
+    public RecordsManagementAction getDispositionAction(String name)
+    {
+        return this.dispositionActions.get(name);
+    }
+
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService#getRecordsManagementAction(java.lang.String)
+     */
+    public RecordsManagementAction getRecordsManagementAction(String name)
+    {
+        return this.rmActions.get(name);
     }
 
     /**

@@ -32,6 +32,7 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -97,14 +98,40 @@ public class RecordsManagementActionServiceImplTest extends BaseSpringTest imple
 	
 	public void testGetActions()
 	{
-	    List<String> result = this.rmActionService.getRecordsManagementActions();
+	    List<RecordsManagementAction> result = this.rmActionService.getRecordsManagementActions();
 	    assertNotNull(result);
-	    assertTrue(result.contains(TestAction.NAME));
-        assertTrue(result.contains(TestAction2.NAME));
+	    Map<String, RecordsManagementAction> resultMap = new HashMap<String, RecordsManagementAction>(8);
+	    for (RecordsManagementAction action : result)
+        {
+	        resultMap.put(action.getName(), action);
+        }
+	    
+	    assertTrue(resultMap.containsKey(TestAction.NAME));
+        assertTrue(resultMap.containsKey(TestAction2.NAME));
 	    
 	    result = this.rmActionService.getDispositionActions();
-	    assertTrue(result.contains(TestAction.NAME));
-	    assertFalse(result.contains(TestAction2.NAME));
+	    resultMap = new HashMap<String, RecordsManagementAction>(8);
+        for (RecordsManagementAction action : result)
+        {
+            resultMap.put(action.getName(), action);
+        }
+	    assertTrue(resultMap.containsKey(TestAction.NAME));
+	    assertFalse(resultMap.containsKey(TestAction2.NAME));
+	    
+	    // get some specific actions and check the label
+	    RecordsManagementAction cutoff = this.rmActionService.getDispositionAction("cutoff");
+	    assertNotNull(cutoff);
+	    assertEquals("Cutoff", cutoff.getLabel());
+	    assertEquals("Cutoff", cutoff.getDescription());
+	    
+	    RecordsManagementAction freeze = this.rmActionService.getRecordsManagementAction("freeze");
+        assertNotNull(freeze);
+        assertEquals("Freeze", freeze.getLabel());
+        assertEquals("Freeze", freeze.getLabel());
+        
+        // test non-existent actions
+        assertNull(this.rmActionService.getDispositionAction("notThere"));
+        assertNull(this.rmActionService.getRecordsManagementAction("notThere"));
 	}
 	
 	public void testExecution()

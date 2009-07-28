@@ -28,12 +28,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.namespace.QName;
-import org.springframework.util.StringUtils;
 
 /**
  * Disposition action implementation
@@ -114,9 +114,17 @@ public class DispositionActionDefinitionImpl implements DispositionActionDefinit
      */
     public String getLabel()
     {
-        // TODO: Do proper lookup of I18N string for disposition action
+        String name = getName();
+        String label = name;
         
-        return StringUtils.capitalize(getName());
+        // get the disposition action from the RM action service
+        RecordsManagementAction action = this.services.getRecordsManagementActionService().getDispositionAction(name);
+        if (action != null)
+        {
+            label = action.getLabel();
+        }
+        
+        return label;
     }
 
     /**

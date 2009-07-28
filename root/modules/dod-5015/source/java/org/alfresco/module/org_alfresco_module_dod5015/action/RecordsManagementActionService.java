@@ -41,17 +41,33 @@ public interface RecordsManagementActionService
     /**
      * Get a list of the available records management actions
      * 
-     * @return  List<String>    records management actions
+     * @return  List<RecordsManagementAction>    records management actions
      */
-    List<String> getRecordsManagementActions();
+    List<RecordsManagementAction> getRecordsManagementActions();
     
     /**
      * Get a list of the available disposition actions.  A disposition action is a records
      * management action that can be used when defining disposition instructions.
      * 
-     * @return List<String>     disposition actions
+     * @return List<RecordsManagementAction>     disposition actions
      */
-    List<String> getDispositionActions();
+    List<RecordsManagementAction> getDispositionActions();
+    
+    /**
+     * Gets the named records management action
+     * 
+     * @param name The name of the RM action to retrieve
+     * @return The RecordsManagementAction or null if it doesn't exist
+     */
+    RecordsManagementAction getRecordsManagementAction(String name);
+    
+    /**
+     * Gets the named disposition action
+     * 
+     * @param name The name of the disposition action to retrieve
+     * @return The RecordsManagementAction or null if it doesn't exist
+     */
+    RecordsManagementAction getDispositionAction(String name);
 
     /**
      * Execute a records management action

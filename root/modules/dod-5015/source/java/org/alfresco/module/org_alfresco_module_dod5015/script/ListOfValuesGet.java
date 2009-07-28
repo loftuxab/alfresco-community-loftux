@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
@@ -127,16 +128,14 @@ public class ListOfValuesGet extends DeclarativeWebScript
      */
     protected Map<String, Object> createDispositionActionsModel(String baseUrl)
     {
-        // TODO: resolve resolution of the disposition action display label
-        
         // iterate over the disposition actions
-        List<String> dispositionActionNames = this.rmActionService.getDispositionActions();
-        List<Map<String, String>> items = new ArrayList<Map<String, String>>(dispositionActionNames.size());
-        for (String dispositionAction : dispositionActionNames)
+        List<RecordsManagementAction> dispositionActions = this.rmActionService.getDispositionActions();
+        List<Map<String, String>> items = new ArrayList<Map<String, String>>(dispositionActions.size());
+        for (RecordsManagementAction dispositionAction : dispositionActions)
         {
             Map<String, String> item = new HashMap<String, String>(2);
-            item.put("label", StringUtils.capitalize(dispositionAction));
-            item.put("value", dispositionAction);
+            item.put("label", dispositionAction.getLabel());
+            item.put("value", dispositionAction.getName());
             items.add(item);
         }
         
