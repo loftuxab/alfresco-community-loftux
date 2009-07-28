@@ -1412,7 +1412,7 @@
             if (oRecord.getData("selectable"))
             {
                var nodeRef = oRecord.getData("nodeRef"),
-                  containerId = Alfresco.util.getDomId();
+                  containerId = Alfresco.util.generateDomId();
 
                if (me.options.compactMode)
                {

@@ -700,7 +700,7 @@
             var owner = args[1].anchor;
             if (owner !== null)
             {
-               var filter = owner.rel.replace(/\|\|/g, "|"),
+               var filter = owner.rel,
                   filterObj = {},
                   filters;
                if (owner.rel && owner.rel !== "")
@@ -709,10 +709,10 @@
                   args[1].stop = true;
                   filterObj =
                   {
-                     filterOwner: filters[0],
-                     filterId: filters[1],
-                     filterData: filters[2],
-                     filterDisplay: filters[3]
+                     filterOwner: decodeURI(filters[0]),
+                     filterId: decodeURI(filters[1]),
+                     filterData: decodeURI(filters[2]),
+                     filterDisplay: decodeURI(filters[3])
                   };
                   Alfresco.logger.debug("DL_fnFilterChangeHandler", "filterChanged =>", filterObj);
                   YAHOO.Bubbling.fire("filterChanged", filterObj);

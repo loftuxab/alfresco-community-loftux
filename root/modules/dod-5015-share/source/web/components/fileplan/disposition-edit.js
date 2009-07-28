@@ -62,7 +62,6 @@
 
    YAHOO.extend(Alfresco.DispositionEdit, Alfresco.component.Base,
    {
-
       /**
        * Object container for initialization options
        *
@@ -108,15 +107,19 @@
          this.widgets.flowButtons = Dom.get(this.id + "-flowButtons");
 
          // Save reference to buttons so we can change label and such later
-         this.widgets.createButton = Alfresco.util.createYUIButton(this, "createaction-button", this.onCreateActionButtonClick);
-         this.widgets.createButton.set("disabled", true);
+         this.widgets.createButton = Alfresco.util.createYUIButton(this, "createaction-button", this.onCreateActionButtonClick,
+         {
+            disabled: true
+         });
          this.widgets.doneButton = Alfresco.util.createYUIButton(this, "done-button", this.onDoneActionsButtonClick);
 
-         // Get the templates and remove them from the DOM
+         // Get the templates and remove the dummy placeholders from the DOM
          this.widgets.eventTemplateEl = Dom.get(this.id + "-event-template");
-         this.widgets.eventTemplateEl.parentNode.removeChild(this.widgets.eventTemplateEl);
+         var dummyEl = Dom.get(this.id + "-event-template-dummy");
+         dummyEl.parentNode.removeChild(dummyEl);
          this.widgets.actionTemplateEl = Dom.get(this.id + "-action-template");
-         this.widgets.actionTemplateEl.parentNode.removeChild(this.widgets.actionTemplateEl);
+         dummyEl = Dom.get(this.id + "-action-template-dummy");
+         dummyEl.parentNode.removeChild(dummyEl);
 
          this._loadActions();
       },
@@ -124,7 +127,7 @@
       /**
        * Loads actions from the server
        *
-       * @method onReady
+       * @method _loadActions
        * @private
        */
       _loadActions: function DispositionEdit__loadActions()
@@ -179,46 +182,45 @@
       _createAction: function DispositionEdit__createAction(action)
       {
          // Clone template
-         var actionEl = this.widgets.actionTemplateEl.cloneNode(true);
-         var elId = Dom.generateId();
-         actionEl.setAttribute("id", elId);
+         var actionEl = this.widgets.actionTemplateEl.cloneNode(true),
+            elId = Alfresco.util.generateDomId(actionEl);
 
-         // Id
+         // Action Id
          Dom.getElementsByClassName("id", "input", actionEl)[0].value = action.id;
 
          // Period
          var period = action.period ? action.period.split("|") : [];
 
-         // No
+         // Sequence Number
          Dom.getElementsByClassName("no", "div", actionEl)[0].innerHTML = action.index + 1;
 
          // Description
          Dom.getElementsByClassName("description", "textarea", actionEl)[0].value = action.description;
 
          // Action
-         var actionType = action.name;
-         var actionTypeSelect = Dom.getElementsByClassName("action-type", "select", actionEl)[0];
+         var actionType = action.name,
+            actionTypeSelect = Dom.getElementsByClassName("action-type", "select", actionEl)[0];
          Alfresco.util.setSelectedIndex(actionTypeSelect, actionType);
 
          // Period Unit
-         var periodUnit = period && period.length > 0 ? period[0] : null;
-         var periodUnitSelect = Dom.getElementsByClassName("period-unit", "select", actionEl)[0];
+         var periodUnit = (period && period.length > 0) ? period[0] : null,
+            periodUnitSelect = Dom.getElementsByClassName("period-unit", "select", actionEl)[0];
          Alfresco.util.setSelectedIndex(periodUnitSelect, periodUnit);
 
          // Period Amount
-         var periodAmount = period && period.length > 1 ? period[1] : null;
-         var periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
+         var periodAmount = (period && period.length > 1) ? period[1] : null,
+            periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
          periodAmountEl.value = periodAmount ? periodAmount : "";
          periodAmountEl.setAttribute("id", elId + "-periodAmount");
 
          // Period Action
-         var periodAction = action.periodProperty;
-         var periodActionSelect = Dom.getElementsByClassName("period-action", "select", actionEl)[0];
+         var periodAction = action.periodProperty,
+            periodActionSelect = Dom.getElementsByClassName("period-action", "select", actionEl)[0];
          Alfresco.util.setSelectedIndex(periodActionSelect, periodAction);
 
          // Add event button
-         var addEventEl = Dom.getElementsByClassName("addevent", "span", actionEl)[0];
-         var addEventButton = Alfresco.util.createYUIButton(this, "addevent-button", null, {}, addEventEl);
+         var addEventEl = Dom.getElementsByClassName("addevent", "span", actionEl)[0],
+            addEventButton = Alfresco.util.createYUIButton(this, "addevent-button", null, {}, addEventEl);
          addEventButton.on("click", this.onAddEventButtonClick, actionEl, this);
 
          // Enable/Disable period & events section
@@ -228,7 +230,7 @@
          var eventsEnabledCheckBox = Dom.getElementsByClassName("events-enabled", "input", actionEl)[0];
          eventsEnabledCheckBox.checked = action.events && action.events.length > 0;
          this._disableEventsSection(!eventsEnabledCheckBox.checked, actionEl, addEventButton);
-         if(!periodEnabledCheckBox.checked || !eventsEnabledCheckBox.checked)
+         if (!periodEnabledCheckBox.checked || !eventsEnabledCheckBox.checked)
          {
             Dom.addClass(actionEl, "relation-disabled");
          }
@@ -239,27 +241,22 @@
             actionEl: actionEl,
             checkBoxEls: [periodEnabledCheckBox, eventsEnabledCheckBox]
          }, this);
-         Event.addListener(periodEnabledCheckBox, "click", function(e, obj)
+
+         Event.addListener(periodEnabledCheckBox, "click", function(e, checkBox)
          {
-            var disabled = obj.periodEnabledCheckBox.checked ? false : true;
-            this._disablePeriodSection(disabled, actionEl);
-         },
-         {
-            periodEnabledCheckBox: periodEnabledCheckBox
-         }, this);
+            this._disablePeriodSection(!checkBox.checked, actionEl);
+         }, periodEnabledCheckBox, this);
+
          Event.addListener(eventsEnabledCheckBox, "click", this.onRelationEnablingCheckBoxClick,
          {
             actionEl: actionEl,
             checkBoxEls: [eventsEnabledCheckBox, periodEnabledCheckBox]
          }, this);
-         Event.addListener(eventsEnabledCheckBox, "click", function(e, obj)
+
+         Event.addListener(eventsEnabledCheckBox, "click", function(e, checkBox)
          {
-            var disabled = obj.eventsEnabledCheckBox.checked ? false : true;
-            this._disableEventsSection(disabled, actionEl, addEventButton);
-         },
-         {
-            eventsEnabledCheckBox: eventsEnabledCheckBox
-         }, this);
+            this._disableEventsSection(!checkBox.checked, actionEl, addEventButton);
+         }, eventsEnabledCheckBox, this);
 
          // Relation
          var relationSelect = Dom.getElementsByClassName("relation", "select", actionEl)[0];
@@ -272,8 +269,8 @@
          }, this);
 
          // Add listener to display edit and delete action
-         var detailsEl = Dom.getElementsByClassName("details", "div", actionEl)[0];
-         var editEl = Dom.getElementsByClassName("edit", "span", actionEl)[0];
+         var detailsEl = Dom.getElementsByClassName("details", "div", actionEl)[0],
+            editEl = Dom.getElementsByClassName("edit", "span", actionEl)[0];
          Event.addListener(editEl, "click", this.onEditActionClick,
          {
             actionEl: actionEl,
@@ -285,13 +282,13 @@
 
          // Add events
          var eventListEl = Dom.getElementsByClassName("events-list", "ul", actionEl)[0];
-         for(var i = 0; action.events && i < action.events.length; i++)
+         for (var i = 0; action.events && i < action.events.length; i++)
          {
-            eventListEl.appendChild(this._createEvent(i + 1, action.events[i]));
+            eventListEl.appendChild(this._createEvent(i, action.events[i]));
          }
 
          // Title
-         if(action.title)
+         if (action.title)
          {
             this._setTitle(action.title, actionEl);
          }
@@ -314,16 +311,29 @@
       _setupActionForm: function DispositionEdit__setupActionForm(action, actionEl)
       {
          // Find id
-         var elId = actionEl.getAttribute("id");
+         var elId = actionEl.attributes["id"].value;
 
          // Setup form
-         var formEl = Dom.getElementsByClassName("action-form", "form", actionEl)[0];
-         formEl.setAttribute("id", elId + "-action-form");
-         var actionForm = new Alfresco.forms.Form(elId + "-action-form");
+         var formEl = Dom.getElementsByClassName("action-form", "form", actionEl)[0],
+            formId = elId + "-action-form";
+         
+         if (YAHOO.env.ua.ie > 0)
+         {
+            // MSIE mixes up name and id attributes on form children. Which is always useful.
+            formEl.attributes["id"].value = formId;
+         }
+         else
+         {
+            formEl.setAttribute("id", formId)
+         }
+         var actionForm = new Alfresco.forms.Form(formId);
 
          // Add validation
          actionForm.addValidation(elId + "-periodAmount", Alfresco.forms.validation.number, null, "keyup");
-         actionForm.addValidation(elId + "-periodAmount", this._mandatoryPeriodAmount, { actionEl: actionEl }, "keyup");
+         actionForm.addValidation(elId + "-periodAmount", this._mandatoryPeriodAmount,
+         {
+            actionEl: actionEl
+         }, "keyup");
          var periodEnabledCheckBox = Dom.getElementsByClassName("period-enabled", "input", actionEl)[0];
          Event.addListener(periodEnabledCheckBox, "click", function(e, obj)
          {
@@ -335,23 +345,23 @@
          }, this);
 
          // Create buttons
-         var saveActionEl = Dom.getElementsByClassName("saveaction", "span", actionEl)[0];
-         var saveActionButton = Alfresco.util.createYUIButton(this, "saveaction-button", null,
-         {
-            type: "submit"
-         }, saveActionEl);
-         var cancelEl = Dom.getElementsByClassName("cancel", "span", actionEl)[0];
-         var cancelActionButton = Alfresco.util.createYUIButton(this, "cancel-button", null, {}, cancelEl);
+         var saveActionEl = Dom.getElementsByClassName("saveaction", "span", actionEl)[0],
+            saveActionButton = Alfresco.util.createYUIButton(this, "saveaction-button", null,
+            {
+               type: "submit"
+            }, saveActionEl),
+            cancelEl = Dom.getElementsByClassName("cancel", "span", actionEl)[0],
+            cancelActionButton = Alfresco.util.createYUIButton(this, "cancel-button", null, {}, cancelEl);
+         
          cancelActionButton.on("click", this.onCancelActionButtonClick,
          {
             action: action,
             actionEl: actionEl
          }, this);
 
-
          // Set form url
          var actionId = Dom.getElementsByClassName("id", "input", formEl)[0].value;
-         if(actionId && actionId.length > 0)
+         if (actionId && actionId.length > 0)
          {
             actionForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
             formEl.attributes.action.nodeValue = Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.replace(":/", "") + "/dispositionschedule/dispositionactiondefinitions/" + actionId;
@@ -370,9 +380,10 @@
             fn: function(formEl, obj)
             {
                // Merge period value
-               var puEl = Dom.getElementsByClassName("period-unit", "select", formEl)[0];
-               var paEl = Dom.getElementsByClassName("period-amount", "input", formEl)[0];
-               if(!puEl.disabled && !paEl.disabled)
+               var puEl = Dom.getElementsByClassName("period-unit", "select", formEl)[0],
+                  paEl = Dom.getElementsByClassName("period-amount", "input", formEl)[0];
+               
+               if (!puEl.disabled && !paEl.disabled)
                {
                   var periodEl = Dom.getElementsByClassName("period", "input", formEl)[0];
                   periodEl.value = puEl.options[puEl.selectedIndex].value + "|" + paEl.value;
@@ -423,7 +434,8 @@
                   // Display add step button
                   Dom.removeClass(this.widgets.flowButtons, "hidden");
                },
-               obj: {
+               obj:
+               {
                   saveButton: saveActionButton,
                   cancelButton: cancelActionButton,
                   actionEl: actionEl
@@ -442,7 +454,8 @@
                      text: this.msg("message.saveActionFailure", this.name)
                   });
                },
-               obj: {
+               obj:
+               {
                   saveButton: saveActionButton,
                   cancelButton: cancelActionButton
                },
@@ -460,11 +473,21 @@
        * @param title The title to use
        * @param actionEl The action HTMLElement
        */
-      _setTitle: function DispositionEdit__createEvent(title, actionEl)
+      _setTitle: function DispositionEdit__setTitle(title, actionEl)
       {
          Dom.getElementsByClassName("title", "div", actionEl)[0].innerHTML = title;
       },
 
+      /**
+       * Mandatory period amount validation. Delegates validation to forms runtime.
+       *
+       * @param field {object} The element representing the field the validation is for
+       * @param args {object} Not used
+       * @param event {object} The event that caused this handler to be called, maybe null
+       * @param form {object} The forms runtime class instance the field is being managed by
+       * @param silent {boolean} Determines whether the user should be informed upon failure
+       * @param message {string} Message to display when validation fails, maybe null
+       */
       _mandatoryPeriodAmount: function _mandatoryPeriodAmount(field, args, event, form, silent, message)
       {
          var periodEnabledCheckBox = Dom.getElementsByClassName("period-enabled", "input", args.actionEl)[0];
@@ -499,7 +522,7 @@
          Dom.setStyle(eventsDivEl, "display", disabled ? "none" : "block");
          addEventButton.set("disabled", disabled);
          var eventEls = Dom.getElementsByClassName("action-event-name-value", "select", actionEl);
-         for(var i = 0; i < eventEls.length; i++)
+         for (var i = 0; i < eventEls.length; i++)
          {
             eventEls[i].disabled = disabled;
          }
@@ -517,21 +540,19 @@
          var periodUnitSelect = Dom.getElementsByClassName("period-unit", "select", actionEl)[0];
          var periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
          var title = "";
-         if(!periodAmountEl.disabled)
+         if (!periodAmountEl.disabled)
          {
             title = this.msg(
-                  "label.title.complex",
-                  actionTypeSelect.options[actionTypeSelect.selectedIndex].text,
-                  periodAmountEl.value,
-                  periodUnitSelect.options[periodUnitSelect.selectedIndex].text
-                  );
+               "label.title.complex",
+               actionTypeSelect.options[actionTypeSelect.selectedIndex].text,
+               periodAmountEl.value,
+               periodUnitSelect.options[periodUnitSelect.selectedIndex].text);
          }
          else
          {
             title = this.msg(
-                  "label.title.simple",
-                  actionTypeSelect.options[actionTypeSelect.selectedIndex].text
-                  );
+               "label.title.simple",
+               actionTypeSelect.options[actionTypeSelect.selectedIndex].text);
          }
 
          this._setTitle(title, actionEl);
@@ -541,26 +562,25 @@
        * Create a action in the list
        *
        * @method _createEvent
-       * @param no The order of the event
-       * @param event The event information
+       * @param p_sequence {number} The (zero-based) sequence number of the event
+       * @param p_event {object} The event information
        * @private
        */
-      _createEvent: function DispositionEdit__createEvent(no, event)
+      _createEvent: function DispositionEdit__createEvent(p_sequence, p_event)
       {
          // Clone template
-         var eventEl = this.widgets.eventTemplateEl.cloneNode(true);
-         var elId = Dom.generateId();
-         eventEl.setAttribute("id", elId);
-         Dom.addClass(eventEl, no % 2 == 0 ? "even" : "odd");
-         if(no == 1)
+         var eventEl = this.widgets.eventTemplateEl.cloneNode(true),
+            elId = Alfresco.util.generateDomId(eventEl);
+
+         Dom.addClass(eventEl, p_sequence % 2 === 0 ? "even" : "odd");
+         if (p_sequence === 0)
          {
             Dom.addClass(eventEl, "first");
          }
 
          // Event Type
-         var eventName = event;
          var eventNameSelect = Dom.getElementsByClassName("action-event-name-value", "select", eventEl)[0];
-         var eventType = Alfresco.util.setSelectedIndex(eventNameSelect, eventName);
+         Alfresco.util.setSelectedIndex(eventNameSelect, p_event);
          Event.addListener(eventNameSelect, "change", this.onEventNameSelectChange,
          {
             eventEl: eventEl,
@@ -568,9 +588,9 @@
          }, this);
 
          // Display data
-         var automatic = this.options.events[event] ? this.options.events[event].automatic + "" : null;
-         var completion = "";
-         if(automatic)
+         var automatic = this.options.events[p_event] ? this.options.events[p_event].automatic + "" : null,
+            completion = "";
+         if (automatic)
          {
             completion = this.msg("label.automatic." + automatic);
          }
@@ -585,7 +605,7 @@
 
 
       /**
-       * Refreshes the action no labels.
+       * Refreshes the action sequence labels.
        *
        * Ideally li.style.list-style: should be used with decimal and inline
        * so this would be handled automatically but hasn't been due to styling issues.
@@ -596,7 +616,7 @@
       _refreshActionList: function DispositionEdit__refreshActionList()
       {
          var actionNos = Dom.getElementsByClassName("no", "div", this.widgets.actionListEl);
-         for(var i = 0; i < actionNos.length; i++)
+         for (var i = 0; i < actionNos.length; i++)
          {
             actionNos[i].innerHTML = i + 1;
          }         
@@ -612,13 +632,13 @@
       _refreshEventList: function DispositionEdit__refreshEventList(eventList)
       {
          var events = eventList.getElementsByTagName("li");
-         for(var i = 0; i < events.length; i++)
+         for (var i = 0; i < events.length; i++)
          {
             Dom.removeClass(events[i], "even");
             Dom.removeClass(events[i], "odd");
             Dom.removeClass(events[i], "first");
-            Dom.addClass(events[i], (i + 1) % 2 == 0 ? "even" : "odd");
-            if(i == 0)
+            Dom.addClass(events[i], (i + 1) % 2 === 0 ? "even" : "odd");
+            if (i === 0)
             {
                Dom.addClass(events[i], "first");
             }
@@ -634,9 +654,9 @@
        */
       onRelationEnablingCheckBoxClick: function DispositionEdit_onRelationEnablingCheckBoxClick(e, obj)
       {
-         for(var i = 0; i < obj.checkBoxEls.length; i++)
+         for (var i = 0; i < obj.checkBoxEls.length; i++)
          {
-            if(!obj.checkBoxEls[i].checked)
+            if (!obj.checkBoxEls[i].checked)
             {
                Dom.addClass(obj.actionEl, "relation-disabled");
                return;
@@ -672,7 +692,7 @@
          var eventName = obj.eventNameSelect.options[obj.eventNameSelect.selectedIndex].value;
          var automatic = this.options.events[eventName] ? this.options.events[eventName].automatic + "" : "";
          var completion = "";
-         if(automatic)
+         if (automatic)
          {
             completion = this.msg("label.automatic." + automatic);
          }
@@ -689,16 +709,24 @@
        */
       onAddEventButtonClick: function DispositionEdit_onAddEventButtonClick(e, actionEl)
       {
-         var eventListEl = Dom.getElementsByClassName("events-list", "ul", actionEl)[0];
-         var no = eventListEl.getElementsByTagName("li").length + 1;
+         var eventListEl = Dom.getElementsByClassName("events-list", "ul", actionEl)[0],
+            sequence = eventListEl.getElementsByTagName("li").length;
 
          // Create new event
-         var eventEl = this._createEvent(no, {event: 0, type: "" })
+         var eventEl = this._createEvent(sequence,
+         {
+            event: 0,
+            type: ""
+         });
          eventListEl.appendChild(eventEl);
 
          // Find last event
          var eventNameSelect = Dom.getElementsByClassName("action-event-name-value", "select", eventEl)[0]; 
-         this.onEventNameSelectChange(null, { eventEl: eventEl, eventNameSelect: eventNameSelect });
+         this.onEventNameSelectChange(null,
+         {
+            eventEl: eventEl,
+            eventNameSelect: eventNameSelect
+         });
       },
 
       /**
@@ -724,9 +752,9 @@
        */
       onEditActionClick: function DispositionEdit_onEditClick(e, obj)
       {
-            Alfresco.util.Anim.fadeIn(obj.detailsEl);
-            Dom.removeClass(obj.actionEl, "collapsed");
-            Dom.addClass(obj.actionEl, "expanded");
+         Alfresco.util.Anim.fadeIn(obj.detailsEl);
+         Dom.removeClass(obj.actionEl, "collapsed");
+         Dom.addClass(obj.actionEl, "expanded");
       },
 
       /**
@@ -745,23 +773,23 @@
             text: Alfresco.util.message("label.confirmDeleteAction", this.name),
             noEscape: true,
             buttons: [
+            {
+               text: Alfresco.util.message("button.yes", this.name),
+               handler: function DispositionEdit_delete()
                {
-                  text: Alfresco.util.message("button.yes", this.name),
-                  handler: function DispositionEdit_delete()
-                  {
-                     this.destroy();
-                     me._onDeleteActionConfirmedClick.call(me, actionEl);
-                  }
+                  this.destroy();
+                  me._onDeleteActionConfirmedClick.call(me, actionEl);
+               }
+            },
+            {
+               text: Alfresco.util.message("button.no", this.name),
+               handler: function DispositionEdit_cancel()
+               {
+                  me.deletePromptActive = false;
+                  this.destroy();
                },
-               {
-                  text: Alfresco.util.message("button.no", this.name),
-                  handler: function DispositionEdit_cancel()
-                  {
-                     me.deletePromptActive = false;
-                     this.destroy();
-                  },
-                  isDefault: true
-               }]
+               isDefault: true
+            }]
          });
       },
 
@@ -773,13 +801,13 @@
        */
       _onDeleteActionConfirmedClick: function DispositionEdit_onDeleteActionClick(actionEl)
       {
-         var actionId = Dom.getElementsByClassName("id", "input", actionEl)[0].value;
-         var feedbackMessage = Alfresco.util.PopupManager.displayMessage(
-         {
-            text: this.msg("message.deletingAction"),
-            spanClass: "wait",
-            displayTime: 0
-         });
+         var actionId = Dom.getElementsByClassName("id", "input", actionEl)[0].value,
+            feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("message.deletingAction"),
+               spanClass: "wait",
+               displayTime: 0
+            });
 
          // user has confirmed, perform the actual delete
          Alfresco.util.Ajax.jsonDelete(
@@ -825,14 +853,14 @@
       onCancelActionButtonClick: function DispositionEdit_onCancelActionButtonClick(e, obj)
       {
          var actionId = Dom.getElementsByClassName("id", "input", obj.actionEl)[0].value;
-         if(actionId && actionId.length > 0)
+         if (actionId && actionId.length > 0)
          {
             /**
              * It is a previous action, cancel it by removing the action element
              * from the dom and insert a new fresh one by using the template and
              * the original data.
              */
-            var newActionEl = this._createAction(obj.action)
+            var newActionEl = this._createAction(obj.action);
             obj.actionEl.parentNode.insertBefore(newActionEl, obj.actionEl);
             obj.actionEl.parentNode.removeChild(obj.actionEl);
             this._setupActionForm(obj.action, newActionEl);
@@ -855,7 +883,8 @@
        */
       onCreateActionButtonClick: function DispositionEdit_onCreateActionButtonClick(e, obj)
       {
-         var action = {
+         var action =
+         {
             id: "",
             index: Dom.getElementsByClassName("action", "li", this.widgets.actionListEl).length,
             title: this.msg("label.title.new"),
@@ -893,6 +922,5 @@
          // Send the user to this page again without saving changes
          document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/record-category-details?nodeRef=" + this.options.nodeRef;
       }
-
    });
 })();

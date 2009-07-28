@@ -198,7 +198,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        */
       init: function()
       {
-         var form = document.getElementById(this.formId);
+         var form = Dom.get(this.formId);
          if (form !== null)
          {
             if (form.getAttribute("forms-runtime") != "listening")
@@ -448,7 +448,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        */
       addValidation: function(fieldId, validationHandler, validationArgs, when, message)
       {
-         var field = document.getElementById(fieldId);
+         var field = Dom.get(fieldId);
          if (field == null)
          {
             this._showInternalError("element with id of '" + fieldId + "' could not be located.");
@@ -514,7 +514,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             }
             else
             {
-               var htmlNode = document.getElementById(this.errorContainer);
+               var htmlNode = Dom.get(this.errorContainer);
                if (htmlNode !== null)
                {
                   htmlNode.style.display = "block";
@@ -578,7 +578,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             /**
              * Ensure the Tab key only focusses relevant fields
              */
-            var form = document.getElementById(this.formId);
+            var form = Dom.get(this.formId);
             
             var fnTabFix = function(id, keyEvent)
             {
@@ -621,7 +621,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
               if (typeof currentItem == "string")
               {
                  // get the element with the id and set the disabled attribute
-                 document.getElementById(currentItem).disabled = !valid;
+                 Dom.get(currentItem).disabled = !valid;
               }
               else
               {
@@ -643,7 +643,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       {
          if (this.errorContainer !== "alert")
          {
-            var htmlNode = document.getElementById(this.errorContainer);
+            var htmlNode = Dom.get(this.errorContainer);
             if (htmlNode !== null)
             {
                htmlNode.style.display = "none";
@@ -714,7 +714,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             {
                // validation was successful
                // get the form element
-               var form = document.getElementById(this.formId);
+               var form = Dom.get(this.formId);
 
                // call the pre-submit function, passing the form for last-chance processing
                this.doBeforeFormSubmit.fn.call(this.doBeforeFormSubmit.scope, form, this.doBeforeFormSubmit.obj);
@@ -725,7 +725,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                {
                   // stop the browser from submitting the form
                   Event.stopEvent(event);
-
+                  
                   // get the form's action URL
                   var submitUrl = form.attributes.action.nodeValue;
                   
@@ -909,7 +909,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          {
             var val = this.validations[x];
                   
-            var field = document.getElementById(val.fieldId);
+            var field = Dom.get(val.fieldId);
             if (field !== null)
             {
                if (!val.handler(field, val.args, null, this, silent))
@@ -974,7 +974,7 @@ Alfresco.forms.validation.mandatory = function mandatory(field, args, event, for
       //       wouldn't a radio button normally have a default
       //       'checked' option?
       
-      var formElem = document.getElementById(form.formId),
+      var formElem = Dom.get(form.formId),
          radios = formElem[field.name],
          anyChecked = false;
       for (var x = 0, xx = radios.length; x < xx; x++)
@@ -1283,7 +1283,7 @@ Alfresco.forms.validation.time = function time(field, args, event, form, silent,
       args = {};
    }
 
-   args.pattern = /^[0-2]\d:[0-5]\d(:[0-5]\d)?$/;
+   args.pattern = /^([0-1]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/;
    args.match = true;
 
    return Alfresco.forms.validation.regexMatch(field, args, event, form, silent, message);

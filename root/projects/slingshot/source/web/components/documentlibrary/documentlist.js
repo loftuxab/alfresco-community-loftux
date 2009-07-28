@@ -118,7 +118,6 @@
 
    /**
     * Generate "filterChanged" event mark-up suitable for element attribute.
-    * Single and double quotes are escaped.
     *
     * @method generateFilterMarkup
     * @param filter {object} Object literal containing new filter parameters
@@ -130,7 +129,7 @@
          markup = YAHOO.lang.substitute("{filterOwner}|{filterId}|{filterData}|{filterDisplay}", filterObj, function(p_key, p_value, p_meta)
          {
             p_value = typeof p_value == "undefined" ? "" : p_value;
-   			return String(p_value).replace(/[']/g, "\\'").replace(/[\"]/g, '\\"').replace(/[|]/g, "||");
+   			return encodeURI(p_value);
          });
       
       return markup;
@@ -962,7 +961,7 @@
             var owner = args[1].anchor;
             if (owner !== null)
             {
-               var filter = owner.rel.replace(/\|\|/g, "|"),
+               var filter = owner.rel,
                   filterObj = {},
                   filters;
                if (owner.rel && owner.rel !== "")
@@ -971,10 +970,10 @@
                   args[1].stop = true;
                   filterObj =
                   {
-                     filterOwner: filters[0],
-                     filterId: filters[1],
-                     filterData: filters[2],
-                     filterDisplay: filters[3]
+                     filterOwner: decodeURI(filters[0]),
+                     filterId: decodeURI(filters[1]),
+                     filterData: decodeURI(filters[2]),
+                     filterDisplay: decodeURI(filters[3])
                   };
                   Alfresco.logger.debug("DL_fnFilterChangeHandler", "filterChanged =>", filterObj);
                   YAHOO.Bubbling.fire("filterChanged", filterObj);
@@ -1551,12 +1550,15 @@
        */
       getActionUrls: function DL_getActionUrls(record)
       {
+         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
+            nodeRef = record.getData("nodeRef");
+
          return (
          {
             downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
-            documentDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/document-details?nodeRef=" + record.getData("nodeRef"),
-            folderDetailsUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + record.getData("nodeRef"),
-            editMetadataUrl: Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + record.getData("nodeRef")
+            documentDetailsUrl: urlContextSite + "/document-details?nodeRef=" + nodeRef,
+            folderDetailsUrl: urlContextSite + "/folder-details?nodeRef=" + nodeRef,
+            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef
          });
       },
 

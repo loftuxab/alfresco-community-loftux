@@ -83,7 +83,7 @@
             "userAccess":
             {
             <#list item.actionPermissions as actionPerm>
-               "${actionPerm?string}": true,
+               "${actionPerm?string}": true<#if actionPerm_has_next>,</#if>
             </#list>
             }
          },

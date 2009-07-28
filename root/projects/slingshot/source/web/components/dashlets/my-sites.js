@@ -122,9 +122,9 @@
          /**
           * Use the getDomId function to get some unique names for global event handling
           */
-         var favEventClass = Alfresco.util.getDomId("fav-site"),
-            imapEventClass = Alfresco.util.getDomId("imap-site"),
-            deleteEventClass = Alfresco.util.getDomId("del-site");
+         var favEventClass = Alfresco.util.generateDomId(null, "fav-site"),
+            imapEventClass = Alfresco.util.generateDomId(null, "imap-site"),
+            deleteEventClass = Alfresco.util.generateDomId(null, "del-site");
 
          /**
           * Favourites custom datacell formatter
