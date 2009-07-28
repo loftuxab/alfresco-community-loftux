@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
@@ -46,6 +46,7 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.springframework.beans.factory.BeanNameAware;
+import org.springframework.util.StringUtils;
 
 /**
  * Records management action executer base class
@@ -58,7 +59,7 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
                                                                BeanNameAware
 {
     /** Action name */
-    protected String name;
+    //protected String name;
     
     /** Node service */
     protected NodeService nodeService;
@@ -202,6 +203,38 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
         return this.name;
     }
     
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction#getLabel()
+     */
+    public String getLabel()
+    {
+        String label = I18NUtil.getMessage(this.getTitleKey());
+        
+        if (label == null)
+        {
+            // default to the name of the action with first letter capitalised
+            label = StringUtils.capitalize(this.name);
+        }
+        
+        return label;
+    }
+    
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction#getDescription()
+     */
+    public String getDescription()
+    {
+        String desc = I18NUtil.getMessage(this.getDescriptionKey());
+        
+        if (desc == null)
+        {
+            // default to the name of the action with first letter capitalised
+            desc = StringUtils.capitalize(this.name);
+        }
+        
+        return desc;
+    }
+
     /**
      * By default an action is not a disposition action
      * 

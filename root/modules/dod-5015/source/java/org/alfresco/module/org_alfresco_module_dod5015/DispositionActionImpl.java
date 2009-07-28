@@ -30,11 +30,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Roy Wetherall
@@ -93,9 +93,17 @@ public class DispositionActionImpl implements DispositionAction,
      */
     public String getLabel()
     {
-        // TODO: Do proper lookup of I18N string for disposition action
+        String name = getName();
+        String label = name;
         
-        return StringUtils.capitalize(getName());
+        // get the disposition action from the RM action service
+        RecordsManagementAction action = this.services.getRecordsManagementActionService().getDispositionAction(name);
+        if (action != null)
+        {
+            label = action.getLabel();
+        }
+        
+        return label;
     }
 
     /*

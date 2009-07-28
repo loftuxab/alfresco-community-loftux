@@ -47,6 +47,20 @@ public interface RecordsManagementAction
     public String getName();
     
     /**
+     * Get the label of the action
+     * 
+     * @return  String  action label
+     */
+    public String getLabel();
+    
+    /**
+     * Get the description of the action
+     * 
+     * @return  String  action description 
+     */
+    public String getDescription();
+    
+    /**
      * Indicates whether this is a disposition action or not
      * 
      * @return  boolean     true if a disposition action, false otherwise
