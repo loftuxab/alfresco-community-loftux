@@ -1,6 +1,6 @@
 <webscript>
   <shortname>Admin Console Record Management Assign Roles</shortname>
   <description>Administration Console - Record Management Tool Assign Roles</description>
-  <url>/components/console/assign-roles</url>
+  <url>/components/console/rm-assign-roles</url>
   <family>admin-console</family>
 </webscript>
