@@ -1,0 +1,115 @@
+/* History Manager */
+#yui-history-iframe
+{
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 1px;
+   height: 1px;
+   visibility: hidden;
+}
+
+/* Metadata Tool */
+.metadata
+{
+   color: #000;
+   margin: 16px 10px 10px;
+}
+
+.metadata .title
+{
+   font-size: 123.1%;
+   font-weight: bold;
+   color: #515D6B;
+   padding-bottom: 0.5em;
+}
+
+.metadata .align-right
+{
+   text-align: right;
+}
+
+.metadata .hidden
+{
+   display: none;
+}
+
+.metadata .left
+{
+   float: left;
+}
+
+.metadata .right
+{
+   float: right;
+}
+
+.metadata .separator
+{
+   border-left: 1px solid #D7D7D7;
+   height: 30em;
+}
+
+.metadata .view-main
+{
+   border: 1px solid #D7D7D7;
+}
+
+.metadata .list-header
+{
+   font-size: 116%;
+   font-weight: bold;
+   color: #515D6B;
+   padding: 0.4em;
+   border-bottom: 1px solid #D7D7D7;
+   margin-right: -7%;
+}
+
+.metadata .list-title
+{
+   font-size: 116%;
+   font-weight: bold;
+   color: #515D6B;
+   padding: 0.4em;
+}
+
+.metadata .object-list li
+{
+   padding: 1em 0.6em 1em 4em;
+   margin-right: -7%;
+   border-bottom: 1px solid #D7D7D7;
+   cursor: pointer;
+}
+
+.metadata .object-list li.selected
+{
+   background-color: #D2E5F2;
+}
+
+.metadata li.item-recordseries
+{
+   background-image: url(../documentlibrary/images/record-series-32.png);
+   background-repeat: no-repeat;
+   background-position: 0.3em 0.3em;
+}
+
+.metadata li.item-recordcategory
+{
+   background-image: url(../documentlibrary/images/record-category-32.png);
+   background-repeat: no-repeat;
+   background-position: 0.3em 0.3em;
+}
+
+.metadata li.item-recordfolder
+{
+   background-image: url(../documentlibrary/images/record-folder-32.png);
+   background-repeat: no-repeat;
+   background-position: 0.3em 0.3em;
+}
+
+.metadata li.item-record
+{
+   background-image: url(../documentlibrary/images/record-32.png);
+   background-repeat: no-repeat;
+   background-position: 0.3em 0.3em;
+}
