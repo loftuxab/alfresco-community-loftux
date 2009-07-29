@@ -1,8 +1,7 @@
 <#import "customassociation.lib.ftl" as customAssociationLib/>
-
 {
-   "data" :
-   {
-      <@customAssociationLib.customAssociationJSON association=customassociation/>
-   }
+	"data":
+	{
+		<@customAssociationLib.customAssociationJSON association=customassociation/>
+	}
 }
