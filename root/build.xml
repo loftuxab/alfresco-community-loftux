@@ -1216,7 +1216,7 @@
       <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/lib"
             file="${dir.module.dod5015.dist}/${file.name.jar.dod5015}" />
       <!-- copy webscripts, etc. -->
-      <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes" verbose="${copy.verbose}" overwrite="yes">
          <fileset dir="${dir.module.dod5015.config}">
             <include name="**/*.*" />
          </fileset>
@@ -1232,11 +1232,11 @@
    <target name="deploy-dod5015-share-exploded"
            depends="init">
       <!-- copy all source files -->
-      <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}" overwrite="yes">
          <fileset dir="${dir.modules}/dod-5015-share/source/web" />
       </copy>
       <!-- copy webscripts, etc. -->
-      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}" overwrite="yes">
          <fileset dir="${dir.modules}/dod-5015-share/config">
             <include name="**/*.*" />
          </fileset>
