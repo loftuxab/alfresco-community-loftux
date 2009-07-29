@@ -58,7 +58,8 @@ public class CustomPropertiesGet extends AbstractRmWebScript
         Map<QName, Serializable> customProperties = new HashMap<QName, Serializable>();
         for (QName qn : allProperties.keySet())
         {
-            if (qn.toPrefixString().startsWith(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX))
+            String prefixedQN = qn.toPrefixString(namespaceService);
+            if (prefixedQN.startsWith(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX))
             {
                 customProperties.put(qn, allProperties.get(qn));
             }
@@ -71,7 +72,7 @@ public class CustomPropertiesGet extends AbstractRmWebScript
         for (QName qn : customProperties.keySet())
         {
             Map<String, Object> nextPropData = new HashMap<String, Object>();
-            nextPropData.put("qname", qn.toPrefixString());
+            nextPropData.put("qname", qn.toPrefixString(namespaceService));
             nextPropData.put("value", customProperties.get(qn));
             customPropData.add(nextPropData);
         }
