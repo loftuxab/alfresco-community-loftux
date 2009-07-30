@@ -100,6 +100,13 @@
             value: "file"
          });
 
+         // Import button: user needs "import" access
+         this.widgets.importButton = Alfresco.util.createYUIButton(this, "import-button", this.onImport,
+         {
+            disabled: true,
+            value: "import"
+         });
+
          // Selected Items menu button
          this.widgets.selectedItems = Alfresco.util.createYUIButton(this, "selectedItems-button", this.onSelectedItems,
          {
@@ -177,11 +184,6 @@
        */
       onNewContainer: function DLTB_onNewContainer(e, p_obj)
       {
-         if (!this.modules.docList)
-         {
-            return;
-         }
-
          var destination = this.modules.docList.doclistMetadata.parent,
             folderType = p_obj.get("name"),
             label = "label.new-" + p_obj.get("name").replace(":", "_"),
@@ -235,6 +237,17 @@
                scope: this
             }
          }).show();
+      },
+
+      /**
+       * Import button click handler
+       *
+       * @method onImport
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onImport: function DLTB_onImport(e, p_obj)
+      {
       },
 
       /**
@@ -305,11 +318,6 @@
             return;
          }
          
-         if (!this.modules.docList)
-         {
-            return;
-         }
-
          var files = this.modules.docList.getSelectedFiles();
          
          if (!this.modules.copyMoveFileTo)
@@ -328,7 +336,27 @@
 
          this.modules.copyMoveFileTo.showDialog();
       },
-      
+
+      /**
+       * Cut Off action.
+       *
+       * @method onActionCutoff
+       */
+      onActionCutoff: function DLTB_onActionCutoff()
+      {
+         this._dod5015Action("message.cutoff", this.modules.docList.getSelectedFiles(), "cutoff");
+      },
+
+      /**
+       * Destroy action.
+       *
+       * @method onActionDestroy
+       */
+      onActionDestroy: function DLTB_onActionDestroy()
+      {
+         this._dod5015Action("message.destroy", this.modules.docList.getSelectedFiles(), "destro");
+      },
+
       /**
        * Freeze action.
        *
@@ -336,11 +364,6 @@
        */
       onActionFreeze: function DLTB_onActionFreeze()
       {
-         if (!this.modules.docList)
-         {
-            return;
-         }
-
          var files = this.modules.docList.getSelectedFiles();
 
          Alfresco.util.PopupManager.getUserInput(
@@ -363,17 +386,42 @@
       },
 
       /**
+       * Retain action.
+       *
+       * @method onActionRetain
+       */
+      onActionRetain: function DLTB_onActionRetain()
+      {
+         this._dod5015Action("message.retain", this.modules.docList.getSelectedFiles(), "retain");
+      },
+
+      /**
+       * Transfer action.
+       *
+       * @method onActionTransfer
+       */
+      onActionTransfer: function DLTB_onActionTransfer()
+      {
+         this._dod5015Action("message.transfer", this.modules.docList.getSelectedFiles(), "transfer");
+      },
+
+      /**
+       * Transfer Confirmation action.
+       *
+       * @method onActionTransferConfirm
+       */
+      onActionTransferConfirm: function DLTB_onActionTransferConfirm()
+      {
+         this._dod5015Action("message.transfer-confirm", this.modules.docList.getSelectedFiles(), "transfer-confirm");
+      },
+
+      /**
        * Unfreeze action.
        *
        * @method onActionUnfreeze
        */
       onActionUnfreeze: function DL_onActionUnfreeze()
       {
-         if (!this.modules.docList)
-         {
-            return;
-         }
-
          this._dod5015Action("message.unfreeze", this.modules.docList.getSelectedFiles(), "unfreeze");
       },
       

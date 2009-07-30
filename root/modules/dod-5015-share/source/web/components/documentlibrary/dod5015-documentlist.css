@@ -122,7 +122,7 @@
 /**
  * Actions: Record Folder
  */
-.doclist .record-folder .onActionClose a
+.doclist .record-folder .onActionCloseFolder a
 {
    background-image: url(images/record-folder-close-16.png);
 }
@@ -152,7 +152,7 @@
    background-image: url(images/move-folder-to-16.png);
 }
 
-.doclist .record-folder .onActionReopen a
+.doclist .record-folder .onActionOpenFolder a
 {
    background-image: url(images/record-folder-open-16.png);
 }
@@ -183,6 +183,24 @@
 .doclist .hold-container .onActionRelinquish a
 {
    background-image: url(images/relinquish-hold-16.png);
+}
+
+/**
+ * Actions: Transfer Container
+ */
+.doclist .transfer-container .onActionDownloadZip a
+{
+   background-image: url(images/download-zip-16.png);
+}
+
+.doclist .transfer-container .onActionFileReport a
+{
+   background-image: url(images/file-report-16.png);
+}
+
+.doclist .transfer-container .onActionTransferConfirm a
+{
+   background-image: url(images/transfer-confirm-16.png);
 }
 
 

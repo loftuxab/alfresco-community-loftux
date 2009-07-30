@@ -239,7 +239,13 @@
                   case "non-electronic-record":
                      elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span class="link"></span>' : '') + '<img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/generic-file-32.png" />';
                      break;
-                     
+
+                  case "metadata-stub":
+                     var id = me.id + '-preview-' + oRecord.getId();
+                     docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
+                     elCell.innerHTML = '<span id="' + id + '" class="icon32">' + (isLink ? '<span class="link"></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/meta-stub-32.png" /></a></span>';
+                     break;
+
                   case "folder":
                      elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/folder-32.png" /></a>';
                      break;
@@ -275,6 +281,11 @@
 
                   case "non-electronic-record":
                      elCell.innerHTML = '<span class="folder">' + (isLink ? '<span class="link"></span>' : '') + '<img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/nonElectronicRecord.png" />';
+                     break;
+
+                  case "metadata-stub":
+                     docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
+                     elCell.innerHTML = '<span class="thumbnail">' + (isLink ? '<span class="link"></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/meta-stub-75x100.png" /></a></span>';
                      break;
 
                   case "folder":
@@ -495,6 +506,38 @@
                   break;
 
                /**
+                * Metadata Stub
+                */
+               case "metadata-stub":
+                  /**
+                   * TODO: How do we handle the details page for this "metadata stub" record?
+                   */
+                  docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
+
+                  desc += '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(oRecord.getData("displayName")) + '</a></span></h3>';
+                  if (me.options.simpleView)
+                  {
+                     /**
+                      * Simple View
+                      */
+                     desc += '<div class="detail"><span class="item-simple"><em>' + me.msg("details.record.identifier") + '</em> ' + rmaIdentifier + '</span></div>';
+                  }
+                  else
+                  {
+                     /**
+                      * Detailed View
+                      */
+                     desc += '<div class="detail"><span class="item"><em>' + me.msg("details.record.identifier") + '</em> ' + rmaIdentifier + '</span></div>';
+                     description = oRecord.getData("description");
+                     if (description === "")
+                     {
+                        description = me.msg("details.description.none");
+                     }
+                     desc += '<div class="detail"><span class="item"><em>' + me.msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
+                  }
+                  break;
+
+               /**
                 * Undeclared Record
                 */
                case "undeclared-record":
@@ -534,6 +577,7 @@
 
                /**
                 * "Normal" Folder
+                * Technically not supported in the Records Management world.
                 */
                case "folder":
                   desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '">';
@@ -930,12 +974,12 @@
       /**
        * Close Record Folder action.
        *
-       * @method onActionClose
+       * @method onActionCloseFolder
        * @param row {object} DataTable row representing file to be actioned
        */
-      onActionClose: function DL_onActionClose(row)
+      onActionCloseFolder: function DL_onActionCloseFolder(row)
       {
-         this._dod5015Action("message.close", row, "closeRecordFolder");
+         this._dod5015Action("message.close-folder", row, "closeRecordFolder");
       },
 
       /**
@@ -1039,6 +1083,17 @@
       },
 
       /**
+       * Open Record Folder action.
+       *
+       * @method onActionOpenFolder
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionOpenFolder: function DL_onActionOpenFolder(row)
+      {
+         this._dod5015Action("message.open-folder", row, "openRecordFolder");
+      },
+
+      /**
        * Relinquish Hold action.
        *
        * @method onActionRelinquish
@@ -1050,14 +1105,14 @@
       },
 
       /**
-       * Re-open Record Folder action.
+       * Retain action.
        *
-       * @method onActionReopen
+       * @method onActionRetain
        * @param row {object} DataTable row representing file to be actioned
        */
-      onActionReopen: function DL_onActionReopen(row)
+      onActionRetain: function DL_onActionRetain(row)
       {
-         this._dod5015Action("message.open", row, "openRecordFolder");
+         this._dod5015Action("message.retain", row, "retain");
       },
 
       /**
@@ -1069,6 +1124,28 @@
       onActionReviewed: function DL_onActionReviewed(row)
       {
          this._dod5015Action("message.review", row, "reviewed");
+      },
+
+      /**
+       * Transfer action.
+       *
+       * @method onActionTransfer
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionTransfer: function DL_onActionTransfer(row)
+      {
+         this._dod5015Action("message.transfer", row, "transfer");
+      },
+
+      /**
+       * Transfer Confirmation action.
+       *
+       * @method onActionTransferConfirm
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionTransferConfirm: function DL_onActionTransferConfirm(row)
+      {
+         this._dod5015Action("message.transfer-confirm", row, "transferConfirm");
       },
 
       /**
