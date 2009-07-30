@@ -199,10 +199,10 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         
         // Check that the property has appeared in the data dictionary
         //TODO This test is currently failing.
-//        final AspectDefinition customPropertiesAspect = dictionaryService.getAspect(aspectQName);
-//        assertNotNull(customPropertiesAspect);
-//        assertNotNull("The customProperty is not returned from the dictionaryService.",
-//                customPropertiesAspect.getProperties().get(propQName));
+        final AspectDefinition customPropertiesAspect = dictionaryService.getAspect(aspectQName);
+        assertNotNull(customPropertiesAspect);
+        assertNotNull("The customProperty is not returned from the dictionaryService.",
+                customPropertiesAspect.getProperties().get(propQName));
     }
     
     public void off_testCreateAndUseCustomChildReference() throws Exception
