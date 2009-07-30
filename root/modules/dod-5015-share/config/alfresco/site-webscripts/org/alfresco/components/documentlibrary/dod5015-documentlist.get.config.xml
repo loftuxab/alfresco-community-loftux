@@ -17,13 +17,17 @@
       <actionSet id="recordFolder">
          <action id="onActionViewDetails" type="simple-link" href="{recordFolderDetailsUrl}" label="actions.view-details" />
          <action id="onActionEditDetails" permisson="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
-         <action id="onActionClose" permission="close" type="action-link" label="actions.close" />
-         <action id="onActionReopen" permission="reopen" type="action-link" label="actions.reopen" />
+         <action id="onActionCloseFolder" permission="close-folder" type="action-link" label="actions.close-folder" />
+         <action id="onActionOpenFolder" permission="open-folder" type="action-link" label="actions.open-folder" />
          <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
-         <action id="onActionUncutoff" permission="uncutoff" type="action-link" label="actions.uncutoff" />
+         <action id="onActionRetain" permission="retain" type="action-link" label="actions.retain" />
+         <action id="onActionDestroy" permission="destroy" type="action-link" label="actions.destroy" />
          <action id="onActionTransfer" permission="transfer" type="action-link" label="actions.transfer" />
          <action id="onActionFreeze" permission="freeze" type="action-link" label="actions.freeze" />
          <action id="onActionUnfreeze" permission="unfreeze" type="action-link" label="actions.unfreeze" />
+         <action id="onActionCopyTo" type="action-link" permission="" label="actions.copy-to" />
+         <action id="onActionMoveTo" type="action-link" permission="delete" label="actions.move-to" />
+         <action id="onActionFileTo" type="action-link" permission="" label="actions.file-to" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 
@@ -31,6 +35,8 @@
          <action id="onActionEditDetails" permisson="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
          <action id="onActionReviewed" permission="reviewed" type="action-link" label="actions.reviewed" />
          <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
+         <action id="onActionRetain" permission="retain" type="action-link" label="actions.retain" />
+         <action id="onActionDestroy" permission="destroy" type="action-link" label="actions.destroy" />
          <action id="onActionTransfer" permission="transfer" type="action-link" label="actions.transfer" />
          <action id="onActionFreeze" permission="freeze" type="action-link" label="actions.freeze" />
          <action id="onActionUnfreeze" permission="unfreeze" type="action-link" label="actions.unfreeze" />
@@ -38,7 +44,7 @@
          <action id="onActionCopyTo" type="action-link" permission="" label="actions.copy-to" />
          <action id="onActionMoveTo" type="action-link" permission="delete" label="actions.move-to" />
          <action id="onActionFileTo" type="action-link" permission="" label="actions.file-to" />
-         <action id="onActionDestroy" permission="destroy" type="action-link" label="actions.destroy" />
+         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 
       <actionSet id="undeclaredRecord">
@@ -49,9 +55,19 @@
          <action id="onActionCopyTo" type="action-link" permission="" label="actions.copy-to" />
          <action id="onActionMoveTo" type="action-link" permission="delete" label="actions.move-to" />
          <action id="onActionFileTo" type="action-link" permission="" label="actions.file-to" />
+         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
       </actionSet>
 
       <actionSet id="nonElectronicRecord">
+      </actionSet>
+
+      <actionSet id="metadataStub">
+      </actionSet>
+
+      <actionSet id="transferContainer">
+         <action id="onActionDownloadZip" permission="download-zip" type="action-link" label="actions.download-zip" />
+         <action id="onActionFileReport" permission="file-report" type="action-link" label="actions.file-report" />
+         <action id="onActionTransferConfirm" permission="transfer-confirm" type="action-link" label="actions.transfer-confirm" />
       </actionSet>
 
       <actionSet id="holdContainer">
