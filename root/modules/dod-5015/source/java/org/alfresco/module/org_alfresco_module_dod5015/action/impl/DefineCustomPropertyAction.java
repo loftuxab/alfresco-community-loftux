@@ -111,11 +111,12 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
 
         M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
 
-        QName propQName = QName.createQName((String)params.get(PARAM_NAME), namespaceService);
+        String qname = (String)params.get(PARAM_NAME);
+		QName propQName = QName.createQName(qname, namespaceService);
         String propQNameAsString = propQName.toPrefixString(namespaceService);
         
         M2Property newProp = customPropsAspect.createProperty(propQNameAsString);
-        newProp.setName((String)params.get(PARAM_NAME));
+        newProp.setName(qname);
 
         // Special handling for type param as it's a QName.
         // TODO Refactor this out into a method?

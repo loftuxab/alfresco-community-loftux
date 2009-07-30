@@ -38,6 +38,8 @@ import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -49,6 +51,7 @@ import org.json.JSONTokener;
  */
 public class CustomPropertiesPost extends AbstractRmWebScript
 {
+    private static Log logger = LogFactory.getLog(CustomPropertiesPost.class);
     /*
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
      */
@@ -83,6 +86,11 @@ public class CustomPropertiesPost extends AbstractRmWebScript
     protected Map<String, Object> addCustomProperties(WebScriptRequest req, JSONObject json) throws JSONException
     {
         NodeRef recordNode = parseRequestForNodeRef(req);
+        
+        if (logger.isDebugEnabled())
+        {
+        	logger.debug("Posting properties to " + recordNode);
+        }
 
         Map<String, Object> result = new HashMap<String, Object>();
         result.put("nodeRef", recordNode.toString());
@@ -104,6 +112,13 @@ public class CustomPropertiesPost extends AbstractRmWebScript
             nextPropData.put("qname", propProperQName.toPrefixString());
             nextPropData.put("value", nextValueString);
             customPropData.add(nextPropData);
+        }
+        
+        if (logger.isDebugEnabled())
+        {
+        	StringBuilder msg = new StringBuilder();
+        	msg.append("Successfully posted ").append(customPropData);
+        	logger.debug(msg.toString());
         }
 
         result.put("properties", customPropData);

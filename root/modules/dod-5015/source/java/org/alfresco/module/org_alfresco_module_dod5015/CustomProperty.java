@@ -143,4 +143,10 @@ public final class CustomProperty
     {
         this.type = type;
     }
+    
+    @Override
+    public String toString()
+    {
+    	return this.getName();
+    }
 }

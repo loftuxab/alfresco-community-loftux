@@ -36,6 +36,8 @@ import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -47,6 +49,8 @@ import org.json.JSONTokener;
  */
 public class CustomAssociationPost extends AbstractRmWebScript
 {
+    private static Log logger = LogFactory.getLog(CustomAssociationPost.class);
+
     private static final String TARGET_ID = "targetId";
     private static final String TARGET_STORE_ID = "targetStoreId";
     private static final String TARGET_STORE_TYPE = "targetStoreType";
@@ -109,6 +113,18 @@ public class CustomAssociationPost extends AbstractRmWebScript
         
         QName assocTypeProperQName = QName.createQName(assocTypeShortQName, namespaceService);
         NodeRef targetNode = new NodeRef(targetStoreType, targetStoreId, targetId);
+
+        if (logger.isDebugEnabled())
+        {
+        	StringBuilder msg = new StringBuilder();
+        	msg.append("Adding custom reference ")
+        	    .append(assocTypeShortQName)
+        	    .append(" from ")
+        	    .append(sourceNode)
+        	    .append(" to ")
+        	    .append(targetNode);
+        	logger.debug(msg.toString());
+        }
 
         // Need to handle child and standard assocs differently.
         Map<QName, CustomAssociation> allCustomAssocs = rmAdminService.getAvailableCustomAssociations();
