@@ -140,13 +140,6 @@ public interface RecordsManagementService
                 DispositionActionDefinition actionDefinition,
                 Map<QName, Serializable> actionDefinitionParams);
     
-    /**
-     * TODO MOVE THIS FROM THIS API
-     * 
-     * @param dispositionInstructions
-     * @param record
-     */
-    void updateNextDispositionAction(NodeRef nodeRef);
     
     /**
      * TODO MOVE THIS FROM THIS API

@@ -52,7 +52,7 @@ public class FileRecordsCapability extends AbstractCapability
     {
         if (isRm(nodeRef))
         {
-            if (checkFilingUnfrozenUncutoffOpen(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+            if (checkFilingUnfrozenUncutoffOpenUndeclared(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
                 if (isRecord(nodeRef))
                 {

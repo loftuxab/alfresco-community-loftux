@@ -98,7 +98,7 @@ public class FileAction extends RMActionExecuterAbstractBase
         if (di != null && di.isRecordLevelDisposition() == true)
         {
             // Setup the next disposition action
-            this.recordsManagementService.updateNextDispositionAction(actionedUponNodeRef);
+            updateNextDispositionAction(actionedUponNodeRef);
         }
     }
 

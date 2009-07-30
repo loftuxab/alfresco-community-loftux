@@ -38,6 +38,8 @@ import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefiniti
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CutOffAction;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FileAction;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -70,6 +72,8 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
 	private SearchService searchService;
 
     private PermissionService permissionService;
+
+    private NodeService unprotectedNodeService;
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -78,6 +82,7 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
 
 		// Get the service required in the tests
 		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); 
+		this.unprotectedNodeService = (NodeService)this.applicationContext.getBean("nodeService"); 
 		this.importService = (ImporterService)this.applicationContext.getBean("importerComponent");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		this.searchService = (SearchService)this.applicationContext.getBean("searchService");
@@ -188,6 +193,8 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
     
 	public void testUpdateNextDispositionAction()
 	{
+	    FileAction fileAction = (FileAction)applicationContext.getBean("file");
+	    
 	    // Get a record folder
         NodeRef folderRecord = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");
         assertNotNull(folderRecord);
@@ -201,7 +208,7 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
         
         assertFalse(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_LIFECYCLE));
         
-        this.rmService.updateNextDispositionAction(folderRecord);
+        fileAction.updateNextDispositionAction(folderRecord);
         
         
         // Check the next disposition action
@@ -217,8 +224,8 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
         
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
         props.put(PROP_CUT_OFF_DATE, new Date());
-        this.nodeService.addAspect(folderRecord, ASPECT_CUT_OFF, props);        
-        this.rmService.updateNextDispositionAction(folderRecord);
+        this.unprotectedNodeService.addAspect(folderRecord, ASPECT_CUT_OFF, props);        
+        fileAction.updateNextDispositionAction(folderRecord);
         
         assertTrue(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_LIFECYCLE));
         ndNodeRef = this.nodeService.getChildAssocs(folderRecord, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
@@ -230,7 +237,7 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
         // Check the history has an action
         // TODO
         
-        this.rmService.updateNextDispositionAction(folderRecord);
+        fileAction.updateNextDispositionAction(folderRecord);
         
         assertTrue(this.nodeService.hasAspect(folderRecord, ASPECT_DISPOSITION_LIFECYCLE));
         assertTrue(this.nodeService.getChildAssocs(folderRecord, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).isEmpty());

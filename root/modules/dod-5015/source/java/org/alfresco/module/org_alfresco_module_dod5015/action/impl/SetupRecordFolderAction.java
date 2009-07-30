@@ -67,7 +67,7 @@ public class SetupRecordFolderAction extends RMActionExecuterAbstractBase
             if (di != null && di.isRecordLevelDisposition() == false)
             {
                 // Setup the next disposition action
-                this.recordsManagementService.updateNextDispositionAction(actionedUponNodeRef);                
+                updateNextDispositionAction(actionedUponNodeRef);                
             }
         }
     }

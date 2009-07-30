@@ -49,7 +49,7 @@ public class CreateCapability extends AbstractCapability
     {
         if (linkee != null)
         {
-            if (voter.getViewRecordsCapability().checkRead(linkee, true) != AccessDecisionVoter.ACCESS_GRANTED)
+            if (checkRead(linkee, true) != AccessDecisionVoter.ACCESS_GRANTED)
             {
                 return AccessDecisionVoter.ACCESS_DENIED;
             }

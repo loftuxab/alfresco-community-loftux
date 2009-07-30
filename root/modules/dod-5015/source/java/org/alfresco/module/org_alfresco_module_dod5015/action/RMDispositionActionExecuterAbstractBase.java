@@ -147,7 +147,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
             if (this.nodeService.exists(actionedUponNodeRef) == true)
             {
                 // Update the disposition schedule
-                this.recordsManagementService.updateNextDispositionAction(actionedUponNodeRef);
+                updateNextDispositionAction(actionedUponNodeRef);
             }
         }
         else
@@ -503,5 +503,6 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
             }
         }
     }
+ 
 
 }
