@@ -36,6 +36,8 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Implementation for Java backed webscript to return list of custom properties
@@ -45,6 +47,8 @@ import org.alfresco.web.scripts.WebScriptRequest;
  */
 public class CustomPropertiesGet extends AbstractRmWebScript
 {
+    private static Log logger = LogFactory.getLog(CustomPropertiesGet.class);
+
     /*
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
      */
@@ -52,7 +56,13 @@ public class CustomPropertiesGet extends AbstractRmWebScript
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
         NodeRef record = parseRequestForNodeRef(req);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Getting custom properties for " + record);
+        }
+
         //TODO This request only makes sense for Record Series, Record Categories, Record Folders and Records.
+        //     Should check the type of the target node and reject non-sensical requests.
         
         Map<QName, Serializable> allProperties = nodeService.getProperties(record);
         Map<QName, Serializable> customProperties = new HashMap<QName, Serializable>();
@@ -63,6 +73,11 @@ public class CustomPropertiesGet extends AbstractRmWebScript
             {
                 customProperties.put(qn, allProperties.get(qn));
             }
+        }
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Returning custom properties:" + customProperties);
         }
         
         Map<String, Object> result = new HashMap<String, Object>();

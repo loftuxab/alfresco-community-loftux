@@ -38,6 +38,8 @@ import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * This class provides the implementation for the custompropdefinitions.get webscript.
@@ -46,6 +48,7 @@ import org.alfresco.web.scripts.WebScriptRequest;
  */
 public class CustomPropDefinitionsGet extends DeclarativeWebScript
 {
+    private static Log logger = LogFactory.getLog(CustomPropDefinitionsGet.class);
     private RecordsManagementAdminService rmAdminService;
     
     public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
@@ -59,6 +62,10 @@ public class CustomPropDefinitionsGet extends DeclarativeWebScript
         Map<String, Object> model = new HashMap<String, Object>();
         
         String elementName = req.getParameter("elementName");
+    	if (logger.isDebugEnabled())
+    	{
+    		logger.debug("Getting custom property definitions for " + elementName);
+    	}
         CustomisableRmElement elem = CustomisableRmElement.getEnumFor(elementName);
 
         Map<QName, CustomProperty> currentCustomProps = rmAdminService.getAvailableCustomProperties(elem);
@@ -69,7 +76,12 @@ public class CustomPropDefinitionsGet extends DeclarativeWebScript
             propData.add(entry.getValue());
         }
         
-        model.put("customProps", propData);
+    	if (logger.isDebugEnabled())
+    	{
+    		logger.debug("Retrieved custom property definitions: " + propData);
+    	}
+
+    	model.put("customProps", propData);
 
         return model;
     }

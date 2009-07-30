@@ -25,10 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
@@ -39,10 +36,10 @@ import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
-import org.json.JSONArray;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 /**
  * Implementation for Java backed webscript to remove RM custom properties from a record type.
@@ -51,18 +48,27 @@ import org.json.JSONTokener;
  */
 public class CustomPropertiesDelete extends AbstractRmWebScript
 {
+    private static Log logger = LogFactory.getLog(CustomPropertiesDelete.class);
     /*
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
      */
     @Override
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
-        JSONObject json = null;
         Map<String, Object> ftlModel = null;
         try
         {
             NodeRef recordNode = parseRequestForNodeRef(req);
         	QName propQName = getPropertyFromReq(req, recordNode);
+        	if (logger.isDebugEnabled())
+        	{
+        		StringBuilder msg = new StringBuilder();
+        		msg.append("Deleting property ")
+        		    .append(propQName)
+        		    .append(" from ")
+        		    .append(recordNode);
+        		logger.debug(msg.toString());
+        	}
             ftlModel = removeProperty(recordNode, propQName);
         } 
         catch (JSONException je)
@@ -95,7 +101,6 @@ public class CustomPropertiesDelete extends AbstractRmWebScript
     /**
      * Applies custom properties to the specified record node.
      */
-    @SuppressWarnings("unchecked")
     protected Map<String, Object> removeProperty(NodeRef record, QName propQName) throws JSONException
     {
         Map<String, Object> result = new HashMap<String, Object>();
