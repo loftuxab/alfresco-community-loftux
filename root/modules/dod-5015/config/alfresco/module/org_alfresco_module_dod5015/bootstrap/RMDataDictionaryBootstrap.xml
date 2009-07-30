@@ -21,7 +21,7 @@
             xmlns:custom="custom.model" 
             xmlns="" >
   
-   <cm:folder view:childName="Records Management">
+   <cm:folder view:childName="cm:records_management">
    
       <view:properties>    
          <sys:store-protocol>workspace</sys:store-protocol>

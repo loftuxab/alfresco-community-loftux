@@ -25,15 +25,14 @@
    </imports>
 
    <!-- Records Management Custom Models Namespace -->
-   <!-- TODO Should this be given a DOD5015-like name? -->
    <namespaces>
       <namespace uri="http://www.alfresco.org/model/rmcustom/1.0" prefix="rmc"/>
    </namespaces>
    
    <aspects>
-      <!-- These aspects are intentionally empty. New associations and/or properties
+      <!-- These aspects are intentionally empty. New references and/or properties
            will be defined at runtime. These new definitions will then be
-           programmatically added to this aspect. -->
+           programmatically added to these aspects. -->
       <aspect name="rmc:customAssocs">
          <title>Records Management Custom Associations</title>
       </aspect>
