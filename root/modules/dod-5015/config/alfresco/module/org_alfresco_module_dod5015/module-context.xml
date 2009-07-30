@@ -127,6 +127,7 @@
           class="org.alfresco.module.org_alfresco_module_dod5015.forms.RecordsManagementTypeFormFilter">
        <property name="filterRegistry" ref="typeFilterRegistry" />
        <property name="namespaceService" ref="NamespaceService"/>
+       <property name="recordsManagementAdminService" ref="recordsManagementAdminService"/>
     </bean>
     
     <!-- REST impl for RM Action Service -->
