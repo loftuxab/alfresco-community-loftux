@@ -1,0 +1,13 @@
+<webscript>
+  <shortname>Removes specified Custom Property from target RM node</shortname>
+  <description><![CDATA[
+  Removes custom property from the target node.<BR/>
+  The property_qname should be provided in the form "rmc_foo"
+  ]]>
+  </description>
+  <url>/api/node/{store_type}/{store_id}/{id}/customproperties/{property_qname}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <lifecycle>internal</lifecycle>
+</webscript>
