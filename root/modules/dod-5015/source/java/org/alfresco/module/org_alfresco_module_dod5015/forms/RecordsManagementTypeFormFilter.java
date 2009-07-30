@@ -1,12 +1,18 @@
 package org.alfresco.module.org_alfresco_module_dod5015.forms;
 
 import java.util.List;
+import java.util.Map;
 
+import org.alfresco.module.org_alfresco_module_dod5015.CustomProperty;
+import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.repo.forms.FieldDefinition;
 import org.alfresco.repo.forms.Form;
 import org.alfresco.repo.forms.FormData;
+import org.alfresco.repo.forms.PropertyFieldDefinition;
 import org.alfresco.repo.forms.processor.AbstractFilter;
+import org.alfresco.repo.forms.processor.node.NodeFormProcessor;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -31,6 +37,7 @@ public class RecordsManagementTypeFormFilter extends AbstractFilter implements D
     private static Log logger = LogFactory.getLog(RecordsManagementTypeFormFilter.class);
     
     protected NamespaceService namespaceService;
+    protected RecordsManagementAdminService rmAdminService;
     
     /**
      * Sets the NamespaceService instance
@@ -40,6 +47,16 @@ public class RecordsManagementTypeFormFilter extends AbstractFilter implements D
     public void setNamespaceService(NamespaceService namespaceService)
     {
         this.namespaceService = namespaceService;
+    }
+    
+    /**
+     * Sets the RecordsManagementAdminService instance
+     * 
+     * @param rmAdminService The RecordsManagementAdminService instance
+     */
+    public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
+    {
+        this.rmAdminService = rmAdminService;
     }
     
     /*
@@ -70,6 +87,36 @@ public class RecordsManagementTypeFormFilter extends AbstractFilter implements D
                     break;
                 }
             }
+            
+            // add any custom properties for the type being created (we don't need to deal with
+            // the record type in here as records are typically uploaded and then their metadata
+            // edited after the fact)
+            CustomisableRmElement rmTypeCustomAspect = null;
+            if (TYPE_RECORD_SERIES.equals(typeName))
+            {
+                rmTypeCustomAspect = CustomisableRmElement.RECORD_SERIES;
+            }
+            else if (TYPE_RECORD_CATEGORY.equals(typeName))
+            {
+                rmTypeCustomAspect = CustomisableRmElement.RECORD_CATEGORY;
+            }
+            else if (TYPE_RECORD_FOLDER.equals(typeName))
+            {
+                rmTypeCustomAspect = CustomisableRmElement.RECORD_FOLDER;
+            }
+            
+            if (rmTypeCustomAspect != null)
+            {
+                Map<QName, CustomProperty> customProps = this.rmAdminService.getAvailableCustomProperties(
+                            rmTypeCustomAspect);
+            
+                if (logger.isDebugEnabled())
+                    logger.debug("Found " + customProps.size() + " custom property for " + 
+                                typeName.toPrefixString(this.namespaceService));
+                
+                // setup field definition for each custom property
+                generateCustomRMPropertyFields(form, customProps);
+            }
         }
     }
 
@@ -96,5 +143,46 @@ public class RecordsManagementTypeFormFilter extends AbstractFilter implements D
     public void beforePersist(Object item, FormData data)
     {
         // ignored
+    }
+    
+    /**
+     * Generates a field definition for each custom property and adds them to the form.
+     * 
+     * @param form The Form to add the fields to
+     * @param customProps The Map of custom properties to add
+     */
+    protected void generateCustomRMPropertyFields(Form form, Map<QName, CustomProperty> customProps)
+    {
+        for (CustomProperty property : customProps.values())
+        {
+            // define property
+            String propName = property.getName();
+            String[] nameParts = QName.splitPrefixedQName(propName);
+            PropertyFieldDefinition fieldDef = new PropertyFieldDefinition(
+                        propName, property.getType().toPrefixString(
+                        this.namespaceService));
+            
+            String title = property.getTitle();
+            if (title == null)
+            {
+                title = propName;
+            }
+            fieldDef.setLabel(title);
+            fieldDef.setDefaultValue(property.getDefaultValue());
+            fieldDef.setDescription(property.getDescription());
+            fieldDef.setMandatory(property.isMandatory());
+            fieldDef.setProtectedField(property.isProtected());
+            fieldDef.setRepeating(property.isMultiValued());
+            
+            // define the data key name and set
+            String dataKeyName = NodeFormProcessor.PROP_DATA_PREFIX + nameParts[0] + 
+                                 NodeFormProcessor.DATA_KEY_SEPARATOR + nameParts[1];
+            fieldDef.setDataKeyName(dataKeyName);
+            
+            // TODO: setup constraints (probably only list of values) for the property
+            
+            // add the field definition to the form
+            form.addFieldDefinition(fieldDef);
+        }
     }
 }
