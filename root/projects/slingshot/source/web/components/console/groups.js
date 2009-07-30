@@ -191,7 +191,7 @@
                {
                   me._setResultsMessage("message.noresults");
                }
-               else if(items.length < parent.options.maxSearchResults)
+               else if (items.length < parent.options.maxSearchResults)
                {
                   me._setResultsMessage("message.results", $html(parent.query), items.length);
                }
@@ -256,19 +256,14 @@
             });
 
             // Create delete group panel
-            this.widgets.deleteGroupPanel = new YAHOO.widget.Panel(parent.id + "-deletegroupdialog",
+            this.widgets.deleteGroupPanel = new Alfresco.util.createYUIPanel(parent.id + "-deletegroupdialog",
             {
-               modal: true,
-               draggable: false,
-               fixedcenter: true,
-               close: false,
                visible: false
             });
-            this.widgets.deleteGroupPanel.render(document.body);
 
             // Add event listeners to buttons
             this.widgets.deleteGroupCancelButton = new YAHOO.widget.Button(parent.id + "-cancel-button", {});
-            this.widgets.deleteGroupCancelButton.on("click", function ()
+            this.widgets.deleteGroupCancelButton.on("click", function()
             {               
                this.widgets.deleteGroupPanel.hide();
             }, null, this);
@@ -296,7 +291,7 @@
           */
          onUpdate: function ConsoleGroups_SearchPanelHandler_onUpdate()
          {
-            if(parent.query)
+            if (parent.query)
             {
                // Lets display the search list since the state indicates a query has been used
                Dom.addClass(parent.id + "-browse-panel", "hidden");
@@ -317,7 +312,7 @@
                Dom.removeClass(parent.id + "-browse-panel", "hidden");
 
                // Refresh the column browser
-               if(parent.refresh)
+               if (parent.refresh)
                {
                   var paths = this.widgets.columnbrowser.get("urlPath");
                   this.widgets.columnbrowser.load(paths, true);
@@ -386,7 +381,7 @@
             // Hide the confirm dialog
             this.widgets.deleteGroupPanel.hide();
 
-            if(obj.multiParentMode && Dom.get(parent.id + "-remove").checked)
+            if (obj.multiParentMode && Dom.get(parent.id + "-remove").checked)
             {
                // Just remove the group from the parent group
                this._removeGroup(obj.fullName, obj.parentShortName, obj.displayName);
@@ -548,18 +543,7 @@
             finderDiv.innerHTML = response.serverResponse.responseText;
 
             // Create the Add User dialog
-            this.widgets.addUserPanel = new YAHOO.widget.Panel(parent.id + "-peoplepicker",
-            {
-               modal: true,
-               draggable: false,
-               fixedcenter: true,
-               close: true,
-               visible: false
-            });
-
-            // Add it to the Dom
-            this.widgets.addUserPanel.render(document.body);
-
+            this.widgets.addUserPanel = Alfresco.util.createYUIPanel(parent.id + "-peoplepicker");
 
             // Find the People Finder by container ID
             this.modules.searchPeopleFinder = Alfresco.util.ComponentManager.get(parent.id + "-search-peoplefinder");
@@ -589,17 +573,7 @@
             finderDiv.innerHTML = response.serverResponse.responseText;
 
             // Create the Add Group dialog
-            this.widgets.addGroupPanel = new YAHOO.widget.Panel(parent.id + "-grouppicker",
-            {
-               modal: true,
-               draggable: false,
-               fixedcenter: true,
-               close: true,
-               visible: false
-            });
-
-            // Add it to the Dom
-            this.widgets.addGroupPanel.render(document.body);
+            this.widgets.addGroupPanel = Alfresco.util.createYUIPanel(parent.id + "-grouppicker")
 
             // Find the Group Finder by container ID
             this.modules.searchGroupFinder = Alfresco.util.ComponentManager.get(parent.id + "-search-groupfinder");
@@ -628,7 +602,7 @@
           */
          onBuildEmptyColumnInfo: function ConsoleGroups_onBuildEmptyColumnInfo(itemInfo)
          {
-            if(itemInfo.cssClass == 'groups-item-group')
+            if (itemInfo.cssClass == 'groups-item-group')
             {
                return {
                   parent: itemInfo,
@@ -703,7 +677,7 @@
             ];
 
             // Transform server respons to itemInfos and add them to the columnInfo's body
-            for(var i = 0; i < obj.data.length; i++)
+            for (var i = 0; i < obj.data.length; i++)
             {
                var o = obj.data[i];
                var item = {
@@ -717,7 +691,7 @@
                   buttons: o.authorityType == 'GROUP' ? groupButtons : usersButtons
                };
                column.body.items.push(item);
-               if(o.authorityType == 'GROUP')
+               if (o.authorityType == 'GROUP')
                {
                   groupCount++;
                }
@@ -834,7 +808,8 @@
                {
                   // Remove previous listeners so we don't make duplicate calls and add a new one later
                   this.widgets.deleteGroupOkButton.removeListener("click", this.onConfirmedDeleteGroupClick);
-                  var callbackObj = {
+                  var callbackObj =
+                  {
                      shortName: shortName,
                      fullName: fullName,
                      displayName: displayName,
@@ -843,7 +818,7 @@
                   };
 
                   // Make sure the dialog is displayed correctly
-                  if(!groups || groups.length == 0 || groups.length == 1)
+                  if (!groups || groups.length == 0 || groups.length == 1)
                   {
                      // Group is root group or has only 1 parent
                      Dom.addClass(parent.id + "-multiparent", "hidden");
@@ -863,17 +838,17 @@
 
                      // Lets display the groups parents to the user, but only the first 10
                      var parentStr = "", displayLimit = 10;
-                     for(var i = 0; i < groups.length && i < displayLimit; i++)
+                     for (var i = 0; i < groups.length && i < displayLimit; i++)
                      {
                         parentStr += groups[i].displayName + (i < groups.length - 1 ? ", " : "");
                      }
-                     if(i >= displayLimit)
+                     if (i >= displayLimit)
                      {
                         parentStr += parent._msg("label.moregroups", groups.length - displayLimit);
                      }
                      Dom.get(parent.id + "-parents").innerHTML = parentStr;
 
-                     if(parentShortName)
+                     if (parentShortName)
                      {
                         // Display both the option to remove from parent group and delete the group
                         Dom.get(parent.id + "-remove").checked = true;
@@ -917,6 +892,7 @@
             var me = this;
             Alfresco.util.PopupManager.displayPrompt(
             {
+               title: parent._msg("message.confirm.removeuser.title"),
                text: parent._msg("message.confirm.removeuser", userDisplayName),
                buttons: [
                   {
@@ -960,7 +936,7 @@
           */
          _removeGroup: function ConsoleGroups_SearchPanelHandler__removeGroup(fullName, parentShortName, displayName)
          {
-            if(parentShortName == null)
+            if (parentShortName == null)
             {
                // todo implement when webscript api supports it
                // This isn't supported by the webscript api yet
@@ -1093,7 +1069,7 @@
                   }
                }
             ];
-            if(itemInfo)
+            if (itemInfo)
             {
                // Only add the following button for NON root columns               
                headerButtons.push({
@@ -1468,12 +1444,12 @@
             {
                fn: function(groups)
                {
-                  if(groups)
+                  if (groups)
                   {
                      // The group alredy existed, now let's see if the identifer already is placed under this group
                      var alreadyThere = false;
                      var parentStr = "";
-                     for(var i = 0; i < groups.length; i++)
+                     for (var i = 0; i < groups.length; i++)
                      {
                         parentStr += groups[i].displayName + (i < groups.length - 1 ? ", " : "");
                      }
@@ -1488,7 +1464,7 @@
                               {
                                  // Hide Prompt
                                  this.destroy();
-                                 if(parent.group)
+                                 if (parent.group)
                                  {
                                     me._createGroupAfterExistCheck.call(me, successHandler);
                                  }
@@ -1544,12 +1520,12 @@
 
             var url = Alfresco.constants.PROXY_URI + "api/";
             var sh = successHandler;
-            if(parent.group && parent.group.length > 0)
+            if (parent.group && parent.group.length > 0)
             {
                url += "groups/" + parent.group + "/children/GROUP_" + shortName;
                sh = function(response)
                {
-                  if(displayName && shortName != displayName)
+                  if (displayName && shortName != displayName)
                   {
                      /**
                       * When a group is created by adding it to a parent group its not possible to
@@ -1572,7 +1548,7 @@
             else
             {
                url += "rootgroups/" + shortName;
-               if(displayName)
+               if (displayName)
                {
                   groupObj.displayName = displayName;
                }
@@ -1720,7 +1696,7 @@
                Dom.get(parent.id + "-update-displayname").value = group.displayName;
 
                // Make sure buttons are in the correct state
-               if(this.forms.updateForm)
+               if (this.forms.updateForm)
                {
                   this.forms.updateForm.init();
                }
@@ -1766,7 +1742,7 @@
                });
 
                var state = {panel: "search", refresh: "true"};
-               if(parent.query)
+               if (parent.query)
                {
                   // If this panel was triggered from the search list, send back the query so the list will be displayed
                   state.query = parent.query;
@@ -1786,7 +1762,7 @@
          onUpdateGroupCancelClick: function ConsoleGroups_UpdatePanelHandler_onUpdateGroupCancelClick(e, args)
          {
             var state = {"panel": "search"};
-            if(parent.query)
+            if (parent.query)
             {
                // If this panel was triggered from the search list, send back the query so the list will be displayed
                state.query = parent.query;
@@ -1929,19 +1905,19 @@
          this.groupDisplayName = undefined;
 
          var state = this.decodeHistoryState(args[1].state);
-         if(state.query)
+         if (state.query)
          {
             this.query = state.query;
          }
-         if(state.refresh)
+         if (state.refresh)
          {
             this.refresh = state.refresh;
          }
-         if(state.group)
+         if (state.group)
          {
             this.group = state.group;
          }
-         if(state.groupDisplayName)
+         if (state.groupDisplayName)
          {
             this.groupDisplayName = state.groupDisplayName;
          }
@@ -1989,7 +1965,7 @@
          var query = args[1].query;
          var state = {"panel": "update", "group": group};
          // Remember query if cancel is clicked
-         if(query)
+         if (query)
          {
             state.query = query;
          }
@@ -2065,7 +2041,7 @@
             {
                fn: function(o)
                {
-                  if(o.serverResponse.status == 404)
+                  if (o.serverResponse.status == 404)
                   {
                      // group didn't exist just continue
                      successCallback.fn.call(successCallback.scope ? successCallback.scope : this, null);

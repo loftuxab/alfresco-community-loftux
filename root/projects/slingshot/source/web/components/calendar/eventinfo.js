@@ -159,15 +159,10 @@
          var div = Dom.get("eventInfoPanel");
          div.innerHTML = response.serverResponse.responseText;
 
-         this.panel = new YAHOO.widget.Panel(div,
+         this.panel = Alfresco.util.createYUIPanel(div,
          {
-            modal: true,
-            fixedcenter: true,
-            visible: false,
-            constraintoviewport: true,
             width: "35em"
          });
-         this.panel.render(document.body);
          this.widgets = this.widgets || {};
          // Buttons
          this.widgets.deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick);
@@ -363,6 +358,7 @@
          var me = this;
          Alfresco.util.PopupManager.displayPrompt(
          {
+            title: this._msg("message.confirm.delete.title"),
             text: this._msg("message.confirm.delete", this.event.name),
             buttons: [
             {

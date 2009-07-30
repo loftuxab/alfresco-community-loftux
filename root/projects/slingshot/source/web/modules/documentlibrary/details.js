@@ -160,16 +160,10 @@
          }
          
          // Create and render the YUI dialog
-         this.widgets.dialog = new YAHOO.widget.Panel(dialogDiv,
+         this.widgets.dialog = Alfresco.util.createYUIPanel(dialogDiv,
          {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            close: true,
-            visible: false,
             width: this.options.width
          });
-         this.widgets.dialog.render(document.body);
          
          // Edit metadata link button
          this.widgets.editMetadata = Alfresco.util.createYUIButton(this, "editMetadata", null, 

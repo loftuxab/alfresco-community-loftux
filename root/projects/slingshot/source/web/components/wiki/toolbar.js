@@ -182,16 +182,10 @@
             type: "link"
          });
          
-         this.popups.deleteDialog = new YAHOO.widget.SimpleDialog("deleteDialog", 
+         this.popups.deleteDialog = Alfresco.util.createYUIPanel("deleteDialog", 
          {
             width: "20em",
-            fixedcenter: true,
-            visible: false,
-            draggable: false,
-            modal: true,
-            close: true,
             text: '<div class="yui-u"><br />' + this._msg("panel.confirm.delete-msg") + '<br /><br /></div>',
-            constraintoviewport: true,
             buttons: [
             {
                text: this._msg("button.delete"),
@@ -210,10 +204,11 @@
                },
                isDefault: true
             }]
+         },
+         {
+            type: YAHOO.widget.SimpleDialog
          });
-         
          this.popups.deleteDialog.setHeader(this._msg("panel.confirm.header"));
-         this.popups.deleteDialog.render(document.body);
          
          // Create the rename panel
          var renamePanel = Dom.get(this.id + "-renamepanel"),
@@ -221,16 +216,10 @@
             
          renamePanel.parentNode.removeChild(renamePanel);
          
-         this.popups.renamePanel = new YAHOO.widget.Panel(clonedRenamePanel,
+         this.popups.renamePanel = Alfresco.util.createYUIPanel(clonedRenamePanel,
          {
             width: "320px",
-            visible: false,
-            draggable: false,
-            constraintoviewport: true,
-            fixedcenter: true,
-            modal: true
          });
-         this.popups.renamePanel.render(document.body);
          
          var renameSaveButton = Alfresco.util.createYUIButton(this, "rename-save-button", null,
          {

@@ -654,6 +654,7 @@
          var me = this;
          Alfresco.util.PopupManager.displayPrompt(
          {
+            title: this._msg("message.confirm.delete.title"),
             text: this._msg("message.confirm.delete", $html(record.getData('title'))),
             buttons: [
             {

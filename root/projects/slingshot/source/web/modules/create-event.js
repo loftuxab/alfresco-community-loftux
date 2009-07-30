@@ -185,17 +185,7 @@ Alfresco.module.event.validation = Alfresco.module.event.validation || {};
           // The panel is created from the HTML returned in the XHR request, not the container
           var panelDiv = Dom.getFirstChild(containerDiv);
 
-          this.panel = new YAHOO.widget.Panel(panelDiv,
-          {
-             modal: true,
-             draggable: false,
-             fixedcenter: true,
-             close: false,
-             visible: false
-          });
-
-          // Add it to the Dom
-          this.panel.render(document.body);
+          this.panel = Alfresco.util.createYUIPanel(panelDiv);
 
           // Set the title depending on the mode
           Dom.get(this.id + "-title-div").innerHTML = Alfresco.util.message("title." + this.options.mode + "Event", this.name);

@@ -395,15 +395,10 @@
          Dom.removeClass(this.id + "-dialog", "hidden");
 
          // Create the panel
-         this.panel = new YAHOO.widget.Panel(this.id + "-dialog",
+         this.panel = Alfresco.util.createYUIPanel(this.id + "-dialog",
          {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            visible: false,
             close: false
          });
-         this.panel.render(document.body);
 
          // Save a reference to the file row template that is hidden inside the markup
          this.fileItemTemplates.left = Dom.get(this.id + "-left-div");

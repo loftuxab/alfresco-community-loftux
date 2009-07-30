@@ -379,17 +379,7 @@
       {
          // TODO stop using a static id after RM, needed now so the text-align in #Share .yui-panel .bd .yui-u.first can be overriden
          // The panel is created from the HTML returned in the XHR request, not the container
-         this.widgets.completeEventPanel = new YAHOO.widget.Panel("complete-event-panel",
-         {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            close: false,
-            visible: false
-         });
-
-         // Add it to the Dom
-         this.widgets.completeEventPanel.render(document.body);
+         this.widgets.completeEventPanel = Alfresco.util.createYUIPanel("complete-event-panel")
 
          // Buttons
          this.widgets.completeEventOkButton = Alfresco.util.createYUIButton(this, "completeEvent-ok-button", this.onCompleteEventOkClick);

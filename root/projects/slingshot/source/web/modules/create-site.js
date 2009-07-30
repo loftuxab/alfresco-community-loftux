@@ -115,17 +115,7 @@
          // The panel is created from the HTML returned in the XHR request, not the container
          var panelDiv = Dom.getFirstChild(containerDiv);
 
-         this.widgets.panel = new YAHOO.widget.Panel(panelDiv,
-         {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            close: false,
-            visible: false
-         });
-
-         // Add it to the Dom
-         this.widgets.panel.render(document.body);
+         this.widgets.panel = Alfresco.util.createYUIPanel(panelDiv);
 
          // Create the cancel button
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
