@@ -175,21 +175,7 @@
 
          // Create the panel from the HTML returned in the server reponse
          var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
-         this.widgets.panel = new YAHOO.widget.Panel(dialogDiv,
-         {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            visible: false,
-            close: false
-         });
-
-         /**
-          * Render the server reponse so the contents get inserted in the Dom.
-          * Scripts in the template, such as setMessage(),  will also get run
-          * at this moment.
-          */
-         this.widgets.panel.render(document.body);
+         this.widgets.panel = Alfresco.util.createYUIPanel(dialogDiv);
 
          // Save a reference to the HTMLElement displaying texts so we can alter the texts later
          this.widgets.headerText = Dom.get(this.id + "-header-span");

@@ -852,8 +852,8 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj, p_oE
    }
    
    // Create the button
-   var p_oElement = p_oElement ? p_oElement : p_scope.id + "-" + p_name,
-      button = new YAHOO.widget.Button(p_oElement, obj);
+   var oElement = p_oElement ? p_oElement : p_scope.id + "-" + p_name,
+      button = new YAHOO.widget.Button(oElement, obj);
 
    if (typeof button == "object")
    {
@@ -1004,6 +1004,71 @@ Alfresco.util.createTwister = function(p_controller, p_filterName, p_config)
    });
 };
 Alfresco.util.createTwister.collapsed = "";
+
+/**
+ * Wrapper to create a YUI Panel with common attributes, as follows:
+ * <pre>
+ *   modal: true,
+ *   constraintoviewport: true,
+ *   draggable: true,
+ *   fixedcenter: true,
+ *   close: true,
+ *   visible: false
+ * </pre>
+ * All supplied object parameters are passed to the panel constructor
+ * e.g. Alfresco.util.createYUIPanel("myId", { draggable: false });
+ *
+ * @method Alfresco.util.createYUIPanel
+ * @param p_el {string|HTMLElement} The element ID representing the Panel or the element representing the Panel
+ * @param p_params {object} Optional extra/overridden object parameters to pass to Panel constructor
+ * @param p_custom {object} Optional parameters to customise Panel creation:
+ * <pre>
+ *    render {boolean} By default the new Panel will be rendered to document.body. Set to false to prevent this.
+ *    type {object} Use to override YAHOO.widget.Panel default type, e.g. YAHOO.widget.Dialog
+ * </pre>
+ * @return {YAHOO.widget.Panel|flags.type} New Panel instance
+ * @static
+ */
+Alfresco.util.createYUIPanel = function(p_el, p_params, p_custom)
+{
+   // Default constructor parameters
+   var panel,
+      params =
+      {
+         modal: true,
+         constraintoviewport: true,
+         draggable: true,
+         fixedcenter: true,
+         close: true,
+         visible: false
+      },
+      custom =
+      {
+         render: true,
+         type: YAHOO.widget.Panel
+      };
+   
+   // Any extra/overridden constructor parameters?
+   if (typeof p_params == "object")
+   {
+      params = YAHOO.lang.merge(params, p_params);
+   }
+   // Any customisation?
+   if (typeof p_custom == "object")
+   {
+      custom = YAHOO.lang.merge(custom, p_custom);
+   }
+
+   // Create and return the panel
+   panel = new (custom.type)(p_el, params);
+
+   if (custom.render)
+   {
+      panel.render(document.body);
+   }
+   
+   return panel;
+};
 
 /**
  * Find an event target's class name, ignoring YUI classes.
@@ -1573,7 +1638,7 @@ Alfresco.util.cleanBubblingObject = function(callbackObj)
    },
       cleanObj = {};
    
-   for (index in callbackObj)
+   for (var index in callbackObj)
    {
       if (callbackObj.hasOwnProperty(index) && augmented[index] !== true)
       {
@@ -1883,10 +1948,10 @@ Alfresco.util.PopupManager = function()
          title: null,
          text: null,
          spanClass: "message",
+         displayTime: 2.5,
          effect: YAHOO.widget.ContainerEffect.FADE,
          effectDuration: 0.5,
-         displayTime: 2.5,
-         modal: false,
+         visible: false,
          noEscape: false
       },
 
@@ -1920,7 +1985,8 @@ Alfresco.util.PopupManager = function()
          // Construct the YUI Dialog that will display the message
          var message = new YAHOO.widget.Dialog("message",
          {
-            visible: false,
+            modal: false,
+            visible: c.visible,
             close: false,
             draggable: false,
             effect:
@@ -1928,7 +1994,6 @@ Alfresco.util.PopupManager = function()
                effect: c.effect,
                duration: c.effectDuration
             },
-            modal: c.modal,
             zIndex: this.zIndex++
          });
 
@@ -1983,10 +2048,13 @@ Alfresco.util.PopupManager = function()
          title: null,
          text: null,
          icon: null,
+         close: false,
+         constraintoviewport: true,
+         draggable: true,
          effect: null,
          effectDuration: 0.5,
          modal: true,
-         close: false,
+         visible: false,
          noEscape: false,
          buttons: [
          {
@@ -2043,11 +2111,12 @@ Alfresco.util.PopupManager = function()
          // Create the SimpleDialog that will display the text
          var prompt = new YAHOO.widget.SimpleDialog("prompt",
          {
-            visible: false,
-            draggable: false,
+            close: c.close,
+            constraintoviewport: c.constraintoviewport,
+            draggable: c.draggable,
             effect: c.effect,
             modal: c.modal,
-            close: c.close,
+            visible: c.visible,
             zIndex: this.zIndex++
          });
 
@@ -2090,10 +2159,13 @@ Alfresco.util.PopupManager = function()
          title: null,
          text: null,
          icon: null,
+         close: true,
+         constraintoviewport: true,
+         draggable: true,
          effect: null,
          effectDuration: 0.5,
          modal: true,
-         close: true,
+         visible: false,
          noEscape: true,
          html: null,
          callback: null,
@@ -2156,11 +2228,12 @@ Alfresco.util.PopupManager = function()
          // Create the SimpleDialog that will display the text
          var prompt = new YAHOO.widget.SimpleDialog("userInput",
          {
-            visible: false,
-            draggable: false,
+            close: c.close,
+            constraintoviewport: c.constraintoviewport,
+            draggable: c.draggable,
             effect: c.effect,
             modal: c.modal,
-            close: c.close,
+            visible: c.visible,
             zIndex: this.zIndex++
          });
 
@@ -3538,7 +3611,7 @@ Alfresco.thirdparty.toISO8601 = function()
       	{
       		var time = [_(dateObject[getter+"Hours"]()), _(dateObject[getter+"Minutes"]()), _(dateObject[getter+"Seconds"]())].join(':');
       		var millis = dateObject[getter+"Milliseconds"]();
-      		if (options.milliseconds == undefined || options.milliseconds) 
+      		if (options.milliseconds === undefined || options.milliseconds) 
       		{
       			time += "."+ (millis < 100 ? "0" : "") + _(millis);
       		}

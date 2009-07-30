@@ -422,16 +422,10 @@
          }
 
          // Create and render the YUI dialog
-         this.dialog = new YAHOO.widget.Panel(dialogDiv,
+         this.dialog = Alfresco.util.createYUIPanel(dialogDiv,
          {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            close: true,
-            visible: false,
             width: this.options.width
          });
-         this.dialog.render(document.body);
 
          // Are we controlling a Forms Service-supplied form?
          if (Dom.get(this.id + "-form-submit"))

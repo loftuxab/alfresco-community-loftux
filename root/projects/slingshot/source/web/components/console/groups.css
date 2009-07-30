@@ -12,11 +12,10 @@
 
 /* Users Tool */
 
-
 .groups
 {
    color: #000000;
-   margin:16px 10px 10px;
+   margin: 16px 10px 10px;
 }
 
 .groups.yui-panel
@@ -32,10 +31,10 @@
 
 .groups .title
 {
-   color:#515D6B;
-   font-size:123.1%;
-   font-weight:bold;
-   margin-bottom:0.8em;
+   color: #515D6B;
+   font-size: 123.1%;
+   font-weight: bold;
+   margin-bottom: 0.8em;
 }
 
 .groups .search-button
@@ -46,9 +45,8 @@
 
 .groups .separator
 {
-   margin-bottom:0.8em;
+   margin-bottom: 0.8em;
 }
-
 
 .groups .search-bar
 {
@@ -62,7 +60,7 @@
 
 .groups .align-right
 {
-   text-align:right;
+   text-align: right;
 }
 
 .groups .search-main
@@ -73,9 +71,8 @@
 .groups .closesearch-button
 {
    float: right;
-   margin-top:-2.3em;
+   margin-top: -2.3em;
 }
-
 
 /* Data table styling */
 
@@ -113,23 +110,24 @@
 {
    text-align: right;
 }
+
 .groups td.yui-dt-last .yui-dt-liner a.update
 {
-   background-image:url(../images/edit-16.png);
+   background-image: url(../images/edit-16.png);
 }
 
 .groups td.yui-dt-last .yui-dt-liner a.delete
 {
-   background-image:url(../images/delete-16.png);
+   background-image: url(../images/delete-16.png);
 }
 
 .groups td.yui-dt-last .yui-dt-liner a
 {
-   background-position:0 center;
-   background-repeat:no-repeat;
-   padding-bottom:0.1em;
-   padding-left:0.6em;
-   padding-right:0.7em;
+   background-position: 0 center;
+   background-repeat: no-repeat;
+   padding-bottom: 0.1em;
+   padding-left: 0.6em;
+   padding-right: 0.7em;
 }
 
 /* Columnbrowser styling */
@@ -146,7 +144,8 @@
 
 .groups .yui-columnbrowser .yui-carousel-content li.yui-columnbrowser-column a
 {
-   color: black;                     ü
+   color: black;
+   Ã¼
    font-family: 'Lucida Grande', Helvetica, sans-serif;
    font-size: 12px;
    text-decoration: none;
@@ -157,16 +156,17 @@
 {
    background-position: 99% center;
 }
+
 .groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-header
 {
-   padding-right:1.5em;
-   text-align:right;
+   padding-right: 1.5em;
+   text-align: right;
 }
 
 .groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-header span span
 {
-   padding-top:0.1em;
-   padding-bottom:0.1em;
+   padding-top: 0.1em;
+   padding-bottom: 0.1em;
    background-repeat: no-repeat;
    background-position: 0 center;
    padding-left: 1em;
@@ -206,6 +206,7 @@
 {
    background-color: #EFEFEF;
 }
+
 .groups .yui-columnbrowser.yui-carousel .yui-columnbrowser-column-body .yui-columnbrowser-item.groups-item-group .yui-columnbrowser-item-label
 {
    background-image: url(../images/group-16.png);
@@ -226,14 +227,16 @@
    border-top: 1px solid #D7D7D7;
    border-left: 1px solid #D7D7D7;
    border-right: 1px solid #D7D7D7;
-   /*width:1001px;*/
-   width:77.2em;
+   
+
+/*width:1001px;*/
+   width: 77.2em;
    line-height: 2.5em;
 }
 
 .groups .yui-columnbrowser-breadcrumb .yui-columnbrowser-breadcrumb-item
 {
-   padding-bottom:0.1em;
+   padding-bottom: 0.1em;
 }
 
 .groups .yui-columnbrowser-breadcrumb .yui-columnbrowser-breadcrumb-item.groups-item-group
@@ -254,16 +257,16 @@
 
 .groups .yui-columnbrowser .yui-columnbrowser-item .yui-columnbrowser-item-buttons
 {
-   margin-right:1.7em;
+   margin-right: 1.7em;
 }
 
 .groups .yui-columnbrowser .yui-columnbrowser-item .yui-columnbrowser-item-buttons span
 {
    background-repeat: no-repeat;
    background-position: 0 0;
-   padding-bottom:0.1em;
-   padding-left:0.6em;
-   padding-right:1.1em;
+   padding-bottom: 0.1em;
+   padding-left: 0.6em;
+   padding-right: 1.1em;
 }
 
 .groups .yui-columnbrowser .yui-columnbrowser-item .yui-columnbrowser-item-buttons span.groups-update-button
@@ -376,12 +379,12 @@
 
 .remove-dialog .yui-gf div.first
 {
-   width:10%;
+   width: 10%;
 }
 
 .remove-dialog .yui-gf .yui-u
 {
-   width:83%;
+   width: 83%;
 }
 
 .remove-dialog .dialog-panel
@@ -391,43 +394,44 @@
 
 .remove-dialog .dialog-panel .parent-list
 {
-   color:#919DAB;
-   margin-bottom:1em;
+   color: #919DAB;
+   margin-bottom: 1em;
 }
-
 
 /* People picker */
 
-.groups.people-picker
+.people-picker
 {
    width: 51em;
 }
 
-
-.groups .people-finder .search-text
+.people-picker .people-finder .search-text
 {
-   padding:0 1em 0.3em 0.3em;
-}
-.groups .people-picker .people-finder
-{
-   margin: 0;
+   padding: 0 1em 0.3em 0.3em;
 }
 
-.groups.people-picker .people-finder.list
+.people-picker .people-finder.list
 {
    margin-bottom: 0;
+   margin-top: 0;
+   padding-bottom: 1em;
+   padding-top: 0.3em;
 }
 
-.groups.people-picker.yui-panel .bd
+.people-picker .people-finder .title
 {
-   padding:1em;
+   display: none;
 }
 
-.groups.people-picker .search-button 
+.people-picker .bd
+{
+   padding: 1em;
+}
+
+.people-picker .search-button
 {
    margin-top: 0;
 }
-
 
 /* Group picker */
 
@@ -436,18 +440,20 @@
    width: 51em;
 }
 
-.groups.group-picker .group-finder
-{
-   margin: 0;
-}
-
-.groups.group-picker .group-finder.list
+.group-picker .group-finder.list
 {
    margin-bottom: 0;
+   margin-top: 0;
+   padding-bottom: 1em;
+   padding-top: 0.3em;
 }
 
-.groups.group-picker.yui-panel .bd
+.group-picker .group-finder .title
 {
-   padding:1em;
+   display: none;
 }
 
+.group-picker .bd
+{
+   padding: 1em;
+}

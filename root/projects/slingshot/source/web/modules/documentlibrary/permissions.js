@@ -237,16 +237,10 @@
          }
          
          // Create and render the YUI dialog
-         this.widgets.dialog = new YAHOO.widget.Panel(dialogDiv,
+         this.widgets.dialog = Alfresco.util.createYUIPanel(dialogDiv,
          {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            close: true,
-            visible: false,
             width: this.options.width
          });
-         this.widgets.dialog.render(document.body);
          
          // OK and cancel buttons
          this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok", this.onOK);

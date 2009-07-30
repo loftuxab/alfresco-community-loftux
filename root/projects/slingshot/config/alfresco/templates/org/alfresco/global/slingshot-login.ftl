@@ -76,7 +76,7 @@
       var panel = new YAHOO.widget.Overlay(YAHOO.util.Dom.get("alflogin"), 
       {
          modal: false,
-         draggable: false,
+         draggable: false, // NOTE: Don't change to "true"
          fixedcenter: true,
          close: false,
          visible: true,

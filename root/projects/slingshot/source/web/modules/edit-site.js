@@ -139,7 +139,7 @@
        */
       show: function CS_show(config)
       {
-         if(!this.editPanelActive)
+         if (!this.editPanelActive)
          {
             // Set editPanelActive to true so we don't open multiple dialogs
             this.editPanelActive = true;
@@ -197,17 +197,10 @@
          // The panel is created from the HTML returned in the XHR request, not the container
          var panelDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
 
-         this.widgets.panel = new YAHOO.widget.Panel(panelDiv,
+         this.widgets.panel = Alfresco.util.createYUIPanel(panelDiv,
          {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            close: false,
-            visible: false
+            close: false
          });
-
-         // Add it to the Dom
-         this.widgets.panel.render(document.body);
 
          // Create the cancel button
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
@@ -292,7 +285,7 @@
       /**
        * Called when user clicks on the isPublic checkbox.
        *
-       * @method onCancelButtonClick
+       * @method onIsPublicChange
        * @param type
        * @param args
        */

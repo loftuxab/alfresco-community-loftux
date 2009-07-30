@@ -170,21 +170,10 @@
          Dom.removeClass(this.id + "-dialog", "hidden");
 
          // Create the panel
-         this.widgets.panel = new YAHOO.widget.Panel(this.id + "-dialog",
+         this.widgets.panel = Alfresco.util.createYUIPanel(this.id + "-dialog",
          {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            visible: false,
             close: false
          });
-
-         /**
-          * Render the server reponse so the contents get inserted in the Dom.
-          * Scripts in the template, such as setMessage(),  will also get run
-          * at this moment.
-          */
-         this.widgets.panel.render(document.body);
 
          // Save a reference to the HTMLElement displaying texts so we can alter the texts later
          this.widgets.titleText = Dom.get(this.id + "-title-span");

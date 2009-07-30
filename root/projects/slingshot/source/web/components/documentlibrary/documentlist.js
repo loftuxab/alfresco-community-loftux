@@ -1704,6 +1704,7 @@
          
          Alfresco.util.PopupManager.displayPrompt(
          {
+            title: this.msg("message.confirm.delete.title"),
             text: this.msg("message.confirm.delete", displayName),
             buttons: [
             {

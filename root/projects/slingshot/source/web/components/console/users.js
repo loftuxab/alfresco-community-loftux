@@ -1152,16 +1152,10 @@
       onReady: function ConsoleUsers_onReady()
       {
          // Generate the popup dialog for confirmation of deleting a user
-         this.popups.deleteDialog = new YAHOO.widget.SimpleDialog("deleteDialog", 
+         this.popups.deleteDialog = Alfresco.util.createYUIPanel("deleteDialog", 
          {
             width: "36em",
-            fixedcenter: true,
-            visible: false,
-            draggable: false,
-            modal: true,
-            close: true,
             text: '<div class="yui-u" style="text-align:center"><br/>' + this._msg("panel.delete.msg") + '<br/><br/></div>',
-            constraintoviewport: true,
             buttons: [
             {
                text: this._msg("button.delete"),
@@ -1180,10 +1174,12 @@
                },
                isDefault: true
             }]
+         },
+         {
+            type: YAHOO.widget.SimpleDialog
          });
          
          this.popups.deleteDialog.setHeader(this._msg("panel.delete.header"));
-         this.popups.deleteDialog.render(document.body);
          
          // Call super-class onReady() method
          Alfresco.ConsoleUsers.superclass.onReady.call(this);

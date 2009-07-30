@@ -221,18 +221,15 @@
          }
          
          // Create and render the YUI dialog
-         this.widgets.dialog = new YAHOO.widget.Dialog(dialogDiv,
+         this.widgets.dialog = Alfresco.util.createYUIPanel(dialogDiv,
          {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            close: true,
-            visible: false,
             width: this.options.width
+         },
+         {
+            type: YAHOO.widget.Dialog
          });
-         
+
          this.widgets.dialog.cancelEvent.subscribe(this.onCancel, null, this);
-         this.widgets.dialog.render(document.body);
 
          // Load the People Finder component from the server
          Alfresco.util.Ajax.request(
@@ -468,7 +465,7 @@
          {
             close: false,
             context: [this.id + "-dueDate", "tl", "tl"],
-            draggable: false,
+            draggable: false, // NOTE: Don't change to "true"
             visible: false,
             width: "200px"
          });
