@@ -22,13 +22,8 @@ function getFilterParams(filter, parsedArgs, favourites)
    var filterData = args["filterData"];
 
    // Common types and aspects to filter from the UI
-   var filterQueryDefaults = " -ASPECT:\"{http://www.alfresco.org/model/content/1.0}workingcopy\"";
-   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/content/1.0}thumbnail\"";
+   var filterQueryDefaults = " -TYPE:\"{http://www.alfresco.org/model/content/1.0}thumbnail\"";
    filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/content/1.0}systemfolder\"";
-   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}forums\"";
-   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}forum\"";
-   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}topic\"";
-   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/forum/1.0}post\"";
    filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule\"";
    filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}hold\"";
    filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer\"";
@@ -58,7 +53,10 @@ function getFilterParams(filter, parsedArgs, favourites)
                var ssJson = eval('(' + ssNode.content + ')');
                var filterQuery = ssJson.query;
                // Wrap the query so that only items within the filePlan are returned
-               filterParams.query = 'PATH:"' + parsedArgs.rootNode.qnamePath + '//*" AND ASPECT:"rma:record" AND (' + filterQuery + ')';
+               // NOTE: required if in future folders are returned from RM search results
+               // filterParams.variablePath = true;
+               filterParams.query = 'PATH:"' + parsedArgs.rootNode.qnamePath +
+                                    '//*" AND ASPECT:"rma:record" AND (' + filterQuery + ')';
                filterParams.templates = [
                {
                   field: "KEYWORDS",
