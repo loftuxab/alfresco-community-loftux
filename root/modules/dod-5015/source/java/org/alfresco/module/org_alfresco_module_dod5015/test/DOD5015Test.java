@@ -1908,8 +1908,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 
 	/**
 	 * This test case reads all the record categories under the spaces store and asserts
-	 * that each has a cm:description and that it is non-null and has non-whitespace
-	 * content.
+	 * that each has a cm:description and that it is non-null.
 	 */
     public void testRecordCategoryDescriptions()
     {
@@ -1922,7 +1921,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             Map<QName, Serializable> props = nodeService.getProperties(recordCategory);
             final Serializable recCatDescription = props.get(ContentModel.PROP_DESCRIPTION);
             assertNotNull(recCatDescription);
-            assertTrue(recCatDescription.toString().trim().length() > 0);
         }
         
         // This test formerly tested a single RecordCategory like so:
