@@ -2278,12 +2278,38 @@
       <clean projectdir="${dir.module.dod5015.share}" />
    </target>
    
-   <target name="package-dod5015-share-extension" depends="init">
+   <target name="assemble-dod5015-share" depends="init">
+      <copy todir="${dir.module.dod5015.share.assemble}">
+         <fileset dir="${dir.module.dod5015.share.src.web}" />
+      </copy>
+   </target>
+   
+   <target name="minimize-dod5015-share-javascript"
+           depends="init">
+     <echo>Compressing DOD5015 Share Javascript...</echo>
+     <apply executable="java" parallel="false" dest="${dir.module.dod5015.share.assemble}">
+        <fileset dir="${dir.module.dod5015.share.assemble}">
+           <include name="**/*.js" />
+           <exclude name="**/*-min.js" />
+           <exclude name="**/WEB-INF/**" />
+           <exclude name="**/tiny_mce/**" />
+           <exclude name="**/yui/**" />
+        </fileset>
+        <arg line="-jar"/>
+        <arg path="${dir.project.slingshot}/lib/yuicompressor-2.4.2.jar"/>
+        <arg line="-o"/>
+        <targetfile />
+        <srcfile />
+        <mapper type="glob" from="*.js" to="*-min.js"/>
+     </apply>
+  </target>
+   
+   <target name="package-dod5015-share-extension" 
+           depends="assemble-dod5015-share, minimize-dod5015-share-javascript">
       <mkdir dir="${dir.module.dod5015.share.dist}" />
-      <zip destfile="${dir.module.dod5015.share.dist}/${file.name.zip.dod5015.share}" 
-           update="true">
+      <zip destfile="${dir.module.dod5015.share.dist}/${file.name.zip.dod5015.share}">
          <zipfileset dir="${dir.module.dod5015.share.config}" prefix="WEB-INF/classes" />
-         <zipfileset dir="${dir.module.dod5015.share.src.web}" />
+         <zipfileset dir="${dir.module.dod5015.share.assemble}" />
       </zip>
    </target>
     
