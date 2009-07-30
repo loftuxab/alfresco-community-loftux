@@ -24,6 +24,9 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * This enum gives the set of allowed customisable types (aspects) where a custom
  * property can be defined.
@@ -35,6 +38,7 @@ public enum CustomisableRmElement
     RECORD_FOLDER   ("rmc:customRecordFolderProperties"),
     RECORD          ("rmc:customRecordProperties");
 
+    private static Log logger = LogFactory.getLog(CustomisableRmElement.class);
     private final String aspectName;
     private CustomisableRmElement(String aspectName)
     {
@@ -43,28 +47,46 @@ public enum CustomisableRmElement
     
     public static CustomisableRmElement getEnumFor(String elementName)
     {
-        if ("recordSeries".equalsIgnoreCase(elementName))
+    	// Two elementName formats are accepted here.
+    	//
+    	// 1. That used in JSON          e.g. recordSeries
+    	// 2. That used in enum.toString e.g. RECORD_SERIES
+        if ("recordSeries".equalsIgnoreCase(elementName) ||
+        		RECORD_SERIES.toString().equals(elementName))
         {
             return RECORD_SERIES;
         }
-        else if ("recordCategory".equalsIgnoreCase(elementName))
+        else if ("recordCategory".equalsIgnoreCase(elementName) ||
+    		RECORD_CATEGORY.toString().equals(elementName))
         {
             return RECORD_CATEGORY;
         }
-        else if ("recordFolder".equalsIgnoreCase(elementName))
+        else if ("recordFolder".equalsIgnoreCase(elementName) ||
+    		RECORD_FOLDER.toString().equals(elementName))
         {
             return RECORD_FOLDER;
         }
-        else if ("record".equalsIgnoreCase(elementName))
+        else if ("record".equalsIgnoreCase(elementName) ||
+    		RECORD.toString().equals(elementName))
         {
             return RECORD;
         }
         else
         {
+        	if (logger.isDebugEnabled())
+        	{
+        		logger.debug("Unrecognised elementName '" + elementName + "' for this enum.");
+        	}
             return null;
         }
     }
     
+    /**
+     * This method returns the String form of the aspect name which is used to house
+     * the custom properties for this element.
+     * 
+     * @return The String form of the corresponding aspect name e.g. "rmc:customRecordProperties"
+     */
     public String getCorrespondingAspect()
     {
         return aspectName;
