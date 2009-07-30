@@ -27,8 +27,10 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability.impl;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
+import org.alfresco.repo.security.permissions.impl.model.PermissionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 
 public class MoveRecordsCapability extends AbstractCapability
@@ -58,24 +60,37 @@ public class MoveRecordsCapability extends AbstractCapability
                 return AccessDecisionVoter.ACCESS_DENIED;
             }
 
-            // TODO: CHECK DELETE RM AND DM
-
-            QName type = voter.getNodeService().getType(movee);
-            // now we know the node - we can abstain for certain types and aspects (eg, rm)
-            state = voter.createCapability.evaluate(destination, movee, type);
+            if (isRm(movee))
+            {
+                state = voter.getDeleteCapability().evaluate(movee);
+            }
+            else
+            {
+                if (voter.getPermissionService().hasPermission(movee, PermissionService.DELETE) == AccessStatus.ALLOWED)
+                {
+                    state = AccessDecisionVoter.ACCESS_GRANTED;
+                }
+            }
 
             if (state == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (isRm(movee))
+                QName type = voter.getNodeService().getType(movee);
+                // now we know the node - we can abstain for certain types and aspects (eg, rm)
+                state = voter.createCapability.evaluate(destination, movee, type);
+
+                if (state == AccessDecisionVoter.ACCESS_GRANTED)
                 {
-                    if (voter.getPermissionService().hasPermission(movee, RMPermissionModel.MOVE_RECORDS) == AccessStatus.ALLOWED)
+                    if (isRm(movee))
+                    {
+                        if (voter.getPermissionService().hasPermission(movee, RMPermissionModel.MOVE_RECORDS) == AccessStatus.ALLOWED)
+                        {
+                            return AccessDecisionVoter.ACCESS_GRANTED;
+                        }
+                    }
+                    else
                     {
                         return AccessDecisionVoter.ACCESS_GRANTED;
                     }
-                }
-                else
-                {
-                    return AccessDecisionVoter.ACCESS_GRANTED;
                 }
             }
 

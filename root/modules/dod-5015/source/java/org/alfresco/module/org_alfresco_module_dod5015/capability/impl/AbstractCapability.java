@@ -75,6 +75,8 @@ public abstract class AbstractCapability implements Capability
     {
         this.actions.add(action);
         this.actionNames.add(action.getName());
+        voter.addProtectedAspects(action.getProtectedAspects());
+        voter.addProtectedProperties(action.getProtectedProperties());
     }
 
     AccessStatus translate(int vote)

@@ -142,7 +142,8 @@
         <property name="viewUpdateReasonsForFreezeCapability" ref="rmViewUpdateReasonsForFreezeCapability"/>
         <!-- public service "roles" -->
         <property name="createCapability" ref="rmCreate"/>
-        
+        <property name="deleteCapability" ref="rmDelete"/>
+        <property name="updateCapability" ref="rmUpdate"/>
     </bean>
     
     <!-- ======================= -->

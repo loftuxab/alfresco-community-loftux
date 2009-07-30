@@ -28,8 +28,11 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.sf.acegisecurity.AccessDecisionManager;
@@ -41,6 +44,8 @@ import net.sf.acegisecurity.vote.AccessDecisionVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.CreateCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.group.DeleteCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.group.UpdateCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AccessAuditCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AddModifyEventDatesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ApproveRecordsScheduledForCutoffCapability;
@@ -148,7 +153,9 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     private static HashMap<String, Policy> policies = new HashMap<String, Policy>();
 
-    private static HashMap<QName, String> restrictedProperties = new HashMap<QName, String>();
+    private HashSet<QName> protectedProperties = new HashSet<QName>();
+
+    private HashSet<QName> protectedAspects = new HashSet<QName>();
 
     private static HashMap<String, Capability> capabilities = new HashMap<String, Capability>();
 
@@ -273,6 +280,10 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     //
 
     public CreateCapability createCapability;
+
+    public DeleteCapability deleteCapability;
+    
+    public UpdateCapability updateCapability;
 
     static
     {
@@ -978,6 +989,28 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         this.createCapability = createCapability;
     }
 
+    public DeleteCapability getDeleteCapability()
+    {
+        return deleteCapability;
+    }
+
+    public void setDeleteCapability(DeleteCapability deleteCapability)
+    {
+        this.deleteCapability = deleteCapability;
+    }
+    
+    
+
+    public UpdateCapability getUpdateCapability()
+    {
+        return updateCapability;
+    }
+
+    public void setUpdateCapability(UpdateCapability updateCapability)
+    {
+        this.updateCapability = updateCapability;
+    }
+
     public boolean supports(ConfigAttribute attribute)
     {
         if ((attribute.getAttribute() != null)
@@ -996,6 +1029,16 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public boolean supports(Class clazz)
     {
         return (MethodInvocation.class.isAssignableFrom(clazz));
+    }
+
+    public void addProtectedProperties(Set<QName> properties)
+    {
+        protectedProperties.addAll(properties);
+    }
+
+    public void addProtectedAspects(Set<QName> aspects)
+    {
+        protectedAspects.addAll(aspects);
     }
 
     public int vote(Authentication authentication, Object object, ConfigAttributeDefinition config)
@@ -1104,6 +1147,53 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             }
         }
 
+        throw new ACLEntryVoterException("Unknown type");
+    }
+    
+    private static QName getQName(MethodInvocation invocation, Class[] params, int position)
+    {
+        if (QName.class.isAssignableFrom(params[position]))
+        {
+            if (invocation.getArguments()[position] != null)
+            {
+                QName qname = (QName) invocation.getArguments()[position];
+                return qname;
+            }
+        }
+        throw new ACLEntryVoterException("Unknown type");
+    }
+    
+    private static Serializable getProperty(MethodInvocation invocation, Class[] params, int position)
+    {
+        if(invocation.getArguments()[position] == null)
+        {
+            return null;
+        }
+        if (Serializable.class.isAssignableFrom(params[position]))
+        {
+            if (invocation.getArguments()[position] != null)
+            {
+                Serializable property = (Serializable) invocation.getArguments()[position];
+                return property;
+            }
+        }
+        throw new ACLEntryVoterException("Unknown type");
+    }
+    
+    private static Map<QName, Serializable> getProperties(MethodInvocation invocation, Class[] params, int position)
+    {
+        if(invocation.getArguments()[position] == null)
+        {
+            return null;
+        }
+        if (Map.class.isAssignableFrom(params[position]))
+        {
+            if (invocation.getArguments()[position] != null)
+            {
+                Map<QName, Serializable> properties = (Map<QName, Serializable>) invocation.getArguments()[position];
+                return properties;
+            }
+        }
         throw new ACLEntryVoterException("Unknown type");
     }
 
@@ -1298,6 +1388,28 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         return dictionaryService;
     }
 
+    public boolean isProtectedAspect(QName aspectQName)
+    {
+        return protectedAspects.contains(aspectQName);
+    }
+    
+    public boolean isProtectedProperty(QName propertyQName)
+    {
+        return protectedProperties.contains(propertyQName);
+    }
+    
+    public boolean includesProtectedProperties(Map<QName, Serializable> properties)
+    {
+        for(QName test : properties.keySet())
+        {
+            if(isProtectedProperty(test))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     private class ConfigAttributeDefintion
     {
         String typeString;
@@ -1424,15 +1536,18 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
         {
-            Policy policy = policies.get("Read");
-            if (policy == null)
+            NodeRef updatee = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(0), cad.parent);
+            QName aspectQName = null;
+            if (cad.parameters.get(1) > -1)
             {
-                return AccessDecisionVoter.ACCESS_DENIED;
+                aspectQName = getQName(invocation, params, cad.parameters.get(1));
             }
-            else
+            Map<QName, Serializable> properties = null;
+            if (cad.parameters.get(2) > -1)
             {
-                return policy.evaluate(voter, invocation, params, cad);
+                properties = getProperties(invocation, params, cad.parameters.get(2));
             }
+            return voter.getUpdateCapability().evaluate(updatee, aspectQName, properties);
         }
 
     }
@@ -1450,19 +1565,12 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             if (deletee != null)
             {
 
-                if (voter.viewRecordsCapability.evaluate(deletee) != AccessDecisionVoter.ACCESS_GRANTED)
-                {
-                    return AccessDecisionVoter.ACCESS_DENIED;
-                }
-                else
-                {
-                    return voter.viewRecordsCapability.checkDelete(deletee);
-                }
+                return voter.getDeleteCapability().evaluate(deletee);
 
             }
             else
             {
-                return AccessDecisionVoter.ACCESS_ABSTAIN;
+                return AccessDecisionVoter.ACCESS_DENIED;
             }
         }
 
