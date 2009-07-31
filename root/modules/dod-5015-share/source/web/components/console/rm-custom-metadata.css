@@ -81,35 +81,55 @@
    cursor: pointer;
 }
 
-.metadata .object-list li.selected
-{
-   background-color: #D2E5F2;
-}
-
-.metadata li.item-recordseries
+.metadata li.recordSeries
 {
    background-image: url(../documentlibrary/images/record-series-32.png);
    background-repeat: no-repeat;
    background-position: 0.3em 0.3em;
 }
 
-.metadata li.item-recordcategory
+.metadata li.recordCategory
 {
    background-image: url(../documentlibrary/images/record-category-32.png);
    background-repeat: no-repeat;
    background-position: 0.3em 0.3em;
 }
 
-.metadata li.item-recordfolder
+.metadata li.recordFolder
 {
    background-image: url(../documentlibrary/images/record-folder-32.png);
    background-repeat: no-repeat;
    background-position: 0.3em 0.3em;
 }
 
-.metadata li.item-record
+.metadata li.record
 {
    background-image: url(../documentlibrary/images/record-32.png);
    background-repeat: no-repeat;
    background-position: 0.3em 0.3em;
+}
+
+.metadata p
+{
+   line-height: 1.4em;
+   padding: 0px;
+}
+
+.metadata p.property-title
+{
+   font-size: 116%;
+   font-weight: bold;
+}
+
+.metadata .property-item
+{
+   padding: 0.3em;
+   border-bottom: 1px solid #D7D7D7;
+}
+
+.metadata .property-actions
+{
+   float: right;
+   margin-right: 0.5em;
+   margin-top: 0.5em;
 }

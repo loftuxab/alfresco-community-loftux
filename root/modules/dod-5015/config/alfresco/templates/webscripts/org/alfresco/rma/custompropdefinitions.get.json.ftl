@@ -5,7 +5,7 @@
 		"customProperties":
 		{
 			<#list customProps as prop>
-			"${prop.name}":
+			"${prop.name.toPrefixString()}":
 			{
 				"dataType": "<#if prop.dataType??>${prop.dataType.name.toPrefixString()}</#if>",
 				"title": "${prop.title!""}",
