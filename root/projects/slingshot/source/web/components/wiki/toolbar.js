@@ -218,7 +218,7 @@
          
          this.popups.renamePanel = Alfresco.util.createYUIPanel(clonedRenamePanel,
          {
-            width: "320px",
+            width: "320px"
          });
          
          var renameSaveButton = Alfresco.util.createYUIButton(this, "rename-save-button", null,

@@ -39,27 +39,7 @@
       {
          pages = pages == null ? [] : pages;
          text = this._renderLinks(text, pages);
-         text = this._renderEmphasizedText(text);
          return text;
-      },
-      
-      /**
-       * Takes any text contained between "*" and generates an <em> tag in HTML.
-       * e.g. *example* is rendered as <em>example</em>
-       * Gets applied to all instances in the text.
-       *
-       * @method _renderEmphasizedText
-       * @param s {String} The text to apply formatting to 
-       */
-      _renderEmphasizedText: function(s)
-      {
-         var re = /\*([^\*]+)\*/g;
-         
-         if (typeof s == "string")
-         {
-            return s.replace(re, "<em>$1</em>");
-         }
-         return s;
       },
       
       /**
