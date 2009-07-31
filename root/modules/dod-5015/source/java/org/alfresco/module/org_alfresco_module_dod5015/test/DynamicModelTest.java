@@ -173,9 +173,9 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         String propLocalName = "rmc:dynamicProperty" + System.currentTimeMillis();
         Map<String, Serializable> actionParams = new HashMap<String, Serializable>();
         actionParams.put(DefineCustomElementAbstractAction.PARAM_NAME, propLocalName);
-        actionParams.put(DefineCustomPropertyAction.PARAM_TYPE, DataTypeDefinition.BOOLEAN);
+        actionParams.put(DefineCustomPropertyAction.PARAM_DATATYPE, DataTypeDefinition.BOOLEAN);
         actionParams.put(DefineCustomPropertyAction.PARAM_MANDATORY, Boolean.TRUE);
-        actionParams.put(DefineCustomPropertyAction.PARAM_CUSTOMISE_ELEMENT, "record");
+        actionParams.put(DefineCustomPropertyAction.PARAM_ELEMENT, "record");
 
         // Submit an action to have it created.
         this.rmActionService.executeRecordsManagementAction("defineCustomProperty", actionParams);

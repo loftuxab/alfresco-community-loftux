@@ -73,7 +73,7 @@ public enum CustomisableRmElement
         }
         else
         {
-        	throw new IllegalArgumentException("Unknown elementName for CustomisableRmElement.");
+        	throw new IllegalArgumentException("Unknown elementName for CustomisableRmElement: " + elementName);
         }
     }
     

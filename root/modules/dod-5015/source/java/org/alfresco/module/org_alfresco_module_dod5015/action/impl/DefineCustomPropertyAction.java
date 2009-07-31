@@ -49,10 +49,10 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
 {
     private static Log logger = LogFactory.getLog(DefineCustomPropertyAction.class);
 
-    public static final String PARAM_CUSTOMISE_ELEMENT = "customiseElement";
+    public static final String PARAM_ELEMENT = "element";
     
     //TODO Many of these parameters are unnecessary and should be deleted.
-    public static final String PARAM_TYPE = "type";
+    public static final String PARAM_DATATYPE = "dataType";
     public static final String PARAM_TITLE = "title";
     public static final String PARAM_DESCRIPTION = "description";
     public static final String PARAM_DEFAULT_VALUE = "defaultValue";
@@ -69,7 +69,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
         super.executeImpl(action, actionedUponNodeRef);
-
+        
         Map<String, Serializable> params = action.getParameterValues();
         if (logger.isDebugEnabled())
         {
@@ -91,7 +91,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         M2Model deserializedModel = customModelUtil.readCustomContentModel();
 
         // Need to select the correct aspect in the customModel to which we'll add the property.
-        String customisableElement = (String)params.get(PARAM_CUSTOMISE_ELEMENT);
+        String customisableElement = (String)params.get(PARAM_ELEMENT);
         CustomisableRmElement ce = CustomisableRmElement.getEnumFor(customisableElement);
         String aspectName = ce.getCorrespondingAspect();
 
@@ -100,15 +100,17 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         String qname = (String)params.get(PARAM_NAME);
 		QName propQName = QName.createQName(qname, namespaceService);
         String propQNameAsString = propQName.toPrefixString(namespaceService);
-        
+
+        //TODO Handle a post where the prop already exists - replace.
+
         M2Property newProp = customPropsAspect.createProperty(propQNameAsString);
         newProp.setName(qname);
 
-        Serializable serializableType = params.get(PARAM_TYPE);
+        Serializable serializableType = params.get(PARAM_DATATYPE);
         QName type = null;
         if (serializableType instanceof String)
         {
-            type = QName.createQName((String)serializableType, this.namespaceService);
+            type = QName.createQName((String)serializableType);
         }
         else
         {
@@ -123,19 +125,19 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         Serializable serializableParam = params.get(PARAM_MANDATORY);
         if (serializableParam != null)
         {
-            Boolean bool = (Boolean)serializableParam;
+            Boolean bool = Boolean.valueOf(serializableParam.toString());
             newProp.setMandatory(bool);
         }
         serializableParam = params.get(PARAM_PROTECTED);
         if (serializableParam != null)
         {
-            Boolean bool = (Boolean)serializableParam;
+            Boolean bool = Boolean.valueOf(serializableParam.toString());
             newProp.setProtected(bool);
         }
         serializableParam = params.get(PARAM_MULTI_VALUED);
         if (serializableParam != null)
         {
-            Boolean bool = (Boolean)serializableParam;
+            Boolean bool = Boolean.valueOf(serializableParam.toString());
             newProp.setMultiValued(bool);
         }
 
@@ -154,13 +156,11 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
 	@Override
 	protected void addParameterDefinitions(List<ParameterDefinition> paramList)
 	{
-	    paramList.add(new ParameterDefinitionImpl(PARAM_CUSTOMISE_ELEMENT, DataTypeDefinition.TEXT, true, null));
-	    
         paramList.add(new ParameterDefinitionImpl(PARAM_NAME, DataTypeDefinition.TEXT, true, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_TITLE, DataTypeDefinition.TEXT, false, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, DataTypeDefinition.TEXT, false, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_DEFAULT_VALUE, DataTypeDefinition.TEXT, false, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TYPE, DataTypeDefinition.QNAME, true, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_DATATYPE, DataTypeDefinition.QNAME, true, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_MULTI_VALUED, DataTypeDefinition.BOOLEAN, false, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_MANDATORY, DataTypeDefinition.BOOLEAN, false, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_PROTECTED, DataTypeDefinition.BOOLEAN, false, null));

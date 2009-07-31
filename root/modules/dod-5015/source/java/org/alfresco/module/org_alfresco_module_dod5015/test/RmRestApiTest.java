@@ -380,45 +380,36 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue("There should be at least one custom association. Found " + customAssocsObj, customAssocsCount > 0);
     }
     
-    //TODO This method to be reimplemented with dedicated REST bindings for POST prop def.
-    public void off_testPostCustomProperty() throws Exception
+    public void testPostCustomProperty() throws Exception
     {
-        NodeRef customModelNodeRef = DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF;
-        // Construct the JSON request for 'defineCustomProperty'.
         final String propertyName = "rmc:customProperty" + System.currentTimeMillis();
         
         String jsonString = new JSONStringer().object()
-            .key("name").value("defineCustomProperty")
-            .key("nodeRef").value(customModelNodeRef.toString())
-            .key("params").object()
-                .key("name").value(propertyName)
-                .key("title").value("Custom test property")
-                .key("description").value("Dynamically defined test property")
-                .key("defaultValue").value("invalid")
-                .key("mandatory").value(false)
-                .key("multiValued").value(false)
-                .key("type").value(DataTypeDefinition.BOOLEAN)
-                .key("customiseElement").value("record")
-            .endObject()
+            .key("name").value(propertyName)
+            .key("title").value("Custom test property")
+            .key("description").value("Dynamically defined test property")
+            .key("mandatory").value(false)
+            .key("dataType").value(DataTypeDefinition.BOOLEAN)
+            .key("element").value("record")
         .endObject()
         .toString();
         
         // Submit the JSON request.
         final int expectedStatus = 200;
-        Response rsp = sendRequest(new PostRequest(RMA_ACTIONS_URL,
+        Response rsp = sendRequest(new PostRequest("/api/rma/admin/custompropertydefinitions?element=record",
                                  jsonString, APPLICATION_JSON), expectedStatus);
         
         String rspContent = rsp.getContentAsString();
-        assertTrue(rspContent.contains("Successfully queued action [defineCustomProperty]"));
+        assertTrue(rspContent.contains("success"));
     }
 
-    public void off_testGetCustomProperties() throws Exception
+    public void testGetCustomProperties() throws Exception
     {
         // Ensure that there is at least one custom property.
-        this.off_testPostCustomProperty();
+        this.testPostCustomProperty();
 
         final int expectedStatus = 200;
-        Response rsp = sendRequest(new GetRequest(RMA_CUSTOM_PROPS_URL), expectedStatus);
+        Response rsp = sendRequest(new GetRequest("/api/rma/admin/custompropertydefinitions?element=record"), expectedStatus);
 
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
 
