@@ -7,7 +7,7 @@
 			<#list customProps as prop>
 			"${prop.name}":
 			{
-				"type": "${prop.type!""}",
+				"dataType": "${prop.dataType!""}",
 				"title": "${prop.title!""}",
 				"description": "${prop.description!""}",
 				"mandatory": ${prop.mandatory?string},

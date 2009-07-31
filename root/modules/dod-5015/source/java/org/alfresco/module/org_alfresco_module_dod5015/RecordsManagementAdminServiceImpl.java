@@ -33,6 +33,10 @@ import org.alfresco.repo.dictionary.M2ClassAssociation;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -108,30 +112,14 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return result;
     }
 
-    public Map<QName, CustomProperty> getAvailableCustomProperties(CustomisableRmElement rmElement)
+    public Map<QName, PropertyDefinition> getAvailableCustomProperties(CustomisableRmElement rmElement)
     {
-        //TODO Delete this delgation when the other method is removed.
-        if (rmElement == null) {
-            return this.getAvailableCustomProperties();
-        }
-        //TODO When ongoing datadictionary issues are resolved, this method should retrieve
-        //     the custom properties from the data dictionary directly.
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(serviceRegistry.getContentService());
-        
-        M2Model customModel = customModelUtil.readCustomContentModel();
-        M2Aspect customPropsAspect = customModel.getAspect(rmElement.getCorrespondingAspect());
-        List<M2Property> allProps = customPropsAspect.getProperties();
-        
-        Map<QName, CustomProperty> result = new HashMap<QName, CustomProperty>(allProps.size());
-        for (M2Property prop : allProps)
-        {
-            QName n = QName.createQName(prop.getName(), serviceRegistry.getNamespaceService());
+        DictionaryService dictionaryService = serviceRegistry.getDictionaryService();
+        NamespaceService namespaceService = serviceRegistry.getNamespaceService();
+		QName relevantAspectQName = QName.createQName(rmElement.getCorrespondingAspect(), namespaceService);
+        AspectDefinition aspectDefn = dictionaryService.getAspect(relevantAspectQName);
+        Map<QName, PropertyDefinition> propDefns = aspectDefn.getProperties();
 
-            CustomProperty rmcp = CustomProperty.createInstance(prop, serviceRegistry);
-
-            result.put(n, rmcp);
-        }
-        return result;
+        return propDefns;
     }
 }

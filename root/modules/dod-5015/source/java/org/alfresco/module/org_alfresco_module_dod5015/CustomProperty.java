@@ -33,8 +33,10 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Neil McErlean
  */
+@Deprecated
 public final class CustomProperty
 {
+	//TODO This class will be deleted soon.
 
     private String defaultValue;
     private String description;

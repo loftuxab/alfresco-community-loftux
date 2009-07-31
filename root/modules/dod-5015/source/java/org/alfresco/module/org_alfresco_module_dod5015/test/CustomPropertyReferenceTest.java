@@ -34,7 +34,6 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomAssociation;
-import org.alfresco.module.org_alfresco_module_dod5015.CustomProperty;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
@@ -47,6 +46,7 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -173,11 +173,11 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         // Confirm the custom property is included in the list from rmAdminService.
         final QName propQName = QName.createQName(propName, namespaceService);
 
-        Map<QName, CustomProperty> customPropDefinitions = rmAdminService.getAvailableCustomProperties(CustomisableRmElement.RECORD_FOLDER);
-        CustomProperty propDefn = customPropDefinitions.get(propQName);
+        Map<QName, PropertyDefinition> customPropDefinitions = rmAdminService.getAvailableCustomProperties(CustomisableRmElement.RECORD_FOLDER);
+        PropertyDefinition propDefn = customPropDefinitions.get(propQName);
         assertNotNull("Custom property definition from rmAdminService was null.", propDefn);
-        assertEquals(propName, propDefn.getName());
-        assertEquals(DataTypeDefinition.BOOLEAN, propDefn.getType());
+        assertEquals(propName, propDefn.getName().toPrefixString(namespaceService));
+        assertEquals(DataTypeDefinition.BOOLEAN, propDefn.getDataType().getName());
         
         // Now we need to use the custom property.
         // So we apply the aspect containing it to our test record.

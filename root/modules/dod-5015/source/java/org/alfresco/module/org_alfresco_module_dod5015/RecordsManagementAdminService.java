@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 
 import java.util.Map;
 
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -51,7 +52,7 @@ public interface RecordsManagementAdminService
      * @param customisedElement
      * @return
      */
-    public Map<QName, CustomProperty> getAvailableCustomProperties(CustomisableRmElement customisedElement);
+    public Map<QName, PropertyDefinition> getAvailableCustomProperties(CustomisableRmElement customisedElement);
 
     public Map<QName, CustomAssociation> getAvailableCustomAssociations();
 }
