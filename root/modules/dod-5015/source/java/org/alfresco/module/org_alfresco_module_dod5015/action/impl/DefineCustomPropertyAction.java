@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2Model;
@@ -50,9 +49,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
 {
     private static Log logger = LogFactory.getLog(DefineCustomPropertyAction.class);
 
-    //TODO Need a better name than this
     public static final String PARAM_CUSTOMISE_ELEMENT = "customiseElement";
-
     
     //TODO Many of these parameters are unnecessary and should be deleted.
     public static final String PARAM_TYPE = "type";
@@ -157,8 +154,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
 	@Override
 	protected void addParameterDefinitions(List<ParameterDefinition> paramList)
 	{
-	    //TODO Make the customisable element param mandatory
-	    paramList.add(new ParameterDefinitionImpl(PARAM_CUSTOMISE_ELEMENT, DataTypeDefinition.TEXT, false, null));
+	    paramList.add(new ParameterDefinitionImpl(PARAM_CUSTOMISE_ELEMENT, DataTypeDefinition.TEXT, true, null));
 	    
         paramList.add(new ParameterDefinitionImpl(PARAM_NAME, DataTypeDefinition.TEXT, true, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_TITLE, DataTypeDefinition.TEXT, false, null));

@@ -130,9 +130,6 @@ public class CustomAssociationPost extends AbstractRmWebScript
         Map<QName, CustomAssociation> allCustomAssocs = rmAdminService.getAvailableCustomAssociations();
         CustomAssociation assocDefinition = allCustomAssocs.get(assocTypeProperQName);
         
-        //TODO This call isn't working yet. Getting IllegalArgumentException as custom type
-        //     is not in the data dictionary. Investigating model reload...
-        
         if (assocDefinition.isChildAssociation())
         {
             //TODO Is this the right nodeService call?

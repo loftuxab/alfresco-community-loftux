@@ -104,8 +104,7 @@ public class CustomPropertiesPost extends AbstractRmWebScript
             QName propProperQName = QName.createQName(nextKeyString, namespaceService);
             Map<QName, Serializable> existingProps = nodeService.getProperties(recordNode);
             existingProps.put(propProperQName, nextValueString);
-            // TODO Given the data dictionary probs, we may need to apply the aspect manually
-            //      if it is not already there.
+
             nodeService.setProperties(recordNode, existingProps);
             
             Map<String, Object> nextPropData = new HashMap<String, Object>();
