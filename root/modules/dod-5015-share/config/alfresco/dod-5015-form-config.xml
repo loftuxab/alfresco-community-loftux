@@ -109,10 +109,22 @@
       <forms>
          <form>
             <field-visibility>
+               <!--
                <show id="cm:name" />
                <show id="cm:title" />
                <show id="cm:description" />
                <show id="rma:identifier" />
+               -->
+               <hide id="sys:node-uuid" />
+               <hide id="sys:store-protocol" />
+               <hide id="sys:store-identifier" />
+               <hide id="sys:node-dbid" />
+               <hide id="cm:created" />
+               <hide id="cm:creator" />
+               <hide id="cm:modified" />
+               <hide id="cm:modifier" />
+               <hide id="cm:accessed" />
+               <hide id="cm:contains" />
             </field-visibility>
          </form>
       </forms>
@@ -122,13 +134,26 @@
       <forms>
          <form>
             <field-visibility>
+               <!-- 
                <show id="cm:name" />
                <show id="cm:title" />
                <show id="cm:description" />
                <show id="rma:identifier" />
-               
                <show id="rma:reviewPeriod" />
                <show id="rma:vitalRecordIndicator" />
+               -->
+               <hide id="sys:node-uuid" />
+               <hide id="sys:store-protocol" />
+               <hide id="sys:store-identifier" />
+               <hide id="sys:node-dbid" />
+               <hide id="cm:created" />
+               <hide id="cm:creator" />
+               <hide id="cm:modified" />
+               <hide id="cm:modifier" />
+               <hide id="cm:accessed" />
+               <hide id="cm:contains" />
+               <hide id="rma:dispositionSchedule" />
+               
             </field-visibility>
          </form>
       </forms>
@@ -138,13 +163,30 @@
       <forms>
          <form>
             <field-visibility>
+               <!--
                <show id="cm:name" />
                <show id="cm:title" />
                <show id="cm:description" />
                <show id="rma:identifier" />
-               
                <show id="rma:location" />
                <show id="rma:supplementalMarkingList" />
+               -->
+               <hide id="sys:node-uuid" />
+               <hide id="sys:store-protocol" />
+               <hide id="sys:store-identifier" />
+               <hide id="sys:node-dbid" />
+               <hide id="cm:created" />
+               <hide id="cm:creator" />
+               <hide id="cm:modified" />
+               <hide id="cm:modifier" />
+               <hide id="cm:accessed" />
+               <hide id="cm:contains" />
+               <hide id="rma:isClosed" />
+               <hide id="rma:nextDispositionAction" />
+               <hide id="rma:dispositionActionHistory" />
+               <!-- NOTE: not sure why these are even on a record folder! -->
+               <hide id="rma:reviewPeriod" />
+               <hide id="rma:vitalRecordIndicator" />
             </field-visibility>
          </form>
       </forms>
