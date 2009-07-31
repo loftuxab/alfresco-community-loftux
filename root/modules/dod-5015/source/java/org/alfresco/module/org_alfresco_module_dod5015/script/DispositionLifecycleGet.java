@@ -75,58 +75,61 @@ public class DispositionLifecycleGet extends DispositionAbstractBase
         DispositionAction nextAction = this.rmService.getNextDispositionAction(nodeRef);
         if (nextAction == null)
         {
-            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Node " + 
-                        nodeRef.toString() + " does not have a disposition lifecycle");
+            status.setCode(HttpServletResponse.SC_NOT_FOUND, 
+                        "Node " + nodeRef.toString() + " does not have a disposition lifecycle");
+            return null;
         }
-
-        // add all the next action data to Map
-        Map<String, Object> nextActionModel = new HashMap<String, Object>(8);
-        String serviceUrl = req.getServiceContextPath() + req.getPathInfo();
-        nextActionModel.put("url", serviceUrl);
-        nextActionModel.put("name", nextAction.getName());
-        nextActionModel.put("label", nextAction.getLabel());
-        nextActionModel.put("eventsEligible", this.rmService.isNextDispositionActionEligible(nodeRef));
-        
-        if (nextAction.getAsOfDate() != null)
+        else
         {
-            nextActionModel.put("asOf", ISO8601DateFormat.format(nextAction.getAsOfDate()));
+            // add all the next action data to Map
+            Map<String, Object> nextActionModel = new HashMap<String, Object>(8);
+            String serviceUrl = req.getServiceContextPath() + req.getPathInfo();
+            nextActionModel.put("url", serviceUrl);
+            nextActionModel.put("name", nextAction.getName());
+            nextActionModel.put("label", nextAction.getLabel());
+            nextActionModel.put("eventsEligible", this.rmService.isNextDispositionActionEligible(nodeRef));
+            
+            if (nextAction.getAsOfDate() != null)
+            {
+                nextActionModel.put("asOf", ISO8601DateFormat.format(nextAction.getAsOfDate()));
+            }
+            
+            if (nextAction.getStartedAt() != null)
+            {
+                nextActionModel.put("startedAt", ISO8601DateFormat.format(nextAction.getStartedAt()));
+            }
+            
+            String startedBy = nextAction.getStartedBy();
+            if (startedBy != null)
+            {
+                nextActionModel.put("startedBy", startedBy);
+                addUsersRealName(nextActionModel, startedBy, "startedBy");
+            }
+            
+            if (nextAction.getCompletedAt() != null)
+            {
+                nextActionModel.put("completedAt", ISO8601DateFormat.format(nextAction.getCompletedAt()));
+            }
+            
+            String completedBy = nextAction.getCompletedBy();
+            if (completedBy != null)
+            {
+                nextActionModel.put("completedBy", completedBy);
+                addUsersRealName(nextActionModel, completedBy, "completedBy");
+            }
+            
+            List<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
+            for (EventCompletionDetails event : nextAction.getEventCompletionDetails())
+            {
+                events.add(createEventModel(event));
+            }
+            nextActionModel.put("events", events);
+            
+            // create model object with just the schedule data
+            Map<String, Object> model = new HashMap<String, Object>(1);
+            model.put("nextaction", nextActionModel);
+            return model;
         }
-        
-        if (nextAction.getStartedAt() != null)
-        {
-            nextActionModel.put("startedAt", ISO8601DateFormat.format(nextAction.getStartedAt()));
-        }
-        
-        String startedBy = nextAction.getStartedBy();
-        if (startedBy != null)
-        {
-            nextActionModel.put("startedBy", startedBy);
-            addUsersRealName(nextActionModel, startedBy, "startedBy");
-        }
-        
-        if (nextAction.getCompletedAt() != null)
-        {
-            nextActionModel.put("completedAt", ISO8601DateFormat.format(nextAction.getCompletedAt()));
-        }
-        
-        String completedBy = nextAction.getCompletedBy();
-        if (completedBy != null)
-        {
-            nextActionModel.put("completedBy", completedBy);
-            addUsersRealName(nextActionModel, completedBy, "completedBy");
-        }
-        
-        List<Map<String, Object>> events = new ArrayList<Map<String, Object>>();
-        for (EventCompletionDetails event : nextAction.getEventCompletionDetails())
-        {
-            events.add(createEventModel(event));
-        }
-        nextActionModel.put("events", events);
-        
-        // create model object with just the schedule data
-        Map<String, Object> model = new HashMap<String, Object>(1);
-        model.put("nextaction", nextActionModel);
-        return model;
     }
     
     /**
