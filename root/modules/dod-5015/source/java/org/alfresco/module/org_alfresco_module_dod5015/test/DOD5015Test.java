@@ -1294,7 +1294,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         nonVitalFolderProps.put(PROP_REVIEW_PERIOD, "week|1");
         this.nodeService.setProperties(nonVitalFolder, nonVitalFolderProps);
         
-        txn4.commit(); // TODO Shouldn't this trigger the behaviour? Need to check that it's working.
+        txn4.commit();
         
         UserTransaction txn5 = transactionService.getUserTransaction(false);
         txn5.begin();
