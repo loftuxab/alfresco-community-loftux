@@ -454,6 +454,34 @@
         <property name="capability" ref="rmCreateModifyDestroyRecordTypesCapability"/>
     </bean>    
     
+    <!-- delete custom property -->
+    
+    <bean id="deleteCustomProperty_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="deleteCustomProperty"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="deleteCustomProperty_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="deleteCustomProperty_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
+        <property name="objectDefinitionSource">
+            <value>
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.CreateModifyDestroyRecordTypes
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
+                   org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="deleteCustomProperty" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.DeleteCustomPropertyAction"
+          parent="rmAction" depends-on="rmCreateModifyDestroyRecordTypesCapability">
+        <property name="capability" ref="rmCreateModifyDestroyRecordTypesCapability"/>
+    </bean>    
+
     <!-- define custom association -->
     
     <bean id="defineCustomAssociation_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">

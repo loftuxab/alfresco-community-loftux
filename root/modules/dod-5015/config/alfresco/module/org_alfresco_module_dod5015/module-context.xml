@@ -154,15 +154,28 @@
     <bean id="webscript.org.alfresco.rma.customassocdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssocDefinitionsGet" parent="webscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
-    <bean id="webscript.org.alfresco.rma.custompropdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropDefinitionsGet" parent="webscript">
-        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
-    </bean>
 
     <!-- Abstract parent bean for many RM get and post beans -->
     <bean id="rmBaseWebscript" parent="webscript" abstract="true">
         <property name="nodeService" ref="NodeService"/>
         <property name="namespaceService" ref="NamespaceService"/>
         <property name="recordsManagementService" ref="RecordsManagementService"/>
+    </bean>
+
+    <!-- REST impl for GET Custom Property Definitions -->
+    <bean id="webscript.org.alfresco.rma.custompropdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropDefinitionsGet" parent="webscript">
+        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
+    </bean>
+
+    <!-- REST impl for POST Custom Property Definitions -->
+    <bean id="webscript.org.alfresco.rma.custompropdefinition.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropertyDefinitionPost" parent="rmBaseWebscript">
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
+    </bean>
+    
+    <!-- REST impl for DELETE Custom Property Definitions -->
+    <bean id="webscript.org.alfresco.rma.custompropdefinition.delete" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropertyDefinitionDelete" parent="rmBaseWebscript">
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
+        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
 
     <!-- REST impl for GET Custom Properties -->

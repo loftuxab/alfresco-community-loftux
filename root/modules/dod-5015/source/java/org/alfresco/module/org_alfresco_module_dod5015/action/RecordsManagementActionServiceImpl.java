@@ -175,7 +175,7 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
      */
     public void executeRecordsManagementAction(String name, Map<String, Serializable> parameters)
     {
-        RecordsManagementAction rmAction = this.rmActions.get(name);
+        RecordsManagementAction rmAction = rmActions.get(name);
         
         NodeRef implicitTargetNode = rmAction.getImplicitTargetNodeRef();
         if (implicitTargetNode == null)

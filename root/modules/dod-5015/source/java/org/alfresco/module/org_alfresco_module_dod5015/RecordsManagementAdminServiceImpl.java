@@ -86,6 +86,16 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return result;
     }
 
+    public Map<QName, PropertyDefinition> getAvailableCustomProperties()
+    {
+    	Map<QName, PropertyDefinition> result = new HashMap<QName, PropertyDefinition>();
+    	for (CustomisableRmElement elem : CustomisableRmElement.values())
+    	{
+    		result.putAll(getAvailableCustomProperties(elem));
+    	}
+        return result;
+    }
+
     public Map<QName, PropertyDefinition> getAvailableCustomProperties(CustomisableRmElement rmElement)
     {
         DictionaryService dictionaryService = serviceRegistry.getDictionaryService();

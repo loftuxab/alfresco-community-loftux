@@ -45,5 +45,11 @@ public interface RecordsManagementAdminService
      */
     public Map<QName, PropertyDefinition> getAvailableCustomProperties(CustomisableRmElement customisedElement);
 
+    /**
+     * This method returns the custom properties that have been defined for all of
+     * the specified customisable RM elements.
+     */
+    public Map<QName, PropertyDefinition> getAvailableCustomProperties();
+
     public Map<QName, CustomAssociation> getAvailableCustomAssociations();
 }

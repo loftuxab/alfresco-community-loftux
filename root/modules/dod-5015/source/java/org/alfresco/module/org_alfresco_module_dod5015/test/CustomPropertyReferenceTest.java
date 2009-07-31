@@ -160,8 +160,8 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
 
         Map <String, Serializable> params = new HashMap<String, Serializable>();
         params.put("name", propName);
-        params.put("type", DataTypeDefinition.BOOLEAN);
-        params.put(DefineCustomPropertyAction.PARAM_CUSTOMISE_ELEMENT, "recordFolder");
+        params.put("dataType", DataTypeDefinition.BOOLEAN);
+        params.put(DefineCustomPropertyAction.PARAM_ELEMENT, "recordFolder");
         rmActionService.executeRecordsManagementAction("defineCustomProperty", params);
         
         // We need to commit the transaction to trigger behaviour that should reload the data dictionary model.
