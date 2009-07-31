@@ -286,8 +286,8 @@ namespace AlfrescoExcel2003
          if (m_AlfrescoPane == null)
          {
             m_AlfrescoPane = new AlfrescoPane();
-            m_AlfrescoPane.ExcelApplication = Application;
             m_AlfrescoPane.DefaultTemplate = m_DefaultTemplate;
+            m_AlfrescoPane.ExcelApplication = Application;
          }
 
          if (Show)

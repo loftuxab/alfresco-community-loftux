@@ -244,8 +244,8 @@ namespace AlfrescoPowerPoint2003
          if (m_AlfrescoPane == null)
          {
             m_AlfrescoPane = new AlfrescoPane();
-            m_AlfrescoPane.PowerPointApplication = Application;
             m_AlfrescoPane.DefaultTemplate = m_DefaultTemplate;
+            m_AlfrescoPane.PowerPointApplication = Application;
          }
 
          if (Show)
