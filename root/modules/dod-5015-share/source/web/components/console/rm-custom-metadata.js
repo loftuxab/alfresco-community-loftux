@@ -69,34 +69,226 @@
       /* Search Panel Handler */
       ViewPanelHandler = function ViewPanelHandler_constructor()
       {
+         // Initialise prototype properties
+         
          ViewPanelHandler.superclass.constructor.call(this, "view");
       };
       
       YAHOO.extend(ViewPanelHandler, Alfresco.ConsolePanelHandler,
       {
+         /**
+          * Object container for storing YUI button instances, indexed by property name.
+          * 
+          * @property propEditButtons
+          * @type object
+          */
+         propEditButtons: null,
+         
+         /**
+          * Object container for storing YUI button instances, indexed by property name.
+          * 
+          * @property propDeleteButtons
+          * @type object
+          */
+         propDeleteButtons: null,
+         
+         /**
+          * onLoad ConsolePanel event handler
+          * 
+          * @method onLoad
+          */
          onLoad: function onLoad()
          {
             // widgets
             parent.widgets.newPropertyButton = Alfresco.util.createYUIButton(parent, "newproperty-button", this.onNewPropertyClick);
             
-            // TODO: hook up onclick events for selected list object
-            // TODO: set initially selected object
-            Dom.get(parent.id + "-metadata-item").innerHTML = parent._msg("label.recordseries");
+            // attach onclick events for list objects
+            var onClickListObject = function(e, id)
+            {
+               // apply highlight to appropriate item
+               var listEls = Dom.getChildren(Dom.get(parent.id + "-object-list"));
+               for (var i=0; i<listEls.length; i++)
+               {
+                  if (listEls[i].id === id)
+                  {
+                     Dom.addClass(listEls[i].id, "theme-bg-color-3");
+                  }
+                  else
+                  {
+                     Dom.removeClass(listEls[i].id, "theme-bg-color-3");
+                  }
+               }
+               
+               // update message in right-hand panel
+               Dom.get(parent.id + "-metadata-item").innerHTML = Dom.get(id).innerHTML;
+               
+               // selected object handling
+               var itemType = id.substring(id.lastIndexOf("-") + 1);
+               
+               // inform the parent object of the selected item e.g. "recordseries"
+               parent.currentType = itemType;
+               
+               // clear the list of meta-data items
+               var elPropList = Dom.get(parent.id + "-property-list");
+               elPropList.innerHTML = "";
+               
+               // reset widget references
+               this.propDeleteButtons = {};
+               this.propEditButtons = {};
+               
+               // perform ajax call to get the custom props for the object type
+               Alfresco.util.Ajax.request(
+               {
+                  method: Alfresco.util.Ajax.GET,
+                  url: Alfresco.constants.PROXY_URI + "api/rma/admin/custompropertydefinitions?element=" + itemType,
+                  successCallback:
+                  {
+                     fn: this.onCustomPropertiesLoaded,
+                     scope: this
+                  },
+                  failureMessage: parent._msg("message.getpropertiesfail")
+               });
+            };
+            var listEls = Dom.getChildren(Dom.get(parent.id + "-object-list"));
+            for (var i=0; i<listEls.length; i++)
+            {
+               var el = new Element(listEls[i]);
+               el.addListener("click", onClickListObject, listEls[i].id, this);
+            }
+            
+            // set initially selected object - fake the event call so handler code is invoked
+            onClickListObject.call(this, null, parent.id + "-recordSeries");
          },
          
+         /**
+          * Custom properties for a type - ajax handler callback
+          *
+          * @method onCustomPropertiesLoaded
+          * @param res {object} Response
+          */
+         onCustomPropertiesLoaded: function onCustomPropertiesLoaded(res)
+         {
+            var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
+            
+            // build the table of values describing the properties and add the action buttons
+            var elPropList = Dom.get(parent.id + "-property-list");
+            var customProperties = json.data.customProperties;
+            for (var propName in customProperties)
+            {
+               var prop = customProperties[propName];
+               
+               // dynamically generated button ids
+               var editBtnContainerId = parent.id + '-edit-' + propName;
+               var deleteBtnContainerId = parent.id + '-delete-' + propName;
+               
+               // add a div element wrapper for each item then construct the inner HTML directly
+               /*
+                  <div class="property-item">
+                     <div class="property-actions">
+                        <span id="btn">Edit Button</span>
+                        <span id="btn">Delete Button</span>
+                     </div>
+                     <div>
+                        <p class="property-title">Project Name</p>
+                        <p>Type: Text</p>
+                        <p>Selection list: regions</p>
+                     </div>
+                  </div>
+               */
+               var div = document.createElement("div");
+               div.setAttribute("class", "theme-bg-color-3 property-item");
+               var html = '<div class="property-actions"><span id="' + editBtnContainerId + '"></span><span id="' + deleteBtnContainerId + '"></span>';
+               html += '</div><div><p class="property-title">' + $html(prop.title) + '</p>';
+               html += '<p>' + parent._msg('label.type') + ': ' + prop.dataType + '</p>';
+               // TODO: display selection list constraint
+               //html += '<p>' + this._msg('label.selection-list') + ': ' + prop.xx + '</p>';
+               html += '</div></div>';
+               div.innerHTML = html;
+               
+               // insert into the DOM for display
+               elPropList.appendChild(div);
+               
+               // generate buttons
+               var editBtn = new YAHOO.widget.Button(
+               {
+                  type: "button",
+                  label: parent._msg("button.edit"),
+                  name: parent.id + '-editButton-' + propName,
+                  container: editBtnContainerId,
+                  onclick:
+                  {
+                     fn: this.onClickEditProperty,
+                     obj: propName,
+                     scope: this
+                  }
+               });
+               this.propEditButtons[propName] = editBtn;
+               var deleteBtn = new YAHOO.widget.Button(
+               {
+                  type: "button",
+                  label: parent._msg("button.delete"),
+                  name: parent.id + '-deleteButton-' + propName,
+                  container: deleteBtnContainerId,
+                  onclick:
+                  {
+                     fn: this.onClickDeleteProperty,
+                     obj: propName,
+                     scope: this
+                  }
+               });
+               this.propDeleteButtons[propName] = deleteBtn;
+            }
+         },
+         
+         /**
+          * Edit Property button click handler
+          *
+          * @method onClickEditProperty
+          * @param e {object} DomEvent
+          * @param obj {object} Object passed back from addListener method
+          */
+         onClickEditProperty: function onClickEditProperty()
+         {
+         },
+         
+         /**
+          * Delete Property button click handler
+          *
+          * @method onClickDeleteProperty
+          * @param e {object} DomEvent
+          * @param obj {object} Object passed back from addListener method
+          */
+         onClickDeleteProperty: function onClickDeleteProperty()
+         {
+         },
+         
+         /**
+          * onShow ConsolePanel event handler
+          * 
+          * @method onShow
+          */
          onShow: function onShow()
          {
-            // TODO: load meta-data for selected object
          },
          
+         /**
+          * onUpdate ConsolePanel event handler
+          * 
+          * @method onUpdate
+          */
          onUpdate: function onUpdate()
          {
-            
          },
          
-         onNewPropertyClick: function onNewPropertyClick()
+         /**
+          * New Property button click handler
+          *
+          * @method onNewPropertyClick
+          * @param e {object} DomEvent
+          * @param obj {object} Object passed back from addListener method
+          */
+         onNewPropertyClick: function onNewPropertyClick(e, obj)
          {
-            
          }
       });
       new ViewPanelHandler();
@@ -118,9 +310,9 @@
       },
       
       /**
-       * Current selected type.
+       * Current selected item type.
        * 
-       * @property currentTyp
+       * @property currentType
        * @type string
        */
       currentType: "",
@@ -144,8 +336,6 @@
        */
       onReady: function RecordsMetaData_onReady()
       {
-         // TODO: setup widgets
-         
          // Call super-class onReady() method
          Alfresco.RecordsMetaData.superclass.onReady.call(this);
       },

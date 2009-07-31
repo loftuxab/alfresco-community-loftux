@@ -23,17 +23,17 @@
             <div class="yui-u first">
                <div class="list-header">${msg("label.list-title")}</div>
                <div class="object-list">
-                  <ul>
-                     <li class="item-recordseries selected">${msg("label.recordseries")}</li>
-                     <li class="item-recordcategory">${msg("label.recordcategory")}</li>
-                     <li class="item-recordfolder">${msg("label.recordfolder")}</li>
-                     <li class="item-record">${msg("label.record")}</li>
+                  <ul id="${el}-object-list">
+                     <li id="${el}-recordSeries" class="recordSeries" title="${msg("label.recordseries")}">${msg("label.recordseries")}</li>
+                     <li id="${el}-recordCategory" class="recordCategory" title="${msg("label.recordcategory")}">${msg("label.recordcategory")}</li>
+                     <li id="${el}-recordFolder" class="recordFolder" title="${msg("label.recordfolder")}">${msg("label.recordfolder")}</li>
+                     <li id="${el}-record" class="record" title="${msg("label.record")}">${msg("label.record")}</li>
                   </ul>
                </div>
             </div>
             <div class="yui-u separator">
                <div class="right">
-                  <!-- New Metadata Property -->
+                  <!-- New Metadata Property button -->
                   <div class="newproperty-button">
                      <span class="yui-button yui-push-button" id="${el}-newproperty-button">
                         <span class="first-child"><button>${msg("button.new")}</button></span>
@@ -44,11 +44,8 @@
                   <span>${msg("label.custom-metadata")}:&nbsp;</span>
                   <span id="${el}-metadata-item"></span>
                </div>
-               <div>
-                  <ul>
-                     <li class="property"></li>
-                  </ul>
-               </div>
+               <!-- dynamically generated property list -->
+               <div id="${el}-property-list"></div>
             </div>
          </div>
       </div>
