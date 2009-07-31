@@ -43,7 +43,7 @@ namespace AlfrescoPowerPoint2003
          set
          {
             m_PowerPointApplication = value;
-            m_SupportsPptx = (Convert.ToDecimal(m_PowerPointApplication.Version) > 11);
+            m_SupportsPptx = (Convert.ToDecimal(m_PowerPointApplication.Version, System.Globalization.CultureInfo.InvariantCulture) > 11);
          }
       }
 

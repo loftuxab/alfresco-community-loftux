@@ -43,7 +43,7 @@ namespace AlfrescoWord2003
          set
          {
             m_WordApplication = value;
-            m_SupportsDocx = (Convert.ToDecimal(m_WordApplication.Version) > 11);
+            m_SupportsDocx = (Convert.ToDecimal(m_WordApplication.Version, System.Globalization.CultureInfo.InvariantCulture) > 11);
          }
       }
 

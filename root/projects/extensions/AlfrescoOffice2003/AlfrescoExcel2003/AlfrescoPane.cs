@@ -43,7 +43,7 @@ namespace AlfrescoExcel2003
          set
          {
             m_ExcelApplication = value;
-            m_SupportsXlsx = (Convert.ToDecimal(m_ExcelApplication.Version) > 11);
+            m_SupportsXlsx = (Convert.ToDecimal(m_ExcelApplication.Version, System.Globalization.CultureInfo.InvariantCulture) > 11);
          }
       }
 
