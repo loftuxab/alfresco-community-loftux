@@ -33,7 +33,7 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomAssociation;
-import org.alfresco.module.org_alfresco_module_dod5015.CustomProperty;
+import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -44,6 +44,7 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -165,7 +166,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
 
     public void testCreateCustomProperties() throws Exception
     {
-        Set<QName> availableCustomProps = this.rmAdminService.getAvailableCustomProperties().keySet();
+        Set<QName> availableCustomProps = this.rmAdminService.getAvailableCustomProperties(CustomisableRmElement.RECORD).keySet();
         final int initialCustomPropCount = availableCustomProps.size();
 
         // Define a new custom property.
@@ -174,12 +175,20 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         actionParams.put(DefineCustomElementAbstractAction.PARAM_NAME, propLocalName);
         actionParams.put(DefineCustomPropertyAction.PARAM_TYPE, DataTypeDefinition.BOOLEAN);
         actionParams.put(DefineCustomPropertyAction.PARAM_MANDATORY, Boolean.TRUE);
+        actionParams.put(DefineCustomPropertyAction.PARAM_CUSTOMISE_ELEMENT, "record");
 
         // Submit an action to have it created.
         this.rmActionService.executeRecordsManagementAction("defineCustomProperty", actionParams);
 
+        // We need to commit the current transaction in order to trigger the content model reloading.
+        setComplete();
+        endTransaction();
+        
+        UserTransaction tx1 = transactionService.getUserTransaction(false);
+        tx1.begin();
+        
         // Retrieve the updated custom property set from the Admin Service.
-        Map<QName, CustomProperty> updatedCustomProps = rmAdminService.getAvailableCustomProperties();
+        Map<QName, PropertyDefinition> updatedCustomProps = rmAdminService.getAvailableCustomProperties(CustomisableRmElement.RECORD);
 
         // Ensure the new custom property is in there.
         final int updatedCount = updatedCustomProps.size();
@@ -187,7 +196,8 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         
         QName propertyQName = QName.createQName(propLocalName, namespaceService);
         assertTrue("Custom property missing", updatedCustomProps.containsKey(propertyQName));
-        assertEquals(updatedCustomProps.get(propertyQName).getType(), DataTypeDefinition.BOOLEAN);
+        assertEquals(updatedCustomProps.get(propertyQName).getDataType().getName(),
+        		DataTypeDefinition.BOOLEAN.getPrefixedQName(namespaceService));
         
         // Now to actually use the custom property
         Map<QName, Serializable> p = new HashMap<QName, Serializable>();
@@ -195,18 +205,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         this.nodeService.addAspect(testRecord, QName.createQName("rmc:customProperties", namespaceService), p);
         
         assertNotNull(nodeService.getProperty(testRecord, propertyQName));
-
-        // Ensure the new custom property is returned by the dictionary service.
-        // TODO If I reimplement the adminService to use the dictionaryService, I can delete this check.
         
-//        QName customPropsAspectQName = QName.createQName(RecordsManagementAdminServiceImpl.RMC_CUSTOM_PROPS, namespaceService);
-//        final AspectDefinition customPropsAspect = dictionaryService.getAspect(customPropsAspectQName);
-//        assertNotNull("The custom property aspect is not returned by the dictionaryService.",
-//                customPropsAspect);
-//        final PropertyDefinition newPropDefn = customPropsAspect.getProperties().get(propertyQName);
-//        //TODO The new prop is not coming back from the dictionary service.
-//        assertNotNull("The new custom property is not returned by the dictionaryService.", newPropDefn);
-//        assertEquals("New custom property had wrong name.", newPropDefn, newPropDefn.getName());
-//        assertEquals("New custom property had wrong type.", DataTypeDefinition.BOOLEAN, newPropDefn.getDataType());
+        tx1.rollback();
     }
 }
