@@ -18,9 +18,9 @@ function main()
          var prop = props[id];
          meta.push(
          {
-            id: id,
+            name: id,
             title: prop.title,
-            datatype: prop.dataType
+            dataType: prop.dataType
          });
       }
    }

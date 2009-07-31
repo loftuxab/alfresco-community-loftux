@@ -2,7 +2,7 @@
    new Alfresco.RecordsSearch("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
-      customFields: YAHOO.lang.JSON.parse('[<#list meta as d>{"id": "${d.id}", "title": "${d.title?js_string}", "datatype": "${d.dataType}"}<#if d_has_next>,</#if></#list>]')
+      customFields: YAHOO.lang.JSON.parse('[<#list meta as d>{"id": "${d.name?substring(4)}", "title": "${d.title?js_string}", "datatype": "${d.dataType}"}<#if d_has_next>,</#if></#list>]')
    }).setMessages(
       ${messages}
    );
