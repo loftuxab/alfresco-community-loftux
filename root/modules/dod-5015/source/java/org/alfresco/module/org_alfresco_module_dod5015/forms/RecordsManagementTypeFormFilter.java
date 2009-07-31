@@ -3,7 +3,6 @@ package org.alfresco.module.org_alfresco_module_dod5015.forms;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.module.org_alfresco_module_dod5015.CustomProperty;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
@@ -13,6 +12,8 @@ import org.alfresco.repo.forms.FormData;
 import org.alfresco.repo.forms.PropertyFieldDefinition;
 import org.alfresco.repo.forms.processor.AbstractFilter;
 import org.alfresco.repo.forms.processor.node.NodeFormProcessor;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -107,7 +108,7 @@ public class RecordsManagementTypeFormFilter extends AbstractFilter implements D
             
             if (rmTypeCustomAspect != null)
             {
-                Map<QName, CustomProperty> customProps = this.rmAdminService.getAvailableCustomProperties(
+                Map<QName, PropertyDefinition> customProps = this.rmAdminService.getAvailableCustomProperties(
                             rmTypeCustomAspect);
             
                 if (logger.isDebugEnabled())
@@ -151,15 +152,16 @@ public class RecordsManagementTypeFormFilter extends AbstractFilter implements D
      * @param form The Form to add the fields to
      * @param customProps The Map of custom properties to add
      */
-    protected void generateCustomRMPropertyFields(Form form, Map<QName, CustomProperty> customProps)
+    protected void generateCustomRMPropertyFields(Form form, Map<QName, PropertyDefinition> customProps)
     {
-        for (CustomProperty property : customProps.values())
+        for (PropertyDefinition property : customProps.values())
         {
             // define property
-            String propName = property.getName();
+            String propName = property.getName().toPrefixString(namespaceService);
             String[] nameParts = QName.splitPrefixedQName(propName);
+            DataTypeDefinition dataType = property.getDataType();
             PropertyFieldDefinition fieldDef = new PropertyFieldDefinition(
-                        propName, property.getType().toPrefixString(
+                        propName, dataType.getName().toPrefixString(
                         this.namespaceService));
             
             String title = property.getTitle();
