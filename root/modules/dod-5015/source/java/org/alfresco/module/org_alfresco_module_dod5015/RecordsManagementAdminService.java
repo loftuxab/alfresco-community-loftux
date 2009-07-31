@@ -37,15 +37,6 @@ import org.alfresco.service.namespace.QName;
 public interface RecordsManagementAdminService
 {
     /**
-     * This method retrieves the custom properties that have been defined in the customProperties aspect.
-     * This method will be deleted and all properties should now be defined in one of the four
-     * customisable RM elements: RS, RC, RF, R.
-     * @return
-     */
-    @Deprecated
-    public Map<QName, CustomProperty> getAvailableCustomProperties();
-
-    /**
      * This method returns the custom properties that have been defined for the specified
      * customisable RM element.
      * 

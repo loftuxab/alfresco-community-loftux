@@ -31,7 +31,6 @@ import java.util.Map;
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2ClassAssociation;
 import org.alfresco.repo.dictionary.M2Model;
-import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -64,31 +63,6 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         this.serviceRegistry = serviceRegistry;
     }
     
-    /**
-     * TODO Remove this method in favour of the 'typed' methods.
-     */
-    @Deprecated
-    public Map<QName, CustomProperty> getAvailableCustomProperties()
-    {
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(serviceRegistry.getContentService());
-        
-        M2Model customModel = customModelUtil.readCustomContentModel();
-        M2Aspect customPropsAspect = customModel.getAspect(RMC_CUSTOM_PROPS);
-        List<M2Property> allProps = customPropsAspect.getProperties();
-        
-        Map<QName, CustomProperty> result = new HashMap<QName, CustomProperty>(allProps.size());
-        for (M2Property prop : allProps)
-        {
-            QName n = QName.createQName(prop.getName(), serviceRegistry.getNamespaceService());
-
-            CustomProperty rmcp = CustomProperty.createInstance(prop, serviceRegistry);
-
-            result.put(n, rmcp);
-        }
-        return result;
-    }
-
     public Map<QName, CustomAssociation> getAvailableCustomAssociations()
     {
         CustomModelUtil customModelUtil = new CustomModelUtil();

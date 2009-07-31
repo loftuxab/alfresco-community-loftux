@@ -101,13 +101,6 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         {
             aspectName = ce.getCorrespondingAspect();
         }
-        if (aspectName == null)
-        {
-            // Do what we did before.
-            //TODO When all custom properties are defined in one of the 4 typed aspects,
-            //     delete this if clause
-            aspectName = RecordsManagementAdminServiceImpl.RMC_CUSTOM_PROPS;
-        }
 
         M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
 
@@ -118,8 +111,6 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         M2Property newProp = customPropsAspect.createProperty(propQNameAsString);
         newProp.setName(qname);
 
-        // Special handling for type param as it's a QName.
-        // TODO Refactor this out into a method?
         Serializable serializableType = params.get(PARAM_TYPE);
         QName type = null;
         if (serializableType instanceof String)

@@ -33,8 +33,10 @@ import org.alfresco.service.ServiceRegistry;
  * 
  * @author Neil McErlean
  */
+@Deprecated
 public final class CustomAssociation
 {
+	//TODO This class will be deleted to be replaced by dictionaryService equivalent(s)
 
     private String description;
     private String name;
