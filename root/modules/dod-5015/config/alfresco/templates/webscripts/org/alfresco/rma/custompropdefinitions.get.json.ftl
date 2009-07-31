@@ -7,7 +7,7 @@
 			<#list customProps as prop>
 			"${prop.name}":
 			{
-				"dataType": "${prop.dataType!""}",
+				"dataType": "<#if prop.dataType??>${prop.dataType.name.toPrefixString()}</#if>",
 				"title": "${prop.title!""}",
 				"description": "${prop.description!""}",
 				"mandatory": ${prop.mandatory?string},

@@ -61,7 +61,7 @@ public class CustomPropDefinitionsGet extends DeclarativeWebScript
     {
         Map<String, Object> model = new HashMap<String, Object>();
         
-        String elementName = req.getParameter("elementName");
+        String elementName = req.getParameter("element");
     	if (logger.isDebugEnabled())
     	{
     		logger.debug("Getting custom property definitions for " + elementName);
