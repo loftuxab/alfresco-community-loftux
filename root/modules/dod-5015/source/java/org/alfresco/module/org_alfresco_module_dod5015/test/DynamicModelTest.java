@@ -202,7 +202,7 @@ public class DynamicModelTest extends BaseSpringTest implements DOD5015Model
         // Now to actually use the custom property
         Map<QName, Serializable> p = new HashMap<QName, Serializable>();
         p.put(propertyQName, "Hello World.");
-        this.nodeService.addAspect(testRecord, QName.createQName("rmc:customProperties", namespaceService), p);
+        this.nodeService.addAspect(testRecord, QName.createQName("rmc:customRecordProperties", namespaceService), p);
         
         assertNotNull(nodeService.getProperty(testRecord, propertyQName));
         

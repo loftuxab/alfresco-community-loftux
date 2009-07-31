@@ -37,12 +37,6 @@
          <title>Records Management Custom Associations</title>
       </aspect>
 
-      <!-- TODO Likely delete the aspect below -->
-      <aspect name="rmc:customProperties">
-         <title>Records Management Custom Properties</title>
-      </aspect>
-      
-      
       <aspect name="rmc:customRecordSeriesProperties">
          <title>Properties for DOD5015 Custom Record Series</title>
       </aspect>
