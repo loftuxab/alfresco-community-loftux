@@ -96,11 +96,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         // Need to select the correct aspect in the customModel to which we'll add the property.
         String customisableElement = (String)params.get(PARAM_CUSTOMISE_ELEMENT);
         CustomisableRmElement ce = CustomisableRmElement.getEnumFor(customisableElement);
-        String aspectName = null;
-        if (ce != null)
-        {
-            aspectName = ce.getCorrespondingAspect();
-        }
+        String aspectName = ce.getCorrespondingAspect();
 
         M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
 

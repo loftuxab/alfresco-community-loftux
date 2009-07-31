@@ -73,11 +73,7 @@ public enum CustomisableRmElement
         }
         else
         {
-        	if (logger.isDebugEnabled())
-        	{
-        		logger.debug("Unrecognised elementName '" + elementName + "' for this enum.");
-        	}
-            return null;
+        	throw new IllegalArgumentException("Unknown elementName for CustomisableRmElement.");
         }
     }
     

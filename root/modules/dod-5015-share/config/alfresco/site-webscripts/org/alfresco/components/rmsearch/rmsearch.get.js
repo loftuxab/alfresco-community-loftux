@@ -9,10 +9,20 @@ function main()
    var conn = remote.connect("alfresco");
    
    // retrieve the RM custom properties - for display as meta-data fields etc.
-   var res = conn.get("/api/classes/rmc_customProperties/properties");
+   var res = conn.get("/api/rma/admin/custompropertydefinitions?element=record");
    if (res.status == 200)
    {
-      meta = eval('(' + res + ')');
+      var props = eval('(' + res + ')').data.customProperties;
+      for (var id in props)
+      {
+         var prop = props[id];
+         meta.push(
+         {
+            id: id,
+            title: prop.title,
+            datatype: prop.dataType
+         });
+      }
    }
    
    model.meta = meta;
