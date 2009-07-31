@@ -464,6 +464,11 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
                     "Military Assignment Documents");
         assertNotNull(recordCategory);
         
+        // Test 404 for disposition lifecycle request on incorrect node
+        String categoryUrl = recordCategory.toString().replace("://", "/");
+        String requestUrl = MessageFormat.format(GET_LIFECYCLE_URL_FORMAT, categoryUrl);
+        Response rsp = sendRequest(new GetRequest(requestUrl), 404);
+        
         UserTransaction txn = transactionService.getUserTransaction(false);
         txn.begin();
         
@@ -496,8 +501,8 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         
         // there should now be a disposition lifecycle for the record
         String recordUrl = recordOne.toString().replace("://", "/");
-        String requestUrl = MessageFormat.format(GET_LIFECYCLE_URL_FORMAT, recordUrl);
-        Response rsp = sendRequest(new GetRequest(requestUrl), 200);
+        requestUrl = MessageFormat.format(GET_LIFECYCLE_URL_FORMAT, recordUrl);
+        rsp = sendRequest(new GetRequest(requestUrl), 200);
         //System.out.println("GET : " + rsp.getContentAsString());
         assertEquals("application/json;charset=UTF-8", rsp.getContentType());
         
