@@ -7,7 +7,7 @@
 		"customProperties":
 		{
       	<#list properties	as	property>
-      	<@customPropertyValueLib.customPropertyJSON property=property/><#ifproperty_has_next>,</#if>
+      	<@customPropertyValueLib.customPropertyJSON property=property/><#if property_has_next>,</#if>
       	</#list>
 		}
 	}
