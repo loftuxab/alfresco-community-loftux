@@ -118,8 +118,8 @@ public class CustomPropertyDefinitionDelete extends AbstractRmWebScript
     	
     	// This work is being delegated to the rmActionService.
     	Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-    	parameters.put("name", propQName);
-    	this.rmActionService.executeRecordsManagementAction("deleteCustomPropertyAction", parameters);
+    	parameters.put("name", propQName.toPrefixString(namespaceService));
+    	this.rmActionService.executeRecordsManagementAction("deleteCustomProperty", parameters);
 
         result.put("propertyqname", propQName.toPrefixString(namespaceService));
 
