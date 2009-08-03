@@ -111,7 +111,7 @@ public class CutOffAction extends RMDispositionActionExecuterAbstractBase
     protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
     {
         // dupicates code from close .. it should get the closed action somehow?
-        if (this.recordsManagementService.isRecordFolder(filePlanComponent))
+        if (this.recordsManagementService.isRecordFolder(filePlanComponent) || this.recordsManagementService.isRecord(filePlanComponent))
         {
             return true;
         }

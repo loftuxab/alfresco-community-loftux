@@ -506,10 +506,17 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         this.nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());        
         this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
-        
+               
         txn.commit();
         txn = transactionService.getUserTransaction(false);
         txn.begin();
+        
+        System.out.println("Completed at :"  + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT )); 
+        assertNotNull("PROP_DISPOSITION_ACTION_COMPLETED_AT", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT));
+        assertNotNull("PROP_DISPOSITION_ACTION_COMPLETED_BY", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY));
+        assertNotNull("PROP_DISPOSITION_ACTION_STARTED_AT", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_STARTED_AT));
+        assertNotNull("PROP_DISPOSITION_ACTION_STARTED_BY", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_STARTED_BY));
+        
         
         // Check the disposition action
         assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
@@ -525,6 +532,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
         System.out.println("Disposition as of: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
         assertNull(this.nodeService.getProperty(recordFolder, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS));
+          
+          
         
         // Check the previous action details
         // TODO check the history association
