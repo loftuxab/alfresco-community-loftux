@@ -161,5 +161,7 @@ public interface RMPermissionModel
     public static final String MAP_CLASSIFICATION_GUIDE_METADATA = "MapClassificationGuideMetadata";
 
     public static final String MANAGE_ACCESS_CONTROLS = "ManageAccessControls";
+    
+    public static final String FILE_RECORDS = "FileRecords";
 
 }

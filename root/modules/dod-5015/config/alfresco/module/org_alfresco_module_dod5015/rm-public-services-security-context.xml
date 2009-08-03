@@ -131,6 +131,7 @@
         <property name="planningReviewCyclesCapability" ref="rmPlanningReviewCyclesCapability"/>
         <property name="reOpenFoldersCapability" ref="rmReOpenFoldersCapability"/>
         <property name="selectAuditMetadataCapability" ref="rmSelectAuditMetadataCapability"/>
+        <property name="triggerAnEventCapability" ref="rmTriggerAnEventCapability"/>
         <property name="undeclareRecordsCapability" ref="rmUndeclareRecordsCapability"/>
         <property name="unfreezeCapability" ref="rmUnfreezeCapability"/>
         <property name="updateClassificationDatesCapability" ref="rmUpdateClassificationDatesCapability"/>

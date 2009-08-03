@@ -32,10 +32,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventType;
 import org.alfresco.repo.policy.JavaBehaviour;
@@ -46,6 +49,7 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Period;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -73,6 +77,9 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     /** Records management action service */
     private RecordsManagementActionService rmActionService;
     
+    /** Entry voter for capability related support */
+    private RMEntryVoter voter;
+    
     /** Configured simple events */
     Properties configuredSimpleEvents;
     
@@ -99,6 +106,16 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         this.policyComponent = policyComponent;
     }
     
+    
+    /**
+     * Set the RMEntryVoter
+     * @param voter
+     */
+    public void setVoter(RMEntryVoter voter)
+    {
+        this.voter = voter;
+    }
+
     /**
      * Init method.  Registered behaviours.
      */
@@ -581,5 +598,37 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
             }
         }
         return result;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getCapabilities(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public Map<Capability, AccessStatus> getCapabilities(NodeRef nodeRef)
+    {
+        return voter.getCapabilities(nodeRef);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getCapability(java.lang.String)
+     */
+    public Capability getCapability(String name)
+    {
+        return voter.getCapability(name);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getProtectedAspects()
+     */
+    public Set<QName> getProtectedAspects()
+    {
+        return voter.getProtetcedAscpects();
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getProtectedProperties()
+     */
+    public Set<QName> getProtectedProperties()
+    {
+       return voter.getProtectedProperties();
     }
 }

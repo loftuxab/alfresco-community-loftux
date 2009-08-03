@@ -47,7 +47,6 @@ import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 /**
  * @author andyh
  */
@@ -96,11 +95,11 @@ public abstract class AbstractCapability implements Capability
 
     public int checkActionConditionsIfPresent(NodeRef nodeRef)
     {
-        if(actions.size() > 0)
+        if (actions.size() > 0)
         {
-            for(RecordsManagementAction action : actions)
+            for (RecordsManagementAction action : actions)
             {
-                if(action.isExecutable(nodeRef, null))
+                if (action.isExecutable(nodeRef, null))
                 {
                     return AccessDecisionVoter.ACCESS_GRANTED;
                 }
@@ -112,16 +111,16 @@ public abstract class AbstractCapability implements Capability
             return AccessDecisionVoter.ACCESS_GRANTED;
         }
     }
-    
+
     public AccessStatus hasPermission(NodeRef nodeRef)
     {
-       
+
         return translate(hasPermissionRaw(nodeRef));
     }
 
     public int hasPermissionRaw(NodeRef nodeRef)
     {
-        if(checkActionConditionsIfPresent(nodeRef) == AccessDecisionVoter.ACCESS_DENIED)
+        if (checkActionConditionsIfPresent(nodeRef) == AccessDecisionVoter.ACCESS_DENIED)
         {
             return AccessDecisionVoter.ACCESS_DENIED;
         }
@@ -678,6 +677,35 @@ public abstract class AbstractCapability implements Capability
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final AbstractCapability other = (AbstractCapability) obj;
+        if (getName() == null)
+        {
+            if (other.getName() != null)
+                return false;
+        }
+        else if (!getName().equals(other.getName()))
+            return false;
+        return true;
     }
 
 }

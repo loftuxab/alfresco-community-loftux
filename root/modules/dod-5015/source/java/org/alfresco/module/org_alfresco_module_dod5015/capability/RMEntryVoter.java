@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -96,6 +97,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.PasswordC
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.PlanningReviewCyclesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ReOpenFoldersCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.SelectAuditMetadataCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.TriggerAnEventCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.UndeclareRecordsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.UnfreezeCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.UpdateClassificationDatesCapability;
@@ -277,6 +279,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public MapClassificationGuideMetadataCapability mapClassificationGuideMetadataCapability;
 
     public ManageAccessControlsCapability manageAccessControlsCapability;
+    
+    public TriggerAnEventCapability triggerAnEventCapability;
 
     //
 
@@ -982,6 +986,17 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         capabilities.put(manageAccessControlsCapability.getName(), manageAccessControlsCapability);
     }
 
+    public TriggerAnEventCapability getTriggerAnEventCapability()
+    {
+        return triggerAnEventCapability;
+    }
+
+    public void setTriggerAnEventCapability(TriggerAnEventCapability triggerAnEventCapability)
+    {
+        this.triggerAnEventCapability = triggerAnEventCapability;
+        capabilities.put(triggerAnEventCapability.getName(), triggerAnEventCapability);
+    }
+    
     public CreateCapability getCreateCapability()
     {
         return createCapability;
@@ -1022,6 +1037,9 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         this.updatePropertiesCapability = updatePropertiesCapability;
     }
 
+    
+ 
+
     public boolean supports(ConfigAttribute attribute)
     {
         if ((attribute.getAttribute() != null)
@@ -1052,6 +1070,16 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         protectedAspects.addAll(aspects);
     }
 
+    public Set<QName> getProtectedProperties()
+    {
+        return Collections.unmodifiableSet(protectedProperties);
+    }
+    
+    public Set<QName> getProtetcedAscpects()
+    {
+        return Collections.unmodifiableSet(protectedAspects);
+    }
+    
     public int vote(Authentication authentication, Object object, ConfigAttributeDefinition config)
     {
         if (logger.isDebugEnabled())
@@ -1139,6 +1167,23 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     }
 
+    public Map<Capability, AccessStatus> getCapabilities(NodeRef nodeRef)
+    {
+        HashMap<Capability, AccessStatus> answer = new HashMap<Capability, AccessStatus>();
+        for(Capability capability : capabilities.values())
+        {
+            AccessStatus status = capability.hasPermission(nodeRef);
+            answer.put(capability, status);
+        }
+        return answer;
+        
+    }
+    
+    public Capability getCapability(String name)
+    {
+        return capabilities.get(name);
+    }
+    
     private static QName getType(NodeService nodeService, MethodInvocation invocation, Class[] params, int position, boolean parent)
     {
         if (QName.class.isAssignableFrom(params[position]))
