@@ -49,9 +49,11 @@ import com.ibatis.sqlmap.engine.transaction.TransactionConfig;
 import com.ibatis.sqlmap.engine.transaction.TransactionManager;
 
 /**
- * Extends the SqlMapConfigParser to allow the selection of a {@link ResourceLoader} that will be used to load the resources specified in the <b>sqlMap</b>'s <b>resource</b>.
+ * Extends the SqlMapConfigParser to allow the selection of a {@link ResourceLoader}
+ * that will be used to load the resources specified in the <b>sqlMap</b>'s <b>resource</b>.
  * <p>
- * By using the <b>resource.dialect</b> placeholder with hierarchical resource loading, different resource files can be picked up for different dialects. This reduces duplication
+ * By using the <b>resource.dialect</b> placeholder with hierarchical resource loading,
+ * different resource files can be picked up for different dialects. This reduces duplication
  * when supporting multiple database configurations.
  * <pre>
  * &lt;sqlMapConfig&gt;
