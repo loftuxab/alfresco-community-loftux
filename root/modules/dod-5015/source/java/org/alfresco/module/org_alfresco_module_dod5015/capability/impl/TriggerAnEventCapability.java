@@ -34,36 +34,33 @@ import org.alfresco.service.cmr.security.AccessStatus;
  * @author andyh
  *
  */
-public class FileRecordsCapability extends AbstractCapability
+public class TriggerAnEventCapability extends AbstractCapability
 {
 
-    public FileRecordsCapability()
-    {
-        super();
-    }
-
+    /* (non-Javadoc)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability#hasPermissionImpl(org.alfresco.service.cmr.repository.NodeRef)
+     */
     @Override
     protected int hasPermissionImpl(NodeRef nodeRef)
     {
         return evaluate(nodeRef);
     }
-
+    
     public int evaluate(NodeRef nodeRef)
     {
         if (isRm(nodeRef))
         {
-            if (checkFilingUnfrozenUncutoffOpenUndeclared(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+            if (checkFilingUnfrozenUncutoff(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (isRecord(nodeRef))
+                if (isRecordFolder(voter.getNodeService().getType(nodeRef)) || isRecord(nodeRef))
                 {
-                    if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.DECLARE_RECORDS) == AccessStatus.ALLOWED)
+                    if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.ADD_MODIFY_EVENT_DATES) == AccessStatus.ALLOWED)
                     {
                         return AccessDecisionVoter.ACCESS_GRANTED;
                     }
                 }
             }
             return AccessDecisionVoter.ACCESS_DENIED;
-
         }
         else
         {
@@ -71,8 +68,14 @@ public class FileRecordsCapability extends AbstractCapability
         }
     }
 
+
+    /* (non-Javadoc)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.capability.Capability#getName()
+     */
     public String getName()
     {
-        return RMPermissionModel.FILE_RECORDS;
+        return RMPermissionModel.TRIGGER_AN_EVENT;
     }
+
+    
 }

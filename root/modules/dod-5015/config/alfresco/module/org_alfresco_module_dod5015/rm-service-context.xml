@@ -13,6 +13,7 @@
           depends-on="org_alfresco_module_dod5015_dictionaryBootstrap" init-method="init">        
         <property name="recordsManagementServiceRegistry" ref="RecordsManagementServiceRegistry"/>
         <property name="policyComponent" ref="policyComponent"/>
+        <property name="voter" ref="rmEntryVoter"/>
     </bean>
     
     <bean id="RecordsManagementService" class="org.springframework.aop.framework.ProxyFactoryBean">

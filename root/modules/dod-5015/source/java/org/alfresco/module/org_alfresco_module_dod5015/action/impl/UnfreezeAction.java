@@ -45,7 +45,8 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 public class UnfreezeAction extends RMActionExecuterAbstractBase
 {
     /**
-     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
+     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
+     *      org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
@@ -54,7 +55,7 @@ public class UnfreezeAction extends RMActionExecuterAbstractBase
         {
             // Remove freeze from node
             removeFreeze(actionedUponNodeRef);
-            
+
             // Remove freeze from records if a record folder
             if (this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
             {
@@ -64,13 +65,14 @@ public class UnfreezeAction extends RMActionExecuterAbstractBase
                     removeFreeze(record);
                 }
             }
-        }        
+        }
     }
-    
+
     /**
      * Removes a freeze from a node
      * 
-     * @param nodeRef   node reference
+     * @param nodeRef
+     *            node reference
      */
     private void removeFreeze(NodeRef nodeRef)
     {
@@ -81,8 +83,8 @@ public class UnfreezeAction extends RMActionExecuterAbstractBase
             // Remove the frozen node as a child
             NodeRef holdNodeRef = assoc.getParentRef();
             this.nodeService.removeChild(holdNodeRef, nodeRef);
-            
-            // Check to see if we should delete the hold 
+
+            // Check to see if we should delete the hold
             List<ChildAssociationRef> holdAssocs = this.nodeService.getChildAssocs(holdNodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
             if (holdAssocs.size() == 0)
             {
@@ -90,11 +92,11 @@ public class UnfreezeAction extends RMActionExecuterAbstractBase
                 this.nodeService.deleteNode(holdNodeRef);
             }
         }
-        
+
         // Remove the aspect
         this.nodeService.removeAspect(nodeRef, ASPECT_FROZEN);
     }
-    
+
     @Override
     public Set<QName> getProtectedAspects()
     {
@@ -106,8 +108,7 @@ public class UnfreezeAction extends RMActionExecuterAbstractBase
     @Override
     protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
     {
-        return true;
+        return this.nodeService.hasAspect(filePlanComponent, ASPECT_FROZEN);
     }
-    
-    
+
 }
