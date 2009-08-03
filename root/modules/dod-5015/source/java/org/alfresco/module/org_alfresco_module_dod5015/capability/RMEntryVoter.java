@@ -46,6 +46,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.CreateCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.DeleteCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.UpdateCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.group.UpdatePropertiesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AccessAuditCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AddModifyEventDatesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ApproveRecordsScheduledForCutoffCapability;
@@ -282,8 +283,10 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public CreateCapability createCapability;
 
     public DeleteCapability deleteCapability;
-    
+
     public UpdateCapability updateCapability;
+
+    public UpdatePropertiesCapability updatePropertiesCapability;
 
     static
     {
@@ -998,8 +1001,6 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     {
         this.deleteCapability = deleteCapability;
     }
-    
-    
 
     public UpdateCapability getUpdateCapability()
     {
@@ -1009,6 +1010,16 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setUpdateCapability(UpdateCapability updateCapability)
     {
         this.updateCapability = updateCapability;
+    }
+
+    public UpdatePropertiesCapability getUpdatePropertiesCapability()
+    {
+        return updatePropertiesCapability;
+    }
+
+    public void setUpdatePropertiesCapability(UpdatePropertiesCapability updatePropertiesCapability)
+    {
+        this.updatePropertiesCapability = updatePropertiesCapability;
     }
 
     public boolean supports(ConfigAttribute attribute)
@@ -1149,7 +1160,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         throw new ACLEntryVoterException("Unknown type");
     }
-    
+
     private static QName getQName(MethodInvocation invocation, Class[] params, int position)
     {
         if (QName.class.isAssignableFrom(params[position]))
@@ -1162,10 +1173,10 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         }
         throw new ACLEntryVoterException("Unknown type");
     }
-    
+
     private static Serializable getProperty(MethodInvocation invocation, Class[] params, int position)
     {
-        if(invocation.getArguments()[position] == null)
+        if (invocation.getArguments()[position] == null)
         {
             return null;
         }
@@ -1179,10 +1190,10 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         }
         throw new ACLEntryVoterException("Unknown type");
     }
-    
+
     private static Map<QName, Serializable> getProperties(MethodInvocation invocation, Class[] params, int position)
     {
-        if(invocation.getArguments()[position] == null)
+        if (invocation.getArguments()[position] == null)
         {
             return null;
         }
@@ -1392,24 +1403,24 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     {
         return protectedAspects.contains(aspectQName);
     }
-    
+
     public boolean isProtectedProperty(QName propertyQName)
     {
         return protectedProperties.contains(propertyQName);
     }
-    
-    public boolean includesProtectedProperties(Map<QName, Serializable> properties)
+
+    public boolean includesProtectedProperties(Set<QName> properties)
     {
-        for(QName test : properties.keySet())
+        for (QName test : properties)
         {
-            if(isProtectedProperty(test))
+            if (isProtectedProperty(test))
             {
                 return true;
             }
         }
         return false;
     }
-    
+
     private class ConfigAttributeDefintion
     {
         String typeString;
@@ -1547,7 +1558,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             {
                 properties = getProperties(invocation, params, cad.parameters.get(2));
             }
-            return voter.getUpdateCapability().evaluate(updatee, aspectQName, properties);
+            return voter.getUpdateCapability().evaluate(updatee, aspectQName, (properties == null ? null : properties.keySet()));
         }
 
     }
@@ -1581,15 +1592,22 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
         {
-            Policy policy = policies.get("Read");
-            if (policy == null)
+            NodeRef updatee = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(0), cad.parent);
+            Set<QName> properties;
+            if (QName.class.isAssignableFrom(params[cad.parameters.get(1)]))
             {
-                return AccessDecisionVoter.ACCESS_DENIED;
+                // single update/delete
+                // We have a specific property
+                QName propertyQName = getQName(invocation, params, cad.parameters.get(1));
+                properties = new HashSet<QName>(1, 1.0f);
+                properties.add(propertyQName);
             }
             else
             {
-                return policy.evaluate(voter, invocation, params, cad);
+                properties = getProperties(invocation, params, cad.parameters.get(1)).keySet();
             }
+            
+            return voter.getUpdatePropertiesCapability().evaluate(updatee, properties);
         }
 
     }

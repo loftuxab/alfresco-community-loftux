@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability.group;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
@@ -60,13 +61,13 @@ public class UpdateCapability extends AbstractCapability
         return "Update";
     }
 
-    public int evaluate(NodeRef nodeRef, QName aspectQName, Map<QName, Serializable> properties)
+    public int evaluate(NodeRef nodeRef, QName aspectQName, Set<QName> propertyQNames)
     {
         if ((aspectQName != null) && (voter.isProtectedAspect(aspectQName)))
         {
             return AccessDecisionVoter.ACCESS_DENIED;
         }
-        if ((properties != null) && (voter.includesProtectedProperties(properties)))
+        if ((propertyQNames != null) && (voter.includesProtectedProperties(propertyQNames)))
         {
             return AccessDecisionVoter.ACCESS_DENIED;
         }

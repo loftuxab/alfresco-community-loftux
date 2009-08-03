@@ -265,8 +265,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertEquals("Unexpected review period.", weeklyReview, secondVitalFolderReviewPeriod);
         
         // We are changing the review period of this second record folder.
-        props.put(PROP_REVIEW_PERIOD, dailyReview);
-        this.nodeService.setProperties(secondVitalFolder, props);
+        this.nodeService.setProperty(secondVitalFolder, PROP_REVIEW_PERIOD, dailyReview);
         
         Date reviewDate = (Date)nodeService.getProperty(recordUnderTest, PROP_REVIEW_AS_OF);
         
@@ -426,7 +425,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         checkSearchAspect(ndNodeRef, recordFolder, 0);
         
 	    // Test the declaration of a record by editing properties
-        Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
+        Map<QName, Serializable> propValues = new HashMap<QName, Serializable>();   
 	    propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());	    
 	    List<String> smList = new ArrayList<String>(2);
         smList.add(FOUO);
@@ -435,7 +434,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	    propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
 	    propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
 	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());
-	    this.nodeService.setProperties(recordOne, propValues);
+	    this.nodeService.addProperties(recordOne, propValues);
 	    
 	    txn.commit(); 
         txn = transactionService.getUserTransaction(false);
@@ -459,11 +458,10 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertTrue("Before test DECLARED aspect was set", 
         		this.nodeService.hasAspect(recordOne, ASPECT_DECLARED_RECORD) == false);    
         
-        propValues = this.nodeService.getProperties(recordOne);        
-        propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
-        propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
-        propValues.put(ContentModel.PROP_TITLE, "titleValue");
-        this.nodeService.setProperties(recordOne, propValues);
+             
+        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        this.nodeService.setProperty(recordOne, ContentModel.PROP_TITLE, "titleValue");
         
         // Declare the record as we have set everything we should have
         this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
@@ -944,6 +942,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
       
     private void declareRecord(NodeRef recordOne)
     {
+        NodeService unprotectedNodeService = (NodeService)applicationContext.getBean("nodeService");
         // Declare record
         Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
         propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
@@ -957,7 +956,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
         propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
         propValues.put(ContentModel.PROP_TITLE, "titleValue");
-        this.nodeService.setProperties(recordOne, propValues);
+        unprotectedNodeService.setProperties(recordOne, propValues);
         this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
 	}
     
@@ -1265,19 +1264,18 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertTrue("Declared record already on prior to test", 
         	this.nodeService.hasAspect(nonVitalRecord, ASPECT_DECLARED_RECORD) == false);  
 
-        Map<QName, Serializable> propValues = this.nodeService.getProperties(nonVitalRecord);        
-        propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
+               
+        this.nodeService.setProperty(nonVitalRecord, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
         List<String> smList = new ArrayList<String>(2);
         smList.add(FOUO);
         smList.add(NOFORN);
-        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
-        propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
-        propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
-        propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());
-        propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
-        propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
-        propValues.put(ContentModel.PROP_TITLE, "titleValue");
-        this.nodeService.setProperties(nonVitalRecord, propValues);
+        this.nodeService.setProperty(nonVitalRecord, RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
+        this.nodeService.setProperty(nonVitalRecord, RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
+        this.nodeService.setProperty(nonVitalRecord, RecordsManagementModel.PROP_FORMAT, "formatValue"); 
+        this.nodeService.setProperty(nonVitalRecord, RecordsManagementModel.PROP_DATE_RECEIVED, new Date());
+        this.nodeService.setProperty(nonVitalRecord, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        this.nodeService.setProperty(nonVitalRecord, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        this.nodeService.setProperty(nonVitalRecord, ContentModel.PROP_TITLE, "titleValue");
 
         this.rmActionService.executeRecordsManagementAction(nonVitalRecord, "declareRecord");
         assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_RECORD));    
@@ -1289,10 +1287,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         //
         
         // 1. Switch parent folder from non-vital to vital.
-        Map<QName, Serializable> nonVitalFolderProps = this.nodeService.getProperties(nonVitalFolder);
-        nonVitalFolderProps.put(PROP_VITAL_RECORD_INDICATOR, true);
-        nonVitalFolderProps.put(PROP_REVIEW_PERIOD, "week|1");
-        this.nodeService.setProperties(nonVitalFolder, nonVitalFolderProps);
+        this.nodeService.setProperty(nonVitalFolder, PROP_VITAL_RECORD_INDICATOR, true);
+        this.nodeService.setProperty(nonVitalFolder, PROP_REVIEW_PERIOD, "week|1");
         
         txn4.commit();
         
@@ -1312,9 +1308,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 
 
         // 2. Switch parent folder from vital to non-vital.
-        Map<QName, Serializable> vitalFolderProps = this.nodeService.getProperties(vitalRecFolder);
-        vitalFolderProps.put(PROP_VITAL_RECORD_INDICATOR, false);
-        this.nodeService.setProperties(vitalRecFolder, vitalFolderProps);
+        this.nodeService.setProperty(vitalRecFolder, PROP_VITAL_RECORD_INDICATOR, false);
         
         txn5.commit();
         
@@ -1335,9 +1329,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         // the overrides work
         
         // First switch the non-vital record folder back to vital.
-        vitalFolderProps = this.nodeService.getProperties(vitalRecFolder);
-        vitalFolderProps.put(PROP_VITAL_RECORD_INDICATOR, true);
-        this.nodeService.setProperties(vitalRecFolder, vitalFolderProps);
+        this.nodeService.setProperty(vitalRecFolder, PROP_VITAL_RECORD_INDICATOR, true);
         
         txn6.commit();
         UserTransaction txn7 = transactionService.getUserTransaction(false);
@@ -1356,8 +1348,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // Run this test twice (after a clean db) and it fails at the below line.
         assertEquals(new Period("week|1"), recCatProps.get(PROP_REVIEW_PERIOD));
-        recCatProps.put(PROP_REVIEW_PERIOD, new Period("day|1"));
-        this.nodeService.setProperties(vitalRecCategory, recCatProps);
+        this.nodeService.setProperty(vitalRecCategory, PROP_REVIEW_PERIOD, new Period("day|1"));
         
         txn7.commit();
         UserTransaction txn8 = transactionService.getUserTransaction(false);
@@ -1370,8 +1361,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         // Change some of the VitalRecordDefinition in Record Folder
         Map<QName, Serializable> folderProps = this.nodeService.getProperties(vitalRecFolder);
         assertEquals(new Period("day|1"), folderProps.get(PROP_REVIEW_PERIOD));
-        folderProps.put(PROP_REVIEW_PERIOD, new Period("month|1"));
-        this.nodeService.setProperties(vitalRecFolder, folderProps);
+        this.nodeService.setProperty(vitalRecFolder, PROP_REVIEW_PERIOD, new Period("month|1"));
 
         txn8.commit();
         UserTransaction txn9 = transactionService.getUserTransaction(false);

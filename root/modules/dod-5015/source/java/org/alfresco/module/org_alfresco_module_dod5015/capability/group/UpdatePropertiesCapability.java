@@ -24,8 +24,15 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.capability.group;
 
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
+
+import net.sf.acegisecurity.vote.AccessDecisionVoter;
+
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * @author andyh
@@ -40,8 +47,7 @@ public class UpdatePropertiesCapability extends AbstractCapability
     @Override
     protected int hasPermissionImpl(NodeRef nodeRef)
     {
-        // TODO Auto-generated method stub
-        return 0;
+        return AccessDecisionVoter.ACCESS_ABSTAIN;
     }
 
     /* (non-Javadoc)
@@ -49,8 +55,40 @@ public class UpdatePropertiesCapability extends AbstractCapability
      */
     public String getName()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return "UpdateProperties";
+    }
+    
+    public int evaluate(NodeRef nodeRef, Set<QName> propertyQNames)
+    {
+        if ((propertyQNames != null) && (voter.includesProtectedProperties(propertyQNames)))
+        {
+            return AccessDecisionVoter.ACCESS_DENIED;
+        }
+        if (voter.getFileRecordsCapability().evaluate(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+        {
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
+        if (voter.getCreateModifyDestroyFoldersCapability().evaluate(nodeRef, null) == AccessDecisionVoter.ACCESS_GRANTED)
+        {
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
+        if (voter.getCreateModifyDestroyFileplanMetadataCapability().evaluate(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+        {
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
+        if (voter.getEditDeclaredRecordMetadataCapability().evaluate(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+        {
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
+        if (voter.getEditNonRecordMetadataCapability().evaluate(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+        {
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
+        if (voter.getEditRecordMetadataCapability().evaluate(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+        {
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
+        return AccessDecisionVoter.ACCESS_DENIED;
     }
 
 }

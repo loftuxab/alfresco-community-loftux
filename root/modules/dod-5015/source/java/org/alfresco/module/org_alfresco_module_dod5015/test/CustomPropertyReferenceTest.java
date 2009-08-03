@@ -328,19 +328,18 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
     private void declareRecord(NodeRef recordOne)
     {
         // Declare record
-        Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
-        propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
+        //Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
+        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
 //        List<String> smList = new ArrayList<String>(2);
 //        smList.add(FOUO);
 //        smList.add(NOFORN);
 //        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
-        propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
-        propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
-        propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());       
-        propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
-        propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
-        propValues.put(ContentModel.PROP_TITLE, "titleValue");
-        this.nodeService.setProperties(recordOne, propValues);
+        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
+        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_FORMAT, "formatValue"); 
+        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_DATE_RECEIVED, new Date());       
+        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        this.nodeService.setProperty(recordOne, ContentModel.PROP_TITLE, "titleValue");
         this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
 	}
 }
