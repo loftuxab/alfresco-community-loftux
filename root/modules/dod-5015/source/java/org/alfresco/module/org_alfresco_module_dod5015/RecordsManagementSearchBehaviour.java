@@ -155,11 +155,10 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
      */
     private void updateDispositionActionProperties(NodeRef record, NodeRef dispositionAction)
     {
-        Map<QName, Serializable> props = this.nodeService.getProperties(record);
-        props.put(PROP_RS_DISPOSITION_ACTION_NAME, this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_ACTION));
-        props.put(PROP_RS_DISPOSITION_ACTION_AS_OF, this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_AS_OF));
-        props.put(PROP_RS_DISPOSITION_EVENTS_ELIGIBLE, this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_EVENTS_ELIGIBLE));
-        this.nodeService.setProperties(record, props);
+        this.nodeService.setProperty(record, PROP_RS_DISPOSITION_ACTION_NAME, this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_ACTION));
+        this.nodeService.setProperty(record, PROP_RS_DISPOSITION_ACTION_AS_OF, this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_AS_OF));
+        this.nodeService.setProperty(record, PROP_RS_DISPOSITION_EVENTS_ELIGIBLE, this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_EVENTS_ELIGIBLE));
+       
     }
 
     public void eventExecutionUpdate(ChildAssociationRef childAssocRef, boolean isNewNode)

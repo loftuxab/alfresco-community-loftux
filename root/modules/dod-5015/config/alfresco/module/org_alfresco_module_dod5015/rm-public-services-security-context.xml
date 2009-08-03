@@ -144,6 +144,7 @@
         <property name="createCapability" ref="rmCreate"/>
         <property name="deleteCapability" ref="rmDelete"/>
         <property name="updateCapability" ref="rmUpdate"/>
+        <property name="updatePropertiesCapability" ref="rmUpdateProperties"/>
     </bean>
     
     <!-- ======================= -->
