@@ -94,7 +94,7 @@ public class DispositionLifecycleJob implements Job
                 sb.append("+ISNULL:\"rma:dispositionActionCompletedAt\" ");
                 sb.append("+( ");
                 sb.append("@rma\\:dispositionEventsEligible:true "); 
-                sb.append("OR @rma\\:dispositionAsOf:[NOW TO MAX] ");
+                sb.append("OR @rma\\:dispositionAsOf:[MIN TO NOW] ");
                 sb.append(") ");
 
                 String query = sb.toString();
