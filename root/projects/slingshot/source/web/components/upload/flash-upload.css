@@ -7,6 +7,7 @@
 }
 
 /* Center text and buttons inside p elements */
+
 .flash-upload p
 {
    text-align: center;
@@ -19,8 +20,8 @@
 
 .flash-upload div.browse-wrapper div.center
 {
-   padding-top:0.5em;
-   line-height:2em;
+   padding-top: 0.5em;
+   line-height: 2em;
    margin-left: auto;
    margin-right: auto;
    width: 18em;
@@ -34,41 +35,41 @@
 
 .flash-upload div.tip-wrapper
 {
-   padding-top:0.5em;
-   line-height:2em;
+   padding-top: 0.5em;
+   line-height: 2em;
    text-align: center;
    clear: both;
 }
 
 .flash-upload div.status-wrapper
 {
-   padding-bottom:0.5em;
-   text-align:center;
+   padding-bottom: 0.5em;
+   text-align: center;
 }
 
 .flash-upload .browse,
 .flash-upload .tip
 {
-   float:left;
+   float: left;
 }
 
 .flash-upload .browse
 {
-   width:38px;
-   height:26px;
-   margin-left:10px;
-   margin-right:10px;
+   width: 38px;
+   height: 26px;
+   margin-left: 10px;
+   margin-right: 10px;
 }
 
 .flash-upload .browse.button-fix
 {
-   width:39px;
+   width: 39px;
 }
 
 .flash-upload .tip
 {
-   height:40px;
-   line-height:40px;
+   height: 40px;
+   line-height: 40px;
 }
 
 .flash-upload div.section span.status
@@ -77,13 +78,14 @@
 }
 
 /* Add som padding to the file list so it looks centered */
+
 .yui-skin-default .yui-panel .bd .fileUpload-filelist-table
 {
    padding: 0.8em;
-   /*clear:both;*/
 }
 
 /* Remove the padding inherited from the panel for divs in the file list */
+
 .yui-skin-default .yui-panel .bd .fileUpload-filelist-table div.yui-dt-hd
 {
    height: 0;
@@ -102,6 +104,7 @@
 }
 
 /* Create a visible gray line beneath each row */
+
 .fileUpload-filelist-table tbody .yui-dt-liner
 {
    border-bottom-style: solid;
@@ -113,12 +116,14 @@
 }
 
 /* Width of the file list - needs to override YUI element style setting */
+
 .fileUpload-filelist-table .yui-dt table
 {
    width: 620px !important;
 }
 
 /* Hide the table header */
+
 .fileUpload-filelist-table .yui-dt table thead
 {
    display: none;
@@ -135,11 +140,12 @@
  *
  * If the outer element also has "position: relative;" it works though.
  */
+
 .fileUpload-filelist-table .yui-dt-bd
 {
-   position:relative;
-   width:620px;
-   overflow-x:hidden;
+   position: relative;
+   width: 620px;
+   overflow-x: hidden;
 }
 
 /* Style left column and its elements */
@@ -159,10 +165,9 @@
 
 .fileupload-percentage-span
 {
-   position: relative;
-   top: 12px;
    font-weight: bold;
    font-size: 123.1%;
+   line-height: 2.5em;
 }
 
 .fileupload-contentType-menu
@@ -237,7 +242,7 @@
 .fileUpload-filelist-table tbody .col-right div.fileupload-right-div
 {
    height: 40px;
-   width: 130px;      
+   width: 130px;
 }
 
 .fileupload-right-div
@@ -266,7 +271,7 @@
 
 .yui-skin-default .fileUpload-filelist-table.yui-dt.yui-dt-scrollable tbody.yui-dt-data tr.yui-dt-last td
 {
-   border-bottom:medium none;
+   border-bottom: medium none;
 }
 
 /* General styling */
@@ -278,7 +283,7 @@
 
 .flash-upload .yui-gd div.first
 {
-   width: 10.5em;   
+   width: 10.5em;
 }
 
 .flash-upload textarea
