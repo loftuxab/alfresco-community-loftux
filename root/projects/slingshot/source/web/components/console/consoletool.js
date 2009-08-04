@@ -376,7 +376,7 @@
                newPanel.onBeforeShow();
                
                // Display the specified panel to the user
-               Dom.setStyle(this.id + "-" + panelId, "display", "block");
+               Alfresco.util.Anim.fadeIn(this.id + "-" + panelId);
                
                // Fire the onShow() panel lifecycle event
                newPanel.onShow();

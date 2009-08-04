@@ -218,7 +218,8 @@
                      </div>
                   */
                   var div = document.createElement("div");
-                  div.setAttribute("class", "theme-bg-color-2 property-item");
+                  Dom.addClass(div, "theme-bg-color-2");
+                  Dom.addClass(div, "property-item");
                   var html = '<div class="property-actions"><span id="' + editBtnContainerId + '"></span><span id="' + deleteBtnContainerId + '"></span>';
                   html += '</div><div><p class="property-title">' + $html(prop.title) + '</p>';
                   html += '<p>' + parent._msg('label.type') + ': ' + parent._dataTypeLabel(prop.dataType) + '</p>';
@@ -265,7 +266,7 @@
             {
                // no properties found, display message
                var div = document.createElement("div");
-               div.setAttribute("class", "no-property-item");
+               Dom.addClass(div, "no-property-item");
                div.innerHTML = parent._msg("message.noproperties");
                
                // insert into the DOM for display
