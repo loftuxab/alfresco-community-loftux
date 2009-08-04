@@ -263,6 +263,9 @@
          
          this.widgets.saveButton.set("disabled", true);
          this.widgets.searchButton.set("disabled", true);
+         
+         // switch to query builder tab
+         this.widgets.tabs.selectTab(0);
       },
       
       /**
