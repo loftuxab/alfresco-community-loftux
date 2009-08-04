@@ -317,9 +317,9 @@
          var formEl = Dom.getElementsByClassName("action-form", "form", actionEl)[0],
             formId = elId + "-action-form";
          
-         if (YAHOO.env.ua.ie > 0)
+         if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8)
          {
-            // MSIE mixes up name and id attributes on form children. Which is always useful.
+            // MSIE 6 & 7 mix up name and id attributes on form children. Which is always useful.
             formEl.attributes["id"].value = formId;
          }
          else
