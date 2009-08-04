@@ -86,11 +86,11 @@
    position: relative !important;
 }
 
-/*.people-finder .itemname a
+.people-finder .itemname
 {
-   color: #276FB6;
+   padding-bottom: 0.2em;
 }
-*/
+
 .people-finder .detail
 {
    line-height: 1.4em;

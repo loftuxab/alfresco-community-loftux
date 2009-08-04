@@ -35,8 +35,7 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+      Event = YAHOO.util.Event;
    
    /**
     * Alfresco Slingshot aliases
@@ -242,7 +241,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "people",
-             fields: ["userName", "avatar", "firstName", "lastName", "organisation", "jobtitle", "email"]
+             fields: ["userName", "avatar", "firstName", "lastName", "organization", "jobtitle", "email"]
          };
 
          this.widgets.dataSource.doBeforeParseData = function PeopleFinder_doBeforeParseData(oRequest, oFullResponse)
@@ -262,7 +261,7 @@
                // Remove the current user from the list?
                if (!me.options.showSelf)
                {
-                  for (i = 0, ii == items.length; i < ii; i++)
+                  for (i = 0, ii = items.length; i < ii; i++)
                   {
                       if (items[i].userName == Alfresco.constants.USERNAME)
                       {
@@ -273,7 +272,8 @@
                }
                
                // Sort the user list by name
-               items.sort(function (user1, user2){
+               items.sort(function (user1, user2)
+               {
                   var name1 = user1.firstName + user1.lastName,
                      name2 = user2.firstName + user2.lastName;
                   return (name1 > name2) ? 1 : (name1 < name2) ? -1 : 0;
@@ -385,8 +385,8 @@
                name += lastName ? lastName : "";
             }
             
-            var title = oRecord.getData("jobtitle") ? oRecord.getData("jobtitle") : "",
-               organisation = oRecord.getData("organisation") ? oRecord.getData("organisation") : "";
+            var title = oRecord.getData("jobtitle") || "",
+               organization = oRecord.getData("organization") || "";
             
             var profileUrl = Alfresco.util.uriTemplate("userprofilepage",
             {
@@ -404,15 +404,15 @@
                   desc += '<div class="detail"><span>' + me.msg("label.title") + ":</span> " + $html(title) + '</div>';
                }
             }
-            if (organisation.length !== 0)
+            if (organization.length !== 0)
             {
                if (me.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT)
                {
-                  desc += '<div class="detail">&nbsp;(' + $html(organisation) + ')</div>';
+                  desc += '<div class="detail">&nbsp;(' + $html(organization) + ')</div>';
                }
                else
                {
-                  desc += '<div class="detail"><span>' + me.msg("label.company") + ":</span> " + $html(organisation) + '</div>';
+                  desc += '<div class="detail"><span>' + me.msg("label.company") + ":</span> " + $html(organization) + '</div>';
                }
             }
             elCell.innerHTML = desc;
@@ -432,8 +432,8 @@
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "text-align", "right");
             
-            var userName = oRecord.getData("userName");
-            var desc = '<span id="' + me.id + '-select-' + userName + '"></span>';
+            var userName = oRecord.getData("userName"),
+               desc = '<span id="' + me.id + '-select-' + userName + '"></span>';
             elCell.innerHTML = desc;
             
             // create button if require - it is not required in the plain people list mode
@@ -463,16 +463,12 @@
          };
 
          // DataTable column defintions
-         var columnDefinitions = [
-         {
-            key: "avatar", label: "Avatar", sortable: false, formatter: renderCellAvatar, width: this.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT ? 36 : 70
-         },
-         {
-            key: "person", label: "Description", sortable: false, formatter: renderCellDescription
-         },
-         {
-            key: "actions", label: "Actions", sortable: false, formatter: renderCellAddButton, width: 80
-         }];
+         var columnDefinitions =
+         [
+            { key: "avatar", label: "Avatar", sortable: false, formatter: renderCellAvatar, width: this.options.viewMode == Alfresco.PeopleFinder.VIEW_MODE_COMPACT ? 36 : 70 },
+            { key: "person", label: "Description", sortable: false, formatter: renderCellDescription },
+            { key: "actions", label: "Actions", sortable: false, formatter: renderCellAddButton, width: 80 }
+         ];
 
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
@@ -559,7 +555,6 @@
          }
          
          this.userSelectButtons = {};
-         
          this._performSearch(searchTerm);
       },
 
