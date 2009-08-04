@@ -66,7 +66,7 @@
       
       // NOTE: the panel registered first is considered the "default" view and is displayed first
       
-      /* Search Panel Handler */
+      /* View Panel Handler */
       ViewPanelHandler = function ViewPanelHandler_constructor()
       {
          // Initialise prototype properties
@@ -119,13 +119,15 @@
                   }
                }
                
-               // update message in right-hand panel
-               Dom.get(parent.id + "-metadata-item").innerHTML = Dom.get(id).innerHTML;
+               // update message in right-hand panel and create panel
+               var msg = Dom.get(id).innerHTML;
+               Dom.get(parent.id + "-view-metadata-item").innerHTML = msg;
+               Dom.get(parent.id + "-create-metadata-item").innerHTML = msg;
                
                // selected object handling
                var itemType = id.substring(id.lastIndexOf("-") + 1);
                
-               // inform the parent object of the selected item e.g. "recordseries"
+               // update the currently selected item context e.g. "record"
                parent.currentType = itemType;
                
                // clear the list of meta-data items
@@ -170,74 +172,106 @@
          {
             var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
             
+            // sort data before display
+            var customProperties = [];
+            var props = json.data.customProperties;
+            for (var propName in props)
+            {
+               var prop = props[propName];
+               
+               // insert 'name' field into object
+               prop.name = propName;
+               
+               // add to array for sorting
+               customProperties.push(prop);
+            }
+            customProperties.sort(parent._sortByTitle);
+            
+            // update the current custom properties list context
+            parent.currentProperties = customProperties;
+            
             // build the table of values describing the properties and add the action buttons
             var elPropList = Dom.get(parent.id + "-property-list");
-            var customProperties = json.data.customProperties;
-            for (var propName in customProperties)
+            
+            if (customProperties.length !== 0)
             {
-               var prop = customProperties[propName];
-               
-               // dynamically generated button ids
-               var editBtnContainerId = parent.id + '-edit-' + propName;
-               var deleteBtnContainerId = parent.id + '-delete-' + propName;
-               
-               // add a div element wrapper for each item then construct the inner HTML directly
-               /*
-                  <div class="property-item">
-                     <div class="property-actions">
-                        <span id="btn">Edit Button</span>
-                        <span id="btn">Delete Button</span>
+               for (var index in customProperties)
+               {
+                  var prop = customProperties[index];
+                  
+                  // dynamically generated button ids
+                  var editBtnContainerId = parent.id + '-edit-' + index;
+                  var deleteBtnContainerId = parent.id + '-delete-' + index;
+                  
+                  // create a div element for each item then construct the inner HTML directly
+                  /*
+                     <div class="property-item">
+                        <div class="property-actions">
+                           <span id="btn">Edit Button</span>
+                           <span id="btn">Delete Button</span>
+                        </div>
+                        <div>
+                           <p class="property-title">Project Name</p>
+                           <p>Type: Text</p>
+                           <p>Selection list: regions</p>
+                        </div>
                      </div>
-                     <div>
-                        <p class="property-title">Project Name</p>
-                        <p>Type: Text</p>
-                        <p>Selection list: regions</p>
-                     </div>
-                  </div>
-               */
+                  */
+                  var div = document.createElement("div");
+                  div.setAttribute("class", "theme-bg-color-2 property-item");
+                  var html = '<div class="property-actions"><span id="' + editBtnContainerId + '"></span><span id="' + deleteBtnContainerId + '"></span>';
+                  html += '</div><div><p class="property-title">' + $html(prop.title) + '</p>';
+                  html += '<p>' + parent._msg('label.type') + ': ' + parent._dataTypeLabel(prop.dataType) + '</p>';
+                  // TODO: display selection list constraint
+                  //html += '<p>' + this._msg('label.selection-list') + ': ' + prop.xx + '</p>';
+                  html += '</div></div>';
+                  div.innerHTML = html;
+                  
+                  // insert into the DOM for display
+                  elPropList.appendChild(div);
+                  
+                  // generate buttons (NOTE: must occur after DOM insertion)
+                  var editBtn = new YAHOO.widget.Button(
+                  {
+                     type: "button",
+                     label: parent._msg("button.edit"),
+                     name: parent.id + '-editButton-' + index,
+                     container: editBtnContainerId,
+                     onclick:
+                     {
+                        fn: this.onClickEditProperty,
+                        obj: index,
+                        scope: this
+                     }
+                  });
+                  this.propEditButtons[index] = editBtn;
+                  var deleteBtn = new YAHOO.widget.Button(
+                  {
+                     type: "button",
+                     label: parent._msg("button.delete"),
+                     name: parent.id + '-deleteButton-' + index,
+                     container: deleteBtnContainerId,
+                     onclick:
+                     {
+                        fn: this.onClickDeleteProperty,
+                        obj: index,
+                        scope: this
+                     }
+                  });
+                  this.propDeleteButtons[index] = deleteBtn;
+               }
+            }
+            else
+            {
+               // no properties found, display message
                var div = document.createElement("div");
-               div.setAttribute("class", "theme-bg-color-3 property-item");
-               var html = '<div class="property-actions"><span id="' + editBtnContainerId + '"></span><span id="' + deleteBtnContainerId + '"></span>';
-               html += '</div><div><p class="property-title">' + $html(prop.title) + '</p>';
-               html += '<p>' + parent._msg('label.type') + ': ' + prop.dataType + '</p>';
-               // TODO: display selection list constraint
-               //html += '<p>' + this._msg('label.selection-list') + ': ' + prop.xx + '</p>';
-               html += '</div></div>';
-               div.innerHTML = html;
+               div.setAttribute("class", "no-property-item");
+               div.innerHTML = parent._msg("message.noproperties");
                
                // insert into the DOM for display
                elPropList.appendChild(div);
-               
-               // generate buttons
-               var editBtn = new YAHOO.widget.Button(
-               {
-                  type: "button",
-                  label: parent._msg("button.edit"),
-                  name: parent.id + '-editButton-' + propName,
-                  container: editBtnContainerId,
-                  onclick:
-                  {
-                     fn: this.onClickEditProperty,
-                     obj: propName,
-                     scope: this
-                  }
-               });
-               this.propEditButtons[propName] = editBtn;
-               var deleteBtn = new YAHOO.widget.Button(
-               {
-                  type: "button",
-                  label: parent._msg("button.delete"),
-                  name: parent.id + '-deleteButton-' + propName,
-                  container: deleteBtnContainerId,
-                  onclick:
-                  {
-                     fn: this.onClickDeleteProperty,
-                     obj: propName,
-                     scope: this
-                  }
-               });
-               this.propDeleteButtons[propName] = deleteBtn;
             }
+            Alfresco.util.Anim.fadeIn(elPropList);
          },
          
          /**
@@ -247,8 +281,10 @@
           * @param e {object} DomEvent
           * @param obj {object} Object passed back from addListener method
           */
-         onClickEditProperty: function onClickEditProperty()
+         onClickEditProperty: function onClickEditProperty(e, obj)
          {
+            // update the current property context
+            parent.currentProperty = parent.currentProperties[obj];
          },
          
          /**
@@ -258,8 +294,10 @@
           * @param e {object} DomEvent
           * @param obj {object} Object passed back from addListener method
           */
-         onClickDeleteProperty: function onClickDeleteProperty()
+         onClickDeleteProperty: function onClickDeleteProperty(e, obj)
          {
+            // update the current property context
+            parent.currentProperty = parent.currentProperties[obj];
          },
          
          /**
@@ -289,11 +327,120 @@
           */
          onNewPropertyClick: function onNewPropertyClick(e, obj)
          {
+            parent.showPanel("create");
          }
       });
       new ViewPanelHandler();
       
-      return this;
+      /* Create Metadata Panel Handler */
+      CreatePanelHandler = function CreatePanelHandler_constructor()
+      {
+         // Initialise prototype properties
+         
+         CreatePanelHandler.superclass.constructor.call(this, "create");
+      };
+      
+      YAHOO.extend(CreatePanelHandler, Alfresco.ConsolePanelHandler,
+      {
+         /**
+          * onLoad ConsolePanel event handler
+          * 
+          * @method onLoad
+          */
+         onLoad: function onLoad()
+         {
+            // Buttons
+            parent.widgets.createpropertyButton = Alfresco.util.createYUIButton(parent, "createproperty-button", this.onClickCreateProperty);
+            parent.widgets.cancelcreatepropertyButton = Alfresco.util.createYUIButton(parent, "cancelcreateproperty-button", this.onClickCancelCreateProperty);
+            
+            // Form definition
+            var form = new Alfresco.forms.Form(parent.id + "-create-form");
+            form.setSubmitElements(parent.widgets.createpropertyButton);
+            form.setShowSubmitStateDynamically(true);
+            
+            // Form field validation
+            form.addValidation(parent.id + "-create-label", Alfresco.forms.validation.mandatory, null, "keyup");
+            
+            // Initialise the form
+            form.init();
+            
+            // additional events
+            Event.on(parent.id + "-create-type", "change", this.onCreateTypeChanged, null, this);
+         },
+         
+         /**
+          * onBeforeShow ConsolePanel event handler
+          * 
+          * @method onBeforeShow
+          */
+         onBeforeShow: function onBeforeShow()
+         {
+            // clear form
+            Dom.get(parent.id + "-create-label").value = "";
+            Dom.get(parent.id + "-create-type").selectedIndex = 0
+            Dom.get(parent.id + "-create-use-list").checked = false;
+            Dom.get(parent.id + "-create-use-list").disabled = false;
+            Dom.get(parent.id + "-create-mandatory").checked = false;
+            Dom.get(parent.id + "-create-list").selectedIndex = 0;
+         },
+         
+         /**
+          * onShow ConsolePanel event handler
+          * 
+          * @method onShow
+          */
+         onShow: function onShow()
+         {
+            Dom.get(parent.id + "-create-label").focus();
+         },
+         
+         /**
+          * onUpdate ConsolePanel event handler
+          * 
+          * @method onUpdate
+          */
+         onUpdate: function onUpdate()
+         {
+         },
+         
+         /**
+          * Create Property button click handler
+          * 
+          * @method onClickCreateProperty
+          * @param e {object} DomEvent
+          * @param obj {object} Object passed back from addListener method
+          */
+         onClickCreateProperty: function onClickCreateProperty(e, obj)
+         {
+         },
+         
+         /**
+          * Cancel Create Property button click handler
+          * 
+          * @method onClickCancelCreateProperty
+          * @param e {object} DomEvent
+          * @param obj {object} Object passed back from addListener method
+          */
+         onClickCancelCreateProperty: function onClickCancelCreateProperty(e, obj)
+         {
+            parent.showPanel("view");
+         },
+         
+         /**
+          * Create Type down-drop changed event handler
+          * 
+          * @method onCreateTypeChanged
+          * @param e {object} DomEvent
+          * @param obj {object} Object passed back from addListener method
+          */
+         onCreateTypeChanged: function onCreateTypeChanged(e, obj)
+         {
+            var disableList = (Dom.get(parent.id + "-create-type").selectedIndex !== 0);
+            Dom.get(parent.id + "-create-use-list").disabled = disableList;
+            Dom.get(parent.id + "-create-list").disabled = disableList;
+         }
+      });
+      new CreatePanelHandler();
    };
    
    YAHOO.extend(Alfresco.RecordsMetaData, Alfresco.ConsoleTool,
@@ -310,12 +457,28 @@
       },
       
       /**
-       * Current selected item type.
+       * Current selected item type. e.g. record
        * 
        * @property currentType
        * @type string
        */
-      currentType: "",
+      currentType: null,
+      
+      /**
+       * Current selected type properties object.
+       * 
+       * @property currentProperties
+       * @type object
+       */
+      currentProperties: null,
+      
+      /**
+       * Current selected property object.
+       * 
+       * @property currentProperty
+       * @type object
+       */
+      currentProperty: null,
       
       /**
        * Fired by YUILoaderHelper when required component script files have
@@ -397,6 +560,48 @@
       /**
        * PRIVATE FUNCTIONS
        */
+      
+      /**
+       * Helper to Array.sort() by the 'title' field of an object.
+       *
+       * @method _sortByTitle
+       * @return {Number}
+       * @private
+       */
+      _sortByTitle: function RecordsMetaData__sortByTitle(s1, s2)
+      {
+         var ss1 = s1.title.toLowerCase(), ss2 = s2.title.toLowerCase();
+         return (ss1 > ss2) ? 1 : (ss1 < ss2) ? -1 : 0;
+      },
+      
+      /**
+       * Helper to convert a repository datatype string to a label
+       *
+       * @method _dataTypeLabel
+       * @param datatype {string} Repository datatype e.g. "d:text"
+       * @return {string} I18N label for the datatype
+       * @private
+       */
+      _dataTypeLabel: function RecordsMetaData__dataTypeLabel(dataType)
+      {
+         // convert datatype to readable label
+         var dataTypeMsgId;
+         switch (dataType)
+         {
+            case "d:text":
+               dataTypeMsgId = "label.datatype.text";
+               break;
+            case "d:boolean":
+               dataTypeMsgId = "label.datatype.boolean";
+               break;
+            case "d:date":
+               dataTypeMsgId = "label.datatype.date";
+               break;
+            default:
+               dataTypeMsgId = "label.datatype.unknown";
+         }
+         return this._msg(dataTypeMsgId);
+      },
       
       /**
        * Gets a custom message
