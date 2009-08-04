@@ -24,10 +24,10 @@
  */
  
 /**
- * GroupFinder component.
+ * AuthorityFinder component.
  * 
  * @namespace Alfresco
- * @class Alfresco.GroupFinder
+ * @class Alfresco.AuthorityFinder
  */
 (function()
 {
@@ -43,15 +43,15 @@
    var $html = Alfresco.util.encodeHTML;
 
    /**
-    * GroupFinder constructor.
+    * AuthorityFinder constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.GroupFinder} The new GroupFinder instance
+    * @return {Alfresco.AuthorityFinder} The new AuthorityFinder instance
     * @constructor
     */
-   Alfresco.GroupFinder = function(htmlId)
+   Alfresco.AuthorityFinder = function(htmlId)
    {
-      Alfresco.GroupFinder.superclass.constructor.call(this, "Alfresco.GroupFinder", htmlId, ["button", "container", "datasource", "datatable", "json"]);
+      Alfresco.AuthorityFinder.superclass.constructor.call(this, "Alfresco.AuthorityFinder", htmlId, ["button", "container", "datasource", "datatable", "json"]);
       
       // Initialise prototype properties
       this.itemSelectButtons = {};
@@ -68,15 +68,45 @@
 
       return this;
    };
-   
-   YAHOO.lang.augmentObject(Alfresco.GroupFinder,
+
+   /**
+    * View Modes
+    */
+   YAHOO.lang.augmentObject(Alfresco.AuthorityFinder,
    {
       VIEW_MODE_DEFAULT: "",
       VIEW_MODE_COMPACT: "COMPACT",
       VIEW_MODE_FULLPAGE: "FULLPAGE"
    });
+
+   /**
+    * Type Modes
+    */
+   YAHOO.lang.augmentObject(Alfresco.AuthorityFinder,
+   {
+      AUTHORITY_TYPE_ALL: "all",
+      AUTHORITY_TYPE_USERS: "user",
+      AUTHORITY_TYPE_GROUPS: "group"
+   });
+
+   /**
+    * Generate User Profile link.
+    *
+    * @method generateUserProfileLink
+    * @param userName {string} User name
+    * @return {string} Mark-up for use in href attribute
+    */
+   Alfresco.AuthorityFinder.generateUserProfileLink = function AuthorityFinder_generateUserProfileLink(userName)
+   {
+      var profileUrl = Alfresco.util.uriTemplate("userprofilepage",
+      {
+         userid: userName
+      });
+      
+      return encodeURI(profileUrl);
+   };
    
-   YAHOO.lang.extend(Alfresco.GroupFinder, Alfresco.component.Base,
+   YAHOO.lang.extend(Alfresco.AuthorityFinder, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -99,9 +129,18 @@
           * 
           * @property viewMode
           * @type string
-          * @default Alfresco.GroupFinder.VIEW_MODE_DEFAULT
+          * @default Alfresco.AuthorityFinder.VIEW_MODE_DEFAULT
           */
-         viewMode: Alfresco.GroupFinder.VIEW_MODE_DEFAULT,
+         viewMode: Alfresco.AuthorityFinder.VIEW_MODE_DEFAULT,
+
+         /**
+          * Authority type
+          * 
+          * @property authorityType
+          * @type string
+          * @default Alfresco.AuthorityFinder.AUTHORITY_TYPE_ALL
+          */
+         authorityType: Alfresco.AuthorityFinder.AUTHORITY_TYPE_ALL,
 
          /**
           * Single Select mode flag
@@ -162,11 +201,11 @@
           * @property dataWebScript
           * @type string
           */
-         dataWebScript: ""
+         dataWebScript: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/authority-query"
       },
 
       /**
-       * Object container for storing YUI button instances, indexed by groupname.
+       * Object container for storing YUI button instances
        * 
        * @property itemSelectButtons
        * @type object
@@ -198,7 +237,7 @@
       selectedItems: null,
 
       /**
-       * Groups for whom the action is not allowed
+       * Authorities for whom the action is not allowed
        * 
        * @property notAllowed
        * @type array
@@ -211,16 +250,16 @@
        *
        * @method onReady
        */
-      onReady: function GroupFinder_onReady()
+      onReady: function AuthorityFinder_onReady()
       {  
          var me = this;
          
          // View mode
-         if (this.options.viewMode == Alfresco.GroupFinder.VIEW_MODE_COMPACT)
+         if (this.options.viewMode == Alfresco.AuthorityFinder.VIEW_MODE_COMPACT)
          {
             Dom.addClass(this.id + "-body", "compact");
          }
-         else if (this.options.viewMode == Alfresco.GroupFinder.VIEW_MODE_FULLPAGE)
+         else if (this.options.viewMode == Alfresco.AuthorityFinder.VIEW_MODE_FULLPAGE)
          {
             Dom.setStyle(this.id + "-results", "height", "auto");
          }
@@ -230,28 +269,29 @@
          }
          
          // Search button
-         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "group-search-button", this.onSearchClick);
+         this.widgets.searchButton = Alfresco.util.createYUIButton(this, "authority-search-button", this.onSearchClick);
 
          // DataSource definition  
-         var groupSearchUrl = Alfresco.constants.PROXY_URI + YAHOO.lang.substitute(this.options.dataWebScript, this.options);
-         groupSearchUrl += (groupSearchUrl.indexOf("?") < 0) ? "?" : "&";
-         groupSearchUrl += "zone=APP.DEFAULT&";
-         this.widgets.dataSource = new YAHOO.util.DataSource(groupSearchUrl);
+         var searchUrl = YAHOO.lang.substitute(this.options.dataWebScript, this.options);
+         searchUrl += (searchUrl.indexOf("?") < 0) ? "?" : "&";
+         searchUrl += "authorityType=" + this.options.authorityType + "&";
+         searchUrl += "maxResults=" + this.options.maxSearchResults + "&";
+         this.widgets.dataSource = new YAHOO.util.DataSource(searchUrl);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
          this.widgets.dataSource.responseSchema =
          {
-             resultsList: "data",
-             fields: ["shortName", "fullName", "displayName", "userCount", "groupCount"]
+             resultsList: "authorities",
+             fields: ["authorityType", "shortName", "fullName", "displayName", "metadata"]
          };
 
-         this.widgets.dataSource.doBeforeParseData = function GroupFinder_doBeforeParseData(oRequest, oFullResponse)
+         this.widgets.dataSource.doBeforeParseData = function AuthorityFinder_doBeforeParseData(oRequest, oFullResponse)
          {
             var updatedResponse = oFullResponse;
             
-            if (oFullResponse && oFullResponse.data)
+            if (oFullResponse && oFullResponse.authorities)
             {
-               var items = oFullResponse.data;
+               var items = oFullResponse.authorities;
                
                // crop item list to max length if required
                if (items.length > me.options.maxSearchResults)
@@ -268,7 +308,7 @@
                // we need to wrap the array inside a JSON object so the DataTable is happy
                updatedResponse =
                {
-                  data: items
+                  authorities: items
                };
             }
             
@@ -277,8 +317,11 @@
          
          // Setup the DataTable
          this._setupDataTable();
+
+         // Update the title based on the mode
+         Dom.get(this.id + "-title").innerHTML = this.msg("title." + this.options.authorityType);
          
-         // register the "enter" event on the search text field
+         // Register the "enter" event on the search text field
          var searchText = Dom.get(this.id + "-search-text");
          
          // declare variable to keep JSLint and YUI Compressor happy
@@ -311,13 +354,13 @@
        * @method _setupDataTable
        * @private
        */
-      _setupDataTable: function GroupFinder__setupDataTable()
+      _setupDataTable: function AuthorityFinder__setupDataTable()
       {
          /**
           * DataTable Cell Renderers
           *
           * Each cell has a custom renderer defined as a custom function. See YUI documentation for details.
-          * These MUST be inline in order to have access to the Alfresco.GroupFinder class (via the "me" variable).
+          * These MUST be inline in order to have access to the Alfresco.AuthorityFinder class (via the "me" variable).
           */
          var me = this;
           
@@ -330,11 +373,58 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderCellIcon = function GroupFinder_renderCellIcon(elCell, oRecord, oColumn, oData)
+         var renderCellIcon = function AuthorityFinder_renderCellIcon(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+            
+            var authType = oRecord.getData("authorityType"),
+               metadata = oRecord.getData("metadata") || {},
+               avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/" + (authType == "USER" ? "no-user-photo-64.png" : "group-64.png");
 
-            elCell.innerHTML = '<img class="avatar" src="' + Alfresco.constants.URL_CONTEXT + 'components/images/group-64.png" alt="avatar" />';
+            if (metadata.avatar !== undefined)
+            {
+               avatarUrl = Alfresco.constants.PROXY_URI + metadata.avatar + "?c=queue&ph=true";
+            }
+
+            elCell.innerHTML = '<img class="avatar" src="' + avatarUrl + '" alt="avatar" />';
+         };
+
+         /**
+          * Description/detail custom datacell formatter - compact mode
+          *
+          * @method renderCellDescriptionCompact
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         var renderCellDescriptionCompact = function AuthorityFinder_renderCellDescriptionCompact(elCell, oRecord, oColumn, oData)
+         {
+            var authType = oRecord.getData("authorityType"),
+               metadata = oRecord.getData("metadata"),
+               desc = '';
+            
+            if (authType == "USER")
+            {
+               var userName = oRecord.getData("shortName"),
+                  jobTitle = metadata.jobTitle || "",
+                  organization = metadata.organization || "";
+               
+               desc = '<h3 class="itemname"><a href=' + Alfresco.AuthorityFinder.generateUserProfileLink(userName) + ' class="theme-color-1">' + $html(oRecord.getData("displayName")) + '</a> <span class="lighter">(' + $html(userName) + ')</span></h3>';
+               if (jobTitle.length > 0)
+               {
+                  desc += '<div class="detail">' + $html(jobTitle) + '</div>';
+               }
+               if (organization.length > 0)
+               {
+                  desc += '<div class="detail">&nbsp;(' + $html(organization) + ')</div>';
+               }
+            }
+            else if (authType == "GROUP")
+            {
+               desc = '<h3 class="itemname">' + $html(oRecord.getData("displayName")) + ' <span class="lighter">(' + $html(oRecord.getData("fullName")) + ')</span></h3>';
+            }
+            elCell.innerHTML = desc;
          };
 
          /**
@@ -346,15 +436,35 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderCellDescription = function GroupFinder_renderCellDescription(elCell, oRecord, oColumn, oData)
+         var renderCellDescription = function AuthorityFinder_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            var desc = '<h3 class="itemname">' + $html(oRecord.getData("displayName")) + '</h3>';
-            if (me.options.viewMode !== Alfresco.GroupFinder.VIEW_MODE_COMPACT)
+            var authType = oRecord.getData("authorityType"),
+               metadata = oRecord.getData("metadata"),
+               desc = '';
+            
+            if (authType == "USER")
             {
+               var userName = oRecord.getData("shortName"),
+                  jobTitle = metadata.jobTitle || "",
+                  organization = metadata.organization || "";
+               
+               desc = '<h3 class="itemname"><a href=' + Alfresco.AuthorityFinder.generateUserProfileLink(userName) + ' class="theme-color-1">' + $html(oRecord.getData("displayName")) + '</a> <span class="lighter">(' + $html(userName) + ')</span></h3>';
+               if (jobTitle.length > 0)
+               {
+                  desc += '<div class="detail"><span>' + me.msg("label.title") + ":</span> " + $html(jobTitle) + '</div>';
+               }
+               if (organization.length > 0)
+               {
+                  desc += '<div class="detail"><span>' + me.msg("label.company") + ":</span> " + $html(organization) + '</div>';
+               }
+            }
+            else if (authType == "GROUP")
+            {
+               desc = '<h3 class="itemname">' + $html(oRecord.getData("displayName")) + '</h3>';
                desc += '<div class="detail"><span>' + me.msg("label.name") + ":</span> " + $html(oRecord.getData("fullName")) + '</div>';
                desc += '<div class="detail">';
-               desc += '<span class="item"><span>' + me.msg("label.users") + ":</span> " + $html(oRecord.getData("userCount")) + '</span>';
-               desc += '<span class="item"><span>' + me.msg("label.subgroups") + ":</span> " + $html(oRecord.getData("groupCount")) + '</span>';
+               desc += '<span class="item"><span>' + me.msg("label.users") + ":</span> " + $html(metadata.userCount) + '</span>';
+               desc += '<span class="item"><span>' + me.msg("label.subgroups") + ":</span> " + $html(metadata.groupCount) + '</span>';
                desc += '</div>';
             }
             elCell.innerHTML = desc;
@@ -369,11 +479,11 @@
           * @param oColumn {object}
           * @param oData {object|string}
           */
-         var renderCellAddButton = function GroupFinder_renderCellAddButton(elCell, oRecord, oColumn, oData)
+         var renderCellAddButton = function AuthorityFinder_renderCellAddButton(elCell, oRecord, oColumn, oData)
          {
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "text-align", "right");
-            
+
             var domId = Alfresco.util.generateDomId(),
                desc = '<span id="' + domId + '"></span>',
                itemName = oRecord.getData("fullName");
@@ -381,7 +491,7 @@
             elCell.innerHTML = desc;
             
             // create button if require - it is not required in the fullpage view mode
-            if (me.options.viewMode !== Alfresco.GroupFinder.VIEW_MODE_FULLPAGE)
+            if (me.options.viewMode !== Alfresco.AuthorityFinder.VIEW_MODE_FULLPAGE)
             {
                var button = new YAHOO.widget.Button(
                {
@@ -407,12 +517,13 @@
          };
 
          // DataTable column defintions
-         var columnDefinitions =
-         [
-            { key: "icon", label: "Icon", sortable: false, formatter: renderCellIcon, width: this.options.viewMode == Alfresco.GroupFinder.VIEW_MODE_COMPACT ? 36 : 70 },
-            { key: "description", label: "Description", sortable: false, formatter: renderCellDescription },
-            { key: "actions", label: "Actions", sortable: false, formatter: renderCellAddButton, width: 80 }
-         ];
+         var isCompact = this.options.viewMode == Alfresco.AuthorityFinder.VIEW_MODE_COMPACT,
+            columnDefinitions =
+            [
+               { key: "authorityType", label: "Icon", sortable: false, formatter: renderCellIcon, width: (isCompact ? 36 : 70) },
+               { key: "fullName", label: "Description", sortable: false, formatter: (isCompact ? renderCellDescriptionCompact : renderCellDescription) },
+               { key: "actions", label: "Actions", sortable: false, formatter: renderCellAddButton, width: 80 }
+            ];
 
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
@@ -422,7 +533,7 @@
             MSG_EMPTY: this.msg("message.instructions")
          });
 
-         this.widgets.dataTable.doBeforeLoadData = function GroupFinder_doBeforeLoadData(sRequest, oResponse, oPayload)
+         this.widgets.dataTable.doBeforeLoadData = function AuthorityFinder_doBeforeLoadData(sRequest, oResponse, oPayload)
          {
             if (oResponse.results)
             {
@@ -439,7 +550,7 @@
       /**
        * Public function to clear the results DataTable
        */
-      clearResults: function GroupFinder_clearResults()
+      clearResults: function AuthorityFinder_clearResults()
       {
          // Clear results DataTable
          if (this.widgets.dataTable)
@@ -465,12 +576,13 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onItemSelect: function GroupFinder_onItemSelect(event, p_obj)
+      onItemSelect: function AuthorityFinder_onItemSelect(event, p_obj)
       {
          // Fire the personSelected bubble event
          YAHOO.Bubbling.fire("itemSelected",
          {
             itemName: p_obj.getData("fullName"),
+            shortName: p_obj.getData("shortName"),
             displayName: p_obj.getData("displayName")
          });
       },
@@ -482,7 +594,7 @@
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onSearchClick: function GroupFinder_onSearchClick(e, p_obj)
+      onSearchClick: function AuthorityFinder_onSearchClick(e, p_obj)
       {
          var searchTerm = Dom.get(this.id + "-search-text").value;
          if (searchTerm.length < this.options.minSearchTermLength)
@@ -511,7 +623,7 @@
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onItemSelected: function GroupFinder_onItemSelected(layer, args)
+      onItemSelected: function AuthorityFinder_onItemSelected(layer, args)
       {
          var obj = args[1];
          // Should be person details in the arguments
@@ -547,7 +659,7 @@
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onItemDeselected: function GroupFinder_onItemDeselected(layer, args)
+      onItemDeselected: function AuthorityFinder_onItemDeselected(layer, args)
       {
          var obj = args[1];
          // Should be item details in the arguments
@@ -585,11 +697,11 @@
        * @method _setDefaultDataTableErrors
        * @param dataTable {object} Instance of the DataTable
        */
-      _setDefaultDataTableErrors: function GroupFinder__setDefaultDataTableErrors(dataTable)
+      _setDefaultDataTableErrors: function AuthorityFinder__setDefaultDataTableErrors(dataTable)
       {
          var msg = Alfresco.util.message;
-         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.GroupFinder"));
-         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.GroupFinder"));
+         dataTable.set("MSG_EMPTY", msg("message.empty", "Alfresco.AuthorityFinder"));
+         dataTable.set("MSG_ERROR", msg("message.error", "Alfresco.AuthorityFinder"));
       },
       
       /**
@@ -598,7 +710,7 @@
        * @method _performSearch
        * @param searchTerm {string} Search term from input field
        */
-      _performSearch: function GroupFinder__performSearch(searchTerm)
+      _performSearch: function AuthorityFinder__performSearch(searchTerm)
       {
          // Reset the custom error messages
          this._setDefaultDataTableErrors(this.widgets.dataTable);
@@ -610,13 +722,13 @@
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
          this.widgets.dataTable.render();
          
-         var successHandler = function GroupFinder__pS_successHandler(sRequest, oResponse, oPayload)
+         var successHandler = function AuthorityFinder__pS_successHandler(sRequest, oResponse, oPayload)
          {
             this._setDefaultDataTableErrors(this.widgets.dataTable);
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          };
          
-         var failureHandler = function GroupFinder__pS_failureHandler(sRequest, oResponse)
+         var failureHandler = function AuthorityFinder__pS_failureHandler(sRequest, oResponse)
          {
             if (oResponse.status == 401)
             {
@@ -653,9 +765,9 @@
        * @method _buildSearchParams
        * @param searchTerm {string} Search terms to query
        */
-      _buildSearchParams: function GroupFinder__buildSearchParams(searchTerm)
+      _buildSearchParams: function AuthorityFinder__buildSearchParams(searchTerm)
       {
-         return "shortNameFilter=" + (this.options.wildcardPrefix ? "*" : "") + encodeURIComponent(searchTerm);
+         return "filter=" + (this.options.wildcardPrefix ? "*" : "") + encodeURIComponent(searchTerm);
       }
    });
 })();

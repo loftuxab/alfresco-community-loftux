@@ -617,15 +617,31 @@ Alfresco.util.encodeHTML.div.appendChild(Alfresco.util.encodeHTML.text);
  */
 Alfresco.util.activateLinks = function(text)
 {
-   var re = new RegExp(/(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&:\/~\+#]*[\w\-\@?\^=%&\/~\+#])?/g);
-   if (re.test(text))
-   {
-      var matches = text.match(re);
-      for (var i = 0, j = matches.length; i < j; i++)
-      {
-         text = text.replace(matches[i], '<a href=' + matches[i] + ' target="_blank">' + matches[i] + '</a>');
-      }
-   }
+   var re = new RegExp(/((http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?\^=%&:\/~\+#]*[\w\-\@?\^=%&\/~\+#])?)/g);
+   text = text.replace(re, "<a href=\"$1\" target=\"_blank\">$1</a>");
+   return text;
+};
+
+/**
+ * Convert a plaintext Tweet into HTML with detected links parsed and "activated"
+ *
+ * @method Alfresco.util.tweetToHTML
+ * @param text {string} The plaintext Tweet
+ * @return {string} HTML string
+ */
+Alfresco.util.tweetToHTML = function(text)
+{
+   // URLs
+   text = Alfresco.util.activateLinks(text);
+   
+   // User links
+   var re = new RegExp(/(^|[^\w])@([\w]{1,})/g);
+   text = text.replace(re, "$1<a href=\"http://twitter.com/$2\">@$2</a>");
+
+   // Hash tags
+   re = new RegExp(/#+([\w]{1,})/g);
+   text = text.replace(re, "<a href=\"http://search.twitter.com/search?q=%23$1\">#$1</a>");
+
    return text;
 };
 
@@ -785,9 +801,9 @@ Alfresco.util.generateDomId = function(p_el, p_prefix)
 
    if (p_el)
    {
-      if (p_el.id)
+      if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8)
       {
-         // MSIE-safe method
+         // MSIE 6 & 7-safe method
          p_el.attributes["id"].value = domId;
       }
       else
@@ -1366,8 +1382,8 @@ Alfresco.util.uriTemplate = function(templateId, obj, absolute)
       return null;
    }
    
-   var uri = "";
-   var template = Alfresco.constants.URI_TEMPLATES[templateId];
+   var uri = "",
+      template = Alfresco.constants.URI_TEMPLATES[templateId];
    
    // Page context end with trailing "/", so remove any leading one from the URI template
    if (template.charAt(0) == "/")
