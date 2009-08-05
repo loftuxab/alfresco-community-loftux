@@ -129,27 +129,7 @@
                
                // update the currently selected item context e.g. "record"
                parent.currentType = itemType;
-               
-               // clear the list of meta-data items
-               var elPropList = Dom.get(parent.id + "-property-list");
-               elPropList.innerHTML = "";
-               
-               // reset widget references
-               this.propDeleteButtons = {};
-               this.propEditButtons = {};
-               
-               // perform ajax call to get the custom props for the object type
-               Alfresco.util.Ajax.request(
-               {
-                  method: Alfresco.util.Ajax.GET,
-                  url: Alfresco.constants.PROXY_URI + "api/rma/admin/custompropertydefinitions?element=" + itemType,
-                  successCallback:
-                  {
-                     fn: this.onCustomPropertiesLoaded,
-                     scope: this
-                  },
-                  failureMessage: parent._msg("message.getpropertiesfail")
-               });
+               this.onUpdate();
             };
             var listEls = Dom.getChildren(Dom.get(parent.id + "-object-list"));
             for (var i=0; i<listEls.length; i++)
@@ -317,6 +297,26 @@
           */
          onUpdate: function onUpdate()
          {
+            // clear the list of meta-data items
+            var elPropList = Dom.get(parent.id + "-property-list");
+            elPropList.innerHTML = "";
+            
+            // reset widget references
+            this.propDeleteButtons = {};
+            this.propEditButtons = {};
+            
+            // perform ajax call to get the custom props for the object type
+            Alfresco.util.Ajax.request(
+            {
+               method: Alfresco.util.Ajax.GET,
+               url: Alfresco.constants.PROXY_URI + "api/rma/admin/custompropertydefinitions?element=" + parent.currentType,
+               successCallback:
+               {
+                  fn: this.onCustomPropertiesLoaded,
+                  scope: this
+               },
+               failureMessage: parent._msg("message.getpropertiesfail")
+            });
          },
          
          /**
@@ -343,6 +343,8 @@
       
       YAHOO.extend(CreatePanelHandler, Alfresco.ConsolePanelHandler,
       {
+         createForm: null,
+         
          /**
           * onLoad ConsolePanel event handler
           * 
@@ -364,6 +366,7 @@
             
             // Initialise the form
             form.init();
+            this.createForm = form;
             
             // additional events
             Event.on(parent.id + "-create-type", "change", this.onCreateTypeChanged, null, this);
@@ -383,6 +386,7 @@
             Dom.get(parent.id + "-create-use-list").disabled = false;
             Dom.get(parent.id + "-create-mandatory").checked = false;
             Dom.get(parent.id + "-create-list").selectedIndex = 0;
+            this.createForm.updateSubmitElements();
          },
          
          /**
@@ -413,6 +417,55 @@
           */
          onClickCreateProperty: function onClickCreateProperty(e, obj)
          {
+            var label = Dom.get(parent.id + "-create-label").value;
+            var dataType = Dom.get(parent.id + "-create-type").value;
+            
+            // TODO: add mandatory field support
+            // TODO: add list of values selection (constraint)
+            // TODO: how to generate the model property name?
+            
+            var obj =
+            {
+               name: "rmc:" + label.replace(/\s/g, "").toLowerCase(),
+               dataType: dataType,
+               title: label
+            };
+            
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/rma/admin/custompropertydefinitions?element=" + parent.currentType,
+               method: Alfresco.util.Ajax.POST,
+               dataObj: obj,
+               requestContentType: Alfresco.util.Ajax.JSON,
+               successCallback:
+               {
+                  fn: function(res)
+                  {
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: parent._msg("message.create-success")
+                     });
+                     
+                     // refresh the view panel to display the new property
+                     parent.showPanel("view");
+                     parent.updateCurrentPanel();
+                  },
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: function(res)
+                  {
+                     var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: this._msg("message.failure"),
+                        text: this._msg("message.create-failure", json.message)
+                     });
+                  },
+                  scope: this
+               }
+            });
          },
          
          /**
@@ -458,7 +511,7 @@
       },
       
       /**
-       * Current selected item type. e.g. record
+       * Current selected item type. e.g. "record"
        * 
        * @property currentType
        * @type string
