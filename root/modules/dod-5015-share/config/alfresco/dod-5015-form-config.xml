@@ -95,6 +95,7 @@
                <hide id="cm:creator" />
                <hide id="cm:modified" />
                <hide id="cm:modifier" />
+               <hide id="cm:owner" />
                <hide id="cm:accessed" />
                <hide id="cm:contains" />
             </field-visibility>
@@ -120,6 +121,7 @@
                <hide id="cm:creator" />
                <hide id="cm:modified" />
                <hide id="cm:modifier" />
+               <hide id="cm:owner" />
                <hide id="cm:accessed" />
                <hide id="cm:contains" />
                <hide id="rma:dispositionSchedule" />
@@ -148,6 +150,7 @@
                <hide id="cm:creator" />
                <hide id="cm:modified" />
                <hide id="cm:modifier" />
+               <hide id="cm:owner" />
                <hide id="cm:accessed" />
                <hide id="cm:contains" />
                <hide id="rma:isClosed" />
