@@ -5,12 +5,6 @@
       <forms>
          <form>
             <field-visibility>
-               <!-- 
-               <show id="cm:name" />
-               <show id="cm:title" />
-               <show id="cm:description" />
-               <show id="rma:identifier" />
-               -->
                <hide id="sys:node-uuid" />
                <hide id="sys:store-protocol" />
                <hide id="sys:store-identifier" />
@@ -31,14 +25,6 @@
       <forms>
          <form>
             <field-visibility>
-               <!-- 
-               <show id="cm:name" />
-               <show id="cm:title" />
-               <show id="cm:description" />
-               <show id="rma:identifier" />
-               <show id="rma:reviewPeriod" />
-               <show id="rma:vitalRecordIndicator" />
-               -->
                <hide id="sys:node-uuid" />
                <hide id="sys:store-protocol" />
                <hide id="sys:store-identifier" />
@@ -60,14 +46,6 @@
       <forms>
          <form>
             <field-visibility>
-               <!--
-               <show id="cm:name" />
-               <show id="cm:title" />
-               <show id="cm:description" />
-               <show id="rma:identifier" />
-               <show id="rma:location" />
-               <show id="rma:supplementalMarkingList" />
-               -->
                <hide id="sys:node-uuid" />
                <hide id="sys:store-protocol" />
                <hide id="sys:store-identifier" />
@@ -109,12 +87,6 @@
       <forms>
          <form>
             <field-visibility>
-               <!--
-               <show id="cm:name" />
-               <show id="cm:title" />
-               <show id="cm:description" />
-               <show id="rma:identifier" />
-               -->
                <hide id="sys:node-uuid" />
                <hide id="sys:store-protocol" />
                <hide id="sys:store-identifier" />
@@ -126,6 +98,12 @@
                <hide id="cm:accessed" />
                <hide id="cm:contains" />
             </field-visibility>
+            <appearance>
+               <set id="rm" />
+               <set id="rm-custom" />
+               
+               <field id="rma:identifier" set="rm" />
+            </appearance>
          </form>
       </forms>
    </config>
@@ -134,14 +112,6 @@
       <forms>
          <form>
             <field-visibility>
-               <!-- 
-               <show id="cm:name" />
-               <show id="cm:title" />
-               <show id="cm:description" />
-               <show id="rma:identifier" />
-               <show id="rma:reviewPeriod" />
-               <show id="rma:vitalRecordIndicator" />
-               -->
                <hide id="sys:node-uuid" />
                <hide id="sys:store-protocol" />
                <hide id="sys:store-identifier" />
@@ -153,8 +123,15 @@
                <hide id="cm:accessed" />
                <hide id="cm:contains" />
                <hide id="rma:dispositionSchedule" />
-               
             </field-visibility>
+            <appearance>
+               <set id="rm" />
+               <set id="rm-custom" />
+               
+               <field id="rma:vitalRecordIndicator" set="rm" />
+               <field id="rma:reviewPeriod" set="rm" />
+               <field id="rma:identifier" set="rm" />
+            </appearance>
          </form>
       </forms>
    </config>
@@ -163,14 +140,6 @@
       <forms>
          <form>
             <field-visibility>
-               <!--
-               <show id="cm:name" />
-               <show id="cm:title" />
-               <show id="cm:description" />
-               <show id="rma:identifier" />
-               <show id="rma:location" />
-               <show id="rma:supplementalMarkingList" />
-               -->
                <hide id="sys:node-uuid" />
                <hide id="sys:store-protocol" />
                <hide id="sys:store-identifier" />
@@ -184,10 +153,17 @@
                <hide id="rma:isClosed" />
                <hide id="rma:nextDispositionAction" />
                <hide id="rma:dispositionActionHistory" />
-               <!-- NOTE: not sure why these are even on a record folder! -->
-               <hide id="rma:reviewPeriod" />
-               <hide id="rma:vitalRecordIndicator" />
             </field-visibility>
+            <appearance>
+               <set id="rm" />
+               <set id="rm-custom" />
+                
+               <field id="rma:vitalRecordIndicator" set="rm" />
+               <field id="rma:reviewPeriod" set="rm" />
+               <field id="rma:identifier" set="rm" />
+               <field id="rma:location" set="rm" />
+               <field id="rma:supplementalMarkingList" set="rm" />
+            </appearance>
          </form>
       </forms>
    </config>

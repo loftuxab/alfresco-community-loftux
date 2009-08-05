@@ -37,7 +37,7 @@ public interface RecordsManagementModel
 	public static String RM_URI = "http://www.alfresco.org/model/recordsmanagement/1.0";
 	public static String DOD_URI ="http://www.alfresco.org/model/dod5015/1.0";
 	public static String RM_PREFIX = "rma";
-	public static String DOD_PREFIX = "dod";
+	public static String RM_CUSTOM_PREFIX = "rmc";
     
     // Model
     public static QName RM_MODEL = QName.createQName(RM_URI, "recordsmanagement");
