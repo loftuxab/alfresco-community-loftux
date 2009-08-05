@@ -9,10 +9,8 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminSer
 import org.alfresco.repo.forms.FieldDefinition;
 import org.alfresco.repo.forms.Form;
 import org.alfresco.repo.forms.FormData;
-import org.alfresco.repo.forms.PropertyFieldDefinition;
 import org.alfresco.repo.forms.processor.AbstractFilter;
-import org.alfresco.repo.forms.processor.node.NodeFormProcessor;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.repo.forms.processor.node.ContentModelFormProcessor;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.namespace.NamespaceService;
@@ -116,7 +114,10 @@ public class RecordsManagementTypeFormFilter extends AbstractFilter implements D
                                 typeName.toPrefixString(this.namespaceService));
                 
                 // setup field definition for each custom property
-                generateCustomRMPropertyFields(form, customProps);
+                for (PropertyDefinition property : customProps.values())
+                {
+                    ContentModelFormProcessor.generatePropertyField(property, null, form, this.namespaceService);
+                }
             }
         }
     }
@@ -144,47 +145,5 @@ public class RecordsManagementTypeFormFilter extends AbstractFilter implements D
     public void beforePersist(Object item, FormData data)
     {
         // ignored
-    }
-    
-    /**
-     * Generates a field definition for each custom property and adds them to the form.
-     * 
-     * @param form The Form to add the fields to
-     * @param customProps The Map of custom properties to add
-     */
-    protected void generateCustomRMPropertyFields(Form form, Map<QName, PropertyDefinition> customProps)
-    {
-        for (PropertyDefinition property : customProps.values())
-        {
-            // define property
-            String propName = property.getName().toPrefixString(namespaceService);
-            String[] nameParts = QName.splitPrefixedQName(propName);
-            DataTypeDefinition dataType = property.getDataType();
-            PropertyFieldDefinition fieldDef = new PropertyFieldDefinition(
-                        propName, dataType.getName().toPrefixString(
-                        this.namespaceService));
-            
-            String title = property.getTitle();
-            if (title == null)
-            {
-                title = propName;
-            }
-            fieldDef.setLabel(title);
-            fieldDef.setDefaultValue(property.getDefaultValue());
-            fieldDef.setDescription(property.getDescription());
-            fieldDef.setMandatory(property.isMandatory());
-            fieldDef.setProtectedField(property.isProtected());
-            fieldDef.setRepeating(property.isMultiValued());
-            
-            // define the data key name and set
-            String dataKeyName = NodeFormProcessor.PROP_DATA_PREFIX + nameParts[0] + 
-                                 NodeFormProcessor.DATA_KEY_SEPARATOR + nameParts[1];
-            fieldDef.setDataKeyName(dataKeyName);
-            
-            // TODO: setup constraints (probably only list of values) for the property
-            
-            // add the field definition to the form
-            form.addFieldDefinition(fieldDef);
-        }
     }
 }

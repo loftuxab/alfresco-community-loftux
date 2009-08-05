@@ -680,14 +680,16 @@ function getFieldsSetMembership(mode, formModel, formConfig)
       if (formConfig.isFieldHiddenInMode(fieldName, mode) == false)
       {
          // if its visible determine its set membership
-         fieldConfig = fields[fieldName];
-         if (fieldConfig != null)
+         set = "";
+         if (typeof fieldsFromServer[idx].group !== "undefined")
+         {
+            set = fieldsFromServer[idx].group;
+         }
+         
+         fieldConfig = fields[fieldName]; 
+         if (fieldConfig != null && fieldConfig.set !== "")
          {
             set = fieldConfig.set;
-         }
-         else
-         {
-            set = "";
          }
          
          // get the array for the set and add the field to it
