@@ -30,6 +30,7 @@ import java.util.List;
 
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
+import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
@@ -591,7 +592,7 @@ public abstract class AbstractCapability implements Capability
 
     public boolean isRecordCategory(QName type)
     {
-        return voter.getDictionaryService().isSubClass(type, RecordsManagementModel.TYPE_RECORD_CATEGORY);
+        return voter.getDictionaryService().isSubClass(type, DOD5015Model.TYPE_RECORD_CATEGORY);
     }
 
     public boolean isCutoff(NodeRef nodeRef)

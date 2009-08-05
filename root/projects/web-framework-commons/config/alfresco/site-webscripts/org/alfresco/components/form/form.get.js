@@ -319,8 +319,8 @@ function createPostBody(itemKind, itemId, visibleFields, formConfig)
    
    if (visibleFields !== null)
    {
-      // TODO: find a way to return/make a native JS array, for now
-      //       convert the Java List to a JS array checking force as we go
+      // create list of fields to show and a list of
+      // those fields to 'force'
       var postBodyFields = [];
       var postBodyForcedFields = [];
       var fieldId = null;

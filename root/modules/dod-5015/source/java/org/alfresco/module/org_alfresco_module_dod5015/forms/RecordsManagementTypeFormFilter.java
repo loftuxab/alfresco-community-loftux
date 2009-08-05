@@ -1,19 +1,11 @@
 package org.alfresco.module.org_alfresco_module_dod5015.forms;
 
 import java.util.List;
-import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
-import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.repo.forms.FieldDefinition;
 import org.alfresco.repo.forms.Form;
-import org.alfresco.repo.forms.FormData;
-import org.alfresco.repo.forms.processor.AbstractFilter;
-import org.alfresco.repo.forms.processor.node.ContentModelFormProcessor;
-import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.GUID;
 import org.apache.commons.logging.Log;
@@ -30,33 +22,10 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Gavin Cornwell
  */
-public class RecordsManagementTypeFormFilter extends AbstractFilter implements DOD5015Model
+public class RecordsManagementTypeFormFilter extends RecordsManagementFormFilter
 {
     /** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementTypeFormFilter.class);
-    
-    protected NamespaceService namespaceService;
-    protected RecordsManagementAdminService rmAdminService;
-    
-    /**
-     * Sets the NamespaceService instance
-     * 
-     * @param namespaceService The NamespaceService instance
-     */
-    public void setNamespaceService(NamespaceService namespaceService)
-    {
-        this.namespaceService = namespaceService;
-    }
-    
-    /**
-     * Sets the RecordsManagementAdminService instance
-     * 
-     * @param rmAdminService The RecordsManagementAdminService instance
-     */
-    public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
-    {
-        this.rmAdminService = rmAdminService;
-    }
     
     /*
      * @see org.alfresco.repo.forms.processor.Filter#afterGenerate(java.lang.Object, java.util.List, java.util.List, org.alfresco.repo.forms.Form)
@@ -90,60 +59,18 @@ public class RecordsManagementTypeFormFilter extends AbstractFilter implements D
             // add any custom properties for the type being created (we don't need to deal with
             // the record type in here as records are typically uploaded and then their metadata
             // edited after the fact)
-            CustomisableRmElement rmTypeCustomAspect = null;
             if (TYPE_RECORD_SERIES.equals(typeName))
             {
-                rmTypeCustomAspect = CustomisableRmElement.RECORD_SERIES;
+                addCustomRMProperties(CustomisableRmElement.RECORD_SERIES, form);
             }
             else if (TYPE_RECORD_CATEGORY.equals(typeName))
             {
-                rmTypeCustomAspect = CustomisableRmElement.RECORD_CATEGORY;
+                addCustomRMProperties(CustomisableRmElement.RECORD_CATEGORY, form);
             }
             else if (TYPE_RECORD_FOLDER.equals(typeName))
             {
-                rmTypeCustomAspect = CustomisableRmElement.RECORD_FOLDER;
-            }
-            
-            if (rmTypeCustomAspect != null)
-            {
-                Map<QName, PropertyDefinition> customProps = this.rmAdminService.getAvailableCustomProperties(
-                            rmTypeCustomAspect);
-            
-                if (logger.isDebugEnabled())
-                    logger.debug("Found " + customProps.size() + " custom property for " + 
-                                typeName.toPrefixString(this.namespaceService));
-                
-                // setup field definition for each custom property
-                for (PropertyDefinition property : customProps.values())
-                {
-                    ContentModelFormProcessor.generatePropertyField(property, null, form, this.namespaceService);
-                }
+                addCustomRMProperties(CustomisableRmElement.RECORD_FOLDER, form);
             }
         }
-    }
-
-    /*
-     * @see org.alfresco.repo.forms.processor.Filter#afterPersist(java.lang.Object, org.alfresco.repo.forms.FormData, java.lang.Object)
-     */
-    public void afterPersist(Object item, FormData data, Object persistedObject)
-    {
-        // ignored
-    }
-
-    /*
-     * @see org.alfresco.repo.forms.processor.Filter#beforeGenerate(java.lang.Object, java.util.List, java.util.List, org.alfresco.repo.forms.Form)
-     */
-    public void beforeGenerate(Object item, List<String> fields, List<String> forcedFields,
-                Form form)
-    {
-        // ignored
-    }
-
-    /*
-     * @see org.alfresco.repo.forms.processor.Filter#beforePersist(java.lang.Object, org.alfresco.repo.forms.FormData)
-     */
-    public void beforePersist(Object item, FormData data)
-    {
-        // ignored
     }
 }
