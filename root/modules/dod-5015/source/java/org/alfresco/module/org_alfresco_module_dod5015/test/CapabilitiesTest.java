@@ -27,8 +27,10 @@ package org.alfresco.module.org_alfresco_module_dod5015.test;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
@@ -36,6 +38,7 @@ import javax.transaction.UserTransaction;
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
@@ -52,6 +55,8 @@ import org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexer;
 import org.alfresco.repo.search.impl.querymodel.QueryEngine;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.permissions.PermissionReference;
+import org.alfresco.repo.security.permissions.impl.model.PermissionModel;
 import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.ServiceRegistry;
@@ -97,6 +102,8 @@ public class CapabilitiesTest extends TestCase
     private PermissionService permissionService;
 
     private RecordsManagementService recordsManagementService;
+    
+    private PermissionModel permissionModel;
 
     /**
      * @param name
@@ -118,6 +125,7 @@ public class CapabilitiesTest extends TestCase
         transactionService = (TransactionService) ctx.getBean("transactionComponent");
         importerService = (ImporterService) ctx.getBean("ImporterService");
         permissionService = (PermissionService) ctx.getBean("permissionService");
+        permissionModel = (PermissionModel) ctx.getBean("permissionsModelDAO");
         
         recordsManagementService = (RecordsManagementService)ctx.getBean("RecordsManagementService");
 
@@ -163,6 +171,95 @@ public class CapabilitiesTest extends TestCase
     
     public void testPermissionsModel()
     {
+        Set<PermissionReference> exposed = permissionModel.getExposedPermissions(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT);
+        assertEquals(5, exposed.size());
+        assertTrue(exposed.contains(permissionModel.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, RMPermissionModel.ROLE_ADMINISTRATOR)));
+        
+        Set<PermissionReference> all = permissionModel.getAllPermissions(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT);
+        assertEquals(58*2+5, all.size());
+        
+        checkGranting(RMPermissionModel.ACCESS_AUDIT, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.ADD_MODIFY_EVENT_DATES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER);
+        checkGranting(RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CLOSE_FOLDERS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER);
+        checkGranting(RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER);
+        checkGranting(RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER); 
+        checkGranting(RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER);
+        checkGranting(RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.CYCLE_VITAL_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER);
+        checkGranting(RMPermissionModel.DECLARE_AUDIT_AS_RECORD, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.DECLARE_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER, RMPermissionModel.ROLE_USER);
+        checkGranting(RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER);
+        checkGranting(RMPermissionModel.DELETE_AUDIT, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.DELETE_LINKS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.DELETE_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.DESTROY_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.DISPLAY_RIGHTS_REPORT, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.EDIT_NON_RECORD_METADATA, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER);
+        checkGranting(RMPermissionModel.EDIT_RECORD_METADATA, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER);
+        checkGranting(RMPermissionModel.EDIT_SELECTION_LISTS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.EXPORT_AUDIT, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        // File does not exists
+        //checkGranting(RMPermissionModel.FILE_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.MANAGE_ACCESS_CONTROLS, RMPermissionModel.ROLE_ADMINISTRATOR);
+        checkGranting(RMPermissionModel.MANAGE_ACCESS_RIGHTS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.MAP_EMAIL_METADATA, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.MOVE_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.PASSWORD_CONTROL, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.PLANNING_REVIEW_CYCLES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER);
+        checkGranting(RMPermissionModel.RE_OPEN_FOLDERS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER);
+        checkGranting(RMPermissionModel.SELECT_AUDIT_METADATA, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.TRIGGER_AN_EVENT, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.UNDECLARE_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.UNFREEZE, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.UPDATE_CLASSIFICATION_DATES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER);
+        checkGranting(RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER);
+        checkGranting(RMPermissionModel.UPDATE_TRIGGER_DATES, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        checkGranting(RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER);
+        checkGranting(RMPermissionModel.VIEW_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER, RMPermissionModel.ROLE_SECURITY_OFFICER, RMPermissionModel.ROLE_POWER_USER, RMPermissionModel.ROLE_USER);
+        checkGranting(RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        
+    }
+    
+    private void checkGranting(String permission, String ... roles)
+    {
+        Set<PermissionReference> granting = permissionModel.getGrantingPermissions(permissionModel.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, permission));
+        Set<PermissionReference> test = new HashSet<PermissionReference>();
+        test.addAll(granting);
+        Set<PermissionReference> nonRM = new HashSet<PermissionReference>();
+        for(PermissionReference pr : granting)
+        {
+            if(!pr.getQName().equals(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT))
+            {
+                nonRM.add(pr);
+            }
+        }
+        test.removeAll(nonRM);
+        assertEquals(roles.length + 1, test.size());
+        for(String role : roles)
+        {
+            assertTrue(test.contains(permissionModel.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, role)));
+        }
         
     }
     
@@ -170,9 +267,71 @@ public class CapabilitiesTest extends TestCase
     {
         assertEquals(6, recordsManagementService.getProtectedAspects().size());
         assertEquals(13, recordsManagementService.getProtectedProperties().size());
+        
+        // Test action wire up
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.ACCESS_AUDIT).getActionNames().size());
+        assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.ADD_MODIFY_EVENT_DATES).getActionNames().size());
+        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.AUTHORIZE_ALL_TRANSFERS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CHANGE_OR_DELETE_REFERENCES).getActionNames().size());
+        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.CLOSE_FOLDERS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES).getActionNames().size()); 
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS).getActionNames().size());
+        assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES).getActionNames().size());
+        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS).getActionNames().size());
+        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.CYCLE_VITAL_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DECLARE_AUDIT_AS_RECORD).getActionNames().size());
+        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.DECLARE_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DELETE_AUDIT).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DELETE_LINKS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DELETE_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DESTROY_RECORDS).getActionNames().size());
+        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DISPLAY_RIGHTS_REPORT).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.EDIT_DECLARED_RECORD_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.EDIT_NON_RECORD_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.EDIT_RECORD_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.EDIT_SELECTION_LISTS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.EXPORT_AUDIT).getActionNames().size());
+        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE).getActionNames().size());
+        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.FILE_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MANAGE_ACCESS_CONTROLS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MANAGE_ACCESS_RIGHTS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MAP_EMAIL_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MOVE_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.PASSWORD_CONTROL).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.PLANNING_REVIEW_CYCLES).getActionNames().size());
+        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.RE_OPEN_FOLDERS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.SELECT_AUDIT_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.TRIGGER_AN_EVENT).getActionNames().size());
+        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.UNDECLARE_RECORDS).getActionNames().size());
+        assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.UNFREEZE).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.UPDATE_CLASSIFICATION_DATES).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.UPDATE_TRIGGER_DATES).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.VIEW_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE).getActionNames().size());
+        
     }
     
-    public void testFilePlan_system()
+    public void testFilePlanAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
         assertEquals(59, access.size());
@@ -237,7 +396,7 @@ public class CapabilitiesTest extends TestCase
         
     }
     
-    public void testFilePlan_administrator()
+    public void testFilePlanAsAdministrator()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
         Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
@@ -303,7 +462,7 @@ public class CapabilitiesTest extends TestCase
     }
     
     
-    public void testFilePlan_records_manager()
+    public void testFilePlanAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
         Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
@@ -368,7 +527,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
         
     }
-    public void testFilePlan_security_officer()
+    public void testFilePlanAsSecurityOfficer()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
         Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
@@ -433,7 +592,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
     }
     
-    public void testFilePlan_power_user()
+    public void testFilePlanAsPowerUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
         Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
@@ -498,7 +657,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
     }
     
-    public void testFilePlan_user()
+    public void testFilePlanAsUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
         Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
