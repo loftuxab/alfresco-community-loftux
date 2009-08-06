@@ -458,7 +458,7 @@
       </aspect>
    
       <aspect name="rma:recordComponentIdentifier">
-         <title>Record component identifier</title>         
+         <title>Record component identifier</title>
          <properties>                
             <property name="rma:identifier">
                <title>Record Component Identifier</title>
@@ -612,7 +612,7 @@
          <title>Vital Record</title>         
          <properties>                
             <property name="rma:reviewAsOf">
-               <title>Review as of date</title>
+               <title>Next Review Date</title>
                <type>d:date</type>
                <mandatory>false</mandatory>
             </property>
