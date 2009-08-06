@@ -120,7 +120,9 @@ function getDocuments(site,container,filter,amount)
         doc.type = 'unknown';
       }
       //make valid dom id using docTitle - prob needs fixing for unicode characters
-      doc.domId = doc.displayName.replace(/ /g,'');
+//      doc.domId = doc.displayName.replace(/ /g,'');
+      // mikef Changed to a safe value
+      doc.domId = "_" + doc.nodeRef.id;
       data.items[i]=doc;
     }
 

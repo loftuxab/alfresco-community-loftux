@@ -1,4 +1,4 @@
-(  
+(
   function(){
     Mobile.util.TypeAhead  = (Mobile.util.TypeAhead) || {};
     Mobile.util.TypeAhead = function TypeAhead(config)
@@ -56,7 +56,7 @@
     //         this.selectedItem = null;
     //         this.data = [];
     //         this.currentSearch = '';
-    //         
+    //
     //         this.scroller = new Mobile.thirdparty.iScroll(this.els['content'].first());
     // 
     //         return this;
@@ -204,7 +204,7 @@ Mobile.util.TypeAhead = Mobile.util.extend(Mobile.util.TypeAhead,Mobile.util.UIC
         {
            inputEl.parentNode.appendChild(taEl)
         }
-        else 
+        else
         {
            inputEl.parentNode.insertBefore(taEl,inputEl.nextSibling);           
         }
@@ -214,7 +214,7 @@ Mobile.util.TypeAhead = Mobile.util.extend(Mobile.util.TypeAhead,Mobile.util.UIC
         // this.els['header'] = x$('#'+this.config.id + ' .header');
         this.els['content'] = x$('#'+this.config.id + ' .scrollContent');
         this.els['inputEl'] = x$('#'+inputEl.id);
-        x$('#sw-cancel').on('click',function(e) 
+        x$('#sw-cancel').on('click',function(e)
          { 
            that.onCancel(e);
          }
@@ -304,7 +304,8 @@ Mobile.util.TypeAhead = Mobile.util.extend(Mobile.util.TypeAhead,Mobile.util.UIC
       onSuccess : function onSuccess(data)
       {
         var data = eval ('(' + data + ')');
-        var htmlTemplate = '<li><p><a href="{url}" class="{userName}"><strong>{firstName} {lastName}</strong></a>{jobtitle},{organization}</p></li>';
+        //var htmlTemplate = '<li><p><a href="{url}" class="{userName}"><strong>{firstName} {lastName}</strong></a>{jobtitle},{organization}</p></li>';
+        var htmlTemplate = '<li><p><a href="{url}" class="{userName}"><strong>{firstName} {lastName}</strong></a></p></li>';
         var html = '';
         this.data = [];
         if (data.people.length>0)
@@ -442,8 +443,10 @@ window.addEventListener('DOMContentLoaded',function(){
               var that = this;
               this.ta.on('selected',function(e,args){
                 var userItem = that.ta.getSelectedItem();
+                // Changed to use username
                 x$('.typeAhead.display').first().value = userItem.firstName + ' ' + userItem.lastName;
-                x$('.typeAheadValue').first().value = userItem.username;
+                //x$('.typeAhead.display').first().value = userItem.userName;
+                x$('.typeAheadValue').first().value = userItem.userName;
                 that.ta.deactivate();
                 x$('.typeAheadTrigger').first().focus();
               });

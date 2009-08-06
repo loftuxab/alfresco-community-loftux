@@ -192,13 +192,13 @@ p.toenail {
    left:0;
    color:#000;
 }
-div#RMod ul{
+div#RMod ul, div#My ul, div#All ul{
    border-top:1px solid #999;
 }
-div#RMod .list{
+div#RMod .list, div#My .list,  div#All .list{
    margin:0;
 }
-div#RMod li h2 {
+div#RMod li h2, div#My li h2, div#All li h2{
    display:block;
    margin:0;
    font-weight:bold;

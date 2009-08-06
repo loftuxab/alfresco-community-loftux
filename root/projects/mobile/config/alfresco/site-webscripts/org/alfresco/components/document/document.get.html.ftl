@@ -5,9 +5,11 @@
     <div class="content">
        <div class="panelBar">
             <a class="button" href="${url.context}/p/workflow?nodeRef=${doc.nodeRef}&site=${doc.location.site}">${msg('label.assignWorkflow')}</a>
+            <#-- Not Implemented
             <form action="${url.context}/p/document" method="post">
                <input type="submit" name="delete" value="${msg('Delete')}" id="delete" class="button delete">
             </form>
+            -->
           </div>
           <a class="preview" href="${url.context}/proxy/alfresco/${doc.contentUrl}"><img src="${url.context}/proxy/alfresco/${doc.thumbnailUrl}" /></a>
           <ul class="rr info">

@@ -18,8 +18,8 @@
            var that = this;
            for (var filter in this.elements)
            {
-             this.getData(filter,this.bind(function(e) 
-              { 
+             this.getData(filter,this.bind(function(e)
+              {
                  if (e.srcElement.readyState===4)
                  {
                     that.renderData(filter,eval('(' + e.srcElement.responseText + ')').tasks);
@@ -30,10 +30,10 @@
          },
          getData : function getData(filter,callback)
          {
-
+           //alert("filter: " + filter);
            this.elements[filter].xhr(Mobile.constants.PROXY_URI + 'slingshot/dashlets/my-tasks?filter='+filter.toLowerCase(),{
               callback:callback
-           });            
+           });
          },
          renderData : function renderData(filter,data)
          {
@@ -48,7 +48,7 @@
                   var taskId = o.id.replace('$','-');
                   this.data[filter][taskId] = o;
                   elRef.html('bottom','<li class="tasks"><a id="'+taskId+'" href="#task" class="panelLink">' + o.description +'</a></li>');
-               }  
+               }
             }
             else {
                //remove ul and add no content element
@@ -57,7 +57,7 @@
                p.className='noContent';
                p.innerHTML = 'No Tasks available';
                elRef.first().parentNode.appendChild(p);
-               elRef.first().parentNode.removeChild(elRef.first());               
+               elRef.first().parentNode.removeChild(elRef.first());
             }
          },
          getTask : function getTask(taskId,filter)
@@ -103,7 +103,7 @@
        * Compares specified task object with self. If description, startDate, nodeRef and site attributes match
        * then the two tasks are assumed to be the same.
        * @param t {Task} Task to compare
-       * 
+       *
        * @returns {Boolean} Whether match occurred
        */
       Task.prototype.compare = function compare(t)
@@ -120,7 +120,7 @@
                   )
                   {
                     return true;
-                  }                  
+                  }
                }
          }
          return false;
@@ -130,12 +130,12 @@
        * Normally, user would have to explicitly close the task. Here, we do it automatically. Two Ajax calls are used as
        * performing an action on a task means the task gains a new Id, so we need to get new list of tasks after performing
        * action and then identify new id and then finally close it.
-       * 
+       *
        * @method performAction
-       * 
+       *
        * @param action {String} Task action to perform
        * @param doCloseTask {Boolean} Flag to denote whether to close task
-       * 
+       *
        */
       Task.prototype.performAction = function performAction(action,doCloseTask)
       {
@@ -170,7 +170,7 @@
                      {
                         App.addMessage(msg);
                         Tasks.removeTask(task.oldId,filter);
-                        App.previous();                        
+                        App.previous();
                      }
                      else {
                         //get new tasks for filter and compare (to get new Id).
@@ -184,7 +184,9 @@
                               {
                                  task.oldId = task.id;
                                  task.id = d.id;
-                                 task.performAction(action,true);
+                                 // mikef test
+                                 // task.performAction(action,true);
+                                 task.performAction(action,false);
                                  break;
                               }
                             }
@@ -196,10 +198,10 @@
             }.call(this)
          });
       };
- }() 
+ }()
 );
 
-( 
+(
   function(){
     Mobile.util.TaskPanel = (Mobile.util.TaskPanel) || {};
     Mobile.util.TaskPanel = function TaskPanel(config){
@@ -238,7 +240,7 @@
             }
             contentHTML += '  </div></form>';
 
-            this.elements.removeClass('loading');   
+            this.elements.removeClass('loading');
             this.renderContent(contentHTML);
             var task = this.task;
             x$('#taskForm .button').click(function() {
@@ -264,7 +266,7 @@
 Mobile.util.TaskPanel.BEHAVIOUR_NAME = 'taskPanel';
 App.registerBehaviour(Mobile.util.TaskPanel.BEHAVIOUR_NAME,function(rootNode) {
    var handler = function(e){
-            
+
             var el = e.srcElement;
 
             if (el === document) {
@@ -285,8 +287,8 @@ App.registerBehaviour(Mobile.util.TaskPanel.BEHAVIOUR_NAME,function(rootNode) {
                {
                   parentFilter = parentFilter.parentNode;
                }
-               var panel = App.addPanel(el.id,new Mobile.util.TaskPanel( 
-                   { 
+               var panel = App.addPanel(el.id,new Mobile.util.TaskPanel(
+                   {
                     el : el,
                     id:Mobile.util.Panel.NAME_PREFIX+el.id,
                     title:'Task',
@@ -305,10 +307,10 @@ App.registerBehaviour(Mobile.util.TaskPanel.BEHAVIOUR_NAME,function(rootNode) {
                   panel,
                   App
                 );
-                App.next();               
+                App.next();
             };
             return false;
-          }; 
+          };
       // handle new panels
 
       var containerEl = x$(rootNode);
