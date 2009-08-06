@@ -266,6 +266,7 @@
          {
             // update the current property context
             parent.currentProperty = parent.currentProperties[obj];
+            parent.showPanel("edit");
          },
          
          /**
@@ -279,15 +280,6 @@
          {
             // update the current property context
             parent.currentProperty = parent.currentProperties[obj];
-         },
-         
-         /**
-          * onShow ConsolePanel event handler
-          * 
-          * @method onShow
-          */
-         onShow: function onShow()
-         {
          },
          
          /**
@@ -400,15 +392,6 @@
          },
          
          /**
-          * onUpdate ConsolePanel event handler
-          * 
-          * @method onUpdate
-          */
-         onUpdate: function onUpdate()
-         {
-         },
-         
-         /**
           * Create Property button click handler
           * 
           * @method onClickCreateProperty
@@ -495,21 +478,152 @@
          }
       });
       new CreatePanelHandler();
+      
+      /* Edit Metadata Panel Handler */
+      EditPanelHandler = function EditPanelHandler_constructor()
+      {
+         // Initialise prototype properties
+         
+         EditPanelHandler.superclass.constructor.call(this, "edit");
+      };
+      
+      YAHOO.extend(EditPanelHandler, Alfresco.ConsolePanelHandler,
+      {
+         editForm: null,
+         
+         /**
+          * onLoad ConsolePanel event handler
+          * 
+          * @method onLoad
+          */
+         onLoad: function onLoad()
+         {
+            // Buttons
+            parent.widgets.savepropertyButton = Alfresco.util.createYUIButton(parent, "saveproperty-button", this.onClickSaveProperty);
+            parent.widgets.cancelsavepropertyButton = Alfresco.util.createYUIButton(parent, "cancelsaveproperty-button", this.onClickCancelSaveProperty);
+            
+            // Form definition
+            var form = new Alfresco.forms.Form(parent.id + "-edit-form");
+            form.setSubmitElements(parent.widgets.editpropertyButton);
+            form.setShowSubmitStateDynamically(true);
+            
+            // Form field validation
+            form.addValidation(parent.id + "-edit-label", Alfresco.forms.validation.mandatory, null, "keyup");
+            
+            // Initialise the form
+            form.init();
+            this.editForm = form;
+         },
+         
+         /**
+          * onBeforeShow ConsolePanel event handler
+          * 
+          * @method onBeforeShow
+          */
+         onBeforeShow: function onBeforeShow()
+         {
+            var prop = parent.currentProperty;
+            
+            // title message
+            Dom.get(parent.id + "-edit-metadata-item").innerHTML = prop.title;
+            
+            // apply current property values to form
+            Dom.get(parent.id + "-edit-label").value = prop.title;
+            Dom.get(parent.id + "-edit-type").innerHTML = parent._dataTypeLabel(prop.dataType);
+            // TODO: apply LOV constraints etc.
+            Dom.get(parent.id + "-edit-use-list").checked = false;
+            Dom.get(parent.id + "-edit-use-list").disabled = true;
+            Dom.get(parent.id + "-edit-list").disabled = true;
+            Dom.get(parent.id + "-edit-mandatory").checked = false;
+            Dom.get(parent.id + "-edit-list").selectedIndex = 0;
+            this.editForm.updateSubmitElements();
+         },
+         
+         /**
+          * onShow ConsolePanel event handler
+          * 
+          * @method onShow
+          */
+         onShow: function onShow()
+         {
+            Dom.get(parent.id + "-edit-label").focus();
+         },
+         
+         /**
+          * Save Property button click handler
+          * 
+          * @method onClickSaveProperty
+          * @param e {object} DomEvent
+          * @param obj {object} Object passed back from addListener method
+          */
+         onClickSaveProperty: function onClickSaveProperty(e, obj)
+         {
+            var label = Dom.get(parent.id + "-edit-label").value;
+            
+            // TODO: add mandatory field support
+            // TODO: add list of values selection (constraint)
+            
+            var obj =
+            {
+               name: parent.currentProperty.name,
+               dataType: parent.currentProperty.dataType,
+               title: label
+            };
+            
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/rma/admin/custompropertydefinitions?element=" + parent.currentType,
+               method: Alfresco.util.Ajax.POST,
+               dataObj: obj,
+               requestContentType: Alfresco.util.Ajax.JSON,
+               successCallback:
+               {
+                  fn: function(res)
+                  {
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: parent._msg("message.edit-success")
+                     });
+                     
+                     // refresh the view panel to display the new property
+                     parent.showPanel("view");
+                     parent.updateCurrentPanel();
+                  },
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: function(res)
+                  {
+                     var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: this._msg("message.failure"),
+                        text: this._msg("message.edit-failure", json.message)
+                     });
+                  },
+                  scope: this
+               }
+            });
+         },
+         
+         /**
+          * Cancel Save Property button click handler
+          * 
+          * @method onClickCancelSaveProperty
+          * @param e {object} DomEvent
+          * @param obj {object} Object passed back from addListener method
+          */
+         onClickCancelSaveProperty: function onClickCancelSaveProperty(e, obj)
+         {
+            parent.showPanel("view");
+         }
+      });
+      new EditPanelHandler();
    };
    
    YAHOO.extend(Alfresco.RecordsMetaData, Alfresco.ConsoleTool,
    {
-      /**
-       * Object container for initialization options
-       *
-       * @property options
-       * @type object
-       */
-      options:
-      {
-         
-      },
-      
       /**
        * Current selected item type. e.g. "record"
        * 
@@ -555,60 +669,6 @@
       {
          // Call super-class onReady() method
          Alfresco.RecordsMetaData.superclass.onReady.call(this);
-      },
-      
-      /**
-       * YUI WIDGET EVENT HANDLERS
-       * Handlers for standard events fired from YUI widgets, e.g. "click"
-       */
-      
-      /**
-       * History manager state change event handler (override base class)
-       *
-       * @method onStateChanged
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onStateChanged: function RecordsMetaData_onStateChanged(e, args)
-      {
-         var state = this.decodeHistoryState(args[1].state);
-         
-         // test if panel has actually changed?
-         if (state.panel)
-         {
-            this.showPanel(state.panel);
-         }
-         
-         // TODO: add history state
-      },
-      
-      /**
-       * Encode state object into a packed string for use as url history value.
-       * Override base class.
-       * 
-       * @method encodeHistoryState
-       * @param obj {object} state object
-       * @private
-       */
-      encodeHistoryState: function RecordsMetaData_encodeHistoryState(obj)
-      {
-         // wrap up current state values
-         var stateObj = {};
-         if (this.currentPanelId !== "")
-         {
-            stateObj.panel = this.currentPanelId;
-         }
-         
-         // TODO: add history state
-         
-         // convert to encoded url history state - overwriting with any supplied values
-         var state = "";
-         if (obj.panel || stateObj.panel)
-         {
-            state += "panel=" + encodeURIComponent(obj.panel ? obj.panel : stateObj.panel);
-         }
-         
-         return state;
       },
       
       /**

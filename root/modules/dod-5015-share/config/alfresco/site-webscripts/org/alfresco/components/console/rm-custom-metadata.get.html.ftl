@@ -4,9 +4,7 @@
 <input id="yui-history-field" type="hidden" />
 
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RecordsMetaData("${args.htmlid}").setOptions(
-   {
-   }).setMessages(
+   new Alfresco.RecordsMetaData("${args.htmlid}").setMessages(
       ${messages}
    );
 //]]></script>
@@ -91,8 +89,50 @@
             <span class="yui-button yui-push-button" id="${el}-createproperty-button">
                <span class="first-child"><button>${msg("button.create")}</button></span>
             </span>
-            <!-- Cancel Metadata Property button -->
+            <!-- Cancel Create Metadata Property button -->
             <span class="yui-button yui-push-button" id="${el}-cancelcreateproperty-button">
+               <span class="first-child"><button>${msg("button.cancel")}</button></span>
+            </span>
+         </div>
+      </div>
+      </form>
+   </div>
+   
+   <!-- Edit panel -->
+   <div id="${el}-edit" class="hidden">
+      <div class="title">
+         <span>${msg("label.edit-metadata-title")}:&nbsp;</span>
+         <span id="${el}-edit-metadata-item"></span>
+      </div>
+      
+      <form id="${el}-edit-form">
+      <div class="edit-main">
+         <div class="label-row">
+            <span>${msg("label.label")}:</span>
+         </div>
+         <div class="field-row">
+            <input id="${el}-edit-label" type="text" maxlength="255" />&nbsp;*
+         </div>
+         <div class="label-row">
+            <span>${msg("label.type")}:</span>&nbsp;<span id="${el}-edit-type"></span>
+         </div>
+         <div class="field-row">
+            <input type="checkbox" id="${el}-edit-use-list" /><label for="${el}-edit-use-list">${msg("label.use-list")}:</label>
+            <!-- TODO: generate list of values drop-down-->
+            <select id="${el}-edit-list">
+               <option value="">REGIONS</option>
+            </select>
+         </div>
+         <div class="field-row">
+            <input type="checkbox" id="${el}-edit-mandatory" /><label for="${el}-edit-mandatory">${msg("label.mandatory")}</label>
+         </div>
+         <div class="button-row">
+            <!-- Edit Metadata Property button -->
+            <span class="yui-button yui-push-button" id="${el}-saveproperty-button">
+               <span class="first-child"><button>${msg("button.save")}</button></span>
+            </span>
+            <!-- Cancel Edit Metadata Property button -->
+            <span class="yui-button yui-push-button" id="${el}-cancelsaveproperty-button">
                <span class="first-child"><button>${msg("button.cancel")}</button></span>
             </span>
          </div>
