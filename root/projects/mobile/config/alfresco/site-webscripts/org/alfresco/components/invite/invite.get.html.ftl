@@ -18,12 +18,17 @@
                       <option value="SiteManager">${msg('label.manager')}</option>
                       <option value="SiteCollaborator">${msg('label.collaborator')}</option>
                       <option value="SiteContributer">${msg('label.contributer')}</option>
-                      <option value="SiteConsumer">${msg('label.consumer')}</option>                      
+                      <option value="SiteConsumer">${msg('label.consumer')}</option>
                     </select>
                   <div>
                     <input type="hidden" value="${site}" name="site" /> 
                     <input type="submit" value="${msg('label.invite')}" class="button actionBut"/>
-                    <input type="button" value="${msg('label.cancel')}" class="button"/>
+                    <#--  Changed to used same action as back button
+                    <input type="button" onclick="<#if (backButton??)>${backButton}</#if>" value="${msg('label.cancel')}" class="button"/>
+                    -->
+                    <#if (backButton??)>
+                         <a class="back button">${msg('label.cancel')}</a>
+                    </#if>
                   </div>
                 </form>               
               </div>
@@ -47,7 +52,12 @@
                     <input type="hidden" value="${site}" name="site" /> 
                     <input type="text" id="name" name="name" value="" class="typeAheadValue"/>
                     <input type="submit" value="${msg('label.invite')}" class="button actionBut"/>
+                    <#-- Changed to used same action as back button
                     <input type="button" value="${msg('label.cancel')}" class="button"/>
+                    -->
+                    <#if (backButton??)>
+                         <a class="back button">${msg('label.cancel')}</a>
+                    </#if>
                   </div>
                 </form>
               </div>

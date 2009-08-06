@@ -17,12 +17,17 @@
            <input name="datePicker" id="datePicker" value="${msg('label.pickDueDate')}" type="button" class="datepicker"/>
            <div>
              <input type="submit" value="${msg('label.assign')}" class="button actionBut">
-             <input type="button" value="${msg('label.cancel')}" class="button">                         
+             <#--   Changed to used same action as back button
+             <input type="button" value="${msg('label.cancel')}" class="button">
+             -->
+             <#if (backButton??)>
+               <a class="back button">${msg('label.cancel')}</a>
+             </#if>
            </div>
            <input type="hidden" name="nodeRef" value="${page.url.args.nodeRef}"/>
            <input type="hidden" name="site" value="${page.url.args.site}"/>
            <input type="hidden" name="user" value="" id="user" class="typeAheadValue">
-           <input type="hidden" name="date" value="" id="date">           
+           <input type="hidden" name="date" value="" id="date">
          </form>
     </div>
    </div>

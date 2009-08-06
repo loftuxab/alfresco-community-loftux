@@ -2,5 +2,5 @@
 
 model.recentDocs = getDocuments(page.url.args.site,'documentLibrary','recentlyModified',30).items;
 model.allDocs = getDocuments(page.url.args.site,'documentLibrary','all',30).items;
-model.myDocs = getDocuments(page.url.args.site,'documentLibrary','editingMe',30).items;
+model.myDocs = getDocuments(page.url.args.site,'documentLibrary','favouriteDocuments',30).items;
 model.backButton = true;

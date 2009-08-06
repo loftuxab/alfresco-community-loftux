@@ -4,7 +4,7 @@
 <#if (workflowResult?string='true')>
    var workflowResult = '${msg("label.workflowAssigned")}';
 <#else>
-   var workflowResult = '${msg("label.workflowAssigned")}';
+   var workflowResult = '${msg("label.workflowNotAssigned")}';
 </#if>
 App.addMessage(workflowResult);
 window.addEventListener('DOMContentLoaded',function(){
