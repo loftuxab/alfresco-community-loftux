@@ -53,6 +53,7 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.util.GUID;
 
 /**
  * Records management service implementation
@@ -630,5 +631,21 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     public Set<QName> getProtectedProperties()
     {
        return voter.getProtectedProperties();
+    }
+    
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getNextRecordIdentifier(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public String getNextRecordIdentifier(NodeRef container)
+    {
+        if(nodeService.hasAspect(container, ASPECT_RECORD_COMPONENT_ID))
+        {
+            String parentIdentifier = (String)nodeService.getProperty(container, PROP_IDENTIFIER);  
+            return parentIdentifier + "-" + GUID.generate();
+        }
+        else
+        {
+            return GUID.generate();
+        }
     }
 }

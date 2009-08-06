@@ -197,4 +197,15 @@ public interface RecordsManagementService
      * @return
      */
     Capability getCapability(String name);
+    
+    /**
+     * Suggest the next record identifier
+     * 
+     * Numbers are not neccessarily sequential, there may be gaps in the sequence 
+     * from failed transactions.
+     * 
+     * @param node ref of the container
+     * @return a suggested next record identifier
+     */
+    String getNextRecordIdentifier(NodeRef container);
 }
