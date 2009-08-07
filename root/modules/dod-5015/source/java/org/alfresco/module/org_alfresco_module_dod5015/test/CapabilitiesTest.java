@@ -27,6 +27,8 @@ package org.alfresco.module.org_alfresco_module_dod5015.test;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -42,6 +44,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.DictionaryDAO;
 import org.alfresco.repo.dictionary.DictionaryNamespaceComponent;
 import org.alfresco.repo.dictionary.M2Model;
@@ -61,7 +64,9 @@ import org.alfresco.repo.tenant.TenantService;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -72,6 +77,7 @@ import org.alfresco.service.cmr.view.ImporterBinding;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.cmr.view.ImporterBinding.UUID_BINDING;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
@@ -104,6 +110,20 @@ public class CapabilitiesTest extends TestCase
     private RecordsManagementService recordsManagementService;
     
     private PermissionModel permissionModel;
+    
+    private ContentService contentService;
+
+    private NodeRef recordSeries;
+
+    private NodeRef recordCategory_1;
+
+    private NodeRef recordCategory_2;
+
+    private NodeRef recordFolder_1;
+
+    private NodeRef recordFolder_2;
+
+    private NodeRef record_1;
 
     /**
      * @param name
@@ -126,6 +146,7 @@ public class CapabilitiesTest extends TestCase
         importerService = (ImporterService) ctx.getBean("ImporterService");
         permissionService = (PermissionService) ctx.getBean("permissionService");
         permissionModel = (PermissionModel) ctx.getBean("permissionsModelDAO");
+        contentService = (ContentService)ctx.getBean("contentService");
         
         recordsManagementService = (RecordsManagementService)ctx.getBean("RecordsManagementService");
 
@@ -137,7 +158,14 @@ public class CapabilitiesTest extends TestCase
         rootNodeRef = nodeService.getRootNode(storeRef);
 
         filePlan = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, DOD5015Model.TYPE_FILE_PLAN, DOD5015Model.TYPE_FILE_PLAN).getChildRef();
-
+        recordSeries = createRecordSeries(filePlan, "RS", "RS-1", "Record Series", "My record series");
+        recordCategory_1 = createRecordCategory(recordSeries, "Docs", "101-1", "Docs", "Docs", "week|1", true);
+        recordCategory_2 = createRecordCategory(recordSeries, "More Docs", "101-2", "More Docs", "More Docs", "week|1", true);
+        recordFolder_1 = createRecordFolder(recordCategory_1, "F1", "101-3", "title", "description",  "week|1", true);
+        recordFolder_2 = createRecordFolder(recordCategory_2, "F2", "102-3", "title", "description",  "week|1", true);
+        record_1 = createRecord(recordFolder_1);
+     
+        
         permissionService.setPermission(filePlan, "rm_user", RMPermissionModel.ROLE_USER, true);
         permissionService.setPermission(filePlan, "rm_power_user", RMPermissionModel.ROLE_POWER_USER, true);
         permissionService.setPermission(filePlan, "rm_security_officer", RMPermissionModel.ROLE_SECURITY_OFFICER, true);
@@ -151,8 +179,87 @@ public class CapabilitiesTest extends TestCase
         Location location = new Location(filePlan);
         importerService.importView(viewReader, location, REPLACE_BINDING, null);
         
+        testTX.commit();
+        testTX = transactionService.getUserTransaction();
+        testTX.begin();
+        
+    }
+    
+    private NodeRef createRecord(NodeRef recordFolder)
+    {
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+        NodeRef recordOne = this.nodeService.createNode(recordFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                        ContentModel.TYPE_CONTENT).getChildRef();
+        
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        return recordOne;
     }
 
+    private NodeRef createRecordSeries(NodeRef filePlan, String name, String identifier, String title, String description)
+    {
+        HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+        properties.put(ContentModel.PROP_NAME, name);
+        properties.put(DOD5015Model.PROP_IDENTIFIER, identifier);
+        properties.put(ContentModel.PROP_TITLE, title);
+        properties.put(ContentModel.PROP_DESCRIPTION, description);
+        NodeRef answer = nodeService.createNode(filePlan, ContentModel.ASSOC_CONTAINS, DOD5015Model.TYPE_RECORD_SERIES, DOD5015Model.TYPE_RECORD_SERIES, properties).getChildRef();
+        return answer;
+    }
+    
+    private NodeRef createRecordCategory(NodeRef recordSeries, String name, String identifier, String title, String description, String review, boolean vital)
+    {
+        HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+        properties.put(ContentModel.PROP_NAME, name);
+        properties.put(DOD5015Model.PROP_IDENTIFIER, identifier);
+        properties.put(ContentModel.PROP_TITLE, title);
+        properties.put(ContentModel.PROP_DESCRIPTION, description);
+        properties.put(DOD5015Model.PROP_REVIEW_PERIOD, review);
+        properties.put(DOD5015Model.PROP_VITAL_RECORD_INDICATOR, vital);
+        NodeRef answer = nodeService.createNode(filePlan, ContentModel.ASSOC_CONTAINS, DOD5015Model.TYPE_RECORD_CATEGORY, DOD5015Model.TYPE_RECORD_CATEGORY, properties).getChildRef();
+ 
+        properties = new HashMap<QName, Serializable>();
+        properties.put(DOD5015Model.PROP_DISPOSITION_AUTHORITY, "N1-218-00-4 item 023");
+        properties.put(DOD5015Model.PROP_DISPOSITION_INSTRUCTIONS, "Cut off monthly, hold 1 month, then destroy.");
+        NodeRef ds = nodeService.createNode(answer, DOD5015Model.ASSOC_DISPOSITION_SCHEDULE, DOD5015Model.TYPE_DISPOSITION_SCHEDULE, DOD5015Model.TYPE_DISPOSITION_SCHEDULE, properties).getChildRef();
+        
+        createDispoistionAction(ds, "cutoff", "monthend|1", null);
+        createDispoistionAction(ds, "destroy", "month|1", "{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate");
+        return answer;
+    }
+    
+    private NodeRef createDispoistionAction(NodeRef disposition, String actionName, String period, String periodProperty)
+    {
+        HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+        properties.put(DOD5015Model.PROP_DISPOSITION_ACTION_NAME, actionName);
+        properties.put(DOD5015Model.PROP_DISPOSITION_PERIOD, period);
+        if(periodProperty != null)
+        {
+        properties.put(DOD5015Model.PROP_DISPOSITION_PERIOD_PROPERTY, periodProperty);
+        }
+        NodeRef answer = nodeService.createNode(disposition, DOD5015Model.ASSOC_DISPOSITION_ACTION_DEFINITIONS, DOD5015Model.TYPE_DISPOSITION_ACTION_DEFINITION, DOD5015Model.TYPE_DISPOSITION_ACTION_DEFINITION, properties).getChildRef();
+        return answer;
+    }
+    
+    private NodeRef createRecordFolder(NodeRef recordCategory, String name, String identifier, String title, String description, String review, boolean vital)
+    {
+        HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+        properties.put(ContentModel.PROP_NAME, name);
+        properties.put(DOD5015Model.PROP_IDENTIFIER, identifier);
+        properties.put(ContentModel.PROP_TITLE, title);
+        properties.put(ContentModel.PROP_DESCRIPTION, description);
+        properties.put(DOD5015Model.PROP_REVIEW_PERIOD, review);
+        properties.put(DOD5015Model.PROP_VITAL_RECORD_INDICATOR, vital);
+        NodeRef answer = nodeService.createNode(recordCategory, ContentModel.ASSOC_CONTAINS, DOD5015Model.TYPE_RECORD_FOLDER, DOD5015Model.TYPE_RECORD_FOLDER, properties).getChildRef();
+        return answer;
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -216,7 +323,8 @@ public class CapabilitiesTest extends TestCase
         checkGranting(RMPermissionModel.EXPORT_AUDIT, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
         checkGranting(RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
         // File does not exists
-        //checkGranting(RMPermissionModel.FILE_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
+        // checkGranting(RMPermissionModel.FILE_RECORDS, RMPermissionModel.ROLE_ADMINISTRATOR,
+        // RMPermissionModel.ROLE_RECORDS_MANAGER);
         checkGranting(RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
         checkGranting(RMPermissionModel.MANAGE_ACCESS_CONTROLS, RMPermissionModel.ROLE_ADMINISTRATOR);
         checkGranting(RMPermissionModel.MANAGE_ACCESS_RIGHTS, RMPermissionModel.ROLE_ADMINISTRATOR, RMPermissionModel.ROLE_RECORDS_MANAGER);
@@ -721,6 +829,1570 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
     }
+    
+    public void testRecordSeriesAsSystem()
+    {
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        assertEquals(59, access.size());
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        
+    }
+    
+    public void testRecordSeriesAsAdministrator()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        assertEquals(59, access.size());
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+    }
+    
+    public void testRecordSeriesAsRecordsManager()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        
+    }
+    public void testRecordSeriesAsSecurityOfficer()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+    
+    public void testRecordSeriesAsPowerUser()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+    
+    public void testRecordSeriesAsUser()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+    
+    public void testRecordCategoryAsSystem()
+    {
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        assertEquals(59, access.size());
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        
+    }
+    
+    public void testRecordCategoryAsAdministrator()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        assertEquals(59, access.size());
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+    }
+    
+    public void testRecordCategoryAsRecordsManager()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        
+    }
+    public void testRecordCategoryAsSecurityOfficer()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+    
+    public void testRecordCategoryAsPowerUser()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+    
+    public void testRecordCategoryAsUser()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+
+    public void testRecordFolderAsSystem()
+    {
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        assertEquals(59, access.size());
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        
+    }
+    
+    public void testRecordFolderAsAdministrator()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        assertEquals(59, access.size());
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+    }
+    
+    public void testRecordFolderAsRecordsManager()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        
+    }
+    public void testRecordFolderAsSecurityOfficer()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+    
+    public void testRecordFolderAsPowerUser()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+    
+    public void testRecordFolderAsUser()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+    
+    
+    public void testRecordAsSystem()
+    {
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        assertEquals(59, access.size());
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        
+    }
+    
+    public void testRecordAsAdministrator()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        assertEquals(59, access.size());
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+    }
+    
+    public void testRecordAsRecordsManager()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        
+    }
+    public void testRecordAsSecurityOfficer()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+    
+    public void testRecordAsPowerUser()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+    
+    public void testRecordAsUser()
+    {
+        AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
+        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        assertEquals(59, access.size()); // 58 + File
+        check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DELETE_LINKS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_TRIGGER_DATES, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.DENIED);
+        check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+    }
+
+
+    
     
     private void check(Map<Capability, AccessStatus> access, String name, AccessStatus accessStatus)
     {

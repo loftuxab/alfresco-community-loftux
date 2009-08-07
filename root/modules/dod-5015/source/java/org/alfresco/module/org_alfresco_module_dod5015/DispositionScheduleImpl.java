@@ -77,7 +77,7 @@ public class DispositionScheduleImpl implements DispositionSchedule,
      */
     public String getDispositionInstructions()
     {
-        return (String)this.services.getNodeService().getProperty(this.dispositionDefinitionNodeRef, PROP_DISPOITION_INSTRUCTIONS);
+        return (String)this.services.getNodeService().getProperty(this.dispositionDefinitionNodeRef, PROP_DISPOSITION_INSTRUCTIONS);
     }
 
     /**

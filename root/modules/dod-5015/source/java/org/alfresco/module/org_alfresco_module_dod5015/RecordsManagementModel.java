@@ -56,7 +56,7 @@ public interface RecordsManagementModel
     // Disposition definition type
     public static QName TYPE_DISPOSITION_SCHEDULE = QName.createQName(RM_URI, "dispositionSchedule");
     public static QName PROP_DISPOSITION_AUTHORITY = QName.createQName(RM_URI, "dispositionAuthority");
-    public static QName PROP_DISPOITION_INSTRUCTIONS = QName.createQName(RM_URI, "dispositionInstructions");
+    public static QName PROP_DISPOSITION_INSTRUCTIONS = QName.createQName(RM_URI, "dispositionInstructions");
     public static QName PROP_RECORD_LEVEL_DISPOSITION = QName.createQName(RM_URI, "recordLevelDisposition");
     public static QName ASSOC_DISPOSITION_ACTION_DEFINITIONS = QName.createQName(RM_URI, "dispositionActionDefinitions");    
     
