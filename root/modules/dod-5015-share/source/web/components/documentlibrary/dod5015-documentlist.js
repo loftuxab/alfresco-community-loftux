@@ -1169,6 +1169,17 @@
       {
          this._dod5015Action("message.unfreeze", row, "unfreeze");
       },
+      
+      /**
+       * Split email record action.
+       *
+       * @method onActionSplitEmail
+       * @param row {object} DataTable row representing file to be actioned
+       */
+      onActionSplitEmail: function DL_onActionSplitEmail(row)
+      {
+         this._dod5015Action("message.split-email", row, "splitEmail");
+      },
 
 
       /**

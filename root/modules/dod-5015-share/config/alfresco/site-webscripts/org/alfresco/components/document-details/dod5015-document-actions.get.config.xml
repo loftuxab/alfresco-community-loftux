@@ -18,6 +18,7 @@
          <action id="onActionDeclare" permission="declare" type="action-link" label="actions.declare" />
          <action id="onActionUploadNewVersion" permission="HIDDEN" type="action-link" label="actions.upload-new-version" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
+         <action id="onActionSplitEmail" permission="edit" type="action-link" label="actions.split-email" />
       </actionSet>
 
       <actionSet id="nonElectronicRecord">
