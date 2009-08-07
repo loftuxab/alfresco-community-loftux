@@ -757,9 +757,76 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	}
 
 	
-	public void testDispositionLifecycle_0412_01() throws Exception
+	public void testDispositionLifecycle_0430_01_recordleveldisposition() throws Exception
     {
-	    
+	    NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Civilian Files", "Employee Performance File System Records");    
+        assertNotNull(recordCategory);
+        assertEquals("Employee Performance File System Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+        
+        NodeRef recordFolder = createRecordFolder(recordCategory, "My Record Folder");
+        
+        setComplete();
+        endTransaction();
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        NodeRef recordOne = createRecord(recordFolder, "one.txt");
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        declareRecord(recordOne);
+        
+        // Check the disposition action
+        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
+        assertFalse(this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+        
+        // Check the dispostion action
+        DispositionAction da = rmService.getNextDispositionAction(recordOne);
+        assertNotNull(da);
+        assertEquals("cutoff", da.getDispositionActionDefinition().getName());
+        assertNull(da.getAsOfDate());
+        assertFalse((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        assertEquals(true, da.getDispositionActionDefinition().eligibleOnFirstCompleteEvent());
+        List<EventCompletionDetails> events = da.getEventCompletionDetails();
+        assertNotNull(events);
+        assertEquals(1, events.size());
+        EventCompletionDetails event = events.get(0);
+        
+        Map<String, Serializable> params = new HashMap<String, Serializable>(3);
+        params.put(CompleteEventAction.PARAM_EVENT_NAME, event.getEventName());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
+        
+        this.rmActionService.executeRecordsManagementAction(recordOne, "completeEvent", params);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        assertTrue((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        
+        // Do the commit action
+        this.rmActionService.executeRecordsManagementAction(recordOne, "cutoff", null);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Check events are gone
+        da = rmService.getNextDispositionAction(recordOne);
+        
+        assertNotNull(da);
+        assertEquals("destroy", da.getDispositionActionDefinition().getName());
+        assertNotNull(da.getAsOfDate());
+        assertFalse((Boolean)this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        events = da.getEventCompletionDetails();
+        assertNotNull(events);
+        assertEquals(0, events.size());
+        
+        txn.commit();
     }
 	
 	public void testDispositionLifecycle_0412_03_eventtest() throws Exception

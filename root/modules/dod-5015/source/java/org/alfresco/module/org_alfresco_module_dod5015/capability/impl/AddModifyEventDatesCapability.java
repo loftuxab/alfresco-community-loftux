@@ -50,7 +50,7 @@ public class AddModifyEventDatesCapability extends AbstractCapability
         {
             if (checkFilingUnfrozenUncutoff(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (isRecordFolder(voter.getNodeService().getType(nodeRef)))
+                if (isRecordFolder(voter.getNodeService().getType(nodeRef)) || isRecord(nodeRef))
                 {
                     if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.ADD_MODIFY_EVENT_DATES) == AccessStatus.ALLOWED)
                     {
