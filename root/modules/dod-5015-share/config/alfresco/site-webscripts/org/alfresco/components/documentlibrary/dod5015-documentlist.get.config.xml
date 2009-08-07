@@ -56,6 +56,7 @@
          <action id="onActionMoveTo" type="action-link" permission="delete" label="actions.move-to" />
          <action id="onActionFileTo" type="action-link" permission="" label="actions.file-to" />
          <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
+         <action id="onActionSplitEmail" permission="edit" type="action-link" label="actions.split-email" />
       </actionSet>
 
       <actionSet id="nonElectronicRecord">

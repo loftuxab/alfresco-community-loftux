@@ -564,6 +564,15 @@
         <property name="capability" ref="rmAddModifyEventDatesCapability"/>
     </bean>    
     
+    <!-- Split Email -->
+    <bean id="splitEmail" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.SplitEmailAction" parent="rmAction" >
+    </bean>  
+    
+    <bean id="splitEmail_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="splitEmail"/>
+        </property>
+    </bean>
     
     <!-- Actions to create DOD 5015 custom types -->
     
