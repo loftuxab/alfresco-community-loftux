@@ -1,4 +1,4 @@
-<#include "common/utils.inc.ftl" />
+<#include "/org/alfresco/components/form/controls/common/utils.inc.ftl" />
 <#if field.control.params.size?exists><#assign size=field.control.params.size><#else><#assign size=5></#if>
 
 <div class="form-field">
