@@ -42,11 +42,11 @@ function main()
          {
             var action = actions[i];
             var p = action.period ? action.period.split("|") : [];
-            var periodYear = p.length > 0 ? p[0] : null;
+            var periodUnit = p.length > 0 ? p[0] : null;
             var periodAmount = p.length > 1 ? p[1] : null;
-            if(periodYear && periodAmount)
+            if(periodUnit && periodAmount)
             {
-               action.title = msg.get("label.title.complex", [action.label, periodAmount, periodYear]);
+               action.title = msg.get("label.title.complex", [action.label, periodAmount, periodUnit]);
             }
             else
             {

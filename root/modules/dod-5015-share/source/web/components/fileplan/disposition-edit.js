@@ -195,12 +195,13 @@
          Dom.getElementsByClassName("no", "div", actionEl)[0].innerHTML = action.index + 1;
 
          // Description
-         Dom.getElementsByClassName("description", "textarea", actionEl)[0].value = action.description;
+         Dom.getElementsByClassName("description", "textarea", actionEl)[0].value = action.description ? action.description : "";
 
          // Action
          var actionType = action.name,
             actionTypeSelect = Dom.getElementsByClassName("action-type", "select", actionEl)[0];
-         Alfresco.util.setSelectedIndex(actionTypeSelect, actionType);
+         var actionTitle = Alfresco.util.setSelectedIndex(actionTypeSelect, actionType);
+         actionTitle = actionTitle ? actionTitle : actionType; 
 
          // Period Unit
          var periodUnit = (period && period.length > 0) ? period[0] : null,
@@ -288,14 +289,7 @@
          }
 
          // Title
-         if (action.title)
-         {
-            this._setTitle(action.title, actionEl);
-         }
-         else
-         {
-            this._refreshTitle(actionEl);
-         }
+         this._refreshTitle(actionEl, actionTitle);
 
          return actionEl;
       },
@@ -467,18 +461,6 @@
       },
 
       /**
-       * Set the title header
-       *
-       * @method _setTitle
-       * @param title The title to use
-       * @param actionEl The action HTMLElement
-       */
-      _setTitle: function DispositionEdit__setTitle(title, actionEl)
-      {
-         Dom.getElementsByClassName("title", "div", actionEl)[0].innerHTML = title;
-      },
-
-      /**
        * Mandatory period amount validation. Delegates validation to forms runtime.
        *
        * @param field {object} The element representing the field the validation is for
@@ -533,29 +515,33 @@
        *
        * @method _refreshTitle
        * @param actionEl The action HTML element
+       * @param actionType (optional) Will use the text from the action drop down if not given
        */
-      _refreshTitle: function DispositionEdit__refreshTitle(actionEl)
+      _refreshTitle: function DispositionEdit__refreshTitle(actionEl, actionType)
       {
-         var actionTypeSelect = Dom.getElementsByClassName("action-type", "select", actionEl)[0];
-         var periodUnitSelect = Dom.getElementsByClassName("period-unit", "select", actionEl)[0];
-         var periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
-         var title = "";
+         var actionTypeSelect = Dom.getElementsByClassName("action-type", "select", actionEl)[0],
+               periodUnitSelect = Dom.getElementsByClassName("period-unit", "select", actionEl)[0],
+               periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
+         alert(actionType ? actionType : "listvalue"); 
+         var title = "",
+               actionType = actionType ? actionType : actionTypeSelect.options[actionTypeSelect.selectedIndex].text;
          if (!periodAmountEl.disabled)
          {
             title = this.msg(
-               "label.title.complex",
-               actionTypeSelect.options[actionTypeSelect.selectedIndex].text,
-               periodAmountEl.value,
-               periodUnitSelect.options[periodUnitSelect.selectedIndex].text);
+                  "label.title.complex",
+                  actionType,
+                  periodAmountEl.value,
+                  periodUnitSelect.options[periodUnitSelect.selectedIndex].text);
          }
          else
          {
             title = this.msg(
-               "label.title.simple",
-               actionTypeSelect.options[actionTypeSelect.selectedIndex].text);
+                  "label.title.simple",
+                  actionType
+                  );
          }
 
-         this._setTitle(title, actionEl);
+         Dom.getElementsByClassName("title", "div", actionEl)[0].innerHTML = title;         
       },
 
       /**
