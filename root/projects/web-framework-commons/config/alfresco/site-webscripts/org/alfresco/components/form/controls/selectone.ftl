@@ -1,4 +1,4 @@
-<#include "common/utils.inc.ftl" />
+<#include "/org/alfresco/components/form/controls/common/utils.inc.ftl" />
 <div class="form-field">
    <#if form.mode == "view">
       <div class="viewmode-field">
