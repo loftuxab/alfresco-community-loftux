@@ -295,13 +295,24 @@
          }
          
          var tagName, elem;
-         // generate inputs for the selected tags
-         for (x = 0, xx = this.currentTags.length; x < xx; x++)
+         if (this.currentTags.length > 0)
          {
-            tagName = this.currentTags[x];
+            // generate inputs for the selected tags
+            for (x = 0, xx = this.currentTags.length; x < xx; x++)
+            {
+               tagName = this.currentTags[x];
+               elem = document.createElement('input');
+               elem.setAttribute('name', fullFieldName);
+               elem.setAttribute('value', tagName);
+               elem.setAttribute('type', 'hidden');
+               formElem.appendChild(elem);
+            }
+         }
+         else
+         {
             elem = document.createElement('input');
-            elem.setAttribute('name', fullFieldName);
-            elem.setAttribute('value', tagName);
+            elem.setAttribute('name', tagsFieldName);
+            elem.setAttribute('value', '');
             elem.setAttribute('type', 'hidden');
             formElem.appendChild(elem);
          }

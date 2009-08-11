@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -39,8 +39,7 @@
     */
    Alfresco.FolderDetails = function FolderDetails_constructor()
    {
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["editor"], this.onComponentsLoaded, this);
+      Alfresco.FolderDetails.superclass.constructor.call(this, null, "Alfresco.FolderDetails", ["editor"]);
       
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("metadataRefresh", this.onReady, this);
@@ -50,7 +49,7 @@
       return this;
    };
    
-   Alfresco.FolderDetails.prototype =
+   YAHOO.extend(Alfresco.FolderDetails, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -60,6 +59,12 @@
        */
       options:
       {
+         /**
+          * nodeRef of folder being viewed
+          * 
+          * @property nodeRef
+          * @type string
+          */
          nodeRef: null,
          
          /**
@@ -72,29 +77,17 @@
       },
 
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setOptions: function FolderDetails_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        *
+       * @override
        * @method onComponentsLoaded
        */
       onComponentsLoaded: function FolderDetails_onComponentsLoaded()
       {
          YAHOO.util.Event.onDOMReady(this.onReady, this, true);
       },
-   
+
       /**
        * Fired by YUI when parent element is available for scripting.
        * Template initialisation, including instantiation of YUI widgets and event listener binding.
@@ -116,7 +109,6 @@
             failureMessage: "Failed to load data for folder details"
          };
          Alfresco.util.Ajax.request(config);
-         
       },
       
       /**
@@ -130,28 +122,23 @@
          {
             var folderData = response.json.items[0];
             
-            // fire event to inform any listening components that the data is ready
+            // Fire event to inform any listening components that the data is ready
             YAHOO.Bubbling.fire("folderDetailsAvailable", folderData);
             
-            // fire event to show comments for folder
-            var itemUrl = YAHOO.lang.substitute("site/{site}/folder-details?nodeRef={nodeRef}",
-            {
-               site: this.options.siteId,
-               nodeRef: this.options.nodeRef
-            });
+            // Fire event to show comments for folder
             var eventData =
             { 
-               nodeRef: this.options.nodeRef,
+               nodeRef: folderData.nodeRef,
                title: folderData.displayName,
                page: "folder-details",
                pageParams:
                {
                   nodeRef: this.options.nodeRef
                }
-            }
+            };
             
             YAHOO.Bubbling.fire("setCommentedNode", eventData);
          }
       }
-   };
+   });
 })();

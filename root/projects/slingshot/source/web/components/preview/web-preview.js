@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,7 +23,6 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-
 /**
  * WebPreview component. 
  *
@@ -36,12 +35,8 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-         Event = YAHOO.util.Event;
-
-   /**
-    * Alfresco Slingshot aliases
-    */
-   var $msg = function(){};
+      Event = YAHOO.util.Event,
+      Element = YAHOO.util.Element;
 
    /**
     * WebPreview constructor.
@@ -53,22 +48,15 @@
     */
    Alfresco.WebPreview = function(containerId)
    {
-      this.name = "Alfresco.WebPreview";
-      this.id = containerId;      
+      Alfresco.WebPreview.superclass.constructor.call(this, "Alfresco.WebPreview", containerId, ["button", "container", "datatable", "datasource", "uploader"]);
 
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      // Load uploader so we get access to swfobject
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "uploader"], this.onComponentsLoaded, this);
-
-      this.widgets = {};
-
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("metadataRefresh", this.onReady, this);
+      
       return this;
    };
 
-   Alfresco.WebPreview.prototype =
+   YAHOO.extend(Alfresco.WebPreview, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -121,41 +109,6 @@
       },
 
       /**
-       * Object container for storing YUI widget instances.
-       *
-       * @property widgets
-       * @type object
-       */
-       widgets: null,
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Preview} returns 'this' for method chaining
-       */
-      setOptions: function WP_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Preview} returns 'this' for method chaining
-       */
-      setMessages: function WP_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         $msg = this._msg;
-         return this;
-      },
-
-      /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        *
@@ -163,13 +116,42 @@
        */
       onComponentsLoaded: function WP_onComponentsLoaded()
       {
+         /**
+          * SWFObject patch
+          * Ensures all flashvars are URI encoded
+          */
+         YAHOO.deconcept.SWFObject.prototype.getVariablePairs = function()
+         {
+       		var variablePairs = [],
+       		   key,
+       		   variables = this.getVariables();
+       		
+       		for (key in variables)
+       		{
+       			if (variables.hasOwnProperty(key))
+       			{
+       				variablePairs[variablePairs.length] = key + "=" + encodeURIComponent(variables[key]);
+       			}
+       		}
+       		return variablePairs;
+       	};
+         
+         Event.onContentReady(this.id, this.onReady, this, true);
+      },
+
+      /**
+       * Fired by YUI when parent element is available for scripting
+       * @method onReady
+       */
+      onReady: function WP_onReady()
+      {
          // Save a reference to the HTMLElement displaying texts so we can alter the texts later
          this.widgets.swfPlayerMessage = Dom.get(this.id + "-swfPlayerMessage-div");
          this.widgets.titleText = Dom.get(this.id + "-title-span");
          this.widgets.titleImg = Dom.get(this.id + "-title-img");
 
          // Set title and icon         
-         this.widgets.titleText["innerHTML"] = this.options.name;
+         this.widgets.titleText.innerHTML = this.options.name;
          this.widgets.titleImg.src = Alfresco.constants.URL_CONTEXT + this.options.icon.substring(1);
 
          // nodeRef is mandatory
@@ -192,15 +174,15 @@
                so.addVariable("paging", previewCtx.paging);
                so.addVariable("url", previewCtx.url);
                so.addVariable("jsCallback", "Alfresco.util.ComponentManager.get('" + this.id + "').onWebPreviewerEvent");
-               so.addVariable("i18n_actualSize", $msg("preview.actualSize"));
-               so.addVariable("i18n_fitPage", $msg("preview.fitPage"));
-               so.addVariable("i18n_fitWidth", $msg("preview.fitWidth"));
-               so.addVariable("i18n_fitHeight", $msg("preview.fitHeight"));
-               so.addVariable("i18n_fullscreen", $msg("preview.fullscreen"));
-               so.addVariable("i18n_fullwindow", $msg("preview.fullwindow"));
-               so.addVariable("i18n_fullwindow_escape", $msg("preview.fullwindowEscape"));
-               so.addVariable("i18n_page", $msg("preview.page"));
-               so.addVariable("i18n_pageOf", $msg("preview.pageOf"));               
+               so.addVariable("i18n_actualSize", this.msg("preview.actualSize"));
+               so.addVariable("i18n_fitPage", this.msg("preview.fitPage"));
+               so.addVariable("i18n_fitWidth", this.msg("preview.fitWidth"));
+               so.addVariable("i18n_fitHeight", this.msg("preview.fitHeight"));
+               so.addVariable("i18n_fullscreen", this.msg("preview.fullscreen"));
+               so.addVariable("i18n_fullwindow", this.msg("preview.fullwindow"));
+               so.addVariable("i18n_fullwindow_escape", this.msg("preview.fullwindowEscape"));
+               so.addVariable("i18n_page", this.msg("preview.page"));
+               so.addVariable("i18n_pageOf", this.msg("preview.pageOf"));               
                so.addVariable("show_fullscreen_button", true);
                so.addVariable("show_fullwindow_button", true);
                so.addParam("allowScriptAccess", "sameDomain");
@@ -211,21 +193,21 @@
                 * To support full window mode an extra div is created with absolute positioning
                 * This is to make sure the flash move is on top of all other divs.
                 */               
-               var realSwfDiv = document.createElement("div");
+               var realSwfDiv = document.createElement("div"),
+                  realSwfDivEl = new Element(realSwfDiv);
                
-               var realSwfDivEl = new YAHOO.util.Element(realSwfDiv);
                realSwfDivEl.set("id", this.id + "-real-swf-div");
                realSwfDivEl.setStyle("position", "absolute");
                this.widgets.realSwfDivEl = realSwfDivEl;
 
                // Place the new div on top of the "shadow-sfw-div" that is there to occupy the space the previewer needs
-               this.widgets.shadowSfwDivEl = new YAHOO.util.Element(shadowSfwDivId);
+               this.widgets.shadowSfwDivEl = new Element(shadowSfwDivId);
                this._positionOver(this.widgets.realSwfDivEl, this.widgets.shadowSfwDivEl);
 
                // Add the new div to the dom
                this.widgets.realSwfDivEl.appendTo(document.body);
 
-               // Finally create the flash web preview o’n the new div
+               // Finally create the flash web preview in the new div
                so.write(realSwfDivEl.get("id"));
 
                /**
@@ -236,27 +218,24 @@
                 */
                Event.addListener(swfId, "mouseover", function(e)
                {
-                  YAHOO.util.Dom.get(swfId).setMode("active");
+                  Dom.get(swfId).setMode("active");
                });
                Event.addListener(swfId, "mouseout", function(e)
                {
-                  YAHOO.util.Dom.get(swfId).setMode("inactive");
+                  Dom.get(swfId).setMode("inactive");
                });
- 
-                              
             }
             else
             {
                // Can't find a preview
                var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "/" + encodeURIComponent(this.options.name) + "?a=true";
-               this.widgets.swfPlayerMessage["innerHTML"] = $msg("label.noPreview", url);
+               this.widgets.swfPlayerMessage.innerHTML = this.msg("label.noPreview", url);
             }
          }
          else
          {
             // No sufficient flash player installed
-            var message = $msg("label.noFlash");
-            this.widgets.swfPlayerMessage["innerHTML"] = message;
+            this.widgets.swfPlayerMessage.innerHTML = this.msg("label.noFlash");
          }
       },
 
@@ -268,11 +247,12 @@
        */
       _resolvePreview: function WP__resolvePreview(event)
       {
-         var ps = this.options.previews;
-         var webpreview = "webpreview", imgpreview = "imgpreview";
-         var nodeRefAsLink = this.options.nodeRef.replace(":/", "");
-         var argsNoCache = "?c=force&noCacheToken=" + new Date().getTime();
-         var preview, url;
+         var ps = this.options.previews,
+            webpreview = "webpreview", imgpreview = "imgpreview",
+            nodeRefAsLink = this.options.nodeRef.replace(":/", ""),
+            argsNoCache = "?c=force&noCacheToken=" + new Date().getTime(),
+            preview, url;
+         
          if (this.options.mimeType.match(/^image\/\w+/))
          {
             /* Matched an image mimetype */
@@ -295,7 +275,7 @@
          else
          {
             preview = Alfresco.util.arrayContains(ps, webpreview) ? webpreview : (Alfresco.util.arrayContains(ps, imgpreview) ? imgpreview : null);
-            if (preview != null)
+            if (preview !== null)
             {
                url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content/thumbnails/" + preview + argsNoCache;
                return (
@@ -311,13 +291,11 @@
       /**
        * Called from the WebPreviewer when an event or error is dispatched.
        *
-       *
        * @method onWebPreviewerEvent
        * @param event {object} an WebPreview message
        */
       onWebPreviewerEvent: function WP_onWebPreviewerEvent(event)
       {
-         var swfTag = Dom.get("WebPreviewer_" + this.id);
          if (event.event)
          {
             if (event.event.type == "onFullWindowClick")
@@ -333,12 +311,13 @@
                this._positionOver(this.widgets.realSwfDivEl, this.widgets.shadowSfwDivEl);
             }
          }
-         else if(event.error) {
+         else if (event.error)
+         {
             // Inform the user about the failure
             var message = "Error";
             if (event.error.code)
             {
-               message = $msg("error." + event.error.code);
+               message = this.msg("error." + event.error.code);
             }
             Alfresco.util.PopupManager.displayMessage(
             {
@@ -352,12 +331,13 @@
                nodeRef: this.showConfig.nodeRef,
                failureUrl: this.showConfig.failureUrl
             });
-
          }
       },
 
       /**
+       * Positions the one element over another
        *
+       * @method _positionOver
        * @param event
        */
       _positionOver: function WP__positionOver(positionedYuiEl, sourceYuiEl)
@@ -367,21 +347,6 @@
          positionedYuiEl.setStyle("top", region.top + "px");
          positionedYuiEl.setStyle("width", region.width + "px");
          positionedYuiEl.setStyle("height", region.height + "px");
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function WP__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.WebPreview", Array.prototype.slice.call(arguments).slice(1));
       }
-
-   };
-
+   });
 })();

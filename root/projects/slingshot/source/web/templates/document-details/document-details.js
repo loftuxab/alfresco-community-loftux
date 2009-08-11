@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -39,17 +39,17 @@
     */
    Alfresco.DocumentDetails = function DocumentDetails_constructor()
    {
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["editor"], this.onComponentsLoaded, this);
+      Alfresco.DocumentDetails.superclass.constructor.call(this, null, "Alfresco.DocumentDetails", ["editor"]);
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("metadataRefresh", this.onReady, this);
       YAHOO.Bubbling.on("filesPermissionsUpdated", this.onReady, this);
+      YAHOO.Bubbling.on("filesMoved", this.onReady, this);
             
       return this;
    };
    
-   Alfresco.DocumentDetails.prototype =
+   YAHOO.extend(Alfresco.DocumentDetails, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -59,6 +59,12 @@
        */
       options:
       {
+         /**
+          * nodeRef of document being viewed
+          * 
+          * @property nodeRef
+          * @type string
+          */
          nodeRef: null,
          
          /**
@@ -71,29 +77,17 @@
       },
 
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setOptions: function DocumentDetails_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        *
+       * @override
        * @method onComponentsLoaded
        */
       onComponentsLoaded: function DocumentDetails_onComponentsLoaded()
       {
          YAHOO.util.Event.onDOMReady(this.onReady, this, true);
       },
-   
+
       /**
        * Fired by YUI when parent element is available for scripting.
        * Template initialisation, including instantiation of YUI widgets and event listener binding.
@@ -115,7 +109,6 @@
             failureMessage: "Failed to load data for document details"
          };
          Alfresco.util.Ajax.request(config);
-         
       },
       
       /**
@@ -129,28 +122,23 @@
          {
             var docData = response.json.items[0];
             
-            // fire event to inform any listening components that the data is ready
+            // Fire event to inform any listening components that the data is ready
             YAHOO.Bubbling.fire("documentDetailsAvailable", docData);
             
-            // fire event to show comments for document
-            var itemUrl = YAHOO.lang.substitute("site/{site}/document-details?nodeRef={nodeRef}",
-            {
-               site: this.options.siteId,
-               nodeRef: this.options.nodeRef
-            });
+            // Fire event to show comments for document
             var eventData =
             { 
-               nodeRef: this.options.nodeRef,
+               nodeRef: docData.nodeRef,
                title: docData.displayName,
                page: "document-details",
                pageParams:
                {
                   nodeRef: this.options.nodeRef
                }
-            }
+            };
             
             YAHOO.Bubbling.fire("setCommentedNode", eventData);
          }
       }
-   };
+   });
 })();

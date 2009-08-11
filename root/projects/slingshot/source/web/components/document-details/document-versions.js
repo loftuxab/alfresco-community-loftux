@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -46,19 +46,15 @@
     */
    Alfresco.DocumentVersions = function DV_constructor(htmlId)
    {
-      this.name = "Alfresco.DocumentVersions";
-      this.id = htmlId;
+      Alfresco.DocumentVersions.superclass.constructor.call(this, "Alfresco.DocumentVersions", htmlId, ["button", "container"]);
 
-      // Register this component
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("metadataRefresh", this.onMetadataRefresh, this);
 
       return this;
    }
 
-   Alfresco.DocumentVersions.prototype =
+   YAHOO.extend(Alfresco.DocumentVersions, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -95,43 +91,6 @@
           * @type {string}
           */
          filename: null         
-      },
-
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.DocumentList} returns 'this' for method chaining
-       */
-      setOptions: function DV_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocumentVersions} returns 'this' for method chaining
-       */
-      setMessages: function DV_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DV_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
       },
 
       /**
@@ -216,7 +175,41 @@
          });
 
          window.location.reload();
+      },
+      
+      /**
+       * Event handler called when the "metadataRefresh" event is received
+       */
+      onMetadataRefresh: function DV_onMetadataRefresh(layer, args)
+      {
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.URL_SERVICECONTEXT + "components/document-details/document-versions",
+            dataObj:
+            {
+               htmlid: this.id,
+               nodeRef: this.options.nodeRef
+            },
+            successCallback:
+            {
+               fn: this.onTemplateLoaded,
+               scope: this
+            },
+            execScripts: true
+         });
+      },
+      
+      /**
+       * Event callback when this component has been reloaded via AJAX call
+       *
+       * @method onTemplateLoaded
+       * @param response {object} Server response from load template XHR request
+       */
+      onTemplateLoaded: function AmSD_onTemplateLoaded(response)
+      {
+         // Inject the template from the XHR request into a new DIV element
+         var containerDiv = Dom.get(this.id + "-body").parentNode;
+         containerDiv.innerHTML = response.serverResponse.responseText;
       }
-
-   };
+   });
 })();

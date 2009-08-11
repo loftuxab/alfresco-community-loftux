@@ -10,7 +10,7 @@
 
 <div id="${args.htmlid}-body" class="document-actions">
 
-   <div class="heading">${msg("document-actions.heading")}</div>
+   <div class="heading">${msg("heading")}</div>
 
    <div class="doclist">
       <div id="${args.htmlid}-actionSet-document" class="action-set ${type}">

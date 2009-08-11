@@ -10,7 +10,7 @@
 
 <div id="${args.htmlid}-body" class="folder-actions">
 
-   <div class="heading">${msg("folder-actions.heading")}</div>
+   <div class="heading">${msg("heading")}</div>
 
    <div class="doclist">
 <#list actionSets?keys as key>

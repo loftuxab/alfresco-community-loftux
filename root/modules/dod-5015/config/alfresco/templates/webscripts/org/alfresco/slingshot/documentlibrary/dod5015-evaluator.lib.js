@@ -234,7 +234,7 @@ function runEvaluator(asset, assetType)
          {
             permissions.push("freeze");
          }
-         permissions.push("undeclare");
+         permissions.push("UndeclareRecords");
          break;
 
 
@@ -243,7 +243,7 @@ function runEvaluator(asset, assetType)
        */
       case "undeclared-record":
          actionSet = "undeclaredRecord";
-         permissions.push("declare");
+         permissions.push("DeclareRecords");
          break;
 
       /**

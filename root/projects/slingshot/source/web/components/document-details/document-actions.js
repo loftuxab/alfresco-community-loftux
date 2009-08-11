@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -53,29 +53,28 @@
     */
    Alfresco.DocumentActions = function(htmlId)
    {
-      this.name = "Alfresco.DocumentActions";
-      this.id = htmlId;
+      Alfresco.DocumentActions.superclass.constructor.call(this, "Alfresco.DocumentActions", htmlId, ["button"]);
       
-      // initialise prototype properties
-      this.widgets = {};
-      this.modules = {};
-      this.docData = null;
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button"], this.onComponentsLoaded, this);
-   
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
-      YAHOO.Bubbling.on("fileRenamed", this.onDetailsEdited, this);
-      YAHOO.Bubbling.on("folderRenamed", this.onDetailsEdited, this);
       
       return this;
-   }
+   };
+
+   /**
+    * Extend Alfresco.component.Base
+    */
+   YAHOO.extend(Alfresco.DocumentActions, Alfresco.component.Base);
    
-   Alfresco.DocumentActions.prototype =
+   /**
+    * Augment prototype with Actions module
+    */
+   YAHOO.lang.augmentProto(Alfresco.DocumentActions, Alfresco.doclib.Actions);
+
+   /**
+    * Augment prototype with main class implementation, ensuring overwrite is enabled
+    */
+   YAHOO.lang.augmentObject(Alfresco.DocumentActions.prototype,
    {
       /**
        * Object container for initialization options
@@ -104,111 +103,72 @@
       },
       
       /**
-       * Object container for storing YUI widget instances.
+       * The data for the document
        * 
-       * @property widgets
+       * @property assetData
        * @type object
        */
-       widgets: {},
-       
+      assetData: null,
+      
       /**
-       * Object container for storing YUI widget instances.
+       * Path of asset being viewed - used to scope some actions (e.g. copy to, move to)
        * 
-       * @property widgets
-       * @type object
+       * @property currentPath
+       * @type string
        */
-       modules: {},
+      currentPath: null,
        
-       /**
-        * The data for the document
-        * 
-        * @property docData
-        * @type object
-        */
-       docData: null,
-       
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setOptions: function SiteMembers_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setMessages: function DocumentActions_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DocumentActions_onComponentsLoaded()
-      {
-         // do nothing
-      },
-      
       /**
        * Event handler called when the "documentDetailsAvailable" event is received
        */
       onDocumentDetailsAvailable: function DocumentActions_onDocumentDetailsAvailable(layer, args)
       {
-         // reference to self
          var me = this;
          
-         // remember the data for the document
-         this.docData = args[1];
+         // Asset data passed-in through event arguments
+         this.assetData = args[1];
+         this.currentPath = this.assetData.location.path;
          
-         // update the href for the download link
-         var url = Alfresco.constants.PROXY_URI + this.docData.contentUrl;
-         try
-         {
-            Dom.get(this.id + "-download-action").href = url + "?a=true";
-         }
-         catch (e)
-         {
-            // Action must be missing
-         }
+         /* TODO: Make this generic using actionUrls (see documentmentlist.js) */
+            // Set the href for the download link
+            var url = Alfresco.constants.PROXY_URI + this.assetData.contentUrl;
+            try
+            {
+               Dom.get(this.id + "-download-action").href = url + "?a=true";
+            }
+            catch (e)
+            {
+               // Action must be missing
+            }
          
-         // update the href for the edit metadata link
-         var metadataUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
-            "/edit-metadata?nodeRef=" + this.docData.nodeRef;
-         try
-         {
-            Dom.get(this.id + "-edit-metadata-action").href = metadataUrl;
-         }
-         catch (e)
-         {
-            // Action must be missing
-         }
+            // Set the href for the edit metadata link
+            var metadataUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + this.assetData.nodeRef;
+            try
+            {
+               Dom.get(this.id + "-edit-metadata-action").href = metadataUrl;
+            }
+            catch (e)
+            {
+               // Action must be missing
+            }
+         /* End TODO */
          
          var actionsContainer = Dom.get(this.id + "-actionSet-document");
-         if (this.docData.permissions && this.docData.permissions.userAccess)
+         
+         /**
+          * Hide actions which have been disallowed through permissions
+          */
+         if (this.assetData.permissions && this.assetData.permissions.userAccess)
          {
-            var userAccess = this.docData.permissions.userAccess;
-            var actions = YAHOO.util.Selector.query("div", actionsContainer);
-            var action, actionPermissions, i, ii, j, jj, actionAllowed;
+            var userAccess = this.assetData.permissions.userAccess,
+               actions = YAHOO.util.Selector.query("div", actionsContainer),
+               action, actionPermissions, i, ii, j, jj, actionAllowed;
+            
             for (i = 0, ii = actions.length; i < ii; i++)
             {
                action = actions[i];
                actionAllowed = true;
-               if (action.firstChild.rel != "")
+               if (action.firstChild.rel !== "")
                {
                   actionPermissions = action.firstChild.rel.split(",");
                   for (j = 0, jj = actionPermissions.length; j < jj; j++)
@@ -232,14 +192,12 @@
             if (owner !== null)
             {
                var action = owner.className;
-               var target = args[1].target;
                if (typeof me[action] == "function")
                {
                   args[1].stop = true;
-                  me[action].call(me, target.offsetParent, owner);
+                  me[action].call(me, me.assetData, owner);
                }
             }
-      		 
             return true;
          }
          
@@ -248,272 +206,39 @@
          // DocLib Actions module
          this.modules.actions = new Alfresco.module.DoclibActions();
       },
-
-      /**
-       * Fired by Metadata edit dialog when new details have been successfully saved.
-       * Prompts a reload of the page, as we can't be sure exactly what metadata may have been editing by the system.
-       *
-       * @method onReady
-       */
-      onDetailsEdited: function DocumentDetails_onDetailsEdited(layer, args)
-      {
-         // Reload the page, rather than trying to replace edited metadata in-place
-         window.location.reload(true);
-      },
       
-      /**
-       * Copy single document or folder.
-       *
-       * @method onActionCopyTo
-       * @param obj {object} Not used
-       */
-      onActionCopyTo: function DocumentActions_onActionCopyTo(obj)
-      {
-         if (!this.modules.copyTo)
-         {
-            this.modules.copyTo = new Alfresco.module.DoclibCopyTo(this.id + "-copyTo").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.docData.location.path,
-               files: this.docData
-            });
-         }
-         else
-         {
-            this.modules.copyTo.setOptions(
-            {
-               path: this.docData.location.path,
-               files: this.docData
-            })
-         }
-
-         // show the dialog         
-         this.modules.copyTo.showDialog();
-      },
-      
-      /**
-       * Move single document or folder.
-       *
-       * @method onActionMoveTo
-       * @param obj {object} Not used
-       */
-      onActionMoveTo: function DocumentActions_onActionMoveTo(obj)
-      {
-         if (!this.modules.moveTo)
-         {
-            this.modules.moveTo = new Alfresco.module.DoclibMoveTo(this.id + "-moveTo").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.docData.location.path,
-               files: this.docData
-            });
-         }
-         else
-         {
-            this.modules.moveTo.setOptions(
-            {
-               path: this.docData.location.path,
-               files: this.docData
-            })
-         }
-         
-         // show the dialog
-         this.modules.moveTo.showDialog();
-      },
-      
-      /**
-       * Assign workflow.
-       *
-       * @method onActionAssignWorkflow
-       * @param obj {object} Not used
-       */
-      onActionAssignWorkflow: function DocumentActions_onActionAssignWorkflow(obj)
-      {
-         if (!this.modules.assignWorkflow)
-         {
-            this.modules.assignWorkflow = new Alfresco.module.DoclibWorkflow(this.id + "-workflow").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.docData.location.path,
-               files: this.docData
-            });
-         }
-         else
-         {
-            this.modules.assignWorkflow.setOptions(
-            {
-               path: this.docData.location.path,
-               files: this.docData
-            })
-         }
-         
-         // show the dialog
-         this.modules.assignWorkflow.showDialog();
-      },
-      
-      /**
-       * Delete Asset.
-       *
-       * @method onActionDelete
-       * @param obj {object} Not used
-       */
-      onActionDelete: function DocumentActions_onActionDelete(obj)
-      {
-         var me = this;
-
-         Alfresco.util.PopupManager.displayPrompt(
-         {
-            text: this._msg("document-actions.delete.confirm", this.docData.fileName),
-            buttons: [
-            {
-               text: this._msg("document-actions.button.delete"),
-               handler: function DocumentActions_onActionDelete_delete()
-               {
-                  this.destroy();
-                  me._onActionDeleteConfirm.call(me, this.docData);
-               }
-            },
-            {
-               text: this._msg("button.cancel"),
-               handler: function DocumentActions_onActionDelete_cancel()
-               {
-                  this.destroy();
-               },
-               isDefault: true
-            }]
-         });
-      },
-
-      /**
-       * Set permissions on a single document or folder.
-       *
-       * @method onActionManagePermissions
-       * @param obj {object} Not used
-       */
-      onActionManagePermissions: function DocumentActions_onActionManagePermissions(row)
-      {
-         if (!this.modules.permissions)
-         {
-            this.modules.permissions = new Alfresco.module.DoclibPermissions(this.id + "-permissions");
-         }            
-         this.modules.permissions.setOptions(
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            path: this.docData.location.path,
-            files: this.docData
-         });
-         this.modules.permissions.showDialog();
-      },
-
-      /**
-       * Manage aspects.
-       *
-       * @method onActionManageAspects
-       * @param obj {object} Not used
-       */
-      onActionManageAspects: function DocumentActions_onActionManageAspects(obj)
-      {
-         if (!this.modules.aspects)
-         {
-            this.modules.aspects = new Alfresco.module.DoclibAspects(this.id + "-aspects");
-         }
-
-         this.modules.aspects.setOptions(
-         {
-            file: this.docData
-         }).show();
-      },
-
-      /**
-       * Change Type
-       *
-       * @method onActionChangeType
-       * @param row {object} DataTable row representing file to be actioned
-       */
-      onActionChangeType: function DocumentActions_onActionChangeType(obj)
-      {
-         var data = this.docData,
-            nodeRef = data.nodeRef,
-            displayName = data.displayName,
-            actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/type/node", nodeRef.replace(":/", ""));
-
-         var doSetupFormsValidation = function DocumentActions_oACT_doSetupFormsValidation(p_form)
-         {
-            // Validation
-            p_form.addValidation(this.id + "-changeType-type", function fnValidateType(field, args, event, form, silent, message)
-            {
-               return field.options[field.selectedIndex].value !== "-";
-            }, null, "change");
-            p_form.setShowSubmitStateDynamically(true, false);
-         };
-
-         // Always create a new instance
-         this.modules.changeType = new Alfresco.module.SimpleDialog(this.id + "-changeType").setOptions(
-         {
-            width: "30em",
-            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/change-type?nodeRef=" + nodeRef,
-            actionUrl: actionUrl,
-            doSetupFormsValidation:
-            {
-               fn: doSetupFormsValidation,
-               scope: this
-            },
-            firstFocus: this.id + "-changeType-type",
-            onSuccess:
-            {
-               fn: function DocumentActions_onActionChangeType_success(response)
-               {
-                  YAHOO.Bubbling.fire("metadataRefresh",
-                  {
-                     highlightFile: displayName
-                  });
-                  Alfresco.util.PopupManager.displayMessage(
-                  {
-                     text: this._msg("document-actions.change-type.success", displayName)
-                  });
-               },
-               scope: this
-            },
-            onFailure:
-            {
-               fn: function DocumentActions_onActionChangeType_failure(response)
-               {
-                  Alfresco.util.PopupManager.displayMessage(
-                  {
-                     text: this._msg("document-actions.change-type.failure", displayName)
-                  });
-               },
-               scope: this
-            }
-         });
-         this.modules.changeType.show();
-      },
-
       /**
        * Delete Asset confirmed.
        *
+       * @override
        * @method _onActionDeleteConfirm
-       * @param obj {object} Not used
+       * @param asset {object} Object literal representing file or folder to be actioned
        * @private
        */
-      _onActionDeleteConfirm: function DocumentActions__onActionDeleteConfirm(record)
+      _onActionDeleteConfirm: function DocumentActions__onActionDeleteConfirm(asset)
       {
-         var fileType = this.docData.type;
-         var fileName = this.docData.fileName;
-         var filePath = this.docData.location.path + "/" + fileName;
-         var displayName = this.docData.displayName;
-         
-         var callbackUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary#path=";
-         var encodedPath = (YAHOO.env.ua.gecko > 0) ? encodeURIComponent(this.docData.location.path) : this.docData.location.path;
+         var path = asset.location.path,
+            fileName = asset.fileName,
+            filePath = $combine(path, fileName),
+            displayName = asset.displayName,
+            callbackUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary",
+            encodedPath = path.length > 1 ? "?path=" + window.escape(path) : "";
          
          this.modules.actions.genericAction(
          {
             success:
             {
+               activity:
+               {
+                  siteId: this.options.siteId,
+                  activityType: "file-deleted",
+                  page: "documentlibrary",
+                  activityData:
+                  {
+                     fileName: fileName,
+                     path: path
+                  }
+               },
                callback:
                {
                   fn: function DocumentActions_oADC_success(data)
@@ -524,7 +249,7 @@
             },
             failure:
             {
-               message: this._msg("document-actions.delete.failure", displayName)
+               message: this._msg("message.delete.failure", displayName)
             },
             webscript:
             {
@@ -534,24 +259,11 @@
                {
                   site: this.options.siteId,
                   container: this.options.containerId,
-                  path: this.docData.location.path,
+                  path: path,
                   file: fileName
                }
             }
          });
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function DocumentActions__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.DocumentActions", Array.prototype.slice.call(arguments).slice(1));
-      }
-   };
+      }      
+   }, true);
 })();

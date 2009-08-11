@@ -3,22 +3,29 @@
       <actionSet id="empty"></actionSet>
 
       <actionSet id="recordSeries">
-         <action id="onActionDetails" type="simple-link" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
-         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
+         <action type="simple-link" id="onActionEditDetails" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action type="action-link" id="onActionDelete" permission="HIDDEN" label="actions.delete" />
       </actionSet>
 
       <actionSet id="recordCategory">
-         <action id="onActionDetails" type="simple-link" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
-         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
+         <action type="simple-link" id="onActionEditDetails" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action type="action-link" id="onActionDelete" permission="HIDDEN" label="actions.delete" />
       </actionSet>
 
       <actionSet id="recordFolder">
-         <action id="onActionDetails" type="simple-link" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
-         <action id="onActionClose" permission="close" type="action-link" label="actions.close" />
-         <action id="onActionReopen" permission="reopen" type="action-link" label="actions.reopen" />
-         <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
-         <action id="onActionUncutoff" permission="uncutoff" type="action-link" label="actions.uncutoff" />
-         <action id="onActionDelete" permission="HIDDEN" type="action-link" label="actions.delete" />
+         <action type="simple-link" id="onActionEditDetails" permisson="edit" href="{editMetadataUrl}" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action type="action-link" id="onActionCloseFolder" permission="close-folder" label="actions.close-folder" />
+         <action type="action-link" id="onActionOpenFolder" permission="open-folder" label="actions.open-folder" />
+         <action type="action-link" id="onActionCutoff" permission="cutoff" label="actions.cutoff" />
+         <action type="action-link" id="onActionRetain" permission="retain" label="actions.retain" />
+         <action type="action-link" id="onActionDestroy" permission="destroy" label="actions.destroy" />
+         <action type="action-link" id="onActionTransfer" permission="transfer" label="actions.transfer" />
+         <action type="action-link" id="onActionFreeze" permission="freeze" label="actions.freeze" />
+         <action type="action-link" id="onActionUnfreeze" permission="unfreeze" label="actions.unfreeze" />
+         <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
+         <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.move-to" />
+         <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
+         <action type="action-link" id="onActionDelete" permission="HIDDEN" label="actions.delete" />
       </actionSet>
    </actionSets>
 </documentList>

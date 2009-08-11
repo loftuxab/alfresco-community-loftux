@@ -67,11 +67,12 @@ function main()
          // them to the form ui model
          formUIModel.constraints = formUIConstraints;
          
-         // add the item kind and id arguments
+         // add the item kind, item id and form id arguments
          formUIModel.arguments =
          {
             itemKind: itemKind,
-            itemId: itemId
+            itemId: itemId,
+            formId: formId
          };
       }
       else
