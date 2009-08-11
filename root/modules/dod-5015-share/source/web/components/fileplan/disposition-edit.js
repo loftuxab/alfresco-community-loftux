@@ -522,7 +522,6 @@
          var actionTypeSelect = Dom.getElementsByClassName("action-type", "select", actionEl)[0],
                periodUnitSelect = Dom.getElementsByClassName("period-unit", "select", actionEl)[0],
                periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
-         alert(actionType ? actionType : "listvalue"); 
          var title = "",
                actionType = actionType ? actionType : actionTypeSelect.options[actionTypeSelect.selectedIndex].text;
          if (!periodAmountEl.disabled)
