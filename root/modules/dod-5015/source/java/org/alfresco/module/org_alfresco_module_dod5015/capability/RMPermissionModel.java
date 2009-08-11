@@ -34,18 +34,30 @@ import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
  */
 public interface RMPermissionModel
 {
+    // Assignment of Filing
+
+    public static final String FILING = "Filing";
+
+    public static final String READ_RECORDS = "ReadRecords";
+
+    public static final String FILE_RECORDS = "FileRecords";
+    
+    // Roles
+
     public static final String ROLE_USER = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "User").toString();
-    
+
     public static final String ROLE_POWER_USER = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "PowerUser").toString();
-    
-    public static final String ROLE_SECURITY_OFFICER = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "SecurityOfficer").toString();
-    
-    public static final String ROLE_RECORDS_MANAGER = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "RecordsManager").toString();
-    
+
+    public static final String ROLE_SECURITY_OFFICER = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "SecurityOfficer")
+            .toString();
+
+    public static final String ROLE_RECORDS_MANAGER = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "RecordsManager")
+            .toString();
+
     public static final String ROLE_ADMINISTRATOR = SimplePermissionReference.getPermissionReference(RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT, "Administrator").toString();
-    
+
     // 
-    
+
     public static final String DECLARE_RECORDS = "DeclareRecords";
 
     public static final String VIEW_RECORDS = "ViewRecords";
@@ -161,7 +173,4 @@ public interface RMPermissionModel
     public static final String MAP_CLASSIFICATION_GUIDE_METADATA = "MapClassificationGuideMetadata";
 
     public static final String MANAGE_ACCESS_CONTROLS = "ManageAccessControls";
-    
-    public static final String FILE_RECORDS = "FileRecords";
-
 }

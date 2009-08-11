@@ -173,7 +173,17 @@
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="UpdateExemptionCategories"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="MapClassificationGuideMetadata"/>
             <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ManageAccessControls"/>
+            <!-- Administrator has filing rights to all records - no other role does -->
+            <includePermissionGroup type="rma:filePlanComponent" permissionGroup="Filing"/>
         </permissionGroup>
+        
+        <permissionGroup name="Filing" allowFullControl="false" expose="true">
+            <includePermissionGroup type="rma:filePlanComponent" permissionGroup="ReadRecords"/>
+            <includePermissionGroup type="rma:filePlanComponent" permissionGroup="FileRecords"/>
+        </permissionGroup>
+        
+        <permissionGroup name="ReadRecords" expose="false" allowFullControl="false"/>
+        <permissionGroup name="FileRecords" expose="false" allowFullControl="false"/>
         
         <permissionGroup name="DeclareRecords" expose="false" allowFullControl="false"/>
         <permissionGroup name="ViewRecords" expose="false" allowFullControl="false"/>
@@ -234,6 +244,14 @@
         <permissionGroup name="UpdateExemptionCategories" expose="false" allowFullControl="false"/>
         <permissionGroup name="MapClassificationGuideMetadata" expose="false" allowFullControl="false"/>
         <permissionGroup name="ManageAccessControls" expose="false" allowFullControl="false"/>
+        
+        <permission name="_ReadRecords" expose="false">
+            <grantedToGroup permissionGroup="ReadRecords"/>
+        </permission>
+        
+         <permission name="_FileRecords" expose="false">
+            <grantedToGroup permissionGroup="FileRecords"/>
+        </permission>
         
         <permission name="_DeclareRecords" expose="false">
             <grantedToGroup permissionGroup="DeclareRecords"/>

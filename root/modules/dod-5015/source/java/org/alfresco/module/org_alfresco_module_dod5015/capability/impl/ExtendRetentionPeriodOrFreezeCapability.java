@@ -50,7 +50,7 @@ public class ExtendRetentionPeriodOrFreezeCapability extends AbstractCapability
         {
             if (checkFiling(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE) == AccessStatus.ALLOWED)
+                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE) == AccessStatus.ALLOWED)
                 {
                     return AccessDecisionVoter.ACCESS_GRANTED;
                 }

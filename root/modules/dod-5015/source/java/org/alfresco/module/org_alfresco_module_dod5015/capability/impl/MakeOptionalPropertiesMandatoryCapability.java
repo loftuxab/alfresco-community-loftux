@@ -48,7 +48,7 @@ public class MakeOptionalPropertiesMandatoryCapability extends AbstractCapabilit
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY) == AccessStatus.ALLOWED)
+            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY) == AccessStatus.ALLOWED)
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }

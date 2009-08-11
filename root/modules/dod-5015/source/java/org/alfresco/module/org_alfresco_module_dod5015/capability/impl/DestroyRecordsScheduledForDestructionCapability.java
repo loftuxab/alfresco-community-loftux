@@ -50,7 +50,7 @@ public class DestroyRecordsScheduledForDestructionCapability extends AbstractCap
         {
             if (isScheduledForDestruction(nodeRef))
             {
-                if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION) == AccessStatus.ALLOWED)
+                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION) == AccessStatus.ALLOWED)
                 {
                     return AccessDecisionVoter.ACCESS_GRANTED;
                 }

@@ -121,6 +121,7 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.EqualsHelper;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -279,7 +280,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public MapClassificationGuideMetadataCapability mapClassificationGuideMetadataCapability;
 
     public ManageAccessControlsCapability manageAccessControlsCapability;
-    
+
     public TriggerAnEventCapability triggerAnEventCapability;
 
     //
@@ -996,7 +997,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         this.triggerAnEventCapability = triggerAnEventCapability;
         capabilities.put(triggerAnEventCapability.getName(), triggerAnEventCapability);
     }
-    
+
     public CreateCapability getCreateCapability()
     {
         return createCapability;
@@ -1037,9 +1038,6 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         this.updatePropertiesCapability = updatePropertiesCapability;
     }
 
-    
- 
-
     public boolean supports(ConfigAttribute attribute)
     {
         if ((attribute.getAttribute() != null)
@@ -1074,12 +1072,12 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     {
         return Collections.unmodifiableSet(protectedProperties);
     }
-    
+
     public Set<QName> getProtetcedAscpects()
     {
         return Collections.unmodifiableSet(protectedAspects);
     }
-    
+
     public int vote(Authentication authentication, Object object, ConfigAttributeDefinition config)
     {
         if (logger.isDebugEnabled())
@@ -1170,20 +1168,21 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public Map<Capability, AccessStatus> getCapabilities(NodeRef nodeRef)
     {
         HashMap<Capability, AccessStatus> answer = new HashMap<Capability, AccessStatus>();
-        for(Capability capability : capabilities.values())
+        for (Capability capability : capabilities.values())
         {
+            System.out.println(capability.getName());
             AccessStatus status = capability.hasPermission(nodeRef);
             answer.put(capability, status);
         }
         return answer;
-        
+
     }
-    
+
     public Capability getCapability(String name)
     {
         return capabilities.get(name);
     }
-    
+
     private static QName getType(NodeService nodeService, MethodInvocation invocation, Class[] params, int position, boolean parent)
     {
         if (QName.class.isAssignableFrom(params[position]))
@@ -1454,13 +1453,17 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         return protectedProperties.contains(propertyQName);
     }
 
-    public boolean includesProtectedProperties(Set<QName> properties)
+    public boolean includesProtectedPropertyChange(NodeRef nodeRef, Map<QName, Serializable> properties)
     {
-        for (QName test : properties)
+        Map<QName, Serializable> originals = nodeService.getProperties(nodeRef);
+        for (QName test : properties.keySet())
         {
             if (isProtectedProperty(test))
             {
-                return true;
+                if (!EqualsHelper.nullSafeEquals(originals.get(test), properties.get(test)))
+                {
+                    return true;
+                }
             }
         }
         return false;
@@ -1603,7 +1606,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             {
                 properties = getProperties(invocation, params, cad.parameters.get(2));
             }
-            return voter.getUpdateCapability().evaluate(updatee, aspectQName, (properties == null ? null : properties.keySet()));
+            return voter.getUpdateCapability().evaluate(updatee, aspectQName, properties);
         }
 
     }
@@ -1638,20 +1641,27 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
         {
             NodeRef updatee = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(0), cad.parent);
-            Set<QName> properties;
+            Map<QName, Serializable> properties;
             if (QName.class.isAssignableFrom(params[cad.parameters.get(1)]))
             {
                 // single update/delete
                 // We have a specific property
                 QName propertyQName = getQName(invocation, params, cad.parameters.get(1));
-                properties = new HashSet<QName>(1, 1.0f);
-                properties.add(propertyQName);
+                properties = new HashMap<QName, Serializable>(1, 1.0f);
+                if (cad.parameters.size() > 2)
+                {
+                    properties.put(propertyQName, getProperty(invocation, params, cad.parameters.get(2)));
+                }
+                else
+                {
+                    properties.put(propertyQName, null);
+                }
             }
             else
             {
-                properties = getProperties(invocation, params, cad.parameters.get(1)).keySet();
+                properties = getProperties(invocation, params, cad.parameters.get(1));
             }
-            
+
             return voter.getUpdatePropertiesCapability().evaluate(updatee, properties);
         }
 

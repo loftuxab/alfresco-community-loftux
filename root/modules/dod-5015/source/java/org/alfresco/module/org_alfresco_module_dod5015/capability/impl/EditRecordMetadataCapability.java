@@ -52,7 +52,7 @@ public class EditRecordMetadataCapability extends AbstractCapability
             {
                 if (isRecord(nodeRef))
                 {
-                    if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.EDIT_RECORD_METADATA) == AccessStatus.ALLOWED)
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.EDIT_RECORD_METADATA) == AccessStatus.ALLOWED)
                     {
                         return AccessDecisionVoter.ACCESS_GRANTED;
                     }

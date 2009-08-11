@@ -52,7 +52,7 @@ public class CycleVitalRecordsCapability extends AbstractCapability
             {
                 if (isVitalRecord(nodeRef))
                 {
-                    if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.CYCLE_VITAL_RECORDS) == AccessStatus.ALLOWED)
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.CYCLE_VITAL_RECORDS) == AccessStatus.ALLOWED)
                     {
                         return AccessDecisionVoter.ACCESS_GRANTED;
                     }

@@ -48,7 +48,7 @@ public class UpgradeDowngradeAndDeclassifyRecordsCapability extends AbstractCapa
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS) == AccessStatus.ALLOWED)
+            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS) == AccessStatus.ALLOWED)
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }

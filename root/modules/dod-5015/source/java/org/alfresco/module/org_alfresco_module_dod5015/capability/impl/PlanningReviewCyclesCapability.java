@@ -52,7 +52,7 @@ public class PlanningReviewCyclesCapability extends AbstractCapability
             {
                 if (isVitalRecord(nodeRef))
                 {
-                    if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.PLANNING_REVIEW_CYCLES) == AccessStatus.ALLOWED)
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.PLANNING_REVIEW_CYCLES) == AccessStatus.ALLOWED)
                     {
                         return AccessDecisionVoter.ACCESS_GRANTED;
                     }
