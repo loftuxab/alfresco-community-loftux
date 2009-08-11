@@ -52,6 +52,7 @@ import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONStringer;
@@ -421,5 +422,30 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 
         final int customPropsCount = customPropsObj.length();
         assertTrue("There should be at least one custom property. Found " + customPropsObj, customPropsCount > 0);
+    }
+    
+    public void testExport() throws Exception
+    {
+        NodeRef recordFolder1 = TestUtilities.getRecordFolder(searchService, "Reports", 
+                    "AIS Audit Records", "January AIS Audit Records");
+        assertNotNull(recordFolder1);
+        
+        NodeRef recordFolder2 = TestUtilities.getRecordFolder(searchService, "Reports", 
+                    "Unit Manning Documents", "1st Quarter Unit Manning Documents");
+        assertNotNull(recordFolder2);
+        
+        String exportUrl = "/api/rma/admin/export";
+        
+        // define JSON POST body
+        JSONObject jsonPostData = new JSONObject();
+        JSONArray nodeRefs = new JSONArray();
+        nodeRefs.put(recordFolder1.toString());
+        nodeRefs.put(recordFolder2.toString());
+        jsonPostData.put("nodeRefs", nodeRefs);
+        String jsonPostString = jsonPostData.toString();
+        
+        // make the export request
+        Response rsp = sendRequest(new PostRequest(exportUrl, jsonPostString, APPLICATION_JSON), 200);
+        assertEquals("application/acp", rsp.getContentType());
     }
 }
