@@ -6,6 +6,7 @@
 		<#list data.items as item>
 		{
 			"nodeRef": "${item.nodeRef}",
+			"type": "${item.type}",
 			"name": "${item.name}",
 			"title": "${item.title!''}",
 			"description": "${item.description!''}",

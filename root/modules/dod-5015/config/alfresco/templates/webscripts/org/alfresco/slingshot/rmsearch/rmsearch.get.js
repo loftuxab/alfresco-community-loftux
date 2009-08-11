@@ -4,6 +4,9 @@
  * Inputs:
  *   mandatory: site = site ID to search in
  *   optional:  query = the query to perform.
+ *   optional:  sortby = comma separated list of sort fields
+ *              each sort field is in the format of "namespace:attribute/[asc|desc]"
+ *              for example: cm:name/asc
  *   optional:  maxResults = max items to return.
  * 
  * Outputs:
@@ -44,6 +47,7 @@ function getRecord(siteId, node)
    var item =
    {
       nodeRef: node.nodeRef.toString(),
+      type: node.typeShort,
       name: node.name,
       title: node.properties["cm:title"],
       description: node.properties["cm:description"],
@@ -51,9 +55,27 @@ function getRecord(siteId, node)
       modifiedByUser: node.properties["cm:modifier"],
       createdOn: node.properties["cm:created"],
       createdByUser: node.properties["cm:creator"],
-      size: node.size,
       properties: {}
    };
+   
+   // specific type related properties
+   if (node.isContainer)
+   {
+      item.size = -1;
+      var displayPaths = node.displayPath.split("/");
+      var relPath = "/" + displayPaths.slice(5, displayPaths.length).join("/");
+      relPath += (relPath.length > 1 ? ("/" + node.name) : (node.name));
+      item.browseUrl = "documentlibrary?path=" + encodeURIComponent(relPath);
+   }
+   else
+   {
+      item.size = node.size;
+      item.browseUrl = "document-details?nodeRef=" + node.nodeRef.toString();
+   }
+   
+   // generated properties
+   item.modifiedBy = getPersonDisplayName(item.modifiedByUser);
+   item.createdBy = getPersonDisplayName(item.createdByUser);
    
    // collect up the RMA namespace properties
    // collect up custom props under the rmc:customProperties marker
@@ -68,11 +90,6 @@ function getRecord(siteId, node)
          item.properties["rmc_" + k.split('}')[1]] = node.properties[k];
       }
    }
-   
-   // generated properties
-   item.modifiedBy = getPersonDisplayName(item.modifiedByUser);
-   item.createdBy = getPersonDisplayName(item.createdByUser);
-   item.browseUrl = "document-details?nodeRef=" + node.nodeRef.toString();
    
    return item;
 }
@@ -113,7 +130,11 @@ function getSearchResults(query, sort, maxResults, siteId)
    
    // suffix the rm doclib fileplan site PATH query and the mandatory ASPECT clause
    var path = SITES_SPACE_QNAME_PATH + "cm:" + search.ISO9075Encode(siteId) + "/cm:documentLibrary/";
-   var alfQuery = 'PATH:"' + path + '/*" AND ASPECT:"rma:record"';
+   var alfQuery = 'PATH:"' + path + '/*" AND ASPECT:"rma:filePlanComponent"' +
+                  ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule"' +
+                  ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionActionDefinition"' +
+                  ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}hold"' +
+                  ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer"';
    
    // build up final query components
    if (query != null && query.length != 0)
