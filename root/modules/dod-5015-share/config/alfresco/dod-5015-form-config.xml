@@ -206,6 +206,13 @@
                <hide id="cm:initialVersion" />
                <hide id="cm:versionLabel" />
                <hide id="cm:content" />
+               <hide id="cm:thumbnails" />
+               <hide id="cm:automaticUpdate" />
+               <hide id="cm:originator" />
+               <hide id="cm:addressee" />
+               <hide id="cm:addressees" />
+               <hide id="cm:subjectline" />
+               <hide id="cm:sentdate" />
                <!-- NOTE: This is a test property and should be removed from the model! -->
                <hide id="rma:projectNameList" />
                <!--  -->
@@ -217,6 +224,7 @@
                <hide id="rma:dispositionActionHistory" />
                <hide id="rma:frozenBy" />
                <hide id="rma:frozenAt" />
+               <hide id="rma:dateFiled" for-mode="edit" />
                <hide id="rma:reviewAsOf" for-mode="edit" />
                <hide id="rma:cutOffDate" for-mode="edit" />
             </field-visibility>
@@ -287,10 +295,10 @@
                <!-- Vital Records Fields -->
                <field id="rma:vitalRecordIndicator" set="vital-record" />
                <field id="rma:reviewPeriod" set="vital-record" />
-               <field id="rma:reviewAsOf" set="vital-record" read-only="true" />
+               <field id="rma:reviewAsOf" set="vital-record" />
                
                <!-- Disposition Fields -->
-               <field id="rma:cutOffDate" set="disposition" read-only="true" />
+               <field id="rma:cutOffDate" set="disposition" />
                
                <!--  -->
                <!-- TODO: Define sets for all aspects that could potentially be applied -->
