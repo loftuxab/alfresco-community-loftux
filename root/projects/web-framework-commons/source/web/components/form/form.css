@@ -33,6 +33,11 @@
    width: 30em;
 }
 
+.form-container input[type="checkbox"]
+{
+   width: auto;
+}
+
 .form-container textarea
 {
    width: 30em;
