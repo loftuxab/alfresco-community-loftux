@@ -50,7 +50,7 @@ public class UndeclareRecordsCapability extends AbstractCapability
         {
             if (checkFilingUnfrozen(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.UNDECLARE_RECORDS) == AccessStatus.ALLOWED)
+                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.UNDECLARE_RECORDS) == AccessStatus.ALLOWED)
                 {
                     return AccessDecisionVoter.ACCESS_GRANTED;
                 }

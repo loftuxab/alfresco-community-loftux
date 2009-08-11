@@ -48,7 +48,7 @@ public class AttachRulesToMetadataPropertiesCapability extends AbstractCapabilit
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES) == AccessStatus.ALLOWED)
+            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES) == AccessStatus.ALLOWED)
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }

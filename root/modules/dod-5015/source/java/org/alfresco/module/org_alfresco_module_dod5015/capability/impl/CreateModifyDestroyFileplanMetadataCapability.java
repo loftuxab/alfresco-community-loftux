@@ -48,7 +48,7 @@ public class CreateModifyDestroyFileplanMetadataCapability extends AbstractCapab
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA) == AccessStatus.ALLOWED)
+            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA) == AccessStatus.ALLOWED)
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }

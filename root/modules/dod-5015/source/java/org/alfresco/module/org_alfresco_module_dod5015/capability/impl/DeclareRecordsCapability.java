@@ -53,7 +53,7 @@ public class DeclareRecordsCapability extends AbstractCapability
             {
                 if (isRecord(nodeRef))
                 {
-                    if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.DECLARE_RECORDS) == AccessStatus.ALLOWED)
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DECLARE_RECORDS) == AccessStatus.ALLOWED)
                     {
                         return AccessDecisionVoter.ACCESS_GRANTED;
                     }

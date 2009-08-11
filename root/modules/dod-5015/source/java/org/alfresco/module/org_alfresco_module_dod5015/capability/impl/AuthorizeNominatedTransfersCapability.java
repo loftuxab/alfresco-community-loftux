@@ -48,7 +48,7 @@ public class AuthorizeNominatedTransfersCapability extends AbstractCapability
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS) == AccessStatus.ALLOWED)
+            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS) == AccessStatus.ALLOWED)
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }

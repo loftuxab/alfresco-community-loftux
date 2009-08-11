@@ -48,7 +48,7 @@ public class DisplayRightsReportCapability extends AbstractCapability
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.DISPLAY_RIGHTS_REPORT) == AccessStatus.ALLOWED)
+            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DISPLAY_RIGHTS_REPORT) == AccessStatus.ALLOWED)
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }

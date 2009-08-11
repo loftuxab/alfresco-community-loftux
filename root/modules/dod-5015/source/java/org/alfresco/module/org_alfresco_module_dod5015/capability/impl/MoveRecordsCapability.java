@@ -27,7 +27,6 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability.impl;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
-import org.alfresco.repo.security.permissions.impl.model.PermissionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
@@ -66,7 +65,7 @@ public class MoveRecordsCapability extends AbstractCapability
             }
             else
             {
-                if (voter.getPermissionService().hasPermission(movee, PermissionService.DELETE) == AccessStatus.ALLOWED)
+                if (voter.getPermissionService().hasPermission(getFilePlan(movee), PermissionService.DELETE) == AccessStatus.ALLOWED)
                 {
                     state = AccessDecisionVoter.ACCESS_GRANTED;
                 }
@@ -82,7 +81,7 @@ public class MoveRecordsCapability extends AbstractCapability
                 {
                     if (isRm(movee))
                     {
-                        if (voter.getPermissionService().hasPermission(movee, RMPermissionModel.MOVE_RECORDS) == AccessStatus.ALLOWED)
+                        if (voter.getPermissionService().hasPermission(getFilePlan(movee), RMPermissionModel.MOVE_RECORDS) == AccessStatus.ALLOWED)
                         {
                             return AccessDecisionVoter.ACCESS_GRANTED;
                         }

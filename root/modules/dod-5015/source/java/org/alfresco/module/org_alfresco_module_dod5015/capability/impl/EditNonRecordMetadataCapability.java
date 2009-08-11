@@ -52,7 +52,7 @@ public class EditNonRecordMetadataCapability extends AbstractCapability
             {
                 if (isRecordFolder(voter.getNodeService().getType(nodeRef)))
                 {
-                    if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.EDIT_NON_RECORD_METADATA) == AccessStatus.ALLOWED)
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.EDIT_NON_RECORD_METADATA) == AccessStatus.ALLOWED)
                     {
                         return AccessDecisionVoter.ACCESS_GRANTED;
                     }

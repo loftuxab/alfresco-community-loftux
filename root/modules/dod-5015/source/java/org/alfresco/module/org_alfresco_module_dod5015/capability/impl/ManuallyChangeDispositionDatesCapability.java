@@ -50,7 +50,7 @@ public class ManuallyChangeDispositionDatesCapability extends AbstractCapability
         {
             if (checkFilingUnfrozenUncutoff(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES) == AccessStatus.ALLOWED)
+                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES) == AccessStatus.ALLOWED)
                 {
                     return AccessDecisionVoter.ACCESS_GRANTED;
                 }

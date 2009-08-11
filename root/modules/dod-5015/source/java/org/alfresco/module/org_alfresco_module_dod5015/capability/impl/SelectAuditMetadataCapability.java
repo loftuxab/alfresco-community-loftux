@@ -48,7 +48,7 @@ public class SelectAuditMetadataCapability extends AbstractCapability
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.SELECT_AUDIT_METADATA) == AccessStatus.ALLOWED)
+            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.SELECT_AUDIT_METADATA) == AccessStatus.ALLOWED)
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }

@@ -57,7 +57,7 @@ public class ApproveRecordsScheduledForCutoffCapability extends AbstractCapabili
             {
                 if (isScheduledForCutoff(nodeRef))
                 {
-                    if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF) == AccessStatus.ALLOWED)
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF) == AccessStatus.ALLOWED)
                     {
                         return AccessDecisionVoter.ACCESS_GRANTED;
                     }

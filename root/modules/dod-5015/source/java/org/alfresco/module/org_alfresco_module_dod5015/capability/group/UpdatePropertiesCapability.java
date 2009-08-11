@@ -58,9 +58,9 @@ public class UpdatePropertiesCapability extends AbstractCapability
         return "UpdateProperties";
     }
     
-    public int evaluate(NodeRef nodeRef, Set<QName> propertyQNames)
+    public int evaluate(NodeRef nodeRef, Map<QName, Serializable> properties)
     {
-        if ((propertyQNames != null) && (voter.includesProtectedProperties(propertyQNames)))
+        if ((properties != null) && (voter.includesProtectedPropertyChange(nodeRef, properties)))
         {
             return AccessDecisionVoter.ACCESS_DENIED;
         }

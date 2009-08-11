@@ -48,7 +48,7 @@ public class CreateModifyDestroyClassificationGuidesCapability extends AbstractC
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES) == AccessStatus.ALLOWED)
+            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES) == AccessStatus.ALLOWED)
             {
                 return AccessDecisionVoter.ACCESS_GRANTED;
             }
