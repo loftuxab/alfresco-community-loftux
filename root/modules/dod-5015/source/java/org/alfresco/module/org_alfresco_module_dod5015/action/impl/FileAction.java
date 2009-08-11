@@ -125,7 +125,6 @@ public class FileAction extends RMActionExecuterAbstractBase
     {
         HashSet<QName> qnames = new HashSet<QName>();
         qnames.add(PROP_DATE_FILED);
-        qnames.add(PROP_IDENTIFIER);
         qnames.add(PROP_REVIEW_AS_OF);
         return qnames;
     }
