@@ -423,6 +423,9 @@
                
                me.widgets.saveButton.set("disabled", false);
                me.widgets.searchButton.set("disabled", false);
+               
+               // switch to query builder tab
+               me.widgets.tabs.selectTab(0);
             }
          });
       },

@@ -121,14 +121,26 @@
 
       /**
        * Number of search results.
+       * 
+       * @property resultsCount
+       * @type number
        */
       resultsCount: 0,
       
       /**
        * True if there are more results than the ones listed in the table.
+       * 
+       * @property hasMoreResults
+       * @type boolean
        */
       hasMoreResults: false,
       
+      /**
+       * Array of sort descriptor objects. See constructor above for example object structure.
+       * 
+       * @property sortby
+       * @type Array
+       */
       sortby: null,
       
       /**
@@ -231,7 +243,7 @@
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
          // add the well known 'cm' fields and 'rma' namespace
-         var fields = ["nodeRef", "name", "title", "description", "modifiedOn", "modifiedByUser", "modifiedBy",
+         var fields = ["nodeRef", "type", "name", "title", "description", "modifiedOn", "modifiedByUser", "modifiedBy",
                        "createdOn", "createdByUser", "createdBy", "size", "browseUrl",
                        "properties.rma_identifier", "properties.rma_dateFiled", "properties.rma_publicationDate", "properties.rma_dateReceived",
                        "properties.rma_originatingOrganization", "properties.rma_mediaType", "properties.rma_format", "properties.rma_location",
@@ -279,6 +291,18 @@
             
             var url = me._getBrowseUrlForRecord(oRecord);
             var imageUrl = Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/record-32.png';
+            switch (oRecord.getData("type"))
+            {
+               case "dod:recordSeries":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/record-series-32.png';
+                  break;
+               case "dod:recordCategory":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/record-category-32.png';
+                  break;
+               case "rma:recordFolder":
+                  imageUrl = Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/record-folder-32.png';
+                  break;
+            }
             
             var name = $html(oRecord.getData("name"));
             elCell.innerHTML = '<span><a href="' + encodeURI(url) + '"><img src="' + imageUrl + '" alt="' + name + '" title="' + name + '" /></a></span>';
