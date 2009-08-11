@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.module.org_alfresco_module_dod5015.script;
+package org.alfresco.repo.web.scripts.content;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -62,7 +62,7 @@ public class StreamArchive extends StreamContent
     /** Logger */
     private static Log logger = LogFactory.getLog(StreamArchive.class);
     
-    protected static final String TEMP_FILE_PREFIX = "rm_export_";
+    protected static final String TEMP_FILE_PREFIX = "export_";
     protected static final String PARAM_NODE_REFS = "nodeRefs";
     
     protected ExporterService exporterService;
