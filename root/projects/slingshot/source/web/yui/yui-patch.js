@@ -147,6 +147,7 @@
  * Required by: DoD 5015 module, Disposition Schedule Edit component.
  * Patches: YUI 2.7.0
  * Known bug: Yes. See http://yuilibrary.com/projects/yui2/ticket/2527744
+ * Patch: http://github.com/yui/yui2/commit/83bad40c45411577812825f091ba397d81a2d86f
  */
 (function()
 {

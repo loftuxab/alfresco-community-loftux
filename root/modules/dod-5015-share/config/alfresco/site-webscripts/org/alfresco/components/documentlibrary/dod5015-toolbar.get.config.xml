@@ -1,17 +1,17 @@
 <toolbar>
    <actionSets>
       <actionSet id="default">
-         <action id="onActionCutoff" type="action-link" permission="cutoff" asset="record-folder,record" label="menu.selected-items.cutoff" />
-         <action id="onActionRetain" type="action-link" permission="retain" asset="record-folder,record" label="menu.selected-items.retain" />
-         <action id="onActionDestroy" type="action-link" permission="destroy" asset="record-folder,record" label="menu.selected-items.destroy" />
-         <action id="onActionTransfer" type="action-link" permission="transfer" asset="record-folder,record" label="menu.selected-items.transfer" />
-         <action id="onActionTransferConfirm" type="action-link" permission="transfer-confirm" asset="transfer" label="menu.selected-items.transfer-confirm" />
-         <action id="onActionFreeze" type="action-link" permission="freeze" asset="record-folder,record" label="menu.selected-items.freeze" />
-         <action id="onActionUnfreeze" type="action-link" permission="unfreeze" asset="record-folder,record" label="menu.selected-items.unfreeze" />
-         <action id="onActionCopyTo" type="action-link" permission="" asset="record-folder,record,undeclared-record" label="menu.selected-items.copy-to" />
-         <action id="onActionMoveTo" type="action-link" permission="delete" asset="record-folder,record,undeclared-record" label="menu.selected-items.move-to" />
-         <action id="onActionFileTo" type="action-link" permission="" asset="record-folder,record,undeclared-record" label="menu.selected-items.file-to" />
-         <action id="onActionDelete" type="action-link" permission="HIDDEN" label="menu.selected-items.delete" />
+         <action type="action-link" id="onActionCutoff" permission="cutoff" asset="record-folder,record" label="menu.selected-items.cutoff" />
+         <action type="action-link" id="onActionRetain" permission="retain" asset="record-folder,record" label="menu.selected-items.retain" />
+         <action type="action-link" id="onActionDestroy" permission="destroy" asset="record-folder,record" label="menu.selected-items.destroy" />
+         <action type="action-link" id="onActionTransfer" permission="transfer" asset="record-folder,record" label="menu.selected-items.transfer" />
+         <action type="action-link" id="onActionTransferConfirm" permission="transfer-confirm" asset="transfer" label="menu.selected-items.transfer-confirm" />
+         <action type="action-link" id="onActionFreeze" permission="freeze" asset="record-folder,record" label="menu.selected-items.freeze" />
+         <action type="action-link" id="onActionUnfreeze" permission="unfreeze" asset="record-folder,record" label="menu.selected-items.unfreeze" />
+         <action type="action-link" id="onActionCopyTo" permission="" asset="record-folder,record,undeclared-record" label="menu.selected-items.copy-to" />
+         <action type="action-link" id="onActionMoveTo" permission="delete" asset="record-folder,record,undeclared-record" label="menu.selected-items.move-to" />
+         <action type="action-link" id="onActionFileTo" permission="" asset="record-folder,record,undeclared-record" label="menu.selected-items.file-to" />
+         <action type="action-link" id="onActionDelete" permission="HIDDEN" label="menu.selected-items.delete" />
       </actionSet>
    </actionSets>
 </toolbar>

@@ -303,7 +303,8 @@
          if (this.options.arguments)
          {
             var itemKind = this.options.arguments.itemKind,
-               itemId = this.options.arguments.itemId;
+               itemId = this.options.arguments.itemId,
+               formId = this.options.arguments.formId;
             
             if (itemKind && itemId)
             {
@@ -318,7 +319,8 @@
                   formUI: false,
                   mode: this.options.mode,
                   itemKind: itemKind,
-                  itemId: itemId
+                  itemId: itemId,
+                  formId: formId
                };
 
                Alfresco.util.Ajax.request(

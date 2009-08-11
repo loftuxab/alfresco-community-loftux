@@ -1,8 +1,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.EditMetadataMgr("${args.htmlid}").setOptions(
    {
-      nodeRef: "${nodeRef!}",
-      nodeType: "${nodeType}",
+      nodeRef: "${nodeRef!page.url.args.nodeRef}",
+      nodeType: "${nodeType!"document"}",
       siteId: "${page.url.templateArgs.site!""}"
    }).setMessages(
       ${messages}

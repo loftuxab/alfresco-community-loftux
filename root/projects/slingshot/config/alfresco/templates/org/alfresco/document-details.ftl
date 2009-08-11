@@ -45,6 +45,10 @@
             </div>
          </div>
       </div>
+
+      <@region id="html-upload" scope="template" protected=true />
+      <@region id="flash-upload" scope="template" protected=true />
+      <@region id="file-upload" scope="template" protected=true />
    </div>
    
    <script type="text/javascript">//<![CDATA[

@@ -142,6 +142,11 @@
    background-image: url(images/destroy-record-16.png);
 }
 
+.doclist .record-folder .onActionFileTo a
+{
+   background-image: url(images/generic-file-to-16.png);
+}
+
 .doclist .record-folder .onActionFreeze a
 {
    background-image: url(images/freeze-folder-16.png);

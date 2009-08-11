@@ -1,51 +1,47 @@
 <documentList>
-
    <actionSets>
-
       <actionSet id="empty"></actionSet>
 
       <actionSet id="document">
-         <action id="onActionDownload" type="simple-link" href="{downloadUrl}" label="actions.document.download" />
-         <action id="onActionDetails" type="action-link" permission="edit" label="actions.document.edit-metadata" />
-         <action id="onActionUploadNewVersion" type="action-link" label="actions.document.upload-new-version" />
-         <action id="onActionEditOnline" type="action-link" permission="edit,online-edit" label="actions.document.edit-online" />
-         <action id="onActionEditOffline" type="action-link" permission="edit" label="actions.document.edit-offline" />
-         <action id="onActionCopyTo" type="action-link" label="actions.document.copy-to" />
-         <action id="onActionMoveTo" type="action-link" permission="delete" label="actions.document.move-to" />
-         <action id="onActionDelete" type="action-link" permission="delete" label="actions.document.delete" />
-         <action id="onActionAssignWorkflow" type="action-link" label="actions.document.assign-workflow" />
-         <action id="onActionManagePermissions" type="action-link" permission="permissions" label="actions.document.manage-permissions" />
-         <action id="onActionManageAspects" type="action-link" permission="edit" label="actions.document.manage-aspects" />
+         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
+         <action type="action-link" id="onActionDetails" permission="edit" label="actions.document.edit-metadata" />
+         <action type="action-link" id="onActionUploadNewVersion" permission="edit" label="actions.document.upload-new-version" />
+         <action type="action-link" id="onActionEditOnline" permission="edit,online-edit" label="actions.document.edit-online" />
+         <action type="action-link" id="onActionEditOffline" permission="edit" label="actions.document.edit-offline" />
+         <action type="action-link" id="onActionCopyTo" label="actions.document.copy-to" />
+         <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.document.move-to" />
+         <action type="action-link" id="onActionDelete" permission="delete" label="actions.document.delete" />
+         <action type="action-link" id="onActionAssignWorkflow" label="actions.document.assign-workflow" />
+         <action type="action-link" id="onActionManagePermissions" permission="permissions" label="actions.document.manage-permissions" />
+         <action type="action-link" id="onActionManageAspects" permission="edit" label="actions.document.manage-aspects" />
       </actionSet>
 
       <actionSet id="locked">
-         <action id="onActionDownload" href="{downloadUrl}" type="simple-link" label="actions.document.download" />
+         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
       </actionSet>
 
       <actionSet id="lockOwner">
-         <action id="onActionDownload" href="{downloadUrl}" type="simple-link" label="actions.document.download-original" />
+         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download-original" />
       </actionSet>
 
       <actionSet id="workingCopyOwner">
-         <action id="onActionUploadNewVersion" type="action-link" label="actions.document.upload-new-version" />
-         <action id="onActionDownload" href="{downloadUrl}" type="simple-link" label="actions.document.download-again" />
-         <action id="onActionCancelEditing" type="action-link" label="actions.document.cancel-editing" />
+         <action type="action-link" id="onActionUploadNewVersion" label="actions.document.upload-new-version" />
+         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download-again" />
+         <action type="action-link" id="onActionCancelEditing" permission="edit" label="actions.document.cancel-editing" />
       </actionSet>
 
       <actionSet id="folder">
-         <action id="onActionDetails" permission="edit" type="action-link" label="actions.folder.edit-metadata" />
-         <action id="onActionMetadata" type="simple-link" href="{folderDetailsUrl}" label="actions.folder.view-metadata" />
-         <action id="onActionCopyTo" type="action-link" label="actions.folder.copy-to" />
-         <action id="onActionMoveTo" permission="delete" type="action-link" label="actions.folder.move-to" />
-         <action id="onActionDelete" permission="delete" type="action-link" label="actions.folder.delete" />
-         <action id="onActionManagePermissions" permission="permissions" type="action-link" label="actions.folder.manage-permissions" />
-         <action id="onActionManageAspects" type="action-link" permission="edit" label="actions.folder.manage-aspects" />
+         <action type="action-link" id="onActionDetails" permission="edit" label="actions.folder.edit-metadata" />
+         <action type="simple-link" id="onActionMetadata" href="{folderDetailsUrl}" label="actions.folder.view-metadata" />
+         <action type="action-link" id="onActionCopyTo" label="actions.folder.copy-to" />
+         <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.folder.move-to" />
+         <action type="action-link" id="onActionDelete" permission="delete" label="actions.folder.delete" />
+         <action type="action-link" id="onActionManagePermissions" permission="permissions" label="actions.folder.manage-permissions" />
+         <action type="action-link" id="onActionManageAspects" permission="edit" label="actions.folder.manage-aspects" />
       </actionSet>
 
       <actionSet id="link">
-         <action id="onActionDelete" permission="delete" type="action-link" label="actions.link.delete" />
+         <action type="action-link" id="onActionDelete" permission="delete" label="actions.link.delete" />
       </actionSet>
-
    </actionSets>
-
 </documentList>

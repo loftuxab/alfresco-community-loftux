@@ -1,11 +1,11 @@
 <toolbar>
    <actionSets>
       <actionSet id="default">
-         <action id="onActionCopyTo" type="action-link" label="menu.selected-items.copy" />
-         <action id="onActionMoveTo" permission="delete" type="action-link" label="menu.selected-items.move" />
-         <action id="onActionDelete" permission="delete" type="action-link" label="menu.selected-items.delete" />
-         <action id="onActionAssignWorkflow" asset="document" type="action-link" label="menu.selected-items.assign-workflow" />
-         <action id="onActionManagePermissions" permission="permissions" type="action-link" label="menu.selected-items.manage-permissions" />
+         <action type="action-link" id="onActionCopyTo" label="menu.selected-items.copy" />
+         <action type="action-link" id="onActionMoveTo" permission="delete" label="menu.selected-items.move" />
+         <action type="action-link" id="onActionDelete" permission="delete" label="menu.selected-items.delete" />
+         <action type="action-link" id="onActionAssignWorkflow" asset="document" label="menu.selected-items.assign-workflow" />
+         <action type="action-link" id="onActionManagePermissions" permission="permissions" label="menu.selected-items.manage-permissions" />
       </actionSet>
    </actionSets>
 </toolbar>

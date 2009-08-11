@@ -36,7 +36,7 @@
       this.name = "Alfresco.module.DoclibActions";
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["connection", "json", "selector"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["json"], this.onComponentsLoaded, this);
 
       return this;
    };

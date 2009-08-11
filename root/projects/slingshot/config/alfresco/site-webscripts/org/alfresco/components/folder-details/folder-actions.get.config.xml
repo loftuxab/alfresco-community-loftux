@@ -1,13 +1,13 @@
 <documentList>
    <actionSets>
       <actionSet id="folder">
-         <action id="onActionDetails" type="simple-link" label="actions.folder.edit-metadata" domId="{htmlid}-edit-metadata-action" />
-         <action id="onActionCopyTo" type="action-link" label="actions.folder.copy-to" />
-         <action id="onActionMoveTo" permission="delete" type="action-link" label="actions.folder.move-to" />
-         <action id="onActionDelete" permission="delete" type="action-link" label="actions.folder.delete" />
-         <action id="onActionManagePermissions" permission="permissions" type="action-link" label="actions.folder.manage-permissions" />
-         <action id="onActionManageAspects" permission="edit" type="action-link" label="actions.folder.manage-aspects" />
-         <action id="onActionChangeType" permission="edit" type="action-link" label="actions.folder.change-type" />
+         <action type="simple-link" id="onActionDetails" label="actions.folder.edit-metadata" domId="{htmlid}-edit-metadata-action" />
+         <action type="action-link" id="onActionCopyTo" label="actions.folder.copy-to" />
+         <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.folder.move-to" />
+         <action type="action-link" id="onActionDelete" permission="delete" label="actions.folder.delete" />
+         <action type="action-link" id="onActionManagePermissions" permission="permissions" label="actions.folder.manage-permissions" />
+         <action type="action-link" id="onActionManageAspects" permission="edit" label="actions.folder.manage-aspects" />
+         <action type="action-link" id="onActionChangeType" permission="edit" label="actions.folder.change-type" />
       </actionSet>
    </actionSets>
 </documentList>

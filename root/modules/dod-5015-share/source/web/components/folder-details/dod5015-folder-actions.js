@@ -32,18 +32,6 @@
 (function()
 {
    /**
-    * YUI Library aliases
-    */
-   var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
-   
-   /**
-    * Alfresco Slingshot aliases
-    */
-   var $html = Alfresco.util.encodeHTML;
-   
-   /**
     * RecordsFolderActions constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -55,115 +43,14 @@
       return Alfresco.RecordsFolderActions.superclass.constructor.call(this, htmlId);
    }
    
-   YAHOO.extend(Alfresco.RecordsFolderActions, Alfresco.FolderActions,
-   {
-      /**
-       * Event handler called when the "folderDetailsAvailable" event is received
-       */
-      onFolderDetailsAvailable: function RFA_onFolderDetailsAvailable(layer, args)
-      {
-         Alfresco.RecordsFolderActions.superclass.onFolderDetailsAvailable.apply(this, arguments);
-         
-         var me = this;
+   /**
+    * Extend from Alfresco.FolderActions
+    */
+   YAHOO.extend(Alfresco.RecordsFolderActions, Alfresco.FolderActions);
+   
+   /**
+    * Augment prototype with RecordActions module, ensuring overwrite is enabled
+    */
+   YAHOO.lang.augmentProto(Alfresco.RecordsFolderActions, Alfresco.doclib.RecordsActions, true);
 
-         // remember the data for the folder
-         this.folderData = args[1];
-
-         // Hook action events
-         var fnActionHandler = function RFA_oFDA_fnActionHandler(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
-            if (owner !== null)
-            {
-               var action = owner.className;
-               var target = args[1].target;
-               if (typeof me[action] == "function")
-               {
-                  args[1].stop = true;
-                  me[action].call(me, target.offsetParent, owner);
-               }
-            }
-      		 
-            return true;
-         };
-         
-         // Ensure the "force" parameter is set to true to override the existing handler
-         YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler, true);
-      },
-
-
-      /**
-       * BUBBLING LIBRARY EVENT HANDLERS FOR ACTIONS
-       * Disconnected event handlers for action event notification
-       */
-
-      /**
-       * Close Record Folder action.
-       *
-       * @method onActionClose
-       * @param obj {object} Event source
-       */
-      onActionClose: function RFA_onActionClose(obj)
-      {
-         this._dod5015Action(obj, "closeRecordFolder", "message.close");
-      },
-
-      /**
-       * Re-open Record Folder action.
-       *
-       * @method onActionReopen
-       * @param obj {object} Event source
-       */
-      onActionReopen: function RFA_onActionReopen(obj)
-      {
-         this._dod5015Action(obj, "openRecordFolder", "message.open");
-      },
-
-      /**
-       * DOD5015 action.
-       *
-       * @method _dod5015Action
-       * @param obj {object} Event source
-       * @param actionName {string} Name of repository action to run
-       * @param i18n {string} Will be appended with ".success" or ".failure" depending on action outcome
-       * @private
-       */
-      _dod5015Action: function RFA__dod5015Action(obj, actionName, i18n)
-      {
-         var record = this.folderData,
-            displayName = record.displayName,
-            nodeRef = record.nodeRef;
-
-         this.modules.actions.genericAction(
-         {
-            success:
-            {
-               event:
-               {
-                  name: "metadataRefresh"
-               },
-               message: this._msg(i18n + ".success", displayName)
-            },
-            failure:
-            {
-               message: this._msg(i18n + ".failure", displayName)
-            },
-            webscript:
-            {
-               method: Alfresco.util.Ajax.POST,
-               stem: Alfresco.constants.PROXY_URI + "api/rma/actions/",
-               name: "ExecutionQueue"
-            },
-            config:
-            {
-               requestContentType: Alfresco.util.Ajax.JSON,
-               dataObj:
-               {
-                  name: actionName,
-                  nodeRef: nodeRef
-               }
-            }
-         });
-      }
-   });
 })();

@@ -111,6 +111,15 @@
       return this;
    };
 
+   /**
+    * Extend from Alfresco.component.Base
+    */
+   YAHOO.extend(Alfresco.DocumentList, Alfresco.component.Base);
+
+   /**
+    * Augment prototype with Actions module
+    */
+   YAHOO.lang.augmentProto(Alfresco.DocumentList, Alfresco.doclib.Actions);
 
    /**
     * Custom field generator functions
@@ -197,7 +206,10 @@
    };
 
    
-   YAHOO.extend(Alfresco.DocumentList, Alfresco.component.Base,
+   /**
+    * Augment prototype with main class implementation, ensuring overwrite is enabled
+    */
+   YAHOO.lang.augmentObject(Alfresco.DocumentList.prototype,
    {
       /**
        * Object container for initialization options
@@ -600,9 +612,10 @@
             Dom.setStyle(elCell, "width", oColumn.width + "px");
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            var status = oRecord.getData("actionSet");
-            var tip = "";
-            var desc = "";
+            var record = oRecord.getData(),
+               status = record.actionSet,
+               tip = "",
+               desc = "";
             
             // Locked by/Editing status
             var lockType = "";
@@ -622,12 +635,12 @@
             }
             if (lockType !== "")
             {
-               tip = me.msg("tip." + lockType, oRecord.getData("lockedBy"), oRecord.getData("lockedByUser"));
+               tip = me.msg("tip." + lockType, record.lockedBy, record.lockedByUser);
                desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + lockType + '-status-16.png" title="' + tip + '" alt="' + lockType + '" /></div>';
             }
             
             // In workflow status
-            status = oRecord.getData("activeWorkflows");
+            status = record.activeWorkflows;
             if (status !== "")
             {
                tip = me.msg("tip.active-workflow", status.split(",").length);
@@ -648,11 +661,12 @@
           */
          var renderCellThumbnail = function DL_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
-            var name = oRecord.getData("fileName"),
-               title = oRecord.getData("title"),
-               type = oRecord.getData("type"),
-               isLink = oRecord.getData("isLink"),
-               locn = oRecord.getData("location"),
+            var record = oRecord.getData(),
+               name = record.fileName,
+               title = record.title,
+               type = record.type,
+               isLink = record.isLink,
+               locn = record.location,
                extn = name.substring(name.lastIndexOf(".")),
                docDetailsUrl;
 
@@ -672,7 +686,7 @@
                else
                {
                   var id = me.id + '-preview-' + oRecord.getId();
-                  docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
+                  docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
                   elCell.innerHTML = '<span id="' + id + '" class="icon32">' + (isLink ? '<span class="link"></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(name) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
                   
                   // Preview tooltip
@@ -694,7 +708,7 @@
                }
                else
                {
-                  docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
+                  docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
                   elCell.innerHTML = '<span class="thumbnail">' + (isLink ? '<span class="link"></span>' : '') + '<a href="' + docDetailsUrl + '"><img src="' + Alfresco.DocumentList.generateThumbnailUrl(oRecord) + '" alt="' + extn + '" title="' + $html(title) + '" /></a></span>';
                }
             }
@@ -712,14 +726,15 @@
          var renderCellDescription = function DL_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
             var desc = "", description, docDetailsUrl, tags, tag, i, j;
-            var type = oRecord.getData("type"),
-               isLink = oRecord.getData("isLink"),
-               locn = oRecord.getData("location");
+            var record = oRecord.getData(),
+               type = record.type,
+               isLink = record.isLink,
+               locn = record.location;
             
             // Link handling
             if (isLink)
             {
-               oRecord.setData("displayName", me.msg("details.link-to", oRecord.getData("displayName")));
+               oRecord.setData("displayName", me.msg("details.link-to", record.displayName));
             }
             
             if (type == "folder")
@@ -728,31 +743,31 @@
                 * Folders
                 */
                desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '">';
-               desc += $html(oRecord.getData("displayName")) + '</a></h3>';
+               desc += $html(record.displayName) + '</a></h3>';
 
                if (me.options.simpleView)
                {
                   /**
                    * Simple View
                    */
-                  desc += '<div class="detail"><span class="item-simple"><em>' + me.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
-                  desc += '<span class="item-simple"><em>' + me.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
+                  desc += '<div class="detail"><span class="item-simple"><em>' + me.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
+                  desc += '<span class="item-simple"><em>' + me.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
                }
                else
                {
                   /**
                    * Detailed View
                    */
-                  desc += '<div class="detail"><span class="item"><em>' + me.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                  desc += '<span class="item"><em>' + me.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
-                  description = oRecord.getData("description");
+                  desc += '<div class="detail"><span class="item"><em>' + me.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
+                  desc += '<span class="item"><em>' + me.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                  description = record.description;
                   if (description === "")
                   {
                      description = me.msg("details.description.none");
                   }
                   desc += '<div class="detail"><span class="item"><em>' + me.msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
                   /* Tags */
-                  tags = oRecord.getData("tags");
+                  tags = record.tags;
                   desc += '<div class="detail"><span class="item tag-item"><em>' + me.msg("details.tags") + '</em> ';
                   if (tags.length > 0)
                   {
@@ -774,37 +789,37 @@
                /**
                 * Documents and Links
                 */
-               docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + oRecord.getData("nodeRef");
+               docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
                 
-               desc = '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(me, oRecord) + '<span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(oRecord.getData("displayName")) + '</a></span></h3>';
+               desc = '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(me, oRecord) + '<span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(record.displayName) + '</a></span></h3>';
                if (me.options.simpleView)
                {
                   /**
                    * Simple View
                    */
-                  desc += '<div class="detail"><span class="item-simple"><em>' + me.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
-                  desc += '<span class="item-simple"><em>' + me.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span></div>';
+                  desc += '<div class="detail"><span class="item-simple"><em>' + me.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn, "dd mmmm yyyy") + '</span>';
+                  desc += '<span class="item-simple"><em>' + me.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
                }
                else
                {
                   /**
                    * Detailed View
                    */
-                  description = oRecord.getData("description");
+                  description = record.description;
                   if (description === "")
                   {
                      description = me.msg("details.description.none");
                   }
 
-                  if (oRecord.getData("status").indexOf("workingCopy") != -1)
+                  if (record.status.indexOf("workingCopy") != -1)
                   {
                      /**
                       * Working Copy
                       */
                      desc += '<div class="detail">';
-                     desc += '<span class="item"><em>' + me.msg("details.checked-out.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                     desc += '<span class="item"><em>' + me.msg("details.checked-out.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span>';
-                     desc += '<span class="item"><em>' + me.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
+                     desc += '<span class="item"><em>' + me.msg("details.checked-out.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
+                     desc += '<span class="item"><em>' + me.msg("details.checked-out.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span>';
+                     desc += '<span class="item"><em>' + me.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
                      desc += '</div><div class="detail">';
                      desc += '<span class="item"><em>' + me.msg("details.description") + '</em> ' + $links($html(description)) + '</span>';
                      desc += '</div>';
@@ -815,16 +830,16 @@
                       * Non-Working Copy
                       */
                      desc += '<div class="detail">';
-                     desc += '<span class="item"><em>' + me.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
-                     desc += '<span class="item"><em>' + me.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(oRecord.getData("modifiedByUser")) + '">' + $html(oRecord.getData("modifiedBy")) + '</a></span>';
-                     desc += '<span class="item"><em>' + me.msg("details.version") + '</em> ' + oRecord.getData("version") + '</span>';
-                     desc += '<span class="item"><em>' + me.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(oRecord.getData("size")) + '</span>';
+                     desc += '<span class="item"><em>' + me.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
+                     desc += '<span class="item"><em>' + me.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span>';
+                     desc += '<span class="item"><em>' + me.msg("details.version") + '</em> ' + record.version + '</span>';
+                     desc += '<span class="item"><em>' + me.msg("details.size") + '</em> ' + Alfresco.util.formatFileSize(record.size) + '</span>';
                      desc += '</div><div class="detail">';
                      desc += '<span class="item"><em>' + me.msg("details.description") + '</em> ' + $links($html(description)) + '</span>';
                      desc += '</div>';
 
                      /* Tags */
-                     tags = oRecord.getData("tags");
+                     tags = record.tags;
                      desc += '<div class="detail"><span class="item tag-item"><em>' + me.msg("details.tags") + '</em> ';
                      if (tags.length > 0)
                      {
@@ -875,12 +890,14 @@
 
             elCell.innerHTML = '<div id="' + me.id + '-actions-' + oRecord.getId() + '" class="hidden"></div>';
             
+            var record = oRecord.getData();
+            
             /**
              * Configure the Online Edit URL if enabled for this mimetype
              */
-            if (me.doclistMetadata.onlineEditing && (oRecord.getData("mimetype") in me.options.onlineEditMimetypes))
+            if (me.doclistMetadata.onlineEditing && (record.mimetype in me.options.onlineEditMimetypes))
             {
-               var loc = oRecord.getData("location"), path;
+               var loc = record.location, path;
                oRecord.setData("onlineEditUrl", window.location.protocol + "//" + window.location.hostname + ":" + me.options.vtiServer.port + "/" + $combine("alfresco", loc.site, loc.container, loc.path, loc.file));
             }
          };
@@ -933,7 +950,8 @@
                if (typeof me[owner.className] == "function")
                {
                   args[1].stop = true;
-                  me[owner.className].call(me, args[1].target.offsetParent, owner);
+                  var asset = me.widgets.dataTable.getRecord(args[1].target.offsetParent).getData();
+                  me[owner.className].call(me, asset, owner);
                }
             }
       		 
@@ -1456,8 +1474,8 @@
          if (elActions.firstChild === null)
          {
             // Retrieve the actionSet for this asset
-            var record = this.widgets.dataTable.getRecord(oArgs.target.id);
-            var actionSet = record.getData("actionSet");
+            var record = this.widgets.dataTable.getRecord(oArgs.target.id),
+               actionSet = record.getData("actionSet");
             
             // Clone the actionSet template node from the DOM
             var clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
@@ -1597,10 +1615,10 @@
        * Show more actions pop-up.
        *
        * @method onActionShowMore
-       * @param row {object} DataTable row representing file to be actioned
+       * @param asset {object} Unused
        * @param elMore {element} DOM Element of "More Actions" link
        */
-      onActionShowMore: function DL_onActionShowMore(row, elMore)
+      onActionShowMore: function DL_onActionShowMore(asset, elMore)
       {
          var me = this;
          
@@ -1671,130 +1689,22 @@
       },
       
       /**
-       * Asset details.
-       *
-       * @method onActionDetails
-       * @param row {object} DataTable row representing file to be actioned
-       */
-      onActionDetails: function DL_onActionDetails(row)
-      {
-         if (!this.modules.details)
-         {
-            this.modules.details = new Alfresco.module.DoclibDetails(this.id + "-details");
-         }
-
-         this.modules.details.setOptions(
-         {
-            siteId: this.options.siteId,
-            file: this.widgets.dataTable.getRecord(row).getData()
-         }).showDialog();
-      },
-
-      /**
-       * Delete Asset.
-       *
-       * @method onActionDelete
-       * @param row {object} DataTable row representing file to be actioned
-       */
-      onActionDelete: function DL_onActionDelete(row)
-      {
-         var me = this;
-         var record = this.widgets.dataTable.getRecord(row),
-            displayName = record.getData("displayName");
-         
-         Alfresco.util.PopupManager.displayPrompt(
-         {
-            title: this.msg("message.confirm.delete.title"),
-            text: this.msg("message.confirm.delete", displayName),
-            buttons: [
-            {
-               text: this.msg("button.delete"),
-               handler: function DL_onActionDelete_delete()
-               {
-                  this.destroy();
-                  me._onActionDeleteConfirm.call(me, record);
-               }
-            },
-            {
-               text: this.msg("button.cancel"),
-               handler: function DL_onActionDelete_cancel()
-               {
-                  this.destroy();
-               },
-               isDefault: true
-            }]
-         });
-      },
-
-      /**
-       * Delete Asset confirmed.
-       *
-       * @method _onActionDeleteConfirm
-       * @param record {object} DataTable record representing file to be actioned
-       * @private
-       */
-      _onActionDeleteConfirm: function DL__onActionDeleteConfirm(record)
-      {
-         var fileType = record.getData("type"),
-            path = record.getData("location").path,
-            fileName = record.getData("fileName"),
-            filePath = $combine(path, fileName),
-            displayName = record.getData("displayName");
-         
-         this.modules.actions.genericAction(
-         {
-            success:
-            {
-               activity:
-               {
-                  siteId: this.options.siteId,
-                  activityType: "file-deleted",
-                  page: "documentlibrary",
-                  activityData:
-                  {
-                     fileName: fileName,
-                     path: path
-                  }
-               },
-               event:
-               {
-                  name: fileType == "folder" ? "folderDeleted" : "fileDeleted",
-                  obj:
-                  {
-                     path: filePath
-                  }
-               },
-               message: this.msg("message.delete.success", displayName)
-            },
-            failure:
-            {
-               message: this.msg("message.delete.failure", displayName)
-            },
-            webscript:
-            {
-               method: Alfresco.util.Ajax.DELETE,
-               name: $combine("file/site", this.options.siteId, this.options.containerId, path, fileName)
-            }
-         });
-      },
-
-      /**
        * Edit Offline.
        *
+       * @override
        * @method onActionEditOffline
-       * @param row {object} DataTable row representing file to be actioned
+       * @param asset {object} Object literal representing file or folder to be actioned
        */
-      onActionEditOffline: function DL_onActionEditOffline(row)
+      onActionEditOffline: function DL_onActionEditOffline(asset)
       {
-         if(!this.state.actionEditOfflineActive)
+         if (!this.state.actionEditOfflineActive)
          {
             // Make sure we don't call edit offline twice
             this.state.actionEditOfflineActive = true;
 
-            var record = this.widgets.dataTable.getRecord(row),
-               path = record.getData("location").path,
-               fileName = record.getData("fileName"),
-               displayName = record.getData("displayName");
+            var path = asset.location.path,
+               fileName = asset.fileName,
+               displayName = asset.displayName;
 
             var me = this;
 
@@ -1888,272 +1798,20 @@
        * Edit Online.
        *
        * @method onActionEditOnline
-       * @param row {object} DataTable row representing file to be actioned
+       * @param asset {object} Object literal representing file or folder to be actioned
        */
-      onActionEditOnline: function DL_onActionEditOnline(row)
+      onActionEditOnline: function DL_onActionEditOnline(asset)
       {
-         var record = this.widgets.dataTable.getRecord(row);
-         window.open(record.getData("onlineEditUrl"), "_blank");
-         // Really, we'd need to refresh after the document has been opened, but we dn't know when/if this occurs
+         window.open(asset.onlineEditUrl, "_blank");
+         // Really, we'd need to refresh after the document has been opened, but we don't know when/if this occurs
          YAHOO.Bubbling.fire("metadataRefresh");
       },
 
-      /**
-       * Upload new version.
-       *
-       * @method onActionUploadNewVersion
-       * @param row {object} DataTable row representing file to be actioned
-       */
-      onActionUploadNewVersion: function DL_onActionUploadNewVersion(row)
-      {
-         var record = this.widgets.dataTable.getRecord(row);
-         var fileName = record.getData("fileName"),
-            nodeRef = record.getData("nodeRef");
-
-         if (this.fileUpload === null)
-         {
-            this.fileUpload = Alfresco.getFileUploadInstance();
-         }
-
-         // Show uploader for multiple files
-         var description = this.msg("label.filter-description", record.getData("displayName"));
-         var extensions = "*" + fileName.substring(fileName.lastIndexOf("."));
-         var singleUpdateConfig =
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            updateNodeRef: nodeRef,
-            updateFilename: fileName,
-            overwrite: true,
-            filter: [
-            {
-               description: description,
-               extensions: extensions
-            }],
-            mode: this.fileUpload.MODE_SINGLE_UPDATE,
-            onFileUploadComplete:
-            {
-               fn: this.onNewVersionUploadComplete,
-               scope: this
-            }
-         };
-         this.fileUpload.show(singleUpdateConfig);
-      },
 
       /**
-       * Called from the uploader component after a the new version has been uploaded.
-       *
-       * @method onNewVersionUploadComplete
-       * @param complete {object} Object literal containing details of successful and failed uploads
+       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
+       * Disconnected event handlers for inter-component event notification
        */
-      onNewVersionUploadComplete: function DL_onNewVersionUploadComplete(complete)
-      {
-         var success = complete.successful.length, activityData, file;
-         if (success > 0)
-         {
-            if (success < this.options.groupActivitiesAt)
-            {
-               // Below cutoff for grouping Activities into one
-               for (var i = 0; i < success; i++)
-               {
-                  file = complete.successful[i];
-                  activityData =
-                  {
-                     fileName: file.fileName,
-                     nodeRef: file.nodeRef
-                  };
-                  this.modules.actions.postActivity(this.options.siteId, "file-updated", "document-details", activityData);
-               }
-            }
-            else
-            {
-               // grouped into one message
-               activityData =
-               {
-                  fileCount: success,
-                  path: this.currentPath
-               };
-               this.modules.actions.postActivity(this.options.siteId, "files-updated", "documentlibrary", activityData);
-            }
-         }
-      },
-
-      /**
-       * Cancel editing.
-       *
-       * @method onActionCancelEditing
-       * @param row {object} DataTable row representing file to be actioned
-       */
-      onActionCancelEditing: function DL_onActionCancelEditing(row)
-      {
-         var record = this.widgets.dataTable.getRecord(row);
-         var displayName = record.getData("displayName");
-         var nodeRef = record.getData("nodeRef");
-
-         this.modules.actions.genericAction(
-         {
-            success:
-            {
-               event:
-               {
-                  name: "metadataRefresh"
-               },
-               message: this.msg("message.edit-cancel.success", displayName)
-            },
-            failure:
-            {
-               message: this.msg("message.edit-cancel.failure", displayName)
-            },
-            webscript:
-            {
-               method: Alfresco.util.Ajax.POST,
-               name: "cancel-checkout/node/{nodeRef}",
-               params:
-               {
-                  nodeRef: nodeRef.replace(":/", "")
-               }
-            }
-         });
-      },
-      
-      /**
-       * Copy single document or folder.
-       *
-       * @method onActionCopyTo
-       * @param row {object} DataTable row representing file to be actioned
-       */
-      onActionCopyTo: function DL_onActionCopyTo(row)
-      {
-         var file = this.widgets.dataTable.getRecord(row).getData();
-         
-         if (!this.modules.copyTo)
-         {
-            this.modules.copyTo = new Alfresco.module.DoclibCopyTo(this.id + "-copyTo").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.currentPath,
-               files: file
-            });
-         }
-         else
-         {
-            this.modules.copyTo.setOptions(
-            {
-               path: this.currentPath,
-               files: file
-            });
-         }
-         this.modules.copyTo.showDialog();
-      },
-
-      /**
-       * Move single document or folder.
-       *
-       * @method onActionMoveTo
-       * @param row {object} DataTable row representing file to be actioned
-       */
-      onActionMoveTo: function DL_onActionMoveTo(row)
-      {
-         var file = this.widgets.dataTable.getRecord(row).getData();
-         
-         if (!this.modules.moveTo)
-         {
-            this.modules.moveTo = new Alfresco.module.DoclibMoveTo(this.id + "-moveTo");
-         }
-
-         this.modules.moveTo.setOptions(
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            path: this.currentPath,
-            files: file
-         });
-
-         this.modules.moveTo.showDialog();
-      },
-
-      /**
-       * Assign workflow.
-       *
-       * @method onActionAssignWorkflow
-       * @param row {object} DataTable row representing file to be actioned
-       */
-      onActionAssignWorkflow: function DL_onActionAssignWorkflow(row)
-      {
-         var file = this.widgets.dataTable.getRecord(row).getData();
-         
-         if (!this.modules.assignWorkflow)
-         {
-            this.modules.assignWorkflow = new Alfresco.module.DoclibWorkflow(this.id + "-workflow").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.currentPath,
-               files: file
-            });
-         }
-         else
-         {
-            this.modules.assignWorkflow.setOptions(
-            {
-               path: this.currentPath,
-               files: file
-            });
-         }
-         this.modules.assignWorkflow.showDialog();
-      },
-
-      /**
-       * Set permissions on a single document or folder.
-       *
-       * @method onActionManagePermissions
-       * @param row {object} DataTable row representing file to be actioned
-       */
-      onActionManagePermissions: function DL_onActionManagePermissions(row)
-      {
-         var file = this.widgets.dataTable.getRecord(row).getData();
-         
-         if (!this.modules.permissions)
-         {
-            this.modules.permissions = new Alfresco.module.DoclibPermissions(this.id + "-permissions").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               path: this.currentPath,
-               files: file
-            });
-         }
-         else
-         {            
-            this.modules.permissions.setOptions(
-            {
-               path: this.currentPath,
-               files: file
-            });
-         }
-         this.modules.permissions.showDialog();
-      },
-
-      /**
-       * Manage aspects.
-       *
-       * @method onActionManageAspects
-       * @param row {object} DataTable row representing file to be actioned
-       */
-      onActionManageAspects: function DL_onActionManageAspects(row)
-      {
-         if (!this.modules.aspects)
-         {
-            this.modules.aspects = new Alfresco.module.DoclibAspects(this.id + "-aspects");
-         }
-
-         this.modules.aspects.setOptions(
-         {
-            file: this.widgets.dataTable.getRecord(row).getData()
-         }).show();
-      },
-
       
       /**
        * Path Changed handler
@@ -2229,12 +1887,6 @@
          }
       },
 
-
-      /**
-       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
-       * Disconnected event handlers for inter-component event notification
-       */
-      
       /**
        * Generic file action event handler
        *
@@ -2392,7 +2044,7 @@
        * Favourite document event handler
        *
        * @method onFavouriteDocument
-       * @param row {object} DataTable row representing file to be actioned
+       * @param asset {object} Object literal representing file or folder to be actioned
        */
       onFavouriteDocument: function DL_onFavouriteDocument(row)
       {
@@ -2650,5 +2302,5 @@
         }
         return null;
       }
-   });
+   }, true);
 })();

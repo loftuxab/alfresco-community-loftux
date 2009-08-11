@@ -22,6 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
+
 /**
  * This is meant to be used as an augmentation to Alfresco.component.Base.
  * It allows events to be delegated to the root element of the component
@@ -29,37 +30,42 @@
  * 
  * Usage:
  *    Component must have an initEvents method which registers event handlers
- *    via registerEventHandler(). initEvents() must be called in component's'
+ *    via registerEventHandler(). initEvents() must be called in component's
  *    onReady() method.
  *    Example call of registerEventHandler from with initEvents() :
  *    (2nd parameter can be an array of third parameters)
- *      this.registerEventHandler('click','button.editRef',{
- *        handler:function editReference(e,args){
- *          console.log(arguments, ' [editReference]');
- *        },
- *        scope : this
- *        }
- *      );
+ *      this.registerEventHandler('click', 'button.editRef',
+ *      {
+ *         handler: function editReference(e, args)
+ *         {
+ *            console.log(arguments, '[editReference]');
+ *         },
+ *         scope : this
+ *      });
  *    
- *    or multiple handlers for the same event : 
+ *    or multiple handlers for the same event: 
  * 
- *    this.registerEventHandler('click',[
- *    {
- *       rule : 'button.editRef',
- *       o : {
- *          handler:function editReference(e,args){
- *             alert('editReference');
- *          },
- *          scope : this
+ *    this.registerEventHandler('click',
+ *    [
+ *       {
+ *          rule: 'button.editRef',
+ *          o:
+ *          {
+ *             handler: function editReference(e,args)
+ *             {
+ *                alert('editReference');
+ *             },
+ *             scope : this
+ *          }
+ *       },
+ *       {
+ *          rule: 'button.deleteRef',
+ *          o:
+ *          {
+ *             handler: this.onDeleteReference,
+ *             scope: this
+ *          }
  *       }
- *    },
- *    {
- *       rule : 'button.deleteRef',
- *       o : {
- *          handler:this.onDeleteReference,
- *          scope : this
- *       }
- *    }
  *    ]);
  * 
  */
@@ -68,63 +74,68 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom,
-       Event = YAHOO.util.Event,
+   var Event = YAHOO.util.Event,
        Sel = YAHOO.util.Selector;
 
-   var eventDelegator = function() { };
-   eventDelegator.prototype = {
-         // Container for event handlers
-         eventHandlers:{},
-         /**
-          * Registers an event handler against a specific CSS rule
-          * 
-          *  
-          */
-         registerEventHandler : function registerEventHandler(eventName, rule, o)
-         {
-            if (YAHOO.lang.isArray(rule))
-            {
-               for (var i=0,len=rule.length;i<len;i++)
-               {
-                  this.registerEventHandler(eventName,rule[i].rule,rule[i].o);
-               }
-               return this;
-            }
-            this.eventHandlers[eventName] = this.eventHandlers[eventName] || {};
-            this.eventHandlers[eventName][rule] = o;
-            return this;
-         },
-         /**
-          * Event delegation handler for any event type
-          * @method onInteractionEvent
-          *  
-          */
-         onInteractionEvent: function RM_References_onInteractionEvent(e, args)
-         {
-            // get element that triggered event
-            var elTarget = Event.getTarget(e), eventName = e.type;
+   var eventDelegator = function(){};
+ 
+   eventDelegator.prototype =
+   {
+      /**
+       * Container for event handlers
+       */
+      eventHandlers: {},
 
-            // Event.preventDefault(e)
-            //iterate through rules and execute handlers
-            if (this.eventHandlers[eventName])
+      /**
+       * Registers an event handler against a specific CSS rule
+       * @method registerEventHandler
+       */
+      registerEventHandler: function registerEventHandler(eventName, rule, o)
+      {
+         if (YAHOO.lang.isArray(rule))
+         {
+            for (var i = 0, len = rule.length; i < len; i++)
             {
-               var rules = this.eventHandlers[eventName];
-               for (var rule in rules)
+               this.registerEventHandler(eventName, rule[i].rule, rule[i].o);
+            }
+            return this;
+         }
+         this.eventHandlers[eventName] = this.eventHandlers[eventName] || {};
+         this.eventHandlers[eventName][rule] = o;
+         return this;
+      },
+
+      /**
+       * Event delegation handler for any event type
+       * @method onInteractionEvent
+       */
+      onInteractionEvent: function RM_References_onInteractionEvent(e, args)
+      {
+         // get element that triggered event
+         var elTarget = Event.getTarget(e),
+            eventName = e.type;
+
+         // Event.preventDefault(e)
+         // Iterate through rules and execute handlers
+         if (this.eventHandlers[eventName])
+         {
+            var rules = this.eventHandlers[eventName],
+               handlerObj;
+            for (var rule in rules)
+            {
+               if (Sel.test(elTarget, rule))
                {
-                  if (Sel.test(elTarget,rule))
+                  handlerObj = rules[rule];
+                  if (handlerObj.handler && YAHOO.lang.isFunction(handlerObj.handler))
                   {
-                     var handlerObj = rules[rule];
-                     if (handlerObj.handler && YAHOO.lang.isFunction(handlerObj.handler))
-                     {
-                        return handlerObj.handler.apply(handlerObj.scope || window,arguments);
-                     }
+                     return handlerObj.handler.apply(handlerObj.scope || window, arguments);
                   }
                }
             }
-            
-            return this;
          }
+         return this;
+      }
    };
+
    YAHOO.augment(Alfresco.component.Base, eventDelegator);
 })();

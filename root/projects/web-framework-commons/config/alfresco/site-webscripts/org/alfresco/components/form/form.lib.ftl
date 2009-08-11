@@ -7,7 +7,8 @@
          arguments:
          {
             itemKind: "${form.arguments.itemKind!""}",
-            itemId: "${form.arguments.itemId!""}"
+            itemId: "${form.arguments.itemId!""}",
+            formId: "${form.arguments.formId!""}"
          }
          <#else>
          enctype: "${form.enctype}",
