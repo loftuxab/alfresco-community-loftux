@@ -377,7 +377,7 @@
   
          <properties>
          
-            <property name="rma:transferAccesnsionIndicator">
+            <property name="rma:transferAccessionIndicator">
                <title>Transfer Accession Indicator</title>
                <type>d:boolean</type>
                <mandatory>true</mandatory>
@@ -388,7 +388,7 @@
          
          <associations>
             
-            <child-association name="rma:transfered">
+            <child-association name="rma:transferred">
                 <title>Transfered</title>
                 <source>
                     <mandatory>false</mandatory>

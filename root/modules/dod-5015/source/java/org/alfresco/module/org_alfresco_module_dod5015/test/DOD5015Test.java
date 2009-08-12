@@ -834,7 +834,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertEquals(1, assocs.size());
         NodeRef transferNodeRef = assocs.get(0).getChildRef();
         assertEquals(TYPE_TRANSFER, this.nodeService.getType(transferNodeRef));
-        List<ChildAssociationRef> children = this.nodeService.getChildAssocs(transferNodeRef, ASSOC_TRANSFERED, RegexQNamePattern.MATCH_ALL);
+        List<ChildAssociationRef> children = this.nodeService.getChildAssocs(transferNodeRef, ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
         assertNotNull(children);
         assertEquals(1, children.size());
         

@@ -124,7 +124,7 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
         // Link the record to the hold
         this.nodeService.addChild(transferNodeRef, 
                                   dispositionLifeCycleNodRef, 
-                                  ASSOC_TRANSFERED, 
-                                  ASSOC_TRANSFERED);
+                                  ASSOC_TRANSFERRED, 
+                                  ASSOC_TRANSFERRED);
     }
 }

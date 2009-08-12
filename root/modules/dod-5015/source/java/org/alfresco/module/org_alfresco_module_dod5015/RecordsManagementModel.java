@@ -160,6 +160,6 @@ public interface RecordsManagementModel
 	
 	// Transfer aspect
 	public static QName TYPE_TRANSFER = QName.createQName(RM_URI, "transfer");
-	public static QName PROP_TRANSFER_ACCESSION_INDICATOR = QName.createQName(RM_URI, "transferAccesnsionIndicator");
-    public static QName ASSOC_TRANSFERED = QName.createQName(RM_URI, "transfered");
+	public static QName PROP_TRANSFER_ACCESSION_INDICATOR = QName.createQName(RM_URI, "transferAccessionIndicator");
+    public static QName ASSOC_TRANSFERRED = QName.createQName(RM_URI, "transferred");
 }
