@@ -374,9 +374,17 @@
       <type name="rma:transfer">
          <title>Transfer</title>
          <parent>cm:folder</parent>
+  
+         <properties>
          
-         <!-- TODO need to reference the transfer download URL -->
-         <!-- TODO need to reference the transfer report URL -->
+            <property name="rma:transferAccesnsionIndicator">
+               <title>Transfer Accession Indicator</title>
+               <type>d:boolean</type>
+               <mandatory>true</mandatory>
+               <default>true</default>
+            </property>
+         
+         </properties>
          
          <associations>
             

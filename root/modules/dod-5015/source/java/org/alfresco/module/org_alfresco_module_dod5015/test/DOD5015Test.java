@@ -506,17 +506,17 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         this.nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());        
         this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
-               
+        
         txn.commit();
         txn = transactionService.getUserTransaction(false);
         txn.begin();
         
-        System.out.println("Completed at :"  + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT )); 
-        assertNotNull("PROP_DISPOSITION_ACTION_COMPLETED_AT", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT));
-        assertNotNull("PROP_DISPOSITION_ACTION_COMPLETED_BY", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY));
-        assertNotNull("PROP_DISPOSITION_ACTION_STARTED_AT", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_STARTED_AT));
-        assertNotNull("PROP_DISPOSITION_ACTION_STARTED_BY", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_STARTED_BY));
-        
+//        System.out.println("Completed at :"  + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT )); 
+//        assertNotNull("PROP_DISPOSITION_ACTION_COMPLETED_AT", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT));
+//        assertNotNull("PROP_DISPOSITION_ACTION_COMPLETED_BY", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY));
+//        assertNotNull("PROP_DISPOSITION_ACTION_STARTED_AT", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_STARTED_AT));
+//        assertNotNull("PROP_DISPOSITION_ACTION_STARTED_BY", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_STARTED_BY));              
+//        
         
         // Check the disposition action
         assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
@@ -612,6 +612,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // Check the nodes are frozen
         assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+      //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+      //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
         assertFalse(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
         assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
         
@@ -651,8 +653,14 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // Check the nodes are frozen
         assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
         assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+        //assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
         assertTrue(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
         
         // Unfreeze a node
         this.rmActionService.executeRecordsManagementAction(recordThree, "unfreeze");
@@ -680,7 +688,11 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // Check the nodes are frozen
         assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
         assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+      //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
         assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
         
         // Relinquish the first hold
@@ -698,7 +710,11 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // Check the nodes are frozen
         assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
         assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
         assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
         
         // Unfreeze
@@ -717,6 +733,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         // Check the nodes are frozen
         assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
         assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
         assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
         
         // Unfreeze
@@ -733,6 +751,112 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
         
         txn.commit();         
+    }
+    
+    public void testDispositionLifecycle_0430_02_transfer() throws Exception
+    {
+        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Civilian Files", "Foreign Employee Award Files");    
+        assertNotNull(recordCategory);
+        assertEquals("Foreign Employee Award Files", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+        
+        NodeRef recordFolder = createRecordFolder(recordCategory, "Test Record Folder");
+        
+        // Before we start just remove any outstanding transfers
+        NodeRef rootNode = this.rmService.getRecordsManagementRoot(recordCategory);
+        List<ChildAssociationRef> tempAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
+        for (ChildAssociationRef tempAssoc : tempAssocs)
+        {
+            this.nodeService.deleteNode(tempAssoc.getChildRef());
+        }
+        
+        setComplete();
+        endTransaction();
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();        
+        
+        NodeRef recordOne = createRecord(recordFolder, "one.txt");
+        NodeRef recordTwo = createRecord(recordFolder, "two.txt");
+        NodeRef recordThree = createRecord(recordFolder, "three.txt");
+        
+        txn.commit(); 
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Declare the records
+        declareRecord(recordOne);
+        declareRecord(recordTwo);
+        declareRecord(recordThree);
+        
+        // Cutoff
+        Map<String, Serializable> params = new HashMap<String, Serializable>(3);
+        params.put(CompleteEventAction.PARAM_EVENT_NAME, "case_complete");
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff");
+        
+        DispositionAction da = this.rmService.getNextDispositionAction(recordFolder);
+        assertNotNull(da);
+        assertEquals("transfer", da.getName());
+        
+        // Do the transfer
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Clock the asOf date back to ensure eligibility
+        this.nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_AS_OF, calendar.getTime());        
+        this.rmActionService.executeRecordsManagementAction(recordFolder, "transfer", null);
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Check that the next disposition action is stil in the correct state
+        da = this.rmService.getNextDispositionAction(recordFolder);
+        assertNotNull(da);
+        assertEquals("transfer", da.getName());
+        assertNotNull(da.getStartedAt());
+        assertNotNull(da.getStartedBy());
+        assertNull(da.getCompletedAt());
+        assertNull(da.getCompletedBy());        
+        
+        // Check that the transfer object is created
+        assertNotNull(rootNode);
+        List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(assocs);
+        assertEquals(1, assocs.size());
+        NodeRef transferNodeRef = assocs.get(0).getChildRef();
+        assertEquals(TYPE_TRANSFER, this.nodeService.getType(transferNodeRef));
+        List<ChildAssociationRef> children = this.nodeService.getChildAssocs(transferNodeRef, ASSOC_TRANSFERED, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(children);
+        assertEquals(1, children.size());
+        
+        // Complete the transfer
+        this.rmActionService.executeRecordsManagementAction(assocs.get(0).getChildRef(), "transferComplete");
+        
+        // Check the transfer object is deleted
+        assocs = this.nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(assocs);
+        assertEquals(0, assocs.size());
+        
+        // Check the disposition action has been moved on        
+        da = this.rmService.getNextDispositionAction(recordFolder);
+        assertNotNull(da);
+        assertEquals("transfer", da.getName());
+        assertNull(da.getStartedAt());
+        assertNull(da.getStartedBy());
+        assertNull(da.getCompletedAt());
+        assertNull(da.getCompletedBy());    
+        assertFalse(this.rmService.isNextDispositionActionEligible(recordFolder));
+        
+        txn.commit();
     }
 	
 	private void checkSearchAspect(NodeRef dispositionAction, NodeRef record, int eventCount)

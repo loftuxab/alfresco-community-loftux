@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.Set;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -102,15 +104,18 @@ public class FreezeAction extends RMActionExecuterAbstractBase
                                         ASSOC_FROZEN_RECORDS);
             
             // Apply the freeze aspect
+            Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
+            props.put(PROP_FROZEN_AT, new Date());
+            props.put(PROP_FROZEN_BY, AuthenticationUtil.getFullyAuthenticatedUser());
             this.nodeService.addAspect(actionedUponNodeRef, ASPECT_FROZEN, null);
-            
+                        
             // Mark all the folders contents as frozen
             if (this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
             {
                 List<NodeRef> records = this.recordsManagementService.getRecords(actionedUponNodeRef);
                 for (NodeRef record : records)
                 {
-                    this.nodeService.addAspect(record, ASPECT_FROZEN, null);
+                    this.nodeService.addAspect(record, ASPECT_FROZEN, props);
                 }
             }
         }

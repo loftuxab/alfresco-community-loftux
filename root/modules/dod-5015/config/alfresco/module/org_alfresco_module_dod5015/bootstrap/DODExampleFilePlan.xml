@@ -543,7 +543,7 @@
                                         </rma:dispositionActionDefinition>                         
                                         <rma:dispositionActionDefinition view:childName="rma:dispositionActionDefinition">                              
                                             <view:properties>
-                                                <rma:dispositionActionName>transferNARA</rma:dispositionActionName>
+                                                <rma:dispositionActionName>accession</rma:dispositionActionName>
                                                 <rma:dispositionDescription>Transfer to NARA.</rma:dispositionDescription>
                                                 <rma:dispositionPeriod>year|25</rma:dispositionPeriod>
                                                 <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
@@ -944,7 +944,7 @@
                                         </rma:dispositionActionDefinition>                                                                           
                                         <rma:dispositionActionDefinition view:childName="rma:dispositionActionDefinition">                              
                                             <view:properties>
-                                                <rma:dispositionActionName>transferNARA</rma:dispositionActionName>
+                                                <rma:dispositionActionName>accession</rma:dispositionActionName>
                                                 <rma:dispositionDescription>Transfer to NARA.</rma:dispositionDescription>
                                                 <rma:dispositionPeriod>year|25</rma:dispositionPeriod>
                                                 <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>

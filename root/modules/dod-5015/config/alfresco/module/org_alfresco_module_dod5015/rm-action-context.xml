@@ -562,7 +562,103 @@
     
     <bean id="undoEvent" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.UndoEventAction" parent="rmAction" depends-on="rmAddModifyEventDatesCapability">
         <property name="capability" ref="rmAddModifyEventDatesCapability"/>
-    </bean>    
+    </bean>   
+    
+    <!-- transfer -->
+
+    <bean id="transfer_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="transfer"/>
+        </property>
+        <!--
+        <property name="interceptorNames">
+            <list>
+                <idref bean="transfer_security"/>
+            </list>
+        </property>
+        -->
+    </bean>
+
+    <bean id="transfer_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
+        <property name="objectDefinitionSource">
+            <value>
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.AuthorizeAllTransfersCapability
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
+                   org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="transfer" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.TransferAction" parent="rmAction" depends-on="rmAuthorizeAllTransfersCapability">
+        <property name="capability" ref="rmAuthorizeAllTransfersCapability"/>
+        <property name="isAccession" value="false"/>
+    </bean>  
+    
+    <!-- Transfer complete -->
+    
+    <bean id="transferComplete_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="transferComplete"/>
+        </property>
+        <!--
+        <property name="interceptorNames">
+            <list>
+                <idref bean="transfer_security"/>
+            </list>
+        </property>
+        -->
+    </bean>
+    
+    <bean id="transferComplete" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.TransferCompleteAction" parent="rmAction" depends-on="rmAuthorizeAllTransfersCapability">
+        <property name="capability" ref="rmAuthorizeAllTransfersCapability"/>
+    </bean> 
+    
+    <!-- accession -->
+    
+    <bean id="accession_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="accession"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="accession_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="accession_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
+        <property name="objectDefinitionSource">
+            <value>
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.AuthorizeNominatedTransfersCapability
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
+                   org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="accession" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.TransferAction" parent="rmAction" depends-on="rmAuthorizeNominatedTransfersCapability">
+        <property name="capability" ref="rmAuthorizeNominatedTransfersCapability"/>
+        <property name="isAccession" value="true"/>
+    </bean> 
+        
+    <!-- Accession complete -->
+    
+    <bean id="accessionComplete_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="accessionComplete"/>
+        </property>
+        <!--
+        <property name="interceptorNames">
+            <list>
+                <idref bean="accesion_security"/>
+            </list>
+        </property>
+        -->
+    </bean>
+    
+    <bean id="accessionComplete" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.TransferCompleteAction" parent="rmAction" depends-on="rmAuthorizeNominatedTransfersCapability">
+        <property name="capability" ref="rmAuthorizeNominatedTransfersCapability"/>
+    </bean> 
     
     <!-- Split Email -->
     <bean id="splitEmail" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.SplitEmailAction" parent="rmAction" >
