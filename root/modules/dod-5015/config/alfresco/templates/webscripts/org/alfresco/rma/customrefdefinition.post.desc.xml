@@ -11,7 +11,6 @@
   &nbsp;&nbsp;&nbsp;"isChild" : true,<br/>
   &nbsp;&nbsp;&nbsp;"sourceRoleName" : "foo",<br/>
   &nbsp;&nbsp;&nbsp;"targetRoleName" : "bar"<br/>
-  &nbsp;&nbsp;&nbsp;etc.<br/>
   }<br/>
   ]]>
   </description>
