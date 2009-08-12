@@ -326,7 +326,7 @@
 <!--
    <classpathentry exported="true" kind="lib" path="alfresco"/>
 -->
-     <pathconvert pathsep="@@@" property="@{classprop}">
+     <pathconvert pathsep="@@@" dirsep="/" property="@{classprop}">
        <path>
             <fileset dir="@{libdir}" includes="**/*.jar"/>
        </path>

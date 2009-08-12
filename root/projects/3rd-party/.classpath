@@ -66,8 +66,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/truezip.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xalan-2.7.0/xalan.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlsec-1.4.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/devenv/jsp.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/devenv/servlet.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/j2ee/jsp.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/j2ee/servlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ant.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/devenv/spring-mock-2.0.2.jar" sourcepath="src/spring-mock-2.0.2-src.zip"/>
 	<classpathentry kind="lib" path="lib/devenv/mysql-connector-java-5.1.7-bin.jar"/>
