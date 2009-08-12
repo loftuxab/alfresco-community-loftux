@@ -197,11 +197,6 @@
         <property name="nodeService" ref="NodeService"/>
     </bean>
     
-    <!-- REST impl for RM Admin Service -->
-    <bean id="webscript.org.alfresco.rma.customassocdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssocDefinitionsGet" parent="webscript">
-        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
-    </bean>
-
     <!-- Abstract parent bean for many RM get and post beans -->
     <bean id="rmBaseWebscript" parent="webscript" abstract="true">
         <property name="nodeService" ref="NodeService"/>
@@ -225,14 +220,14 @@
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
     
-    <!-- REST impl for GET Custom Associations -->
-    <bean id="webscript.org.alfresco.rma.customassociations.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssociationsGet" parent="rmBaseWebscript">
+    <!-- REST impl for GET Custom Reference Definitions -->
+    <bean id="webscript.org.alfresco.rma.customrefdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceDefinitionsGet" parent="webscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
 
-    <!-- REST impl for POST Custom Associations -->
-    <bean id="webscript.org.alfresco.rma.customassociation.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomAssociationPost" parent="rmBaseWebscript">
-        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
+    <!-- REST impl for POST Custom Reference Definitions -->
+    <bean id="webscript.org.alfresco.rma.customrefdefinition.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceDefinitionPost" parent="rmBaseWebscript">
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
     </bean>
     
     <!-- REST impl for GET Disposition Schedule -->
