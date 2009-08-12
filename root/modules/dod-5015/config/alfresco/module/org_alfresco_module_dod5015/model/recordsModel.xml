@@ -389,7 +389,7 @@
          <associations>
             
             <child-association name="rma:transferred">
-                <title>Transfered</title>
+                <title>Transferred</title>
                 <source>
                     <mandatory>false</mandatory>
                     <many>false</many>

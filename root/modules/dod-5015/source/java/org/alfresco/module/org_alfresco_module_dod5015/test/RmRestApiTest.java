@@ -26,12 +26,24 @@ package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -40,6 +52,7 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -48,6 +61,8 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
@@ -65,7 +80,8 @@ import org.json.JSONTokener;
  */
 public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagementModel
 {
-    private static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
+    protected static final String GET_TRANSFER_URL_FORMAT = "/api/node/{0}/transfers/{1}";
+    protected static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String RMA_CUSTOM_ASSOCS_URL = "/api/rma/admin/customassociationdefinitions";
     protected static final String RMA_CUSTOM_PROPS_URL = "/api/rma/admin/custompropertydefinitions";
@@ -75,7 +91,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     protected DictionaryService dictionaryService;
     protected SearchService searchService;
     protected ImporterService importService;
-    protected ServiceRegistry services;    
+    protected TransactionService transactionService;
+    protected ServiceRegistry services;
+    protected RecordsManagementService rmService;
     protected RecordsManagementActionService rmActionService;
     
 
@@ -91,7 +109,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         this.dictionaryService = (DictionaryService)getServer().getApplicationContext().getBean("DictionaryService");
         this.searchService = (SearchService)getServer().getApplicationContext().getBean("SearchService");
         this.importService = (ImporterService)getServer().getApplicationContext().getBean("ImporterService");
-        this.services = (ServiceRegistry)getServer().getApplicationContext().getBean("ServiceRegistry");        
+        this.transactionService = (TransactionService)getServer().getApplicationContext().getBean("TransactionService");
+        this.services = (ServiceRegistry)getServer().getApplicationContext().getBean("ServiceRegistry");
+        this.rmService = (RecordsManagementService)getServer().getApplicationContext().getBean("RecordsManagementService");
         this.rmActionService = (RecordsManagementActionService)getServer().getApplicationContext().getBean("RecordsManagementActionService");
         
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
@@ -447,5 +467,125 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         // make the export request
         Response rsp = sendRequest(new PostRequest(exportUrl, jsonPostString, APPLICATION_JSON), 200);
         assertEquals("application/acp", rsp.getContentType());
+    }
+    
+    public void testTransfer() throws Exception
+    {
+        // Test 404 status for non existent node
+        String transferId = "yyy";
+        String nonExistentNode = "workspace/SpacesStore/09ca1e02-1c87-4a53-97e7-xxxxxxxxxxxx";
+        String nonExistentUrl = MessageFormat.format(GET_TRANSFER_URL_FORMAT, nonExistentNode, transferId);
+        Response rsp = sendRequest(new GetRequest(nonExistentUrl), 404);
+        
+        // Test 400 status for node that isn't a file plan
+        NodeRef series = TestUtilities.getRecordSeries(searchService, "Reports");
+        assertNotNull(series);
+        String seriesNodeUrl = series.toString().replace("://", "/");
+        String wrongNodeUrl = MessageFormat.format(GET_TRANSFER_URL_FORMAT, seriesNodeUrl, transferId);
+        rsp = sendRequest(new GetRequest(wrongNodeUrl), 400);
+        
+        // Test 404 status for file plan with no transfers
+        NodeRef rootNode = this.rmService.getRecordsManagementRoot(series);
+        String rootNodeUrl = rootNode.toString().replace("://", "/");
+        String transferUrl = MessageFormat.format(GET_TRANSFER_URL_FORMAT, rootNodeUrl, transferId);
+        rsp = sendRequest(new GetRequest(transferUrl), 404);
+        
+        // Get test in state where a transfer will be present
+        NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Civilian Files", "Foreign Employee Award Files");    
+        assertNotNull(recordCategory);
+        
+        UserTransaction txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        NodeRef newRecordFolder = this.nodeService.createNode(recordCategory, ContentModel.ASSOC_CONTAINS, 
+                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("recordFolder")), 
+                    DOD5015Model.TYPE_RECORD_FOLDER).getChildRef();
+        
+        txn.commit();
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        
+        // Create the document
+        NodeRef recordOne = this.nodeService.createNode(newRecordFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "record"), 
+                                                        ContentModel.TYPE_CONTENT).getChildRef();
+        
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        txn.commit();
+        
+        // declare the new record
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        declareRecord(recordOne);
+        
+        // prepare for the transfer
+        Map<String, Serializable> params = new HashMap<String, Serializable>(3);
+        params.put(CompleteEventAction.PARAM_EVENT_NAME, "case_complete");
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "gavinc");
+        this.rmActionService.executeRecordsManagementAction(newRecordFolder, "completeEvent", params);
+        this.rmActionService.executeRecordsManagementAction(newRecordFolder, "cutoff");
+        
+        DispositionAction da = this.rmService.getNextDispositionAction(newRecordFolder);
+        assertNotNull(da);
+        assertEquals("transfer", da.getName());
+        txn.commit();
+        
+        // Clock the asOf date back to ensure eligibility
+        txn = transactionService.getUserTransaction(false);
+        txn.begin();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        this.nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_AS_OF, calendar.getTime());
+        
+        // Do the transfer
+        this.rmActionService.executeRecordsManagementAction(newRecordFolder, "transfer", null);
+        txn.commit();
+        
+        // check that there is a transfer object present
+        List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
+        assertNotNull(assocs);
+        assertTrue(assocs.size() > 0);
+        
+        // Test 404 status for file plan with transfers but not the requested one
+        rootNode = this.rmService.getRecordsManagementRoot(newRecordFolder);
+        rootNodeUrl = rootNode.toString().replace("://", "/");
+        transferUrl = MessageFormat.format(GET_TRANSFER_URL_FORMAT, rootNodeUrl, transferId);
+        rsp = sendRequest(new GetRequest(transferUrl), 404);
+        
+        // retrieve the id of the first transfer
+        NodeRef transferNodeRef = assocs.get(0).getChildRef();
+        
+        // Test successful retrieval of transfer archive
+        transferId = transferNodeRef.getId();
+        transferUrl = MessageFormat.format(GET_TRANSFER_URL_FORMAT, rootNodeUrl, transferId);
+        rsp = sendRequest(new GetRequest(transferUrl), 200);
+        assertEquals("application/acp", rsp.getContentType());
+    }
+    
+    private void declareRecord(NodeRef recordOne)
+    {
+        // Declare record
+        Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
+        propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
+        List<String> smList = new ArrayList<String>(2);
+        smList.add("FOUO");
+        smList.add("NOFORN");
+        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
+        propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
+        propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
+        propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());       
+        propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        propValues.put(ContentModel.PROP_TITLE, "titleValue");
+        this.nodeService.setProperties(recordOne, propValues);
+        this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
     }
 }
