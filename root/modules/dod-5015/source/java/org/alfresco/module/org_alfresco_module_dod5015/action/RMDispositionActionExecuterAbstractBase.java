@@ -66,7 +66,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
      * 
      * @return boolean true if marked complete, false otherwise
      */
-    public boolean setDispositionActionComplete()
+    public boolean getSetDispositionActionComplete()
     {
         return true;
     }
@@ -84,8 +84,6 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
         // Check the validity of the action (is it the next action, are we dealing with the correct type of object for
         // the disposition level?
         DispositionSchedule di = checkDispositionActionExecutionValidity(actionedUponNodeRef, nextDispositionActionNodeRef, true);
-
-        // TODO check for frozen state (can not execute a disposition action when frozen)
 
         // Check the eligibility of the action
         if (checkEligibility == false || this.recordsManagementService.isNextDispositionActionEligible(actionedUponNodeRef) == true)
@@ -105,8 +103,8 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
                         // Execute record level disposition
                         executeRecordLevelDisposition(action, actionedUponNodeRef);
 
-                        // Indicate that the disposition action is compelte
-                        if (setDispositionActionComplete() == true)
+                        if (this.nodeService.exists(nextDispositionActionNodeRef) == true &&
+                            getSetDispositionActionComplete() == true)
                         {
                             this.nodeService.setProperty(nextDispositionActionNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT, new Date());
                             this.nodeService.setProperty(nextDispositionActionNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY, AuthenticationUtil.getRunAsUser());
@@ -130,7 +128,20 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
                 {
                     if (this.recordsManagementService.isRecordFolderDeclared(actionedUponNodeRef) == true)
                     {
+                        // Indicate that the disposition action is underway
+                        this.nodeService.setProperty(nextDispositionActionNodeRef, PROP_DISPOSITION_ACTION_STARTED_AT, new Date());
+                        this.nodeService.setProperty(nextDispositionActionNodeRef, PROP_DISPOSITION_ACTION_STARTED_BY, AuthenticationUtil.getRunAsUser());
+
                         executeRecordFolderLevelDisposition(action, actionedUponNodeRef);
+                        
+                        // Indicate that the disposition action is compelte
+                        if (this.nodeService.exists(nextDispositionActionNodeRef) == true &&
+                            getSetDispositionActionComplete() == true)
+                        {
+                            this.nodeService.setProperty(nextDispositionActionNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT, new Date());
+                            this.nodeService.setProperty(nextDispositionActionNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY, AuthenticationUtil.getRunAsUser());
+                        }
+
                     }
                     else
                     {
@@ -147,7 +158,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
 
             }
 
-            if (this.nodeService.exists(actionedUponNodeRef) == true)
+            if (this.nodeService.exists(actionedUponNodeRef) == true && getSetDispositionActionComplete() == true)
             {
                 // Update the disposition schedule
                 updateNextDispositionAction(actionedUponNodeRef);
@@ -286,8 +297,6 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
         NodeRef nextDispositionActionNodeRef = getNextDispostionAction(filePlanComponent);
         
         DispositionSchedule di = checkDispositionActionExecutionValidity(filePlanComponent, nextDispositionActionNodeRef, throwException);
-
-        // TODO check for frozen state (can not execute a disposition action when frozen)
 
         // Check the eligibility of the action
         if (checkEligibility == false || this.recordsManagementService.isNextDispositionActionEligible(filePlanComponent) == true)

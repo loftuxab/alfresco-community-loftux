@@ -157,4 +157,9 @@ public interface RecordsManagementModel
 	public static QName ASPECT_FROZEN = QName.createQName(RM_URI, "frozen");
 	public static QName PROP_FROZEN_AT = QName.createQName(RM_URI, "frozenAt");
 	public static QName PROP_FROZEN_BY = QName.createQName(RM_URI, "frozenBy");
+	
+	// Transfer aspect
+	public static QName TYPE_TRANSFER = QName.createQName(RM_URI, "transfer");
+	public static QName PROP_TRANSFER_ACCESSION_INDICATOR = QName.createQName(RM_URI, "transferAccesnsionIndicator");
+    public static QName ASSOC_TRANSFERED = QName.createQName(RM_URI, "transfered");
 }
