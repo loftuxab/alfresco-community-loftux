@@ -116,10 +116,24 @@
          </div>
          <div class="yui-u">
             <div class="records">
-               <span class="header">${msg("label.records")}</span>
+               <span class="header">${msg("label.components")}</span>
                <div>
+                  <input type="checkbox" id="${el}-records" checked />
+                  <label for="${el}-records">${msg("label.records")}</label>
+               </div>
+               <div class="indented">
                   <input type="checkbox" id="${el}-undeclared" />
                   <label for="${el}-undeclared">${msg("label.undeclared")}</label>
+               </div>
+               <div class="indented">
+                  <input type="checkbox" id="${el}-vital" />
+                  <label for="${el}-vital">${msg("label.vital")}</label>
+               </div>
+               <div>
+                  <span title="${msg("label.containers.tooltip")}">
+                     <input type="checkbox" id="${el}-containers" />
+                     <label for="${el}-containers">${msg("label.containers")}</label>
+                  </span>
                </div>
             </div>
          </div>

@@ -44,6 +44,12 @@
    display: none;
 }
 
-.rmoptions .sort
+.rmoptions .records
 {
+   line-height: 1.75em;
+}
+
+.rmoptions .indented
+{
+   margin-left: 20px;
 }
