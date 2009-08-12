@@ -171,6 +171,10 @@
                <hide id="rma:isClosed" />
                <hide id="rma:nextDispositionAction" />
                <hide id="rma:dispositionActionHistory" />
+               <hide id="rma:recordSearchDispositionActionName" />
+               <hide id="rma:recordSearchDispositionActionAsOf" />
+               <hide id="rma:recordSearchDispositionEventsEligible" />
+               <hide id="rma:recordSearchDispositionEvents" />
             </field-visibility>
             <appearance>
                <set id="rm" />
