@@ -394,8 +394,8 @@ public class CapabilitiesTest extends TestCase
         assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.ADD_MODIFY_EVENT_DATES).getActionNames().size());
         assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF).getActionNames().size());
         assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.AUTHORIZE_ALL_TRANSFERS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS).getActionNames().size());
+        assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.AUTHORIZE_ALL_TRANSFERS).getActionNames().size());
+        assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS).getActionNames().size());
         assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CHANGE_OR_DELETE_REFERENCES).getActionNames().size());
         assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.CLOSE_FOLDERS).getActionNames().size());
         assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS).getActionNames().size());
