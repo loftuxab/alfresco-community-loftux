@@ -22,11 +22,13 @@ function getFilterParams(filter, parsedArgs, favourites)
    var filterData = args["filterData"];
 
    // Common types and aspects to filter from the UI
-   var filterQueryDefaults = " -TYPE:\"{http://www.alfresco.org/model/content/1.0}thumbnail\"";
-   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/content/1.0}systemfolder\"";
-   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule\"";
-   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}hold\"";
-   filterQueryDefaults += " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer\"";
+   var filterQueryDefaults = " -TYPE:\"{http://www.alfresco.org/model/content/1.0}thumbnail\"" +
+                             " -TYPE:\"{http://www.alfresco.org/model/content/1.0}systemfolder\"" +
+                             " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule\"" +
+                             " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionActionDefinition\"" +
+                             " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAction\"" +
+                             " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}hold\"" +
+                             " -TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer\"";
 
    // Create query based on passed-in arguments
    switch (String(filter))
@@ -58,6 +60,7 @@ function getFilterParams(filter, parsedArgs, favourites)
                                     '//*" AND ASPECT:"rma:filePlanComponent" AND (' + filterQuery + ')' +
                                     ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule"' +
                                     ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionActionDefinition"' +
+                                    ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAction"' +
                                     ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}hold"' +
                                     ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer"';
                filterParams.templates = [
