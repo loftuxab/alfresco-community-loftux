@@ -1129,7 +1129,7 @@
       <mkdir dir="${dir.continuous.assemble.sdk}/lib/server/dependencies" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server/dependencies">
          <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="**/*.jar" />
+                  includes="**/*.jar" excludes="devenv/**, optional/**, jboss/**, virtual-tomcat/**"/>
       </copy>
       <mkdir dir="${dir.continuous.assemble.sdk}/lib/server/alfresco/desktop" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server/alfresco/desktop">
@@ -1207,10 +1207,13 @@
       <copy todir="${dir.continuous.assemble.sdk}/lib/remote"
             file="${dir.project.sdk.projects.remote}/.classpath" />
 -->
-      <generate-classpath classprop="serverlibs" libdir="${dir.continuous.assemble.sdk}/lib/server/" 
+      <!-- Resolve the server lib path prefix using appropriate file separators -->
+      <property name="dir.continuous.assemble.sdk.lib.server" location="${dir.continuous.assemble.sdk}/lib/server" />
+      <generate-classpath classprop="serverlibs" libdir="${dir.continuous.assemble.sdk.lib.server}${file.separator}" 
             classfile="${dir.continuous.assemble.sdk}/lib/server/.classpath">
       </generate-classpath>
-      <generate-classpath classprop="remotelibs" libdir="${dir.continuous.assemble.sdk}/lib/remote/" 
+      <property name="dir.continuous.assemble.sdk.lib.remote" location="${dir.continuous.assemble.sdk}/lib/remote" />
+      <generate-classpath classprop="remotelibs" libdir="${dir.continuous.assemble.sdk.lib.remote}${file.separator}" 
             classfile="${dir.continuous.assemble.sdk}/lib/remote/.classpath">
       </generate-classpath>
 
