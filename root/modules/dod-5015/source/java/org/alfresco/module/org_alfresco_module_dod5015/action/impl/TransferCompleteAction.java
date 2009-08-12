@@ -63,7 +63,7 @@ public class TransferCompleteAction extends RMActionExecuterAbstractBase
         QName className = this.nodeService.getType(actionedUponNodeRef);
         if (this.dictionaryService.isSubClass(className, TYPE_TRANSFER) == true)
         {
-            List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionedUponNodeRef, ASSOC_TRANSFERED, RegexQNamePattern.MATCH_ALL);
+            List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionedUponNodeRef, ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
             for (ChildAssociationRef assoc : assocs)
             {
                 markComplete(assoc.getChildRef());
