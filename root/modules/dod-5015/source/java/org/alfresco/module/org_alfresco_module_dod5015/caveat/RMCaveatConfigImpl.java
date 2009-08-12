@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,7 +65,9 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.JSONtoFmModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * RM Caveat Config impl
@@ -91,6 +94,14 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
     private static final String CAVEAT_CONFIG_NAME = "caveatConfig.json";
     
     private static final QName DATATYPE_TEXT = DataTypeDefinition.TEXT;
+    
+    
+    /*
+     * Caveat Config
+     * first string is property name
+     * second string is authority name (user or group full name)
+     * third string is list of values of property 
+     */
     
     // TODO - convert to SimpleCache to be cluster-aware (for dynamic changes to caveat config across a cluster)
     private Map<String, Map<String, List<String>>> caveatConfig = new ConcurrentHashMap<String, Map<String, List<String>>>(2);
@@ -159,7 +170,7 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
                 RecordsManagementModel.TYPE_CAVEAT_CONFIG,
                 new JavaBehaviour(this, "onCreateNode"));
         
-        NodeRef caveatConfigNodeRef = getCaveatConfig();
+        NodeRef caveatConfigNodeRef = getCaveatConfigNode();
         if (caveatConfigNodeRef != null)
         {
             validateAndReset(caveatConfigNodeRef);
@@ -208,7 +219,7 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
             String caveatConfigData = cr.getContentString();
             if (caveatConfigData != null)
             {
-                NodeRef existing = getCaveatConfig();
+                NodeRef existing = getCaveatConfigNode();
                 if ((existing != null && (! existing.equals(nodeRef))))
                 {
                     throw new AlfrescoRuntimeException("Cannot create more than one caveat config (existing="+existing+", new="+nodeRef+")");
@@ -333,11 +344,12 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
         }
     }
     
-    public NodeRef getCaveatConfig()
+    public NodeRef getCaveatConfigNode()
     {
         NodeRef rootNode = nodeService.getRootNode(storeRef);
         return nodeService.getChildByName(rootNode, RecordsManagementModel.ASSOC_CAVEAT_CONFIG, CAVEAT_CONFIG_NAME);
     }
+    
     
     public NodeRef updateOrCreateCaveatConfig(InputStream is)
     {
@@ -380,7 +392,7 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
     
     private NodeRef updateOrCreateCaveatConfig()
     {
-        NodeRef caveatConfig = getCaveatConfig();
+        NodeRef caveatConfig = getCaveatConfigNode();
         if (caveatConfig == null)
         {
             NodeRef rootNode = nodeService.getRootNode(storeRef);
@@ -522,5 +534,132 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
         }
         
         return true;
+    }
+    
+    /**
+     * add RM constraint list
+     * @param listName the name of the RMConstraintList
+     */
+    public void addRMConstraintList(String listName)
+    {
+        Map<String, List<String>> emptyConstraint =  new HashMap<String, List<String>>(0) ;
+        List<String> emptyList = new ArrayList<String>();
+        emptyConstraint.put(listName, emptyList);
+        caveatConfig.put(listName, emptyConstraint);
+        updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));
+    }
+    
+    /**
+     * delete RM Constraint Name
+     * 
+     * @param listName the name of the RMConstraintList
+     */
+    public void deleteRMConstraintList(String listName)
+    {
+        caveatConfig.remove(listName);
+        updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));
+    }
+    
+    /**
+     * Add a single value to an authority in a list.   The existing values of the list remain.
+     * 
+     * @param listName the name of the RMConstraintList
+     * @param authorityName
+     * @param values
+     * @throws AlfrescoRuntimeException if either the list or the authority do not already exist.
+     */
+    public void addRMConstraintListValue(String listName, String authorityName, String value)
+    {
+        Map<String, List<String>> members = caveatConfig.get(listName);
+        if(members == null) 
+        {
+            throw new AlfrescoRuntimeException("unable to add to list, list not defined:"+ listName);
+        }
+        List<String> values = members.get(authorityName);
+        if(values == null)
+        {
+            throw new AlfrescoRuntimeException("Unable to add to authority in list.   Authority not member listName: "+ listName + " authorityName:" +authorityName);
+        }
+        values.add(value);
+        updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));        
+    }
+    
+    /**
+     * Replace the values for an authority in a list.   
+     * The existing values are removed.
+     * 
+     * If the authority does not already exist in the list, it will be added
+     * 
+     * @param listName the name of the RMConstraintList
+     * @param authorityName
+     * @param values
+     */
+    public void updateRMConstraintListAuthority(String listName, String authorityName, List<String>values)
+    {
+        Map<String, List<String>> members = caveatConfig.get(listName);
+        if(members == null) 
+        {
+            // Create the new list, with the authority name
+            Map<String, List<String>> constraint =  new HashMap<String, List<String>>(0) ;
+            constraint.put(authorityName, values);
+            caveatConfig.put(listName, constraint);
+        }
+        else
+        {
+            members.put(authorityName, values);    
+        }
+      
+        updateOrCreateCaveatConfig(convertToJSONString(caveatConfig)); 
+    }
+    
+    /**
+     * Remove an authority from a list
+     * 
+     * @param listName the name of the RMConstraintList
+     * @param authorityName
+     * @param values
+     */
+    public void removeRMConstraintListAuthority(String listName, String authorityName)
+    {
+        Map<String, List<String>> members = caveatConfig.get(listName);
+        if(members != null) 
+        {
+            members.remove(authorityName);    
+        }
+     
+        updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));   
+    }
+    
+    /**
+     * @param config the configuration to convert
+     * @return a String containing the JSON representation of the configuration.
+     */
+    private String convertToJSONString(Map<String, Map<String, List<String>>> config)
+    {
+        JSONObject obj = new JSONObject();
+        
+        try 
+        {
+            Set<String> listNames = config.keySet();
+            for(String listName : listNames)
+            {
+                Map<String, List<String>> members = config.get(listName);
+                
+                Set<String> authorityNames = members.keySet();
+                JSONObject listMembers = new JSONObject();
+                
+                for(String authorityName : authorityNames)
+                {
+                    listMembers.put(authorityName, members.get(authorityName));    
+                }
+                   
+                obj.put(listName, listMembers);
+            }
+        }
+        catch (JSONException je)
+        {
+            throw new AlfrescoRuntimeException("Invalid caveat config syntax: "+ je);
+        }
+        return obj.toString();    
     }
 }
