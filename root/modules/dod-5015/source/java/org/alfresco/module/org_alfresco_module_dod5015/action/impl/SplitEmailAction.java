@@ -77,8 +77,9 @@ public class SplitEmailAction extends RMActionExecuterAbstractBase
                      * Move the attachments up one level, to the parent folder of the record
                      */
                     logger.debug("split attachment:" + actionedUponNodeRef);
+                    String parentName = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
                     String bareName = (String)nodeService.getProperty(ref.getTargetRef(), ContentModel.PROP_NAME);
-                    QName assocName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(bareName));
+                    QName assocName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(parentName + "-" + bareName));
                     nodeService.moveNode(ref.getTargetRef(), parent.getParentRef(), parent.getTypeQName(), assocName);
                 }
 
