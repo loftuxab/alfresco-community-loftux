@@ -56,13 +56,7 @@ function getFilterParams(filter, parsedArgs, favourites)
                var filterQuery = ssJson.query;
                // Wrap the query so that only valid items within the filePlan are returned
                filterParams.variablePath = true;
-               filterParams.query = 'PATH:"' + parsedArgs.rootNode.qnamePath +
-                                    '//*" AND ASPECT:"rma:filePlanComponent" AND (' + filterQuery + ')' +
-                                    ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule"' +
-                                    ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionActionDefinition"' +
-                                    ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAction"' +
-                                    ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}hold"' +
-                                    ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer"';
+               filterParams.query = 'PATH:"' + parsedArgs.rootNode.qnamePath + '//*" AND (' + filterQuery + ')';
                filterParams.templates = [
                {
                   field: "KEYWORDS",

@@ -311,7 +311,7 @@
          /**
           * Vital Record indicator custom datacell formatter
           *
-          * @method renderCellImage
+          * @method renderCellVitalRecord
           */
          var renderCellVitalRecord = function RecordsResults_renderCellVitalRecord(elCell, oRecord, oColumn, oData)
          {
@@ -415,7 +415,7 @@
          // DataTable column defintions
          var columnDefinitions =
          [
-            { key: "image", label: "", sortable: false, formatter: renderCellImage, width: "64px" },
+            { key: "image", label: me._msg("label.type"), sortable: false, field: "type", sortable: true, formatter: renderCellImage, width: "64px" },
             { key: "identifier", label: me._msg("label.identifier"), sortable: true, sortOptions: {sortFunction: sortCellURI}, resizeable: true, formatter: renderCellURI },
             { key: "name", label: me._msg("label.name"), field: "name", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
             { key: "title", label: me._msg("label.title"), field: "title", sortable: true, resizeable: true, formatter: renderCellSafeHTML },

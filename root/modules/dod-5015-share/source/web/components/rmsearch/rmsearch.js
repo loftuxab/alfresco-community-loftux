@@ -136,8 +136,9 @@
             }
          });
          
-         // wire up keydown event on query field
+         // wire up misc events
          Event.on(me.id + "-terms", "keyup", this.onQueryKeyup, this, true);
+         Event.on(me.id + "-records", "change", this.onRecordsCheckChanged, this, true);
          
          // Call super class onReady() method
          Alfresco.RecordsSearch.superclass.onReady.call(this);
@@ -195,6 +196,19 @@
       },
       
       /**
+       * Records checkbox change event handler
+       * 
+       * @method onRecordsCheckChanged
+       * @param e {object} DomEvent
+       */
+      onRecordsCheckChanged: function RecordsSearch_onRecordsCheckChanged(e)
+      {
+         var disable = !(Dom.get(this.id + "-records").checked);
+         Dom.get(this.id + "-undeclared").disabled = disable;
+         Dom.get(this.id + "-vital").disabled = disable;
+      },
+      
+      /**
        * Search button click event handler
        * 
        * @method onSearchClick
@@ -207,7 +221,11 @@
          this.widgets.tabs.selectTab(1);
          
          // execute the search and populate the results
-         this._performSearch(this._buildSearchQuery());
+         var query = this._buildSearchQuery();
+         if (query != null)
+         {
+            this._performSearch(query);
+         }
       },
       
       /**
@@ -221,27 +239,31 @@
       {
          // get values to pass to the module
          var query = this._buildSearchQuery();
-         
-         // build up params to pass to the module
-         var params = "";
-         // search query terms
-         var termsElem = Dom.get(this.id + "-terms");
-         var terms = YAHOO.lang.trim(termsElem.value);
-         params += "terms=" + encodeURIComponent(terms);
-         // search undeclared records
-         params += "&undeclared=" + (Dom.get(this.id + "-undeclared").checked);
-         
-         // TODO: prepopulate dialog with current saved search name if any selected
-         
-         // display the SaveSearch module dialog
-         var module = Alfresco.module.getSaveSearchInstance();
-         module.setOptions(
-            {
-               siteId: this.options.siteId,
-               query: query,
-               params: params
-            });
-         module.show();
+         if (query != null)
+         {
+            // build up params to pass to the module
+            // query terms
+            var termsElem = Dom.get(this.id + "-terms");
+            var terms = YAHOO.lang.trim(termsElem.value);
+            var params = "terms=" + encodeURIComponent(terms);
+            // search components
+            params += "&records=" + (Dom.get(this.id + "-records").checked);
+            params += "&undeclared=" + (Dom.get(this.id + "-undeclared").checked);
+            params += "&vital=" + (Dom.get(this.id + "-vital").checked);
+            params += "&containers=" + (Dom.get(this.id + "-containers").checked);
+            
+            // TODO: prepopulate dialog with current saved search name if any selected
+            
+            // display the SaveSearch module dialog
+            var module = Alfresco.module.getSaveSearchInstance();
+            module.setOptions(
+               {
+                  siteId: this.options.siteId,
+                  query: query,
+                  params: params
+               });
+            module.show();
+         }
       },
       
       /**
@@ -258,7 +280,12 @@
          {
             this.widgets.savedSearchMenu.set("label", this._msg("button.savedsearches"));
          }
+         Dom.get(this.id + "-records").checked = true;
+         Dom.get(this.id + "-undeclared").disabled = false;
+         Dom.get(this.id + "-vital").disabled = false;
          Dom.get(this.id + "-undeclared").checked = false;
+         Dom.get(this.id + "-vital").checked = false;
+         Dom.get(this.id + "-containers").checked = false;
          Dom.get(this.id + "-terms").value = "";
          
          this.widgets.saveButton.set("disabled", true);
@@ -351,7 +378,7 @@
        * Builds the search query based on the current search terms and parameters.
        *
        * @method _buildSearchQuery
-       * @return {string} Full query string for execution
+       * @return {string} Full query string for execution or null if incorrect options set
        * @private
        */
       _buildSearchQuery: function RecordsSearch__buildSearchQuery()
@@ -360,13 +387,37 @@
          var userQuery = YAHOO.lang.trim(queryElem.value);
          
          var query = "";
-         if (Dom.get(this.id + "-undeclared").checked === false)
+         var selectRecords = Dom.get(this.id + "-records").checked;
+         if (selectRecords)
          {
-            query = 'ASPECT:"rma:declaredRecord"';
+            query += 'ASPECT:"rma:record"';
          }
-         if (userQuery.length != 0)
+         if (selectRecords && Dom.get(this.id + "-undeclared").checked === false)
          {
-            query = query + (query.length != 0 ? (' AND (' + userQuery + ')') : userQuery);
+            query += (query.length != 0 ? ' AND ' : '') + 'ASPECT:"rma:declaredRecord"';
+         }
+         if (selectRecords && Dom.get(this.id + "-vital").checked)
+         {
+            query += (query.length != 0 ? ' AND ' : '') + 'ASPECT:"rma:vitalRecord"';
+         }
+         if (Dom.get(this.id + "-containers").checked)
+         {
+            if (query.length != 0)
+            {
+               query = '(' + query + ') OR (TYPE:"rma:recordFolder" TYPE:"dod:recordCategory" TYPE:"dod:recordSeries")';
+            }
+            else
+            {
+               query = '(TYPE:"rma:recordFolder" TYPE:"dod:recordCategory" TYPE:"dod:recordSeries")';
+            }
+         }
+         if (query.length != 0)
+         {
+            query = '(' + query + ') AND (' + userQuery + ')';
+         }
+         else
+         {
+            query = null;
          }
          
          return query;
@@ -407,9 +458,27 @@
                   var pair = params[i].split("=");
                   switch (pair[0])
                   {
+                     case "records":
+                     {
+                        Dom.get(me.id + "-records").checked = (pair[1] === "true");
+                        break;
+                     }
+                     
                      case "undeclared":
                      {
                         Dom.get(me.id + "-undeclared").checked = (pair[1] === "true");
+                        break;
+                     }
+                     
+                     case "vital":
+                     {
+                        Dom.get(me.id + "-vital").checked = (pair[1] === "true");
+                        break;
+                     }
+                     
+                     case "containers":
+                     {
+                        Dom.get(me.id + "-containers").checked = (pair[1] === "true");
                         break;
                      }
                      

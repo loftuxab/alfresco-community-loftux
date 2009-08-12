@@ -128,13 +128,8 @@ function getSearchResults(query, sort, maxResults, siteId)
 {
    var nodes;
    
-   // suffix the rm doclib fileplan site PATH query and the mandatory ASPECT clause
-   var path = SITES_SPACE_QNAME_PATH + "cm:" + search.ISO9075Encode(siteId) + "/cm:documentLibrary/";
-   var alfQuery = 'PATH:"' + path + '/*" AND ASPECT:"rma:filePlanComponent"' +
-                  ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule"' +
-                  ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionActionDefinition"' +
-                  ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}hold"' +
-                  ' AND -TYPE:"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer"';
+   // suffix the rm doclib fileplan site PATH query
+   var alfQuery = 'PATH:"' + SITES_SPACE_QNAME_PATH + 'cm:' + search.ISO9075Encode(siteId) + '/cm:documentLibrary//*"';
    
    // build up final query components
    if (query != null && query.length != 0)
