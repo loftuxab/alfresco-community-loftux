@@ -1,0 +1,1 @@
+model.logStartDate = new Date()
