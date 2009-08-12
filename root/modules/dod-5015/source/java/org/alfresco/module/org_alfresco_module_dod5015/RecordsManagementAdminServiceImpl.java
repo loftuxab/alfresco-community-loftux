@@ -25,14 +25,11 @@
 package org.alfresco.module.org_alfresco_module_dod5015;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.M2Aspect;
-import org.alfresco.repo.dictionary.M2ClassAssociation;
-import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.namespace.NamespaceService;
@@ -51,9 +48,6 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     private static Log logger = LogFactory.getLog(RecordsManagementAdminServiceImpl.class);
 
     public static final String CUSTOM_MODEL_PREFIX = "rmc";
-    public static final String RMA_RECORD = "rma:record";
-    @Deprecated
-    public static final String RMC_CUSTOM_PROPS = CUSTOM_MODEL_PREFIX + ":customProperties";
     public static final String RMC_CUSTOM_ASSOCS = CUSTOM_MODEL_PREFIX + ":customAssocs";
 
     private ServiceRegistry serviceRegistry;
@@ -63,27 +57,15 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         this.serviceRegistry = serviceRegistry;
     }
     
-    public Map<QName, CustomAssociation> getAvailableCustomAssociations()
+    public Map<QName, AssociationDefinition> getAvailableCustomReferences()
     {
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(serviceRegistry.getContentService());
-
-        M2Model customModel = customModelUtil.readCustomContentModel();
-        M2Aspect customAssocsAspect = customModel.getAspect(RMC_CUSTOM_ASSOCS);
+        DictionaryService dictionaryService = serviceRegistry.getDictionaryService();
+        NamespaceService namespaceService = serviceRegistry.getNamespaceService();
+		QName relevantAspectQName = QName.createQName(RMC_CUSTOM_ASSOCS, namespaceService);
+        AspectDefinition aspectDefn = dictionaryService.getAspect(relevantAspectQName);
+        Map<QName, AssociationDefinition> assocDefns = aspectDefn.getAssociations();
         
-        // M2ClassAssociation is a common supertype for M2Association and M2ChildAssociation.
-        List<M2ClassAssociation> allAssocs = customAssocsAspect.getAssociations();
-
-        Map<QName, CustomAssociation> result = new HashMap<QName, CustomAssociation>(allAssocs.size());
-        for (M2ClassAssociation a : allAssocs)
-        {
-            QName n = QName.createQName(a.getName(), serviceRegistry.getNamespaceService());
-
-            CustomAssociation cA = CustomAssociation.createInstance(a, serviceRegistry);
-
-            result.put(n, cA);
-        }
-        return result;
+        return assocDefns;
     }
 
     public Map<QName, PropertyDefinition> getAvailableCustomProperties()

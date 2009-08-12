@@ -61,6 +61,7 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
     private static final String PARAM_SOURCE_ROLE_NAME = "sourceRoleName";
     private static final String PARAM_IS_CHILD = "isChild";
     private static Log logger = LogFactory.getLog(DefineCustomAssociationAction.class);
+	public static final String RMA_RECORD = "rma:record";
 
 	/**
 	 * 
@@ -124,7 +125,7 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
 
         newAssoc.setDescription((String)params.get(PARAM_DESCRIPTION));
         newAssoc.setSourceRoleName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX + ":" + params.get(PARAM_SOURCE_ROLE_NAME));
-        newAssoc.setTargetClassName(RecordsManagementAdminServiceImpl.RMA_RECORD);
+        newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
         newAssoc.setTargetRoleName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX + ":" + params.get(PARAM_TARGET_ROLE_NAME));
         newAssoc.setTitle((String)params.get(PARAM_TITLE));
         
@@ -183,7 +184,7 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
 
         newAssoc.setDescription((String)params.get(PARAM_DESCRIPTION));
         newAssoc.setSourceRoleName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX + ":" + params.get(PARAM_SOURCE_ROLE_NAME));
-        newAssoc.setTargetClassName(RecordsManagementAdminServiceImpl.RMA_RECORD);
+        newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
         newAssoc.setTargetRoleName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX + ":" + params.get(PARAM_TARGET_ROLE_NAME));
         newAssoc.setTitle((String)params.get(PARAM_TITLE));
 

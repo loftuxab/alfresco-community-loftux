@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 
 import java.util.Map;
 
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.namespace.QName;
 
@@ -51,5 +52,11 @@ public interface RecordsManagementAdminService
      */
     public Map<QName, PropertyDefinition> getAvailableCustomProperties();
 
-    public Map<QName, CustomAssociation> getAvailableCustomAssociations();
+    /**
+     * This method returns the custom references that have been defined in the custom
+     * model.
+     * 
+     * @return The Map of custom references (both parent-child and standard).
+     */
+    public Map<QName, AssociationDefinition> getAvailableCustomReferences();
 }

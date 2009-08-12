@@ -1,0 +1,23 @@
+<webscript>
+  <shortname>Add a Custom Reference Definition to the custom model</shortname>
+  <description><![CDATA[
+  Adds a custom reference definition to the custom model. If the reference definition is<br/>
+  for an already existing reference, it may not be possible to apply the changes. If there<br/>
+  are already instances of the reference, it may not be possible to change the model.<br/>
+  <br/>
+  The body of the post should be in the form, e.g.<br/>
+  {<br/>
+  &nbsp;&nbsp;&nbsp;"name" : "rmc:sampleCustomReference",<br/>
+  &nbsp;&nbsp;&nbsp;"isChild" : true,<br/>
+  &nbsp;&nbsp;&nbsp;"sourceRoleName" : "foo",<br/>
+  &nbsp;&nbsp;&nbsp;"targetRoleName" : "bar"<br/>
+  &nbsp;&nbsp;&nbsp;etc.<br/>
+  }<br/>
+  ]]>
+  </description>
+  <url>/api/rma/admin/customreferencedefinitions</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <lifecycle>internal</lifecycle>
+</webscript>

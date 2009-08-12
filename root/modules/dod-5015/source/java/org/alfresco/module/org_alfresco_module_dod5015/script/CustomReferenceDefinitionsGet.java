@@ -30,21 +30,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.alfresco.module.org_alfresco_module_dod5015.CustomAssociation;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * This class provides the implementation for the customassocdefinitions.get webscript.
+ * This class provides the implementation for the customrefdefinitions.get webscript.
  * 
  * @author Neil McErlean
  */
-public class CustomAssocDefinitionsGet extends DeclarativeWebScript
+public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
 {
+    private static Log logger = LogFactory.getLog(CustomReferenceDefinitionsGet.class);
     private RecordsManagementAdminService rmAdminService;
     
     public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
@@ -56,16 +59,26 @@ public class CustomAssocDefinitionsGet extends DeclarativeWebScript
     public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
         Map<String, Object> model = new HashMap<String, Object>();
+        
+    	if (logger.isDebugEnabled())
+    	{
+    		logger.debug("Getting custom reference definitions");
+    	}
 
-        Map<QName, CustomAssociation> currentCustomAssocs = rmAdminService.getAvailableCustomAssociations();
+    	Map<QName, AssociationDefinition> currentCustomRefs = rmAdminService.getAvailableCustomReferences();
 
-        List<CustomAssociation> assocData = new ArrayList<CustomAssociation>(currentCustomAssocs.size());
-        for (Entry<QName, CustomAssociation> entry : currentCustomAssocs.entrySet())
+        List<AssociationDefinition> refData = new ArrayList<AssociationDefinition>(currentCustomRefs.size());
+        for (Entry<QName, AssociationDefinition> entry : currentCustomRefs.entrySet())
         {
-            assocData.add(entry.getValue());
+            refData.add(entry.getValue());
         }
         
-        model.put("customAssocs", assocData);
+    	if (logger.isDebugEnabled())
+    	{
+    		logger.debug("Retrieved custom reference definitions: " + refData);
+    	}
+
+    	model.put("customRefs", refData);
 
         return model;
     }

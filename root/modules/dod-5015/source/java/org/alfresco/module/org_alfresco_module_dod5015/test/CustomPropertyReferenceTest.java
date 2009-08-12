@@ -33,20 +33,20 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.module.org_alfresco_module_dod5015.CustomAssociation;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomPropertyAction;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -59,6 +59,7 @@ import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 
@@ -204,9 +205,19 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
                 customPropertiesAspect.getProperties().get(propQName));
     }
     
-    public void off_testCreateAndUseCustomChildReference() throws Exception
+    public void testCreateAndUseCustomChildReference() throws Exception
     {
-        // Create the necessary test objects in the db: two records.
+        createAndUseCustomReference(true, "superseded", "superseding");
+    }
+
+    public void testCreateAndUseCustomNonChildReference() throws Exception
+    {
+    	createAndUseCustomReference(false, "supporting", "supported");
+    }
+    
+	private void createAndUseCustomReference(boolean isChild, String srcRoleName, String targetRoleName) throws Exception
+	{
+		// Create the necessary test objects in the db: two records.
         NodeRef recordFolder = retrievePreexistingRecordFolder();
         NodeRef testRecord1 = createRecord(recordFolder, "testRecordA" + System.currentTimeMillis());
         NodeRef testRecord2 = createRecord(recordFolder, "testRecordB" + System.currentTimeMillis());
@@ -221,17 +232,15 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         declareRecord(testRecord2);
 
         // Define a custom reference.
-        final String refName = "rmc:customReference" + System.currentTimeMillis();
+        final String refDefinitionName = "rmc:customReference" + System.currentTimeMillis();
 
         Map <String, Serializable> params = new HashMap<String, Serializable>();
-        params.put("name", refName);
-        params.put("isChild", true);
-        params.put("title", "Supersedes link");
-        params.put("description", "Descriptive text");
-        params.put("sourceRoleName", "superseding");
-        params.put("targetRoleName", "superseded");
-        rmActionService.executeRecordsManagementAction(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF,
-                "defineCustomAssociation", params);
+        params.put("name", refDefinitionName);
+        params.put("isChild", isChild);
+        params.put("sourceRoleName", srcRoleName);
+        params.put("targetRoleName", targetRoleName);
+        
+        rmActionService.executeRecordsManagementAction("defineCustomAssociation", params);
         
         // We need to commit the transaction to trigger behaviour that should reload the data dictionary model.
         txn1.commit();
@@ -240,53 +249,74 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         txn2.begin();
 
         // Confirm the custom reference is included in the list from rmAdminService.
-        final QName refQName = QName.createQName(refName, namespaceService);
+        final QName refDefinitionQName = QName.createQName(refDefinitionName, namespaceService);
         
-        Map<QName, CustomAssociation> customRefDefinitions = rmAdminService.getAvailableCustomAssociations();
-        CustomAssociation refDefn = customRefDefinitions.get(refQName);
-        assertNotNull("Custom reference definition from rmAdminService was null.", refDefn);
-        assertEquals(refName, refDefn.getName());
-        assertEquals(true, refDefn.isChildAssociation());
-        //TODO Might need to lose the rmc: prefix here.
-        assertEquals("rmc:superseding", refDefn.getSourceRoleName());
+        Map<QName, AssociationDefinition> customRefDefinitions = rmAdminService.getAvailableCustomReferences();
+        AssociationDefinition retrievedRefDefn = customRefDefinitions.get(refDefinitionQName);
+        assertNotNull("Custom reference definition from rmAdminService was null.", retrievedRefDefn);
+        assertEquals(refDefinitionName, retrievedRefDefn.getName().toPrefixString());
+        assertEquals(isChild, retrievedRefDefn.isChild());
+        
+        if (srcRoleName != null) assertEquals("rmc:" + srcRoleName, retrievedRefDefn.getSourceRoleName().toPrefixString()); //TODO Remove ifs
+        if (targetRoleName != null) assertEquals("rmc:" + targetRoleName, retrievedRefDefn.getTargetRoleName().toPrefixString());
         
         // Now we need to use the custom reference.
         // So we apply the aspect containing it to our test records.
         
-        QName aspectQName = QName.createQName("rmc:customAssocs", namespaceService);
-        nodeService.addAspect(testRecord1, aspectQName, null);
-        nodeService.addAspect(testRecord2, aspectQName, null);
+        QName assocsAspectQName = QName.createQName("rmc:customAssocs", namespaceService);
+        nodeService.addAspect(testRecord1, assocsAspectQName, null);
 
-        //TODO The below line fails.
-        nodeService.addChild(testRecord1, testRecord2, refQName, refQName); // TODO 2 names? name of type, and name of assoc?
+        String assocInstanceQNameString = "rmc:" + targetRoleName;
+		QName assocInstanceQName = QName.createQName(assocInstanceQNameString, namespaceService);
+		if (isChild)
+		{
+			nodeService.addChild(testRecord1, testRecord2, refDefinitionQName, assocInstanceQName);
+		}
+		else
+		{
+			nodeService.createAssociation(testRecord1, testRecord2, refDefinitionQName);
+		}
         
         txn2.commit();
         
         // Read back the reference value to make sure it was correctly applied.
         transactionService.getUserTransaction(true);
-        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(testRecord1);
-        ChildAssociationRef newlyAddedRef = null;
-        for (ChildAssociationRef caRef : childAssocs)
-        {
-            if (refQName.equals(caRef.getQName())) newlyAddedRef = caRef;
-        }
-
-        assertNotNull("newlyAddedRef was null.", newlyAddedRef);
+    	List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(testRecord1);
+    	List<AssociationRef> retrievedAssocs = nodeService.getTargetAssocs(testRecord1, RegexQNamePattern.MATCH_ALL);
+    	
+    	Object newlyAddedRef = null;
+    	if (isChild)
+    	{
+    		for (ChildAssociationRef caRef : childAssocs)
+    		{
+    			QName refInstanceQName = caRef.getQName();
+    			if (assocInstanceQName.equals(refInstanceQName)) newlyAddedRef = caRef;
+    		}
+    	}
+    	else
+    	{
+    		for (AssociationRef aRef : retrievedAssocs)
+    		{
+    			QName refQName = aRef.getTypeQName();
+    			if (refDefinitionQName.equals(refQName)) newlyAddedRef = aRef;
+    		}
+    	}
+    	assertNotNull("newlyAddedRef was null.", newlyAddedRef);
         
         // Check that the reference has appeared in the data dictionary
-        AspectDefinition customAssocsAspect = dictionaryService.getAspect(aspectQName);
+        AspectDefinition customAssocsAspect = dictionaryService.getAspect(assocsAspectQName);
         assertNotNull(customAssocsAspect);
-        assertNotNull("The customReference is not returned from the dictionaryService.",
-                customAssocsAspect.getChildAssociations().get(refQName));
-    }
-    
-    public void off_testCreateAndUseCustomNonChildReference() throws Exception
-    {
-        //TODO Need to check the implementation of the defineCustomAssociation action.
-        //     Is it actually calling the services correctly?
-        
-        fail("To be implemented.");
-    }
+        if (isChild)
+        {
+        	assertNotNull("The customReference is not returned from the dictionaryService.",
+        			customAssocsAspect.getChildAssociations().get(refDefinitionQName));
+        }
+        else
+        {
+        	assertNotNull("The customReference is not returned from the dictionaryService.",
+        			customAssocsAspect.getAssociations().get(refDefinitionQName));
+        }
+	}
     
     private NodeRef retrievePreexistingRecordFolder()
     {
