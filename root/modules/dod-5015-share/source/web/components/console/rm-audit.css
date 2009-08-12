@@ -1,0 +1,121 @@
+#audit 
+{
+   padding: 1em;
+}
+#audit .yui-u
+{
+   text-align:right;
+}
+
+#audit .first
+{
+   text-align: left;
+}
+#audit h2
+{
+   font-size: 120%;       
+}
+#audit-log .yui-u
+{
+   width: 100%;
+}
+#audit-log
+{
+   margin-top: 1em;
+   position: relative;
+}
+#audit-log .yui-dt table
+{
+   width:100%;
+}
+#audit-log .yui-dt caption
+{
+   text-align: left;
+   font:107% normal Arial,sans-serif;
+}
+#audit-log .first
+{
+   text-align: right;
+}
+#filterActions
+{
+   float: right;
+}
+#audit #filterActions,
+#audit #defaultActions
+{
+   display: none;
+   float: right;
+}
+#audit #filterActions .yui-button,
+#audit #defaultActions .yui-button
+{
+   vertical-align: middle;
+}
+#audit #defaultActions.active,
+#audit #filterActions.active    
+{
+   display: inline;
+}
+#audit-peoplefinder
+{
+   display: none;
+   position: absolute;
+   right: -10px;
+   top: 1em;
+   z-index: 100;
+}
+#audit-peoplefinder.active
+{
+   display: block;
+}
+#personFilter
+{
+   display: inline;
+}
+#personFilterRemove
+{
+   vertical-align: middle;
+   margin: 0 5px;
+   display: none;
+}
+#personFilter.active #personFilterRemove
+{
+   display: inline;
+}
+#personFilterRemove img
+{
+   vertical-align: middle;
+}
+#audit-peoplefinder
+{
+   width: 30em;
+}
+/* audit log popup page */
+#doc3
+{
+   margin: 0;
+}
+#audit-popup-log #audit-info,
+#audit-popup-log #auditDT
+{
+   margin: 1em;
+}
+#audit-popup-log #auditDT table
+{
+   width: 100%;
+}
+#audit-popup-log #audit
+{
+   padding: 0;
+}
+#audit-popup-log #audit-search
+{
+   width: 100%;
+   text-align: center;
+   padding: 0.5em;
+}
+#audit-popup-log #search
+{
+   vertical-align: middle;
+}
