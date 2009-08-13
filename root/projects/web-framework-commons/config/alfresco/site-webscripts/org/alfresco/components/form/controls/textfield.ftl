@@ -5,7 +5,12 @@
             <span class="incomplete-warning"><img src="${url.context}/components/form/images/warning-16.png" title="${msg("form.field.incomplete")}" /><span>
          </#if>
          <span class="viewmode-label">${field.label?html}:</span>
-         <span class="viewmode-value">${field.value?html}</span>
+         <#if field.control.params.activateLinks?? && field.control.params.activateLinks == "true">
+            <#assign fieldValue=field.value?html?replace("((http|ftp|https)://[\\w\\-_]+(.[\\w\\-_]+)+([\\w\\-.,@?^=%&:/~+#]*[\\w\\-@?^=%&/~+#])?)", "<a href=\"$1\" target=\"_blank\">$1</a>", "r")>
+         <#else>
+            <#assign fieldValue=field.value?html>
+         </#if>
+         <span class="viewmode-value">${fieldValue}</span>
       </div>
    <#else>
       <label for="${fieldHtmlId}">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
