@@ -44,9 +44,16 @@ function main()
             var p = action.period ? action.period.split("|") : [];
             var periodUnit = p.length > 0 ? p[0] : null;
             var periodAmount = p.length > 1 ? p[1] : null;
-            if(periodUnit && periodAmount)
+            if(periodUnit && periodUnit != "none")
             {
-               action.title = msg.get("label.title.complex", [action.label, periodAmount, periodUnit]);
+               if(!periodAmount || periodAmount == "" || periodAmount == "0")
+               {
+                  action.title = msg.get("label.title.noTime", [action.label, periodUnit]);                  
+               }
+               else
+               {
+                  action.title = msg.get("label.title.complex", [action.label, periodAmount, periodUnit]);
+               }
             }
             else
             {
