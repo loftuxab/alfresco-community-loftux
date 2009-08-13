@@ -208,9 +208,8 @@
        */
       _generateTagMarkup: function TagComponent__generateTagMarkup(tag)
       {
-         var tagName = $html(tag.name),
-            html = '<li><span class="tag">';
-         html += '<a href="#" class="tag-link" rel="' + tagName + '">' + tagName + '</a>&nbsp;(' + tag.count + ')';
+         var html = '<li><span class="tag">';
+         html += '<a href="#" class="tag-link" rel="' + $html(tag.name) + '">' + $html(tag.name) + '</a>&nbsp;(' + tag.count + ')';
          html += '</span></li>';
          return html;
       }

@@ -1098,7 +1098,7 @@
          {
             eDescMore = new Element(document.createElement("span"),
             {
-               innerHTML: this.msg("description." + this.currentFilter.filterId + ".more", filterDisplay)
+               innerHTML: this.msg("description." + this.currentFilter.filterId + ".more", $html(filterDisplay))
             });
             eDescMore.addClass("more");
 
