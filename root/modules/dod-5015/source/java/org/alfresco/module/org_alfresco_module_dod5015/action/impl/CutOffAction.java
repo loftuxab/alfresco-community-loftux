@@ -52,7 +52,11 @@ public class CutOffAction extends RMDispositionActionExecuterAbstractBase
     protected void executeRecordFolderLevelDisposition(Action action, NodeRef recordFolder)
     {
         // Close folder
-        this.recordsManagementActionService.executeRecordsManagementAction(recordFolder, "closeRecordFolder");
+        Boolean isClosed = (Boolean)this.nodeService.getProperty(recordFolder, PROP_IS_CLOSED);
+        if (Boolean.FALSE.equals(isClosed) == true)
+        {
+            this.nodeService.setProperty(recordFolder, PROP_IS_CLOSED, true);
+        }
         
         // Mark the folder as cut off
         doCutOff(recordFolder);
@@ -110,7 +114,12 @@ public class CutOffAction extends RMDispositionActionExecuterAbstractBase
     @Override
     protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
     {
-        // dupicates code from close .. it should get the closed action somehow?
+        if(!super.isExecutableImpl(filePlanComponent, parameters, throwException))
+        {
+            return false;
+        }
+        
+        // duplicates code from close .. it should get the closed action somehow?
         if (this.recordsManagementService.isRecordFolder(filePlanComponent) || this.recordsManagementService.isRecord(filePlanComponent))
         {
             return true;

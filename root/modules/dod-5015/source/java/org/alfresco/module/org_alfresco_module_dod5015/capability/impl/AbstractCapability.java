@@ -693,7 +693,7 @@ public abstract class AbstractCapability implements Capability
         }
         return false;
     }
-
+    
     public boolean isScheduledForDestruction(NodeRef nodeRef)
     {
         // The record is all set up for destruction

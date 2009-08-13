@@ -298,6 +298,11 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
         
         DispositionSchedule di = checkDispositionActionExecutionValidity(filePlanComponent, nextDispositionActionNodeRef, throwException);
 
+        if(di == null)
+        {
+            return false;
+        }
+        
         // Check the eligibility of the action
         if (checkEligibility == false || this.recordsManagementService.isNextDispositionActionEligible(filePlanComponent) == true)
         {

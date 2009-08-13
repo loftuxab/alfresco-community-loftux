@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,9 +46,11 @@ import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
+import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
@@ -64,6 +68,7 @@ import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -79,6 +84,8 @@ public class CapabilitiesTest extends TestCase
 
     private NodeService nodeService;
 
+    private NodeService publicNodeService;
+
     private TransactionService transactionService;
 
     private ImporterService importerService;
@@ -90,8 +97,10 @@ public class CapabilitiesTest extends TestCase
     private PermissionService permissionService;
 
     private RecordsManagementService recordsManagementService;
-    
+
     private RecordsManagementActionService recordsManagementActionService;
+
+    private RecordsManagementEventService recordsManagementEventService;
 
     private PermissionModel permissionModel;
 
@@ -128,6 +137,7 @@ public class CapabilitiesTest extends TestCase
     {
         super.setUp();
         nodeService = (NodeService) ctx.getBean("dbNodeService");
+        publicNodeService = (NodeService) ctx.getBean("NodeService");
         transactionService = (TransactionService) ctx.getBean("transactionComponent");
         importerService = (ImporterService) ctx.getBean("ImporterService");
         permissionService = (PermissionService) ctx.getBean("permissionService");
@@ -136,6 +146,7 @@ public class CapabilitiesTest extends TestCase
 
         recordsManagementService = (RecordsManagementService) ctx.getBean("RecordsManagementService");
         recordsManagementActionService = (RecordsManagementActionService) ctx.getBean("RecordsManagementActionService");
+        recordsManagementEventService = (RecordsManagementEventService) ctx.getBean("RecordsManagementEventService");
 
         testTX = transactionService.getUserTransaction();
         testTX.begin();
@@ -143,9 +154,12 @@ public class CapabilitiesTest extends TestCase
 
         StoreRef storeRef = nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
         rootNodeRef = nodeService.getRootNode(storeRef);
-        
+
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
-        
+
+        recordsManagementEventService.getEvents();
+        recordsManagementEventService.addEvent("rmEventType.simple", "event", "My Event");
+
         filePlan = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, DOD5015Model.TYPE_FILE_PLAN, DOD5015Model.TYPE_FILE_PLAN).getChildRef();
         recordSeries = createRecordSeries(filePlan, "RS", "RS-1", "Record Series", "My record series");
         recordCategory_1 = createRecordCategory(recordSeries, "Docs", "101-1", "Docs", "Docs", "week|1", true, false);
@@ -224,12 +238,12 @@ public class CapabilitiesTest extends TestCase
         NodeRef ds = nodeService.createNode(answer, DOD5015Model.ASSOC_DISPOSITION_SCHEDULE, DOD5015Model.TYPE_DISPOSITION_SCHEDULE, DOD5015Model.TYPE_DISPOSITION_SCHEDULE,
                 properties).getChildRef();
 
-        createDispoistionAction(ds, "cutoff", "monthend|1", null);
-        createDispoistionAction(ds, "destroy", "month|1", "{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate");
+        createDispoistionAction(ds, "cutoff", "monthend|1", null, "event");
+        createDispoistionAction(ds, "destroy", "month|1", "{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate", "event");
         return answer;
     }
 
-    private NodeRef createDispoistionAction(NodeRef disposition, String actionName, String period, String periodProperty)
+    private NodeRef createDispoistionAction(NodeRef disposition, String actionName, String period, String periodProperty, String event)
     {
         HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
         properties.put(DOD5015Model.PROP_DISPOSITION_ACTION_NAME, actionName);
@@ -237,6 +251,10 @@ public class CapabilitiesTest extends TestCase
         if (periodProperty != null)
         {
             properties.put(DOD5015Model.PROP_DISPOSITION_PERIOD_PROPERTY, periodProperty);
+        }
+        if (event != null)
+        {
+            properties.put(DOD5015Model.PROP_DISPOSITION_EVENT, event);
         }
         NodeRef answer = nodeService.createNode(disposition, DOD5015Model.ASSOC_DISPOSITION_ACTION_DEFINITIONS, DOD5015Model.TYPE_DISPOSITION_ACTION_DEFINITION,
                 DOD5015Model.TYPE_DISPOSITION_ACTION_DEFINITION, properties).getChildRef();
@@ -516,7 +534,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
 
     }
-    
+
     public void testFilePlanAsAdmin()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -973,7 +991,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
 
     }
-    
+
     public void testRecordSeriesAsAdmin()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -1497,7 +1515,6 @@ public class CapabilitiesTest extends TestCase
 
     }
 
-    
     public void testRecordCategoryAsAdministrator()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
@@ -1888,7 +1905,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
 
     }
-    
+
     public void testRecordFolderAsAdmin()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -2345,7 +2362,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
 
     }
-    
+
     public void testRecordAsAdmin()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -2890,48 +2907,465 @@ public class CapabilitiesTest extends TestCase
         checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        
+
         // check frozen
-        
-        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());       
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "one");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
-        
+
         checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        
+
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
-        
+
         checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        
+
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
-        
+
         checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        
+
         // Check closed
-        
-        
-        
+        // should make no difference
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+
+        // try and complete some events
+
+        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        Map<String, Serializable> eventDetails = new HashMap<String, Serializable>(3);
+        eventDetails.put(CompleteEventAction.PARAM_EVENT_NAME, "event");
+        eventDetails.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+        eventDetails.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "test_user");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "completeEvent", eventDetails);
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "completeEvent", eventDetails);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_1, "completeEvent", eventDetails);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "completeEvent", eventDetails);
+
+        // check protected properties
+
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETE, true);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETED_AT, new Date());
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETED_BY, "me");
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+
         // check cutoff
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_1, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_1, "declareRecord");
+
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_2, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "declareRecord");
+
+        NodeRef ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        ndNodeRef = this.nodeService.getChildAssocs(record_2, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
     }
 
     public void testApproveRecordsScheduledForCutoffCapability()
     {
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkPermission("rm_security_officer", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkPermission("rm_power_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkPermission("rm_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkPermission("rm_administrator", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkPermission("rm_records_manager", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkPermission("rm_security_officer", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkPermission("rm_power_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkPermission("rm_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        // folder level - not eligible all deny
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_administrator", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_power_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        // record level - not eligible all deny
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_administrator", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_power_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        // Set appropriate state - declare records and make eligible
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_1, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_1, "declareRecord");
+
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_2, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "declareRecord");
+
+        NodeRef ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        ndNodeRef = this.nodeService.getChildAssocs(record_2, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_administrator", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_power_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("rm_administrator", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("rm_records_manager", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("rm_security_officer", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_power_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("rm_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, "test_user", RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, "test_user", RMPermissionModel.FILING);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+
+        // check frozen
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+
+        // Check closed
+        // should make no difference
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+
+        // try and cut off
+
+        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "cutoff", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_1, "cutoff", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
+
+        // check protected properties
+
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETE, true);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETED_AT, new Date());
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETED_BY, "me");
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+
+        // check cutoff again (it is already cut off)
+
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
     }
 
     public void testAttachRulesToMetadataPropertiesCapability()
