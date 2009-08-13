@@ -1,272 +1,348 @@
-/**
- * Asset type evaluator
- */
-function getAssetType(asset)
+var Evaluator =
 {
-   var assetType = "";
-   // More detailed asset type
-   switch (String(asset.typeShort))
+   /**
+    * Asset type evaluator
+    */
+   getAssetType: function Evaluator_getAssetType(asset)
    {
-      case "dod:filePlan":
-         assetType = "fileplan";
-         break;
-      case "dod:recordSeries":
-         assetType = "record-series";
-         break;
-      case "dod:recordCategory":
-         assetType = "record-category";
-         break;
-      case "rma:recordFolder":
-         assetType = "record-folder";
-         break;
-      case "rma:nonElectronicRecord":
-         assetType = "non-electronic-record";
-         break;
-      case "cm:content":
-         if (asset.hasAspect("rma:record"))
-         {
-            assetType = "undeclared-record";
-            if (asset.hasAspect("rma:declaredRecord"))
+      var assetType = "";
+      // More detailed asset type
+      switch (String(asset.typeShort))
+      {
+         case "dod:filePlan":
+            assetType = "fileplan";
+            break;
+         case "dod:recordSeries":
+            assetType = "record-series";
+            break;
+         case "dod:recordCategory":
+            assetType = "record-category";
+            break;
+         case "rma:recordFolder":
+            assetType = "record-folder";
+            break;
+         case "rma:nonElectronicRecord":
+            assetType = "non-electronic-record";
+            break;
+         case "cm:content":
+            if (asset.hasAspect("rma:record"))
             {
-               assetType = "record";
+               assetType = "undeclared-record";
+               if (asset.hasAspect("rma:declaredRecord"))
+               {
+                  assetType = "record";
+               }
+            }
+            break;
+         case "rma:transfer":
+            assetType = "transfer-container";
+            break;
+         case "rma:hold":
+            assetType = "hold-container";
+            break;
+         default:
+            assetType = asset.isContainer ? "folder" : "document";
+            break;
+      }
+
+      return assetType;
+   },
+
+   /**
+    * Records Management metadata extracter
+    */
+   getMetadata: function Evaluator_getMetadata(asset)
+   {
+      var metadata = {};
+
+      var fnExtract = function(p_asset)
+      {
+         for (var index in p_asset.properties)
+         {
+            if (index.indexOf("{http://www.alfresco.org/model/recordsmanagement/1.0}") == 0)
+            {
+               metadata[index.replace("{http://www.alfresco.org/model/recordsmanagement/1.0}", "rma:")] = p_asset.properties[index];
+            }
+            else if (index.indexOf("{http://www.alfresco.org/model/dod5015/1.0}") == 0)
+            {
+               metadata[index.replace("{http://www.alfresco.org/model/dod5015/1.0}", "dod:")] = p_asset.properties[index];
             }
          }
-         break;
-      case "rma:hold":
-         assetType = "hold-container";
-         break;
-      default:
-         assetType = asset.isContainer ? "folder" : "document";
-         break;
-   }
+      };
 
-   return assetType;
-}
+      // General Records Management properties
+      fnExtract(asset);
 
-/**
- * Records Management metadata extracter
- */
-function getMetadata(asset)
-{
-   var metadata = {};
-
-   var fnExtract = function(p_asset)
-   {
-      for (var index in p_asset.properties)
+      // Disposition Instructions, if relevant
+      if (asset.hasAspect("rma:scheduled"))
       {
-         if (index.indexOf("{http://www.alfresco.org/model/recordsmanagement/1.0}") == 0)
+         var dsNode = asset.childAssocs["rma:dispositionSchedule"][0];
+         if (dsNode !== null)
          {
-            metadata[index.replace("{http://www.alfresco.org/model/recordsmanagement/1.0}", "rma:")] = p_asset.properties[index];
-         }
-         else if (index.indexOf("{http://www.alfresco.org/model/dod5015/1.0}") == 0)
-         {
-            metadata[index.replace("{http://www.alfresco.org/model/dod5015/1.0}", "dod:")] = p_asset.properties[index];
+            fnExtract(dsNode);
          }
       }
-   };
-   
-   // General Records Management properties
-   fnExtract(asset);
-   
-   // Disposition Instructions, if relevant
-   if (asset.hasAspect("rma:scheduled"))
+
+      return metadata;
+   },
+
+   /**
+    * Disposition evaluator
+    */
+   filterDispositionActions: function Evaluator_filterDispositionActions(asset, permissions, status)
    {
-      var dsNode = asset.childAssocs["rma:dispositionSchedule"][0];
-      if (dsNode !== null)
+      var actionName = asset.properties["rma:recordSearchDispositionActionName"];
+
+      if (actionName !== null)
       {
-         fnExtract(dsNode);
+         if (actionName !== "accession")
+         {
+            delete permissions["accession"];
+         }
+         
+         if (actionName !== "cutoff")
+         {
+            delete permissions["cutoff"];
+         }
+         
+         if (actionName !== "destroy")
+         {
+            delete permissions["destroy"];
+         }
+         
+         if (actionName !== "retain")
+         {
+            delete permissions["retain"];
+         }
+         
+         if (actionName !== "transfer")
+         {
+            delete permissions["transfer"];
+         }
       }
-   }
-   
-   return metadata;
-}
-
-
-/**
- * Asset Evaluator
- */
-function runEvaluator(asset, assetType)
-{
-   var actionSet = "empty",
-      permissions = [],
-      status = [];
-   
-   var now = new Date();
+   },
 
    /**
-    * COMMON FOR ALL TYPES
+    * Asset Evaluator
     */
+   run: function Evaluator_run(asset)
+   {
+      var assetType = Evaluator.getAssetType(asset),
+         actionSet = "empty",
+         permissions = {},
+         status = {};
 
-   /**
-    * Basic permissions
-    */
-   if (asset.hasPermission("CreateChildren"))
-   {
-      permissions.push("create");
-   }
-   if (asset.hasPermission("Write"))
-   {
-      permissions.push("edit");
-   }
-   if (asset.hasPermission("Delete"))
-   {
-      permissions.push("delete");
-   }
-   if (asset.hasPermission("ChangePermissions"))
-   {
-      permissions.push("permissions");
-   }
-   
-   /**
-    * Multiple parent assocs
-    */
-   var parents = asset.parentAssocs["contains"];
-   if (parents !== null && parents.length > 1)
-   {
-      status.push("multi-parent " + parents.length);
-   }
-   
-   switch (assetType)
-   {
-      /**
-       * SPECIFIC TO: FILEPLAN
-       */
-      case "fileplan":
-         permissions.push("new-series");
-         break;
-
+      var now = new Date();
 
       /**
-       * SPECIFIC TO: RECORD SERIES
+       * COMMON FOR ALL TYPES
        */
-      case "record-series":
-         actionSet = "recordSeries";
-         permissions.push("new-category");
-         break;
-
 
       /**
-       * SPECIFIC TO: RECORD CATEGORY
+       * Basic permissions - replace these with RM equivalents
        */
-      case "record-category":
-         actionSet = "recordCategory";
-         permissions.push("new-folder");
-         break;
- 
+      if (asset.hasPermission("CreateChildren"))
+      {
+         permissions["create"] = true;
+      }
+      if (asset.hasPermission("Write"))
+      {
+         permissions["edit"] = true;
+      }
+      if (asset.hasPermission("Delete"))
+      {
+         permissions["delete"] = true;
+      }
+      if (asset.hasPermission("ChangePermissions"))
+      {
+         permissions["permissions"] = true;
+      }
 
       /**
-       * SPECIFIC TO: RECORD FOLDER
+       * Multiple parent assocs
        */
-      case "record-folder":
-         actionSet = "recordFolder";
+      var parents = asset.parentAssocs["contains"];
+      if (parents !== null && parents.length > 1)
+      {
+         status["multi-parent " + parents.length] = true;
+      }
+
+      switch (assetType)
+      {
          /**
-          * Open/Close
+          * SPECIFIC TO: FILEPLAN
           */
-         if (asset.properties["rma:isClosed"])
-         {
-            permissions.push("reopen");
-            status.push("closed");
-         }
-         else
-         {
-            permissions.push("file");
-            permissions.push("close");
-            status.push("open");
-         }
-         /**
-          * Freeze/Unfreeze
-          */
-         if (asset.hasAspect("rma:frozen"))
-         {
-            permissions.push("unfreeze");
-            status.push("frozen");
-         }
-         else
-         {
-            permissions.push("freeze");
-         }
-         break;
- 
+         case "fileplan":
+            permissions["new-series"] = true;
+            break;
 
-      /**
-       * SPECIFIC TO: NON-ELECTRONIC RECORD
-       */
-      case "non-electronic-record":
-         actionSet = "nonElectronicRecord";
-         break;
- 
 
-      /**
-       * SPECIFIC TO: RECORD
-       */
-      case "record":
-         actionSet = "record";
          /**
-          * Reviewed
-          * Rules: Has rma:vitalRecord aspect and rma:reviewAsOf date exists and is before now
+          * SPECIFIC TO: RECORD SERIES
           */
-         if (asset.hasAspect("rma:vitalRecord"))
-         {
-            if (asset.properties["rma:reviewAsOf"] != null && asset.properties["rma:reviewAsOf"] < now)
+         case "record-series":
+            actionSet = "recordSeries";
+            permissions["new-category"] = true;
+            break;
+
+
+         /**
+          * SPECIFIC TO: RECORD CATEGORY
+          */
+         case "record-category":
+            actionSet = "recordCategory";
+            permissions["new-folder"] = true;
+            break;
+
+
+         /**
+          * SPECIFIC TO: RECORD FOLDER
+          */
+         case "record-folder":
+            actionSet = "recordFolder";
+
+            /**
+             * Open/Close
+             */
+            if (asset.properties["rma:isClosed"])
             {
-               permissions.push("reviewed");
+               permissions["reopen"] = true;
+               status["closed"] = true;
             }
-         }
-         /**
-          * Disposition Actions
-          */
-         if (asset.hasAspect("rma:dispositionSchedule"))
-         {
-            if (asset.properties["rma:dispositionAsOf"] != null && asset.properties["rma:dispositionAsOf"] < now)
+            else
             {
-               permissions.push(asset.properties["rma:dispositionAction"]);
+               permissions["file"] = true;
+               permissions["close"] = true;
+               status["open"] = true;
             }
-         }
+
+            /**
+             * Disposition Actions
+             */
+            permissions["accession"] = true;
+            permissions["cutoff"] = true;
+            permissions["destroy"] = true;
+            permissions["retain"] = true;
+            permissions["transfer"] = true;
+
+            /**
+             * Freeze/Unfreeze
+             */
+            if (asset.hasAspect("rma:frozen"))
+            {
+               permissions["Unfreeze"] = true;
+               status["frozen"] = true;
+            }
+            else
+            {
+               permissions["ExtendRetentionPeriodOrFreeze"] = true;
+            }
+            break;
+
+
          /**
-          * Freeze/Unfreeze
+          * SPECIFIC TO: NON-ELECTRONIC RECORD
           */
-         if (asset.hasAspect("rma:frozen"))
-         {
-            permissions.push("unfreeze");
-            status.push("frozen");
-         }
-         else
-         {
-            permissions.push("freeze");
-         }
-         permissions.push("UndeclareRecords");
-         break;
+         case "non-electronic-record":
+            actionSet = "nonElectronicRecord";
+            break;
 
 
-      /**
-       * SPECIFIC TO: UNDECLARED RECORD
-       */
-      case "undeclared-record":
-         actionSet = "undeclaredRecord";
-         permissions.push("DeclareRecords");
-         break;
+         /**
+          * SPECIFIC TO: RECORD
+          */
+         case "record":
+            actionSet = "record";
 
-      /**
-       * SPECIFIC TO: HOLD CONTAINERS
-       */
-      case "hold-container":
-         actionSet = "holdContainer";
-         permissions.push("relinquish");
-         break;
+            /**
+             * Reviewed
+             * Rules: Has rma:vitalRecord aspect and rma:reviewAsOf date exists and is before now
+             */
+            if (asset.hasAspect("rma:vitalRecord"))
+            {
+               if (asset.properties["rma:reviewAsOf"] != null && asset.properties["rma:reviewAsOf"] < now)
+               {
+                  permissions["reviewed"] = true;
+               }
+            }
 
-      /**
-       * SPECIFIC TO: LEGACY TYPES
-       */
-      default:
-         actionSet = assetType;
-         break;
+            /**
+             * Disposition Actions
+             *
+             * Note: Development values currently
+             */
+            if (!asset.hasAspect("rma:cutOff"))
+            {
+               permissions["accession"] = true;
+               permissions["cutoff"] = true;
+               permissions["destroy"] = true;
+               permissions["retain"] = true;
+               permissions["transfer"] = true;
+            }
+
+            /**
+             * Freeze/Unfreeze
+             */
+            if (asset.hasAspect("rma:frozen"))
+            {
+               permissions["Unfreeze"] = true;
+               status["frozen"] = true;
+            }
+            else
+            {
+               permissions["ExtendRetentionPeriodOrFreeze"] = true;
+            }
+            permissions["UndeclareRecords"] = true;
+            break;
+
+
+         /**
+          * SPECIFIC TO: UNDECLARED RECORD
+          */
+         case "undeclared-record":
+            actionSet = "undeclaredRecord";
+            permissions["DeclareRecords"] = true;
+            break;
+
+
+         /**
+          * SPECIFIC TO: TRANSFER CONTAINERS
+          */
+         case "transfer-container":
+            actionSet = "transferContainer";
+            permissions["download-zip"] = true;
+            permissions["file-report"] = true;
+            permissions["transfer-complete"] = true;
+            break;
+
+
+         /**
+          * SPECIFIC TO: HOLD CONTAINERS
+          */
+         case "hold-container":
+            actionSet = "holdContainer";
+            permissions["Unfreeze"] = true;
+            permissions["ViewUpdateReasonsForFreeze"] = true;
+            break;
+
+         /**
+          * SPECIFIC TO: LEGACY TYPES
+          */
+         default:
+            actionSet = assetType;
+            break;
+      }
+
+      // Filter by next Disposition action
+      Evaluator.filterDispositionActions(asset, permissions, status);
+
+      return (
+      {
+         assetType: assetType,
+         actionSet: actionSet,
+         permissions: permissions,
+         status: status,
+         metadata: Evaluator.getMetadata(asset, assetType)
+      });
    }
-   
-   return (
-   {
-      actionSet: actionSet,
-      permissions: permissions,
-      status: status,
-      metadata: getMetadata(asset, assetType)
-   });
-}
+};

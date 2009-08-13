@@ -437,19 +437,26 @@
                 * Transfer Container
                 */
                case "transfer-container":
+                  var transferTitle = me.msg("details.transfer-container.title", record.displayName);
+               
+                  desc = '<h3 class="filename">' + $html(transferTitle) + '</h3>';
+
                   if (me.options.simpleView)
                   {
                      /**
                       * Simple View
                       */
-                     desc += '<div class="detail"><span class="item-simple"><em>' + me.msg("details.transfer-container.todo") + '</em> ' + 'TODO' + '</span></div>';
+                     desc += '<div class="detail"><span class="item-simple"><em>' + me.msg("details.created.on") + '</em> ' + Alfresco.util.formatDate(record.createdOn, "longDate") + '</span>';
+                     desc += '<span class="item-simple"><em>' + me.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
                   }
                   else
                   {
                      /**
                       * Detailed View
                       */
-                     desc += '<div class="detail"><span class="item"><em>' + me.msg("details.transfer-container.todo") + '</em> ' + 'TODO' + '</span></div>';
+                     desc += '<div class="detail"><span class="item"><em>' + me.msg("details.created.on") + '</em> ' + Alfresco.util.formatDate(record.createdOn, "longDate") + '</span>';
+                     desc += '<span class="item"><em>' + me.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
+                     desc += '<div class="detail">&nbsp;</div>';
                      desc += '<div class="detail">&nbsp;</div>';
                   }
                   break;
@@ -484,6 +491,7 @@
                       * Detailed View
                       */
                      desc += '<div class="detail"><span class="item"><em>' + me.msg("details.hold-container.reason") + '</em> ' + holdReason + '</span></div>';
+                     desc += '<div class="detail">&nbsp;</div>';
                      desc += '<div class="detail">&nbsp;</div>';
                   }
                   break;
@@ -909,17 +917,19 @@
       getActionUrls: function DL_getActionUrls(record)
       {
          var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
-            nodeRef = record.getData("nodeRef");
-         
+            nodeRef = record.getData("nodeRef"),
+            filePlan = this.doclistMetadata.filePlan.replace(":/", "");
+
          return (
          {
             downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
             documentDetailsUrl: urlContextSite + "/document-details?nodeRef=" + nodeRef,
             folderDetailsUrl: urlContextSite + "/folder-details?nodeRef=" + nodeRef,
-            recordFolderDetailsUrl: urlContextSite + "/record-folder-details?nodeRef=" + nodeRef,
-            recordCategoryDetailsUrl: urlContextSite + "/record-category-details?nodeRef=" + nodeRef,
+            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef,
             recordSeriesDetailsUrl: urlContextSite + "/record-series-details?nodeRef=" + nodeRef,
-            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef
+            recordCategoryDetailsUrl: urlContextSite + "/record-category-details?nodeRef=" + nodeRef,
+            recordFolderDetailsUrl: urlContextSite + "/record-folder-details?nodeRef=" + nodeRef,
+            transfersZipUrl: Alfresco.constants.PROXY_URI + "api/node/" + filePlan + "/transfers/" + nodeRef.replace(":/", "").split("/")[2]
          });
       }
    }, true);

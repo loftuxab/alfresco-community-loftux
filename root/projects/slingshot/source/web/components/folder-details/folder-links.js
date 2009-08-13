@@ -139,7 +139,7 @@
        */
       onFolderDetailsAvailable: function FolderLinks_onFolderDetailsAvailable(layer, args)
       {
-         var folderData = args[1];
+         var folderData = args[1].folderDetails;
          
          var clipboard = (window.clipboardData && clipboardData.setData);
          

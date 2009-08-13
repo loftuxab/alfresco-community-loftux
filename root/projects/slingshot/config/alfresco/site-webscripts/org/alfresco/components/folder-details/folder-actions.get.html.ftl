@@ -17,8 +17,7 @@
    <#assign actionSet = actionSets[key]>
       <div id="${args.htmlid}-actionSet-${key}" class="action-set">
    <#list actionSet as action>
-      <#assign domId><#if action.domId?? && action.domId != "">id="${action.domId?replace("{htmlid}", args.htmlid)}"</#if></#assign>
-         <div class="${action.id}"><a rel="${action.permission!""}" href="${action.href}" class="${action.type}" title="${msg(action.label)}" ${domId}><span>${msg(action.label)}</span></a></div>
+         <div class="${action.id}"><a rel="${action.permission!""}" href="${action.href}" class="${action.type}" title="${msg(action.label)}"><span>${msg(action.label)}</span></a></div>
    </#list>
       </div>
 </#list>

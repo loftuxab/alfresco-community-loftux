@@ -75,9 +75,9 @@
    background-image: url(images/transfer-record-16.png);
 }
 
-.doclist .record .onActionTransferConfirm a
+.doclist .record .onActionTransferComplete a
 {
-   background-image: url(images/transfer-confirm-16.png);
+   background-image: url(images/transfer-complete-16.png);
 }
 
 .doclist .record .onActionUndeclare a
@@ -167,9 +167,9 @@
    background-image: url(images/transfer-16.png);
 }
 
-.doclist .record-folder .onActionTransferConfirm a
+.doclist .record-folder .onActionTransferComplete a
 {
-   background-image: url(images/transfer-confirm-16.png);
+   background-image: url(images/transfer-complete-16.png);
 }
 
 .doclist .record-folder .onActionUndoCutoff a
@@ -190,6 +190,16 @@
    background-image: url(images/relinquish-hold-16.png);
 }
 
+.doclist .hold-container .onActionUnfreezeAll a
+{
+   background-image: url(images/unfreeze-all-16.png);
+}
+
+.doclist .hold-container .onActionEditHoldDetails a
+{
+   background-image: url(images/edit-hold-details-16.png);
+}
+
 /**
  * Actions: Transfer Container
  */
@@ -198,14 +208,14 @@
    background-image: url(images/download-zip-16.png);
 }
 
-.doclist .transfer-container .onActionFileReport a
+.doclist .transfer-container .onActionFileTransferReport a
 {
    background-image: url(images/file-report-16.png);
 }
 
-.doclist .transfer-container .onActionTransferConfirm a
+.doclist .transfer-container .onActionTransferComplete a
 {
-   background-image: url(images/transfer-confirm-16.png);
+   background-image: url(images/transfer-complete-16.png);
 }
 
 

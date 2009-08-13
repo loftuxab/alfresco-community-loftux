@@ -62,10 +62,12 @@
    {
       /**
        * Event handler called when the "documentDetailsAvailable" event is received
+       *
+       * @method: onDocumentDetailsAvailable
        */
       onDocumentDetailsAvailable: function DocumentInfo_onDocumentDetailsAvailable(layer, args)
       {
-         var docData = args[1];
+         var docData = args[1].documentDetails;
          
          // render tags values
          var tags = docData.tags,

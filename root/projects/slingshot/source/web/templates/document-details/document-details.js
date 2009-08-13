@@ -77,8 +77,8 @@
       },
 
       /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
+       * Fired by YUILoaderHelper when required component script files have been loaded into the browser.
+       * NOTE: This component doesn't have an htmlId, so we can't use onContentReady.
        *
        * @override
        * @method onComponentsLoaded
@@ -114,30 +114,34 @@
       /**
        * Success handler called when the AJAX call to the doclist web script returns successfully
        *
-       * @response The response object
+       * @method _getDataSuccess
+       * @param response {object} The response object
+       * @private
        */
       _getDataSuccess: function DocumentDetails__getDataSuccess(response)
       {
          if (response.json !== undefined)
          {
-            var docData = response.json.items[0];
+            var documentDetails = response.json.items[0];
             
             // Fire event to inform any listening components that the data is ready
-            YAHOO.Bubbling.fire("documentDetailsAvailable", docData);
+            YAHOO.Bubbling.fire("documentDetailsAvailable",
+            {
+               documentDetails: documentDetails,
+               metadata: response.json.metadata
+            });
             
             // Fire event to show comments for document
-            var eventData =
+            YAHOO.Bubbling.fire("setCommentedNode",
             { 
-               nodeRef: docData.nodeRef,
-               title: docData.displayName,
+               nodeRef: documentDetails.nodeRef,
+               title: documentDetails.displayName,
                page: "document-details",
                pageParams:
                {
                   nodeRef: this.options.nodeRef
                }
-            };
-            
-            YAHOO.Bubbling.fire("setCommentedNode", eventData);
+            });
          }
       }
    });

@@ -52,5 +52,30 @@
     * Augment prototype with RecordActions module, ensuring overwrite is enabled
     */
    YAHOO.lang.augmentProto(Alfresco.RecordsDocumentActions, Alfresco.doclib.RecordsActions, true);
-   
+
+   /**
+    * Augment prototype with main class implementation, ensuring overwrite is enabled
+    */
+   YAHOO.lang.augmentObject(Alfresco.RecordsDocumentActions.prototype,
+   {
+      /**
+       * The urls to be used when creating links in the action cell
+       *
+       * @method getActionUrls
+       * @return {object} Object literal containing URLs to be substituted in action placeholders
+       */
+      getActionUrls: function RecordsDocumentActions_getActionUrls()
+      {
+         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
+            nodeRef = this.assetData.nodeRef,
+            filePlan = this.doclistMetadata.filePlan.replace(":/", "");
+
+         return (
+         {
+            downloadUrl: Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
+            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef,
+            transfersZipUrl: Alfresco.constants.PROXY_URI + "api/node/" + filePlan + "/transfers/" + nodeRef.replace(":/", "").split("/")[2]
+         });
+      }
+   }, true);
 })();

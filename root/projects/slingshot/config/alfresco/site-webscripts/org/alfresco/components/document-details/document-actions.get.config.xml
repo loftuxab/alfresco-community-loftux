@@ -3,8 +3,8 @@
       <actionSet id="empty"></actionSet>
 
       <actionSet id="document">
-         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" domId="{htmlid}-download-action" />
-         <action type="simple-link" id="onActionDetails" permission="edit" href="{editMetadataUrl}" label="actions.document.edit-metadata" domId="{htmlid}-edit-metadata-action" />
+         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
+         <action type="simple-link" id="onActionDetails" permission="edit" href="{editMetadataUrl}" label="actions.document.edit-metadata" />
          <action type="action-link" id="onActionUploadNewVersion" permission="edit" label="actions.document.upload-new-version" />
          <action type="action-link" id="onActionCopyTo" label="actions.document.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.document.move-to" />
@@ -16,16 +16,16 @@
       </actionSet>
 
       <actionSet id="locked">
-         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" domId="{htmlid}-download-action" />
+         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
       </actionSet>
 
       <actionSet id="lockOwner">
-         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" domId="{htmlid}-download-action" />
+         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
       </actionSet>
 
       <actionSet id="workingCopyOwner">
          <action type="action-link" id="onActionUploadNewVersion" label="actions.document.upload-new-version" />
-         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" domId="{htmlid}-download-action" />
+         <action type="simple-link" id="onActionDownload" href="{downloadUrl}" label="actions.document.download" />
          <action type="action-link" id="onActionCancelEditing" permission="edit" label="actions.document.cancel-editing" />
       </actionSet>
 

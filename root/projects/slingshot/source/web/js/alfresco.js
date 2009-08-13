@@ -1941,7 +1941,8 @@ Alfresco.util.PopupManager = function()
     */
    var $html = Alfresco.util.encodeHTML;
    
-   return {
+   return (
+   {
 
       /**
        * The html zIndex startvalue that will be incremented for each popup
@@ -2174,6 +2175,7 @@ Alfresco.util.PopupManager = function()
       {
          title: null,
          text: null,
+         value: "",
          icon: null,
          close: true,
          constraintoviewport: true,
@@ -2209,6 +2211,7 @@ Alfresco.util.PopupManager = function()
        * {
        *    title: {string},       // the title of the dialog, default is null
        *    text: {string},        // optional label next to input box
+       *    value: {string},       // optional default value to populate textbox with
        *    callback: {object}     // Object literal specifying function callback to receive user input. Only called if default button config used.
        *                           // fn: function, obj: optional pass-thru object, scope: callback scope
        *    icon: null,            // the icon to display next to the text, default is null
@@ -2269,7 +2272,7 @@ Alfresco.util.PopupManager = function()
             {
                html += '<label for="' + id + '">' + (c.noEscape ? c.text : $html(c.text)) + '</label>';
             }
-            html += '<textarea id="' + id + '"></textarea>';
+            html += '<textarea id="' + id + '" tabindex="1">' + c.value + '</textarea>';
          }
          prompt.setBody(html);
 
@@ -2322,6 +2325,13 @@ Alfresco.util.PopupManager = function()
          prompt.render(document.body);
          prompt.center();
          prompt.show();
+         
+         // If a default value was given, set the selectionStart and selectionEnd properties
+         if (c.value !== "")
+         {
+            YUIDom.get(id).selectionStart = 0;
+            YUIDom.get(id).selectionEnd = c.value.length;
+         }
 
          // Register the ESC key to close the panel
          var escapeListener = new YAHOO.util.KeyListener(document,
@@ -2343,7 +2353,7 @@ Alfresco.util.PopupManager = function()
             YUIDom.get(id).focus();
          }
       }
-   };
+   });
 }();
 
 

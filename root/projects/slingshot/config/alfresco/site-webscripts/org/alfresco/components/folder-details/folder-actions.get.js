@@ -24,8 +24,7 @@ function main()
             type: xmlAction.@type.toString(),
             permission: xmlAction.@permission.toString(),
             href: xmlAction.@href.toString(),
-            label: xmlAction.@label.toString(),
-            domId: xmlAction.@domId.toString()
+            label: xmlAction.@label.toString()
          });
       }
       actionSets[actionSetId] = actionSet;

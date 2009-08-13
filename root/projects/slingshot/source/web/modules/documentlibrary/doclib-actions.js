@@ -177,7 +177,7 @@
 
          if (action.params)
          {
-            Alfresco.logger.warn("genericAction()", "action.params now deprecated. Use action.webscript.params instead.");
+            Alfresco.logger.warn("Alfresco.module.DoclibActions.genericAction()", "action.params deprecated. Use action.webscript.params instead.");
          }
 
          var fnCallback = function DLA_genericAction_callback(data, obj)

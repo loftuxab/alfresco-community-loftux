@@ -96,7 +96,9 @@
 
 #Share #userInput .bd textarea
 {
+   height: 4em;
    position: relative;
+   width: 40em;
 }
 
 #Share #prompt .ft .button-group,

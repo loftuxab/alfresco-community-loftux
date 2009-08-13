@@ -79,10 +79,12 @@
       
       /**
        * Event handler called when the "documentDetailsAvailable" event is received
+       *
+       * @method: onDocumentDetailsAvailable
        */
       onDocumentDetailsAvailable: function DocumentPath_onDocumentDetailsAvailable(layer, args)
       {
-         var docData = args[1],
+         var docData = args[1].documentDetails,
             pathHtml = "",
             rootLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary",
             baseLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary{file}#path=",

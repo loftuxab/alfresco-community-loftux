@@ -24,10 +24,10 @@
  */
  
 /**
- * Document Library "Copy-, Move- and File-To" module for Records Management.
+ * Document Library "File Transfer Report" module for Records Management.
  * 
  * @namespace Alfresco.module
- * @class Alfresco.module.RecordsCopyMoveFileTo
+ * @class Alfresco.module.RecordsFileTransferReport
  */
 (function()
 {
@@ -44,12 +44,12 @@
     var $html = Alfresco.util.encodeHTML,
        $combine = Alfresco.util.combinePaths;
 
-   Alfresco.module.RecordsCopyMoveFileTo = function(htmlId)
+   Alfresco.module.RecordsFileTransferReport = function(htmlId)
    {
       Alfresco.module.DoclibMoveTo.superclass.constructor.call(this, htmlId);
       
       // Re-register with our own name
-      this.name = "Alfresco.module.RecordsCopyMoveFileTo";
+      this.name = "Alfresco.module.RecordsFileTransferReport";
       Alfresco.util.ComponentManager.reregister(this);
 
       // Initialise prototype properties
@@ -58,7 +58,7 @@
       return this;
    };
    
-   YAHOO.extend(Alfresco.module.RecordsCopyMoveFileTo, Alfresco.module.DoclibMoveTo,
+   YAHOO.extend(Alfresco.module.RecordsFileTransferReport, Alfresco.module.DoclibMoveTo,
    {
       /**
        * Set multiple initialization options at once.
@@ -66,40 +66,16 @@
        * @method setOptions
        * @override
        * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.module.RecordsCopyMoveFileTo} returns 'this' for method chaining
+       * @return {Alfresco.module.RecordsFileTransferReport} returns 'this' for method chaining
        */
       setOptions: function RMCMFT_setOptions(obj)
       {
-         var dataWebScripts =
+         return Alfresco.module.RecordsFileTransferReport.superclass.setOptions.call(this, YAHOO.lang.merge(
          {
-            copy: "copy-to/site",
-            move: "move-to/site",
-            file: "add-child/site"
-         };
-         
-         if (typeof dataWebScripts[obj.mode] == "undefined")
-         {
-            throw new Error("Alfresco.module.RecordsCopyMoveFileTo: Invalid mode '" + obj.mode + "'");
-         }
-         
-         return Alfresco.module.RecordsCopyMoveFileTo.superclass.setOptions.call(this, YAHOO.lang.merge(
-         {
-            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/copy-move-file-to",
-            dataWebScript: dataWebScripts[obj.mode]
+            templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/file-transfer-report",
+            dataWebScriptStem: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/",
+            dataWebScript: "file-transfer-report/site"
          }, obj));
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @override
-       */
-      msg: function RMCMFT_msg(messageId)
-      {
-         return Alfresco.util.message.call(this, this.options.mode + "." + messageId, this.name, Array.prototype.slice.call(arguments).slice(1));
       },
 
       /**
@@ -113,8 +89,8 @@
        */
       _showDialog: function RMCMFT__showDialog()
       {
-         this.widgets.okButton.set("label", this.msg("button"));
-         return Alfresco.module.RecordsCopyMoveFileTo.superclass._showDialog.apply(this, arguments);
+         this.widgets.okButton.set("label", this.msg("button.file"));
+         return Alfresco.module.RecordsFileTransferReport.superclass._showDialog.apply(this, arguments);
       },
 
       /**
@@ -140,4 +116,4 @@
 })();
 
 /* Dummy instance to load optional YUI components early */
-new Alfresco.module.RecordsCopyMoveFileTo("null");
+new Alfresco.module.RecordsFileTransferReport("null");
