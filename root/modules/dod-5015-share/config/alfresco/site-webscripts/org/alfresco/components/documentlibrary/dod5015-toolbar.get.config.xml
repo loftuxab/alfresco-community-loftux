@@ -6,8 +6,8 @@
          <action type="action-link" id="onActionDestroy" permission="destroy" asset="record-folder,record" label="menu.selected-items.destroy" />
          <action type="action-link" id="onActionTransfer" permission="transfer" asset="record-folder,record" label="menu.selected-items.transfer" />
          <action type="action-link" id="onActionTransferComplete" permission="transfer-complete" asset="transfer" label="menu.selected-items.transfer-complete" />
-         <action type="action-link" id="onActionFreeze" permission="freeze" asset="record-folder,record" label="menu.selected-items.freeze" />
-         <action type="action-link" id="onActionUnfreeze" permission="unfreeze" asset="record-folder,record" label="menu.selected-items.unfreeze" />
+         <action type="action-link" id="onActionFreeze" permission="ExtendRetentionPeriodOrFreeze" asset="record-folder,record" label="menu.selected-items.freeze" />
+         <action type="action-link" id="onActionUnfreeze" permission="Unfreeze" asset="record-folder,record" label="menu.selected-items.unfreeze" />
          <action type="action-link" id="onActionCopyTo" permission="" asset="record-folder,record,undeclared-record" label="menu.selected-items.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" asset="record-folder,record,undeclared-record" label="menu.selected-items.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" asset="record-folder,record,undeclared-record" label="menu.selected-items.file-to" />

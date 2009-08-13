@@ -57,6 +57,11 @@
    background-image: url(images/freeze-record-16.png);
 }
 
+.toolbar .onActionRetain
+{
+   background-image: url(images/generic-16.png);
+}
+
 .toolbar .onActionTransfer
 {
    background-image: url(images/transfer-16.png);
