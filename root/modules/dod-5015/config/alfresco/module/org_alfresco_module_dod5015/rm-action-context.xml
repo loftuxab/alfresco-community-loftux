@@ -570,19 +570,17 @@
         <property name="target">
             <ref bean="transfer"/>
         </property>
-        <!--
         <property name="interceptorNames">
             <list>
                 <idref bean="transfer_security"/>
             </list>
         </property>
-        -->
     </bean>
 
     <bean id="transfer_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
         <property name="objectDefinitionSource">
             <value>
-                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.AuthorizeAllTransfersCapability
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.AuthorizeAllTransfers
                    org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
                    org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
             </value>
@@ -600,13 +598,11 @@
         <property name="target">
             <ref bean="transferComplete"/>
         </property>
-        <!--
         <property name="interceptorNames">
             <list>
                 <idref bean="transfer_security"/>
             </list>
         </property>
-        -->
     </bean>
     
     <bean id="transferComplete" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.TransferCompleteAction" parent="rmAction" depends-on="rmAuthorizeAllTransfersCapability">
@@ -629,7 +625,7 @@
     <bean id="accession_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
         <property name="objectDefinitionSource">
             <value>
-                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.AuthorizeNominatedTransfersCapability
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.AuthorizeNominatedTransfers
                    org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
                    org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
             </value>
