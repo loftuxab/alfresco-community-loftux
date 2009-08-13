@@ -45,7 +45,6 @@
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
-         <action type="action-link" id="onActionDestroy" permission="destroy" label="actions.destroy" />
          <action type="action-link" id="onActionDelete" permission="HIDDEN" label="actions.delete" />
       </actionSet>
 

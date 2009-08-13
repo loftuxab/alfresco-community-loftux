@@ -117,7 +117,11 @@
             <appearance>
                <set id="rm" />
                <set id="rm-custom" />
-               
+               <field id="cm:description">
+                  <control>
+                     <control-param name="activateLinks">true</control-param>
+                  </control>
+               </field>
                <field id="rma:identifier" set="rm" label-id="label.seriesIdentifier" />
             </appearance>
          </form>
@@ -144,7 +148,11 @@
             <appearance>
                <set id="rm" />
                <set id="rm-custom" />
-               
+               <field id="cm:description">
+                  <control>
+                     <control-param name="activateLinks">true</control-param>
+                  </control>
+               </field>
                <field id="rma:vitalRecordIndicator" set="rm" />
                <field id="rma:reviewPeriod" set="rm" />
                <field id="rma:identifier" set="rm" label-id="label.categoryIdentifier" />
@@ -179,7 +187,11 @@
             <appearance>
                <set id="rm" />
                <set id="rm-custom" />
-                
+               <field id="cm:description">
+                  <control>
+                     <control-param name="activateLinks">true</control-param>
+                  </control>
+               </field>
                <field id="rma:vitalRecordIndicator" set="rm" />
                <field id="rma:reviewPeriod" set="rm" />
                <field id="rma:identifier" set="rm" label-id="label.folderIdentifier" />
@@ -255,7 +267,11 @@
                <field id="cm:title" set="id-status">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
-               <field id="cm:description" set="id-status" />
+               <field id="cm:description" set="id-status">
+                  <control>
+                     <control-param name="activateLinks">true</control-param>
+                  </control>
+               </field>
                <!-- ???
                <field id="rma:declared" set="id-status" />
                <field id="rma:dateDeclared" set="id-status" /> 
