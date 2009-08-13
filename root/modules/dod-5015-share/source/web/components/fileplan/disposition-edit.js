@@ -203,21 +203,31 @@
          var actionTitle = Alfresco.util.setSelectedIndex(actionTypeSelect, actionType);
          actionTitle = actionTitle ? actionTitle : actionType; 
 
-         // Period Unit
-         var periodUnit = (period && period.length > 0) ? period[0] : null,
-            periodUnitSelect = Dom.getElementsByClassName("period-unit", "select", actionEl)[0];
-         Alfresco.util.setSelectedIndex(periodUnitSelect, periodUnit);
-
          // Period Amount
          var periodAmount = (period && period.length > 1) ? period[1] : null,
             periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
          periodAmountEl.value = periodAmount ? periodAmount : "";
          periodAmountEl.setAttribute("id", elId + "-periodAmount");
+         Event.addListener(periodAmountEl, "keyup", this.onPeriodAmountKeyUp,
+         {
+            actionEl: actionEl
+         }, this);
 
          // Period Action
          var periodAction = action.periodProperty,
-            periodActionSelect = Dom.getElementsByClassName("period-action", "select", actionEl)[0];
-         Alfresco.util.setSelectedIndex(periodActionSelect, periodAction);
+            periodActionEl = Dom.getElementsByClassName("period-action", "select", actionEl)[0];
+         Alfresco.util.setSelectedIndex(periodActionEl, periodAction);
+
+         // Period Unit
+         var periodUnit = (period && period.length > 0) ? period[0] : null,
+            periodUnitEl = Dom.getElementsByClassName("period-unit", "select", actionEl)[0];
+         Event.addListener(periodUnitEl, "change", this.onPeriodUnitSelectChange,
+         {
+            actionEl: actionEl,
+            periodAmountEl: periodAmountEl,
+            periodActionEl: periodActionEl
+         }, this);
+         Alfresco.util.setSelectedIndex(periodUnitEl, periodUnit);
 
          // Add event button
          var addEventEl = Dom.getElementsByClassName("addevent", "span", actionEl)[0],
@@ -324,10 +334,7 @@
 
          // Add validation
          actionForm.addValidation(elId + "-periodAmount", Alfresco.forms.validation.number, null, "keyup");
-         actionForm.addValidation(elId + "-periodAmount", this._mandatoryPeriodAmount,
-         {
-            actionEl: actionEl
-         }, "keyup");
+         actionForm.addValidation(elId + "-periodAmount", Alfresco.forms.validation.mandatory, null, "keyup");
          var periodEnabledCheckBox = Dom.getElementsByClassName("period-enabled", "input", actionEl)[0];
          Event.addListener(periodEnabledCheckBox, "click", function(e, obj)
          {
@@ -461,22 +468,6 @@
       },
 
       /**
-       * Mandatory period amount validation. Delegates validation to forms runtime.
-       *
-       * @param field {object} The element representing the field the validation is for
-       * @param args {object} Not used
-       * @param event {object} The event that caused this handler to be called, maybe null
-       * @param form {object} The forms runtime class instance the field is being managed by
-       * @param silent {boolean} Determines whether the user should be informed upon failure
-       * @param message {string} Message to display when validation fails, maybe null
-       */
-      _mandatoryPeriodAmount: function _mandatoryPeriodAmount(field, args, event, form, silent, message)
-      {
-         var periodEnabledCheckBox = Dom.getElementsByClassName("period-enabled", "input", args.actionEl)[0];
-         return !periodEnabledCheckBox.checked ? true : Alfresco.forms.validation.mandatory(field, args, event, form, silent, message);
-      },
-
-      /**
        * Disable the period elements
        *
        * @method _disablePeriodSection
@@ -524,13 +515,23 @@
                periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
          var title = "",
                actionType = actionType ? actionType : actionTypeSelect.options[actionTypeSelect.selectedIndex].text;
-         if (!periodAmountEl.disabled)
+         if (!periodUnitSelect.disabled && periodUnitSelect.options[periodUnitSelect.selectedIndex].value != "none")
          {
-            title = this.msg(
-                  "label.title.complex",
-                  actionType,
-                  periodAmountEl.value,
-                  periodUnitSelect.options[periodUnitSelect.selectedIndex].text);
+            if(periodAmountEl.disabled || periodAmountEl.value == "" || periodAmountEl.value == "0")
+            {
+               title = this.msg(
+                     "label.title.noTime",
+                     actionType,
+                     periodUnitSelect.options[periodUnitSelect.selectedIndex].text);
+            }
+            else
+            {
+               title = this.msg(
+                     "label.title.complex",
+                     actionType,
+                     periodAmountEl.value,
+                     periodUnitSelect.options[periodUnitSelect.selectedIndex].text);
+            }
          }
          else
          {
@@ -628,6 +629,39 @@
                Dom.addClass(events[i], "first");
             }
          }
+      },
+
+
+      /**
+       * Called when user changes the period amount
+       *
+       * @method onPeriodAmountKeyUp
+       * @param e click event object
+       * @param obj callback object containg action info & HTMLElements
+       */
+      onPeriodAmountKeyUp: function DispositionEdit_onPeriodUnitSelectChange(e, obj)
+      {
+         this._refreshTitle(obj.actionEl);
+      },
+
+      /**
+       * Called when user toggles one of the checkboxes related to
+       *
+       * @method onPeriodUnitSelectChange
+       * @param e click event object
+       * @param obj callback object containg action info & HTMLElements
+       */
+      onPeriodUnitSelectChange: function DispositionEdit_onPeriodUnitSelectChange(e, obj)
+      {
+         var periodUnitEl = e.target;
+         var periodUnit = periodUnitEl.options[periodUnitEl.selectedIndex].value
+         obj.periodAmountEl.disabled = Alfresco.util.arrayContains(["none", "immediately"], periodUnit);
+         if(obj.periodAmountEl.disabled)
+         {
+            obj.periodAmountEl.value = "";
+         }
+         obj.periodActionEl.disabled = Alfresco.util.arrayContains(["none", "immediately", "fmend", "fqend", "fyend", "monthend", "quarterend", "yearend"], periodUnit);
+         this._refreshTitle(obj.actionEl);
       },
 
       /**

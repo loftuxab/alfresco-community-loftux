@@ -1,4 +1,15 @@
 /**
+ * Sort helper function for objects with labels
+ *
+ * @param obj1
+ * @param obj2
+ */
+function sortByLabel(obj1, obj2)
+{
+   return (obj1.label > obj2.label) ? 1 : (obj1.label < obj2.label) ? -1 : 0;
+}
+
+/**
  * Main entrypoint for component webscript logic
  *
  * @method main
@@ -31,11 +42,15 @@ function main()
          }
          if(data && data.periodTypes)
          {
-            model.periodTypes = data.periodTypes.items;
+            var periodTypes = data.periodTypes.items;
+            periodTypes.sort(sortByLabel);
+            model.periodTypes = periodTypes;
          }
          if(data && data.periodProperties)
          {
-            model.periodProperties = data.periodProperties.items;
+            var periodProperties = data.periodProperties.items;
+            periodProperties.sort(sortByLabel);
+            model.periodProperties = periodProperties;
          }
       }
       else if (repoJSON.status.code)
