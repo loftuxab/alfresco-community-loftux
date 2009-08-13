@@ -1,4 +1,5 @@
 /**
+/**
  * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
@@ -199,8 +200,12 @@
 
          // Action
          var actionType = action.name,
-            actionTypeSelect = Dom.getElementsByClassName("action-type", "select", actionEl)[0];
-         var actionTitle = Alfresco.util.setSelectedIndex(actionTypeSelect, actionType);
+            actionTypeEl = Dom.getElementsByClassName("action-type", "select", actionEl)[0];
+         Event.addListener(actionTypeEl, "change", this.onActionTypeSelectChange,
+         {
+            actionEl: actionEl
+         }, this);
+         var actionTitle = Alfresco.util.setSelectedIndex(actionTypeEl, actionType);
          actionTitle = actionTitle ? actionTitle : actionType; 
 
          // Period Amount
@@ -208,7 +213,7 @@
             periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
          periodAmountEl.value = periodAmount ? periodAmount : "";
          periodAmountEl.setAttribute("id", elId + "-periodAmount");
-         Event.addListener(periodAmountEl, "keyup", this.onPeriodAmountKeyUp,
+         Event.addListener(periodAmountEl, "keyup", this.onPeriodAmountTextKeyUp,
          {
             actionEl: actionEl
          }, this);
@@ -298,6 +303,9 @@
             eventListEl.appendChild(this._createEvent(i, action.events[i]));
          }
 
+         // Make sure enabling and disabling is correct
+         this._disableEnablePeriodElements(periodUnitEl, periodAmountEl, periodActionEl);
+
          // Title
          this._refreshTitle(actionEl, actionTitle);
 
@@ -334,7 +342,7 @@
 
          // Add validation
          actionForm.addValidation(elId + "-periodAmount", Alfresco.forms.validation.number, null, "keyup");
-         actionForm.addValidation(elId + "-periodAmount", Alfresco.forms.validation.mandatory, null, "keyup");
+         //actionForm.addValidation(elId + "-periodAmount", Alfresco.forms.validation.mandatory, null, "keyup");
          var periodEnabledCheckBox = Dom.getElementsByClassName("period-enabled", "input", actionEl)[0];
          Event.addListener(periodEnabledCheckBox, "click", function(e, obj)
          {
@@ -383,12 +391,17 @@
                // Merge period value
                var puEl = Dom.getElementsByClassName("period-unit", "select", formEl)[0],
                   paEl = Dom.getElementsByClassName("period-amount", "input", formEl)[0];
-               
-               if (!puEl.disabled && !paEl.disabled)
+               var pa = "", pu = "";
+               if(!paEl.disabled)
                {
-                  var periodEl = Dom.getElementsByClassName("period", "input", formEl)[0];
-                  periodEl.value = puEl.options[puEl.selectedIndex].value + "|" + paEl.value;
+                  pa = paEl.value;
                }
+               if (!puEl.disabled)
+               {
+                  pu = puEl.options[puEl.selectedIndex].value;
+               }
+               var periodEl = Dom.getElementsByClassName("period", "input", formEl)[0];
+               periodEl.value = pu + "|" + pa;               
 
                // Disable buttons during submit
                obj.saveButton.set("disabled", true);
@@ -482,6 +495,25 @@
       },
 
       /**
+       * handles disabling and enabling of period elements
+       *
+       * @method _disableEnablePeriodElements
+       * @param periodUnitEl The period unit select
+       * @param periodAmountEl The period unit text input
+       * @param periodActionEl The period action select
+       */
+      _disableEnablePeriodElements: function DispositionEdit__disableEnablePeriodElements(periodUnitEl, periodAmountEl, periodActionEl)
+      {
+         var periodUnit = periodUnitEl.options[periodUnitEl.selectedIndex].value;
+         periodAmountEl.disabled = Alfresco.util.arrayContains(["none", "immediately"], periodUnit);
+         if(periodAmountEl.disabled)
+         {
+            periodAmountEl.value = "";
+         }
+         periodActionEl.disabled = Alfresco.util.arrayContains(["none", "immediately", "fmend", "fqend", "fyend", "monthend", "quarterend", "yearend"], periodUnit);
+      },
+
+      /**
        * Disable the events elements
        *
        * @method _disableEventsSection
@@ -510,11 +542,11 @@
        */
       _refreshTitle: function DispositionEdit__refreshTitle(actionEl, actionType)
       {
-         var actionTypeSelect = Dom.getElementsByClassName("action-type", "select", actionEl)[0],
+         var actionTypeEl = Dom.getElementsByClassName("action-type", "select", actionEl)[0],
                periodUnitSelect = Dom.getElementsByClassName("period-unit", "select", actionEl)[0],
                periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
          var title = "",
-               actionType = actionType ? actionType : actionTypeSelect.options[actionTypeSelect.selectedIndex].text;
+               actionType = actionType ? actionType : actionTypeEl.options[actionTypeEl.selectedIndex].text;
          if (!periodUnitSelect.disabled && periodUnitSelect.options[periodUnitSelect.selectedIndex].value != "none")
          {
             if(periodAmountEl.disabled || periodAmountEl.value == "" || periodAmountEl.value == "0")
@@ -633,13 +665,25 @@
 
 
       /**
-       * Called when user changes the period amount
+       * Called when user changes the action type amount
        *
-       * @method onPeriodAmountKeyUp
+       * @method onActionTypeSelectChange
        * @param e click event object
        * @param obj callback object containg action info & HTMLElements
        */
-      onPeriodAmountKeyUp: function DispositionEdit_onPeriodUnitSelectChange(e, obj)
+      onActionTypeSelectChange: function DispositionEdit_onActionTypeSelectChange(e, obj)
+      {
+         this._refreshTitle(obj.actionEl);
+      },
+
+      /**
+       * Called when user changes the period amount
+       *
+       * @method onPeriodAmountTextKeyUp
+       * @param e click event object
+       * @param obj callback object containg action info & HTMLElements
+       */
+      onPeriodAmountTextKeyUp: function DispositionEdit_onPeriodAmountTextKeyUp(e, obj)
       {
          this._refreshTitle(obj.actionEl);
       },
@@ -654,13 +698,7 @@
       onPeriodUnitSelectChange: function DispositionEdit_onPeriodUnitSelectChange(e, obj)
       {
          var periodUnitEl = e.target;
-         var periodUnit = periodUnitEl.options[periodUnitEl.selectedIndex].value
-         obj.periodAmountEl.disabled = Alfresco.util.arrayContains(["none", "immediately"], periodUnit);
-         if(obj.periodAmountEl.disabled)
-         {
-            obj.periodAmountEl.value = "";
-         }
-         obj.periodActionEl.disabled = Alfresco.util.arrayContains(["none", "immediately", "fmend", "fqend", "fyend", "monthend", "quarterend", "yearend"], periodUnit);
+         this._disableEnablePeriodElements(periodUnitEl, obj.periodAmountEl, obj.periodActionEl);
          this._refreshTitle(obj.actionEl);
       },
 
