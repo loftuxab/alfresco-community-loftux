@@ -4225,8 +4225,8 @@ Alfresco.util.RichEditor = function(editorName,id,config)
             {
                var href = anchor.getAttribute("href", 2);
                // Check the filter isn't a link (yes wiki, we're all looking at you)
-               // Note: IE6 just doesn't get it, even with the second parameter on getAttribute()
-               if (YAHOO.env.ua.ie == 6)
+               // Note: IE6 (and IE7 for DHTML operations) just doesn't get it, even with the second parameter on getAttribute()
+               if (YAHOO.env.ua.ie > 0 && YAHOO.env.ua.ie < 8)
                {
                   var d = href.length - 1;
                   if (d < 0 || href.lastIndexOf("#") != d)
