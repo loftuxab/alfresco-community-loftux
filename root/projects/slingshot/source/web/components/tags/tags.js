@@ -34,8 +34,7 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event;
+   var Dom = YAHOO.util.Dom;
 
    /**
     * Alfresco Slingshot aliases
@@ -57,7 +56,7 @@
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
       
       return this;
-   }
+   };
    
    YAHOO.extend(Alfresco.TagComponent, Alfresco.component.Base,
    {
@@ -209,9 +208,9 @@
        */
       _generateTagMarkup: function TagComponent__generateTagMarkup(tag)
       {
-         var tag = $html(tag.name),
+         var tagName = $html(tag.name),
             html = '<li><span class="tag">';
-         html += '<a href="#" class="tag-link" rel="' + tag + '">' + tag + '</a>&nbsp;(' + tag.count + ')';
+         html += '<a href="#" class="tag-link" rel="' + tagName + '">' + tagName + '</a>&nbsp;(' + tag.count + ')';
          html += '</span></li>';
          return html;
       }
