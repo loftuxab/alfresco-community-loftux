@@ -110,11 +110,11 @@
        */
       onFolderDetailsAvailable: function FolderInfo_onFolderDetailsAvailable(layer, args)
       {
-         var folderData = args[1];
+         var folderData = args[1].folderDetails;
          
          // render tags values
-         var tags = folderData.tags;
-         var tagsHtml = "";
+         var tags = folderData.tags,
+            tagsHtml = "";
          
          if (tags.length === 0)
          {

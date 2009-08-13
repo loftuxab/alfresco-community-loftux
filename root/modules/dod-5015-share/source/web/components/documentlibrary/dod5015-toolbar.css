@@ -62,9 +62,9 @@
    background-image: url(images/transfer-16.png);
 }
 
-.toolbar .onActionTransferConfirm
+.toolbar .onActionTransferComplete
 {
-   background-image: url(images/transfer-confirm-16.png);
+   background-image: url(images/transfer-complete-16.png);
 }
 
 .toolbar .onActionUndoCutoff

@@ -408,11 +408,11 @@
       /**
        * Transfer Confirmation action.
        *
-       * @method onActionTransferConfirm
+       * @method onActionTransferComplete
        */
-      onActionTransferConfirm: function DLTB_onActionTransferConfirm()
+      onActionTransferComplete: function DLTB_onActionTransferComplete()
       {
-         this._dod5015Action("message.transfer-confirm", this.modules.docList.getSelectedFiles(), "transfer-confirm");
+         this._dod5015Action("message.transfer-complete", this.modules.docList.getSelectedFiles(), "transfer-complete");
       },
 
       /**

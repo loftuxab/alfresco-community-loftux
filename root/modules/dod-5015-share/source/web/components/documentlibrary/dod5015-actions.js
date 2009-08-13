@@ -181,6 +181,56 @@
       },
 
       /**
+       * Edit Hold Details action.
+       *
+       * @method onActionEditHoldDetails
+       * @param asset {object} Object literal representing file or folder to be actioned
+       */
+      onActionEditHoldDetails: function RDLA_onActionEditHoldDetails(asset)
+      {
+         Alfresco.util.PopupManager.getUserInput(
+         {
+            title: this.msg("message.edit-hold.title"),
+            text: this.msg("message.edit-hold.reason.label"),
+            value: asset.dod5015["rma:holdReason"],
+            okButtonText: this.msg("button.update"),
+            callback:
+            {
+               fn: function RDLA_onActionEditHoldDetails_callback(value)
+               {
+                  this._dod5015Action("message.edit-hold", asset, "editHoldReason",
+                  {
+                     "reason": value
+                  });
+               },
+               scope: this
+            }
+         });
+      },
+
+      /**
+       * File Transfer Report action.
+       *
+       * @method onActionFileTransferReport
+       * @param asset {object} Object literal representing file or folder to be actioned
+       */
+      onActionFileTransferReport: function RDLA_onActionFileTransferReport(asset)
+      {
+         if (!this.modules.fileTransferReport)
+         {
+            this.modules.fileTransferReport = new Alfresco.module.RecordsFileTransferReport(this.id + "-fileTransferReport");
+         }
+
+         this.modules.fileTransferReport.setOptions(
+         {
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: this.currentPath,
+            files: asset
+         }).showDialog();
+      },
+
+      /**
        * Freeze action.
        *
        * @method onActionFreeze
@@ -190,7 +240,7 @@
       {
          Alfresco.util.PopupManager.getUserInput(
          {
-            title: this.msg("message.freeze.reason.title"),
+            title: this.msg("message.freeze.title"),
             text: this.msg("message.freeze.reason.label"),
             okButtonText: this.msg("button.freeze.record"),
             callback:
@@ -252,6 +302,17 @@
       },
 
       /**
+       * Split email record action.
+       *
+       * @method onActionSplitEmail
+       * @param asset {object} Object literal representing file or folder to be actioned
+       */
+      onActionSplitEmail: function RDLA_onActionSplitEmail(asset)
+      {
+         this._dod5015Action("message.split-email", asset, "splitEmail");
+      },
+
+      /**
        * Transfer action.
        *
        * @method onActionTransfer
@@ -265,12 +326,12 @@
       /**
        * Transfer Confirmation action.
        *
-       * @method onActionTransferConfirm
+       * @method onActionTransferComplete
        * @param asset {object} Object literal representing file or folder to be actioned
        */
-      onActionTransferConfirm: function RDLA_onActionTransferConfirm(asset)
+      onActionTransferComplete: function RDLA_onActionTransferComplete(asset)
       {
-         this._dod5015Action("message.transfer-confirm", asset, "transferConfirm");
+         this._dod5015Action("message.transfer-complete", asset, "transferComplete");
       },
 
       /**
@@ -295,17 +356,6 @@
          this._dod5015Action("message.unfreeze", asset, "unfreeze");
       },
       
-      /**
-       * Split email record action.
-       *
-       * @method onActionSplitEmail
-       * @param asset {object} Object literal representing file or folder to be actioned
-       */
-      onActionSplitEmail: function RDLA_onActionSplitEmail(asset)
-      {
-         this._dod5015Action("message.split-email", asset, "splitEmail");
-      },
-
       /**
        * DOD5015 action.
        *

@@ -12,5 +12,5 @@
    </div>
 </div>
 <script type="text/javascript">//<![CDATA[
-Alfresco.util.addMessages(${messages}, "Alfresco.module.RecordsCopyMoveFileTo");
+Alfresco.util.addMessages(${messages}, "Alfresco.module.RecordsFileTransferReport");
 //]]></script>

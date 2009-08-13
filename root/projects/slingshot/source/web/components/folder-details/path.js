@@ -82,7 +82,7 @@
        */
       onFolderDetailsAvailable: function FolderPath_onFolderDetailsAvailable(layer, args)
       {
-         var folderData = args[1],
+         var folderData = args[1].folderDetails,
             pathHtml = "",
             rootLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary",
             baseLinkUrl = rootLinkUrl + "{file}#path=",

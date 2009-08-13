@@ -9,15 +9,14 @@
    "startIndex": ${paging.startIndex?c},
    "metadata":
    {
-      <#if doclist.parent??>
-      "parent": "${doclist.parent.nodeRef}",
-      </#if>
+      <#if doclist.filePlan??>"filePlan": "${doclist.filePlan.nodeRef}",</#if>
+      <#if doclist.parent??>"parent": "${doclist.parent.nodeRef}",</#if>
       "permissions":
       {
          "userRole": "${user.role!""}",
          "userAccess":
          {
-         <#list user.permissions as perm>
+         <#list user.permissions?keys as perm>
             "${perm?string}": true<#if perm_has_next>,</#if>
          </#list>
          }
@@ -49,7 +48,7 @@
          "mimetype": "${d.mimetype!""}",
          "fileName": "${d.name}",
          "displayName": "${d.name?replace(workingCopyLabel, "")}",
-         "status": "<#list item.status as s>${s}<#if s_has_next>,</#if></#list>",
+         "status": "<#list item.status?keys as s>${s}<#if s_has_next>,</#if></#list>",
          "title": "${d.properties.title!""}",
          "description": "${d.properties.description!""}",
          "author": "${d.properties.author!""}",
@@ -82,7 +81,7 @@
             ],
             "userAccess":
             {
-            <#list item.actionPermissions as actionPerm>
+            <#list item.actionPermissions?keys as actionPerm>
                "${actionPerm?string}": true<#if actionPerm_has_next>,</#if>
             </#list>
             }

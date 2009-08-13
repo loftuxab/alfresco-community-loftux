@@ -1,54 +1,66 @@
 <import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/dod5015-evaluator.lib.js">
 <import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/dod5015-filters.lib.js">
 <import resource="classpath:/alfresco/templates/webscripts/org/alfresco/slingshot/documentlibrary/parse-args.lib.js">
-var THUMBNAIL_NAME = "doclib";
+
+const THUMBNAIL_NAME = "doclib";
+
+var PeopleCache = {};
 
 /**
- * Document List Component: doclist
+ * Gets / caches a person object
+ * @method getPerson
+ * @param username {string} User name
  */
-model.doclist = getDocList(args["filter"]);
-
-/* Create collection of documents and folders in the given space */
-function getDocList(filter)
+function getPerson(username)
 {
+   if (typeof PeopleCache[username] == "undefined")
+   {
+      PeopleCache[username] = people.getPerson(username);
+   }
+   return PeopleCache[username];
+}
+
+/**
+ * Main entry point: Create collection of documents and folders in the given space
+ * @method main
+ */
+function main()
+{
+   var filter = args.filter,
+      items = [],
+      assets;
+
    // Is our thumbnail tpe registered?
    var haveThumbnails = thumbnailService.isThumbnailNameRegistered(THUMBNAIL_NAME);
 
    // Use helper function to get the arguments
-   var parsedArgs = getParsedArgs("dod:filePlan");
+   var parsedArgs = ParseArgs.getParsedArgs("dod:filePlan");
    if (parsedArgs === null)
    {
       return;
    }
 
-   // Type missing implies single nodeRef requested
-   if (url.templateArgs.type === null)
+   // "node" Type implies single nodeRef requested
+   if (parsedArgs.type === "node")
    {
       filter = "node";
    }
 
    // Try to find a filter query based on the passed-in arguments
-   var allAssets = [], filterQuery, query;
-   var filterParams = getFilterParams(filter, parsedArgs);
-   query = filterParams.query;
-
-   // Specialise by passed-in type
-   var typeQuery = getTypeFilterQuery(url.templateArgs.type);
-   if (typeQuery != "")
-   {
-      query += " " + typeQuery;
-   }
+   var allAssets = [],
+      filterParams = Filters.getFilterParams(filter, parsedArgs),
+      query = filterParams.query;
 
    // Query the assets - passing in sort and result limit parameters
-   if (query != "")
+   if (query !== "")
    {
-      var queryDef =
+      allAssets = search.query(
       {
          query: query,
          language: filterParams.language,
          page:
          {
-            maxItems: (filterParams.limitResults ? parseInt(filterParams.limitResults) : 0)
+            maxItems: (filterParams.limitResults ? parseInt(filterParams.limitResults, 10) : 0)
          },
          sort: [
          {
@@ -56,14 +68,14 @@ function getDocList(filter)
             ascending: filterParams.sortByAscending
          }],
          templates: filterParams.templates
-      };
-      allAssets = search.query(queryDef);
+      });
    }
 
    // Ensure folders appear at the top of the list
-   folderAssets = [];
-   documentAssets = [];
-   for each(asset in allAssets)
+   var folderAssets = [],
+      documentAssets = [];
+   
+   for each (asset in allAssets)
    {
       try
       {
@@ -85,8 +97,7 @@ function getDocList(filter)
    var folderAssetsCount = folderAssets.length,
       documentAssetsCount = documentAssets.length;
    
-   var assets;
-   if (url.templateArgs.type === "documents")
+   if (parsedArgs.type === "documents")
    {
       assets = documentAssets;
    }
@@ -99,14 +110,14 @@ function getDocList(filter)
    var totalRecords = assets.length;
 
    // Pagination
-   var pageSize = args["size"] || assets.length,
-      pagePos = args["pos"] || "1",
+   var pageSize = args.size || assets.length,
+      pagePos = args.pos || "1",
       startIndex = (pagePos - 1) * pageSize;
 
    assets = assets.slice(startIndex, pagePos * pageSize);
    
-   var thumbnail, createdBy, modifiedBy, activeWorkflows, assetType, assetEvaluator,
-      defaultLocation, location, qnamePaths, displayPaths, locationAsset;
+   var thumbnail, createdBy, modifiedBy, activeWorkflows, assetEvaluator,
+      defaultLocation, location, qnamePaths, displayPaths;
 
    // Location if we're in a site
    defaultLocation =
@@ -120,16 +131,14 @@ function getDocList(filter)
    // User permissions and role
    var user =
    {
-      permissions: runEvaluator(parsedArgs.parentNode, getAssetType(parsedArgs.parentNode)).permissions
+      permissions: Evaluator.run(parsedArgs.parentNode).permissions
    };
    if (defaultLocation.site !== null)
    {
-      user.role = parsedArgs.location.siteNode.getMembersRole(person.properties["userName"]);
+      user.role = parsedArgs.location.siteNode.getMembersRole(person.properties.userName);
    }
 
-   var items = [];
-   
-   // Locked/working copy status defines action set
+   // Populate location and other properties
    for each (asset in assets)
    {
       createdBy = null;
@@ -138,12 +147,9 @@ function getDocList(filter)
       activeWorkflows = [];
 
       // Get users
-      createdBy = people.getPerson(asset.properties["cm:creator"]);
-      modifiedBy = people.getPerson(asset.properties["cm:modifier"]);
+      createdBy = getPerson(asset.properties["cm:creator"]);
+      modifiedBy = getPerson(asset.properties["cm:modifier"]);
       
-      // Asset type
-      assetType = getAssetType(asset);
-
       // Does this collection of assets have potentially differering paths?
       if (filterParams.variablePath)
       {
@@ -159,7 +165,7 @@ function getDocList(filter)
                container: displayPaths[4],
                path: "/" + displayPaths.slice(5, displayPaths.length).join("/"),
                file: asset.name
-            }
+            };
          }
          else
          {
@@ -169,7 +175,7 @@ function getDocList(filter)
                container: null,
                path: null,
                file: asset.name
-            }
+            };
          }
       }
       else
@@ -180,7 +186,7 @@ function getDocList(filter)
             container: defaultLocation.container,
             path: defaultLocation.path,
             file: asset.name
-         }
+         };
       }
 
       // Make sure we have a thumbnail
@@ -195,12 +201,12 @@ function getDocList(filter)
       }
       
       // Get evaluated properties
-      assetEvaluator = runEvaluator(asset, assetType);
+      assetEvaluator = Evaluator.run(asset);
       
       items.push(
       {
          asset: asset,
-         type: assetType,
+         type: assetEvaluator.assetType,
          createdBy: createdBy,
          modifiedBy: modifiedBy,
          status: assetEvaluator.status,
@@ -228,6 +234,12 @@ function getDocList(filter)
       },
       user: user,
       items: items,
+      filePlan: parsedArgs.rootNode,
       parent: filterParams.variablePath ? null : parsedArgs.parentNode
    });
 }
+
+/**
+ * Document List Component: doclist
+ */
+model.doclist = main();

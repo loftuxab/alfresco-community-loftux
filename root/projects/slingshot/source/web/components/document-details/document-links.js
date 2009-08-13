@@ -136,10 +136,12 @@
             
       /**
        * Event handler called when the "documentDetailsAvailable" event is received
+       *
+       * @method: onDocumentDetailsAvailable
        */
       onDocumentDetailsAvailable: function DocumentLinks_onDocumentDetailsAvailable(layer, args)
       {
-         var docData = args[1];
+         var docData = args[1].documentDetails;
          
          // construct the base content URL
          var contentUrl = (this.options.externalAuth ? Alfresco.constants.PROXY_URI : Alfresco.constants.PROXY_FEED_URI) + docData.contentUrl;

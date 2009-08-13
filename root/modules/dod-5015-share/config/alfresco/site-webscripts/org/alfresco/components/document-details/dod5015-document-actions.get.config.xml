@@ -3,8 +3,8 @@
       <actionSet id="empty"></actionSet>
 
       <actionSet id="record">
-         <action id="onActionDownload" permission="" type="simple-link" href="{downloadUrl}" label="actions.download" domId="{htmlid}-download-action" />
-         <action id="onActionEditDetails" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action id="onActionDownload" permission="" type="simple-link" href="{downloadUrl}" label="actions.download" />
+         <action id="onActionEditDetails" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
          <action id="onActionReviewed" permission="reviewed" type="action-link" label="actions.reviewed" />
          <action id="onActionCutoff" permission="cutoff" type="action-link" label="actions.cutoff" />
          <action id="onActionRetain" permission="retain" type="action-link" label="actions.retain" />
@@ -21,8 +21,8 @@
       </actionSet>
 
       <actionSet id="undeclaredRecord">
-         <action id="onActionDownload" permission="" type="simple-link" href="{downloadUrl}" label="actions.download" domId="{htmlid}-download-action" />
-         <action id="onActionEditDetails" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" domId="{htmlid}-edit-metadata-action" />
+         <action id="onActionDownload" permission="" type="simple-link" href="{downloadUrl}" label="actions.download" />
+         <action id="onActionEditDetails" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
          <action id="onActionDeclare" permission="declare" type="action-link" label="actions.declare" />
          <action id="onActionUploadNewVersion" permission="edit" type="action-link" label="actions.upload-new-version" />
          <action id="onActionCopyTo" permission="" type="action-link" label="actions.copy-to" />

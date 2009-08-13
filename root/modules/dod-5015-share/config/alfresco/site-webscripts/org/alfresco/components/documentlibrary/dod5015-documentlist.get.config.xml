@@ -23,8 +23,8 @@
          <action type="action-link" id="onActionRetain" permission="retain" label="actions.retain" />
          <action type="action-link" id="onActionDestroy" permission="destroy" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="transfer" label="actions.transfer" />
-         <action type="action-link" id="onActionFreeze" permission="freeze" label="actions.freeze" />
-         <action type="action-link" id="onActionUnfreeze" permission="unfreeze" label="actions.unfreeze" />
+         <action type="action-link" id="onActionFreeze" permission="ExtendRetentionPeriodOrFreeze" label="actions.freeze" />
+         <action type="action-link" id="onActionUnfreeze" permission="Unfreeze" label="actions.unfreeze" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
@@ -39,8 +39,8 @@
          <action type="action-link" id="onActionRetain" permission="retain" label="actions.retain" />
          <action type="action-link" id="onActionDestroy" permission="destroy" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="transfer" label="actions.transfer" />
-         <action type="action-link" id="onActionFreeze" permission="freeze" label="actions.freeze" />
-         <action type="action-link" id="onActionUnfreeze" permission="unfreeze" label="actions.unfreeze" />
+         <action type="action-link" id="onActionFreeze" permission="ExtendRetentionPeriodOrFreeze" label="actions.freeze" />
+         <action type="action-link" id="onActionUnfreeze" permission="Unfreeze" label="actions.unfreeze" />
          <action type="action-link" id="onActionUndeclare" permission="UndeclareRecords" label="actions.undeclare" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.move-to" />
@@ -69,15 +69,15 @@
       </actionSet>
 
       <actionSet id="transferContainer">
-         <action type="action-link" id="onActionDownloadZip" permission="download-zip" label="actions.download-zip" />
-         <action type="action-link" id="onActionFileReport" permission="file-report" label="actions.file-report" />
-         <action type="action-link" id="onActionTransferConfirm" permission="transfer-confirm" label="actions.transfer-confirm" />
+         <action type="simple-link" id="onActionDownloadZip" permission="download-zip" href="{transfersZipUrl}" label="actions.download-zip" />
+         <action type="action-link" id="onActionFileTransferReport" permission="file-report" label="actions.file-report" />
+         <action type="action-link" id="onActionTransferComplete" permission="transfer-complete" label="actions.transfer-complete" />
       </actionSet>
 
       <actionSet id="holdContainer">
-         <action type="action-link" id="onActionRelinquish" permission="relinquish" label="actions.relinquish" />
-         <action type="action-link" id="onActionUnfreezeAll" permission="unfreeze" label="actions.unfreeze-all" />
-         <action type="action-link" id="onActionEditHoldDetails" permission="view-edit-reason" label="actions.edit-reason" />
+         <action type="action-link" id="onActionRelinquish" permission="Unfreeze" label="actions.relinquish" />
+         <action type="action-link" id="onActionUnfreezeAll" permission="Unfreeze" label="actions.unfreeze-all" />
+         <action type="action-link" id="onActionEditHoldDetails" permission="ViewUpdateReasonsForFreeze" label="actions.edit-reason" />
       </actionSet>
 
       <actionSet id="folder">

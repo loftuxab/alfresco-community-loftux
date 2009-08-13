@@ -1,7 +1,7 @@
 <documentList>
    <actionSets>
       <actionSet id="folder">
-         <action type="simple-link" id="onActionDetails" label="actions.folder.edit-metadata" domId="{htmlid}-edit-metadata-action" />
+         <action type="simple-link" id="onActionDetails" permission="edit" href="{editMetadataUrl}" label="actions.folder.edit-metadata" />
          <action type="action-link" id="onActionCopyTo" label="actions.folder.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.folder.move-to" />
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.folder.delete" />

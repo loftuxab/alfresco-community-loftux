@@ -111,49 +111,60 @@
       assetData: null,
       
       /**
+       * Metadata returned by doclist data webscript
+       *
+       * @property doclistMetadata
+       * @type object
+       * @default null
+       */
+      doclistMetadata: null,
+      
+      /**
        * Path of asset being viewed - used to scope some actions (e.g. copy to, move to)
        * 
        * @property currentPath
        * @type string
        */
       currentPath: null,
+
+      /**
+       * The urls to be used when creating links in the action cell
+       *
+       * @method getActionUrls
+       * @return {object} Object literal containing URLs to be substituted in action placeholders
+       */
+      getActionUrls: function DocumentActions_getActionUrls()
+      {
+         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
+            nodeRef = this.assetData.nodeRef;
+
+         return (
+         {
+            downloadUrl: Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
+            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef
+         });
+      },
        
       /**
        * Event handler called when the "documentDetailsAvailable" event is received
+       *
+       * @method: onDocumentDetailsAvailable
        */
       onDocumentDetailsAvailable: function DocumentActions_onDocumentDetailsAvailable(layer, args)
       {
          var me = this;
          
          // Asset data passed-in through event arguments
-         this.assetData = args[1];
+         this.assetData = args[1].documentDetails;
+         this.doclistMetadata = args[1].metadata;
          this.currentPath = this.assetData.location.path;
          
-         /* TODO: Make this generic using actionUrls (see documentmentlist.js) */
-            // Set the href for the download link
-            var url = Alfresco.constants.PROXY_URI + this.assetData.contentUrl;
-            try
-            {
-               Dom.get(this.id + "-download-action").href = url + "?a=true";
-            }
-            catch (e)
-            {
-               // Action must be missing
-            }
-         
-            // Set the href for the edit metadata link
-            var metadataUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + this.assetData.nodeRef;
-            try
-            {
-               Dom.get(this.id + "-edit-metadata-action").href = metadataUrl;
-            }
-            catch (e)
-            {
-               // Action must be missing
-            }
-         /* End TODO */
-         
          var actionsContainer = Dom.get(this.id + "-actionSet-document");
+         
+         /**
+          * Token replacement
+          */
+         actionsContainer.innerHTML = YAHOO.lang.substitute(window.unescape(actionsContainer.innerHTML), this.getActionUrls());
          
          /**
           * Hide actions which have been disallowed through permissions
@@ -199,7 +210,7 @@
                }
             }
             return true;
-         }
+         };
          
          YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler);
          

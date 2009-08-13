@@ -120,24 +120,26 @@
       {
          if (response.json !== undefined)
          {
-            var folderData = response.json.items[0];
+            var folderDetails = response.json.items[0];
             
             // Fire event to inform any listening components that the data is ready
-            YAHOO.Bubbling.fire("folderDetailsAvailable", folderData);
+            YAHOO.Bubbling.fire("folderDetailsAvailable",
+            {
+               folderDetails: folderDetails,
+               metadata: response.json.metadata
+            });
             
             // Fire event to show comments for folder
-            var eventData =
+            YAHOO.Bubbling.fire("setCommentedNode",
             { 
-               nodeRef: folderData.nodeRef,
-               title: folderData.displayName,
+               nodeRef: folderDetails.nodeRef,
+               title: folderDetails.displayName,
                page: "folder-details",
                pageParams:
                {
                   nodeRef: this.options.nodeRef
                }
-            };
-            
-            YAHOO.Bubbling.fire("setCommentedNode", eventData);
+            });
          }
       }
    });
