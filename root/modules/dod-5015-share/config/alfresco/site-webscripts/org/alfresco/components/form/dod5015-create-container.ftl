@@ -23,11 +23,11 @@
          </#if>
    
          <div id="${formId}-fields" class="form-fields">
-            <#list form.items as item>
+            <#list form.structure as item>
                <#if item.kind == "set">
                   <@formLib.renderSet set=item />
                <#else>
-                  <@formLib.renderField field=item />
+                  <@formLib.renderField field=form.fields[item.id] />
                </#if>
             </#list>
          </div>
