@@ -910,7 +910,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             var val = this.validations[x];
                   
             var field = Dom.get(val.fieldId);
-            if (field !== null)
+            if (field !== null && !field.disabled)
             {
                if (!val.handler(field, val.args, null, this, silent))
                {
