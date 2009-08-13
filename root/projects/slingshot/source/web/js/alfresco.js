@@ -1624,11 +1624,17 @@ Alfresco.util.setVar = function(p_name, p_value)
  */
 Alfresco.util.getTags = function(str)
 {
-   var tag = null, tags = [];
-   var regexp = /([^\s^,^&^\^<^>^\|^\"^\:^\/^\\^\?^\*/]+)/gi;
+   var tag = null,
+      tags = [],
+      regexp = /([^\s\"\*\\\>\<\?\/\:\|]+)/gi;
+
    while ((tag = regexp.exec(str)))
    {
-      tags.push(tag[1]);
+      if (tags[tag[1]] === undefined)
+      {
+         tags[tag[1]] = true;
+         tags.push(tag[1]);
+      }
    }
    return tags;
 };
@@ -4299,7 +4305,7 @@ Alfresco.util.RichEditor = function(editorName,id,config)
                }
                else if (candidates.length > 1)
                {
-                  candidates = YUISelector.query("a[rel='" + obj.filterData.replace("'", "\\'") + "']", this.id);
+                  candidates = YUISelector.query("a[rel='" + obj.filterData.replace("'", "\'") + "']", this.id);
                   if (candidates.length == 1)
                   {
                      // This component now owns the active filter
