@@ -66,7 +66,7 @@
       <#if item.kind == "set">
          <@renderSet set=item />
       <#else>
-         <@renderField field=item />
+         <@renderField field=form.fields[item.id] />
       </#if>
    </#list>
    

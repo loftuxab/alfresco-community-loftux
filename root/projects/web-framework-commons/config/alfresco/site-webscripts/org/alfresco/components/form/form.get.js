@@ -4,6 +4,8 @@ var associationFields = null;
 var defaultControls = null;
 var defaultConstraintHandlers = null;
 var formUIConstraints = null;
+var formUIStructure = null;
+var formUIFields = null;
          
 /* constants */
 const PROP_PREFIX = "prop:"
@@ -58,13 +60,15 @@ function main()
          setupCaches(formModel);
          
          // setup the initial form ui model
-         formUIModel = setupFormUIModel(mode, formModel, formConfig);
+         formUIModel = createFormUIModel(mode, formModel, formConfig);
          
-         // setup and add items to form ui model
-         formUIModel.items = setupFormUIItems(mode, formModel, formConfig, visibleFields);
+         // setup the form items i.e. fields, sets and their structure
+         setupFormUIItems(mode, formModel, formConfig, visibleFields);
          
-         // constraints were built during form items construction, add 
-         // them to the form ui model
+         // create properties for all the objects built during form items 
+         // construction above
+         formUIModel.structure = formUIStructure;
+         formUIModel.fields = formUIFields;
          formUIModel.constraints = formUIConstraints;
          
          // add the item kind, item id and form id arguments
@@ -186,6 +190,8 @@ function setupCaches(formModel)
 {
    propertyFields = {};
    associationFields = {};
+   formUIFields = {};
+   formUIStructure = [];
    formUIConstraints = [];
    
    // iterate over fields array and cache the properties and associations separately
@@ -349,15 +355,15 @@ function createPostBody(itemKind, itemId, visibleFields, formConfig)
 }
 
 /**
- * Sets up the basics of the form UI model used to generate the UI
+ * Creates the basic form UI model used to generate the UI
  *
- * @method setupFormUIModel
+ * @method createFormUIModel
  * @param mode The mode of the form
  * @param formModel The model returned from the server
  * @param formConfig The form configuration
  * @return Object representing the form UI model
  */
-function setupFormUIModel(mode, formModel, formConfig)
+function createFormUIModel(mode, formModel, formConfig)
 {
    // determine what enctype to use from the arguments
    var submitType = getArgument("submitType", "multipart");
@@ -467,8 +473,6 @@ function setupFormUIModel(mode, formModel, formConfig)
  */
 function setupFormUIItems(mode, formModel, formConfig, visibleFields)
 {
-   var formUIItems = [];
-   
    // setup the set and field structure
    if (visibleFields !== null && visibleFields.length > 0)
    {
@@ -479,10 +483,11 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
       for (var s = 0; s < rootSets.length; s++)
       {
          var set = setupSetUsingVisibleFields(mode, rootSets[s], formModel, formConfig);
-         // if the set got created (as it contained fields or other sets) add to items list
+         // if the set got created (as it contained fields or other sets) add to structure list
+         // and also to the map of sets
          if (set !== null)
          {
-            formUIItems.push(set);
+            formUIStructure.push(set);
          }
       }
    }
@@ -494,7 +499,7 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
       if (formConfig === null)
       {
          // if there is no config at all just show all fields in the default set
-         formUIItems.push(createDefaultSetFromServerFields(mode, formModel));
+         formUIStructure.push(createDefaultSetFromServerFields(mode, formModel));
       }
       else
       {
@@ -507,16 +512,14 @@ function setupFormUIItems(mode, formModel, formConfig, visibleFields)
          for (var s = 0; s < rootSets.length; s++)
          {
             var set = setupSetUsingServerFields(mode, rootSets[s], formModel, formConfig, setMembership);
-            // if the set got created (as it contained fields or other sets) add to items list
+            // if the set got created (as it contained fields or other sets) add to structure list
             if (set !== null)
             {
-               formUIItems.push(set);
+               formUIStructure.push(set);
             }
          }
       }
    }
-   
-   return formUIItems;
 }
 
 /**
@@ -792,10 +795,16 @@ function createSetUsingFields(mode, setConfig, formModel, formConfig, fieldsForS
       // setup the field
       var field = setupField(mode, formModel, fieldName, fieldConfig);
       
-      // if a field was created add to the set's list of children
+      // if a field was created add to the set's list of children and 
+      // to the map of fields
       if (field !== null)
       {
-         set.children.push(field);
+         formUIFields[field.id] = field;
+         set.children.push(
+         {
+            id : field.id,
+            kind : field.kind
+         });
       }
    }
    
@@ -962,6 +971,12 @@ function setupFieldControl(fieldDef, fieldConfig)
    {
       // get the default control for the property data type
       defaultControlConfig = defaultControls.items[fieldDef.dataType];
+      
+      // for backwards compatibility also check d:<dataType>
+      if (defaultControlConfig === null)
+      {
+         defaultControlConfig = defaultControls.items["d:" + fieldDef.dataType];
+      }
    }
    else
    {
