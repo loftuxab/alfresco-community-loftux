@@ -230,6 +230,11 @@
         <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
     </bean>
     
+    <!-- REST impl for GET Custom Reference Instances -->
+    <bean id="webscript.org.alfresco.rma.customrefs.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomRefsGet" parent="rmBaseWebscript">
+        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
+    </bean>
+
     <!-- REST impl for GET Disposition Schedule -->
     <bean id="webscript.org.alfresco.rma.dispositionschedule.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.DispositionScheduleGet" parent="rmBaseWebscript">
     </bean>
