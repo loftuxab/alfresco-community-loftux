@@ -114,6 +114,11 @@
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
+               <field id="cm:description">
+                  <control>
+                     <control-param name="activateLinks">true</control-param>
+                  </control>
+               </field>
                <field id="mimetype">
                   <control template="/org/alfresco/components/form/controls/mimetype.ftl" />
                </field>
@@ -144,6 +149,13 @@
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
             </field-visibility>
+            <appearance>
+               <field id="cm:description">
+                  <control>
+                     <control-param name="activateLinks">true</control-param>
+                  </control>
+               </field>
+            </appearance>
           </form>
       </forms>
    </config>
