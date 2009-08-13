@@ -39,11 +39,6 @@
          Selector = YAHOO.util.Selector;
 
    /**
-    * Alfresco Slingshot aliases
-    */
-   var $html = Alfresco.util.encodeHTML;
-
-   /**
     * Internal date formats
     */
    var DATE_LONG = "dddd, d mmmm yyyy",
@@ -196,12 +191,12 @@
             ev = events[i];
             if (ev.complete)
             {
-               completedAt = Alfresco.util.fromISO8601(event.completedAt);
-               eventEl = this._createEvent(event, [
-                  { "name" : event.label },
-                  { "automatic" : event.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
+               completedAt = Alfresco.util.fromISO8601(ev.completedAt);
+               eventEl = this._createEvent(ev, [
+                  { "name" : ev.label },
+                  { "automatic" : ev.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
                   { "completed-at" : completedAt ? Alfresco.util.formatDate(completedAt) : "" },
-                  { "completed-by" : event.completedByFirstName + " " + event.completedByLastName }
+                  { "completed-by" : ev.completedByFirstName + " " + ev.completedByLastName }
                ],
                   "undo-button", this.onUndoEventButtonClick, this.widgets.completedEventTemplate);
                
@@ -211,9 +206,9 @@
             else
             {
                asOf = Alfresco.util.fromISO8601(nextDispositionAction.asOf);
-               eventEl = this._createEvent(event, [
-                  { "name" : event.label },
-                  { "automatic" : event.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
+               eventEl = this._createEvent(ev, [
+                  { "name" : ev.label },
+                  { "automatic" : ev.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
                   { "asof" : asOf ? Alfresco.util.formatDate(asOf) : "" }
                ],
                   "complete-button", this.onCompleteEventButtonClick, this.widgets.incompleteEventTemplate);
@@ -379,7 +374,7 @@
       {
          // TODO stop using a static id after RM, needed now so the text-align in #Share .yui-panel .bd .yui-u.first can be overriden
          // The panel is created from the HTML returned in the XHR request, not the container
-         this.widgets.completeEventPanel = Alfresco.util.createYUIPanel("complete-event-panel")
+         this.widgets.completeEventPanel = Alfresco.util.createYUIPanel("complete-event-panel");
 
          // Buttons
          this.widgets.completeEventOkButton = Alfresco.util.createYUIButton(this, "completeEvent-ok-button", this.onCompleteEventOkClick);
