@@ -107,7 +107,7 @@ var Filters =
       // Specialise by passed-in type
       if (filterParams.query !== "")
       {
-         filterParams.query += " " + Filters.TYPE_MAP[parsedArgs.type] || "";
+         filterParams.query += " " + (Filters.TYPE_MAP[parsedArgs.type] || "");
       }
 
       return filterParams;
