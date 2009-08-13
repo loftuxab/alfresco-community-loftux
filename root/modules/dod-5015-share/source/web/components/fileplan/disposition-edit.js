@@ -505,12 +505,12 @@
       _disableEnablePeriodElements: function DispositionEdit__disableEnablePeriodElements(periodUnitEl, periodAmountEl, periodActionEl)
       {
          var periodUnit = periodUnitEl.options[periodUnitEl.selectedIndex].value;
-         periodAmountEl.disabled = Alfresco.util.arrayContains(["none", "immediately"], periodUnit);
+         periodAmountEl.disabled = Alfresco.util.arrayContains(["none", "immediately", "fmend", "fqend", "fyend", "monthend", "quarterend", "yearend"], periodUnit);
          if(periodAmountEl.disabled)
          {
             periodAmountEl.value = "";
          }
-         periodActionEl.disabled = Alfresco.util.arrayContains(["none", "immediately", "fmend", "fqend", "fyend", "monthend", "quarterend", "yearend"], periodUnit);
+         periodActionEl.disabled = Alfresco.util.arrayContains(["none", "immediately"], periodUnit);
       },
 
       /**
@@ -554,7 +554,7 @@
                title = this.msg(
                      "label.title.noTime",
                      actionType,
-                     periodUnitSelect.options[periodUnitSelect.selectedIndex].text);
+                     periodUnitSelect.options[periodUnitSelect.selectedIndex].text.toLowerCase());
             }
             else
             {
@@ -562,7 +562,7 @@
                      "label.title.complex",
                      actionType,
                      periodAmountEl.value,
-                     periodUnitSelect.options[periodUnitSelect.selectedIndex].text);
+                     periodUnitSelect.options[periodUnitSelect.selectedIndex].text.toLowerCase());
             }
          }
          else

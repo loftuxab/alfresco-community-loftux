@@ -23,6 +23,17 @@ function main()
       // Check if we got a positive result
       if (repoJSON.data)
       {
+         repoResponse = scriptRemoteConnector.get("/api/rma/admin/listofvalues");
+         var listOfValuesResult= eval('(' + repoResponse + ')');
+         var periodTypesArray = listOfValuesResult.data.periodTypes.items,
+            periodTypeLabels = {},
+            periodType;
+         for (var pti = 0; pti < periodTypesArray.length; pti++)
+         {
+            periodType = periodTypesArray[pti];
+            periodTypeLabels[periodType.value] = periodType.label;
+         }
+
          var schedule = repoJSON.data;
          if(schedule.instructions)
          {
@@ -37,22 +48,25 @@ function main()
             model.dipositionScheduleNodeRef = schedule.nodeRef;            
          }
          model.recordLevelDisposition = schedule.recordLevelDisposition;
-         var actions = schedule.actions;
+         var actions = schedule.actions,
+               periodTypeLabel;
          for(var i = 0; i < actions.length; i++)
          {
             var action = actions[i];
             var p = action.period ? action.period.split("|") : [];
-            var periodUnit = p.length > 0 ? p[0] : null;
+            var periodType = p.length > 0 ? p[0] : null;
             var periodAmount = p.length > 1 ? p[1] : null;
-            if(periodUnit && periodUnit != "none")
+            if(periodType && periodType != "none")
             {
+               periodTypeLabel = periodTypeLabels[periodType];
+               periodTypeLabel = periodTypeLabel ? periodTypeLabel.toLowerCase() : "";
                if(!periodAmount || periodAmount == "" || periodAmount == "0")
                {
-                  action.title = msg.get("label.title.noTime", [action.label, periodUnit]);                  
+                  action.title = msg.get("label.title.noTime", [action.label, periodTypeLabel]);                  
                }
                else
                {
-                  action.title = msg.get("label.title.complex", [action.label, periodAmount, periodUnit]);
+                  action.title = msg.get("label.title.complex", [action.label, periodAmount, periodTypeLabel]);
                }
             }
             else
