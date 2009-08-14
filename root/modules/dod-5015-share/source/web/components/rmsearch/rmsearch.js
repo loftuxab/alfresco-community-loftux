@@ -371,7 +371,25 @@
        */
       onExport: function RecordsSearch_onExport(e, args)
       {
+         // generate a Form as we need to POST the noderefs to the server,
+         // the binary response can then be handled by the browser and present
+         // the Save As dialog correctly - as an Ajax request would not do this
+         var form = document.createElement("form");
+         document.body.appendChild(form);
+         form.id = this.id + "_export_form";
+         form.name = form.id;
+         form.style.display = "none";
+         form.method = "post";
+         form.enctype = "multipart/form-data";
+         form.encoding = "multipart/form-data";
+         form.action = Alfresco.constants.PROXY_URI + "api/rma/admin/export";
          
+         var input = document.createElement("input");
+         input.type = "hidden";
+         form.appendChild(input);
+         input.name = "nodeRefs";
+         input.value = this.resultNodeRefs.join(",");
+         form.submit();
       },
       
       /**
