@@ -70,7 +70,7 @@
     <!-- Event types -->
     
     <bean id="rmEventType" init-method="init" abstract="true">
-        <property name="recordsManagementEventService" ref="RecordsManagementEventService"/>
+        <property name="recordsManagementEventService" ref="recordsManagementEventService"/>
     </bean>
     
     <bean id="rmEventType.simple" class="org.alfresco.module.org_alfresco_module_dod5015.event.SimpleRecordsManagementEventTypeImpl" parent="rmEventType"/>

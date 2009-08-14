@@ -309,6 +309,11 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     }
 
+    public void init()
+    {
+        
+    }
+    
     /**
      * Set the permission service
      * 
@@ -1172,7 +1177,10 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         {
             System.out.println(capability.getName());
             AccessStatus status = capability.hasPermission(nodeRef);
-            answer.put(capability, status);
+            if(answer.put(capability, status) != null)
+            {
+                throw new IllegalStateException();
+            }
         }
         return answer;
 

@@ -51,7 +51,15 @@ public class TransferCompleteAction extends RMActionExecuterAbstractBase
     @Override
     protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
     {
-        return true;
+        QName className = this.nodeService.getType(filePlanComponent);
+        if (this.dictionaryService.isSubClass(className, TYPE_TRANSFER) == true)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     /**
