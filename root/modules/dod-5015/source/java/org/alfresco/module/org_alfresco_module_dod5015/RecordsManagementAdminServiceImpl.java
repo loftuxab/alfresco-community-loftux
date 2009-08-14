@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.service.ServiceRegistry;
@@ -32,8 +33,13 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,23 +50,39 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RecordsManagementAdminServiceImpl implements RecordsManagementAdminService
 {
-    /** Logger */
+	/** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementAdminServiceImpl.class);
 
     public static final String CUSTOM_MODEL_PREFIX = "rmc";
     public static final String RMC_CUSTOM_ASSOCS = CUSTOM_MODEL_PREFIX + ":customAssocs";
 
     private ServiceRegistry serviceRegistry;
+    private DictionaryService dictionaryService;
+    private NamespaceService namespaceService;
+    private NodeService nodeService;
 
     public void setServiceRegistry(ServiceRegistry serviceRegistry)
     {
         this.serviceRegistry = serviceRegistry;
     }
-    
+
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+		this.dictionaryService = dictionaryService;
+	}
+
+	public void setNamespaceService(NamespaceService namespaceService)
+	{
+		this.namespaceService = namespaceService;
+	}
+
+	public void setNodeService(NodeService nodeService)
+	{
+		this.nodeService = nodeService;
+	}
+
     public Map<QName, AssociationDefinition> getAvailableCustomReferences()
     {
-        DictionaryService dictionaryService = serviceRegistry.getDictionaryService();
-        NamespaceService namespaceService = serviceRegistry.getNamespaceService();
 		QName relevantAspectQName = QName.createQName(RMC_CUSTOM_ASSOCS, namespaceService);
         AspectDefinition aspectDefn = dictionaryService.getAspect(relevantAspectQName);
         Map<QName, AssociationDefinition> assocDefns = aspectDefn.getAssociations();
@@ -80,12 +102,42 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 
     public Map<QName, PropertyDefinition> getAvailableCustomProperties(CustomisableRmElement rmElement)
     {
-        DictionaryService dictionaryService = serviceRegistry.getDictionaryService();
-        NamespaceService namespaceService = serviceRegistry.getNamespaceService();
 		QName relevantAspectQName = QName.createQName(rmElement.getCorrespondingAspect(), namespaceService);
         AspectDefinition aspectDefn = dictionaryService.getAspect(relevantAspectQName);
         Map<QName, PropertyDefinition> propDefns = aspectDefn.getProperties();
 
         return propDefns;
     }
+
+	public void addCustomReference(NodeRef fromNode, NodeRef toNode, QName refId)
+	{
+		Map<QName, AssociationDefinition> availableAssocs = this.getAvailableCustomReferences();
+
+		AssociationDefinition assocDef = availableAssocs.get(refId);
+		if (assocDef == null)
+		{
+			throw new IllegalArgumentException("No such custom reference: " + refId);
+		}
+
+		if (assocDef.isChild())
+		{
+			this.nodeService.addChild(fromNode, toNode, refId, refId);
+		}
+		else
+		{
+			this.nodeService.createAssociation(fromNode, toNode, refId);
+		}
+	}
+
+	public List<AssociationRef> getCustomReferencesFor(NodeRef node)
+	{
+    	List<AssociationRef> retrievedAssocs = nodeService.getTargetAssocs(node, RegexQNamePattern.MATCH_ALL);
+    	return retrievedAssocs;
+	}
+
+	public List<ChildAssociationRef> getCustomChildReferencesFor(NodeRef node)
+	{
+    	List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(node);
+    	return childAssocs;
+	}
 }

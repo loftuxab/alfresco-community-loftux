@@ -36,9 +36,12 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomPropertyAction;
+import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
@@ -71,8 +74,6 @@ import org.alfresco.util.BaseSpringTest;
  */
 public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD5015Model
 {    
-	protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-	
 	private NodeRef filePlan;
 	
     private ContentService contentService;
@@ -207,15 +208,15 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
     
     public void testCreateAndUseCustomChildReference() throws Exception
     {
-        createAndUseCustomReference(true, "superseded", "superseding");
+        createAndUseCustomReference(CustomReferenceType.PARENT_CHILD, null, "superseded", "superseding");
     }
 
     public void testCreateAndUseCustomNonChildReference() throws Exception
     {
-    	createAndUseCustomReference(false, "supporting", "supported");
+    	createAndUseCustomReference(CustomReferenceType.BIDIRECTIONAL, "supporting", null, null);
     }
     
-	private void createAndUseCustomReference(boolean isChild, String srcRoleName, String targetRoleName) throws Exception
+	private void createAndUseCustomReference(CustomReferenceType refType, String label, String source, String target) throws Exception
 	{
 		// Create the necessary test objects in the db: two records.
         NodeRef recordFolder = retrievePreexistingRecordFolder();
@@ -232,13 +233,14 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         declareRecord(testRecord2);
 
         // Define a custom reference.
-        final String refDefinitionName = "rmc:customReference" + System.currentTimeMillis();
+        final String uiRefName = "customReference" + System.currentTimeMillis();
 
         Map <String, Serializable> params = new HashMap<String, Serializable>();
-        params.put("name", refDefinitionName);
-        params.put("isChild", isChild);
-        params.put("sourceRoleName", srcRoleName);
-        params.put("targetRoleName", targetRoleName);
+        params.put("name", uiRefName);
+        params.put("referenceType", refType.toString());
+        if (label != null) params.put("label", label);
+        if (source != null) params.put("source", source);
+        if (target != null) params.put("target", target);
         
         rmActionService.executeRecordsManagementAction("defineCustomAssociation", params);
         
@@ -249,16 +251,14 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         txn2.begin();
 
         // Confirm the custom reference is included in the list from rmAdminService.
-        final QName refDefinitionQName = QName.createQName(refDefinitionName, namespaceService);
+        String uid = CustomReferenceId.getReferenceIdFor(uiRefName);
+        final QName refDefinitionQName = QName.createQName(uid, namespaceService);
         
         Map<QName, AssociationDefinition> customRefDefinitions = rmAdminService.getAvailableCustomReferences();
         AssociationDefinition retrievedRefDefn = customRefDefinitions.get(refDefinitionQName);
         assertNotNull("Custom reference definition from rmAdminService was null.", retrievedRefDefn);
-        assertEquals(refDefinitionName, retrievedRefDefn.getName().toPrefixString());
-        assertEquals(isChild, retrievedRefDefn.isChild());
-        
-        if (srcRoleName != null) assertEquals("rmc:" + srcRoleName, retrievedRefDefn.getSourceRoleName().toPrefixString()); //TODO Remove ifs
-        if (targetRoleName != null) assertEquals("rmc:" + targetRoleName, retrievedRefDefn.getTargetRoleName().toPrefixString());
+        assertEquals(refDefinitionQName, retrievedRefDefn.getName());
+        assertEquals(refType.equals(CustomReferenceType.PARENT_CHILD), retrievedRefDefn.isChild());
         
         // Now we need to use the custom reference.
         // So we apply the aspect containing it to our test records.
@@ -266,11 +266,11 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         QName assocsAspectQName = QName.createQName("rmc:customAssocs", namespaceService);
         nodeService.addAspect(testRecord1, assocsAspectQName, null);
 
-        String assocInstanceQNameString = "rmc:" + targetRoleName;
+        String assocInstanceQNameString = "rmc:" + target;
 		QName assocInstanceQName = QName.createQName(assocInstanceQNameString, namespaceService);
-		if (isChild)
+		if (CustomReferenceType.PARENT_CHILD.equals(refType))
 		{
-			nodeService.addChild(testRecord1, testRecord2, refDefinitionQName, assocInstanceQName);
+			nodeService.addChild(testRecord1, testRecord2, refDefinitionQName, refDefinitionQName);
 		}
 		else
 		{
@@ -285,12 +285,12 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
     	List<AssociationRef> retrievedAssocs = nodeService.getTargetAssocs(testRecord1, RegexQNamePattern.MATCH_ALL);
     	
     	Object newlyAddedRef = null;
-    	if (isChild)
+		if (CustomReferenceType.PARENT_CHILD.equals(refType))
     	{
     		for (ChildAssociationRef caRef : childAssocs)
     		{
     			QName refInstanceQName = caRef.getQName();
-    			if (assocInstanceQName.equals(refInstanceQName)) newlyAddedRef = caRef;
+    			if (refDefinitionQName.equals(refInstanceQName)) newlyAddedRef = caRef;
     		}
     	}
     	else
@@ -306,7 +306,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         // Check that the reference has appeared in the data dictionary
         AspectDefinition customAssocsAspect = dictionaryService.getAspect(assocsAspectQName);
         assertNotNull(customAssocsAspect);
-        if (isChild)
+		if (CustomReferenceType.PARENT_CHILD.equals(refType))
         {
         	assertNotNull("The customReference is not returned from the dictionaryService.",
         			customAssocsAspect.getChildAssociations().get(refDefinitionQName));
@@ -321,8 +321,6 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
     private NodeRef retrievePreexistingRecordFolder()
     {
         final List<NodeRef> resultNodeRefs = retrieveJanuaryAISVitalFolders();
-        final int folderCount = resultNodeRefs.size();
-//        assertTrue("There should only be one 'January AIS Audit Records' folder. Were " + folderCount, folderCount == 1);
         
         return resultNodeRefs.get(0);
     }
@@ -330,7 +328,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
     private List<NodeRef> retrieveJanuaryAISVitalFolders()
     {
         String typeQuery = "TYPE:\"" + TYPE_RECORD_FOLDER + "\" AND @cm\\:name:\"January AIS Audit Records\"";
-        ResultSet types = this.searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, typeQuery);
+        ResultSet types = this.searchService.query(TestUtilities.SPACES_STORE, SearchService.LANGUAGE_LUCENE, typeQuery);
         
         final List<NodeRef> resultNodeRefs = types.getNodeRefs();
         return resultNodeRefs;

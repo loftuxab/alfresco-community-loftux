@@ -30,10 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
@@ -58,7 +59,7 @@ public class CustomRefsGet extends AbstractRmWebScript
     @Override
     public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
-        Map<String, Object> model = new HashMap<String, Object>();
+        Map<String, Object> ftlModel = new HashMap<String, Object>();
         
         NodeRef node = parseRequestForNodeRef(req);
         
@@ -67,22 +68,52 @@ public class CustomRefsGet extends AbstractRmWebScript
     		logger.debug("Getting custom reference instances for " + node);
     	}
 
-    	List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(node);
-    	List<AssociationRef> retrievedAssocs = nodeService.getTargetAssocs(node, RegexQNamePattern.MATCH_ALL);
-
-    	List<Object> allAssocs = new ArrayList<Object>(childAssocs.size() + retrievedAssocs.size());
-    	//TODO This amalgamation of two different types may or may not be suitable for the FTL.
+    	List<Map<String, String>> listOfReferenceData = new ArrayList<Map<String, String>>();
     	
-    	allAssocs.addAll(childAssocs);
-    	allAssocs.addAll(retrievedAssocs);
+    	List<AssociationRef> assocs = this.rmAdminService.getCustomReferencesFor(node);
+    	for (AssociationRef assRef : assocs)
+    	{
+    		Map<String, String> data = new HashMap<String, String>();
 
+    		QName typeQName = assRef.getTypeQName();
+    		
+    		data.put("sourceRef", assRef.getSourceRef().toString());
+    		data.put("targetRef", assRef.getTargetRef().toString());
+
+    		CustomReferenceId crId = new CustomReferenceId(typeQName.toPrefixString());
+			data.put("name", crId.getUiName());
+			data.put("label", crId.getLabel());
+			data.put("referenceType", CustomReferenceType.BIDIRECTIONAL.toString());
+    		
+    		listOfReferenceData.add(data);
+    	}
+    	
+    	List<ChildAssociationRef> childAssocs = this.rmAdminService.getCustomChildReferencesFor(node);
+    	for (ChildAssociationRef childAssRef : childAssocs)
+    	{
+    		Map<String, String> data = new HashMap<String, String>();
+
+    		QName typeQName = childAssRef.getTypeQName();
+    		
+    		data.put("childRef", childAssRef.getChildRef().toString());
+    		data.put("parentRef", childAssRef.getParentRef().toString());
+
+    		CustomReferenceId crId = new CustomReferenceId(typeQName.toPrefixString());
+			data.put("name", crId.getUiName());
+			data.put("source", crId.getSource());
+			data.put("target", crId.getTarget());
+			data.put("referenceType", CustomReferenceType.PARENT_CHILD.toString());
+    		
+    		listOfReferenceData.add(data);
+    	}
+    	
     	if (logger.isDebugEnabled())
     	{
-    		logger.debug("Retrieved custom reference instances: " + allAssocs);
+    		logger.debug("Retrieved custom reference instances: " + assocs);
     	}
+    	
+    	ftlModel.put("customRefs", listOfReferenceData);
 
-    	model.put("customRefs", allAssocs);
-
-        return model;
+        return ftlModel;
     }
 }

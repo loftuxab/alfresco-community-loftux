@@ -24,10 +24,14 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
+import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -59,4 +63,17 @@ public interface RecordsManagementAdminService
      * @return The Map of custom references (both parent-child and standard).
      */
     public Map<QName, AssociationDefinition> getAvailableCustomReferences();
+    
+    public List<AssociationRef> getCustomReferencesFor(NodeRef node);
+    
+    public List<ChildAssociationRef> getCustomChildReferencesFor(NodeRef node);
+    
+    /**
+     * This method adds the specified custom reference instance between the specified nodes.
+     * 
+     * @param fromNode
+     * @param toNode
+     * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}customRefStandard1250274577519__supported__null__null
+     */
+    public void addCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId);
 }

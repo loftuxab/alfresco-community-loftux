@@ -3,10 +3,14 @@
 	"data":
 	{
 		"customReferences":
-		{
+		[
 			<#list customRefs as ref>
-			"TODO" : "impl"
-		}
+			{
+                <#assign keys = ref?keys>
+                <#list keys as key>"${key}": "${ref[key]}"<#if key_has_next>,</#if></#list>
+			}<#if ref_has_next>,</#if>
+    		</#list>
+		]
 	}
 }
 </#escape>

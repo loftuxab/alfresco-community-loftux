@@ -124,6 +124,15 @@
         <property name="serviceRegistry">
             <ref bean="ServiceRegistry" />
         </property>
+        <property name="dictionaryService">
+            <ref bean="DictionaryService" />
+        </property>
+        <property name="namespaceService">
+            <ref bean="NamespaceService" />
+        </property>
+        <property name="nodeService">
+            <ref bean="NodeService" />
+        </property>
     </bean>
     
     <bean id="RecordsManagementAdminService" class="org.springframework.aop.framework.ProxyFactoryBean">
