@@ -21,6 +21,26 @@
                      <label for="${el}-metadata-title">${msg("label.title")}</label>
                   </li>
                   <li>
+                     <input type="checkbox" id="${el}-metadata-description" />
+                     <label for="${el}-metadata-description">${msg("label.description")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-creator" />
+                     <label for="${el}-metadata-creator">${msg("label.creator")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-created" checked="checked" />
+                     <label for="${el}-metadata-created">${msg("label.created")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-modifier" />
+                     <label for="${el}-metadata-modifier">${msg("label.modifier")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-modified" checked="checked" />
+                     <label for="${el}-metadata-modified">${msg("label.modified")}</label>
+                  </li>
+                  <li>
                      <input type="checkbox" id="${el}-metadata-originator" checked="checked" />
                      <label for="${el}-metadata-originator">${msg("label.originator")}</label>
                   </li>
@@ -29,8 +49,12 @@
                      <label for="${el}-metadata-dateFiled">${msg("label.dateFiled")}</label>
                   </li>
                   <li>
-                     <input type="checkbox" id="${el}-metadata-publicationDate" checked="checked" />
+                     <input type="checkbox" id="${el}-metadata-publicationDate" />
                      <label for="${el}-metadata-publicationDate">${msg("label.publicationDate")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-reviewDate" />
+                     <label for="${el}-metadata-reviewDate">${msg("label.reviewDate")}</label>
                   </li>
                   <li>
                      <input type="checkbox" id="${el}-metadata-vitalRecord" checked="checked" />
@@ -87,6 +111,11 @@
                         <option value="rma:identifier">${msg("label.identifier")}</option>
                         <option value="cm:name">${msg("label.name")}</option>
                         <option value="cm:title">${msg("label.title")}</option>
+                        <option value="cm:description">${msg("label.description")}</option>
+                        <option value="cm:creator">${msg("label.creator")}</option>
+                        <option value="cm:created">${msg("label.created")}</option>
+                        <option value="cm:modifier">${msg("label.modifier")}</option>
+                        <option value="cm:modified">${msg("label.modified")}</option>
                         <option value="rma:originator">${msg("label.originator")}</option>
                         <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
                         <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
@@ -118,7 +147,7 @@
             <div class="records">
                <span class="header">${msg("label.components")}</span>
                <div>
-                  <input type="checkbox" id="${el}-records" checked />
+                  <input type="checkbox" id="${el}-records" checked="checked" />
                   <label for="${el}-records">${msg("label.records")}</label>
                </div>
                <div class="indented">
