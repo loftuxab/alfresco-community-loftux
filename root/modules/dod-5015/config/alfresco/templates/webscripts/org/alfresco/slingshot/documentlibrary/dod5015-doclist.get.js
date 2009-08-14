@@ -62,11 +62,7 @@ function main()
          {
             maxItems: (filterParams.limitResults ? parseInt(filterParams.limitResults, 10) : 0)
          },
-         sort: [
-         {
-            column: filterParams.sortBy,
-            ascending: filterParams.sortByAscending
-         }],
+         sort: filterParams.sort,
          templates: filterParams.templates
       });
    }

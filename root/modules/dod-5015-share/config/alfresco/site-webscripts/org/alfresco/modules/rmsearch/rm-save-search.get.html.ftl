@@ -7,6 +7,7 @@
       <form id="${args.htmlid}-form" method="POST" action="" enctype="application/json">
          <input id="${args.htmlid}-query" type="hidden" name="query" value="" />
          <input id="${args.htmlid}-params" type="hidden" name="params" value="" />
+         <input id="${args.htmlid}-sort" type="hidden" name="sort" value="" />
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-name">${msg("label.name")}:</label></div>
             <div class="yui-u"><input id="${args.htmlid}-name" type="text" name="name" tabindex="1" maxlength="255" />&nbsp;*</div>
