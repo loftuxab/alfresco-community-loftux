@@ -31,7 +31,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
@@ -67,18 +69,41 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
 
     	Map<QName, AssociationDefinition> currentCustomRefs = rmAdminService.getAvailableCustomReferences();
 
-        List<AssociationDefinition> refData = new ArrayList<AssociationDefinition>(currentCustomRefs.size());
+    	List<Map<String, String>> listOfReferenceData = new ArrayList<Map<String, String>>();
+
         for (Entry<QName, AssociationDefinition> entry : currentCustomRefs.entrySet())
         {
-            refData.add(entry.getValue());
+    		Map<String, String> data = new HashMap<String, String>();
+
+    		QName serverSideQName = entry.getValue().getName();
+    		
+    		CustomReferenceId crId = new CustomReferenceId(serverSideQName);
+
+    		CustomReferenceType referenceType = entry.getValue() instanceof ChildAssociationDefinition ?
+    				CustomReferenceType.PARENT_CHILD : CustomReferenceType.BIDIRECTIONAL;
+    		
+			data.put("referenceType", referenceType.toString());
+
+			data.put("name", crId.getUiName());
+			
+			String label = crId.getLabel();
+			if (!label.equals("null")) data.put("label", label);
+			
+			String source = crId.getSource();
+			if (!source.equals("null")) data.put("source", source);
+			
+			String target = crId.getTarget();
+			if (!target.equals("null")) data.put("target", target);
+        	
+    		listOfReferenceData.add(data);
         }
         
     	if (logger.isDebugEnabled())
     	{
-    		logger.debug("Retrieved custom reference definitions: " + refData);
+    		logger.debug("Retrieved custom reference definitions: " + listOfReferenceData.size());
     	}
 
-    	model.put("customRefs", refData);
+    	model.put("customRefs", listOfReferenceData);
 
         return model;
     }

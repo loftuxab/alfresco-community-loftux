@@ -56,8 +56,6 @@ public class DeleteCustomPropertyAction extends DefineCustomElementAbstractActio
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
-        super.executeImpl(action, actionedUponNodeRef);
-
         Map<String, Serializable> params = action.getParameterValues();
 
         CustomModelUtil customModelUtil = new CustomModelUtil();

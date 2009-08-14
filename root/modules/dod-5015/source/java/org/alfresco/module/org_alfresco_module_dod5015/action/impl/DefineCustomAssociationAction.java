@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
+import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2Association;
@@ -39,7 +40,6 @@ import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -49,17 +49,10 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DefineCustomAssociationAction extends DefineCustomElementAbstractAction
 {
-    private static final String PARAM_TARGET_MANDATORY_ENFORCED = "targetMandatoryEnforced";
-    private static final String PARAM_TITLE = "title";
-    private static final String PARAM_DESCRIPTION = "description";
-    private static final String PARAM_SOURCE_MANY = "sourceMany";
-    private static final String PARAM_SOURCE_MANDATORY = "sourceMandatory";
-    private static final String PARAM_PROTECTED = "protected";
-    private static final String PARAM_TARGET_MANDATORY = "targetMandatory";
-    private static final String PARAM_TARGET_MANY = "targetMany";
-    private static final String PARAM_TARGET_ROLE_NAME = "targetRoleName";
-    private static final String PARAM_SOURCE_ROLE_NAME = "sourceRoleName";
-    private static final String PARAM_IS_CHILD = "isChild";
+    private static final String PARAM_LABEL = "label";
+    private static final String PARAM_TARGET = "target";
+    private static final String PARAM_SOURCE = "source";
+    private static final String PARAM_REFERENCE_TYPE = "referenceType";
     private static Log logger = LogFactory.getLog(DefineCustomAssociationAction.class);
 	public static final String RMA_RECORD = "rma:record";
 
@@ -71,11 +64,10 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
-	    super.executeImpl(action, actionedUponNodeRef);
+	    Serializable refTypeSerializable = action.getParameterValue(PARAM_REFERENCE_TYPE);
+	    CustomReferenceType refType = CustomReferenceType.getEnumFromString((String)refTypeSerializable);
 	    
-	    // isChild defaults to false
-	    Serializable serializableParam = action.getParameterValue(PARAM_IS_CHILD);
-	    boolean isChildValue = serializableParam == null ? false : (Boolean)serializableParam;
+	    boolean isChildAssoc = refType.equals(CustomReferenceType.PARENT_CHILD);
 	    
         if (logger.isDebugEnabled())
         {
@@ -83,11 +75,11 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
             msg.append("Creating custom assoc: ")
                 .append(action.getParameterValue(PARAM_NAME))
                 .append("; isChild ")
-                .append(isChildValue);
+                .append(isChildAssoc);
             logger.debug(msg.toString());
         }
 
-        if (isChildValue)
+        if (isChildAssoc)
         {
             this.createCustomChildAssoc(action, actionedUponNodeRef);
         }
@@ -118,52 +110,16 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
         M2Model deserializedModel = customModelUtil.readCustomContentModel();
         M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
 
-        QName assocQName = QName.createQName((String)params.get(PARAM_NAME), namespaceService);
-        String assocQNameAsString = assocQName.toPrefixString(this.namespaceService);
+        String name = (String)params.get(PARAM_NAME);
+        String label = (String)params.get(PARAM_LABEL);
         
-        M2Association newAssoc = customAssocsAspect.createAssociation(assocQNameAsString);
+        CustomReferenceId crId = new CustomReferenceId(name, label, null, null);
+        
+        M2Association newAssoc = customAssocsAspect.createAssociation(crId.getReferenceId());
 
-        newAssoc.setDescription((String)params.get(PARAM_DESCRIPTION));
-        newAssoc.setSourceRoleName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX + ":" + params.get(PARAM_SOURCE_ROLE_NAME));
+        //TODO Could be the customAssocs aspect
         newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
-        newAssoc.setTargetRoleName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX + ":" + params.get(PARAM_TARGET_ROLE_NAME));
-        newAssoc.setTitle((String)params.get(PARAM_TITLE));
         
-        // This boilerplate code is to ensure that a null Boolean is not set on the
-        // association, as that would trigger the unboxing of a null and therefore a NPE.
-        Serializable serializableParam = null;
-        
-        serializableParam = params.get(PARAM_TARGET_MANY);
-        if (serializableParam != null)
-        {
-            Boolean bool = (Boolean)serializableParam;
-            newAssoc.setTargetMany(bool);
-        }
-        serializableParam = params.get(PARAM_TARGET_MANDATORY);
-        if (serializableParam != null)
-        {
-            Boolean bool = (Boolean)serializableParam;
-            newAssoc.setTargetMandatory(bool);
-        }
-        serializableParam = params.get(PARAM_PROTECTED);
-        if (serializableParam != null)
-        {
-            Boolean bool = (Boolean)serializableParam;
-            newAssoc.setProtected(bool);
-        }
-        serializableParam = params.get(PARAM_SOURCE_MANDATORY);
-        if (serializableParam != null)
-        {
-            Boolean bool = (Boolean)serializableParam;
-            newAssoc.setSourceMandatory(bool);
-        }
-        serializableParam = params.get(PARAM_SOURCE_MANY);
-        if (serializableParam != null)
-        {
-            Boolean bool = (Boolean)serializableParam;
-            newAssoc.setSourceMany(bool);
-        }
-
         customModelUtil.writeCustomContentModel(deserializedModel);
     }
     
@@ -177,52 +133,17 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
         M2Model deserializedModel = customModelUtil.readCustomContentModel();
         M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
 
-        QName assocQName = QName.createQName((String)params.get(PARAM_NAME), namespaceService);
-        String assocQNameAsString = assocQName.toPrefixString(this.namespaceService);
+        String name = (String)params.get(PARAM_NAME);
+        String source = (String)params.get(PARAM_SOURCE);
+        String target = (String)params.get(PARAM_TARGET);
 
-        M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(assocQNameAsString);
+        CustomReferenceId crId = new CustomReferenceId(name, null, source, target);
 
-        newAssoc.setDescription((String)params.get(PARAM_DESCRIPTION));
-        newAssoc.setSourceRoleName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX + ":" + params.get(PARAM_SOURCE_ROLE_NAME));
+        M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(crId.getReferenceId());
+
+        //TODO Could be the cstom assocs aspect
         newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
-        newAssoc.setTargetRoleName(RecordsManagementAdminServiceImpl.CUSTOM_MODEL_PREFIX + ":" + params.get(PARAM_TARGET_ROLE_NAME));
-        newAssoc.setTitle((String)params.get(PARAM_TITLE));
 
-        // This boilerplate code is to ensure that a null Boolean is not set on the
-        // association, as that would trigger the unboxing of a null and therefore a NPE.
-        Serializable serializableParam = null;
-        
-        serializableParam = params.get(PARAM_TARGET_MANY);
-        if (serializableParam != null)
-        {
-            Boolean bool = (Boolean)serializableParam;
-            newAssoc.setTargetMany(bool);
-        }
-        serializableParam = params.get(PARAM_TARGET_MANDATORY);
-        if (serializableParam != null)
-        {
-            Boolean bool = (Boolean)serializableParam;
-            newAssoc.setTargetMandatory(bool);
-        }
-        serializableParam = params.get(PARAM_PROTECTED);
-        if (serializableParam != null)
-        {
-            Boolean bool = (Boolean)serializableParam;
-            newAssoc.setProtected(bool);
-        }
-        serializableParam = params.get(PARAM_SOURCE_MANDATORY);
-        if (serializableParam != null)
-        {
-            Boolean bool = (Boolean)serializableParam;
-            newAssoc.setSourceMandatory(bool);
-        }
-        serializableParam = params.get(PARAM_SOURCE_MANY);
-        if (serializableParam != null)
-        {
-            Boolean bool = (Boolean)serializableParam;
-            newAssoc.setSourceMany(bool);
-        }
-        
         customModelUtil.writeCustomContentModel(deserializedModel);
     }
     
@@ -233,20 +154,10 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
 	@Override
 	protected void addParameterDefinitions(List<ParameterDefinition> paramList)
 	{
-	    //TODO Could separate defineCustomChildAssociation out into a separate action.
-        paramList.add(new ParameterDefinitionImpl(PARAM_IS_CHILD, DataTypeDefinition.BOOLEAN, true, null));
-
+        paramList.add(new ParameterDefinitionImpl(PARAM_REFERENCE_TYPE, DataTypeDefinition.TEXT, true, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_NAME, DataTypeDefinition.TEXT, true, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_ROLE_NAME, DataTypeDefinition.TEXT, true, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_ROLE_NAME, DataTypeDefinition.TEXT, true, null));
-	    
-        paramList.add(new ParameterDefinitionImpl(PARAM_DESCRIPTION, DataTypeDefinition.TEXT, false, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_MANDATORY, DataTypeDefinition.BOOLEAN, false, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE_MANY, DataTypeDefinition.BOOLEAN, false, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_MANDATORY, DataTypeDefinition.BOOLEAN, false, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_MANDATORY_ENFORCED, DataTypeDefinition.BOOLEAN, false, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET_MANY, DataTypeDefinition.BOOLEAN, false, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_TITLE, DataTypeDefinition.TEXT, false, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_PROTECTED, DataTypeDefinition.BOOLEAN, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_LABEL, DataTypeDefinition.TEXT, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE, DataTypeDefinition.TEXT, false, null));
+        paramList.add(new ParameterDefinitionImpl(PARAM_TARGET, DataTypeDefinition.TEXT, false, null));
 	}
 }

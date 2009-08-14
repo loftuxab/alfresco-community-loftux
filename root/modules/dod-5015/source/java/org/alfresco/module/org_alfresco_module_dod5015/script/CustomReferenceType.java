@@ -20,34 +20,42 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
-
-import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+package org.alfresco.module.org_alfresco_module_dod5015.script;
 
 /**
- * This superclass of DefineCustomPropertyAction and DefineCustomAssociationAction provides handling of bad 'name'
- * parameters, which is consistent across both subtypes.
+ * This enum represents the allowed types of custom references.
  * 
  * @author Neil McErlean
  */
-public abstract class DefineCustomElementAbstractAction extends RMActionExecuterAbstractBase
+public enum CustomReferenceType
 {
-    private static Log logger = LogFactory.getLog(DefineCustomElementAbstractAction.class);
+	PARENT_CHILD("parentchild"),
+	BIDIRECTIONAL("bidirectional");
 
-    public static final String PARAM_NAME = "name";
-    /**
-     * This is the hard-coded NodeRef where the RMC Custom Model is stored.
-     */
-    public static final NodeRef RM_CUSTOM_MODEL_NODE_REF = new NodeRef("workspace://SpacesStore/records_management_custom_model");
-
-    @Override
-    public NodeRef getImplicitTargetNodeRef()
-    {
-        return DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF;
-    }
+	private final String printableString;
+	
+	private CustomReferenceType(String printableString)
+	{
+		this.printableString = printableString;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return this.printableString;
+	}
+	
+	public static CustomReferenceType getEnumFromString(String stg)
+	{
+		for (CustomReferenceType type : CustomReferenceType.values())
+		{
+			if (type.printableString.equals(stg))
+			{
+				return type;
+			}
+		}
+		throw new IllegalArgumentException("Unrecognised CustomReferenceType: " + stg);
+	}
 }

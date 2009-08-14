@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -44,11 +45,14 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
+import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -56,6 +60,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -80,6 +85,7 @@ import org.json.JSONTokener;
 public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagementModel
 {
     protected static final String GET_TRANSFER_URL_FORMAT = "/api/node/{0}/transfers/{1}";
+    protected static final String REF_INSTANCES_URL_FORMAT = "/api/node/{0}/customreferences";
     protected static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String RMA_CUSTOM_PROPS_URL = "/api/rma/admin/custompropertydefinitions";
@@ -307,16 +313,28 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 //                                 jsonString, APPLICATION_JSON), expectedStatus);
     }
     
-    public void testPostCustomReference() throws IOException, JSONException
+    public void testPostCustomReferences() throws IOException, JSONException
     {
-        // 1. Child association.
-        final String childReferenceName = "rmc:customRefChild" + System.currentTimeMillis();
+        postCustomReferences();
+    }
+
+    /**
+     * This method creates a child and a non-child reference and returns their
+     * names as elements 0 and 1 of the List<String> result.
+     */
+	private List<String> postCustomReferences() throws JSONException, IOException,
+			UnsupportedEncodingException {
+		List<String> result = new ArrayList<String>(2);
+		
+		// 1. Child association.
+        final String childRefUiName = "customRefChild" + System.currentTimeMillis();
+        result.add(childRefUiName);
 
         String jsonString = new JSONStringer().object()
-            .key("name").value(childReferenceName)
-            .key("isChild").value(true)
-            .key("sourceRoleName").value("superseding")
-            .key("targetRoleName").value("superseded")
+            .key("name").value(childRefUiName)
+            .key("referenceType").value(CustomReferenceType.PARENT_CHILD)
+            .key("source").value("superseding")
+            .key("target").value("superseded")
         .endObject()
         .toString();
         
@@ -329,13 +347,13 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(rspContent.contains("success"));
 
         // 2. Non-child or standard association.
-        final String stdReferenceName = "rmc:customRefStandard" + System.currentTimeMillis();
+        final String stdRefUiName = "customRefStandard" + System.currentTimeMillis();
+        result.add(stdRefUiName);
 
         jsonString = new JSONStringer().object()
-            .key("name").value(stdReferenceName)
-            .key("isChild").value(false)
-            .key("sourceRoleName").value("supported")
-            .key("targetRoleName").value("supporting")
+            .key("name").value(stdRefUiName)
+            .key("referenceType").value(CustomReferenceType.BIDIRECTIONAL)
+            .key("label").value("supported")
         .endObject()
         .toString();
         
@@ -351,17 +369,22 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
             dictionaryService.getAspect(QName.createQName(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS, namespaceService));
         assertNotNull("Missing customAssocs aspect", customAssocsAspect);
         
-        QName newRefQname = QName.createQName(childReferenceName, namespaceService);
-        assertTrue("Custom child assoc not returned by dataDictionary.", customAssocsAspect.getAssociations().containsKey(newRefQname));
+        String childRefName = CustomReferenceId.getReferenceIdFor(childRefUiName);
+        QName newRefQname = QName.createQName(childRefName, namespaceService);
+        Map<QName, AssociationDefinition> associations = customAssocsAspect.getAssociations();
+		assertTrue("Custom child assoc not returned by dataDictionary.", associations.containsKey(newRefQname));
 
-        newRefQname = QName.createQName(stdReferenceName, namespaceService);
+        String stdRefName = CustomReferenceId.getReferenceIdFor(stdRefUiName);
+        newRefQname = QName.createQName(stdRefName, namespaceService);
         assertTrue("Custom std assoc not returned by dataDictionary.", customAssocsAspect.getAssociations().containsKey(newRefQname));
-    }
+        
+        return result;
+	}
 
     public void testGetCustomReferences() throws IOException, JSONException
     {
         // Ensure that there is at least one custom reference.
-        this.testPostCustomReference();
+        this.testPostCustomReferences();
 
         final int expectedStatus = 200;
         Response rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL), expectedStatus);
@@ -371,12 +394,63 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONObject dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
         
-        JSONObject customRefsObj = (JSONObject)dataObj.get("customReferences");
+        JSONArray customRefsObj = (JSONArray)dataObj.get("customReferences");
         assertNotNull("JSON 'customProperties' object was null", customRefsObj);
 
         final int customRefsCount = customRefsObj.length();
         assertTrue("There should be at least one custom reference. Found " + customRefsObj, customRefsCount > 0);
+    }
 
+    public void testGetCustomReferenceInstances() throws Exception
+    {
+    	// Create test records.
+        NodeRef recordFolder = retrievePreexistingRecordFolder();
+        NodeRef testRecord1 = createRecord(recordFolder, "testRecord1" + System.currentTimeMillis());
+        NodeRef testRecord2 = createRecord(recordFolder, "testRecord2" + System.currentTimeMillis());
+
+        String node1Url = testRecord1.toString().replace("://", "/");
+        String refInstancesUrl = MessageFormat.format(REF_INSTANCES_URL_FORMAT, node1Url);
+
+        // Create reference types.
+        List<String> referenceNames = postCustomReferences();
+        String childClientRefName = referenceNames.get(0);
+        String stdClientRefName = referenceNames.get(1);
+
+        // Add a standard ref
+        String jsonString = new JSONStringer().object()
+            .key("toNode").value(testRecord2.toString())
+            .key("refId").value(stdClientRefName)
+        .endObject()
+        .toString();
+    
+        Response rsp = sendRequest(new PostRequest(refInstancesUrl,
+	                             jsonString, APPLICATION_JSON), 200);
+
+	    // Add a child ref
+	    jsonString = new JSONStringer().object()
+	    .key("toNode").value(testRecord2.toString())
+	    .key("refId").value(childClientRefName)
+	    .endObject()
+	    .toString();
+	    
+	    rsp = sendRequest(new PostRequest(refInstancesUrl,
+	    		jsonString, APPLICATION_JSON), 200);
+	    
+	    
+        // Now retrieve the applied references from the REST API
+       
+        rsp = sendRequest(new GetRequest(refInstancesUrl), 200);
+
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        
+        JSONObject dataObj = (JSONObject)jsonRsp.get("data");
+        assertNotNull("JSON 'data' object was null", dataObj);
+        
+        JSONArray customRefsArray = (JSONArray)dataObj.get("customReferences");
+        assertNotNull("JSON 'customReferences' object was null", customRefsArray);
+
+        final int customRefsCount = customRefsArray.length();
+        assertTrue("There should be at least one custom reference. Found " + customRefsArray, customRefsCount > 0);
     }
     
     public void testPostCustomProperty() throws Exception
@@ -566,4 +640,40 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         this.nodeService.setProperties(recordOne, propValues);
         this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
     }
+
+    //TODO Extract these methods and those matching in CPRT into TestUtilities
+    private NodeRef retrievePreexistingRecordFolder()
+    {
+        final List<NodeRef> resultNodeRefs = retrieveJanuaryAISVitalFolders();
+        
+        return resultNodeRefs.get(0);
+    }
+
+    private List<NodeRef> retrieveJanuaryAISVitalFolders()
+    {
+        String typeQuery = "TYPE:\"" + TYPE_RECORD_FOLDER + "\" AND @cm\\:name:\"January AIS Audit Records\"";
+        ResultSet types = this.searchService.query(TestUtilities.SPACES_STORE, SearchService.LANGUAGE_LUCENE, typeQuery);
+        
+        final List<NodeRef> resultNodeRefs = types.getNodeRefs();
+        return resultNodeRefs;
+    }
+
+	private NodeRef createRecord(NodeRef recordFolder, String name)
+	{
+    	// Create the document
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        props.put(ContentModel.PROP_NAME, name);
+        NodeRef recordOne = this.nodeService.createNode(recordFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name), 
+                                                        ContentModel.TYPE_CONTENT).getChildRef();
+        
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+        return recordOne;
+	}   
 }

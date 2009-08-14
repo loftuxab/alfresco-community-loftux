@@ -68,8 +68,6 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
-        super.executeImpl(action, actionedUponNodeRef);
-        
         Map<String, Serializable> params = action.getParameterValues();
         if (logger.isDebugEnabled())
         {
