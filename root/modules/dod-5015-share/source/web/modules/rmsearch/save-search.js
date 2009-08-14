@@ -72,9 +72,29 @@
           */
          siteId: "",
          
+         /**
+          * Search query.
+          * 
+          * @property query
+          * @type string
+          */
          query: "",
          
-         params: ""
+         /**
+          * Search parameters in URI encoded name/value pair format.
+          * 
+          * @property params
+          * @type string
+          */
+         params: "",
+         
+         /**
+          * Search sort in comma separated "property/dir" packed format i.e. "cm:name/asc,cm:title/desc"
+          * 
+          * @property sort
+          * @type string
+          */
+         sort: ""
       },
       
       /**
@@ -178,6 +198,7 @@
                // apply hidden field values for query via module options
                Dom.get(this.id + "-query").value = this.options.query;
                Dom.get(this.id + "-params").value = this.options.params;
+               Dom.get(this.id + "-sort").value = this.options.sort;
             },
             obj: null,
             scope: this
@@ -235,7 +256,8 @@
                label: name,
                description: Dom.get(this.id + "-description").value,
                query: this.options.query,
-               params: this.options.params
+               params: this.options.params,
+               sort: this.options.sort
             };
             YAHOO.Bubbling.fire("savedSearchAdded", obj);
             this.widgets.panel.hide();

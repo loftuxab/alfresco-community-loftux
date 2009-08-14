@@ -555,7 +555,8 @@
             this.widgets.sortMenus[i] = new YAHOO.widget.Button(this.id + "-sort" + (i+1),
             {
                type: "menu",
-               menu: this.id + "-sort" + (i+1) + "-menu"
+               menu: this.id + "-sort" + (i+1) + "-menu",
+               lazyloadmenu: false
             });
             this.widgets.sortMenus[i].getMenu().subscribe("click", function(p_sType, p_aArgs, index)
             {
@@ -569,7 +570,8 @@
             this.widgets.sortOrderMenus[i] = new YAHOO.widget.Button(this.id + "-sort" + (i+1) + "-order",
             {
                type: "menu",
-               menu: this.id + "-sort" + (i+1) + "-order-menu"
+               menu: this.id + "-sort" + (i+1) + "-order-menu",
+               lazyloadmenu: false
             });
             this.widgets.sortOrderMenus[i].getMenu().subscribe("click", function(p_sType, p_aArgs, index)
             {
@@ -632,14 +634,14 @@
             scope: this
          });
       },
-
+      
       /**
-       * Build URI parameter string for search JSON data webscript
-       *
-       * @method _buildSearchParams
-       * @param query {string} Query to execute
+       * Build URI sort parameter string for search.
+       * 
+       * @method _buildSortParam
+       * @return {string} The sort parameter string for search.
        */
-      _buildSearchParams: function RecordsResults__buildSearchParams(query)
+      _buildSortParam: function RecordsResults__buildSortParam()
       {
          // encode and pack the sort fields as "property/dir" i.e. "cm:name/asc"
          // comma separated between each property and direction pair
@@ -656,13 +658,24 @@
                sort += field + '/' + this.sortby[i].order;
             }
          }
-         
+         return sort;
+      },
+
+      /**
+       * Build URI parameter string for search JSON data webscript.
+       * 
+       * @method _buildSearchParams
+       * @param query {string} Query to execute
+       * @return {string} The parameters string for search.
+       */
+      _buildSearchParams: function RecordsResults__buildSearchParams(query)
+      {
          // build the parameter string and encode each value
          var params = YAHOO.lang.substitute("site={site}&query={query}&sortby={sortby}&maxResults={maxResults}",
          {
             site: encodeURIComponent(this.options.siteId),
             query : query !== null ? encodeURIComponent(query) : "",
-            sortby : encodeURIComponent(sort),
+            sortby : encodeURIComponent(this._buildSortParam()),
             maxResults : this.options.maxResults + 1 // to be able to know whether we got more results
          });
          

@@ -44,7 +44,8 @@ function main()
                   name: ssNode.name,
                   description: ssNode.properties.description,
                   query: ssJson.query,
-                  params: ssJson.params
+                  params: ssJson.params,
+                  sort: ssJson.sort
                });
             }
          }

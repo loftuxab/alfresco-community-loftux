@@ -174,7 +174,8 @@
                   label: s.name,
                   description: s.description,
                   query: s.query,
-                  params: s.params
+                  params: s.params,
+                  sort: s.sort
                });
             }
          }
@@ -260,7 +261,8 @@
                {
                   siteId: this.options.siteId,
                   query: query,
-                  params: params
+                  params: params,
+                  sort: this._buildSortParam()
                });
             module.show();
          }
@@ -288,6 +290,21 @@
          Dom.get(this.id + "-containers").checked = false;
          Dom.get(this.id + "-terms").value = "";
          
+         // reset sorting options
+         for (var i=0, j=this.widgets.sortMenus.length; i<j; i++)
+         {
+            var menu = this.widgets.sortMenus[i],
+                menuItems = menu.getMenu().getItems();
+            menu.set("label", menuItems[0].cfg.getProperty("text"));
+            this.sortby[i].field = menuItems[0].value;
+            
+            var orderMenu = this.widgets.sortOrderMenus[i],
+                orderMenuItems = orderMenu.getMenu().getItems();
+            orderMenu.set("label", orderMenuItems[0].cfg.getProperty("text"));
+            this.sortby[i].order = orderMenuItems[0].value;
+         }
+         
+         // reset buttons
          this.widgets.saveButton.set("disabled", true);
          this.widgets.searchButton.set("disabled", true);
          
@@ -467,9 +484,40 @@
                // Update the menu button label to be the selected Saved Search
                me.widgets.savedSearchMenu.set("label", menuItem.cfg.getProperty("text"));
                
-               // Rebuild search UI based on saved search parameters
-               // Params are packed into a single string URL encoded
+               // Rebuild search UI based on saved search object
                var searchObj = me.options.savedSearches[menuItem.value];
+               
+               // Sort options are packed into a single string comma separated
+               // in "property/dir" packed format i.e. "cm:name/asc,cm:title/desc"
+               var sorts = (searchObj.sort ? searchObj.sort.split(",") : []);
+               for (var i in sorts)
+               {
+                  // get the correct sort menu and calculate the selected item from the sort value
+                  var pair = sorts[i].split("/"),
+                      menu = me.widgets.sortMenus[i],
+                      menuItems = menu.getMenu().getItems();
+                  for (var m in menuItems)
+                  {
+                     if (menuItems[m].value === pair[0])
+                     {
+                        // apply selected sort field to menu
+                        menu.set("label", menuItems[m].cfg.getProperty("text"));
+                        
+                        // also keep track of the current sort field
+                        me.sortby[i].field = pair[0];
+                        
+                        // apply selected sort direction to menu
+                        var sortDirIndex = (pair[1] === "asc" ? 0 : 1);
+                        var sortDirMenuItem = me.widgets.sortOrderMenus[i].getMenu().getItems()[sortDirIndex];
+                        me.widgets.sortOrderMenus[i].set("label", sortDirMenuItem.cfg.getProperty("text"));
+                        me.sortby[i].order = pair[1];
+                        
+                        break;
+                     }
+                  }
+               }
+               
+               // Params are packed into a single string URL encoded
                var params = (searchObj.params ? searchObj.params.split("&") : []);
                for (var i in params)
                {

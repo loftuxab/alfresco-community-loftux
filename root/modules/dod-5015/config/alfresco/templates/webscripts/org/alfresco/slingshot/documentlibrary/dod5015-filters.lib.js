@@ -13,8 +13,11 @@ var Filters =
       {
          query: "+PATH:\"" + parsedArgs.parentNode.qnamePath + "/*\"",
          limitResults: null,
-         sortBy: "@{http://www.alfresco.org/model/content/1.0}name",
-         sortByAscending: true,
+         sort: [
+         {
+            column: "@{http://www.alfresco.org/model/content/1.0}name",
+            ascending: true
+         }],
          language: "lucene",
          templates: null,
          variablePath: false
@@ -73,6 +76,26 @@ var Filters =
                      template: "%(cm:name cm:title cm:description TEXT)"
                   }];
                   filterParams.language = "fts-alfresco";
+                  // gather up the sort by fields
+                  // they are encoded as "property/dir" i.e. "cm:name/asc"
+                  if (ssJson.sort && ssJson.sort.length != 0)
+                  {
+                     var sortPairs = ssJson.sort.split(",");
+                     var sort = [];
+                     for (var i=0, j; i<sortPairs.length; i++)
+                     {
+                        if (sortPairs[i].length != 0)
+                        {
+                           j = sortPairs[i].indexOf("/");
+                           sort.push(
+                           {
+                              column: sortPairs[i].substring(0, j),
+                              ascending: (sortPairs[i].substring(j+1) == "asc")
+                           });
+                        }
+                     }
+                     filterParams.sort = sort;
+                  }
                }
             }
             break;

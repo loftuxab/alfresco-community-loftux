@@ -19,10 +19,13 @@ function main()
          "description": "the search description",
          "query": "the complete search query string",
          "public": boolean,
-         "params": "terms=keywords:xyz&undeclared=true"
+         "params": "terms=keywords:xyz&undeclared=true",
+         "sort": "cm:name/asc"
       }
       
-      where name and query values are mandatory and params are in URL encoded name/value pair format
+      where: name and query values are mandatory
+             params are in URL encoded name/value pair format
+             sort is in comma separated "property/dir" packed format i.e. "cm:name/asc,cm:title/desc"
    */
    if (json.isNull("name") || json.get("name").length() == 0)
    {
