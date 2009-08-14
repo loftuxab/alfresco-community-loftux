@@ -26,12 +26,14 @@ package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -126,5 +128,28 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
                                   dispositionLifeCycleNodRef, 
                                   ASSOC_TRANSFERRED, 
                                   ASSOC_TRANSFERRED);
+    }
+
+    @Override
+    protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
+    {
+      
+        if(!super.isExecutableImpl(filePlanComponent, parameters, throwException))
+        {
+            return false;
+        }
+        NodeRef transferNodeRef = (NodeRef)AlfrescoTransactionSupport.getResource(KEY_TRANSFER_NODEREF);            
+        if (transferNodeRef != null)
+        {
+            List<ChildAssociationRef> transferredAlready = nodeService.getChildAssocs(transferNodeRef, ASSOC_TRANSFERRED, ASSOC_TRANSFERRED);
+            for(ChildAssociationRef car : transferredAlready)
+            {
+                if(car.getChildRef().equals(filePlanComponent))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

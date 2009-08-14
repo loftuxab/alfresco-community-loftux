@@ -91,10 +91,10 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
      */
     public void setRecordsManagementServiceRegistry(RecordsManagementServiceRegistry serviceRegistry)
     {
+        // Internal ops use the unprotected services from the voter (e.g. nodeService)
         this.serviceRegistry = serviceRegistry;
-        this.nodeService = serviceRegistry.getNodeService();
         this.dictionaryService = serviceRegistry.getDictionaryService();
-        this.rmActionService = serviceRegistry.getRecordsManagementActionService();
+        //this.rmActionService = serviceRegistry.getRecordsManagementActionService();
     }
     
     /**
@@ -115,6 +115,17 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     public void setVoter(RMEntryVoter voter)
     {
         this.voter = voter;
+       
+    }
+
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+
+    public void setRmActionService(RecordsManagementActionService rmActionService)
+    {
+        this.rmActionService = rmActionService;
     }
 
     /**
@@ -141,6 +152,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"), 
                 ASPECT_SCHEDULED, 
                 new JavaBehaviour(this, "onAddAspect", NotificationFrequency.TRANSACTION_COMMIT));
+        
     }
     
     /**

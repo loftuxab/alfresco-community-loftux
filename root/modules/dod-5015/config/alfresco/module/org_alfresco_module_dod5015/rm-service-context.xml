@@ -12,6 +12,8 @@
     <bean id="recordsManagementService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceImpl"
           depends-on="org_alfresco_module_dod5015_dictionaryBootstrap" init-method="init">        
         <property name="recordsManagementServiceRegistry" ref="RecordsManagementServiceRegistry"/>
+        <property name="rmActionService" ref="recordsManagementActionService"/>
+        <property name="nodeService" ref="nodeService"/>
         <property name="policyComponent" ref="policyComponent"/>
         <property name="voter" ref="rmEntryVoter"/>
     </bean>
@@ -44,8 +46,44 @@
         </property>
     </bean>
 
-    <bean id="RecordsManagementService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
-  
+    <bean id="RecordsManagementService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref bean="accessDecisionManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref bean="afterInvocationManager"/>
+        </property>
+        <property name="objectDefinitionSource">
+            <value>
+                <![CDATA[  
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getRecordsManagementRoot=RM.Read.0,AFTER_RM.FilterNode
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isRecord=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isRecordDeclared=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isRecordFolderDeclared=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isRecordFolder=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isRecordsManagementContainer=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getRecordFolders=RM.Read.0,AFTER_RM.FilterNode
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getRecords=RM.Read.0,AFTER_RM.FilterNode
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getDispositionSchedule=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.addDispositionActionDefinition=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.removeDispositionActionDefinition=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.updateDispositionActionDefinition=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isNextDispositionActionEligible=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getNextDispositionAction=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getVitalRecordDefinition=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getProtectedAspects=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getProtectedProperties=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getCapabilities=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getCapability=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getNextRecordIdentifier=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.*=RM_DENY
+                ]]>
+            </value>
+        </property>
+    </bean>
     
     <!-- Records Management Action Service -->
     
@@ -79,7 +117,35 @@
         </property>
     </bean>
 
-    <bean id="RecordsManagementActionService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    
+    <bean id="RecordsManagementActionService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref bean="accessDecisionManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref bean="afterInvocationManager"/>
+        </property>
+        <property name="objectDefinitionSource">
+            <value>
+                <![CDATA[  
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.getRecordsManagementActions=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.getDispositionActions=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.getRecordsManagementAction=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.getDispositionAction=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.executeRecordsManagementAction=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.executeRecordsManagementAction=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.executeRecordsManagementAction=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.executeRecordsManagementAction=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.executeRecordsManagementAction=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.register=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService.*=RM_DENY
+                ]]>
+            </value>
+        </property>
+    </bean>
     
     <!-- Records Management Event Service -->
     
@@ -116,7 +182,32 @@
         </property>
     </bean>
 
-    <bean id="RecordsManagementEventService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+   
+    <bean id="RecordsManagementEventService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref bean="accessDecisionManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref bean="afterInvocationManager"/>
+        </property>
+        <property name="objectDefinitionSource">
+            <value>
+                <![CDATA[  
+                org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService.registerEventType=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService.getEventTypes=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService.getEventType=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService.getEvents=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService.getEvent=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService.addEvent=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService.removeEvent=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService.*=RM_DENY
+                ]]>
+            </value>
+        </property>
+    </bean>
     
     <!-- Records Management Admin Service -->
     
@@ -163,7 +254,28 @@
         </property>
     </bean>
 
-    <bean id="RecordsManagementAdminService_security" class="org.alfresco.repo.security.permissions.impl.AlwaysProceedMethodInterceptor" />
+    
+    <bean id="RecordsManagementAdminService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref bean="accessDecisionManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref bean="afterInvocationManager"/>
+        </property>
+        <property name="objectDefinitionSource">
+            <value>
+                <![CDATA[  
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getAvailableCustomProperties=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getAvailableCustomProperties=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getAvailableCustomReferences=RM_ALLOW
+                    org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.*=RM_DENY
+                ]]>
+            </value>
+        </property>
+    </bean>
     
     <!-- Search Behaviour -->
     

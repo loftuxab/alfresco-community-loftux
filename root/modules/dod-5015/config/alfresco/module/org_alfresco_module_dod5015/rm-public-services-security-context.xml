@@ -73,7 +73,7 @@
         </property>
     </bean>
     
-    <bean id="rmEntryVoter" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter">
+    <bean id="rmEntryVoter" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter" lazy-init="false">
         <!-- Services -->
         <property name="permissionService" ref="permissionService"/>
         <property name="namespacePrefixResolver" ref="namespaceService"/>
