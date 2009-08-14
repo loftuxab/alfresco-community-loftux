@@ -128,6 +128,14 @@
       resultsCount: 0,
       
       /**
+       * Array of NodeRef strings from the search results.
+       * 
+       * @property resultNodeRefs
+       * @type Array
+       */
+      resultNodeRefs: [],
+      
+      /**
        * True if there are more results than the ones listed in the table.
        * 
        * @property hasMoreResults
@@ -484,6 +492,13 @@
                }
                me.resultsCount = oResponse.results.length;
                me.renderLoopSize = 32;
+               
+               // collect noderefs (for export if required)
+               me.resultNodeRefs = new Array(me.resultsCount);
+               for (var i=0, j=me.resultsCount; i<j; i++)
+               {
+                  me.resultNodeRefs[i] = oResponse.results[i].nodeRef;
+               }
                
                // update message area if any
                var el = Dom.get(me.id + "-itemcount");
