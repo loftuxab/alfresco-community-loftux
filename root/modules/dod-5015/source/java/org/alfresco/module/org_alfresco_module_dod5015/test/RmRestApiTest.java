@@ -78,7 +78,7 @@ import org.json.JSONStringer;
 import org.json.JSONTokener;
 
 /**
- * This class tests the Rest API for the submission of RM actions.
+ * This class tests the Rest API for RM.
  * 
  * @author Neil McErlean
  */
@@ -320,7 +320,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 
     /**
      * This method creates a child and a non-child reference and returns their
-     * names as elements 0 and 1 of the List<String> result.
+     * ui/simple names as elements 0 and 1 of the List<String> result.
      */
 	private List<String> postCustomReferences() throws JSONException, IOException,
 			UnsupportedEncodingException {
