@@ -25,14 +25,12 @@
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
-import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
@@ -97,7 +95,6 @@ public class CustomRefPost extends AbstractRmWebScript
     protected Map<String, Object> addCustomReferenceInstance(WebScriptRequest req, JSONObject json) throws JSONException
     {
         NodeRef fromNode = parseRequestForNodeRef(req);
-        //TODO assert exists
 
         Map<String, Object> result = new HashMap<String, Object>();
         
@@ -106,7 +103,11 @@ public class CustomRefPost extends AbstractRmWebScript
 
         String clientsRefId = json.getString("refId");
         String serversRefId = CustomReferenceId.getReferenceIdFor(clientsRefId);
-        //TODO Check for null
+        if (serversRefId == null)
+        {
+            throw new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+            		"Unable to find reference type: " + clientsRefId);
+        }
         
         QName refQName = QName.createQName(serversRefId, namespaceService);
         
