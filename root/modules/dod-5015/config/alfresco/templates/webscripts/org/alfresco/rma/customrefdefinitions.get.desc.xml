@@ -5,6 +5,7 @@
    ]]>
    </description>
    <url>/api/rma/admin/customreferencedefinitions</url>
+   <url>/api/rma/admin/customreferencedefinitions/{refId}</url>
    <format default="json"/>
    <authentication>user</authentication>
    <transaction allow="readonly">required</transaction>

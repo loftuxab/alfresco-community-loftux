@@ -30,14 +30,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
+import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,9 +53,17 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
 {
+	private final static String PARAM_REF_ID = "refId";
     private static Log logger = LogFactory.getLog(CustomReferenceDefinitionsGet.class);
-    private RecordsManagementAdminService rmAdminService;
     
+    private RecordsManagementAdminService rmAdminService;
+    private NamespaceService namespaceService;
+    
+    public void setNamespaceService(NamespaceService namespaceService)
+    {
+    	this.namespaceService = namespaceService;
+    }
+
     public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
     {
         this.rmAdminService = rmAdminService;
@@ -62,6 +74,9 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
     {
         Map<String, Object> model = new HashMap<String, Object>();
         
+        Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
+        String refId = templateVars.get(PARAM_REF_ID);
+        
     	if (logger.isDebugEnabled())
     	{
     		logger.debug("Getting custom reference definitions");
@@ -69,8 +84,26 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
 
     	Map<QName, AssociationDefinition> currentCustomRefs = rmAdminService.getAvailableCustomReferences();
 
-    	List<Map<String, String>> listOfReferenceData = new ArrayList<Map<String, String>>();
+    	// If refId has been provided then this is a request for a single custom-ref-defn.
+        // else it is a request for them all.
+        if (refId != null)
+        {
+        	String qname = CustomReferenceId.getReferenceIdFor(refId);
+        	QName qn = QName.createQName(qname, namespaceService);
+        	
+        	AssociationDefinition assDef = currentCustomRefs.get(qn);
+        	if (assDef == null)
+        	{
+                throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND,
+                		"Unable to find reference: " +  refId);
+        	}
 
+        	currentCustomRefs = new HashMap<QName, AssociationDefinition>(1);
+        	currentCustomRefs.put(qn, assDef);
+        }
+
+        List<Map<String, String>> listOfReferenceData = new ArrayList<Map<String, String>>();
+        
         for (Entry<QName, AssociationDefinition> entry : currentCustomRefs.entrySet())
         {
     		Map<String, String> data = new HashMap<String, String>();
