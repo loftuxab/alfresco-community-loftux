@@ -384,8 +384,10 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     public void testGetCustomReferences() throws IOException, JSONException
     {
         // Ensure that there is at least one custom reference.
-        this.testPostCustomReferences();
+        List<String> uiNames = postCustomReferences();
+        String childRefUiName = uiNames.get(0);
 
+        // GET all custom reference definitions
         final int expectedStatus = 200;
         Response rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL), expectedStatus);
 
@@ -397,8 +399,23 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONArray customRefsObj = (JSONArray)dataObj.get("customReferences");
         assertNotNull("JSON 'customProperties' object was null", customRefsObj);
 
-        final int customRefsCount = customRefsObj.length();
-        assertTrue("There should be at least one custom reference. Found " + customRefsObj, customRefsCount > 0);
+        assertTrue("There should be at least two custom references. Found " + customRefsObj, customRefsObj.length() >= 2);
+
+        // GET a specific custom reference definition
+        rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL + "/" + childRefUiName), expectedStatus);
+
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+
+        dataObj = (JSONObject)jsonRsp.get("data");
+        assertNotNull("JSON 'data' object was null", dataObj);
+        
+        customRefsObj = (JSONArray)dataObj.get("customReferences");
+        assertNotNull("JSON 'customProperties' object was null", customRefsObj);
+
+        assertTrue("There should be exactly 1 custom references. Found " + customRefsObj.length(), customRefsObj.length() == 1);
+        
+        JSONObject soleRef = customRefsObj.getJSONObject(0);
+        assertEquals(childRefUiName, soleRef.getString("name"));
     }
 
     public void testGetCustomReferenceInstances() throws Exception
