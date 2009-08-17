@@ -14,7 +14,7 @@
   &nbsp;&nbsp;&nbsp;"label" : "bar"<br/>
   }<br/>
   For parentchild references, source and target must be provided. For bidirectional references,
-  a label is required.
+  a label is required. A name is always required and cannot contain whitespace.
   ]]>
   </description>
   <url>/api/rma/admin/customreferencedefinitions</url>
