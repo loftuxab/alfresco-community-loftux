@@ -62,13 +62,17 @@
       </#if>
    </#if>
    
-   <#list set.children as item>
-      <#if item.kind == "set">
-         <@renderSet set=item />
-      <#else>
-         <@renderField field=form.fields[item.id] />
-      </#if>
-   </#list>
+   <#if set.template??>
+      <#include "${set.template}" />
+   <#else>
+      <#list set.children as item>
+         <#if item.kind == "set">
+            <@renderSet set=item />
+         <#else>
+            <@renderField field=form.fields[item.id] />
+         </#if>
+      </#list>
+   </#if>
    
    <#if set.appearance?exists>
       <#if set.appearance == "fieldset">

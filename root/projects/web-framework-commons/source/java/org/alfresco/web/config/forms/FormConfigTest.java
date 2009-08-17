@@ -130,6 +130,9 @@ public class FormConfigTest extends BaseTest
                 .getAppearance());
         assertEquals("Set parent was wrong.", "panel", sets.get("user")
                 .getAppearance());
+        
+        assertNull(sets.get("details").getTemplate());
+        assertEquals("custom-layout.ftl", sets.get("user").getTemplate());
     }
 
     /**

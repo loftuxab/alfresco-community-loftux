@@ -189,8 +189,9 @@ class FormElementReader implements ConfigElementReader
             String appearance = setElem.attributeValue(ATTR_APPEARANCE);
             String label = setElem.attributeValue(ATTR_LABEL);
             String labelId = setElem.attributeValue(ATTR_LABEL_ID);
+            String template = setElem.attributeValue(ATTR_TEMPLATE);
             
-            result.addSet(setId, parentSetId, appearance, label, labelId);
+            result.addSet(setId, parentSetId, appearance, label, labelId, template);
         }
     }
 
