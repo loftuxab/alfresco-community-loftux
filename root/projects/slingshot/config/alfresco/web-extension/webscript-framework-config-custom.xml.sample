@@ -45,12 +45,19 @@
    <config evaluator="string-compare" condition="Remote">
 		<remote>
          
+			<connector>
+				<id>alfrescoCookie</id>
+				<name>Alfresco Connector</name>
+				<description>Connects to an Alfresco instance using cookie-based authentication</description>
+				<class>org.alfresco.connector.AlfrescoConnector</class>
+			</connector>
+
 			<endpoint>
 				<id>alfresco</id>
 				<name>Alfresco - user access</name>
 				<description>Access to Alfresco Repository WebScripts that require user authentication</description>
-				<connector-id>alfresco</connector-id>
-				<endpoint-url>http://yourserver:8080/alfresco/wcs</endpoint-url>
+				<connector-id>alfrescoCookie</connector-id>
+				<endpoint-url>http://localhost:8080/alfresco/wcs</endpoint-url>
 				<identity>user</identity>
 				<external-auth>true</external-auth>
 			</endpoint>
