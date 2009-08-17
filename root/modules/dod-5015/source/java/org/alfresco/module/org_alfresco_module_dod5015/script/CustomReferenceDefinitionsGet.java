@@ -117,8 +117,6 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
     		
 			data.put("referenceType", referenceType.toString());
 
-			data.put("name", crId.getUiName());
-			
 			String label = crId.getLabel();
 			if (!label.equals("null")) data.put("label", label);
 			

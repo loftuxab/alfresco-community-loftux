@@ -81,7 +81,6 @@ public class CustomRefsGet extends AbstractRmWebScript
     		data.put("targetRef", assRef.getTargetRef().toString());
 
     		CustomReferenceId crId = new CustomReferenceId(typeQName.toPrefixString());
-			data.put("name", crId.getUiName());
 			data.put("label", crId.getLabel());
 			data.put("referenceType", CustomReferenceType.BIDIRECTIONAL.toString());
     		
@@ -99,7 +98,6 @@ public class CustomRefsGet extends AbstractRmWebScript
     		data.put("parentRef", childAssRef.getParentRef().toString());
 
     		CustomReferenceId crId = new CustomReferenceId(typeQName.toPrefixString());
-			data.put("name", crId.getUiName());
 			data.put("source", crId.getSource());
 			data.put("target", crId.getTarget());
 			data.put("referenceType", CustomReferenceType.PARENT_CHILD.toString());

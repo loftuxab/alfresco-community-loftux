@@ -87,10 +87,6 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
         {
             this.createCustomStandardAssoc(action, actionedUponNodeRef);
         }
-        
-        // A note on source and target role names:
-        // The role names are required to have valid namespace prefixes e.g. "cm:" or "rmc:"
-        // The subsequent part of the role name is just a string and is not validated.
 	}
 	
 
@@ -110,10 +106,9 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
         M2Model deserializedModel = customModelUtil.readCustomContentModel();
         M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
 
-        String name = (String)params.get(PARAM_NAME);
         String label = (String)params.get(PARAM_LABEL);
         
-        CustomReferenceId crId = new CustomReferenceId(name, label, null, null);
+        CustomReferenceId crId = new CustomReferenceId(label, null, null);
         
         M2Association newAssoc = customAssocsAspect.createAssociation(crId.getReferenceId());
 
@@ -133,11 +128,10 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
         M2Model deserializedModel = customModelUtil.readCustomContentModel();
         M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
 
-        String name = (String)params.get(PARAM_NAME);
         String source = (String)params.get(PARAM_SOURCE);
         String target = (String)params.get(PARAM_TARGET);
 
-        CustomReferenceId crId = new CustomReferenceId(name, null, source, target);
+        CustomReferenceId crId = new CustomReferenceId(null, source, target);
 
         M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(crId.getReferenceId());
 
@@ -155,7 +149,6 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
 	protected void addParameterDefinitions(List<ParameterDefinition> paramList)
 	{
         paramList.add(new ParameterDefinitionImpl(PARAM_REFERENCE_TYPE, DataTypeDefinition.TEXT, true, null));
-        paramList.add(new ParameterDefinitionImpl(PARAM_NAME, DataTypeDefinition.TEXT, true, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_LABEL, DataTypeDefinition.TEXT, false, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_SOURCE, DataTypeDefinition.TEXT, false, null));
         paramList.add(new ParameterDefinitionImpl(PARAM_TARGET, DataTypeDefinition.TEXT, false, null));

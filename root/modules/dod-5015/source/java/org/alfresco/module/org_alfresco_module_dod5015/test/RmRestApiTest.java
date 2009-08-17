@@ -319,22 +319,18 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     }
 
     /**
-     * This method creates a child and a non-child reference and returns their
-     * ui/simple names as elements 0 and 1 of the List<String> result.
+     * This method creates a child and a non-child reference and returns the system-time
+     * used in creating unique labels, sources and targets.
      */
-	private List<String> postCustomReferences() throws JSONException, IOException,
+	private long postCustomReferences() throws JSONException, IOException,
 			UnsupportedEncodingException {
-		List<String> result = new ArrayList<String>(2);
+		long now = System.currentTimeMillis();
 		
 		// 1. Child association.
-        final String childRefUiName = "customRefChild" + System.currentTimeMillis();
-        result.add(childRefUiName);
-
         String jsonString = new JSONStringer().object()
-            .key("name").value(childRefUiName)
             .key("referenceType").value(CustomReferenceType.PARENT_CHILD)
-            .key("source").value("superseding")
-            .key("target").value("superseded")
+            .key("source").value("superseding" + now)
+            .key("target").value("superseded" + now)
         .endObject()
         .toString();
         
@@ -347,13 +343,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(rspContent.contains("success"));
 
         // 2. Non-child or standard association.
-        final String stdRefUiName = "customRefStandard" + System.currentTimeMillis();
-        result.add(stdRefUiName);
-
         jsonString = new JSONStringer().object()
-            .key("name").value(stdRefUiName)
             .key("referenceType").value(CustomReferenceType.BIDIRECTIONAL)
-            .key("label").value("supported")
+            .key("label").value("supported" + now)
         .endObject()
         .toString();
         
@@ -369,23 +361,22 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
             dictionaryService.getAspect(QName.createQName(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS, namespaceService));
         assertNotNull("Missing customAssocs aspect", customAssocsAspect);
         
-        String childRefName = CustomReferenceId.getReferenceIdFor(childRefUiName);
+        String childRefName = CustomReferenceId.getReferenceIdFor("superseding" + now + CustomReferenceId.SEPARATOR + "superseded" + now);
         QName newRefQname = QName.createQName(childRefName, namespaceService);
         Map<QName, AssociationDefinition> associations = customAssocsAspect.getAssociations();
 		assertTrue("Custom child assoc not returned by dataDictionary.", associations.containsKey(newRefQname));
 
-        String stdRefName = CustomReferenceId.getReferenceIdFor(stdRefUiName);
+        String stdRefName = CustomReferenceId.getReferenceIdFor("supported" + now);
         newRefQname = QName.createQName(stdRefName, namespaceService);
         assertTrue("Custom std assoc not returned by dataDictionary.", customAssocsAspect.getAssociations().containsKey(newRefQname));
         
-        return result;
+        return now;
 	}
 
     public void testGetCustomReferences() throws IOException, JSONException
     {
         // Ensure that there is at least one custom reference.
-        List<String> uiNames = postCustomReferences();
-        String childRefUiName = uiNames.get(0);
+        final long now = postCustomReferences();
 
         // GET all custom reference definitions
         final int expectedStatus = 200;
@@ -402,7 +393,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue("There should be at least two custom references. Found " + customRefsObj, customRefsObj.length() >= 2);
 
         // GET a specific custom reference definition
-        rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL + "/" + childRefUiName), expectedStatus);
+        rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL + "/supported" + now), expectedStatus);
 
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
 
@@ -413,9 +404,6 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertNotNull("JSON 'customProperties' object was null", customRefsObj);
 
         assertTrue("There should be exactly 1 custom references. Found " + customRefsObj.length(), customRefsObj.length() == 1);
-        
-        JSONObject soleRef = customRefsObj.getJSONObject(0);
-        assertEquals(childRefUiName, soleRef.getString("name"));
     }
 
     public void testGetCustomReferenceInstances() throws Exception
@@ -429,14 +417,12 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         String refInstancesUrl = MessageFormat.format(REF_INSTANCES_URL_FORMAT, node1Url);
 
         // Create reference types.
-        List<String> referenceNames = postCustomReferences();
-        String childClientRefName = referenceNames.get(0);
-        String stdClientRefName = referenceNames.get(1);
+        final long now = postCustomReferences();
 
         // Add a standard ref
         String jsonString = new JSONStringer().object()
             .key("toNode").value(testRecord2.toString())
-            .key("refId").value(stdClientRefName)
+            .key("refId").value("supported" + now)
         .endObject()
         .toString();
     
@@ -446,7 +432,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 	    // Add a child ref
 	    jsonString = new JSONStringer().object()
 	    .key("toNode").value(testRecord2.toString())
-	    .key("refId").value(childClientRefName)
+	    .key("refId").value("superseding" + now + "__" + "superseded" + now)
 	    .endObject()
 	    .toString();
 	    
