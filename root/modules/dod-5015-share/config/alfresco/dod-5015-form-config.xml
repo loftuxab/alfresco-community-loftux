@@ -205,127 +205,38 @@
    <config evaluator="node-type" condition="cm:content">
       <forms>
          <form id="rm">
+            <view-form template="record-metadata.ftl" />
+            <edit-form template="record-metadata.ftl" />
+            
             <field-visibility>
-               <hide id="sys:node-uuid" />
-               <hide id="sys:store-protocol" />
-               <hide id="sys:store-identifier" />
-               <hide id="sys:node-dbid" />
-               <hide id="cm:accessed" />
-               <hide id="cm:contains" />
-               <hide id="cm:taggable" />
-               <hide id="cm:owner" for-mode="edit" />
-               <hide id="cm:creator" for-mode="edit" />
-               <hide id="cm:created" for-mode="edit" />
-               <hide id="cm:modifier" for-mode="edit" />
-               <hide id="cm:modified" for-mode="edit" />
-               <hide id="size" for-mode="edit" />
-               <hide id="encoding" />
-               <hide id="cm:autoVersionOnUpdateProps" />
-               <hide id="cm:autoVersion" />
-               <hide id="cm:initialVersion" />
-               <hide id="cm:versionLabel" />
-               <hide id="cm:content" />
-               <hide id="cm:thumbnails" />
-               <hide id="cm:automaticUpdate" />
-               <hide id="cm:originator" />
-               <hide id="cm:addressee" />
-               <hide id="cm:addressees" />
-               <hide id="cm:subjectline" />
-               <hide id="cm:sentdate" />
                <!-- NOTE: This is a test property and should be removed from the model! -->
                <hide id="rma:projectNameList" />
-               <!--  -->
-               <hide id="rma:recordSearchDispositionActionName" />
-               <hide id="rma:recordSearchDispositionActionAsOf" />
-               <hide id="rma:recordSearchDispositionEventsEligible" />
-               <hide id="rma:recordSearchDispositionEvents" />
-               <hide id="rma:nextDispositionAction" />
-               <hide id="rma:dispositionActionHistory" />
+               
+               <!-- explicitly hide mandatory fields we don't want in edit mode -->
+               <hide id="cm:automaticUpdate" />
+               <hide id="rma:dateFiled" for-mode="edit" />
                <hide id="rma:frozenBy" />
                <hide id="rma:frozenAt" />
-               <hide id="rma:dateFiled" for-mode="edit" />
-               <hide id="rma:reviewAsOf" for-mode="edit" />
-               <hide id="rma:cutOffDate" for-mode="edit" />
             </field-visibility>
-            <appearance>
-               <set id="id-status" label-id="label.set.idStatus" appearance="panel" />
-               <set id="general" label-id="label.set.general" appearance="panel" />
-               <set id="record" label-id="label.set.record" appearance="panel" />
-               <set id="scanned-record" label-id="label.set.scannedRecord" appearance="panel" />
-               <set id="pdf-record" label-id="label.set.pdfRecord" appearance="panel" />
-               <set id="photo-record" label-id="label.set.photoRecord" appearance="panel" />
-               <set id="web-record" label-id="label.set.webRecord" appearance="panel" />
-               <set id="correspondence" label-id="label.set.correspondence" appearance="panel" />
-               <set id="security" label-id="label.set.security" appearance="panel" />
-               <set id="vital-record" label-id="label.set.vitalRecord" appearance="panel" />
-               <set id="disposition" label-id="label.set.disposition" appearance="panel" />
-               <set id="rm-custom" label-id="label.set.customMetadata" appearance="panel" />
             
-               <!-- Identification and Status Fields -->
-               <field id="cm:name" set="id-status" />
-               <field id="rma:identifier" set="id-status" label-id="label.recordIdentifier" />
-               <field id="cm:title" set="id-status">
+            <appearance>
+               <set id="rm-custom" label-id="label.set.customMetadata" appearance="panel" />
+               
+               <field id="rma:identifier" label-id="label.recordIdentifier" />
+               <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
-               <field id="cm:description" set="id-status">
+               <field id="cm:description">
                   <control>
                      <control-param name="activateLinks">true</control-param>
                   </control>
                </field>
-               <!-- ???
-               <field id="rma:declared" set="id-status" />
-               <field id="rma:dateDeclared" set="id-status" /> 
-               -->
-               <field id="cm:owner" set="id-status" />
-               <field id="cm:author" set="id-status" />
-               
-               <!-- General Fields -->
-               <field id="cm:creator" set="general" />
-               <field id="cm:creator" set="general" />
-               <field id="cm:created" set="general" />
-               <field id="cm:modifier" set="general" />
-               <field id="cm:modified" set="general" />
-               <field id="mimetype" set="general">
+               <field id="mimetype">
                   <control template="/org/alfresco/components/form/controls/mimetype.ftl" />
                </field>
-               <field id="size" set="general">
+               <field id="size">
                   <control template="/org/alfresco/components/form/controls/size.ftl" />
                </field>
-               
-               <!-- Record Fields -->
-               <!-- <field id="rma:recordType" set="record" /> -->
-               <field id="rma:originator" set="record" />
-               <field id="rma:originatingOrganization" set="record" />
-               <field id="rma:dateFiled" set="record" />
-               <field id="rma:publicationDate" set="record" />
-               <field id="rma:location" set="record" />
-               <field id="rma:mediaType" set="record" />
-               <field id="rma:format" set="record" />
-               
-               <!-- Scanned Record Fields -->
-               <!-- PDF Record Fields -->
-               <!-- Photo Record Fields -->
-               <!-- Web Record Fields -->
-               
-               <!-- Correspondence Fields -->
-               <field id="rma:dateReceived" set="correspondence" />
-               <field id="rma:address" set="correspondence" />
-               <field id="rma:otherAddress" set="correspondence" />
-               
-               <!-- Security Fields -->
-               <field id="rma:supplementalMarkingList" set="security" />
-               
-               <!-- Vital Records Fields -->
-               <field id="rma:vitalRecordIndicator" set="vital-record" />
-               <field id="rma:reviewPeriod" set="vital-record" />
-               <field id="rma:reviewAsOf" set="vital-record" />
-               
-               <!-- Disposition Fields -->
-               <field id="rma:cutOffDate" set="disposition" />
-               
-               <!--  -->
-               <!-- TODO: Define sets for all aspects that could potentially be applied -->
-               <!--  -->
             </appearance>
          </form>
       </forms>
