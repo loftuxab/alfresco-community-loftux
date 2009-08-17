@@ -12,9 +12,10 @@
  * Outputs:
  *  data.items/data.error - object containing list of search results
  */
+
 const DEFAULT_MAX_RESULTS = 500;
 const SITES_SPACE_QNAME_PATH = "/app:company_home/st:sites/";
-
+const QUERY_TEMPLATES = {field: "KEYWORDS", template: "%(cm:name cm:title cm:description TEXT)"};
 
 /**
  * Returns person display name string as returned to the user.
@@ -59,18 +60,29 @@ function getRecord(siteId, node)
    };
    
    // specific type related properties
+   // TODO: add caveat permission check for ViewRecords for parent folder access check?
+   var parent = node.parent;
+   item.parentFolder = "";
    if (node.isContainer)
    {
       item.size = -1;
       var displayPaths = node.displayPath.split("/");
-      var relPath = "/" + displayPaths.slice(5, displayPaths.length).join("/");
-      relPath += (relPath.length > 1 ? ("/" + node.name) : (node.name));
-      item.browseUrl = "documentlibrary?path=" + encodeURIComponent(relPath);
+      if (displayPaths.length >= 5)
+      {
+         if (displayPaths.length > 5)
+         {
+            item.parentFolder = parent.name;
+         }
+         var relPath = "/" + displayPaths.slice(5, displayPaths.length).join("/");
+         relPath += (relPath.length > 1 ? ("/" + node.name) : (node.name));
+         item.browseUrl = "documentlibrary?path=" + encodeURIComponent(relPath);
+      }
    }
    else
    {
       item.size = node.size;
       item.browseUrl = "document-details?nodeRef=" + node.nodeRef.toString();
+      item.parentFolder = parent.name;
    }
    
    // generated properties
@@ -159,8 +171,7 @@ function getSearchResults(query, sort, maxResults, siteId)
       language: "fts-alfresco",
       page: {maxItems: maxResults},
       sort: sorts,
-      // we define RM helper query templates
-      templates: [ {field: "KEYWORDS", template: "%(cm:name cm:title cm:description TEXT)"} ]
+      templates: [ QUERY_TEMPLATES ]
    };
    nodes = search.query(queryDef);
    

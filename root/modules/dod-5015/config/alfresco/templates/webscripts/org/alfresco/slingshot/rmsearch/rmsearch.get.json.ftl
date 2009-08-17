@@ -17,7 +17,8 @@
 			"createdByUser": "${item.createdByUser}",
 			"createdBy": "${item.createdBy}",
 			"size": ${item.size?c},
-			"browseUrl": "${item.browseUrl}",
+			<#if item.browseUrl??>"browseUrl": "${item.browseUrl}",</#if>
+			"parentFolder": "${item.parentFolder!""}",
 			"properties":
 			{
 			<#assign first=true>
