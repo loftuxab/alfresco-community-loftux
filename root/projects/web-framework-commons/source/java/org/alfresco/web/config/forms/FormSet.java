@@ -16,26 +16,34 @@ public class FormSet
     private final String appearance;
     private final String label;
     private final String labelId;
+    private final String template;
     
     /**
-     * This filed will be null for a 'root' set.
+     * This field will be null for a 'root' set.
      */
     private FormSet parent;
     private List<FormSet> children = new ArrayList<FormSet>();
     
     public FormSet(String setId)
     {
-        this(setId, null, null, null, null);
+        this(setId, null, null, null, null, null);
     }
     
     public FormSet(String setId, String parentId, String appearance,
-                   String label, String labelId)
+             String label, String labelId)
+   {
+        this(setId, parentId, appearance, label, labelId, null);
+   }
+    
+    public FormSet(String setId, String parentId, String appearance,
+                   String label, String labelId, String template)
     {
         this.setId = setId;
         this.parentId = parentId;
         this.appearance = appearance;
         this.label = label;
         this.labelId = labelId;
+        this.template = template;
     }
     public String getSetId()
     {
@@ -58,6 +66,11 @@ public class FormSet
     public String getLabelId()
     {
         return this.labelId;
+    }
+    
+    public String getTemplate()
+    {
+        return this.template;
     }
     
     public FormSet getParent()
@@ -92,7 +105,7 @@ public class FormSet
         result.append("Set: id='").append(setId).append("' parentId='")
             .append(parentId).append("' appearance='").append(appearance)
             .append("' label='").append(label).append("' labelId='").append(labelId)
-            .append("'");
+            .append("' template='").append(template).append("'");
 
         return result.toString();
     }

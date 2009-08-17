@@ -41,7 +41,7 @@
 	         </field-visibility>
 	         <appearance>
 	            <set id="details" appearance="fieldset" />
-	            <set id="user" parent="details" appearance="panel" />
+	            <set id="user" parent="details" appearance="panel" template="custom-layout.ftl" />
 	            
 	            <field id="name" label="Name" label-id="field_label_name" read-only="true" set="details"
 	                     help="This is the name of the node" help-id="field_help_name" >

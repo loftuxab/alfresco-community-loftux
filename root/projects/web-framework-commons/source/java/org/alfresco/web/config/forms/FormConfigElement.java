@@ -170,7 +170,8 @@ public class FormConfigElement extends ConfigElementAdapter
             String appearance = nextOldSetData.getAppearance();
             String label = nextOldSetData.getLabel();
             String labelId = nextOldSetData.getLabelId();
-            result.addSet(setId, parentId, appearance, label, labelId);
+            String template = nextOldSetData.getTemplate();
+            result.addSet(setId, parentId, appearance, label, labelId, template);
         }
         for (String nextNewSet : otherFormElem.sets.keySet())
         {
@@ -180,7 +181,8 @@ public class FormConfigElement extends ConfigElementAdapter
             String appearance = nextNewSetData.getAppearance();
             String label = nextNewSetData.getLabel();
             String labelId = nextNewSetData.getLabelId();
-            result.addSet(setId, parentId, appearance, label, labelId);
+            String template = nextNewSetData.getTemplate();
+            result.addSet(setId, parentId, appearance, label, labelId, template);
         }
     }
 
@@ -706,10 +708,16 @@ public class FormConfigElement extends ConfigElementAdapter
     }
     
     /* package */void addSet(String setId, String parentSetId, String appearance,
-                             String label, String labelId)
+             String label, String labelId)
+    {
+        this.addSet(setId, parentSetId, appearance, label, labelId, null);
+    }
+    
+    /* package */void addSet(String setId, String parentSetId, String appearance,
+                             String label, String labelId, String template)
     {
         FormSet newFormSetObject = new FormSet(setId, parentSetId, appearance, 
-                    label, labelId);
+                    label, labelId, template);
         
         // We disallow the declaration of sets whose parents do not already exist.
         // The reason for this is to ensure that cycles within the parent structure

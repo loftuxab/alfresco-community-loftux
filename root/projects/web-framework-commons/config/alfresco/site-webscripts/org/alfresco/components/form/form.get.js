@@ -782,6 +782,7 @@ function createSetUsingFields(mode, setConfig, formModel, formConfig, fieldsForS
       kind: "set",
       id: setConfig.setId,
       appearance: setConfig.appearance,
+      template: setConfig.template,
       label: getSetLabel(setConfig),
       children: []
    };
