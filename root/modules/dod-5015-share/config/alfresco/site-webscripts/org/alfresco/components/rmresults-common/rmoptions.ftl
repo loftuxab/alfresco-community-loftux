@@ -25,11 +25,15 @@
                      <label for="${el}-metadata-description">${msg("label.description")}</label>
                   </li>
                   <li>
+                     <input type="checkbox" id="${el}-metadata-parentFolder" checked="checked" />
+                     <label for="${el}-metadata-parentFolder">${msg("label.parentFolder")}</label>
+                  </li>
+                  <li>
                      <input type="checkbox" id="${el}-metadata-creator" />
                      <label for="${el}-metadata-creator">${msg("label.creator")}</label>
                   </li>
                   <li>
-                     <input type="checkbox" id="${el}-metadata-created" checked="checked" />
+                     <input type="checkbox" id="${el}-metadata-created" />
                      <label for="${el}-metadata-created">${msg("label.created")}</label>
                   </li>
                   <li>

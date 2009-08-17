@@ -252,7 +252,7 @@
          this.widgets.dataSource.connXhrMode = "queueRequests";
          // add the well known 'cm' fields and 'rma' namespace
          var fields = ["nodeRef", "type", "name", "title", "description", "modifiedOn", "modifiedByUser", "modifiedBy",
-                       "createdOn", "createdByUser", "createdBy", "size", "browseUrl",
+                       "createdOn", "createdByUser", "createdBy", "size", "browseUrl", "parentFolder",
                        "properties.rma_identifier", "properties.rma_dateFiled", "properties.rma_publicationDate", "properties.rma_dateReceived",
                        "properties.rma_originator", "properties.rma_originatingOrganization", "properties.rma_mediaType", "properties.rma_format", "properties.rma_location",
                        "properties.rma_address", "properties.rma_supplementalMarkingList", "properties.rma_reviewAsOf"];
@@ -428,8 +428,9 @@
             { key: "name", label: me._msg("label.name"), field: "name", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
             { key: "title", label: me._msg("label.title"), field: "title", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
             { key: "description", label: me._msg("label.description"), field: "description", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "parentFolder", label: me._msg("label.parentFolder"), field: "parentFolder", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
             { key: "creator", label: me._msg("label.creator"), field: "createdBy", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
-            { key: "created", label: me._msg("label.created"), field: "createdOn", sortable: true, resizeable: true, formatter: renderCellDate },
+            { key: "created", label: me._msg("label.created"), field: "createdOn", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true },
             { key: "modifier", label: me._msg("label.modifier"), field: "modifiedBy", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
             { key: "modified", label: me._msg("label.modified"), field: "modifiedOn", sortable: true, resizeable: true, formatter: renderCellDate },
             { key: "originator", label: me._msg("label.originator"), field: "properties.rma_originator", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
