@@ -36,7 +36,6 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
@@ -55,7 +54,6 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
@@ -208,12 +206,14 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
     
     public void testCreateAndUseCustomChildReference() throws Exception
     {
-        createAndUseCustomReference(CustomReferenceType.PARENT_CHILD, null, "superseded", "superseding");
+    	long now = System.currentTimeMillis();
+        createAndUseCustomReference(CustomReferenceType.PARENT_CHILD, null, "superseded" + now, "superseding" + now);
     }
 
     public void testCreateAndUseCustomNonChildReference() throws Exception
     {
-    	createAndUseCustomReference(CustomReferenceType.BIDIRECTIONAL, "supporting", null, null);
+    	long now = System.currentTimeMillis();
+    	createAndUseCustomReference(CustomReferenceType.BIDIRECTIONAL, "supporting" + now, null, null);
     }
     
 	private void createAndUseCustomReference(CustomReferenceType refType, String label, String source, String target) throws Exception
@@ -232,11 +232,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         declareRecord(testRecord1);
         declareRecord(testRecord2);
 
-        // Define a custom reference.
-        final String uiRefName = "customReference" + System.currentTimeMillis();
-
         Map <String, Serializable> params = new HashMap<String, Serializable>();
-        params.put("name", uiRefName);
         params.put("referenceType", refType.toString());
         if (label != null) params.put("label", label);
         if (source != null) params.put("source", source);
@@ -251,7 +247,15 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         txn2.begin();
 
         // Confirm the custom reference is included in the list from rmAdminService.
-        String uid = CustomReferenceId.getReferenceIdFor(uiRefName);
+        String uid;
+        if (label != null)
+        {
+        	uid = CustomReferenceId.getReferenceIdFor(label);
+        }
+        else
+        {
+        	uid = CustomReferenceId.getReferenceIdFor(source + CustomReferenceId.SEPARATOR + target);
+        }
         final QName refDefinitionQName = QName.createQName(uid, namespaceService);
         
         Map<QName, AssociationDefinition> customRefDefinitions = rmAdminService.getAvailableCustomReferences();
@@ -266,8 +270,6 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         QName assocsAspectQName = QName.createQName("rmc:customAssocs", namespaceService);
         nodeService.addAspect(testRecord1, assocsAspectQName, null);
 
-        String assocInstanceQNameString = "rmc:" + target;
-		QName assocInstanceQName = QName.createQName(assocInstanceQNameString, namespaceService);
 		if (CustomReferenceType.PARENT_CHILD.equals(refType))
 		{
 			nodeService.addChild(testRecord1, testRecord2, refDefinitionQName, refDefinitionQName);

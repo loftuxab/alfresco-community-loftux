@@ -7,14 +7,13 @@
   <br/>
   The body of the post should be in the form, e.g.<br/>
   {<br/>
-  &nbsp;&nbsp;&nbsp;"name" : "sampleCustomReference",<br/>
   &nbsp;&nbsp;&nbsp;"referenceType" : ""parentchild" OR "bidirectional",<br/>
   &nbsp;&nbsp;&nbsp;"source" : "foo",<br/>
   &nbsp;&nbsp;&nbsp;"target" : "bar"<br/>
   &nbsp;&nbsp;&nbsp;"label" : "bar"<br/>
   }<br/>
   For parentchild references, source and target must be provided. For bidirectional references,
-  a label is required. A name is always required and cannot contain whitespace.
+  a label is required.
   ]]>
   </description>
   <url>/api/rma/admin/customreferencedefinitions</url>

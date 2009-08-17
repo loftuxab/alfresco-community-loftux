@@ -24,8 +24,8 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,43 +34,42 @@ import org.alfresco.service.namespace.QName;
 
 /**
  * This class contains the definitions and conversions between client-side and server-side
- * custom reference IDs. On the client-side, there is a non-namespaced, simple name
- * e.g. customRefStandard1250274577519. However on the server-side a custom namespace,
- * as well as a label or (source and target) strings are added to the id, which is then
- * used as the qname of the association e.g. {http://www.alfresco.org/model/rmcustom/1.0}customRefStandard1250274577519__supported__null__null
+ * custom reference IDs. On the server-side a custom namespace,
+ * as well as a label or (source and target) strings are combined and then
+ * used as the qname of the association e.g. {http://www.alfresco.org/model/rmcustom/1.0}supported__null__null
  * 
  * @author Neil McErlean
  */
 public class CustomReferenceId
 {
+	/**
+	 * This String is used to separate label, source and target substrings in the server-side
+	 * qname.
+	 */
+	public final static String SEPARATOR = "__";
 	private Pattern regEx = Pattern.compile(RecordsManagementCustomModel.RM_CUSTOM_PREFIX + ":"
-    		+"(.+){1}" + SEPARATOR + "(.+){1}" + SEPARATOR
-    		+ "(.+){1}" + SEPARATOR + "(.+){1}");
+    		+ "(.+){1}" + SEPARATOR + "(.+){1}" + SEPARATOR + "(.+){1}");
     
-    private static final Map<String, CustomReferenceId> mappings = new HashMap<String, CustomReferenceId>();
-    private final static String SEPARATOR = "__";
+    private static final List<CustomReferenceId> existingIds = new ArrayList<CustomReferenceId>();
     
-    private final String uiName;
     private final String label;
     private final String source;
     private final String target;
     
     private String mungedString;
     
-    public CustomReferenceId(String uiName, String label, String source, String target)
+    public CustomReferenceId(String label, String source, String target)
     {
     	// Either label must be set or else source AND target must be set.
     	if ((label != null || (source != null && target != null)) == false)
     	{
     		StringBuilder msg = new StringBuilder();
     		msg.append("Illegal custom reference id: ")
-    		    .append("uiName=").append(uiName)
-    		    .append(", label=").append(label)
+    		    .append("label=").append(label)
     		    .append(", source=").append(source)
     		    .append(", target=").append(target);
     		throw new IllegalArgumentException(msg.toString());
     	}
-    	this.uiName = uiName;
     	this.label = label;
     	this.source = source;
     	this.target = target;
@@ -85,10 +84,9 @@ public class CustomReferenceId
     {
     	Matcher m = regEx.matcher(serverSideId);
     	if (!m.matches()) throw new IllegalArgumentException("Illegal CustomReferenceId: " + serverSideId);
-    	this.uiName = m.group(1);
-    	this.label = m.group(2);
-    	this.source = m.group(3);
-    	this.target = m.group(4);
+    	this.label = m.group(1);
+    	this.source = m.group(2);
+    	this.target = m.group(3);
     	
     	this.mungedString = serverSideId;
     }
@@ -97,12 +95,9 @@ public class CustomReferenceId
     {
     	if (mungedString == null)
     	{
-    		//TODO Munge up something usable here.
     		StringBuilder buf = new StringBuilder();
     		buf.append(RecordsManagementCustomModel.RM_CUSTOM_PREFIX)
     		    .append(":")
-    		    .append(uiName)
-    		    .append(SEPARATOR)
     		    .append(label)
     		    .append(SEPARATOR)
     		    .append(source)
@@ -112,16 +107,11 @@ public class CustomReferenceId
     		mungedString = buf.toString();
     	}
     	
-    	//TODO Do I need to check for overwrites?
-    	mappings.put(uiName, this);
+    	//TODO check for overwrites
+    	existingIds.add(this);
     	return mungedString;
     }
     
-    public String getUiName()
-    {
-		return uiName;
-	}
-
 	public String getLabel()
 	{
 		return label;
@@ -137,9 +127,47 @@ public class CustomReferenceId
 		return target;
 	}
 
-	public static String getReferenceIdFor(String uiName)
+	/**
+	 * This method finds the qname string for the specified client-side id.
+	 * 
+	 * @param clientId this can be either a label string or a source__target string.
+	 * @return
+	 */
+	public static String getReferenceIdFor(String clientId)
     {
-    	CustomReferenceId refIdObject = mappings.get(uiName);
-		return refIdObject == null ? null : refIdObject.getReferenceId();
+		if (clientId == null)
+		{
+			return null;
+		}
+
+		String label = null;
+		String source = null;
+		String target = null;
+		
+		if (!clientId.contains(SEPARATOR))
+		{
+			label = clientId;
+		}
+		else
+		{
+			String[] substrings = clientId.split(SEPARATOR);
+			source = substrings[0];
+			target = substrings[1];
+		}
+		
+		for (CustomReferenceId crId : existingIds)
+		{
+			if (label != null && label.equals(crId.getLabel()))
+			{
+				return crId.getReferenceId();
+			}
+			else if (source != null & target != null
+					&& source.equals(crId.getSource())
+					&& target.equals(crId.getTarget()))
+			{
+				return crId.getReferenceId();
+			}
+		}
+		return null;
     }
 }
