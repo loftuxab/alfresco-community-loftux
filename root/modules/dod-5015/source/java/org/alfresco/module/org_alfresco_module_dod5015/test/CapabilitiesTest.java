@@ -24,9 +24,6 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,14 +36,12 @@ import java.util.Set;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
@@ -56,6 +51,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
+import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
@@ -71,7 +67,6 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterBinding;
 import org.alfresco.service.cmr.view.ImporterService;
-import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -102,7 +97,7 @@ public class CapabilitiesTest extends TestCase
 
     private PermissionService permissionService;
 
-    private RecordsManagementService recordsManagementService;
+    private RecordsManagementSecurityService recordsManagementSecurityService;
 
     private RecordsManagementActionService recordsManagementActionService;
 
@@ -152,7 +147,7 @@ public class CapabilitiesTest extends TestCase
         permissionModel = (PermissionModel) ctx.getBean("permissionsModelDAO");
         contentService = (ContentService) ctx.getBean("contentService");
 
-        recordsManagementService = (RecordsManagementService) ctx.getBean("RecordsManagementService");
+        recordsManagementSecurityService = (RecordsManagementSecurityService) ctx.getBean("RecordsManagementSecurityService");
         recordsManagementActionService = (RecordsManagementActionService) ctx.getBean("RecordsManagementActionService");
         recordsManagementEventService = (RecordsManagementEventService) ctx.getBean("RecordsManagementEventService");
         rmEntryVoter = (RMEntryVoter) ctx.getBean("rmEntryVoter");
@@ -412,75 +407,75 @@ public class CapabilitiesTest extends TestCase
 
     public void testConfig()
     {
-        assertEquals(6, recordsManagementService.getProtectedAspects().size());
-        assertEquals(12, recordsManagementService.getProtectedProperties().size());
+        assertEquals(6, recordsManagementSecurityService.getProtectedAspects().size());
+        assertEquals(12, recordsManagementSecurityService.getProtectedProperties().size());
 
         // Test action wire up
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.ACCESS_AUDIT).getActionNames().size());
-        assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.ADD_MODIFY_EVENT_DATES).getActionNames().size());
-        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES).getActionNames().size());
-        assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.AUTHORIZE_ALL_TRANSFERS).getActionNames().size());
-        assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CHANGE_OR_DELETE_REFERENCES).getActionNames().size());
-        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.CLOSE_FOLDERS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS).getActionNames().size());
-        assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES).getActionNames().size());
-        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS).getActionNames().size());
-        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.CYCLE_VITAL_RECORDS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DECLARE_AUDIT_AS_RECORD).getActionNames().size());
-        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.DECLARE_RECORDS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DELETE_AUDIT).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DELETE_LINKS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DELETE_RECORDS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DESTROY_RECORDS).getActionNames().size());
-        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.DISPLAY_RIGHTS_REPORT).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.EDIT_DECLARED_RECORD_METADATA).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.EDIT_NON_RECORD_METADATA).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.EDIT_RECORD_METADATA).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.EDIT_SELECTION_LISTS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.EXPORT_AUDIT).getActionNames().size());
-        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE).getActionNames().size());
-        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.FILE_RECORDS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MANAGE_ACCESS_CONTROLS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MANAGE_ACCESS_RIGHTS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MAP_EMAIL_METADATA).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.MOVE_RECORDS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.PASSWORD_CONTROL).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.PLANNING_REVIEW_CYCLES).getActionNames().size());
-        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.RE_OPEN_FOLDERS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.SELECT_AUDIT_METADATA).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.TRIGGER_AN_EVENT).getActionNames().size());
-        assertEquals(1, recordsManagementService.getCapability(RMPermissionModel.UNDECLARE_RECORDS).getActionNames().size());
-        assertEquals(2, recordsManagementService.getCapability(RMPermissionModel.UNFREEZE).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.UPDATE_CLASSIFICATION_DATES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.UPDATE_TRIGGER_DATES).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.VIEW_RECORDS).getActionNames().size());
-        assertEquals(0, recordsManagementService.getCapability(RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.ACCESS_AUDIT).getActionNames().size());
+        assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.ADD_MODIFY_EVENT_DATES).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES).getActionNames().size());
+        assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.AUTHORIZE_ALL_TRANSFERS).getActionNames().size());
+        assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CHANGE_OR_DELETE_REFERENCES).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.CLOSE_FOLDERS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS).getActionNames().size());
+        assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.CYCLE_VITAL_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.DECLARE_AUDIT_AS_RECORD).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.DECLARE_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.DELETE_AUDIT).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.DELETE_LINKS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.DELETE_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.DESTROY_RECORDS).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.DESTROY_RECORDS_SCHEDULED_FOR_DESTRUCTION).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.DISPLAY_RIGHTS_REPORT).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.EDIT_DECLARED_RECORD_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.EDIT_NON_RECORD_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.EDIT_RECORD_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.EDIT_SELECTION_LISTS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.EXPORT_AUDIT).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.FILE_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MANAGE_ACCESS_CONTROLS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MANAGE_ACCESS_RIGHTS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MAP_EMAIL_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MOVE_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.PASSWORD_CONTROL).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.PLANNING_REVIEW_CYCLES).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.RE_OPEN_FOLDERS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.SELECT_AUDIT_METADATA).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.TRIGGER_AN_EVENT).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.UNDECLARE_RECORDS).getActionNames().size());
+        assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.UNFREEZE).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.UPDATE_CLASSIFICATION_DATES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.UPDATE_TRIGGER_DATES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.VIEW_RECORDS).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE).getActionNames().size());
 
     }
 
     public void testFilePlanAsSystem()
     {
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -546,7 +541,7 @@ public class CapabilitiesTest extends TestCase
     public void testFilePlanAsAdmin()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -612,7 +607,7 @@ public class CapabilitiesTest extends TestCase
     public void testFilePlanAsAdministrator()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -677,7 +672,7 @@ public class CapabilitiesTest extends TestCase
     public void testFilePlanAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -743,7 +738,7 @@ public class CapabilitiesTest extends TestCase
     public void testFilePlanAsSecurityOfficer()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -808,7 +803,7 @@ public class CapabilitiesTest extends TestCase
     public void testFilePlanAsPowerUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -873,7 +868,7 @@ public class CapabilitiesTest extends TestCase
     public void testFilePlanAsUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(filePlan);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -937,7 +932,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordSeriesAsSystem()
     {
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1003,7 +998,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsAdmin()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1069,7 +1064,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsAdministrator()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1134,7 +1129,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1200,7 +1195,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsSecurityOfficer()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1265,7 +1260,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsPowerUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1330,7 +1325,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordSeries);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1394,7 +1389,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordCategoryAsSystem()
     {
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1460,7 +1455,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsAdmin()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1526,7 +1521,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsAdministrator()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1591,7 +1586,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1657,7 +1652,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsSecurityOfficer()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1722,7 +1717,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsPowerUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1787,7 +1782,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordCategory_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -1851,7 +1846,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordFolderAsSystem()
     {
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
@@ -1917,7 +1912,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsAdmin()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
@@ -1983,7 +1978,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsAdministrator()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
@@ -2048,7 +2043,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
@@ -2114,7 +2109,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsSecurityOfficer()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
@@ -2179,7 +2174,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsPowerUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
@@ -2244,7 +2239,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(recordFolder_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -2308,7 +2303,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordAsSystem()
     {
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -2374,7 +2369,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordAsAdmin()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -2440,7 +2435,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordAsAdministrator()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -2505,7 +2500,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -2571,7 +2566,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordAsSecurityOfficer()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -2636,7 +2631,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordAsPowerUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -2701,7 +2696,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordAsUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
-        Map<Capability, AccessStatus> access = recordsManagementService.getCapabilities(record_1);
+        Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
@@ -4852,7 +4847,7 @@ public class CapabilitiesTest extends TestCase
 
     private void check(Map<Capability, AccessStatus> access, String name, AccessStatus accessStatus)
     {
-        Capability capability = recordsManagementService.getCapability(name);
+        Capability capability = recordsManagementSecurityService.getCapability(name);
         assertNotNull(capability);
         assertEquals(accessStatus, access.get(capability));
     }

@@ -89,7 +89,7 @@ public class TestUtilities implements DOD5015Model
         return filePlan;
     }
     
-    protected static NodeRef getRecordSeries(SearchService searchService, String seriesName)
+    public static NodeRef getRecordSeries(SearchService searchService, String seriesName)
     {
         SearchParameters searchParameters = new SearchParameters();
         searchParameters.addStore(SPACES_STORE);
@@ -105,7 +105,7 @@ public class TestUtilities implements DOD5015Model
         return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
     }
     
-    protected static NodeRef getRecordCategory(SearchService searchService, String seriesName, String categoryName)
+    public static NodeRef getRecordCategory(SearchService searchService, String seriesName, String categoryName)
     {
         SearchParameters searchParameters = new SearchParameters();
         searchParameters.addStore(SPACES_STORE);
@@ -121,7 +121,7 @@ public class TestUtilities implements DOD5015Model
         return rs.getNodeRefs().isEmpty() ? null : rs.getNodeRef(0);
     }
     
-    protected static NodeRef getRecordFolder(SearchService searchService, String seriesName, String categoryName, String folderName)
+    public static NodeRef getRecordFolder(SearchService searchService, String seriesName, String categoryName, String folderName)
     {
         SearchParameters searchParameters = new SearchParameters();
         searchParameters.addStore(SPACES_STORE);

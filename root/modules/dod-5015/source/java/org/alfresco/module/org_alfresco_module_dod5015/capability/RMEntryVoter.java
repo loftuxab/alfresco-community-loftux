@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,13 +37,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import net.sf.acegisecurity.AccessDecisionManager;
 import net.sf.acegisecurity.Authentication;
 import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.CreateCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.DeleteCapability;
@@ -54,26 +53,26 @@ import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ApproveRe
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AttachRulesToMetadataPropertiesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AuthorizeAllTransfersCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AuthorizeNominatedTransfersCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ChangeOrDeleteReferencesCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CloseFoldersCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateAndAssociateSelectionListsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyClassificationGuidesCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyEventsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyFileplanMetadataCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyFileplanTypesCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyFoldersCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyRecordTypesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyReferenceTypesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyRolesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyTimeframesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyUsersAndGroupsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyRecordsInCuttoffFoldersCapability;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DeclareAuditAsRecordCapability;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DeleteAuditCapability;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DeleteLinksCapability;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ChangeOrDeleteReferencesCapability;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CloseFoldersCapability;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyEventsCapability;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CreateModifyDestroyFoldersCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.CycleVitalRecordsCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DeclareAuditAsRecordCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DeclareRecordsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DeclareRecordsInClosedFoldersCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DeleteAuditCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DeleteLinksCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DeleteRecordsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DestroyRecordsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.DestroyRecordsScheduledForDestructionCapability;
@@ -1186,6 +1185,11 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     }
 
+    public Collection<Capability> getAllCapabilities()
+    {
+        return capabilities.values();
+    }
+    
     public Capability getCapability(String name)
     {
         return capabilities.get(name);

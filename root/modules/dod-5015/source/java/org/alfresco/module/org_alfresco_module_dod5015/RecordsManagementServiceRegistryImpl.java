@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
+import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
 import org.alfresco.repo.service.ServiceDescriptorRegistry;
 
 /**
@@ -37,7 +38,7 @@ import org.alfresco.repo.service.ServiceDescriptorRegistry;
 public class RecordsManagementServiceRegistryImpl extends ServiceDescriptorRegistry 
                                                   implements RecordsManagementServiceRegistry
 {
-    /* (non-Javadoc)
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistry#getRecordsManagementActionService()
      */
     public RecordsManagementActionService getRecordsManagementActionService()
@@ -45,7 +46,7 @@ public class RecordsManagementServiceRegistryImpl extends ServiceDescriptorRegis
         return (RecordsManagementActionService)getService(RECORDS_MANAGEMENT_ACTION_SERVICE);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistry#getRecordsManagementAdminService()
      */
     public RecordsManagementAdminService getRecordsManagementAdminService()
@@ -53,7 +54,7 @@ public class RecordsManagementServiceRegistryImpl extends ServiceDescriptorRegis
         return (RecordsManagementAdminService)getService(RECORDS_MANAGEMENT_ADMIN_SERVICE);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistry#getRecordsManagementEventService()
      */
     public RecordsManagementEventService getRecordsManagementEventService()
@@ -61,12 +62,20 @@ public class RecordsManagementServiceRegistryImpl extends ServiceDescriptorRegis
         return (RecordsManagementEventService)getService(RECORDS_MANAGEMENT_EVENT_SERVICE);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistry#getRecordsManagementService()
      */
     public RecordsManagementService getRecordsManagementService()
     {
         return (RecordsManagementService)getService(RECORDS_MANAGEMENT_SERVICE);
+    }
+
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistry#getRecordsManagementSecurityService()
+     */
+    public RecordsManagementSecurityService getRecordsManagementSecurityService()
+    {
+        return (RecordsManagementSecurityService)getService(RECORDS_MANAGEMENT_SECURITY_SERVICE);
     }
 
     /*
