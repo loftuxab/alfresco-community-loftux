@@ -16,5 +16,6 @@
   ]]>
   </description>
   <url>/index/lifecycle/{lifecycle}</url>
+  <authentication>admin</authentication>
   <lifecycle>internal</lifecycle>
 </webscript>

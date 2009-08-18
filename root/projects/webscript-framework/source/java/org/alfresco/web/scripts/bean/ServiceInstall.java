@@ -193,15 +193,16 @@ public class ServiceInstall extends DeclarativeWebScript
             throw new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Store path " + storePath + " refers to a store that does not exist");
         }
         
-        // determine if file already exists in store
-        if (store.hasDocument(file))
-        {
-            throw new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Web Script file " + file + " already exists in store " + storePath);
-        }
         
-        // create the web script file
         try
         {
+            // determine if file already exists in store
+            if (store.hasDocument(file))
+            {
+                throw new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Web Script file " + file + " already exists in store " + storePath);
+            }
+
+            // create the web script file
             store.createDocument(file, content);
         }
         catch(IOException e)

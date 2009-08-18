@@ -3,5 +3,6 @@
   <description>Maintain index of Web Scripts</description>
   <url>/index?reset={reset?}</url>
   <url>/?reset={reset?}</url>
+  <authentication>admin</authentication>
   <lifecycle>internal</lifecycle>
 </webscript>

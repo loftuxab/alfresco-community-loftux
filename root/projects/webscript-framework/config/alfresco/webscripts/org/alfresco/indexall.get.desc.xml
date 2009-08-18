@@ -3,5 +3,6 @@
   <description>Retrieve an index of all Web Scripts</description>
   <url>/index/all?package={package?}&amp;url={url?}&amp;family={family?}</url>
   <url>/index/all.mediawiki?package={package?}&amp;url={url?}&amp;family={family?}</url>
+  <authentication>admin</authentication>
   <lifecycle>internal</lifecycle>
 </webscript>
