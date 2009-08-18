@@ -25,61 +25,24 @@
 package org.alfresco.module.org_alfresco_module_dod5015.caveat;
 
 import java.io.File;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
-import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
-import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
-import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
-import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
-import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
-import org.alfresco.repo.node.integrity.IntegrityException;
-import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
-import org.alfresco.repo.security.permissions.AccessDeniedException;
-import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ChildAssociationRef;
-import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
-import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.service.cmr.security.PublicServiceAccessService;
-import org.alfresco.service.cmr.site.SiteVisibility;
-import org.alfresco.service.cmr.view.ImporterService;
-import org.alfresco.service.namespace.NamespaceService;
-import org.alfresco.service.namespace.QName;
-import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.PropertyMap;
@@ -87,7 +50,7 @@ import org.alfresco.util.PropertyMap;
 /**
  * @author Mark Rogers
  */
-public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Model
+public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD5015Model
 {    
 	protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 	
@@ -95,7 +58,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
 	
 	private NodeService nodeService;
 	private TransactionService transactionService;
-	private RMCaveatConfigImpl caveatConfigImpl;
+	private RMCaveatConfigService caveatConfigService;
 	
 	private AuthenticationService authenticationService;
 	private PersonService personService;
@@ -121,8 +84,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
 		this.authenticationService = (AuthenticationService)this.applicationContext.getBean("AuthenticationService");
 		this.personService = (PersonService)this.applicationContext.getBean("PersonService");
 		this.authorityService = (AuthorityService)this.applicationContext.getBean("AuthorityService");
-		this.caveatConfigImpl = (RMCaveatConfigImpl)this.applicationContext.getBean("caveatConfigImpl");
-
+		this.caveatConfigService = (RMCaveatConfigServiceImpl)this.applicationContext.getBean("caveatConfigService");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		
 		
@@ -131,13 +93,6 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
 		
 		// Get the test data
 		setUpTestData();
-        
-        URL url = RMCaveatConfigImplTest.class.getClassLoader().getResource("testCaveatConfig1.json"); // from test-resources
-        assertNotNull(url);
-        File file = new File(url.getFile());
-        assertTrue(file.exists());
-        
-        caveatConfigImpl.updateOrCreateCaveatConfig(file);
 	}
 	
 	private void setUpTestData()
@@ -192,26 +147,26 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
          * Now remove the entire list (rma:smList);
          */
         logger.debug("test remove entire list rma:smList");
-        caveatConfigImpl.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraintList(RM_LIST);
         
         /**
          * Now add the list again
          */
         logger.debug("test add back rma:smList");
-        caveatConfigImpl.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraintList(RM_LIST);
         
         /**
          * Negative test - add a list that already exists
          */
         logger.debug("try to create duplicate list rma:smList");
-        caveatConfigImpl.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraintList(RM_LIST);
         
         /**
          * Negative test - remove a list that does not exist
          */
         logger.debug("test remove entire list rma:smList");
-        caveatConfigImpl.deleteRMConstraintList(RM_LIST);
-        caveatConfigImpl.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraintList(RM_LIST);
         
         
         /**
@@ -220,7 +175,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
         logger.debug("test property does not exist");
         try 
         {
-            caveatConfigImpl.addRMConstraintList("rma:mer");
+            caveatConfigService.addRMConstraintList("rma:mer");
             fail("unknown property should have thrown an exception");
         }
         catch (Exception e)
@@ -247,7 +202,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
         
         startNewTransaction();
        
-        caveatConfigImpl.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraintList(RM_LIST);
         
         /**
          * Add a user to the list
@@ -255,24 +210,24 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
         List<String> values = new ArrayList<String>();
         values.add(NOFORN);
         values.add(NOCONTRACT);
-        caveatConfigImpl.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
+        caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
         
         /**
          * Add another value to that list
          */
-        caveatConfigImpl.addRMConstraintListValue(RM_LIST, "jrogers", FGI);
+        caveatConfigService.addRMConstraintListValue(RM_LIST, "jrogers", FGI);
      
         /**
          * Negative test - attempt to add a duplicate value
          */
-        caveatConfigImpl.addRMConstraintListValue(RM_LIST, "jrogers", FGI);
+        caveatConfigService.addRMConstraintListValue(RM_LIST, "jrogers", FGI);
         
         /**
          * Negative test - attempt to add to a list that does not exist
          */
         try
         {
-            caveatConfigImpl.addRMConstraintListValue(RM_LIST_ALT, "mhouse", FGI);
+            caveatConfigService.addRMConstraintListValue(RM_LIST_ALT, "mhouse", FGI);
             fail("exception not thrown");
         } 
         catch (Exception re)
@@ -286,7 +241,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
          */
         try 
         {
-            caveatConfigImpl.addRMConstraintListValue(RM_LIST, "mhouse", FGI);
+            caveatConfigService.addRMConstraintListValue(RM_LIST, "mhouse", FGI);
             fail("exception not thrown");
         }
         catch (Exception e)
@@ -312,7 +267,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
         
         startNewTransaction();
        
-        caveatConfigImpl.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraintList(RM_LIST);
         
         /**
          * Add a user to the list
@@ -320,7 +275,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
         List<String> values = new ArrayList<String>();
         values.add(NOFORN);
         values.add(NOCONTRACT);
-        caveatConfigImpl.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
+        caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
         
         /**
          * Add to a authority that already exists
@@ -328,20 +283,20 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
          */
         List<String> updatedValues = new ArrayList<String>();
         values.add(FGI);
-        caveatConfigImpl.updateRMConstraintListAuthority(RM_LIST, "jrogers", updatedValues);
+        caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "jrogers", updatedValues);
         
         /**
          * Add a group to the list
          */
-        caveatConfigImpl.updateRMConstraintListAuthority(RM_LIST, "Engineering", values);
-        caveatConfigImpl.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "Engineering", values);
+        caveatConfigService.deleteRMConstraintList(RM_LIST);
         
         /**
          * Add to a list that does not exist
          * Should create a new list
          */
-        caveatConfigImpl.deleteRMConstraintList(RM_LIST);
-        caveatConfigImpl.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
+        caveatConfigService.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
         
         
         /**
@@ -369,27 +324,27 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
         
         startNewTransaction();
        
-        caveatConfigImpl.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraintList(RM_LIST);
         List<String> values = new ArrayList<String>();
         values.add(FGI);
-        caveatConfigImpl.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
+        caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
         
         /**
          * Remove a user from a list
          */
-        caveatConfigImpl.removeRMConstraintListAuthority(RM_LIST, "jrogers");
+        caveatConfigService.removeRMConstraintListAuthority(RM_LIST, "jrogers");
         
         /**
          * Negative test - remove a user that does not exist
          */
-        caveatConfigImpl.removeRMConstraintListAuthority(RM_LIST, "jrogers");
+        caveatConfigService.removeRMConstraintListAuthority(RM_LIST, "jrogers");
         
         /**
          * Negative test - remove a user from a list that does not exist.
          * Should create a new list
          */
-        caveatConfigImpl.deleteRMConstraintList(RM_LIST);
-        caveatConfigImpl.updateRMConstraintListAuthority(RM_LIST_ALT, "jrogers", values);
+        caveatConfigService.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.updateRMConstraintListAuthority(RM_LIST_ALT, "jrogers", values);
            
         endTransaction();
         cleanCaveatConfigData();
@@ -421,7 +376,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
             public List<String> doWork()
             {
                 // get allowed values for given caveat (for current user)
-                return caveatConfigImpl.getRMAllowedValues(RM_LIST);
+                return caveatConfigService.getRMAllowedValues(RM_LIST);
             }
         }, "dfranco");
         
@@ -435,7 +390,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
             public List<String> doWork()
             {
                 // get allowed values for given caveat (for current user)
-                return caveatConfigImpl.getRMAllowedValues(RM_LIST);
+                return caveatConfigService.getRMAllowedValues(RM_LIST);
             }
         }, "dmartinz");
         
@@ -449,27 +404,27 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
          * Now remove the entire list (rma:smList);
          */
         logger.debug("test remove entire list rma:smList");
-        caveatConfigImpl.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraintList(RM_LIST);
         
         
         /**
          * Now add the list again
          */
         logger.debug("test add back rma:smList");
-        caveatConfigImpl.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraintList(RM_LIST);
         
         /**
          * Negative test - add a list that already exists
          */
         logger.debug("try to create duplicate list rma:smList");
-        caveatConfigImpl.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraintList(RM_LIST);
         
         /**
          * Negative test - remove a list that does not exist
          */
         logger.debug("test remove entire list rma:smList");
-        caveatConfigImpl.deleteRMConstraintList(RM_LIST);
-        caveatConfigImpl.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraintList(RM_LIST);
         
         
         /**
@@ -478,7 +433,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
         logger.debug("test property does not exist");
         try 
         {
-            caveatConfigImpl.addRMConstraintList("rma:mer");
+            caveatConfigService.addRMConstraintList("rma:mer");
             fail("unknown property should have thrown an exception");
         }
         catch (Exception e)
@@ -514,7 +469,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
         deleteGroup("Finance");
         deleteGroup("test1");
         
-        caveatConfigImpl.updateOrCreateCaveatConfig("{}"); // empty config !
+        caveatConfigService.updateOrCreateCaveatConfig("{}"); // empty config !
         
         setComplete();
         endTransaction();
@@ -559,7 +514,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
         File file = new File(url.getFile());
         assertTrue(file.exists());
         
-        caveatConfigImpl.updateOrCreateCaveatConfig(file);
+        caveatConfigService.updateOrCreateCaveatConfig(file);
         
         setComplete();
         endTransaction();

@@ -24,7 +24,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
-import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService;
 import org.alfresco.repo.module.AbstractModuleComponent;
 
 
@@ -35,17 +35,17 @@ import org.alfresco.repo.module.AbstractModuleComponent;
  */
 public class RecordsManagementModuleComponent extends AbstractModuleComponent
 {
-    private RMCaveatConfigImpl caveatConfigImpl;
+    private RMCaveatConfigService caveatConfigService;
     
-    public void setCaveatConfigImpl(RMCaveatConfigImpl caveatConfigImpl)
+    public void setCaveatConfigService(RMCaveatConfigService caveatConfigService)
     {
-        this.caveatConfigImpl = caveatConfigImpl;
+        this.caveatConfigService = caveatConfigService;
     }
     
     @Override
     protected void executeInternal() throws Throwable
     {
         // initialse caveat config
-        caveatConfigImpl.init();
+        caveatConfigService.init();
     }
 }

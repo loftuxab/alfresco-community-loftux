@@ -74,11 +74,12 @@ import org.json.JSONObject;
  * 
  * @author janv
  */
-public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdatePolicy,
+public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnContentUpdatePolicy,
                                            NodeServicePolicies.BeforeDeleteNodePolicy,
-                                           NodeServicePolicies.OnCreateNodePolicy
+                                           NodeServicePolicies.OnCreateNodePolicy,
+                                           RMCaveatConfigService
 {
-    private static Log logger = LogFactory.getLog(RMCaveatConfigImpl.class);
+    private static Log logger = LogFactory.getLog(RMCaveatConfigServiceImpl.class);
     
     private PolicyComponent policyComponent;
     private ContentService contentService;
@@ -410,7 +411,7 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
         return caveatConfig;
     }
     
-    // Get list of all caveats name
+    // Get list of all caveat names
     public Set<String> getRMConstraintNames()
     {
         return caveatConfig.keySet();
@@ -543,8 +544,6 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
     public void addRMConstraintList(String listName)
     {
         Map<String, List<String>> emptyConstraint =  new HashMap<String, List<String>>(0) ;
-        List<String> emptyList = new ArrayList<String>();
-        emptyConstraint.put(listName, emptyList);
         caveatConfig.put(listName, emptyConstraint);
         updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));
     }
@@ -582,6 +581,17 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
         }
         values.add(value);
         updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));        
+    }
+    
+    /**
+     * Get the details of the specified list
+     * @param listName
+     * @return the details of the specified list
+     */
+    public Map<String, List<String>> getListDetails(String listName)
+    {
+        Map<String, List<String>> members = caveatConfig.get(listName);
+        return members;
     }
     
     /**
@@ -624,7 +634,7 @@ public class RMCaveatConfigImpl implements ContentServicePolicies.OnContentUpdat
         Map<String, List<String>> members = caveatConfig.get(listName);
         if(members != null) 
         {
-            members.remove(authorityName);    
+            members.remove(listName);    
         }
      
         updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));   

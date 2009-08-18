@@ -279,7 +279,7 @@ public abstract class AbstractCapability implements Capability
             return AccessDecisionVoter.ACCESS_DENIED;
         }
 
-        if (voter.getCaveatConfigImpl().hasAccess(nodeRef))
+        if (voter.getCaveatConfigService().hasAccess(nodeRef))
         {
             return AccessDecisionVoter.ACCESS_GRANTED;
         }

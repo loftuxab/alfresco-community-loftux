@@ -78,7 +78,7 @@
         <property name="permissionService" ref="permissionService"/>
         <property name="namespacePrefixResolver" ref="namespaceService"/>
         <property name="nodeService" ref="nodeService"/>
-        <property name="caveatConfigImpl" ref="caveatConfigImpl"/>
+        <property name="caveatConfigService" ref="caveatConfigService"/>
         <property name="dictionaryService" ref="dictionaryService"/>
         <property name="recordsManagementService" ref="recordsManagementService"/>
         <!-- Capabilities -->
