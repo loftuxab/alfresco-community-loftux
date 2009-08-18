@@ -130,12 +130,21 @@
    width: 40.5em;
 }
 
-.disposition-edit .action .section.events .event-name-header,
-.disposition-edit .action .section.events .event-completion-header
+.disposition-edit .action .section.events .event-completion-header,
+.disposition-edit .action .section.events .event-name-header
 {
    float: left;
-   width: 18em;
    margin-bottom: 0.2em;
+}
+
+.disposition-edit .action .section.events .event-completion-header
+{
+   width: 15em;
+}
+
+.disposition-edit .action .section.events .event-name-header
+{
+   width: 21em;
 }
 
 .disposition-edit .action .section.events .event-name-header
@@ -217,15 +226,15 @@
 {
    position: absolute;
    margin-left: 3.25em;
-   width: 19em;
+   width: 22em;
    padding-left: 0.5em
 }
 
 .disposition-edit .action .action-event-completion
 {
    position: absolute;
-   margin-left: 22.25em;
-   width: 19em;
+   margin-left: 25.25em;
+   width: 16em;
 }
 
 .disposition-edit .action .action-event-buttons

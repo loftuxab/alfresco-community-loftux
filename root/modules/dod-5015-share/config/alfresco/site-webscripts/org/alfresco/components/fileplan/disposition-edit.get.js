@@ -38,7 +38,9 @@ function main()
          }
          if(data && data.events)
          {
-            model.events = data.events.items;
+            var events = data.events.items;
+            events.sort(sortByLabel);
+            model.events = events;
          }
          if(data && data.periodTypes)
          {

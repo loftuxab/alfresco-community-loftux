@@ -1,5 +1,4 @@
 /**
-/**
  * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
@@ -182,6 +181,8 @@
        */
       _createAction: function DispositionEdit__createAction(action)
       {
+         var me = this;
+         
          // Clone template
          var actionEl = this.widgets.actionTemplateEl.cloneNode(true),
             elId = Alfresco.util.generateDomId(actionEl);
@@ -235,9 +236,28 @@
          Alfresco.util.setSelectedIndex(periodUnitEl, periodUnit);
 
          // Add event button
-         var addEventEl = Dom.getElementsByClassName("addevent", "span", actionEl)[0],
-            addEventButton = Alfresco.util.createYUIButton(this, "addevent-button", null, {}, addEventEl);
-         addEventButton.on("click", this.onAddEventButtonClick, actionEl, this);
+         var addEventButtonEl = Dom.getElementsByClassName("addevent-button", "input", actionEl)[0],
+               addEventMenuEl = Dom.getElementsByClassName("addevent-menu", "select", actionEl)[0];
+         var addEventButton = Alfresco.util.createYUIButton(this, "addevent-button", null,
+         {
+            type: "menu",
+            lazyloadmenu: false, 
+            menu: addEventMenuEl
+         }, addEventButtonEl);
+
+         addEventButton.getMenu().subscribe("beforeShow", function(p_sType, p_aArgs, aItemsArray)
+         {
+            me._disableUnusedEvents(addEventButton, actionEl);
+         }, []);
+
+         addEventButton.getMenu().subscribe("click", function(p_sType, p_aArgs)
+         {
+            if (p_aArgs[1] && !p_aArgs[1].cfg.getProperty("disabled"))
+            {
+               me._addSelectedEventItem(p_aArgs[1].value, actionEl, addEventButton);
+            }
+         });
+
 
          // Enable/Disable period & events section
          var periodEnabledCheckBox = Dom.getElementsByClassName("period-enabled", "input", actionEl)[0];
@@ -245,7 +265,7 @@
          this._disablePeriodSection(!periodEnabledCheckBox.checked, actionEl);
          var eventsEnabledCheckBox = Dom.getElementsByClassName("events-enabled", "input", actionEl)[0];
          eventsEnabledCheckBox.checked = action.events && action.events.length > 0;
-         this._disableEventsSection(!eventsEnabledCheckBox.checked, actionEl, addEventButton);
+         this._disableEventsSection(!eventsEnabledCheckBox.checked, actionEl);
          if (!periodEnabledCheckBox.checked || !eventsEnabledCheckBox.checked)
          {
             Dom.addClass(actionEl, "relation-disabled");
@@ -271,7 +291,7 @@
 
          Event.addListener(eventsEnabledCheckBox, "click", function(e, checkBox)
          {
-            this._disableEventsSection(!checkBox.checked, actionEl, addEventButton);
+            this._disableEventsSection(!checkBox.checked, actionEl);
          }, eventsEnabledCheckBox, this);
 
          // Relation
@@ -336,7 +356,7 @@
          }
          else
          {
-            formEl.setAttribute("id", formId)
+            formEl.setAttribute("id", formId);
          }
          var actionForm = new Alfresco.forms.Form(formId);
 
@@ -392,7 +412,7 @@
                var puEl = Dom.getElementsByClassName("period-unit", "select", formEl)[0],
                   paEl = Dom.getElementsByClassName("period-amount", "input", formEl)[0];
                var pa = "", pu = "";
-               if(!paEl.disabled)
+               if (!paEl.disabled)
                {
                   pa = paEl.value;
                }
@@ -506,7 +526,7 @@
       {
          var periodUnit = periodUnitEl.options[periodUnitEl.selectedIndex].value;
          periodAmountEl.disabled = Alfresco.util.arrayContains(["none", "immediately", "fmend", "fqend", "fyend", "monthend", "quarterend", "yearend"], periodUnit);
-         if(periodAmountEl.disabled)
+         if (periodAmountEl.disabled)
          {
             periodAmountEl.value = "";
          }
@@ -519,13 +539,11 @@
        * @method _disableEventsSection
        * @param disabled
        * @param actionEl The action HTMLElement
-       * @param addEventButton the add event button to be enabled or disabled
        */
-      _disableEventsSection: function DispositionEdit__disableEventsSection(disabled, actionEl, addEventButton)
+      _disableEventsSection: function DispositionEdit__disableEventsSection(disabled, actionEl)
       {
          var eventsDivEl = Dom.getElementsByClassName("events", "div", actionEl)[0];
          Dom.setStyle(eventsDivEl, "display", disabled ? "none" : "block");
-         addEventButton.set("disabled", disabled);
          var eventEls = Dom.getElementsByClassName("action-event-name-value", "select", actionEl);
          for (var i = 0; i < eventEls.length; i++)
          {
@@ -549,7 +567,7 @@
                actionType = actionType ? actionType : actionTypeEl.options[actionTypeEl.selectedIndex].text;
          if (!periodUnitSelect.disabled && periodUnitSelect.options[periodUnitSelect.selectedIndex].value != "none")
          {
-            if(periodAmountEl.disabled || periodAmountEl.value == "" || periodAmountEl.value == "0")
+            if (periodAmountEl.disabled || periodAmountEl.value == "" || periodAmountEl.value == "0")
             {
                title = this.msg(
                      "label.title.noTime",
@@ -581,10 +599,10 @@
        *
        * @method _createEvent
        * @param p_sequence {number} The (zero-based) sequence number of the event
-       * @param p_event {object} The event information
+       * @param p_eventName {string} The event key/name
        * @private
        */
-      _createEvent: function DispositionEdit__createEvent(p_sequence, p_event)
+      _createEvent: function DispositionEdit__createEvent(p_sequence, p_eventName)
       {
          // Clone template
          var eventEl = this.widgets.eventTemplateEl.cloneNode(true),
@@ -597,16 +615,14 @@
          }
 
          // Event Type
-         var eventNameSelect = Dom.getElementsByClassName("action-event-name-value", "select", eventEl)[0];
-         Alfresco.util.setSelectedIndex(eventNameSelect, p_event);
-         Event.addListener(eventNameSelect, "change", this.onEventNameSelectChange,
-         {
-            eventEl: eventEl,
-            eventNameSelect: eventNameSelect
-         }, this);
+         var eventNameHidden = Dom.getElementsByClassName("action-event-name-value", "input", eventEl)[0],
+               eventNameLabel = Dom.getElementsByClassName("action-event-name-label", "span", eventEl)[0],
+               label = this.options.events[p_eventName] ? this.options.events[p_eventName].label + "" : p_eventName;;
+         eventNameHidden.value = p_eventName;
+         eventNameLabel.innerHTML = label;
 
          // Display data
-         var automatic = this.options.events[p_event] ? this.options.events[p_event].automatic + "" : null,
+         var automatic = this.options.events[p_eventName] ? this.options.events[p_eventName].automatic + "" : null,
             completion = "";
          if (automatic)
          {
@@ -616,7 +632,10 @@
 
          // Add listener to delete event
          var deleteEventEl = Dom.getElementsByClassName("delete", "span", eventEl)[0];
-         Event.addListener(deleteEventEl, "click", this.onDeleteEventClick, eventEl, this);
+         Event.addListener(deleteEventEl, "click", function(e, obj)
+         {            
+            this._deleteClickedEvent(eventEl);
+         }, null, this);
 
          return eventEl;
       },
@@ -655,7 +674,7 @@
             Dom.removeClass(events[i], "even");
             Dom.removeClass(events[i], "odd");
             Dom.removeClass(events[i], "first");
-            Dom.addClass(events[i], (i + 1) % 2 === 0 ? "even" : "odd");
+            Dom.addClass(events[i], ((i + 1) % 2) === 0 ? "odd" : "even");
             if (i === 0)
             {
                Dom.addClass(events[i], "first");
@@ -738,62 +757,56 @@
       },
 
       /**
-       * Called when user changes the event name option select
+       * Makes sure only unused events are enabled in the menu
        *
-       * @method onEventNameSelectChange
-       * @param e click event object
-       * @param obj callback object containg action info & HTMLElements
+       * @method _disableUnusedEvents
+       * @param addEventButton The button used to add event
+       * @param actionEl The action HTMLElement
        */
-      onEventNameSelectChange: function DispositionEdit_onEventNameSelectChange(e, obj)
+      _disableUnusedEvents: function DispositionEdit__disableUnusedEvents(addEventButton, actionEl)
       {
-         var eventName = obj.eventNameSelect.options[obj.eventNameSelect.selectedIndex].value;
-         var automatic = this.options.events[eventName] ? this.options.events[eventName].automatic + "" : "";
-         var completion = "";
-         if (automatic)
+         // Find out what events that has been used
+         var actionEventValues = Dom.getElementsByClassName("action-event-name-value", "input", actionEl);
+         var usedEventNames = {};
+         for (var i = 0; i < actionEventValues.length; i++)
          {
-            completion = this.msg("label.automatic." + automatic);
+            usedEventNames[actionEventValues[i].value] = true;
          }
-         Dom.getElementsByClassName("action-event-completion", "div", obj.eventEl)[0].innerHTML = completion;
 
+         // Clear event menu and disable/enable events in the menu
+         var items = addEventButton.getMenu().getItems(),
+               item;
+         for (i = 0; i < items.length; i++)
+         {
+            item = items[i];
+            item.cfg.setProperty("disabled", usedEventNames[item.value] ? true : false);
+         }
       },
 
       /**
-       * Called when user clicks the add event icon
+       * Called when user has selected an event to add
        *
-       * @method onAddEventButtonClick
-       * @param e click event object
+       * @method _addSelectedEventItem
+       * @param eventType The type of event that shall get added
        * @param actionEl The action HTMLElement
        */
-      onAddEventButtonClick: function DispositionEdit_onAddEventButtonClick(e, actionEl)
+      _addSelectedEventItem: function DispositionEdit__addSelectedEventItem(eventType, actionEl)
       {
          var eventListEl = Dom.getElementsByClassName("events-list", "ul", actionEl)[0],
             sequence = eventListEl.getElementsByTagName("li").length;
 
          // Create new event
-         var eventEl = this._createEvent(sequence,
-         {
-            event: 0,
-            type: ""
-         });
+         var eventEl = this._createEvent(sequence, eventType);
          eventListEl.appendChild(eventEl);
-
-         // Find last event
-         var eventNameSelect = Dom.getElementsByClassName("action-event-name-value", "select", eventEl)[0]; 
-         this.onEventNameSelectChange(null,
-         {
-            eventEl: eventEl,
-            eventNameSelect: eventNameSelect
-         });
       },
 
       /**
        * Called when user clicks the delete event icon
        *
-       * @method onDeleteEventClick
-       * @param e click event object
+       * @method _deleteClickedEvent
        * @param eventEl The event HTMLElement
        */
-      onDeleteEventClick: function DispositionEdit_onEditClick(e, eventEl)
+      _deleteClickedEvent: function DispositionEdit__deleteClickedEvent(eventEl)
       {
          var parent = eventEl.parentNode;
          parent.removeChild(eventEl);
