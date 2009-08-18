@@ -58,7 +58,7 @@ public abstract class AbstractModelObjectPersister implements ModelObjectPersist
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.ModelObjectPersister#hasObject(org.alfresco.web.framework.ModelPersistenceContext, org.alfresco.web.framework.ModelObject)
      */
-    public boolean hasObject(ModelPersistenceContext context, ModelObject object)
+    public boolean hasObject(ModelPersistenceContext context, ModelObject object) throws ModelObjectPersisterException
     {
         return hasObject(context, object.getId());
     }

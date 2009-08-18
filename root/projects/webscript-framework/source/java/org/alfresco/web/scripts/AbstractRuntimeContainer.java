@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.config.ConfigService;
+import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -53,7 +54,7 @@ public abstract class AbstractRuntimeContainer
     // Logger
     private static final Log logger = LogFactory.getLog(AbstractRuntimeContainer.class);
     
-    private ApplicationContext applicationContext = null;
+    protected ApplicationContext applicationContext = null;
     private String name = "<undefined>";
     private Registry registry;
     private FormatRegistry formatRegistry;
@@ -271,5 +272,27 @@ public abstract class AbstractRuntimeContainer
     protected ApplicationContext getApplicationContext()
     {
         return this.applicationContext;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.RuntimeContainer#getRequiredAuthentication()
+     */
+    public RequiredAuthentication getRequiredAuthentication()
+    {
+        return RequiredAuthentication.none;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.RuntimeContainer#authenticate(org.alfresco.web.scripts.Authenticator, org.alfresco.web.scripts.Description.RequiredAuthentication)
+     */
+    public boolean authenticate(Authenticator auth, RequiredAuthentication required)
+    {
+        if (! ((required == null) || (required.equals(RequiredAuthentication.none))))
+        {
+            logger.error("Unexpected - required authentication = "+required);
+            return false;
+        }
+        
+        return true;
     }
 }

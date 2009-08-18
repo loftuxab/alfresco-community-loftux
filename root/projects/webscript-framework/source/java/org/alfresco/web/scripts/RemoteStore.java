@@ -337,7 +337,7 @@ public class RemoteStore implements Store
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#hasDocument(java.lang.String)
      */
-    public boolean hasDocument(String documentPath)
+    public boolean hasDocument(String documentPath) throws IOException
     {
         boolean hasDocument = false;
         
@@ -345,6 +345,12 @@ public class RemoteStore implements Store
         if (Status.STATUS_OK == res.getStatus().getCode())
         {
             hasDocument = Boolean.parseBoolean(res.getResponse());
+        }
+        else
+        {
+            throw new IOException("Unable to test document path: " + documentPath +
+                    " in remote store: " + this.getEndpoint() +
+                    " due to error: " + res.getStatus().getMessage());
         }
         
         if (logger.isDebugEnabled())
@@ -755,9 +761,16 @@ public class RemoteStore implements Store
         public ScriptContent getScript(String path)
         {
             ScriptContent sc = null;
-            if (hasDocument(path))
+            try
             {
-                sc = new RemoteScriptContent(path);
+                if (hasDocument(path))
+                {
+                    sc = new RemoteScriptContent(path);
+                }
+            }
+            catch (IOException e)
+            {
+                throw new WebScriptException("Error locating script " + path, e);                
             }
             return sc;
         }

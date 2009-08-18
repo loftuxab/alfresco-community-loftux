@@ -96,8 +96,9 @@ public interface ModelObjectPersister
      * 
      * @param objectId
      * @return
+     * @throws ModelObjectPersisterException
      */
-    public boolean hasObject(ModelPersistenceContext context, String objectId);
+    public boolean hasObject(ModelPersistenceContext context, String objectId) throws ModelObjectPersisterException;
     
     /**
      * Creates a new object

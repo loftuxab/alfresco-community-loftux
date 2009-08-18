@@ -135,23 +135,23 @@ public class PresetsManager
         {
             for (String file : this.files)
             {
-                if (store.hasDocument(file))
+                try
                 {
-                    try
+                    if (store.hasDocument(file))
                     {
                         docs.add(XMLUtil.parse(store.getDocument(file)));
                     }
-                    catch (IOException ioe)
-                    {
-                        throw new AlfrescoRuntimeException("Error loading presets XML file: " +
-                                file + " in store: " + store.toString(), ioe);
-                    }
-                    catch (DocumentException de)
-                    {
-                        de.printStackTrace();
-                        throw new AlfrescoRuntimeException("Error processing presets XML file: " +
-                                file + " in store: " + store.toString(), de);
-                    }
+                }
+                catch (IOException ioe)
+                {
+                    throw new AlfrescoRuntimeException("Error loading presets XML file: " + file + " in store: "
+                            + store.toString(), ioe);
+                }
+                catch (DocumentException de)
+                {
+                    de.printStackTrace();
+                    throw new AlfrescoRuntimeException("Error processing presets XML file: " + file + " in store: "
+                            + store.toString(), de);
                 }
             }
         }

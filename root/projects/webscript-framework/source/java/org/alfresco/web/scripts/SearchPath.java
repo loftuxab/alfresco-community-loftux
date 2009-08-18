@@ -135,8 +135,9 @@ public class SearchPath implements ApplicationContextAware, ApplicationListener
      * 
      * @param documentPath  document path
      * @return  true => exists, false => does not exist
+     * @throws IOException 
      */
-    public boolean hasDocument(String documentPath)
+    public boolean hasDocument(String documentPath) throws IOException
     {
        for (Store store : getStores())
        {

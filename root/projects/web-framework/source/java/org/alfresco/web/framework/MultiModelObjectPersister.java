@@ -190,7 +190,7 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.ModelObjectPersister#hasObject(org.alfresco.web.framework.ModelPersistenceContext, org.alfresco.web.framework.ModelObject)
      */
-    public boolean hasObject(ModelPersistenceContext context, ModelObject object)
+    public boolean hasObject(ModelPersistenceContext context, ModelObject object) throws ModelObjectPersisterException
     {
         return hasObject(context, object.getId());
     }
@@ -198,7 +198,7 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.ModelObjectPersister#hasObject(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
      */
-    public boolean hasObject(ModelPersistenceContext context, String objectId)  
+    public boolean hasObject(ModelPersistenceContext context, String objectId) throws ModelObjectPersisterException  
     {
         boolean hasObject = false;
         

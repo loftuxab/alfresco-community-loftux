@@ -299,22 +299,22 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         throws ModelObjectPersisterException
     {    
         boolean removed = false;
-        
-        if (this.store.hasDocument(path))
+
+        try
         {
-            try
+            if (this.store.hasDocument(path))
             {
                 removed = this.store.removeDocument(path);
-                
+
                 // remove from cache
                 cacheRemove(context, path);
             }
-            catch (IOException ex)
-            {
-                throw new ModelObjectPersisterException("Unable to remove object for path: " + path);
-            }
         }
-        
+        catch (IOException ex)
+        {
+            throw new ModelObjectPersisterException("Unable to remove object for path: " + path);
+        }
+
         return removed;
     }
     
@@ -373,7 +373,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.ModelObjectPersister#hasObject(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
      */
-    public boolean hasObject(ModelPersistenceContext context, String objectId)
+    public boolean hasObject(ModelPersistenceContext context, String objectId) throws ModelObjectPersisterException
     {
         boolean has = false;
         
@@ -393,10 +393,17 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      * @param path the path
      * 
      * @return true, if successful
-     */
-    protected boolean hasObjectByPath(ModelPersistenceContext context, String path)
+     */    
+    protected boolean hasObjectByPath(ModelPersistenceContext context, String path) throws ModelObjectPersisterException
     {
-        return this.store.hasDocument(path);
+        try
+        {
+            return this.store.hasDocument(path);
+        }
+        catch (IOException e)
+        {
+            throw new ModelObjectPersisterException("Failed to check object path: " + path, e);
+        }
     }
     
     /* (non-Javadoc)

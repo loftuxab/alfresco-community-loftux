@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,6 +26,7 @@ package org.alfresco.web.scripts;
 
 import java.io.IOException;
 
+import org.alfresco.web.scripts.Description.RequiredAuthentication;
 
 /**
  * Web Script Container extensions for a Web Script Runtime
@@ -43,4 +44,18 @@ public interface RuntimeContainer extends Container
     public void executeScript(WebScriptRequest scriptReq, WebScriptResponse scriptRes, Authenticator auth)
         throws IOException;
     
+    /**
+     * Gets the required container authentication level (for matching web scripts)
+     * 
+     * @return  the required authentication level
+     */
+    public RequiredAuthentication getRequiredAuthentication();
+    
+    /**
+     * Pre-authenticate container, if required
+     * 
+     * @param auth
+     * @param required
+     */
+    public boolean authenticate(Authenticator auth, RequiredAuthentication required);
 }

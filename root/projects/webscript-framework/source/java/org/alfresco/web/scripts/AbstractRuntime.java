@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -95,6 +96,28 @@ public abstract class AbstractRuntime implements Runtime
             if (logger.isDebugEnabled())
                 logger.debug("(Runtime=" + getName() + ", Container=" + container.getName() + ") Processing script url ("  + method + ") " + scriptUrl);
 
+            WebScriptRequest scriptReq = null;
+            WebScriptResponse scriptRes = null;
+            Authenticator auth = null;
+            
+            RequiredAuthentication containerRequiredAuth = container.getRequiredAuthentication();
+            
+            if (! containerRequiredAuth.equals(RequiredAuthentication.none))
+            {
+                // Create initial request & response
+                scriptReq = createRequest(null);
+                scriptRes = createResponse();
+                auth = createAuthenticator();
+                
+                if (logger.isDebugEnabled())
+                    logger.debug("(Runtime=" + getName() + ", Container=" + container.getName() + ") Container requires pre-auth: "+containerRequiredAuth);
+                
+                if (! container.authenticate(auth, containerRequiredAuth))
+                {
+                    return; // will prompt for un/pw
+                }
+            }
+            
             match = container.getRegistry().findWebScript(method, scriptUrl);
             if (match == null || match.getKind() == Match.Kind.URI)
             {
@@ -115,9 +138,19 @@ public abstract class AbstractRuntime implements Runtime
             }
 
             // create web script request & response
-            final WebScriptRequest scriptReq = createRequest(match);
-            final WebScriptResponse scriptRes = createResponse();
-            final Authenticator auth = createAuthenticator();
+            scriptReq = createRequest(match);
+            scriptRes = createResponse();
+            
+            if (! containerRequiredAuth.equals(RequiredAuthentication.none))
+            {
+                // pre-authenticated (before matching web script)
+                auth = null; 
+            }
+            else
+            {
+                // not pre-authenticated
+                auth = createAuthenticator();
+            }
             
             if (logger.isDebugEnabled())
                 logger.debug("Agent: " + scriptReq.getAgent());
