@@ -284,8 +284,13 @@
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
 
-    <!-- REST impl for POST Custom Reference Instances -->
+    <!-- REST impl for POST Custom Reference Instance -->
     <bean id="webscript.org.alfresco.rma.customref.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomRefPost" parent="rmBaseWebscript">
+        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
+    </bean>
+
+    <!-- REST impl for DELETE Custom Reference Instance -->
+    <bean id="webscript.org.alfresco.rma.customref.delete" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomRefDelete" parent="rmBaseWebscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
 

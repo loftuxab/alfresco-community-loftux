@@ -73,7 +73,16 @@ public interface RecordsManagementAdminService
      * 
      * @param fromNode
      * @param toNode
-     * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}customRefStandard1250274577519__supported__null__null
+     * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}supported__null__null
      */
     public void addCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId);
+
+    /**
+     * This method removes the specified custom reference instance from the specified node.
+     * 
+     * @param fromNode
+     * @param toNode
+     * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}supported__null__null
+     */
+    public void removeCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId);
 }
