@@ -74,11 +74,12 @@ public abstract class RecordsManagementFormFilter extends AbstractFilter impleme
     {
         // ignored
     }
-    
+
     /*
-     * @see org.alfresco.repo.forms.processor.Filter#beforeGenerate(java.lang.Object, java.util.List, java.util.List, org.alfresco.repo.forms.Form)
+     * @see org.alfresco.repo.forms.processor.Filter#beforeGenerate(java.lang.Object, java.util.List, java.util.List, org.alfresco.repo.forms.Form, java.util.Map)
      */
-    public void beforeGenerate(Object item, List<String> fields, List<String> forcedFields, Form form)
+    public void beforeGenerate(Object item, List<String> fields, List<String> forcedFields, 
+                Form form, Map<String, Object> context)
     {
         // ignored
     }

@@ -2,6 +2,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.forms;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
@@ -31,9 +32,10 @@ public class RecordsManagementTypeFormFilter extends RecordsManagementFormFilter
     private static Log logger = LogFactory.getLog(RecordsManagementTypeFormFilter.class);
     
     /*
-     * @see org.alfresco.repo.forms.processor.Filter#afterGenerate(java.lang.Object, java.util.List, java.util.List, org.alfresco.repo.forms.Form)
+     * @see org.alfresco.repo.forms.processor.Filter#afterGenerate(java.lang.Object, java.util.List, java.util.List, org.alfresco.repo.forms.Form, java.util.Map)
      */
-    public void afterGenerate(Object item, List<String> fields, List<String> forcedFields, Form form)
+    public void afterGenerate(Object item, List<String> fields, List<String> forcedFields, 
+                Form form, Map<String, Object> context)
     {
         // as we're registered with the type form processor we know we are being
         // given a TypeDefinition, so check the current item is an RM type
