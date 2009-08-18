@@ -107,7 +107,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.UpdateVit
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.UpgradeDowngradeAndDeclassifyRecordsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ViewRecordsCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ViewUpdateReasonsForFreezeCapability;
-import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.impl.SimplePermissionReference;
 import org.alfresco.repo.security.permissions.impl.acegi.ACLEntryVoterException;
@@ -149,7 +149,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     private PermissionService permissionService;
 
-    private RMCaveatConfigImpl caveatConfigImpl;
+    private RMCaveatConfigService caveatConfigService;
 
     private DictionaryService dictionaryService;
 
@@ -344,9 +344,9 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         this.nspr = nspr;
     }
 
-    public void setCaveatConfigImpl(RMCaveatConfigImpl caveatConfigImpl)
+    public void setCaveatConfigService(RMCaveatConfigService caveatConfigService)
     {
-        this.caveatConfigImpl = caveatConfigImpl;
+        this.caveatConfigService = caveatConfigService;
     }
 
     public void setDictionaryService(DictionaryService dictionaryService)
@@ -1419,11 +1419,11 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     }
 
     /**
-     * @return the caveatConfigImpl
+     * @return the caveatConfigService
      */
-    public RMCaveatConfigImpl getCaveatConfigImpl()
+    public RMCaveatConfigService getCaveatConfigService()
     {
-        return caveatConfigImpl;
+        return caveatConfigService;
     }
 
     /**

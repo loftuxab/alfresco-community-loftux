@@ -56,11 +56,11 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
     private List<String> allowedValuesUpper;
     
     // note: alternative to static init could be to use 'registered' constraint
-    private static RMCaveatConfigImpl caveatConfigImpl;
+    private static RMCaveatConfigService caveatConfigService;
     
-    public void setCaveatConfigImpl(RMCaveatConfigImpl caveatConfigImpl)
+    public void setCaveatConfigService(RMCaveatConfigService caveatConfigService)
     {
-        RMListOfValuesConstraint.caveatConfigImpl = caveatConfigImpl;
+        RMListOfValuesConstraint.caveatConfigService = caveatConfigService;
     }
     
     
@@ -85,9 +85,9 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
     public List<String> getAllowedValues()
     {
         String runAsUser = AuthenticationUtil.getRunAsUser();
-        if ((runAsUser != null) && (! runAsUser.equals(AuthenticationUtil.getSystemUserName())) && (caveatConfigImpl != null))
+        if ((runAsUser != null) && (! runAsUser.equals(AuthenticationUtil.getSystemUserName())) && (caveatConfigService != null))
         {
-            List<String> allowedForUser = caveatConfigImpl.getRMAllowedValues(getShortName()); // get allowed values for current user
+            List<String> allowedForUser = caveatConfigService.getRMAllowedValues(getShortName()); // get allowed values for current user
             
             List<String> filteredList = new ArrayList<String>(allowedForUser.size());
             for (String allowed : allowedForUser)
@@ -109,9 +109,9 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
     private List<String> getAllowedValuesUpper()
     {
         String runAsUser = AuthenticationUtil.getRunAsUser();
-        if ((runAsUser != null) && (! runAsUser.equals(AuthenticationUtil.getSystemUserName())) && (caveatConfigImpl != null))
+        if ((runAsUser != null) && (! runAsUser.equals(AuthenticationUtil.getSystemUserName())) && (caveatConfigService != null))
         {
-            List<String> allowedForUser = caveatConfigImpl.getRMAllowedValues(getType()); // get allowed values for current user
+            List<String> allowedForUser = caveatConfigService.getRMAllowedValues(getType()); // get allowed values for current user
             
             List<String> filteredList = new ArrayList<String>(allowedForUser.size());
             for (String allowed : allowedForUser)

@@ -153,14 +153,14 @@
         <property name="executeOnceOnly" value="false"/>
         
         <property name="moduleId" value="org_alfresco_module_dod5015"/>
-        <property name="caveatConfigImpl" ref="caveatConfigImpl"/>
+        <property name="caveatConfigService" ref="caveatConfigService"/>
         
     </bean>
     
     <!-- RM caveats -->
     <!-- Caveat read veto is now enforced via the security wrappers for RM -->
     
-    <bean id="caveatConfigImpl" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl">
+    <bean id="caveatConfigService" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigServiceImpl">
         <property name="policyComponent" ref="policyComponent"/>
         <property name="contentService" ref="contentService"/>
         <property name="dictionaryService" ref="dictionaryService"/>
@@ -171,7 +171,46 @@
     </bean>
     
     <bean id="rmListOfValuesContraintInit" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
-        <property name="caveatConfigImpl" ref="caveatConfigImpl"/>
+        <property name="caveatConfigService" ref="caveatConfigService"/>
+    </bean>
+         
+    <!-- Site service transaction bean -->
+    <bean id="CaveatConfigService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="CaveatConfigService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService</value>
+            </list>
+        </property>
+        <property name="targetName">
+            <value>caveatConfigService</value>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="CaveatConfigService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+            </list>
+        </property>
+    </bean>
+    
+    
+    <!-- Java script interface for rm caveat config-->
+    <bean id="rmConfigServiceScript" parent="baseJavaScriptExtension" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.ScriptRMCaveatConfigService">
+        <property name="extensionName">
+            <value>caveatConfig</value>
+        </property>
+        <property name="caveatConfigService" ref="caveatConfigService"/>
     </bean>
     
     <!-- Form Processor Filters to process RM nodes and types -->

@@ -49,7 +49,8 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementA
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
-import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigImpl;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigServiceImpl;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.node.integrity.IntegrityException;
@@ -107,7 +108,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
     private RecordsManagementActionService rmActionService;
     private ServiceRegistry serviceRegistry;
 	private TransactionService transactionService;
-	private RMCaveatConfigImpl caveatConfigImpl;
+	private RMCaveatConfigService caveatConfigService;
 	
 	private AuthenticationService authenticationService;
 	private PersonService personService;
@@ -143,7 +144,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         this.serviceRegistry = (ServiceRegistry)this.applicationContext.getBean("ServiceRegistry");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		
-		this.caveatConfigImpl = (RMCaveatConfigImpl)this.applicationContext.getBean("caveatConfigImpl");
+		this.caveatConfigService = (RMCaveatConfigService)this.applicationContext.getBean("caveatConfigService");
 		
 		this.publicServiceAccessService = (PublicServiceAccessService)this.applicationContext.getBean("PublicServiceAccessService");
 		
@@ -158,7 +159,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         File file = new File(url.getFile());
         assertTrue(file.exists());
         
-        caveatConfigImpl.updateOrCreateCaveatConfig(file);
+        caveatConfigService.updateOrCreateCaveatConfig(file);
 	}
 	
 	private void setUpTestData()
@@ -1612,7 +1613,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             public List<String> doWork()
             {
                 // get allowed values for given caveat (for current user)
-                return caveatConfigImpl.getRMAllowedValues("rma:smList");
+                return caveatConfigService.getRMAllowedValues("rma:smList");
             }
         }, "dfranco");
         
@@ -1626,7 +1627,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             public List<String> doWork()
             {
                 // get allowed values for given caveat (for current user)
-                return caveatConfigImpl.getRMAllowedValues("rma:smList");
+                return caveatConfigService.getRMAllowedValues("rma:smList");
             }
         }, "dmartinz");
         
@@ -1864,7 +1865,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         deleteGroup("Finance");
         deleteGroup("test1");
         
-        caveatConfigImpl.updateOrCreateCaveatConfig("{}"); // empty config !
+        caveatConfigService.updateOrCreateCaveatConfig("{}"); // empty config !
         
         setComplete();
         endTransaction();
@@ -1909,7 +1910,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         File file = new File(url.getFile());
         assertTrue(file.exists());
         
-        caveatConfigImpl.updateOrCreateCaveatConfig(file);
+        caveatConfigService.updateOrCreateCaveatConfig(file);
         
         setComplete();
         endTransaction();

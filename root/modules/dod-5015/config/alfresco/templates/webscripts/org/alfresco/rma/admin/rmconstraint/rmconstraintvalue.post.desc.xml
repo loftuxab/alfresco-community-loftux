@@ -1,0 +1,12 @@
+<webscript>
+  <shortname>Add value to an authority in an an RM Constraint List</shortname>
+  <description><![CDATA[
+  Custom constraint full deep 
+  ]]>
+  </description>
+  <url>/api/rma/admin/rmconstraints/{listName}/{authorityName}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+  <lifecycle>internal</lifecycle>
+</webscript>

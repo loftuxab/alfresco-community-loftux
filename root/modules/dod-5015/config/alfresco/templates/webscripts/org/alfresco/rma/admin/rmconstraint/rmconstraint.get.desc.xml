@@ -1,0 +1,42 @@
+<webscript>
+  <shortname>Get an RM Constraint</shortname>
+  <description>
+  <![CDATA[
+  Get an RM Constraint including the details.    The list name is qualified with an underscore between prefix and name to be compatible with Java Script and URLs
+  e.g. rma_listName rather than rma:listName
+ 
+   <BR />
+   Constraint object
+   <BR />
+   <dl>
+   <dt>constraintName</dt> <dd>the name of the constraint.   The underscore character is used instead of the colon</dd>  
+   <dt>constraintDetails</dt> <dd>array of constraint details</dd>
+   </dl>
+   <BR />
+   constraintDetails object
+   <dl>
+   <dt>authorityName</dt><dd>the full name of the authority, either user or group</dd>
+   <dt>values</dt><dd>array of constraint values</dd>
+   </dl>
+   
+   <br />
+   Example JSON data
+  <pre> 
+  "data":
+        {
+           "constraintName" : "rma_smList",
+           "constraintDetails" : [
+{
+     "authorityName" : "fbloggs",
+     "values" : [ "NOFORN", "FGI" ] 
+   }
+   </pre>  
+
+  ]]>
+  </description>
+  <url>/api/rma/admin/rmconstraints/{listName}</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction allow="readonly">required</transaction>
+  <lifecycle>internal</lifecycle>
+</webscript>
