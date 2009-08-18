@@ -727,6 +727,18 @@ public abstract class AbstractCapability implements Capability
         }
         return false;
     }
+    
+    public boolean hasDispositionSchedule(NodeRef nodeRef)
+    {
+        DispositionSchedule dispositionSchedule = voter.getRecordsManagementService().getDispositionSchedule(nodeRef);
+        return dispositionSchedule != null;
+    }
+    
+    public boolean isRecordLevelDisposition(NodeRef nodeRef)
+    {
+        DispositionSchedule dispositionSchedule = voter.getRecordsManagementService().getDispositionSchedule(nodeRef);
+        return dispositionSchedule.isRecordLevelDisposition();
+    }
 
     @Override
     public int hashCode()
