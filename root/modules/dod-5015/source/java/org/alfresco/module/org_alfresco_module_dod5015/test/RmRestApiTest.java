@@ -653,7 +653,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertEquals("application/acp", rsp.getContentType());
     }
     
-    public void testAudit() throws IOException
+    public void xtestAudit() throws IOException
     {
         // construct the URL
         NodeRef nodeRef = new NodeRef("workspace://SpacesStore/cc2f1431-5e15-4c66-b79b-3f76c227dd9b");
