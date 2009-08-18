@@ -300,7 +300,14 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
 
         if(di == null)
         {
-            return false;
+            if (throwException)
+            {
+                throw new AlfrescoRuntimeException("Null disposition");
+            }
+            else
+            {
+                return false;
+            }
         }
         
         // Check the eligibility of the action
