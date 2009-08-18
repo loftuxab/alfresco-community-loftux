@@ -68,6 +68,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ISO8601DateFormat;
+import org.alfresco.web.scripts.TestWebScriptServer.DeleteRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
@@ -407,7 +408,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue("There should be exactly 1 custom references. Found " + customRefsObj.length(), customRefsObj.length() == 1);
     }
 
-    public void testGetCustomReferenceInstances() throws Exception
+    public void testGetAndDeleteCustomReferenceInstances() throws Exception
     {
     	// Create test records.
         NodeRef recordFolder = retrievePreexistingRecordFolder();
@@ -442,7 +443,6 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 	    
 	    
         // Now retrieve the applied references from the REST API
-       
         rsp = sendRequest(new GetRequest(refInstancesUrl), 200);
 
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
@@ -455,6 +455,33 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 
         final int customRefsCount = customRefsArray.length();
         assertTrue("There should be at least one custom reference. Found " + customRefsArray, customRefsCount > 0);
+        
+        // Now to delete a reference instance of each type
+        String protocol = testRecord2.getStoreRef().getProtocol();
+        String identifier = testRecord2.getStoreRef().getIdentifier();
+        String recId = testRecord2.getId();
+        final String queryFormat = "?st={0}&si={1}&id={2}";
+        String urlQueryString = MessageFormat.format(queryFormat, protocol, identifier, recId);
+
+        rsp = sendRequest(new DeleteRequest(refInstancesUrl + "/" + "supported" + now + urlQueryString), 200);
+        assertTrue(rsp.getContentAsString().contains("success"));
+
+        rsp = sendRequest(new DeleteRequest(refInstancesUrl + "/"
+        		+ "superseding" + now + "__" + "superseded" + now
+        		+ urlQueryString), 200);
+        assertTrue(rsp.getContentAsString().contains("success"));
+        
+        // Get the reference instances back and confirm they've been removed.
+        rsp = sendRequest(new GetRequest(refInstancesUrl), 200);
+
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        
+        dataObj = (JSONObject)jsonRsp.get("data");
+        assertNotNull("JSON 'data' object was null", dataObj);
+        
+        customRefsArray = (JSONArray)dataObj.get("customReferences");
+        assertNotNull("JSON 'customReferences' object was null", customRefsArray);
+        assertTrue("customRefsArray was unexpectedly not empty.", customRefsArray.length() == 0);
     }
     
     public void testPostCustomProperty() throws Exception

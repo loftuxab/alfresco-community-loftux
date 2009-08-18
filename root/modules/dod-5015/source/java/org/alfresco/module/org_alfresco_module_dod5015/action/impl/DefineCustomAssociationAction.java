@@ -111,6 +111,8 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
         CustomReferenceId crId = new CustomReferenceId(label, null, null);
         
         M2Association newAssoc = customAssocsAspect.createAssociation(crId.getReferenceId());
+        newAssoc.setSourceMandatory(false);
+        newAssoc.setTargetMandatory(false);
 
         //TODO Could be the customAssocs aspect
         newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
@@ -134,6 +136,8 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
         CustomReferenceId crId = new CustomReferenceId(null, source, target);
 
         M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(crId.getReferenceId());
+        newAssoc.setSourceMandatory(false);
+        newAssoc.setTargetMandatory(false);
 
         //TODO Could be the cstom assocs aspect
         newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);

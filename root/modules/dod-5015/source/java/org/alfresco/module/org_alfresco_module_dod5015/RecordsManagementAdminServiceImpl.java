@@ -31,6 +31,7 @@ import java.util.Map;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
@@ -126,6 +127,32 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 		else
 		{
 			this.nodeService.createAssociation(fromNode, toNode, refId);
+		}
+	}
+
+	public void removeCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId) {
+		Map<QName, AssociationDefinition> availableAssocs = this.getAvailableCustomReferences();
+
+		AssociationDefinition assocDef = availableAssocs.get(assocId);
+		if (assocDef == null)
+		{
+			throw new IllegalArgumentException("No such custom reference: " + assocId);
+		}
+
+		if (assocDef.isChild())
+		{
+			List<ChildAssociationRef> children = nodeService.getChildAssocs(fromNode);
+			for (ChildAssociationRef chRef : children)
+			{
+				if (assocId.equals(chRef.getTypeQName()) && chRef.getChildRef().equals(toNode))
+				{
+					nodeService.removeChildAssociation(chRef);
+				}
+			}
+		}
+		else
+		{
+			nodeService.removeAssociation(fromNode, toNode, assocId);
 		}
 	}
 

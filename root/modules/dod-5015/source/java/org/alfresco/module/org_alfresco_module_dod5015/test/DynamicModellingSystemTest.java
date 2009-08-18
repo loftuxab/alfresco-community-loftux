@@ -50,6 +50,8 @@ import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 
 /**
+ * TODO Delete this class
+ * 
  * @author Neil McErlean
  */
 public class DynamicModellingSystemTest extends BaseSpringTest implements DOD5015Model
