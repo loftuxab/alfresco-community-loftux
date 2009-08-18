@@ -766,6 +766,7 @@
          _originalGroups: [],
          _groups: [],
          _photoReset: false,
+         _form: null,
          
          onLoad: function onLoad()
          {
@@ -791,6 +792,7 @@
             
             // Initialise the form
             form.init();
+            this._form = form;
             
             // Load in the Groups Finder component from the server
             Alfresco.util.Ajax.request(
@@ -1003,6 +1005,7 @@
                fnSetter("-update-firstname", firstName);
                fnSetter("-update-lastname", lastName);
                fnSetter("-update-email", person.email);
+               fnSetter("-update-old-password", "");
                fnSetter("-update-password", "");
                fnSetter("-update-verifypassword", "");
                
@@ -1046,8 +1049,20 @@
                   me.addGroup({"itemName": person.groups[i], "displayName": person.groups[i].substring(6)});
                }
                
+               // Hide or show the old password field - only required if user changing own password
+               if (parent.currentUserId.toLowerCase() === Alfresco.constants.USERNAME.toLowerCase())
+               {
+                  Dom.setStyle(parent.id + "-oldpassword-wrapper", "display", "block");
+               }
+               else
+               {
+                  Dom.setStyle(parent.id + "-oldpassword-wrapper", "display", "none");
+               }
+               
                // Make main panel area visible
                Dom.setStyle(parent.id + "-update-main", "visibility", "visible");
+               
+               me._form.updateSubmitElements();
             };
             
             // make an ajax call to get user details
@@ -1618,9 +1633,10 @@
        */
       _updateUser: function ConsoleUsers__updateUser(handler)
       {
-         // TODO: respect minimum field length for password
-         
          var me = this;
+         
+         var isCurrentUser = (this.currentUserId.toLowerCase() === Alfresco.constants.USERNAME.toLowerCase());
+         
          var fnGetter = function(id)
          {
             return Dom.get(me.id + id).value;
@@ -1630,12 +1646,16 @@
          {
             var completed = function(res)
             {
-               if (fnGetter("-update-password") !== "")
+               if (YAHOO.lang.trim(fnGetter("-update-password")).length !== 0)
                {
                   var passwordObj =
                   {
-                     newpw: fnGetter("-update-password")
+                     newpw: YAHOO.lang.trim(fnGetter("-update-password"))
                   };
+                  if (isCurrentUser == true)
+                  {
+                     passwordObj.oldpw = YAHOO.lang.trim(fnGetter("-update-old-password"));
+                  }
                   
                   // update the password for the user
                   Alfresco.util.Ajax.request(
@@ -1693,10 +1713,19 @@
          };
          
          // verify password against second field
+         var oldPw = fnGetter("-update-old-password");
          var password = fnGetter("-update-password");
          var verifypw = fnGetter("-update-verifypassword");
          if (YAHOO.lang.trim(password).length !== 0)
          {
+            if (isCurrentUser == true && (YAHOO.lang.trim(oldPw).length === 0))
+            {
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: this._msg("message.password-validate-oldpw")
+               });
+               return;
+            }
             if (YAHOO.lang.trim(password).length < this.options.minPasswordLength)
             {
                Alfresco.util.PopupManager.displayMessage(

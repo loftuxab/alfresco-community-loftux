@@ -157,10 +157,10 @@
                            if (iframe.attributes["name"])
                            {
                               var titleLink = Dom.get(this.id + "-title-link");
-                              //update iframe and internal config
+                              // update iframe and internal config
                               titleLink.href.value = this.options.webviewURI = iframe.attributes["src"].value;
-                              titleLink.innerHTML = this.options.webviewTitle = $html(iframe.attributes["name"].value);
-                              
+                              this.options.webviewTitle = iframe.attributes["name"].value;
+                              titleLink.innerHTML = $html(this.options.webviewTitle);
                            }
                            if (iframe.attributes["theHeight"])
                            {
@@ -170,7 +170,6 @@
                            this.options.isDefault = 'false';
                         }
                      }
-                     
                   },
                   scope: this
                },

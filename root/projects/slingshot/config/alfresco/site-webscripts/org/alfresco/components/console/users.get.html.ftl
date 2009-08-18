@@ -317,6 +317,14 @@
                <option value="kb">${msg("size.kilobytes")}</option>
             </select>
          </div>
+         <div id="${el}-oldpassword-wrapper">
+            <div class="field-row">
+               <span class="crud-label">${msg("label.oldpassword")}:</span>
+            </div>
+            <div class="field-row">
+               <input class="crud-input" id="${el}-update-old-password" type="password" maxlength="255" />
+            </div>
+         </div>
          <div class="field-row">
             <span class="crud-label">${msg("label.newpassword")}:</span>
          </div>
