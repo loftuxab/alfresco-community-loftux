@@ -50,11 +50,8 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                <span class="and">${msg("label.and")}</span>
             </div>
             <div class="action-event-name">
-               <select name="events[]" class="action-event-name-value">
-                  <#list events as event>
-                  <option value="${event.value}">${event.label}</option>
-                  </#list>
-               </select>
+               <input type="hidden" name="events[]" class="action-event-name-value">
+               <span class="action-event-name-label"></span>
             </div>
             <div class="action-event-completion"></div>
             <div class="action-event-buttons">
@@ -117,11 +114,12 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                         <li id="${el}-event-template-dummy"></li>
                      </ul>
                      <div class="events-header">
-                        <span class="yui-button addevent">
-                           <span class="first-child">
-                              <button type="button">${msg("button.addevent")}</button>
-                           </span>
-                        </span>
+                        <input type="button" class="addevent-button" name="addevent-button" value="${msg("button.addevent")}">
+                        <select class="addevent-menu" name="addevent-menu">
+                           <#list events as event>
+                           <option value="${event.value}">${event.label}</option>
+                           </#list>                           
+                        </select>
                         <hr />
                      </div>
                      <select name="eligibleOnFirstCompleteEvent" class="relation">
