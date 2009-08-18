@@ -3696,9 +3696,9 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
-        catch(AlfrescoRuntimeException are)
+        catch (AlfrescoRuntimeException are)
         {
-            
+
         }
         try
         {
@@ -3709,11 +3709,11 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
-        catch(AlfrescoRuntimeException are)
+        catch (AlfrescoRuntimeException are)
         {
-            
+
         }
-        
+
         checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
         checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
@@ -3887,14 +3887,14 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "transfer", null);
         recordsManagementActionService.executeRecordsManagementAction(record_2, "transfer", null);
         recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "transferComplete", null);
-        
+
         assertTrue(this.nodeService.exists(recordFolder_1));
         ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
         assertTrue(this.nodeService.exists(recordFolder_1));
         ndNodeRef = this.nodeService.getChildAssocs(record_2, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
-        
+
         // folder level
 
         assertTrue(this.nodeService.exists(recordFolder_1));
@@ -4140,9 +4140,9 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
-        catch(AlfrescoRuntimeException are)
+        catch (AlfrescoRuntimeException are)
         {
-            
+
         }
         try
         {
@@ -4153,9 +4153,9 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
-        catch(AlfrescoRuntimeException are)
+        catch (AlfrescoRuntimeException are)
         {
-            
+
         }
 
         checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
@@ -4190,12 +4190,20 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
+        catch (AlfrescoRuntimeException are)
+        {
+
+        }
         try
         {
             recordsManagementActionService.executeRecordsManagementAction(record_1, "accessionComplete", null);
             fail();
         }
         catch (AccessDeniedException ade)
+        {
+
+        }
+        catch (AlfrescoRuntimeException are)
         {
 
         }
@@ -4209,24 +4217,36 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
+        catch (AlfrescoRuntimeException are)
+        {
+
+        }
 
         // try again - should fail
 
         try
         {
-            recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "accessionComplete", null);
+            recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "accessionComplete", null);
             fail();
         }
         catch (AccessDeniedException ade)
         {
 
         }
+        catch (AlfrescoRuntimeException are)
+        {
+
+        }
         try
         {
-            recordsManagementActionService.executeRecordsManagementAction(record_2, "accessionComplete", null);
+            recordsManagementActionService.executeRecordsManagementAction(getTranferObject(record_2), "accessionComplete", null);
             fail();
         }
         catch (AccessDeniedException ade)
+        {
+
+        }
+        catch (AlfrescoRuntimeException are)
         {
 
         }
