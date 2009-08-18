@@ -15,7 +15,6 @@
         <property name="rmActionService" ref="recordsManagementActionService"/>
         <property name="nodeService" ref="nodeService"/>
         <property name="policyComponent" ref="policyComponent"/>
-        <property name="voter" ref="rmEntryVoter"/>
     </bean>
     
     <bean id="RecordsManagementService" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -74,12 +73,66 @@
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isNextDispositionActionEligible=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getNextDispositionAction=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getVitalRecordDefinition=RM.Read.0
-                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getProtectedAspects=RM_ALLOW
-                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getProtectedProperties=RM_ALLOW
-                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getCapabilities=RM.Read.0
-                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getCapability=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getNextRecordIdentifier=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.*=RM_DENY
+                ]]>
+            </value>
+        </property>
+    </bean>
+    
+    <!-- Records Management Security Service -->
+    
+    <bean id="recordsManagementSecurityService" class="org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityServiceImpl" depends-on="org_alfresco_module_dod5015_dictionaryBootstrap">        
+        <property name="voter" ref="rmEntryVoter"/>
+        <property name="authorityService" ref="AuthorityService"/>
+        <property name="permissionService" ref="PermissionService"/>
+    </bean>
+    
+    <bean id="RecordsManagementSecurityService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService</value>
+        </property>
+        <property name="target">
+            <ref bean="recordsManagementSecurityService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="RecordsManagementSecurityService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref local="RecordsManagementSecurityService_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementSecurityService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementSecurityService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref bean="accessDecisionManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref bean="afterInvocationManager"/>
+        </property>
+        <property name="objectDefinitionSource">
+            <value>
+                <![CDATA[  
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getProtectedAspects=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getProtectedProperties=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getCapabilities=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getCapability=RM_ALLOW                
                 ]]>
             </value>
         </property>

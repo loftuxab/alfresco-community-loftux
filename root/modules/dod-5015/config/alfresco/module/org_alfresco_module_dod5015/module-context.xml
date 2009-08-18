@@ -67,6 +67,15 @@
     <!-- Import the RM action's -->
     <import resource="classpath:alfresco/module/org_alfresco_module_dod5015/rm-action-context.xml"/>
     
+    <!-- RM Script API -->
+    
+    <bean id="scriptRecordsManagementService" parent="baseJavaScriptExtension" class="org.alfresco.module.org_alfresco_module_dod5015.jscript.ScriptRecordsManagmentService">
+        <property name="extensionName">
+            <value>rmService</value>
+        </property>
+        <property name="recordsManagementServiceRegistry" ref="RecordsManagementServiceRegistry"/>
+    </bean>
+    
     <!-- Event types -->
     
     <bean id="rmEventType" init-method="init" abstract="true">

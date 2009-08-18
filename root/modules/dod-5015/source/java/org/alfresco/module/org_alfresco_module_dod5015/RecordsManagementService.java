@@ -27,11 +27,8 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.namespace.QName;
 
 /**
@@ -169,34 +166,6 @@ public interface RecordsManagementService
      * @return VitalRecordDetails   vital record details, null if none
      */
     VitalRecordDefinition getVitalRecordDefinition(NodeRef nodeRef);  
-    
-    /**
-     * Get the set of aspect QNames which can not be added direct via the public node service;
-     * they must be managed via the appropriate actions.
-     * @return
-     */
-    Set<QName> getProtectedAspects();
-    
-    /**
-     * Get the set of property QNames which can not be added, updated or removed direct via the public node service;
-     * they must be managed via the appropriate actions.
-     * @return
-     */
-    Set<QName> getProtectedProperties();
-    
-    /**
-     * Get the full set of capabilities for the current user.
-     * @param nodeRef
-     * @return
-     */
-    Map<Capability, AccessStatus> getCapabilities(NodeRef nodeRef);
-    
-    /**
-     * Get a capability by name
-     * @param name
-     * @return
-     */
-    Capability getCapability(String name);
     
     /**
      * Suggest the next record identifier
