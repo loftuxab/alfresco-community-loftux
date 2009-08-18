@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,6 +42,7 @@ import javax.transaction.UserTransaction;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
@@ -48,6 +50,8 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.TransferAction;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.TransferCompleteAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
@@ -57,6 +61,7 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.security.permissions.PermissionReference;
 import org.alfresco.repo.security.permissions.impl.model.PermissionModel;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -150,7 +155,7 @@ public class CapabilitiesTest extends TestCase
         recordsManagementService = (RecordsManagementService) ctx.getBean("RecordsManagementService");
         recordsManagementActionService = (RecordsManagementActionService) ctx.getBean("RecordsManagementActionService");
         recordsManagementEventService = (RecordsManagementEventService) ctx.getBean("RecordsManagementEventService");
-        rmEntryVoter = (RMEntryVoter)  ctx.getBean("rmEntryVoter");
+        rmEntryVoter = (RMEntryVoter) ctx.getBean("rmEntryVoter");
 
         testTX = transactionService.getUserTransaction();
         testTX.begin();
@@ -237,6 +242,7 @@ public class CapabilitiesTest extends TestCase
 
         createDispoistionAction(ds, "cutoff", "monthend|1", null, "event");
         createDispoistionAction(ds, "transfer", "month|1", null, null);
+        createDispoistionAction(ds, "accession", "month|1", null, null);
         createDispoistionAction(ds, "destroy", "month|1", "{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate", null);
         return answer;
     }
@@ -3317,25 +3323,7 @@ public class CapabilitiesTest extends TestCase
 
         try
         {
-            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETE, true);
-            fail();
-        }
-        catch (AccessDeniedException ade)
-        {
-
-        }
-        try
-        {
-            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETED_AT, new Date());
-            fail();
-        }
-        catch (AccessDeniedException ade)
-        {
-
-        }
-        try
-        {
-            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETED_BY, "me");
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_CUT_OFF_DATE, new Date());
             fail();
         }
         catch (AccessDeniedException ade)
@@ -3383,7 +3371,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testAuthorizeAllTransfersCapability()
     {
-     // Folder
+        // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
         checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
         checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
@@ -3458,12 +3446,12 @@ public class CapabilitiesTest extends TestCase
 
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
         recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
-        
+
         ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
         ndNodeRef = this.nodeService.getChildAssocs(record_2, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
-        
+
         // folder level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
@@ -3652,27 +3640,44 @@ public class CapabilitiesTest extends TestCase
 
         // check protected properties
 
+        // PROP_DISPOSITION_ACTION_STARTED_AT
+        // PROP_DISPOSITION_ACTION_STARTED_BY
+        // PROP_DISPOSITION_ACTION_COMPLETED_AT
+        // PROP_DISPOSITION_ACTION_COMPLETED_BY
+
         try
         {
-            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETE, true);
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_DISPOSITION_ACTION_STARTED_AT, true);
             fail();
         }
         catch (AccessDeniedException ade)
         {
 
         }
+
         try
         {
-            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETED_AT, new Date());
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_DISPOSITION_ACTION_STARTED_BY, true);
             fail();
         }
         catch (AccessDeniedException ade)
         {
 
         }
+
         try
         {
-            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_EVENT_EXECUTION_COMPLETED_BY, "me");
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_DISPOSITION_ACTION_COMPLETED_AT, true);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_DISPOSITION_ACTION_COMPLETED_BY, true);
             fail();
         }
         catch (AccessDeniedException ade)
@@ -3684,7 +3689,57 @@ public class CapabilitiesTest extends TestCase
 
         try
         {
-            recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "transfer", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        catch(AlfrescoRuntimeException are)
+        {
+            
+        }
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_2, "transfer", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        catch(AlfrescoRuntimeException are)
+        {
+            
+        }
+        
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+
+        // check each action
+
+        TransferAction transfer = (TransferAction) ctx.getBean("transfer");
+        assertFalse(transfer.isExecutable(recordFolder_1, null));
+        assertFalse(transfer.isExecutable(record_1, null));
+        assertFalse(transfer.isExecutable(recordFolder_2, null));
+        assertFalse(transfer.isExecutable(record_2, null));
+
+        TransferCompleteAction transferComplete = (TransferCompleteAction) ctx.getBean("transferComplete");
+        assertTrue(transferComplete.isExecutable(recordFolder_1, null));
+        assertFalse(transferComplete.isExecutable(record_1, null));
+        assertFalse(transferComplete.isExecutable(recordFolder_2, null));
+        assertTrue(transferComplete.isExecutable(record_2, null));
+
+        // try and complete the transfer
+
+        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "transferComplete", null);
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "transferComplete", null);
             fail();
         }
         catch (AccessDeniedException ade)
@@ -3693,7 +3748,17 @@ public class CapabilitiesTest extends TestCase
         }
         try
         {
-            recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
+            recordsManagementActionService.executeRecordsManagementAction(record_1, "transferComplete", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            // will fail as this is in the same transafer which is now done.
+            recordsManagementActionService.executeRecordsManagementAction(getTranferObject(record_2), "transferComplete", null);
             fail();
         }
         catch (AccessDeniedException ade)
@@ -3701,21 +3766,475 @@ public class CapabilitiesTest extends TestCase
 
         }
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        // try again - should fail
 
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "transferComplete", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_2, "transferComplete", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+    }
+
+    private NodeRef getTranferObject(NodeRef fp)
+    {
+        List<ChildAssociationRef> assocs = this.nodeService.getParentAssocs(fp, RecordsManagementModel.ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
+        if (assocs.size() > 0)
+        {
+            return assocs.get(0).getParentRef();
+        }
+        else
+        {
+            return fp;
+        }
     }
 
     public void testAuthorizeNominatedTransfersCapability()
     {
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission("rm_security_officer", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkPermission("rm_power_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkPermission("rm_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission("rm_administrator", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission("rm_records_manager", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission("rm_security_officer", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkPermission("rm_power_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkPermission("rm_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        // folder level - not eligible all deny
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_administrator", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        // record level - not eligible all deny
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_administrator", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        // Set appropriate state - declare records and make eligible
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_1, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_1, "declareRecord");
+
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_2, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "declareRecord");
+
+        NodeRef ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        ndNodeRef = this.nodeService.getChildAssocs(record_2, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
+
+        ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        ndNodeRef = this.nodeService.getChildAssocs(record_2, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "transfer", null);
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "transfer", null);
+        recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "transferComplete", null);
+        
+        assertTrue(this.nodeService.exists(recordFolder_1));
+        ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        assertTrue(this.nodeService.exists(recordFolder_1));
+        ndNodeRef = this.nodeService.getChildAssocs(record_2, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        
+        // folder level
+
+        assertTrue(this.nodeService.exists(recordFolder_1));
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_administrator", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("rm_administrator", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("rm_records_manager", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("rm_security_officer", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("rm_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, "test_user", RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, "test_user", RMPermissionModel.FILING);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        // check frozen
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        // Check closed
+        // should make no difference
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        // try accession
+
+        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "accession", null);
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "accession", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_1, "accession", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "accession", null);
+
+        // check protected properties
+
+        // PROP_DISPOSITION_ACTION_STARTED_AT
+        // PROP_DISPOSITION_ACTION_STARTED_BY
+        // PROP_DISPOSITION_ACTION_COMPLETED_AT
+        // PROP_DISPOSITION_ACTION_COMPLETED_BY
+
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_DISPOSITION_ACTION_STARTED_AT, true);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_DISPOSITION_ACTION_STARTED_BY, true);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_DISPOSITION_ACTION_COMPLETED_AT, true);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+
+        try
+        {
+            publicNodeService.setProperty(record_1, RecordsManagementModel.PROP_DISPOSITION_ACTION_COMPLETED_BY, true);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+
+        // check cutoff again (it is already cut off)
+
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "accession", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        catch(AlfrescoRuntimeException are)
+        {
+            
+        }
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_2, "accession", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        catch(AlfrescoRuntimeException are)
+        {
+            
+        }
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+
+        // check each action
+
+        TransferAction transfer = (TransferAction) ctx.getBean("accession");
+        assertFalse(transfer.isExecutable(recordFolder_1, null));
+        assertFalse(transfer.isExecutable(record_1, null));
+        assertFalse(transfer.isExecutable(recordFolder_2, null));
+        assertFalse(transfer.isExecutable(record_2, null));
+
+        TransferCompleteAction transferComplete = (TransferCompleteAction) ctx.getBean("accessionComplete");
+        assertTrue(transferComplete.isExecutable(recordFolder_1, null));
+        assertFalse(transferComplete.isExecutable(record_1, null));
+        assertFalse(transferComplete.isExecutable(recordFolder_2, null));
+        assertTrue(transferComplete.isExecutable(record_2, null));
+
+        // try and complete the transfer
+
+        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "accessionComplete", null);
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "accessionComplete", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_1, "accessionComplete", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            // will fail as this is in the same transafer which is now done.
+            recordsManagementActionService.executeRecordsManagementAction(getTranferObject(record_2), "accessionComplete", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+
+        // try again - should fail
+
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "accessionComplete", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_2, "accessionComplete", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
     }
 
-    public void testChangeOrDeleteReferencesCapability()                  
+    public void testChangeOrDeleteReferencesCapability()
     {
-     // capability is checked above - just check permission assignments
+        // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.ALLOWED);
         checkPermission("rm_administrator", filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.ALLOWED);
         checkPermission("rm_records_manager", filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.ALLOWED);

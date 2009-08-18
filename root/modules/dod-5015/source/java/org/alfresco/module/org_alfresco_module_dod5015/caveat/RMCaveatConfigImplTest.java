@@ -132,7 +132,7 @@ public class RMCaveatConfigImplTest extends BaseSpringTest implements DOD5015Mod
 		// Get the test data
 		setUpTestData();
         
-        URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig1.json"); // from test-resources
+        URL url = RMCaveatConfigImplTest.class.getClassLoader().getResource("testCaveatConfig1.json"); // from test-resources
         assertNotNull(url);
         File file = new File(url.getFile());
         assertTrue(file.exists());

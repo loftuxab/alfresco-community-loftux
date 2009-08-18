@@ -32,6 +32,7 @@ import java.util.Map;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -46,7 +47,8 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 public class TransferCompleteAction extends RMActionExecuterAbstractBase
 {
     /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase#isExecutableImpl(org.alfresco.service.cmr.repository.NodeRef, java.util.Map, boolean)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase#isExecutableImpl(org.alfresco.service.cmr.repository.NodeRef,
+     *      java.util.Map, boolean)
      */
     @Override
     protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
@@ -58,16 +60,18 @@ public class TransferCompleteAction extends RMActionExecuterAbstractBase
         }
         else
         {
-            return false;
+            List<ChildAssociationRef> assocs = this.nodeService.getParentAssocs(filePlanComponent, ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
+            return assocs.size() > 0;
         }
     }
 
     /**
-     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
+     * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
+     *      org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
-    {   
+    {
         QName className = this.nodeService.getType(actionedUponNodeRef);
         if (this.dictionaryService.isSubClass(className, TYPE_TRANSFER) == true)
         {
@@ -76,29 +80,39 @@ public class TransferCompleteAction extends RMActionExecuterAbstractBase
             {
                 markComplete(assoc.getChildRef());
             }
-            
+
             // Delete the transfer object
             this.nodeService.deleteNode(actionedUponNodeRef);
+
+            NodeRef transferNodeRef = (NodeRef) AlfrescoTransactionSupport.getResource(TransferAction.KEY_TRANSFER_NODEREF);
+            if (transferNodeRef != null)
+            {
+                if (transferNodeRef.equals(actionedUponNodeRef))
+                {
+                    AlfrescoTransactionSupport.bindResource(TransferAction.KEY_TRANSFER_NODEREF, null);
+                }
+            }
         }
         else
         {
             throw new AlfrescoRuntimeException("Actioned upon node is not a valid transfer object.");
         }
-    }    
-    
+    }
+
     /**
      * Marks the node complete
      * 
-     * @param nodeRef   disposition lifecycle node reference
+     * @param nodeRef
+     *            disposition lifecycle node reference
      */
     private void markComplete(NodeRef nodeRef)
     {
         // Set the completed date
         this.nodeService.setProperty(nodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT, new Date());
         this.nodeService.setProperty(nodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY, AuthenticationUtil.getRunAsUser());
-        
+
         // Update to the next disposition action
         updateNextDispositionAction(nodeRef);
     }
-   
+
 }

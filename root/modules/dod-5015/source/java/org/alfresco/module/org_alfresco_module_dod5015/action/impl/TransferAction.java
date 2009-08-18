@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
@@ -46,7 +47,7 @@ import org.alfresco.service.namespace.QName;
 public class TransferAction extends RMDispositionActionExecuterAbstractBase
 {    
     /** Transfer node reference key */
-    private static final String KEY_TRANSFER_NODEREF = "transferNodeRef";
+    public static final String KEY_TRANSFER_NODEREF = "transferNodeRef";
     
     /** Indictates whether the transfer is an accession or not */
     private boolean isAccession = false;
@@ -136,6 +137,7 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
       
         if(!super.isExecutableImpl(filePlanComponent, parameters, throwException))
         {
+            // super will throw ...
             return false;
         }
         NodeRef transferNodeRef = (NodeRef)AlfrescoTransactionSupport.getResource(KEY_TRANSFER_NODEREF);            
@@ -146,7 +148,14 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
             {
                 if(car.getChildRef().equals(filePlanComponent))
                 {
-                    return false;
+                    if (throwException)
+                    {
+                        throw new AlfrescoRuntimeException("Already in transfer (" + filePlanComponent.toString() + ")");
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
         }
