@@ -277,6 +277,64 @@
         </property>
     </bean>
     
+    <!-- Records Management Audit Service -->
+    
+    <bean id="recordsManagementAuditService" class="org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditServiceImpl">
+        <property name="auditService">
+            <ref bean="AuditService" />
+        </property>
+        <property name="nodeService">
+            <ref bean="NodeService" />
+        </property>
+    </bean>
+    
+    <bean id="RecordsManagementAuditService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService</value>
+        </property>
+        <property name="target">
+            <ref bean="recordsManagementAuditService"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="RecordsManagementAuditService_transaction"/>
+                <idref bean="AuditMethodInterceptor"/>
+                <idref bean="exceptionTranslator"/>
+                <idref local="RecordsManagementAuditService_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="RecordsManagementAuditService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="RecordsManagementAuditService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref bean="accessDecisionManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref bean="afterInvocationManager"/>
+        </property>
+        <property name="objectDefinitionSource">
+            <value>
+                <![CDATA[  
+                org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService.*=RM_ALLOW
+                ]]>
+            </value>
+        </property>
+    </bean>
+    
     <!-- Search Behaviour -->
     
     <bean id="recordsManagementSearchBehaviour" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour" init-method="init">        

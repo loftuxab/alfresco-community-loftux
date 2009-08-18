@@ -84,6 +84,7 @@ import org.json.JSONTokener;
  */
 public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagementModel
 {
+    protected static final String GET_AUDITLOG_URL_FORMAT = "/api/node/{0}/rmauditlog";
     protected static final String GET_TRANSFER_URL_FORMAT = "/api/node/{0}/transfers/{1}";
     protected static final String REF_INSTANCES_URL_FORMAT = "/api/node/{0}/customreferences";
     protected static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
@@ -623,6 +624,21 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         transferUrl = MessageFormat.format(GET_TRANSFER_URL_FORMAT, rootNodeUrl, transferId);
         rsp = sendRequest(new GetRequest(transferUrl), 200);
         assertEquals("application/acp", rsp.getContentType());
+    }
+    
+    public void testAudit() throws IOException
+    {
+        // construct the URL
+        NodeRef nodeRef = new NodeRef("workspace://SpacesStore/cc2f1431-5e15-4c66-b79b-3f76c227dd9b");
+        String nodeUrl = nodeRef.toString().replace("://", "/");
+        String auditUrl = MessageFormat.format(GET_AUDITLOG_URL_FORMAT, nodeUrl);
+        
+        // send request
+        Response rsp = sendRequest(new GetRequest(auditUrl), 200);
+        
+        // check response
+        String rspContent = rsp.getContentAsString();
+        System.out.println(rspContent);
     }
     
     private void declareRecord(NodeRef recordOne)
