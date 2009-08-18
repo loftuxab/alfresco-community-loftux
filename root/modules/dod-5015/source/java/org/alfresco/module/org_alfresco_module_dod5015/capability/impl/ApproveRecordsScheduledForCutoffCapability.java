@@ -31,9 +31,9 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessStatus;
 
 /**
- * Note this is not just records 
+ * Note this is not just records
+ * 
  * @author andyh
- *
  */
 public class ApproveRecordsScheduledForCutoffCapability extends AbstractCapability
 {
@@ -55,7 +55,17 @@ public class ApproveRecordsScheduledForCutoffCapability extends AbstractCapabili
         {
             if (checkFilingUnfrozenUncutoff(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (isScheduledForCutoff(nodeRef))
+                if (hasDispositionSchedule(nodeRef))
+                {
+                    if (isScheduledForCutoff(nodeRef))
+                    {
+                        if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF) == AccessStatus.ALLOWED)
+                        {
+                            return AccessDecisionVoter.ACCESS_GRANTED;
+                        }
+                    }
+                }
+                else
                 {
                     if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF) == AccessStatus.ALLOWED)
                     {
