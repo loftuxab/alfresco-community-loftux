@@ -7,7 +7,6 @@
    <properties>
       <itemKind>node</itemKind>
       <itemId>{nodeRef}</itemId>
-      <formId>rm</formId>
       <mode>view</mode>
    </properties>
 </component>

@@ -148,11 +148,23 @@
                <show id="cm:name" />
                <show id="cm:title" force="true" />
                <show id="cm:description" force="true" />
+
+               <!-- tags and categories -->
+               <show id="cm:taggable" for-mode="edit" />
+               <show id="cm:categories" />
             </field-visibility>
             <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
                <field id="cm:description">
                   <control>
                      <control-param name="activateLinks">true</control-param>
+                  </control>
+               </field>
+               <field id="cm:taggable">
+                  <control>
+                     <control-param name="params">aspect=cm:taggable</control-param>
                   </control>
                </field>
             </appearance>
