@@ -71,6 +71,7 @@ import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.scripts.TestWebScriptServer.DeleteRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
+import org.alfresco.web.scripts.TestWebScriptServer.PutRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,7 +90,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     protected static final String GET_NODE_AUDITLOG_URL_FORMAT = "/api/node/{0}/rmauditlog";
     protected static final String GET_TRANSFER_URL_FORMAT = "/api/node/{0}/transfers/{1}";
     protected static final String REF_INSTANCES_URL_FORMAT = "/api/node/{0}/customreferences";
-    protected static final String GET_AUDITLOG_URL = "/api/rma/admin/rmauditlog";
+    protected static final String RMA_AUDITLOG_URL = "/api/rma/admin/rmauditlog";
     protected static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String RMA_CUSTOM_PROPS_URL = "/api/rma/admin/custompropertydefinitions";
@@ -655,12 +656,11 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertEquals("application/acp", rsp.getContentType());
     }
     
-    public void testAudit() throws IOException
+    public void testAudit() throws IOException, JSONException
     {
         // get the full RM audit log 
-        Response rsp = sendRequest(new GetRequest(GET_AUDITLOG_URL), 200);
-        String rspContent = rsp.getContentAsString();
-        System.out.println(rspContent);
+        Response rsp = sendRequest(new GetRequest(RMA_AUDITLOG_URL), 200);
+        System.out.println(rsp.getContentAsString());
         
         // get category
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Civilian Files", "Foreign Employee Award Files");
@@ -673,10 +673,35 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         // send request
         rsp = sendRequest(new GetRequest(auditUrl), 200);
+        System.out.println(rsp.getContentAsString());
         
-        // check response
-        rspContent = rsp.getContentAsString();
-        System.out.println(rspContent);
+        // start the RM audit log
+        JSONObject jsonPostData = new JSONObject();
+        jsonPostData.put("enabled", true);
+        String jsonPostString = jsonPostData.toString();
+        rsp = sendRequest(new PutRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 200);
+        
+        // check the response
+        System.out.println(rsp.getContentAsString());
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        JSONObject dataObj = (JSONObject)jsonRsp.get("data");
+        assertNotNull("JSON 'data' object was null", dataObj);
+        assertTrue(dataObj.getBoolean("enabled"));
+        assertTrue(dataObj.has("started"));
+        assertTrue(dataObj.has("stopped"));
+        
+        // stop the RM audit log
+        jsonPostData = new JSONObject();
+        jsonPostData.put("enabled", false);
+        jsonPostString = jsonPostData.toString();
+        rsp = sendRequest(new PutRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 200);
+        
+        // check the response
+        System.out.println(rsp.getContentAsString());
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        dataObj = (JSONObject)jsonRsp.get("data");
+        assertNotNull("JSON 'data' object was null", dataObj);
+        assertFalse(dataObj.getBoolean("enabled"));
     }
     
     private void declareRecord(NodeRef recordOne)
