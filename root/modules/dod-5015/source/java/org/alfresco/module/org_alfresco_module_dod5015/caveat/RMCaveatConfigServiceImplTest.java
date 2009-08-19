@@ -24,8 +24,6 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.caveat;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +31,6 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
-import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -509,12 +506,12 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         //addToGroup("gsmith", "Engineering");
         
         
-        URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig2.json"); // from test-resources
-        assertNotNull(url);
-        File file = new File(url.getFile());
-        assertTrue(file.exists());
+        //URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig2.json"); // from test-resources
+        //assertNotNull(url);
+        //File file = new File(url.getFile());
+        //assertTrue(file.exists());
         
-        caveatConfigService.updateOrCreateCaveatConfig(file);
+        //caveatConfigService.updateOrCreateCaveatConfig(file);
         
         setComplete();
         endTransaction();
