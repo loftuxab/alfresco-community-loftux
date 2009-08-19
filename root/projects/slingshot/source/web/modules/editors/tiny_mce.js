@@ -93,6 +93,23 @@ Alfresco.util.RichEditorManager.addEditor('tinyMCE', function(id,config)
       clearDirtyFlag: function RichEditorManager_tinyMCE_clearDirtyFlag()
       {
          editor.isNotDirty = 1;
+      },
+      
+      addPageUnloadBehaviour: function RichEditorManage_tinyMCE_addUnloadBehaviour(message)
+      {
+         // Page unload / unsaved changes behaviour
+         window.onbeforeunload = function(e)
+         {
+            var e = e || window.event;
+            if (editor.isDirty())
+            {
+               if (e)
+               {
+                  e.returnValue = message;
+               }
+               return message;
+            }
+         };
       }
    });
 });

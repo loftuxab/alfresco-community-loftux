@@ -6,16 +6,6 @@
       containerId: "${template.properties.container!'discussions'}",
       editorConfig : 
       {
-         <#--
-         //YUI
-         //             height: this.options.height + 'px',
-         //             width: this.options.width + 'px',
-         //             dompath: false, //Turns on the bar at the bottom
-         //             animate: false, //Animates the opening, closing and moving of Editor windows
-         //             markup: "xhtml",
-         //             toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg),
-         -->
-         //Tiny MCE
          width: '538',
          height: '250',
          theme:'advanced',

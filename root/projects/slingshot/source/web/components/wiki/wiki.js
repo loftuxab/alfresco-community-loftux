@@ -181,20 +181,6 @@
          if (this.options.mode === "edit")
          {
             this._setupEditForm();
-            
-            var me = this;
-            window.onbeforeunload = function(e)
-            {
-               var e = e || window.event;
-               if (me.pageEditor.isDirty())
-               {
-                  if (e)
-                  {
-                     e.returnValue = me._msg("message.confirmNavigation");
-                  }
-                  return me._msg("message.confirmNavigation");
-               }
-            };
          }
          else if (this.options.mode === "details")
          {
@@ -356,6 +342,7 @@
             siteId: this.options.siteId,
             language:this.options.locale         
          });
+         this.pageEditor.addPageUnloadBehaviour(this._msg("message.unsavedChanges.wiki"));
          this.pageEditor.render();
 
          var saveButton = new YAHOO.widget.Button(this.id + "-save-button",
@@ -433,7 +420,7 @@
                   {
                      Alfresco.util.PopupManager.displayPrompt(
                      {
-                        title: this._msg("message.failure", this.name),
+                        title: this._msg("message.failure"),
                         text: data.json.message
                      });
                   }
