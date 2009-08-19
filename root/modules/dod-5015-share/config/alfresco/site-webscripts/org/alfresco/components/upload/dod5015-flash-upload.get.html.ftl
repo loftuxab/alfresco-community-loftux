@@ -3,6 +3,31 @@
       <span id="${args.htmlid}-title-span"></span>
    </div>
    <div class="bd">
+      <div class="yui-g">
+         <h2>${msg("section.recordType")}</h2>
+      </div>
+      <div class="yui-gd">
+         <div class="yui-u first">
+            <label for="${args.htmlid}-recordTypes-select">${msg("label.recordType")}</label>
+         </div>
+         <div class="yui-u" id="${args.htmlid}-recordTypes-select-container">
+            <select id="${args.htmlid}-recordTypes-select" name="aspects">
+               <#if (recordTypes?size > 0)>
+                  <#list recordTypes as recordType>
+                     <option value="${recordType.id}"<#if recordType_index = 0> selected</#if>>${msg("recordType." + recordType.value)}</option>
+                  </#list>
+               </#if>
+            </select>
+         </div>
+      </div>
+      <div class="yui-gd">
+         <div class="yui-u first">&nbsp;</div>
+         <div class="yui-u">${msg("label.recordType.description")}</div>
+      </div>
+
+      <div class="yui-g">
+         <h2>${msg("section.file")}</h2>
+      </div>
       <div class="browse-wrapper">
          <div class="center">
             <div id="${args.htmlid}-flashuploader-div" class="browse">${msg("label.noFlash")}</div>
@@ -79,7 +104,7 @@
    </div>
 </div>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.FlashUpload("${args.htmlid}").setMessages(
+new Alfresco.RecordsFlashUpload("${args.htmlid}").setMessages(
    ${messages}
 );
 //]]></script>
