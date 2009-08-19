@@ -6,7 +6,6 @@
       <form id="${args.htmlid}-htmlupload-form"
             method="post" enctype="multipart/form-data" accept-charset="utf-8"
             action="${url.context}/proxy/alfresco/api/upload.html">
-         <fieldset>
          <input type="hidden" id="${args.htmlid}-siteId-hidden" name="siteId" value=""/>
          <input type="hidden" id="${args.htmlid}-containerId-hidden" name="containerId" value=""/>
          <input type="hidden" id="${args.htmlid}-username-hidden" name="username" value=""/>
@@ -25,9 +24,6 @@
          </p>
 
          <div>
-            <div class="yui-g">
-               <h2>${msg("section.file")}</h2>
-            </div>
             <div class="yui-gd <#if (contentTypes?size == 1)>hidden</#if>">
                <div class="yui-u first">
                   <label for="${args.htmlid}-contentType-select">${msg("label.contentType")}</label>
@@ -41,6 +37,26 @@
                      </#if>
                   </select>
                </div>
+            </div>
+            <div class="yui-g">
+               <h2>${msg("section.recordType")}</h2>
+            </div>
+            <div class="yui-gd">
+               <div class="yui-u first">
+                  <label for="${args.htmlid}-recordTypes-select">${msg("label.recordType")}</label>
+               </div>
+               <div class="yui-u" id="${args.htmlid}-recordTypes-select-container">
+                  <select id="${args.htmlid}-recordTypes-select" name="aspects">
+                     <#if (recordTypes?size > 0)>
+                        <#list recordTypes as recordType>
+                           <option value="${recordType.id}"<#if recordType_index = 0> selected</#if>>${msg("recordType." + recordType.value)}</option>
+                        </#list>
+                     </#if>
+                  </select>
+               </div>
+            </div>
+            <div class="yui-g">
+               <h2>${msg("section.file")}</h2>
             </div>
             <div class="yui-gd">
                <div class="yui-u first">
@@ -86,13 +102,12 @@
             <input id="${args.htmlid}-cancel-button" type="button" value="${msg("button.cancel")}" />
          </div>
 
-         </fieldset>
       </form>
 
    </div>
 </div>
 <script type="text/javascript">//<![CDATA[
-new Alfresco.HtmlUpload("${args.htmlid}").setMessages(
+new Alfresco.RecordsHtmlUpload("${args.htmlid}").setMessages(
    ${messages}
 );
 Alfresco.util.relToTarget("${args.htmlid}-singleUploadTip-span");

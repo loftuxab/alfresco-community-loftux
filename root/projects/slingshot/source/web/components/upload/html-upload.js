@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -44,6 +44,7 @@
  *
  * @namespace Alfresco
  * @class Alfresco.HtmlUpload
+ * @extends Alfresco.component.Base
  */
 (function()
 {
@@ -59,26 +60,19 @@
     * HtmlUpload is considered a singleton so constructor should be treated as private,
     * please use Alfresco.getHtmlUploadInstance() instead.
     *
-    * @param {string} htmlId The HTML id of the parent element
+    * @param htmlId {String} The HTML id of the parent element
     * @return {Alfresco.HtmlUpload} The new HtmlUpload instance
     * @constructor
     * @private
     */
-   Alfresco.HtmlUpload = function(containerId)
+   Alfresco.HtmlUpload = function(htmlId)
    {
-      this.name = "Alfresco.HtmlUpload";
-      this.id = containerId; 
-
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource"], this.onComponentsLoaded, this);
+      Alfresco.HtmlUpload.superclass.constructor.call(this, "Alfresco.HtmlUpload", htmlId, ["button", "container"]); 
 
       return this;
    };
 
-   Alfresco.HtmlUpload.prototype =
+   YAHOO.extend(Alfresco.HtmlUpload, Alfresco.component.Base,
    {
       /**
        * Shows uploader in single upload mode.
@@ -131,14 +125,6 @@
       showConfig: {},
 
       /**
-       * Object container for storing YUI widget and HTMLElement instances.
-       *
-       * @property widgets
-       * @type object
-       */
-      widgets: {},
-
-      /**
        * HTMLElement of type div that displays the version input form.
        *
        * @property versionSection
@@ -147,25 +133,12 @@
       versionSection: null,
 
       /**
-       * Set messages for this module.
+       * Fired by YUI when parent element is available for scripting.
+       * Initial History Manager event registration
        *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.HtmlUpload} returns 'this' for method chaining
+       * @method onReady
        */
-      setMessages: function HU_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function HU_onComponentsLoaded()
+      onReady: function HtmlUpload_onReady()
       {
          Dom.removeClass(this.id + "-dialog", "hidden");
 
@@ -238,7 +211,6 @@
          // Submit as an ajax submit (not leave the page), in json format
          form.setAJAXSubmit(true, {});
 
-         //form.setSubmitAsJSON(true);
          // We're in a popup, so need the tabbing fix
          form.applyTabFix();
          form.init();
@@ -278,7 +250,7 @@
        *                             // an overwrite and a new version
        * }
        */
-      show: function HU_show(config)
+      show: function HtmlUpload_show(config)
       {
          // Merge the supplied config with default config and check mandatory properties
          this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
@@ -303,7 +275,7 @@
        *
        * @method onUploadSuccess
        */
-      onUploadSuccess: function HU_onUploadSuccess(response)
+      onUploadSuccess: function HtmlUpload_onUploadSuccess(response)
       {
          // Hide the current message display
          this.widgets.feedbackMessage.destroy();
@@ -336,7 +308,7 @@
        *
        * @method onUploadFailure
        */
-      onUploadFailure: function HU_onUploadFailure(e)
+      onUploadFailure: function HtmlUpload_onUploadFailure(e)
       {
          // Hide the current message display
          this.widgets.feedbackMessage.destroy();
@@ -355,7 +327,7 @@
        * @method onCancelButtonClick
        * @param event {object} a Button "click" event
        */
-      onCancelButtonClick: function HU_onCancelButtonClick()
+      onCancelButtonClick: function HtmlUpload_onCancelButtonClick()
       {
          // Disable the Esc key listener
          this.widgets.escapeListener.disable();
@@ -370,7 +342,7 @@
        * @method _applyConfig
        * @private
        */
-      _applyConfig: function HU__applyConfig()
+      _applyConfig: function HtmlUpload__applyConfig()
       {
          // Set the panel title
          var title;
@@ -382,7 +354,7 @@
          {
             title = Alfresco.util.message("header.singleUpdate", this.name);
          }
-         this.widgets.titleText["innerHTML"] = title;
+         this.widgets.titleText.innerHTML = title;
 
          if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {
@@ -390,7 +362,7 @@
             {
                "0": this.showConfig.updateFilename
             });
-            this.widgets.singleUpdateTip["innerHTML"] = tip;
+            this.widgets.singleUpdateTip.innerHTML = tip;
 
             // Display the version input form
             Dom.removeClass(this.widgets.versionSection, "hidden");
@@ -421,7 +393,7 @@
 
          // Set the forms action url
          var formEl = Dom.get(this.id + "-htmlupload-form");
-         if (this.showConfig.uploadURL == null)
+         if (this.showConfig.uploadURL === null)
          {
             // The .html suffix is required - it is not possible to do a multipart post using an ajax call.
             // So it has to be a FORM submit, to make it feel like an ajax call a a hidden iframe is used.
@@ -467,7 +439,7 @@
        * @method _showPanel
        * @private
        */
-      _showPanel: function HU__showPanel()
+      _showPanel: function HtmlUpload__showPanel()
       {
          // Reset references and the gui before showing it
          this.widgets.description.value = "";
@@ -479,5 +451,5 @@
          // Show the upload panel
          this.widgets.panel.show();
       }
-   };
+   });
 })();

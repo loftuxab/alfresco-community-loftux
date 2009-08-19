@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -44,7 +44,8 @@
  * this.flashUpload.show(multiUploadConfig);
  *
  * @namespace Alfresco.module
- * @class Alfresco.component.FlashUpload
+ * @class Alfresco.FlashUpload
+ * @extends Alfresco.component.Base
  */
 (function()
 {
@@ -61,31 +62,22 @@
     * FlashUpload is considered a singleton so constructor should be treated as private,
     * please use Alfresco.component.getFlashUploadInstance() instead.
     *
-    * @param {string} htmlId The HTML id of the parent element
+    * @param htmlId {String} The HTML id of the parent element
     * @return {Alfresco.component.FlashUpload} The new FlashUpload instance
     * @constructor
     * @private
     */
-   Alfresco.FlashUpload = function(containerId)
+   Alfresco.FlashUpload = function(htmlId)
    {
-      this.name = "Alfresco.FlashUpload";
-      this.id = containerId;
+      Alfresco.FlashUpload.superclass.constructor.call(this, "Alfresco.FlashUpload", htmlId, ["button", "container", "datatable", "datasource", "cookie", "uploader"]);
+
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf?dt=" + (new Date()).getTime();
       this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45);
       
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      if (this.hasRequiredFlashPlayer)
-      {
-         // Load YUI Components if flash player is installed
-         Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "cookie", "uploader"], this.onComponentsLoaded, this);
-      }
-
       return this;
    };
 
-   Alfresco.FlashUpload.prototype =
+   YAHOO.extend(Alfresco.FlashUpload, Alfresco.component.Base,
    {
       /**
        * The flash move will dispatch the contentReady event twice,
@@ -263,14 +255,6 @@
       panel: null,
 
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: {},
-
-      /**
        * YUI class that controls the .swf to open the browser dialog window
        * and transfers the files.
        *
@@ -369,25 +353,12 @@
       fileItemTemplates: {},
 
       /**
-       * Set messages for this module.
+       * Fired by YUI when parent element is available for scripting.
+       * Initial History Manager event registration
        *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.component.FlashUpload} returns 'this' for method chaining
+       * @method onReady
        */
-      setMessages: function FU_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function FU_onComponentsLoaded()
+      onReady: function FlashUpload_onReady()
       {
          // Tell the YUI class where the swf is
          YAHOO.widget.Uploader.SWFURL = this.swf;
@@ -417,9 +388,6 @@
 
          // Save reference to version radio so we can reset and get its value later
          this.minorVersion = Dom.get(this.id + "-minorVersion-radioButton");
-
-         // Save a reference to browseButton so wa can change it later
-         //this.widgets.browseButton = Alfresco.util.createYUIButton(this, "browse-button", this.onBrowseButtonClick);
 
          // Save a reference to the HTMLElement displaying version input so we can hide or show it
          this.versionSection = Dom.get(this.id + "-versionSection-div");
@@ -453,13 +421,12 @@
          });
       },
 
-
       /**
        * Called when the "wrapping" SWFPlayer-flash movie is loaded
        *
        * @method onContentReady
        */
-      onContentReady: function FP_onContentReady(event)
+      onContentReady: function FlashUpload_onContentReady(event)
       {
          this.uploader.enable();
          this.uploader.setAllowMultipleFiles(this.showConfig.mode === this.MODE_MULTI_UPLOAD);
@@ -489,13 +456,13 @@
        *                             // an overwrite and a new version
        * }
        */
-      show: function FU_show(config)
+      show: function FlashUpload_show(config)
       {
          if (!this.hasRequiredFlashPlayer)
          {
             Alfresco.util.PopupManager.displayPrompt(
             {
-               text: Alfresco.util.message("label.noFlash", this.name)
+               text: this.msg("label.noFlash")
             });
          }
 
@@ -524,26 +491,31 @@
 
          // Need to resize FF in Ubuntu so the button appears
          var swfWrapper = this.id + "-flashuploader-div";
-         if(navigator.userAgent && navigator.userAgent.indexOf("Ubuntu") != -1 &&
+         if (navigator.userAgent && navigator.userAgent.indexOf("Ubuntu") != -1 &&
             YAHOO.env.ua.gecko > 1 && !Dom.hasClass(swfWrapper, "button-fix"))
          {
             Dom.addClass(swfWrapper, "button-fix");
          }
-
       },
 
-      _resetGUI: function FU__resetGUI()
+      /**
+       * Reset GUI to start state
+       *
+       * @method _resetGUI
+       * @private       
+       */
+      _resetGUI: function FlashUpload__resetGUI()
       {
          // Reset references and the gui before showing it
          this.state = this.STATE_BROWSING;
          this.noOfFailedUploads = 0;
          this.noOfSuccessfulUploads = 0;
-         this.statusText["innerHTML"] = "&nbsp;";
+         this.statusText.innerHTML = "&nbsp;";
          this.description.value = "";
          this.minorVersion.checked = true;
-         this.widgets.uploadButton.set("label", Alfresco.util.message("button.upload", this.name));
+         this.widgets.uploadButton.set("label", this.msg("button.upload"));
          this.widgets.uploadButton.set("disabled", true);
-         this.widgets.cancelOkButton.set("label", Alfresco.util.message("button.cancel", this.name));
+         this.widgets.cancelOkButton.set("label", this.msg("button.cancel"));
          this.widgets.cancelOkButton.set("disabled", false);
       },
 
@@ -552,16 +524,16 @@
        *
        * @method onPostRenderEvent       
        */
-      onPostRenderEvent: function FU_onPostRenderEvent()
+      onPostRenderEvent: function FlashUpload_onPostRenderEvent()
       {
          // Display the upload button since all files are rendered
          if (this.dataTable.getRecordSet().getLength() > 0)
          {
             this.widgets.uploadButton.set("disabled", false);
          }
-         if(this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+         if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {
-            if(this.dataTable.getRecordSet().getLength() == 0)
+            if (this.dataTable.getRecordSet().getLength() === 0)
             {
                this.uploader.enable();
             }
@@ -580,7 +552,7 @@
        * @method onRowDeleteEvent
        * @param event {object} a DataTable "rowDelete" event
        */
-      onRowDeleteEvent: function FU_onRowDeleteEvent(event)
+      onRowDeleteEvent: function FlashUpload_onRowDeleteEvent(event)
       {
       },
 
@@ -592,7 +564,7 @@
        * @method onFileSelect
        * @param event {object} an Uploader "fileSelect" event
        */
-      onFileSelect: function FU_onFileSelect(event)
+      onFileSelect: function FlashUpload_onFileSelect(event)
       {
          // Disable upload button until all files have been rendered and added
          this.widgets.uploadButton.set("disabled", true);
@@ -600,28 +572,29 @@
          // For each time the user select new files, all the previous selected
          // files also are included in the event.fileList. Make sure we only
          // add files to the table that haven's been added before.
-         var newFiles = [];
+         var newFiles = [],
+            data, uniqueFileToken;
          for (var i in event.fileList)
          {
-            if(this.dataTable.get("renderLoopSize") == 0)
+            if (this.dataTable.get("renderLoopSize") === 0)
             {
                this.dataTable.set("renderLoopSize", 1);
             }
-            var data = YAHOO.widget.DataTable._cloneObject(event.fileList[i]);
+            data = YAHOO.widget.DataTable._cloneObject(event.fileList[i]);
             if (!this.addedFiles[this._getUniqueFileToken(data)])
             {
-               if (data.size == 0)           
+               if (data.size === 0)
                {
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: Alfresco.util.message("message.zeroByteFileSelected", this.name, data.name)
+                     text: this.msg("message.zeroByteFileSelected", data.name)
                   });
                }
                else
                {
                   // Since the flash movie allows the user to select one file several
                   // times we need to keep track of the selected files by our selves
-                  var uniqueFileToken = this._getUniqueFileToken(data);
+                  uniqueFileToken = this._getUniqueFileToken(data);
                   this.addedFiles[uniqueFileToken] = uniqueFileToken;
                   newFiles.push(data);                  
                }
@@ -638,16 +611,16 @@
        * @method onUploadStart
        * @param event {object} an Uploader "uploadStart" event
        */
-      onUploadStart: function FU_onUploadStart(event)
+      onUploadStart: function FlashUpload_onUploadStart(event)
       {
          // Get the reference to the files gui components
-         var fileInfo = this.fileStore[event["id"]];
+         var fileInfo = this.fileStore[event.id];
 
          // Hide the contentType drop down if it wasn't hidden already
          Dom.addClass(fileInfo.contentType, "hidden");
 
          // Show the progress percentage if it wasn't visible already
-         fileInfo.progressPercentage["innerHTML"] = "0%";
+         fileInfo.progressPercentage.innerHTML = "0%";
          Dom.removeClass(fileInfo.progressPercentage, "hidden");
 
          // Make sure we know we are in upload state
@@ -661,14 +634,14 @@
        * @method onUploadComplete
        * @param event {object} an Uploader "uploadProgress" event
        */
-      onUploadProgress: function FU_onUploadProgress(event)
+      onUploadProgress: function FlashUpload_onUploadProgress(event)
       {
-         var flashId = event["id"];
+         var flashId = event.id;
          var fileInfo = this.fileStore[flashId];
 
          // Set percentage
-         var percentage = event["bytesLoaded"] / event["bytesTotal"];
-         fileInfo.progressPercentage["innerHTML"] = Math.round(percentage * 100) + "%";
+         var percentage = event.bytesLoaded / event.bytesTotal;
+         fileInfo.progressPercentage.innerHTML = Math.round(percentage * 100) + "%";
 
          // Set progress position
          var left = (-400 + (percentage * 400));
@@ -681,7 +654,7 @@
        * @method onUploadComplete
        * @param event {object} an Uploader "uploadComplete" event
        */
-      onUploadComplete: function FU_onUploadComplete(event)
+      onUploadComplete: function FlashUpload_onUploadComplete(event)
       {
          /**
           * Actions taken on a completed upload is handled by the
@@ -699,11 +672,11 @@
        * @method onUploadCompleteData
        * @param event {object} an Uploader "uploadCompleteData" event
        */
-      onUploadCompleteData: function FU_onUploadCompleteData(event)
+      onUploadCompleteData: function FlashUpload_onUploadCompleteData(event)
       {
          // The individual file has been transfered completely
          // Now adjust the gui for the individual file row
-         var fileInfo = this.fileStore[event["id"]];
+         var fileInfo = this.fileStore[event.id];
          fileInfo.state = this.STATE_SUCCESS;
          fileInfo.fileButton.set("disabled", true);
 
@@ -717,14 +690,14 @@
          }
 
          // Add the label "Successful" after the filename, updating the fileName from the response
-         fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"].replace(oldFileName, fileInfo.fileName) + " " + Alfresco.util.message("label.success", this.name);
+         fileInfo.progressInfo.innerHTML = fileInfo.progressInfo.innerHTML.replace(oldFileName, fileInfo.fileName) + " " + this.msg("label.success");
 
          // Change the style of the progress bar
          fileInfo.progress.setAttribute("class", "fileupload-progressFinished-span");
 
          // Move the progress bar to "full" progress
          Dom.setStyle(fileInfo.progress, "left", 0 + "px");
-         fileInfo.progressPercentage["innerHTML"] = "100%";
+         fileInfo.progressPercentage.innerHTML = "100%";
          this.noOfSuccessfulUploads++;
 
          // Adjust the rest of the gui
@@ -740,7 +713,7 @@
        * @method onUploadCancel
        * @param event {object} an Uploader "uploadCancel" event
        */
-      onUploadCancel: function FU_onUploadCancel(event)
+      onUploadCancel: function FlashUpload_onUploadCancel(event)
       {
          // The gui has already been adjusted in the function that caused the cancel
       },
@@ -752,9 +725,9 @@
        * @method onUploadError
        * @param event {object} an Uploader "uploadError" event
        */
-      onUploadError: function FU_onUploadError(event)
+      onUploadError: function FlashUpload_onUploadError(event)
       {
-         var fileInfo = this.fileStore[event["id"]];
+         var fileInfo = this.fileStore[event.id];
 
          // This sometimes gets called twice, make sure we only adjust the gui once
          if (fileInfo.state !== this.STATE_FAILURE)
@@ -762,8 +735,7 @@
             fileInfo.state = this.STATE_FAILURE;
 
             // Add the label "Failure" to the filename
-            fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] +
-                                                 " " + Alfresco.util.message("label.failure", this.name);
+            fileInfo.progressInfo.innerHTML = fileInfo.progressInfo.innerHTML + " " + this.msg("label.failure");
 
             // Change the style of the progress bar
             fileInfo.progress.setAttribute("class", "fileupload-progressFailure-span");
@@ -791,7 +763,7 @@
        * @param flashId {string} an id matching the flash movies fileId
        * @param recordId {int} an id matching a record in the data tables data source
        */
-      _onFileButtonClickHandler: function FU__onFileButtonClickHandler(flashId, recordId)
+      _onFileButtonClickHandler: function FlashUpload__onFileButtonClickHandler(flashId, recordId)
       {
          /**
           * The file button has been clicked to remove a file.
@@ -840,9 +812,9 @@
        * @method onBrowseButtonClick
        * @param event {object} a Button "click" event
        */
-      onCancelOkButtonClick: function FU_onCancelOkButtonClick()
+      onCancelOkButtonClick: function FlashUpload_onCancelOkButtonClick()
       {
-         var message;
+         var message, i;
          if (this.state === this.STATE_BROWSING)
          {     
             // Do nothing (but close the panel, which happens below)
@@ -853,7 +825,7 @@
 
             // Inform the user if any files were uploaded before the rest was cancelled
             var noOfUploadedFiles = 0;
-            for (var i in this.fileStore)
+            for (i in this.fileStore)
             {
                if (this.fileStore[i] && this.fileStore[i].state === this.STATE_SUCCESS)
                {
@@ -862,8 +834,7 @@
             }
             if (noOfUploadedFiles > 0)
             {
-               message = Alfresco.util.message("message.cancelStatus", this.name);
-               message = YAHOO.lang.substitute(message,
+               message = YAHOO.lang.substitute(this.msg("message.cancelStatus"),
                {
                   "0": noOfUploadedFiles
                });
@@ -879,10 +850,10 @@
          {
             // Tell the document list to refresh itself if present and to
             // highlight the uploaded file (if multi upload was used display the first file)
-            var fileName = null;
-            for (var i in this.fileStore)
+            var fileName = null, f;
+            for (i in this.fileStore)
             {
-               var f = this.fileStore[i];
+               f = this.fileStore[i];
                if (f && f.state === this.STATE_SUCCESS)
                {
                   fileName = f.fileName;
@@ -932,7 +903,7 @@
        * @method onBrowseButtonClick
        * @param event {object} a Button "click" event
        */
-      onUploadButtonClick: function FU_onUploadButtonClick()
+      onUploadButtonClick: function FlashUpload_onUploadButtonClick()
       {
          if (this.state === this.STATE_BROWSING)
          {
@@ -956,33 +927,30 @@
        * @method _applyConfig
        * @private
        */
-      _applyConfig: function FU__applyConfig()
+      _applyConfig: function FlashUpload__applyConfig()
       {
          // Set the panel title
          var title;
          if (this.showConfig.mode === this.MODE_SINGLE_UPLOAD)
          {
-            title = Alfresco.util.message("header.singleUpload", this.name);
+            title = this.msg("header.singleUpload");
          }
          else if (this.showConfig.mode === this.MODE_MULTI_UPLOAD)
          {
-            title = Alfresco.util.message("header.multiUpload", this.name);
+            title = this.msg("header.multiUpload");
          }
          else if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {
-            title = Alfresco.util.message("header.singleUpdate", this.name);
+            title = this.msg("header.singleUpdate");
          }
-         this.titleText["innerHTML"] = title;
+         this.titleText.innerHTML = title;
 
          if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {
-
-            var tip = Alfresco.util.message("label.singleUpdateTip", this.name);
-            tip = YAHOO.lang.substitute(tip,
+            this.singleUpdateTip.innerHTML = YAHOO.lang.substitute(this.msg("label.singleUpdateTip"),
             {
                "0": this.showConfig.updateFilename
             });
-            this.singleUpdateTip["innerHTML"] = tip;
 
             // Display the version input form
             Dom.removeClass(this.versionSection, "hidden");
@@ -1061,11 +1029,11 @@
          }
          catch(e)
          {
-            if(attempt == 7)
+            if (attempt == 7)
             {
                Alfresco.util.PopupManager.displayMessage(
                {
-                  text: Alfresco.util.message("message.flashConfigError", this.name)
+                  text: this.msg("message.flashConfigError")
                });
             }
             else
@@ -1081,7 +1049,7 @@
        * @method _createEmptyDataTable
        * @private
        */
-      _createEmptyDataTable: function FU__createEmptyDataTable()
+      _createEmptyDataTable: function FlashUpload__createEmptyDataTable()
       {
          /**
           * Save a reference of 'this' so that the formatter below can use it
@@ -1134,15 +1102,15 @@
           */
          this._formatCellElements = function(el, oRecord, template)
          {
-
+            var record = oRecord.getData(),
+               flashId = record.id;
             // Set the state for this file(/row) if it hasn't been set
-            var flashId = oRecord.getData()["id"];
             if (!this.fileStore[flashId])
             {
                this.fileStore[flashId] =
                {
                   state: this.STATE_BROWSING,
-                  fileName: oRecord.getData("name"),
+                  fileName: record.name,
                   nodeRef: null
                };
             }
@@ -1162,19 +1130,16 @@
             if (progressInfo.length == 1)
             {
                // Display the file size in human readable format after the filename.
-               var readableSize = new Number(oRecord.getData()["size"]);
-               readableSize = Alfresco.util.formatFileSize(readableSize);
-               var fileInfoStr = oRecord.getData()["name"] + " (" + readableSize + ")";
+               var fileInfoStr = record.name + " (" + Alfresco.util.formatFileSize(record.size) + ")";
 
                // Display the file name and size.
                progressInfo = progressInfo[0];
                this.fileStore[flashId].progressInfo = progressInfo;
-               this.fileStore[flashId].progressInfo["innerHTML"] = fileInfoStr;
+               this.fileStore[flashId].progressInfo.innerHTML = fileInfoStr;
             }
 
 
-            // * Save a reference to the contentType dropdown so we can find each
-            // * files contentType before upload.            
+            // Save a reference to the contentType dropdown so we can find each file's contentType before upload.            
             var contentType = Dom.getElementsByClassName("fileupload-contentType-select", "select", templateInstance);
             if (contentType.length == 1)
             {
@@ -1207,12 +1172,11 @@
             cell.appendChild (templateInstance);
          };
 
-
          // Definition of the data table column
          var myColumnDefs = [
-            {key: "id",      className:"col-left", resizable: false, formatter: formatLeftCell},
-            {key: "name",    className:"col-center", resizable: false, formatter: formatCenterCell},
-            {key: "created", className:"col-right", resizable: false, formatter: formatRightCell}
+            { key: "id", className:"col-left", resizable: false, formatter: formatLeftCell },
+            { key: "name", className:"col-center", resizable: false, formatter: formatCenterCell },
+            { key: "created", className:"col-right", resizable: false, formatter: formatRightCell }
          ];
 
          // The data tables underlying data source.
@@ -1220,7 +1184,7 @@
          myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSARRAY;
          myDataSource.responseSchema =
          {
-            fields: ["id","name","created","modified","type", "size", "progress"]
+            fields: ["id", "name", "created", "modified", "type", "size", "progress"]
          };
 
          /**
@@ -1236,7 +1200,7 @@
             height: "100px", // must be set to something so it can be changed afterwards, when the showconfig options decides if its a sinlge or multi upload
             width: "620px",
             renderLoopSize: 0, // value > 0 results in an error in IE & Safari from YIU2.6.0
-            MSG_EMPTY: Alfresco.util.message("label.noFiles", this.name)
+            MSG_EMPTY: this.msg("label.noFiles")
          });
          this.dataTable.subscribe("postRenderEvent", this.onPostRenderEvent, this, true);
          this.dataTable.subscribe("rowDeleteEvent", this.onRowDeleteEvent, this, true);
@@ -1249,9 +1213,9 @@
        * @param data {object} a file data object describing a file
        * @private
        */
-      _getUniqueFileToken: function FU__getUniqueFileToken(data)
+      _getUniqueFileToken: function FlashUpload__getUniqueFileToken(data)
       {
-         return data.name + ":" + data.size + ":" + data.cDate + ":" + data.mDate
+         return data.name + ":" + data.size + ":" + data.cDate + ":" + data.mDate;
       },
 
       /**
@@ -1260,17 +1224,15 @@
        * @method _updateStatus
        * @private
        */
-      _updateStatus: function FU__updateStatus()
+      _updateStatus: function FlashUpload__updateStatus()
       {
          // Update the status label with the latest information about the upload progress
-         var status = Alfresco.util.message("label.uploadStatus", this.name);
-         status = YAHOO.lang.substitute(status,
+         this.statusText.innerHTML = YAHOO.lang.substitute(this.msg("label.uploadStatus"),
          {
             "0" : this.noOfSuccessfulUploads,
             "1" : this.dataTable.getRecordSet().getLength(),
             "2" : this.noOfFailedUploads
          });
-         this.statusText["innerHTML"] = status; 
       },
 
       /**
@@ -1280,7 +1242,7 @@
        * @method _adjustGuiIfFinished
        * @private
        */
-      _adjustGuiIfFinished: function FU__adjustGuiIfFinished()
+      _adjustGuiIfFinished: function FlashUpload__adjustGuiIfFinished()
       {
          var objComplete =
          {
@@ -1319,7 +1281,7 @@
             }
          }
          this.state = this.STATE_FINISHED;
-         this.widgets.cancelOkButton.set("label", Alfresco.util.message("button.ok", this.name));
+         this.widgets.cancelOkButton.set("label", this.msg("button.ok"));
          this.widgets.uploadButton.set("disabled", true);
          
          var callback = this.showConfig.onFileUploadComplete;
@@ -1338,11 +1300,11 @@
        * @param noOfUploadsToStart
        * @private
        */
-      _uploadFromQueue: function FU__uploadFromQueue(noOfUploadsToStart)
+      _uploadFromQueue: function FlashUpload__uploadFromQueue(noOfUploadsToStart)
       {
          // generate upload POST url
          var url;
-         if (this.showConfig.uploadURL == null)
+         if (this.showConfig.uploadURL === null)
          {
             url = Alfresco.constants.PROXY_URI + "api/upload";
          }
@@ -1356,19 +1318,21 @@
          url += ";jsessionid=" + YAHOO.util.Cookie.get("JSESSIONID");
          
          // Find files to upload
-         var startedUploads = 0;
-         var length = this.dataTable.getRecordSet().getLength();
+         var startedUploads = 0,
+            length = this.dataTable.getRecordSet().getLength(),
+            record, flashId, fileInfo, attributes;
+         
          for (var i = 0; i < length && startedUploads < noOfUploadsToStart; i++)
          {
-            var record = this.dataTable.getRecordSet().getRecord(i);
-            var flashId = record.getData("id");
-            var fileInfo = this.fileStore[flashId];
+            record = this.dataTable.getRecordSet().getRecord(i);
+            flashId = record.getData("id");
+            fileInfo = this.fileStore[flashId];
             if (fileInfo.state === this.STATE_BROWSING)
             {
                // Upload has NOT been started for this file, start it now
                fileInfo.state = this.STATE_UPLOADING;
                
-               var attributes =
+               attributes =
                {
                   siteId: this.showConfig.siteId,
                   containerId: this.showConfig.containerId,
@@ -1383,8 +1347,7 @@
                else
                {
                   attributes.uploadDirectory = this.showConfig.uploadDirectory;
-                  var contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
-                  attributes.contentType = contentType;
+                  attributes.contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
                   attributes.overwrite = this.showConfig.overwrite;
                   if (this.showConfig.thumbnails)
                   {
@@ -1403,7 +1366,7 @@
        * @method _cancelAllUploads
        * @private
        */
-      _cancelAllUploads: function FU__cancelAllUploads()
+      _cancelAllUploads: function FlashUpload__cancelAllUploads()
       {
          // Cancel all uploads inside the flash movie
          var length = this.dataTable.getRecordSet().getLength();
@@ -1422,7 +1385,7 @@
        * @method _clear
        * @private
        */
-      _clear: function FU__clear()
+      _clear: function FlashUpload__clear()
       {
          /**
           * Remove all references to files inside the data table, flash movie
@@ -1434,8 +1397,5 @@
          this.dataTable.deleteRows(0, length);
          this.uploader.clearFileList();
       }
-
-   };
-
+   });
 })();
-
