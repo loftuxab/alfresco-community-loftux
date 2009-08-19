@@ -702,6 +702,14 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
         assertFalse(dataObj.getBoolean("enabled"));
+        
+        // clear the RM audit log
+        rsp = sendRequest(new DeleteRequest(RMA_AUDITLOG_URL), 200);
+        System.out.println(rsp.getContentAsString());
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        dataObj = (JSONObject)jsonRsp.get("data");
+        assertNotNull("JSON 'data' object was null", dataObj);
+        assertFalse(dataObj.getBoolean("enabled"));
     }
     
     private void declareRecord(NodeRef recordOne)
