@@ -31,7 +31,7 @@ import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.util.ParameterCheck;
 
 /**
- * Class to represent a Records Management audit entry
+ * Class to represent a Records Management audit entry.
  * 
  * @author Gavin Cornwell
  */
@@ -69,41 +69,74 @@ public final class RecordsManagementAuditEntry
         this.event = event;
     }
 
+    /**
+     * 
+     * @return The date of the audit entry
+     */
     public Date getTimestamp()
     {
         return this.timestamp;
     }
     
+    /**
+     * 
+     * @return The date of the audit entry as an ISO8601 formatted String
+     */
     public String getTimestampString()
     {
         return ISO8601DateFormat.format(this.timestamp);
     }
 
+    /**
+     * 
+     * @return The username of the user that caused the audit log entry to be created
+     */
     public String getUserName()
     {
         return this.userName;
     }
 
+    /**
+     * 
+     * @return The full name of the user that caused the audit log entry to be created
+     */
     public String getFullName()
     {
         return this.fullName;
     }
 
+    /**
+     * 
+     * @return The role of the user that caused the audit log entry to be created
+     */
     public String getUserRole()
     {
         return this.userRole;
     }
 
+    /**
+     * 
+     * @return The NodeRef of the node the audit log entry is for
+     */
     public NodeRef getNodeRef()
     {
         return this.nodeRef;
     }
 
+    /**
+     * 
+     * @return The name of the node the audit log entry is for
+     */
     public String getNodeName()
     {
         return this.nodeName;
     }
 
+    /**
+     * 
+     * @return The human readable description of the reason for the audit log 
+     *         entry i.e. metadata updated, record declared
+     */
     public String getEvent()
     {
         return this.event;

@@ -14,6 +14,8 @@
                 "userName": "${entry.userName}",
                 "userRole": "${entry.userRole}",
                 "fullName": "${entry.fullName}",
+                "nodeRef": "${entry.nodeRef}",
+                "nodeName": "${entry.nodeName}",
                 "event": "${entry.event}",
             }<#if entry_has_next>,</#if>
             </#list>

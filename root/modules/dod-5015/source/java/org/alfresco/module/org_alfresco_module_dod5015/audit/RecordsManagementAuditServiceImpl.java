@@ -49,50 +49,92 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
     private NodeService nodeService;
     private AuditService auditService;
 
+    // temporary field to hold imaginary enabled flag
+    private boolean enabled = false;
+    
+    /**
+     * Sets the AuditService instance
+     * 
+     * @param auditService AuditService instance
+     */
 	public void setAuditService(AuditService auditService)
 	{
 		this.auditService = auditService;
 	}
 	
+	/**
+     * Sets the NodeService instance
+     * 
+     * @param nodeService NodeService instance
+     */
 	public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
-
+	
+	/*
+	 * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#isEnabled()
+	 */
 	public boolean isEnabled()
     {
-        return true;
+        return this.enabled;
     }
-
+	
+	/*
+	 * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#start()
+	 */
     public void start()
     {
+        // TODO: Start RM auditing properly!
+        this.enabled = true;
     }
 
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#stop()
+     */
     public void stop()
     {
+        // TODO: Stop RM auditing properly!
+        this.enabled = false;
     }
     
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#clear()
+     */
     public void clear()
     {
+        // TODO: Clear the RM audit trail
     }
-
+    
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#getDateLastStarted()
+     */
     public Date getDateLastStarted()
     {
         // TODO: return proper date, for now it's today's date
         return new Date();
     }
-
+    
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#getDateLastStopped()
+     */
     public Date getDateLastStopped()
     {
         // TODO: return proper date, for now it's today's date
         return new Date();
     }
-
+    
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#getAuditTrail()
+     */
     public List<RecordsManagementAuditEntry> getAuditTrail()
     {
         return getAuditTrail(null);
     }
-
+    
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#getAuditTrail(org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters)
+     */
     public List<RecordsManagementAuditEntry> getAuditTrail(
                 RecordsManagementAuditQueryParameters params)
     {
@@ -100,10 +142,11 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
         
         if (params != null)
         {
-            // examine parameters and build up query? or call relevant service methods
+            // TODO: examine parameters and build up query or call relevant service methods
             
             if (params.getNodeRef() != null)
             {
+                // get audit trail for provided node
                 List<AuditInfo> auditLog = this.auditService.getAuditTrail(params.getNodeRef());
                 for (AuditInfo entry: auditLog)
                 {
@@ -113,6 +156,9 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
                         entries.add(rmEntry);
                     }
                 }
+                
+                if (logger.isDebugEnabled())
+                    logger.debug("Found " + entries.size() + " audit entries for node: " + params.getNodeRef());
             }
         }
         else
@@ -123,6 +169,13 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
         return entries;
     }
     
+    /**
+     * Creates a RecordsManagementAuditEntry instance for the given AuditInfo.
+     * 
+     * @param entry The AuditInfo instance holding audit log entry to generate
+     * @param nodeRef The node the audit log entry is for
+     * @return RecordsManagementAuditEntry instance
+     */
     protected RecordsManagementAuditEntry createRMAuditEntry(AuditInfo entry, NodeRef nodeRef)
     {
         RecordsManagementAuditEntry rmEntry = null;
@@ -131,12 +184,15 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
         String method = entry.getAuditMethod();
         if (service != null && method != null)
         {
+            // construct the event from the service and method
             String event = service + "." + method;
             String userName = entry.getUserIdentifier();
             String fullName = userName;
+            // TODO: Call the 'to be implemented' RM security service to get user's role
             String userRole = "Records Manager";
             String nodeName = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
             
+            // create the entry instance
             rmEntry = new RecordsManagementAuditEntry(entry.getDate(), userName, fullName, 
                         userRole, nodeRef, nodeName, event);
         }
