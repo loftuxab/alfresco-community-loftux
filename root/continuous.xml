@@ -187,6 +187,7 @@
            userid="${db.username}" 
            password="${db.password}">
          create database ${db.name};
+         create database ${db.name}_test;
       </sql>
    </target>
 
@@ -200,6 +201,7 @@
            userid="${db.username}" 
            password="${db.password}">
          drop database ${db.name};
+         drop database ${db.name}_test;
       </sql>
 
       <delete verbose="true">
