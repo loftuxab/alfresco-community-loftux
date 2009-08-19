@@ -17,7 +17,7 @@
          <action type="action-link" id="onActionCloseFolder" permission="close-folder" label="actions.close-folder" />
          <action type="action-link" id="onActionOpenFolder" permission="open-folder" label="actions.open-folder" />
          <action type="action-link" id="onActionCutoff" permission="cutoff" label="actions.cutoff" />
-         <action type="action-link" id="onActionRetain" permission="retain" label="actions.retain" />
+         <action type="action-link" id="onActionRetain" permission="hidden" label="actions.retain" />
          <action type="action-link" id="onActionDestroy" permission="destroy" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="transfer" label="actions.transfer" />
          <action type="action-link" id="onActionFreeze" permission="ExtendRetentionPeriodOrFreeze" label="actions.freeze" />

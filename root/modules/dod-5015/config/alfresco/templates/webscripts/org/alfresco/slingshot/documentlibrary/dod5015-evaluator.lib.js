@@ -21,9 +21,8 @@ var Evaluator =
          case "rma:recordFolder":
             assetType = "record-folder";
             break;
-         case "rma:nonElectronicRecord":
-            assetType = "non-electronic-record";
-            break;
+         case "rma:nonElectronicDocument":
+            // Fall-through
          case "cm:content":
             if (asset.hasAspect("rma:record"))
             {
@@ -241,14 +240,6 @@ var Evaluator =
 
 
          /**
-          * SPECIFIC TO: NON-ELECTRONIC RECORD
-          */
-         case "non-electronic-record":
-            actionSet = "nonElectronicRecord";
-            break;
-
-
-         /**
           * SPECIFIC TO: RECORD
           */
          case "record":
@@ -293,6 +284,18 @@ var Evaluator =
                permissions["ExtendRetentionPeriodOrFreeze"] = true;
             }
             permissions["UndeclareRecords"] = true;
+            
+            /**
+             * Electronic/Non-electronic documents
+             */
+            if (asset.typeShort == "rma:nonElectronicDocument")
+            {
+               assetType = "record-nonelec";
+            }
+            else
+            {
+               permissions["download"] = true;
+            }
             break;
 
 
@@ -302,6 +305,18 @@ var Evaluator =
          case "undeclared-record":
             actionSet = "undeclaredRecord";
             permissions["DeclareRecords"] = true;
+
+            /**
+             * Electronic/Non-electronic documents
+             */
+            if (asset.typeShort == "rma:nonElectronicDocument")
+            {
+               assetType = "undeclared-record-nonelec";
+            }
+            else
+            {
+               permissions["download"] = true;
+            }
             break;
 
 
