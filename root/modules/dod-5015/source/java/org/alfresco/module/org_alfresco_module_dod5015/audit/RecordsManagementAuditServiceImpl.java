@@ -87,6 +87,9 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
     {
         // TODO: Start RM auditing properly!
         this.enabled = true;
+        
+        if (logger.isInfoEnabled())
+            logger.info("Started Records Management auditing");
     }
 
     /*
@@ -96,6 +99,9 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
     {
         // TODO: Stop RM auditing properly!
         this.enabled = false;
+        
+        if (logger.isInfoEnabled())
+            logger.info("Stopped Records Management auditing");
     }
     
     /*
@@ -104,6 +110,9 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
     public void clear()
     {
         // TODO: Clear the RM audit trail
+        
+        if (logger.isInfoEnabled())
+            logger.debug("Records Management audit log has been cleared");
     }
     
     /*

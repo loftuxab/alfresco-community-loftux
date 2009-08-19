@@ -333,6 +333,11 @@
         <property name="recordsManagementAuditService" ref="RecordsManagementAuditService"/>
     </bean>
     
+    <!-- REST impl for DELETE Audit Log (clears audit log) -->
+    <bean id="webscript.org.alfresco.rma.rmauditlog.delete" class="org.alfresco.module.org_alfresco_module_dod5015.script.AuditLogDelete" parent="webscript">
+        <property name="recordsManagementAuditService" ref="RecordsManagementAuditService"/>
+    </bean>
+    
     <!-- REST impl for POST export -->
     <bean id="webscript.org.alfresco.rma.export.post" class="org.alfresco.repo.web.scripts.content.StreamArchive" parent="webscript">
         <property name="nodeService" ref="NodeService"/>

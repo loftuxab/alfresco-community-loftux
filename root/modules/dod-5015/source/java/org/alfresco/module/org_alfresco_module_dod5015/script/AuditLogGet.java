@@ -29,12 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
-import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.scripts.Cache;
-import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
 
@@ -44,27 +41,15 @@ import org.alfresco.web.scripts.WebScriptRequest;
  * 
  * @author Gavin Cornwell
  */
-public class AuditLogGet extends DeclarativeWebScript
+public class AuditLogGet extends BaseAuditLogWebScript
 {
-    protected RecordsManagementAuditService rmAuditService;
-    
-    /**
-     * Sets the RecordsManagementAuditService instance
-     * 
-     * @param auditService The RecordsManagementAuditService instance
-     */
-    public void setRecordsManagementAuditService(RecordsManagementAuditService rmAuditService)
-    {
-        this.rmAuditService = rmAuditService;
-    }
-    
     /*
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
      */
     @Override
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
-        // this webscript has a couple of differnt forms of url, work out
+        // this webscript has a couple of different forms of url, work out
         // whether a nodeRef has been supplied or whether the whole audit
         // log should be displayed
         NodeRef nodeRef = null;
@@ -84,7 +69,7 @@ public class AuditLogGet extends DeclarativeWebScript
         // gather all the common filtering parameters
         // TODO: get result set size, user, date range etc.
         
-        // create model object with the lists model
+        // create model object with the audit model
         Map<String, Object> model = new HashMap<String, Object>(1);
         model.put("auditlog", generateAuditModel(nodeRef));
         return model;
@@ -99,11 +84,7 @@ public class AuditLogGet extends DeclarativeWebScript
      */
     protected Map<String, Object> generateAuditModel(NodeRef nodeRef)
     {
-        Map<String, Object> model = new HashMap<String, Object>(8);
-        
-        model.put("started", ISO8601DateFormat.format(rmAuditService.getDateLastStarted()));
-        model.put("stopped", ISO8601DateFormat.format(rmAuditService.getDateLastStopped()));
-        model.put("enabled", Boolean.valueOf(rmAuditService.isEnabled()));
+        Map<String, Object> model = createAuditStatusModel();
         
         if (nodeRef != null)
         {
