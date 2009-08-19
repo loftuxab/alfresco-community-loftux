@@ -201,7 +201,7 @@
            userid="${db.username}" 
            password="${db.password}">
          drop database ${db.name};
-         drop database ${db.name}_test;
+         drop database if exists ${db.name}_test;
       </sql>
 
       <delete verbose="true">
