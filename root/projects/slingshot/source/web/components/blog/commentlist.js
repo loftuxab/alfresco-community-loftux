@@ -625,6 +625,7 @@
 
          // instantiate the simple editor we use for the form
          this.editData.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR, formId + '-content', this.options.editorConfig);
+         this.editData.widgets.editor.addPageUnloadBehaviour(this._msg("message.unsavedChanges.comment"));
          this.editData.widgets.editor.render();
 
          // Add validation to the editor

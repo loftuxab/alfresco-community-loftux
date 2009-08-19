@@ -581,8 +581,7 @@
              animate: false, //Animates the opening, closing and moving of Editor windows
              toolbar:  Alfresco.util.editor.getTextOnlyToolbarConfig(this._msg)
          });
-         // render the editor - we use the private function as we want this to happen
-         // prior of displaying the form. Otherwise we get quite ugly ui behavior
+         this.widgets.editor.addPageUnloadBehaviour(this._msg("message.unsavedChanges.reply"));
          this.widgets.editor.render();
          
          // create the form that does the validation/submit

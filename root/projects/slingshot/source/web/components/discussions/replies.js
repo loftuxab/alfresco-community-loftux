@@ -624,6 +624,7 @@
          
          // Instantiate and render the simple editor we use for the form
          this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR, formId + '-content',this.options.editorConfig);
+         this.widgets.editor.addPageUnloadBehaviour(this._msg("message.unsavedChanges.reply"));
          this.widgets.editor.render();
          
          // Add validation to the rich text editor

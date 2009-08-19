@@ -77,6 +77,23 @@ Alfresco.util.RichEditorManager.addEditor('YAHOO.widget.SimpleEditor', function(
       clearDirtyFlag: function RichEditorManager_yui_clearDirtyFlag()
       {
          editor.editorDirty = null;
+      },
+
+      addPageUnloadBehaviour: function RichEditorManage_yui_addUnloadBehaviour(message)
+      {
+         // Page unload / unsaved changes behaviour
+         window.onbeforeunload = function(e)
+         {
+            var e = e || window.event;
+            if (editor.editorDirty)
+            {
+               if (e)
+               {
+                  e.returnValue = message;
+               }
+               return message;
+            }
+         };
       }
    });
 });

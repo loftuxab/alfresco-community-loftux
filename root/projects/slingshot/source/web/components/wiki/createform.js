@@ -133,6 +133,7 @@
             siteId: this.siteId,
             language:this.options.locale         
          });
+         this.widgets.editor.addPageUnloadBehaviour(this._msg("message.unsavedChanges.wiki"));
          this.widgets.editor.render();
 
          this.widgets.saveButton = new YAHOO.widget.Button(this.id + "-save-button",
@@ -302,7 +303,23 @@
                }]
             });
          }
-
+         else if (e.serverResponse.status == 401)
+         {
+            // Unauthenticated, which is probably due to a web-tier timeout or restart
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               title: $msg("message.sessionTimeout.title"),
+               text: $msg("message.sessionTimeout.text")
+            });
+         }
+         else
+         {
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               title: $msg("message.failure"),
+               text: e.json.message
+            });
+         }
       },
       
       /**
