@@ -53,12 +53,48 @@
             <@formLib.renderField field=form.fields["prop_rma_location"] />
             <@formLib.renderField field=form.fields["prop_rma_mediaType"] />
             <@formLib.renderField field=form.fields["prop_rma_format"] />
+            <!-- Scanned Record Fields -->
+            <#if form.fields["prop_dod_scannedFormat"]??>
+               <@formLib.renderField field=form.fields["prop_dod_scannedFormat"] />
+               <@formLib.renderField field=form.fields["prop_dod_scannedFormatVersion"] />
+               <@formLib.renderField field=form.fields["prop_dod_resolutionX"] />
+               <@formLib.renderField field=form.fields["prop_dod_resolutionY"] />
+               <@formLib.renderField field=form.fields["prop_dod_scannedBitDepth"] />
+            </#if>
+            <!-- PDF Record Fields -->
+            <#if form.fields["prop_dod_producingApplication"]??>
+               <@formLib.renderField field=form.fields["prop_dod_producingApplication"] />
+               <@formLib.renderField field=form.fields["prop_dod_producingApplicationVersion"] />
+               <@formLib.renderField field=form.fields["prop_dod_pdfVersion"] />
+               <@formLib.renderField field=form.fields["prop_dod_creatingApplication"] />
+               <@formLib.renderField field=form.fields["prop_dod_documentSecuritySettings"] />
+            </#if>
+            <!-- Digital Photograph Record Fields -->
+            <#if form.fields["prop_dod_caption"]??>
+               <@formLib.renderField field=form.fields["prop_dod_caption"] />
+               <@formLib.renderField field=form.fields["prop_dod_photographer"] />
+               <@formLib.renderField field=form.fields["prop_dod_copyright"] />
+               <@formLib.renderField field=form.fields["prop_dod_bitDepth"] />
+               <@formLib.renderField field=form.fields["prop_dod_imageSizeX"] />
+               <@formLib.renderField field=form.fields["prop_dod_imageSizeY"] />
+               <@formLib.renderField field=form.fields["prop_dod_imageSource"] />
+               <@formLib.renderField field=form.fields["prop_dod_compression"] />
+               <@formLib.renderField field=form.fields["prop_dod_iccIcmProfile"] />
+               <@formLib.renderField field=form.fields["prop_dod_exifInformation"] />
+            </#if>
+            <!-- Web Record Fields -->
+            <#if form.fields["prop_dod_webFileName"]??>
+               <@formLib.renderField field=form.fields["prop_dod_webFileName"] />
+               <@formLib.renderField field=form.fields["prop_dod_webPlatform"] />
+               <@formLib.renderField field=form.fields["prop_dod_webSiteName"] />
+               <@formLib.renderField field=form.fields["prop_dod_webSiteURL"] />
+               <@formLib.renderField field=form.fields["prop_dod_captureMethod"] />
+               <@formLib.renderField field=form.fields["prop_dod_captureDate"] />
+               <@formLib.renderField field=form.fields["prop_dod_contact"] />
+               <@formLib.renderField field=form.fields["prop_dod_contentManagementSystem"] />
+            </#if>
          </div>
       </div>
-      <!-- Scanned Record Fields -->
-      <!-- PDF Record Fields -->
-      <!-- Photo Record Fields -->
-      <!-- Web Record Fields -->
       <div class="form-panel">
          <div class="form-panel-heading">${msg("label.set.correspondence")}</div>
          <div class="form-panel-body">

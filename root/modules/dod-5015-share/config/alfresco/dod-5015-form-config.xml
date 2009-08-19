@@ -241,5 +241,27 @@
          </form>
       </forms>
    </config>
+
+   <config evaluator="node-type" condition="cm:folder">
+      <forms>
+         <form id="rm">
+            <field-visibility>
+               <show id="cm:name" />
+               <show id="cm:title" force="true" />
+               <show id="cm:description" force="true" />
+            </field-visibility>
+            <appearance>
+               <field id="cm:title">
+                  <control template="/org/alfresco/components/form/controls/textfield.ftl" />
+               </field>
+               <field id="cm:description">
+                  <control>
+                     <control-param name="activateLinks">true</control-param>
+                  </control>
+               </field>
+            </appearance>
+          </form>
+      </forms>
+   </config>
    
 </alfresco-config>
