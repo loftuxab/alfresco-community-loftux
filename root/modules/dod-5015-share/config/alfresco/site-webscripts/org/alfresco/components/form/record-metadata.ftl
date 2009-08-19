@@ -28,26 +28,32 @@
             </#if>
          </div>
       </div>
+      <#if form.fields["prop_mimetype"]?? || form.mode == "view">
       <div class="form-panel">
          <div class="form-panel-heading">${msg("label.set.general")}</div>
          <div class="form-panel-body">
             <#if form.mode == "view">
-                <@formLib.renderField field=form.fields["prop_cm_creator"] />
-                <@formLib.renderField field=form.fields["prop_cm_created"] />
-                <@formLib.renderField field=form.fields["prop_cm_modifier"] />
-                <@formLib.renderField field=form.fields["prop_cm_modified"] />
-                <@formLib.renderField field=form.fields["prop_size"] />
+               <@formLib.renderField field=form.fields["prop_cm_creator"] />
+               <@formLib.renderField field=form.fields["prop_cm_created"] />
+               <@formLib.renderField field=form.fields["prop_cm_modifier"] />
+               <@formLib.renderField field=form.fields["prop_cm_modified"] />
+               <#if form.fields["prop_size"]??>
+                  <@formLib.renderField field=form.fields["prop_size"] />
+               </#if>
             </#if>
-            <@formLib.renderField field=form.fields["prop_mimetype"] />
+            <#if form.fields["prop_mimetype"]??>
+               <@formLib.renderField field=form.fields["prop_mimetype"] />
+            </#if>
          </div>
       </div>
+      </#if>
       <div class="form-panel">
          <div class="form-panel-heading">${msg("label.set.record")}</div>
          <div class="form-panel-body">
             <@formLib.renderField field=form.fields["prop_rma_originator"] />
             <@formLib.renderField field=form.fields["prop_rma_originatingOrganization"] />
             <#if form.mode == "view">
-                <@formLib.renderField field=form.fields["prop_rma_dateFiled"] />
+               <@formLib.renderField field=form.fields["prop_rma_dateFiled"] />
             </#if>
             <@formLib.renderField field=form.fields["prop_rma_publicationDate"] />
             <@formLib.renderField field=form.fields["prop_rma_location"] />

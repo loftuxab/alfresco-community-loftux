@@ -216,7 +216,7 @@
             msgHeader = this.msg(label + ".header");
 
          // Intercept before dialog show
-         var doBeforeDialogShow = function DLTB_oNF_doBeforeDialogShow(p_form, p_dialog)
+         var doBeforeDialogShow = function DLTB_onNewContainer_doBeforeDialogShow(p_form, p_dialog)
          {
             Dom.get(p_dialog.id + "-dialogTitle").innerHTML = msgTitle;
             Dom.get(p_dialog.id + "-dialogHeader").innerHTML = msgHeader;
@@ -246,7 +246,7 @@
             },
             onSuccess:
             {
-               fn: function DLTB_onNewFolder_callback(response)
+               fn: function DLTB_onNewContainer_success(response)
                {
                   var folderName = response.config.dataObj["prop_cm_name"];
                   YAHOO.Bubbling.fire("folderCreated",
@@ -257,6 +257,17 @@
                   Alfresco.util.PopupManager.displayMessage(
                   {
                      text: this.msg("message.new-folder.success", folderName)
+                  });
+               },
+               scope: this
+            },
+            onFailure:
+            {
+               fn: function DLTB_onNewContainer_failure(response)
+               {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg("message.new-folder.failure")
                   });
                },
                scope: this
@@ -272,6 +283,47 @@
        * @param p_obj {object} Object passed back from addListener method
        */
       onFileUpload: function DLTB_onFileUpload(e, p_obj)
+      {
+         var me = this;
+         
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            title: this.msg("message.file.type.title"),
+            text: this.msg("message.file.type"),
+            buttons: [
+            {
+               text: this.msg("button.electronic"),
+               handler: function DLTB_onFileUpload_electronic()
+               {
+                  this.destroy();
+                  me.onElectronicRecord.call(me);
+               },
+               isDefault: true
+            },
+            {
+               text: this.msg("button.non-electronic"),
+               handler: function DLTB_onFileUpload_nonElectronic()
+               {
+                  this.destroy();
+                  me.onnonElectronicDocument.call(me);
+               }
+            },
+            {
+               text: this.msg("button.cancel"),
+               handler: function DLTB_onFileUpload_cancel()
+               {
+                  this.destroy();
+               }
+            }]
+         });
+      },
+      
+      /**
+       * Electronic Record button click handler
+       *
+       * @method onElectronicRecord
+       */
+      onElectronicRecord: function DLTB_onElectronicRecord()
       {
          if (this.fileUpload === null)
          {
@@ -294,6 +346,77 @@
             }
          };
          this.fileUpload.show(multiUploadConfig);
+      },
+
+      /**
+       * Non-Electronic Record button click handler
+       *
+       * @method onnonElectronicDocument
+       */
+      onnonElectronicDocument: function DLTB_onnonElectronicDocument()
+      {
+         var destination = this.modules.docList.doclistMetadata.parent,
+            label = "label.new-rma_nonElectronicDocument",
+            msgTitle = this.msg(label + ".title"),
+            msgHeader = this.msg(label + ".header");
+
+         // Intercept before dialog show
+         var doBeforeDialogShow = function DLTB_onnonElectronicDocument_doBeforeDialogShow(p_form, p_dialog)
+         {
+            Dom.get(p_dialog.id + "-dialogTitle").innerHTML = msgTitle;
+            Dom.get(p_dialog.id + "-dialogHeader").innerHTML = msgHeader;
+         };
+         
+         var templateUrl = YAHOO.lang.substitute(Alfresco.constants.URL_SERVICECONTEXT + "components/form?itemKind={itemKind}&itemId={itemId}&destination={destination}&mode={mode}&submitType={submitType}&showCancelButton=true",
+         {
+            itemKind: "type",
+            itemId: "rma:nonElectronicDocument",
+            destination: destination,
+            mode: "create",
+            submitType: "json"
+         });
+
+         // Using Forms Service, so always create new instance
+         var createRecord = new Alfresco.module.SimpleDialog(this.id + "-createRecord");
+
+         createRecord.setOptions(
+         {
+            width: "33em",
+            templateUrl: templateUrl,
+            actionUrl: null,
+            doBeforeDialogShow:
+            {
+               fn: doBeforeDialogShow,
+               scope: this
+            },
+            onSuccess:
+            {
+               fn: function DLTB_onnonElectronicDocument_success(response)
+               {
+                  var fileName = response.config.dataObj["prop_cm_name"];
+                  YAHOO.Bubbling.fire("metadataRefresh",
+                  {
+                     highlightFile: fileName
+                  });
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg("message.new-record.success", fileName)
+                  });
+               },
+               scope: this
+            },
+            onFailure:
+            {
+               fn: function DLTB_onnonElectronicDocument_failure(response)
+               {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg("message.new-record.failure")
+                  });
+               },
+               scope: this
+            }
+         }).show();
       },
 
       /**

@@ -20,7 +20,7 @@
          <action type="action-link" id="onActionCloseFolder" permission="close-folder" label="actions.close-folder" />
          <action type="action-link" id="onActionOpenFolder" permission="open-folder" label="actions.open-folder" />
          <action type="action-link" id="onActionCutoff" permission="cutoff" label="actions.cutoff" />
-         <action type="action-link" id="onActionRetain" permission="retain" label="actions.retain" />
+         <action type="action-link" id="onActionRetain" permission="HIDDEN" label="actions.retain" />
          <action type="action-link" id="onActionDestroy" permission="destroy" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="transfer" label="actions.transfer" />
          <action type="action-link" id="onActionFreeze" permission="ExtendRetentionPeriodOrFreeze" label="actions.freeze" />
@@ -32,11 +32,11 @@
       </actionSet>
 
       <actionSet id="record">
-         <action type="simple-link" id="onActionDownload" permission="" href="{downloadUrl}" label="actions.download" />
+         <action type="simple-link" id="onActionDownload" permission="download" href="{downloadUrl}" label="actions.download" />
          <action type="simple-link" id="onActionEditDetails" permisson="edit" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionReviewed" permission="reviewed" label="actions.reviewed" />
          <action type="action-link" id="onActionCutoff" permission="cutoff" label="actions.cutoff" />
-         <action type="action-link" id="onActionRetain" permission="retain" label="actions.retain" />
+         <action type="action-link" id="onActionRetain" permission="HIDDEN" label="actions.retain" />
          <action type="action-link" id="onActionDestroy" permission="destroy" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="transfer" label="actions.transfer" />
          <action type="action-link" id="onActionFreeze" permission="ExtendRetentionPeriodOrFreeze" label="actions.freeze" />
@@ -49,7 +49,7 @@
       </actionSet>
 
       <actionSet id="undeclaredRecord">
-         <action type="simple-link" id="onActionDownload" permission="" href="{downloadUrl}" label="actions.download" />
+         <action type="simple-link" id="onActionDownload" permission="download" href="{downloadUrl}" label="actions.download" />
          <action type="simple-link" id="onActionEditDetails" permisson="edit" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionDeclare" permission="DeclareRecords" label="actions.declare" />
          <action type="action-link" id="onActionUploadNewVersion" permission="HIDDEN" label="actions.upload-new-version" />
@@ -58,10 +58,7 @@
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
          <action type="action-link" id="onActionDelete" permission="HIDDEN" label="actions.delete" />
-         <action type="action-link" id="onActionSplitEmail" permission="edit" label="actions.split-email" />
-      </actionSet>
-
-      <actionSet id="nonElectronicRecord">
+         <action type="action-link" id="onActionSplitEmail" permission="split-email" label="actions.split-email" />
       </actionSet>
 
       <actionSet id="metadataStub">

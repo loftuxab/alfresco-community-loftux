@@ -253,8 +253,9 @@
                      elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + type + '-32.png" /></a>';
                      break;
 
-                  case "non-electronic-record":
-                     elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span class="link"></span>' : '') + '<img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/generic-file-32.png" />';
+                  case "record-nonelec":
+                  case "undeclared-record-nonelec":
+                     elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span class="link"></span>' : '') + '<img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/non-electronic-32.png" />';
                      break;
 
                   case "metadata-stub":
@@ -296,8 +297,9 @@
                      elCell.innerHTML = '<span class="folder">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + type + '-48.png" /></a>';
                      break;
 
-                  case "non-electronic-record":
-                     elCell.innerHTML = '<span class="folder">' + (isLink ? '<span class="link"></span>' : '') + '<img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/nonElectronicRecord.png" />';
+                  case "record-nonelec":
+                  case "undeclared-record-nonelec":
+                     elCell.innerHTML = '<span class="folder">' + (isLink ? '<span class="link"></span>' : '') + '<img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/non-electronic-75x100.png" />';
                      break;
 
                   case "metadata-stub":
@@ -501,6 +503,7 @@
                 * Record
                 */
                case "record":
+               case "record-nonelec":
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
 
                   desc = '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '" title="' + title + '">' + $html(record.displayName) + '</a></span></h3>';
@@ -524,12 +527,6 @@
                      desc +=    '<span class="item"><em>' + me.msg("details.record.originating-organisation") + '</em> ' + $html(dod5015["rma:originatingOrganization"]) + '</span>';
                      desc += '</div>';
                   }
-                  break;
-
-               /**
-                * Non-Electronic Record
-                */
-               case "non-electronic-record":
                   break;
 
                /**
@@ -568,6 +565,7 @@
                 * Undeclared Record
                 */
                case "undeclared-record":
+               case "undeclared-record-nonelec":
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
 
                   desc = '<div class="undeclared-record-info">' + me.msg("details.undeclared-record.info") + '</div>';
