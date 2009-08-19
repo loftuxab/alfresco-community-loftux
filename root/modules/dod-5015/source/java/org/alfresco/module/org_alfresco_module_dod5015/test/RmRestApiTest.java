@@ -85,9 +85,11 @@ import org.json.JSONTokener;
  */
 public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagementModel
 {
-    protected static final String GET_AUDITLOG_URL_FORMAT = "/api/node/{0}/rmauditlog";
+    
+    protected static final String GET_NODE_AUDITLOG_URL_FORMAT = "/api/node/{0}/rmauditlog";
     protected static final String GET_TRANSFER_URL_FORMAT = "/api/node/{0}/transfers/{1}";
     protected static final String REF_INSTANCES_URL_FORMAT = "/api/node/{0}/customreferences";
+    protected static final String GET_AUDITLOG_URL = "/api/rma/admin/rmauditlog";
     protected static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String RMA_CUSTOM_PROPS_URL = "/api/rma/admin/custompropertydefinitions";
@@ -653,18 +655,27 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertEquals("application/acp", rsp.getContentType());
     }
     
-    public void xtestAudit() throws IOException
+    public void testAudit() throws IOException
     {
+        // get the full RM audit log 
+        Response rsp = sendRequest(new GetRequest(GET_AUDITLOG_URL), 200);
+        String rspContent = rsp.getContentAsString();
+        System.out.println(rspContent);
+        
+        // get category
+        NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Civilian Files", "Foreign Employee Award Files");
+        //NodeRef recordCategory = new NodeRef("workspace://SpacesStore/cc2f1431-5e15-4c66-b79b-3f76c227dd9b");
+        assertNotNull(recordCategory);
+        
         // construct the URL
-        NodeRef nodeRef = new NodeRef("workspace://SpacesStore/cc2f1431-5e15-4c66-b79b-3f76c227dd9b");
-        String nodeUrl = nodeRef.toString().replace("://", "/");
-        String auditUrl = MessageFormat.format(GET_AUDITLOG_URL_FORMAT, nodeUrl);
+        String nodeUrl = recordCategory.toString().replace("://", "/");
+        String auditUrl = MessageFormat.format(GET_NODE_AUDITLOG_URL_FORMAT, nodeUrl);
         
         // send request
-        Response rsp = sendRequest(new GetRequest(auditUrl), 200);
+        rsp = sendRequest(new GetRequest(auditUrl), 200);
         
         // check response
-        String rspContent = rsp.getContentAsString();
+        rspContent = rsp.getContentAsString();
         System.out.println(rspContent);
     }
     

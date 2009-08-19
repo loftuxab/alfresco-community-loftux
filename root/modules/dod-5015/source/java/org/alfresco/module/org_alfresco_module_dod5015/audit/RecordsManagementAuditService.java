@@ -28,25 +28,66 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Records management audit service
+ * Records management audit service.
  * 
  * @author Gavin Cornwell
  */
 public interface RecordsManagementAuditService
 {
+    /**
+     * Starts RM auditing.
+     */
     void start();
     
+    /**
+     * Stops RM auditing.
+     */
     void stop();
     
+    /**
+     * Clears the RM audit trail.
+     */
     void clear();
     
+    /**
+     * Determines whether the RM audit log is currently enabled.
+     * 
+     * @return true if RM auditing is active false otherwise
+     */
     boolean isEnabled();
     
+    /**
+     * Returns the date the RM audit was last started.
+     * 
+     * @return Date the audit was last started
+     */
     Date getDateLastStarted();
     
+    /**
+     * Returns the date the RM audit was last stopped.
+     * 
+     * @return Date the audit was last stopped
+     */
     Date getDateLastStopped();
     
+    /**
+     * Retrieves a list of ALL audit log entries for the RM system.
+     * 
+     * @return List of RecordsManagementAuditEntry objects
+     */
     List<RecordsManagementAuditEntry> getAuditTrail();
     
+    /**
+     * Retrieves a list of audit log entries using the provided parameters
+     * represented by the RecordsManagementAuditQueryParameters instance.
+     * <p>
+     * The parameters are all optional, null or an empty RecordsManagementAuditQueryParameters
+     * object will result in ALL audit log entries for the RM system being
+     * returned. Setting the various parameters effectively filters the full
+     * audit trail.
+     * 
+     * @param params Parameters to use to retrieve audit trail
+     * @return List of RecordsManagementAuditEntry objects
+     */
     List<RecordsManagementAuditEntry> getAuditTrail(RecordsManagementAuditQueryParameters params);
 }

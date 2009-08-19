@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,15 +101,19 @@ public class AuditLogGet extends DeclarativeWebScript
     {
         Map<String, Object> model = new HashMap<String, Object>(8);
         
+        model.put("started", ISO8601DateFormat.format(rmAuditService.getDateLastStarted()));
+        model.put("stopped", ISO8601DateFormat.format(rmAuditService.getDateLastStopped()));
+        model.put("enabled", Boolean.valueOf(rmAuditService.isEnabled()));
+        
         if (nodeRef != null)
         {
-            model.put("started", ISO8601DateFormat.format(rmAuditService.getDateLastStarted()));
-            model.put("stopped", ISO8601DateFormat.format(rmAuditService.getDateLastStopped()));
-            model.put("enabled", Boolean.valueOf(rmAuditService.isEnabled()));
-            
             RecordsManagementAuditQueryParameters params = new RecordsManagementAuditQueryParameters();
             params.setNodeRef(nodeRef);
             model.put("entries", this.rmAuditService.getAuditTrail(params));
+        }
+        else
+        {
+            model.put("entries", Collections.EMPTY_LIST);
         }
         
         return model;
