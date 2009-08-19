@@ -462,6 +462,6 @@
             }
          });
          this.modules.changeType.show();
-      },
+      }
    };
 })();

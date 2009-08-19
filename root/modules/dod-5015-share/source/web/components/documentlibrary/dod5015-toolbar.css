@@ -1,25 +1,5 @@
 /* Header- and Navigation-Bar Buttons */
 
-.toolbar .new-series button
-{
-   background: transparent url(images/folder-new-16.png) no-repeat 12px 4px;
-   padding-left: 32px; 
-}
-.toolbar .new-series .yui-button-disabled button
-{
-   background-image: url(images/folder-new-disabled-16.png);
-}
-
-.toolbar .new-category button
-{
-   background: transparent url(images/folder-new-16.png) no-repeat 12px 4px;
-   padding-left: 32px; 
-}
-.toolbar .new-category .yui-button-disabled button
-{
-   background-image: url(images/folder-new-disabled-16.png);
-}
-
 .toolbar .import button
 {
    background: transparent url(images/import-16.png) no-repeat 12px 4px;

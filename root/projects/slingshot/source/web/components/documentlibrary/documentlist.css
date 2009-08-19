@@ -217,8 +217,8 @@
    padding-top: 2px;
 }
 
-.doclist .documents .thumbnail span,
-.doclist .documents .folder span
+.doclist .documents .thumbnail span.link,
+.doclist .documents .folder span.link
 {
    background: url(images/link-32.png) no-repeat;
    display: block;

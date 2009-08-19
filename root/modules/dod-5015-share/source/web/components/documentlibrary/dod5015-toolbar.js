@@ -62,6 +62,13 @@
       return Alfresco.RecordsDocListToolbar.superclass.constructor.call(this, htmlId);
    };
    
+   Alfresco.RecordsDocListToolbar.containerMap =
+   {
+      "new-series": "dod:recordSeries",
+      "new-category": "dod:recordCategory",
+      "new-folder": "rma:recordFolder"
+   };
+   
    YAHOO.extend(Alfresco.RecordsDocListToolbar, Alfresco.DocListToolbar,
    {
       /**
@@ -72,27 +79,22 @@
        */
       onReady: function DLTB_onReady()
       {
-         // New Series button: user needs "create,series" access
-         this.widgets.newSeries = Alfresco.util.createYUIButton(this, "newSeries-button", this.onNewContainer,
+         // New Container button: user needs "create" and container-type access
+         this.widgets.newContainer = Alfresco.util.createYUIButton(this, "newContainer-button", this.onNewContainer,
          {
             disabled: true,
-            value: "create,new-series"
+            value: "new-series|new-category|new-folder"
+         });
+         this.widgets.newContainer.createAttribute("activePermission");
+         this.widgets.newContainer.setAttributeConfig("activePermission",
+         {
+            method: this.setNewContainerPermissions,
+            owner: this,
+            silent: true,
+            validator: YAHOO.lang.isString,
+            value: ""
          });
 
-         // New Category button: user needs "create,category" access
-         this.widgets.newCategory = Alfresco.util.createYUIButton(this, "newCategory-button", this.onNewContainer,
-         {
-            disabled: true,
-            value: "create,new-category"
-         });
-
-         // New Folder button: user needs "create,folder" access
-         this.widgets.newFolder = Alfresco.util.createYUIButton(this, "newFolder-button", this.onNewContainer,
-         {
-            disabled: true,
-            value: "create,new-folder"
-         });
-         
          // File Upload button: user needs "file" access
          this.widgets.fileUpload = Alfresco.util.createYUIButton(this, "fileUpload-button", this.onFileUpload,
          {
@@ -173,6 +175,29 @@
        * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
 
+       /**
+        * Required because this class has declared itself a button attribute owner
+        *
+        * @method fireBeforeChangeEvent
+        * @return {boolean} true
+        */
+       fireBeforeChangeEvent: function DLTB_fireBeforeChangeEvent(e)
+       {
+          return true;
+       },
+
+      /**
+       * Called when the value of the button's "permissions" attribute is set.
+       *
+       * @method setNewContainerPermissions
+       * @param {String} p_sPermission String indicating the value for the button's "permission" attribute.
+       */
+      setNewContainerPermissions: function DLTB_setNewContainerPermissions(p_sValue)
+      {
+         this.widgets.newContainer.set("label", this.msg("button." + p_sValue));
+         this.widgets.newContainer.set("name", Alfresco.RecordsDocListToolbar.containerMap[p_sValue]);
+      },
+
       /**
        * New Container button click handler
        *
@@ -237,6 +262,38 @@
                scope: this
             }
          }).show();
+      },
+
+      /**
+       * File Upload button click handler
+       *
+       * @method onFileUpload
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onFileUpload: function DLTB_onFileUpload(e, p_obj)
+      {
+         if (this.fileUpload === null)
+         {
+            this.fileUpload = Alfresco.getRecordsFileUploadInstance();
+         }
+         
+         // Show uploader for multiple files
+         var multiUploadConfig =
+         {
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            uploadDirectory: this.currentPath,
+            filter: [],
+            mode: this.fileUpload.MODE_MULTI_UPLOAD,
+            thumbnails: "doclib",
+            onFileUploadComplete:
+            {
+               fn: this.onFileUploadComplete,
+               scope: this
+            }
+         };
+         this.fileUpload.show(multiUploadConfig);
       },
 
       /**

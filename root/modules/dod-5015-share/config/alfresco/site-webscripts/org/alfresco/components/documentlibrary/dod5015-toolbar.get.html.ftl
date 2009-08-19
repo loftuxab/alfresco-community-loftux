@@ -12,15 +12,7 @@
    <div id="${args.htmlid}-headerBar" class="header-bar flat-button theme-bg-2">
       <div class="left">
          <div class="hideable toolbar-hidden DocListTree">
-            <div class="new-series"><button id="${args.htmlid}-newSeries-button" name="dod:recordSeries">${msg("button.new-series")}</button></div>
-            <div class="separator">&nbsp;</div>
-         </div>
-         <div class="hideable toolbar-hidden DocListTree">
-            <div class="new-category"><button id="${args.htmlid}-newCategory-button" name="dod:recordCategory">${msg("button.new-category")}</button></div>
-            <div class="separator">&nbsp;</div>
-         </div>
-         <div class="hideable toolbar-hidden DocListTree">
-            <div class="new-folder"><button id="${args.htmlid}-newFolder-button" name="rma:recordFolder">${msg("button.new-folder")}</button></div>
+            <div class="new-folder"><button id="${args.htmlid}-newContainer-button" name="">${msg("button.new-series")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
          <div class="hideable toolbar-hidden DocListTree">

@@ -59,8 +59,8 @@
            }
        }
 
-   	// Return a reference to the item that was removed
-   	return oItem;
+      // Return a reference to the item that was removed
+      return oItem;
    };
 
    YAHOO.widget.Menu.prototype._removeItemFromGroupByValue = function (p_nGroupIndex, p_oItem, p_keepEmptyGroup) {
@@ -95,7 +95,7 @@
 
    YAHOO.widget.Menu.prototype.removeItem = function (p_oObject, p_nGroupIndex, p_keepEmptyGroup) {
        var oItem,
-       	returnVal;
+          returnVal;
     
        if (!Lang.isUndefined(p_oObject)) {
            if (p_oObject instanceof YAHOO.widget.MenuItem) {
@@ -111,7 +111,7 @@
            }
        }
 
-   	return returnVal;
+      return returnVal;
    };
 })();
 
@@ -139,7 +139,7 @@
               oUnderlay.style.height = oElement.offsetHeight + "px";
            }
        }
-   }
+   };
 })();
 
 /**
@@ -203,5 +203,5 @@
        }
 
        return null;
-   }
+   };
 })();
