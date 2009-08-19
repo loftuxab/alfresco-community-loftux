@@ -55,7 +55,7 @@
    /**
     * DocumentList constructor.
     * 
-    * @param {String} htmlId The HTML id of the parent element
+    * @param htmlId {String} The HTML id of the parent element
     * @return {Alfresco.DocumentList} The new DocumentList instance
     * @constructor
     */

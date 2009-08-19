@@ -27,5 +27,12 @@
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
          <action type="action-link" id="onActionDelete" permission="HIDDEN" label="actions.delete" />
       </actionSet>
+
+      <actionSet id="folder">
+         <action type="simple-link" id="onActionDetails" permission="edit" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action type="action-link" id="onActionCopyTo" label="actions.copy-to" />
+         <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.move-to" />
+         <action type="action-link" id="onActionDelete" permission="HIDDEN" label="actions.delete" />
+      </actionSet>
    </actionSets>
 </documentList>

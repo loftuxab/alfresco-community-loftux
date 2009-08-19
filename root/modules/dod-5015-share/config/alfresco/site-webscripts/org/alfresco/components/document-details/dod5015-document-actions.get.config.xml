@@ -22,7 +22,7 @@
       <actionSet id="undeclaredRecord">
          <action id="onActionDownload" permission="" type="simple-link" href="{downloadUrl}" label="actions.download" />
          <action id="onActionEditDetails" permission="edit" type="simple-link" href="{editMetadataUrl}" label="actions.edit-details" />
-         <action id="onActionDeclare" permission="declare" type="action-link" label="actions.declare" />
+         <action id="onActionDeclare" permission="DeclareRecords" type="action-link" label="actions.declare" />
          <action id="onActionUploadNewVersion" permission="edit" type="action-link" label="actions.upload-new-version" />
          <action id="onActionCopyTo" permission="" type="action-link" label="actions.copy-to" />
          <action id="onActionMoveTo" permission="delete" type="action-link" label="actions.move-to" />

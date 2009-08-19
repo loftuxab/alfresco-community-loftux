@@ -211,6 +211,9 @@
          // Reference to Document List component
          this.modules.docList = Alfresco.util.ComponentManager.findFirst("Alfresco.DocumentList");
 
+         // Reference to Document List Tree component
+         this.modules.docListTree = Alfresco.util.ComponentManager.findFirst("Alfresco.DocListTree");
+
          // Preferences service
          this.services.preferences = new Alfresco.service.Preferences();
 
@@ -861,9 +864,9 @@
       onUserAccess: function DLTB_onUserAccess(layer, args)
       {
          var obj = args[1];
-         if ((obj !== null) && (obj.userAccess !== null))
+         if (obj && obj.userAccess)
          {
-            var widget, widgetPermissions, index;
+            var widget, widgetPermissions, index, orPermissions, orMatch;
             for (index in this.widgets)
             {
                if (this.widgets.hasOwnProperty(index))
@@ -877,7 +880,26 @@
                         widgetPermissions = widget.get("value").split(",");
                         for (var i = 0, ii = widgetPermissions.length; i < ii; i++)
                         {
-                           if (!obj.userAccess[widgetPermissions[i]])
+                           if (widgetPermissions[i].indexOf("|") !== -1)
+                           {
+                              orMatch = false;
+                              orPermissions = widgetPermissions[i].split("|");
+                              for (var j = 0, jj = orPermissions.length; j < jj; j++)
+                              {
+                                 if (obj.userAccess[orPermissions[j]])
+                                 {
+                                    orMatch = true;
+                                    widget.set("activePermission", orPermissions[j], true);
+                                    break;
+                                 }
+                              }
+                              if (!orMatch)
+                              {
+                                 widget.set("disabled", true);
+                                 break;
+                              }
+                           }
+                           else if (!obj.userAccess[widgetPermissions[i]])
                            {
                               widget.set("disabled", true);
                               break;
@@ -1011,7 +1033,13 @@
          
          displayPaths[0] = Alfresco.util.message("node.root", "Alfresco.DocListTree");
 
-         var fnBreadcrumbClick = function DLTB__gB_click(e, path)
+         var fnCrumbIconClick = function DLTB__fnCrumbIconClick(e, path)
+         {
+            Dom.addClass(e.target.parentNode, "highlighted");
+            Event.stopEvent(e);
+         };
+
+         var fnBreadcrumbClick = function DLTB__fnBreadcrumbClick(e, path)
          {
             var filter = me.currentFilter;
             filter.filterData = path;
@@ -1020,18 +1048,28 @@
             Event.stopEvent(e);
          };
          
-         var eBreadcrumb = new Element(divBC);
+         var eBreadcrumb = new Element(divBC),
+            newPath,
+            eCrumb,
+            eIcon,
+            eFolder;
+         
          for (var i = 0, j = paths.length; i < j; ++i)
          {
-            var eCrumb = new Element(document.createElement("span"));
+            newPath = paths.slice(0, i+1).join("/");
+            eCrumb = new Element(document.createElement("div"));
             eCrumb.addClass("crumb");
-            if (i === 0)
+            
+            if (i > 0)
             {
-               eCrumb.addClass("first");
-            }
-            else
-            {
-               eCrumb.addClass("folder");
+               eIcon = new Element(document.createElement("a"),
+               {
+                  href: "#",
+                  innerHTML: "&nbsp;"
+               });
+               eIcon.on("click", fnBreadcrumbClick, newPath);
+               eIcon.addClass("icon");
+               eCrumb.appendChild(eIcon);
             }
 
             // Last crumb shouldn't be rendered as a link
@@ -1039,27 +1077,34 @@
             {
                if (j > 1)
                {
-                  eCrumb.addClass("last");
+                  eIcon.addClass("last");
                }
-               eCrumb.set("innerHTML", displayPaths[i]);
+               eFolder = new Element(document.createElement("a"),
+               {
+                  href: "#",
+                  innerHTML: displayPaths[i]
+               });
+               eFolder.addClass("folder");
+               eCrumb.appendChild(eFolder);
+               eBreadcrumb.appendChild(eCrumb);
             }
             else
             {
-               var eLink = new Element(document.createElement("a"),
+               eFolder = new Element(document.createElement("a"),
                {
                   href: "",
                   innerHTML: displayPaths[i]
                });
-               var newPath = paths.slice(0, i+1).join("/");
-               eLink.on("click", fnBreadcrumbClick, newPath);
-               eCrumb.appendChild(eLink);
-               eCrumb.appendChild(new Element(document.createElement("span"),
+               eFolder.addClass("folder");
+               eFolder.on("click", fnBreadcrumbClick, newPath);
+               eCrumb.appendChild(eFolder);
+               eBreadcrumb.appendChild(eCrumb);
+               eBreadcrumb.appendChild(new Element(document.createElement("div"),
                {
                   innerHTML: "&gt;",
                   className: "separator"
                }));
             }
-            eBreadcrumb.appendChild(eCrumb);
          }
       },
 

@@ -59,9 +59,9 @@
          </div>
       </div>
 
-      <@region id="html-upload" scope="template" protected=true />
-      <@region id="flash-upload" scope="template" protected=true />
-      <@region id="file-upload" scope="template" protected=true />
+      <@region id=doclibType + "html-upload" scope="template" protected=true />
+      <@region id=doclibType + "flash-upload" scope="template" protected=true />
+      <@region id=doclibType + "file-upload" scope="template" protected=true />
    </div>
 </@>
 

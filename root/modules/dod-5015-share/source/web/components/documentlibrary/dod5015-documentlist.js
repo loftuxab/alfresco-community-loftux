@@ -334,7 +334,8 @@
                nodeRef = record.nodeRef,
                isLink = record.isLink,
                locn = record.location,
-               dod5015 = record.dod5015;
+               dod5015 = record.dod5015,
+               title = record.title || record.displayName;
             
             // Link handling
             if (isLink)
@@ -355,7 +356,7 @@
                 * Record Series
                 */
                case "record-series":
-                  desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '">';
+                  desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '" title="' + title + '">';
                   desc += $html(record.displayName) + '</a></h3>';
 
                   if (me.options.simpleView)
@@ -384,7 +385,7 @@
                 * Record Category
                 */
                case "record-category":
-                  desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '">';
+                  desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '" title="' + title + '">';
                   desc += $html(record.displayName) + '</a></h3>';
 
                   if (me.options.simpleView)
@@ -412,7 +413,7 @@
                 * Record Folder
                 */
                case "record-folder":
-                  desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '">' + $html(record.displayName) + '</a></h3>';
+                  desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '" title="' + title + '">' + $html(record.displayName) + '</a></h3>';
 
                   if (me.options.simpleView)
                   {
@@ -502,7 +503,7 @@
                case "record":
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
 
-                  desc = '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(record.displayName) + '</a></span></h3>';
+                  desc = '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '" title="' + title + '">' + $html(record.displayName) + '</a></span></h3>';
                   if (me.options.simpleView)
                   {
                      /**
@@ -540,7 +541,7 @@
                    */
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
 
-                  desc += '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(record.displayName) + '</a></span></h3>';
+                  desc += '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '" title="' + title + '">' + $html(record.displayName) + '</a></span></h3>';
                   if (me.options.simpleView)
                   {
                      /**
@@ -570,7 +571,7 @@
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
 
                   desc = '<div class="undeclared-record-info">' + me.msg("details.undeclared-record.info") + '</div>';
-                  desc += '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(record.displayName) + '</a></span></h3>';
+                  desc += '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '" title="' + title + '">' + $html(record.displayName) + '</a></span></h3>';
                   if (me.options.simpleView)
                   {
                      /**
@@ -606,7 +607,7 @@
                 * Technically not supported in the Records Management world.
                 */
                case "folder":
-                  desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '">';
+                  desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '" title="' + title + '">';
                   desc += $html(record.displayName) + '</a></h3>';
 
                   if (me.options.simpleView)
@@ -640,7 +641,7 @@
                default:
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
                 
-                  desc = '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(record.displayName) + '</a></span></h3>';
+                  desc = '<h3 class="filename"><span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '" title="' + title + '">' + $html(record.displayName) + '</a></span></h3>';
                   if (me.options.simpleView)
                   {
                      /**

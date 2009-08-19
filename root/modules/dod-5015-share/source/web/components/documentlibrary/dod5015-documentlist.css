@@ -65,6 +65,11 @@
    background-image: url(images/move-record-to-16.png);
 }
 
+.doclist .record .onActionRetain a
+{
+   background-image: url(images/generic-16.png);
+}
+
 .doclist .record .onActionReviewed a
 {
    background-image: url(images/reviewed-record-16.png);
@@ -160,6 +165,11 @@
 .doclist .record-folder .onActionOpenFolder a
 {
    background-image: url(images/record-folder-open-16.png);
+}
+
+.doclist .record-folder .onActionRetain a
+{
+   background-image: url(images/generic-16.png);
 }
 
 .doclist .record-folder .onActionTransfer a

@@ -4305,12 +4305,29 @@ Alfresco.util.RichEditor = function(editorName,id,config)
                }
                else if (candidates.length > 1)
                {
-                  candidates = YUISelector.query("a[rel='" + obj.filterData.replace("'", "\'") + "']", this.id);
-                  if (candidates.length == 1)
+                  if (obj.filterData.indexOf("]") !== -1)
                   {
-                     // This component now owns the active filter
-                     this.selectedFilter = candidates[0].parentNode.parentNode;
-                     YUIDom.addClass(this.selectedFilter, "selected");
+                     // Special case handling, as YUI Selector doesn't work with "]" within an attribute
+                     // See http://yuilibrary.com/projects/yui2/ticket/1978321
+                     for (var i = 0, ii = candidates.length; i < ii; i++)
+                     {
+                        if (candidates[i].firstChild.rel == obj.filterData)
+                        {
+                           // This component now owns the active filter
+                           this.selectedFilter = candidates[i].parentNode;
+                           YUIDom.addClass(this.selectedFilter, "selected");
+                        }
+                     }
+                  }
+                  else
+                  {
+                     candidates = YUISelector.query("a[rel='" + obj.filterData.replace("'", "\'") + "']", this.id);
+                     if (candidates.length == 1)
+                     {
+                        // This component now owns the active filter
+                        this.selectedFilter = candidates[0].parentNode.parentNode;
+                        YUIDom.addClass(this.selectedFilter, "selected");
+                     }
                   }
                }
             }
