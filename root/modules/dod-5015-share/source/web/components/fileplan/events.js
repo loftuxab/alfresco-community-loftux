@@ -42,7 +42,8 @@
     * Internal date formats
     */
    var DATE_LONG = "dddd, d mmmm yyyy",
-      DATE_SHORT = "yyyy/mm/dd";
+      DATE_SHORT = "yyyy/mm/dd",
+      TIME_24H = "HH:MM";
 
    /**
     * Events constructor.
@@ -54,6 +55,9 @@
    Alfresco.Events = function Events_constructor(htmlId)
    {
       Alfresco.Events.superclass.constructor.call(this, "Alfresco.Events", htmlId, ["button", "container"]);
+      
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("metadataRefresh", this.refreshEvents, this);
 
       return this;
    };
@@ -100,16 +104,15 @@
          this._setupEventDialog();
 
          // Load events data
-         this._refreshEvents();
+         this.refreshEvents();
       },
 
       /**
        * Refresh the events list
        *
-       * @method _refreshEvents
-       * @private
+       * @method refreshEvents
        */
-      _refreshEvents: function Events__refreshEvents(response)
+      refreshEvents: function Events_refreshEvents()
       {
          Alfresco.util.Ajax.jsonGet(
          {
@@ -209,7 +212,7 @@
                eventEl = this._createEvent(ev, [
                   { "name" : ev.label },
                   { "automatic" : ev.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
-                  { "asof" : asOf ? Alfresco.util.formatDate(asOf) : "" }
+                  { "asof" : asOf ? Alfresco.util.formatDate(asOf) : this.msg("label.none") }
                ],
                   "complete-button", this.onCompleteEventButtonClick, this.widgets.incompleteEventTemplate);
                
@@ -288,7 +291,7 @@
       onCompleteEventButtonClick: function Events_onCompleteEventButtonClick(e, obj)
       {
          Dom.get(this.id + "-eventName").value = obj.event.name;
-         Dom.get(this.id + "-completedAtTime").value = "12:00";
+         Dom.get(this.id + "-completedAtTime").value = Alfresco.util.formatDate(new Date(), TIME_24H);
          Dom.get(this.id + "-completedAtDate").value = Alfresco.util.formatDate(new Date(), DATE_LONG);
 
          this.widgets.completeEventPanel.show();
@@ -323,7 +326,7 @@
        * @param action The name of action the action to be invoked
        * @param pendingMessage Message displayed durint action invocation and
        *        the event data is refreshed afterwards
-       * @param failureMessage DIsplayed if the action failed
+       * @param failureMessage Displayed if the action failed
        * @private
        */
       _doEventAction: function Events__doEventAction(action, params, pendingMessage, failureMessage)
@@ -346,7 +349,7 @@
             },
             successCallback:
             {
-               fn: this._refreshEvents,
+               fn: this.refreshEvents,
                scope: this
             },
             failureCallback:
@@ -479,7 +482,7 @@
          {
             eventName: eventName,
             eventCompletedBy: Alfresco.constants.USERNAME,
-            dateParam:
+            eventCompletedAt:
             {
                iso8601: completedAtIso
             }
