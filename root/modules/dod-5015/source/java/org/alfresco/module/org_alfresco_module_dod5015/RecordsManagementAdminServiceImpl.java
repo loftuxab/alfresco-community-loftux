@@ -32,6 +32,7 @@ import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
@@ -166,5 +167,32 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 	{
     	List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(node);
     	return childAssocs;
+	}
+
+	public void addCustomConstraintDefinition(String constraintName,
+			boolean caseSensitive, List<String> allowedValues) {
+		// TODO Auto-generated method stub
+	}
+
+	public void changeCustomConstraintValues(String constraintName,
+			List<String> newValues) {
+		// TODO Auto-generated method stub
+	}
+
+	public List<ConstraintDefinition> getCustomConstraintDefinitions() {
+		// The result would have to come from the dataDictionary.
+		// So the DictionaryService will need to have something like
+		// public List<ConstraintDefinition> getConstraints(QName model);
+		//
+		// It currently offers access to ConstraintDefinitions through the
+		// PropertyDefinition, but RM will need to access Constraints not yet associated
+		// with properties.
+		 
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void removeCustomConstraintDefinition(String constraintName) {
+		// TODO Auto-generated method stub
 	}
 }

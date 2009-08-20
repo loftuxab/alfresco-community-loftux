@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -85,4 +86,47 @@ public interface RecordsManagementAdminService
      * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}supported__null__null
      */
     public void removeCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId);
+
+    /**
+     * This method returns ConstraintDefinition objects for all constraints defined
+     * in the rmc model.
+     */
+    public List<ConstraintDefinition> getCustomConstraintDefinitions();
+
+    /**
+     * This method would add a Constraint definition to the custom model.
+     * The implementation of this method would have to go into the M2Model and insert
+     * the relevant M2Objects for this new constraint.
+     * 
+     * param type not included as it would always be RMListOfValuesConstraint for RM.
+     * 
+     * @param constraintName the name e.g. rmc:foo. TODO Maybe this should be a QName?
+     * @param caseSensitive
+     * @param allowedValues the allowed values list
+     * 
+     * TODO exceptions?
+     */
+    public void addCustomConstraintDefinition(String constraintName, boolean caseSensitive, List<String> allowedValues);
+
+    /**
+     * This method would remove a constraint definition from the custom model.
+     * The implementation of this method would have to go into the M2Model and
+     * remove the specified M2Constraint object from the model.
+     * It would be subject to the same limitations as other non-incremental changes.
+     * 
+     * @param constraintName the name e.g. rmc:foo. TODO Perhaps this should be a QName?
+     * 
+     * TODO exceptions?
+     */
+    public void removeCustomConstraintDefinition(String constraintName);
+    
+    /**
+     * This method would change the list of values supported in a custom constraint
+     * 
+     * @param name the name e.g. rmc:foo of the custom constraint.
+     * @param newValues
+     * 
+     * TODO exceptions?
+     */
+    public void changeCustomConstraintValues(String constraintName, List<String> newValues);
 }
