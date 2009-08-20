@@ -200,7 +200,7 @@
            print="yes"
            userid="${db.username}" 
            password="${db.password}">
-         drop database ${db.name};
+         drop database if exists ${db.name};
          drop database if exists ${db.name}_test;
       </sql>
 
