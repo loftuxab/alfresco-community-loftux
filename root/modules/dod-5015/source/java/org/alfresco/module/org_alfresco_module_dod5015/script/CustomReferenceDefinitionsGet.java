@@ -79,7 +79,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
         
     	if (logger.isDebugEnabled())
     	{
-    		logger.debug("Getting custom reference definitions");
+    		logger.debug("Getting custom reference definitions with refId: " + String.valueOf(refId));
     	}
 
     	Map<QName, AssociationDefinition> currentCustomRefs = rmAdminService.getAvailableCustomReferences();
@@ -94,8 +94,14 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
         	AssociationDefinition assDef = currentCustomRefs.get(qn);
         	if (assDef == null)
         	{
-                throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND,
-                		"Unable to find reference: " +  refId);
+        		StringBuilder msg = new StringBuilder();
+        		msg.append("Unable to find reference: ").append(refId);
+        		if (logger.isDebugEnabled())
+        		{
+        		    logger.debug(msg.toString());
+        		}
+				throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND,
+                		msg.toString());
         	}
 
         	currentCustomRefs = new HashMap<QName, AssociationDefinition>(1);
