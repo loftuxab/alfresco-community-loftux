@@ -79,12 +79,12 @@
 
 .form-container .incomplete-warning
 {
-   margin-left: -22px;
+   margin-left: -26px;
 }
 
 .form-container .incomplete-warning img
 {
-   margin-right: 2px;
+   margin-right: 6px;
    vertical-align: -2px;
 }
    
@@ -182,24 +182,6 @@
    margin-left: 3em;
 }
 
-.form-panel
-{
-   margin-bottom: 0.6em;
-}
-
-.form-panel-heading
-{
-   background-color: #eeeeee;
-   color: #515d6b;
-   padding: 0.3em 0.2em;
-}
-
-.form-panel-body
-{
-   margin-top: 0.8em;
-   padding-left: 0.2em;
-}
-
 .yui-calcontainer .title
 {
    position: relative;
@@ -225,4 +207,55 @@
    margin-left: 0.3em;
 }
 
+/* Set appearance classes */
 
+.set-panel
+{
+   margin-bottom: 0.6em;
+}
+
+.set-panel-heading
+{
+   background-color: #eeeeee;
+   color: #515d6b;
+   padding: 0.3em 0.2em;
+}
+
+.set-panel-body
+{
+   margin-top: 0.8em;
+   padding-left: 0.2em;
+}
+
+.set-bordered-panel
+{
+   margin-bottom: 0.8em;
+}
+
+.set-bordered-panel-heading
+{
+   background-color: #eeeeee;
+   color: #515d6b;
+   padding: 0.3em 0.6em;
+}
+
+.set-bordered-panel-body
+{
+   padding: 1em 0.2em 0 0.6em;
+   border: 1px solid #eeeeee;
+}
+
+.set-title
+{
+   font-size: 106%;
+   font-weight: bold;
+   border-bottom: 1px solid #eeeeee;
+   padding-bottom: 0.1em;
+   margin-bottom: 0.6em;
+   margin-top: 0.2em;
+}
+
+.set-whitespace
+{
+   padding: 0.8em;
+}

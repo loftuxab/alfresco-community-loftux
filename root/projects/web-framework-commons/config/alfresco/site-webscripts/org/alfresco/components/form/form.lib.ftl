@@ -55,10 +55,18 @@
    <#if set.appearance?exists>
       <#if set.appearance == "fieldset">
          <fieldset><legend>${set.label}</legend>
+      <#elseif set.appearance == "bordered-panel">
+         <div class="set-bordered-panel">
+            <div class="set-bordered-panel-heading">${set.label}</div>
+            <div class="set-bordered-panel-body">
       <#elseif set.appearance == "panel">
-         <div class="form-panel">
-            <div class="form-panel-heading">${set.label}</div>
-            <div class="form-panel-body">
+         <div class="set-panel">
+            <div class="set-panel-heading">${set.label}</div>
+            <div class="set-panel-body">
+      <#elseif set.appearance == "title">
+         <div class="set-title">${set.label}</div>
+      <#elseif set.appearance == "whitespace">
+         <div class="set-whitespace"></div>
       </#if>
    </#if>
    
@@ -77,7 +85,7 @@
    <#if set.appearance?exists>
       <#if set.appearance == "fieldset">
          </fieldset>
-      <#elseif set.appearance == "panel">
+      <#elseif set.appearance == "panel" || set.appearance == "bordered-panel">
             </div>
          </div>
       </#if>
