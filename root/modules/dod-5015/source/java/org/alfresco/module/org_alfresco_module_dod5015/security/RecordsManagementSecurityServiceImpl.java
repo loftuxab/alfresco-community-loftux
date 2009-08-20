@@ -24,19 +24,17 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.security;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
@@ -59,12 +57,9 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     /** Permission service */
     private PermissionService permissionService;
     
-    /** Search service */
-    private SearchService searchService;
-    
     /** Records management role zone */
-    public static final String RM_ROLE_ZONE = "rmRoleZone";
-
+    public static final String RM_ROLE_ZONE_PREFIX = "rmRoleZone";
+    
     /**
      * Set the RMEntryVoter
      * 
@@ -83,19 +78,14 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     public void setPermissionService(PermissionService permissionService)
     {
         this.permissionService = permissionService;
-    }
-    
-    public void setSearchService(SearchService searchService)
-    {
-        this.searchService = searchService;
-    }
+    }  
     
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#getCapabilities()
      */
-    public List<Capability> getCapabilities()
+    public Set<Capability> getCapabilities()
     {
-        return new ArrayList<Capability>(voter.getAllCapabilities());
+        return new HashSet<Capability>(voter.getAllCapabilities());
     }
     
     /**
@@ -133,63 +123,172 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#getRoles()
      */
-    public List<String> getRoles()
+    public Set<Role> getRoles(final NodeRef rmRootNode)
+    {  
+        return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Set<Role>>()
+        {
+            public Set<Role> doWork() throws Exception
+            {
+                Set<Role> result = new HashSet<Role>(13);
+                
+                Set<String> roleAuthorities = authorityService.getAllAuthoritiesInZone(getZoneName(rmRootNode), AuthorityType.GROUP);        
+                for (String roleAuthority : roleAuthorities)
+                {
+                    String name = getShortRoleName(authorityService.getShortName(roleAuthority), rmRootNode);
+                    String displayLabel = authorityService.getAuthorityDisplayName(roleAuthority);
+                    Set<String> capabilities = getCapabilities(rmRootNode, roleAuthority);
+                    
+                    Role role = new Role(name, displayLabel, capabilities);
+                    result.add(role);            
+                }
+                
+                return result;
+            }
+        }, AuthenticationUtil.getAdminUserName());
+    }
+    
+    /**
+     * 
+     * @param rmRootNode
+     * @return
+     */
+    private String getZoneName(NodeRef rmRootNode)
     {
-        return null;
+        return RM_ROLE_ZONE_PREFIX + rmRootNode.getId();
+    }
+    
+    private String getFullRoleName(String role, NodeRef rmRootNode)
+    {
+        return role + rmRootNode.getId();
+    }
+    
+    private String getShortRoleName(String fullRoleName, NodeRef rmRootNode)
+    {
+        return fullRoleName.replaceAll(rmRootNode.getId(), "");
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#getRole(org.alfresco.service.cmr.repository.NodeRef, java.lang.String)
+     */
+    public Role getRole(final NodeRef rmRootNode, final String role)
+    {
+        return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Role>()
+        {
+            public Role doWork() throws Exception
+            {                
+                String roleAuthority = authorityService.getName(AuthorityType.GROUP, getFullRoleName(role, rmRootNode));
+                
+                String name = getShortRoleName(authorityService.getShortName(roleAuthority), rmRootNode);
+                String displayLabel = authorityService.getAuthorityDisplayName(roleAuthority);                
+                Set<String> capabilities = getCapabilities(rmRootNode, roleAuthority);
+                
+                return new Role(name, displayLabel, capabilities);
+            }
+        }, AuthenticationUtil.getAdminUserName());
+    }
+    
+    private Set<String> getCapabilities(NodeRef rmRootNode, String roleAuthority)
+    {
+        Set<AccessPermission> permissions = permissionService.getAllSetPermissions(rmRootNode);
+        Set<String> capabilities = new HashSet<String>(52);
+        for (AccessPermission permission : permissions)
+        {
+            if (permission.getAuthority().equals(roleAuthority) == true)
+            {
+                capabilities.add(permission.getPermission());
+            }
+        }
+        return capabilities;
     }
 
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#existsRole(java.lang.String)
      */
-    public boolean existsRole(String role)
+    public boolean existsRole(final NodeRef rmRootNode, final String role)
     {
-        return false;
+        return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Boolean>()
+        {
+            public Boolean doWork() throws Exception
+            {                                
+                String fullRoleName = authorityService.getName(AuthorityType.GROUP, getFullRoleName(role, rmRootNode));
+            
+                String zone = getZoneName(rmRootNode);
+                Set<String> roles = authorityService.getAllAuthoritiesInZone(zone, AuthorityType.GROUP);
+                return new Boolean(roles.contains(fullRoleName));
+            }
+        }, AuthenticationUtil.getAdminUserName()).booleanValue();
     }
     
-    public void createRole(String role, String roleDisplayLabel, List<Capability> capabilities)
+    public void createRole(final NodeRef rmRootNode, final String role, final String roleDisplayLabel, final Set<Capability> capabilities)
     {
-        Set<String> zones = new HashSet<String>(1);
-        zones.add(RM_ROLE_ZONE);
-        
-        // Create a group that relates to the records management role
-        String roleGroup = this.authorityService.createAuthority(AuthorityType.GROUP, role, roleDisplayLabel, zones);
-        
-        // TODO figure out how to cope with more than one root records managment node
-        // Find the file plan node reference
-        ResultSet resultSet = this.searchService.query(
-                                new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore"), 
-                                SearchService.LANGUAGE_LUCENE, 
-                                "ASPECT:\"rma:recordsManagementRoot\"");
-        if (resultSet.length() == 0)
+        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
         {
-            throw new AlfrescoRuntimeException("No records mamangement root node found.");
-        }
-        if (resultSet.length() != 1)
-        {
-            throw new AlfrescoRuntimeException("More than one records managment root node round.  This is currently unsupported.");
-        }
-        NodeRef rootRMNodeRef = resultSet.getNodeRef(0);
-        
-        // Assign the various capabilities to the group on the root records management node
-        for (Capability capability : capabilities)
-        {
-            this.permissionService.setPermission(rootRMNodeRef, roleGroup, capability.getName(), true);
-        }
+            public Object doWork() throws Exception
+            {
+                String fullRoleName = getFullRoleName(role, rmRootNode);
+                
+                // Check that the role does not already exist for the rm root node
+                Set<String> exists = authorityService.findAuthoritiesByShortName(AuthorityType.GROUP, fullRoleName);
+                if (exists.size() != 0)
+                {
+                    throw new AlfrescoRuntimeException("The role " + role + " already exists for root rm node " + rmRootNode.getId());
+                }
+                
+                // Create a group that relates to the records management role
+                Set<String> zones = new HashSet<String>(1);
+                zones.add(getZoneName(rmRootNode));
+                String roleGroup = authorityService.createAuthority(AuthorityType.GROUP, fullRoleName, roleDisplayLabel, zones);
+                
+                // Assign the various capabilities to the group on the root records management node
+                for (Capability capability : capabilities)
+                {
+                    permissionService.setPermission(rmRootNode, roleGroup, capability.getName(), true);
+                }
+                
+                return null;
+            }
+        }, AuthenticationUtil.getAdminUserName());
     }
 
-    /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#updateRole(java.lang.String, java.util.List)
-     */
-    public void updateRole(String role, List<Capability> capabilities)
+    public void updateRole(final NodeRef rmRootNode, final String role, final String roleDisplayLabel, final Set<Capability> capabilities)
     {
-             
+        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+        {
+            public Boolean doWork() throws Exception
+            {                                
+                String roleAuthority = authorityService.getName(AuthorityType.GROUP, getFullRoleName(role, rmRootNode));
+
+                authorityService.setAuthorityDisplayName(roleAuthority, roleDisplayLabel);
+                
+                // Remove all the current capabilities                
+                permissionService.clearPermission(rmRootNode, roleAuthority);
+                
+                // Re-add the provided capabilities
+                for (Capability capability : capabilities)
+                {
+                    permissionService.setPermission(rmRootNode, roleAuthority, capability.getName(), true);
+                }
+                
+                return null;
+                
+            }
+        }, AuthenticationUtil.getAdminUserName());
     }
 
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#deleteRole(java.lang.String)
      */
-    public void deleteRole(String role)
+    public void deleteRole(final NodeRef rmRootNode, final String role)
     {
-             
+        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+        {
+            public Boolean doWork() throws Exception
+            {                                
+                String roleAuthority = authorityService.getName(AuthorityType.GROUP, getFullRoleName(role, rmRootNode));
+                authorityService.deleteAuthority(roleAuthority);                
+                return null;
+                
+            }
+        }, AuthenticationUtil.getAdminUserName());
     }
 }
