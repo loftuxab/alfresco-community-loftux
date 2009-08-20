@@ -45,7 +45,7 @@ public interface RecordsManagementSecurityService
      * 
      * @return  List<Capability>    list of capabilities available
      */
-    List<Capability> getCapabilities();
+    Set<Capability> getCapabilities();
     
     /**
      * Get the full set of capabilities for the current user.
@@ -75,33 +75,17 @@ public interface RecordsManagementSecurityService
      */
     Set<QName> getProtectedProperties();
     
-    /**
-     * Gets a list of all the available roles
-     * 
-     * @return  List<String>    list of available roles
-     */
-    List<String> getRoles();
+    Set<Role> getRoles(NodeRef rmRootNode);
     
-    /**
-     * Indicates whether a role exists or not.
-     * 
-     * param    role        role name
-     * @return  boolean     true if role exits, false otherwise
-     */
-    boolean existsRole(String role);
+    Role getRole(NodeRef rmRootNode, String role);
     
-    void createRole(String role, String roleDisplayLabel, List<Capability> capabilities);
+    boolean existsRole(NodeRef rmRootNode, String role);
     
-    /**
-     * 
-     * @param role
-     * @param capabilities
-     */
-    void updateRole(String role, List<Capability> capabilities);
+    void createRole(NodeRef rmRootNode, String role, String roleDisplayLabel, Set<Capability> capabilities);
     
-    /**
-     * 
-     * @param role
-     */
-    void deleteRole(String role);
+
+    void updateRole(NodeRef rmRootNode, String role, String roleDisplayLabel, Set<Capability> capabilities);
+    
+  
+    void deleteRole(NodeRef rmRootNode, String role);
 }
