@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.repo.dictionary.M2NamedValue;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -94,19 +95,30 @@ public interface RecordsManagementAdminService
     public List<ConstraintDefinition> getCustomConstraintDefinitions();
 
     /**
-     * This method would add a Constraint definition to the custom model.
+     * This method adds a Constraint definition to the custom model.
      * The implementation of this method would have to go into the M2Model and insert
      * the relevant M2Objects for this new constraint.
      * 
      * param type not included as it would always be RMListOfValuesConstraint for RM.
      * 
-     * @param constraintName the name e.g. rmc:foo. TODO Maybe this should be a QName?
+     * @param constraintName the name e.g. rmc:foo.
      * @param caseSensitive
      * @param allowedValues the allowed values list
      * 
      * TODO exceptions?
      */
-    public void addCustomConstraintDefinition(String constraintName, boolean caseSensitive, List<String> allowedValues);
+    public void addCustomConstraintDefinition(QName constraintName, boolean caseSensitive, List<String> allowedValues);
+
+    /**
+     * This method adds a constraint definition to the custom model.
+     * @param constraintName the name e.g. rmc:foo
+     * @param description a description string.
+     * @param parameters parameters should contain "caseSensitive" : Boolean, "allowedValues" : List<String>.
+     *                   It can probably be made to accept a title and other parameters too.
+     *                   
+     * TODO Exceptions?
+     */
+    public void addCustomConstraintDefinition(QName constraintName, String description, Map<String, Object> parameters);
 
     /**
      * This method would remove a constraint definition from the custom model.
@@ -114,11 +126,11 @@ public interface RecordsManagementAdminService
      * remove the specified M2Constraint object from the model.
      * It would be subject to the same limitations as other non-incremental changes.
      * 
-     * @param constraintName the name e.g. rmc:foo. TODO Perhaps this should be a QName?
+     * @param constraintName the name e.g. rmc:foo.
      * 
      * TODO exceptions?
      */
-    public void removeCustomConstraintDefinition(String constraintName);
+    public void removeCustomConstraintDefinition(QName constraintName);
     
     /**
      * This method would change the list of values supported in a custom constraint
@@ -128,5 +140,5 @@ public interface RecordsManagementAdminService
      * 
      * TODO exceptions?
      */
-    public void changeCustomConstraintValues(String constraintName, List<String> newValues);
+    public void changeCustomConstraintValues(QName constraintName, List<String> newValues);
 }
