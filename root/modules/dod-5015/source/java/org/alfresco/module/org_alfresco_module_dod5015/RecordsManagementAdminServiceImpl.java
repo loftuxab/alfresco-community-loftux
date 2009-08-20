@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,7 +190,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 		// with properties.
 		 
 		// TODO Auto-generated method stub
-		return null;
+		return Collections.emptyList();
 	}
 
 	public void removeCustomConstraintDefinition(String constraintName) {
