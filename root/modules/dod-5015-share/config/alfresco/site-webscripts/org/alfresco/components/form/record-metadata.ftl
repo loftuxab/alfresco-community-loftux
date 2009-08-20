@@ -13,9 +13,9 @@
    </#if>
    
    <div id="${formId}-fields" class="form-fields">
-      <div class="form-panel">
-         <div class="form-panel-heading">${msg("label.set.idStatus")}</div>
-         <div class="form-panel-body">
+      <div class="set-panel">
+         <div class="set-panel-heading">${msg("label.set.idStatus")}</div>
+         <div class="set-panel-body">
             <@formLib.renderField field=form.fields["prop_cm_name"] />
             <@formLib.renderField field=form.fields["prop_rma_identifier"] />
             <@formLib.renderField field=form.fields["prop_cm_title"] />
@@ -29,9 +29,9 @@
          </div>
       </div>
       <#if form.fields["prop_mimetype"]?? || form.mode == "view">
-      <div class="form-panel">
-         <div class="form-panel-heading">${msg("label.set.general")}</div>
-         <div class="form-panel-body">
+      <div class="set-panel">
+         <div class="set-panel-heading">${msg("label.set.general")}</div>
+         <div class="set-panel-body">
             <#if form.mode == "view">
                <@formLib.renderField field=form.fields["prop_cm_creator"] />
                <@formLib.renderField field=form.fields["prop_cm_created"] />
@@ -47,9 +47,9 @@
          </div>
       </div>
       </#if>
-      <div class="form-panel">
-         <div class="form-panel-heading">${msg("label.set.record")}</div>
-         <div class="form-panel-body">
+      <div class="set-panel">
+         <div class="set-panel-heading">${msg("label.set.record")}</div>
+         <div class="set-panel-body">
             <@formLib.renderField field=form.fields["prop_rma_originator"] />
             <@formLib.renderField field=form.fields["prop_rma_originatingOrganization"] />
             <#if form.mode == "view">
@@ -101,26 +101,26 @@
             </#if>
          </div>
       </div>
-      <div class="form-panel">
-         <div class="form-panel-heading">${msg("label.set.correspondence")}</div>
-         <div class="form-panel-body">
+      <div class="set-panel">
+         <div class="set-panel-heading">${msg("label.set.correspondence")}</div>
+         <div class="set-panel-body">
             <@formLib.renderField field=form.fields["prop_rma_dateReceived"] />
             <@formLib.renderField field=form.fields["prop_rma_address"] />
             <@formLib.renderField field=form.fields["prop_rma_otherAddress"] />
          </div>
       </div>
-      <div class="form-panel">
-         <div class="form-panel-heading">${msg("label.set.security")}</div>
-         <div class="form-panel-body">
+      <div class="set-panel">
+         <div class="set-panel-heading">${msg("label.set.security")}</div>
+         <div class="set-panel-body">
             <@formLib.renderField field=form.fields["prop_rma_supplementalMarkingList"] />
          </div>
       </div>
       
       <#if form.fields["prop_rma_vitalRecordIndicator"]?? || form.fields["prop_rma_reviewPeriod"]?? ||
            (form.fields["prop_rma_reviewAsOf"]?? && form.mode == "view")>
-         <div class="form-panel">
-            <div class="form-panel-heading">${msg("label.set.vitalRecord")}</div>
-            <div class="form-panel-body">
+         <div class="set-panel">
+            <div class="set-panel-heading">${msg("label.set.vitalRecord")}</div>
+            <div class="set-panel-body">
                <#if form.fields["prop_rma_vitalRecordIndicator"]??>
                   <@formLib.renderField field=form.fields["prop_rma_vitalRecordIndicator"] />
                </#if>
@@ -135,9 +135,9 @@
       </#if>
       
       <#if form.fields["prop_rma_cutOffDate"]?? && form.mode == "view">
-         <div class="form-panel">
-            <div class="form-panel-heading">${msg("label.set.disposition")}</div>
-            <div class="form-panel-body">
+         <div class="set-panel">
+            <div class="set-panel-heading">${msg("label.set.disposition")}</div>
+            <div class="set-panel-body">
                <@formLib.renderField field=form.fields["prop_rma_cutOffDate"] />
             </div>
          </div>
