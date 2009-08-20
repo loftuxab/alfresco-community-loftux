@@ -24,17 +24,20 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
-import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
+import org.alfresco.service.cmr.dictionary.Constraint;
 import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -170,17 +173,56 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     	return childAssocs;
 	}
 
-	public void addCustomConstraintDefinition(String constraintName,
+	public void addCustomConstraintDefinition(QName constraintName,
 			boolean caseSensitive, List<String> allowedValues) {
 		// TODO Auto-generated method stub
 	}
 
-	public void changeCustomConstraintValues(String constraintName,
+	public void addCustomConstraintDefinition(QName constraintName,
+			String description, Map<String, Object> parameters) {
+		// TODO Auto-generated method stub
+	}
+
+	public void changeCustomConstraintValues(QName constraintName,
 			List<String> newValues) {
 		// TODO Auto-generated method stub
 	}
 
 	public List<ConstraintDefinition> getCustomConstraintDefinitions() {
+		// TODO I'm returning dummy data here for testing purposes.
+		//      Obviously this will have to return live data
+		List<ConstraintDefinition> result = new ArrayList<ConstraintDefinition>();
+		
+		ConstraintDefinition dummyData = new ConstraintDefinition() {
+			public ModelDefinition getModel() {
+				return null;
+ 			}
+			public Constraint getConstraint() {
+				return new Constraint() {
+					public void evaluate(Object value) {}
+
+					public Map<String, Object> getParameters() {
+						HashMap<String, Object> hashMap = new HashMap<String, Object>();
+						hashMap.put("caseSensitive", false);
+						hashMap.put("allowedValues", Arrays.asList(new String[]{"foo", "bar", "other"}));
+						return hashMap;
+					}
+
+					public String getType() {
+						return "LIST";
+					}
+
+					public void initialize() {}
+				};
+			}
+			public QName getName() {
+				return QName.createQName("rmc:dummy", namespaceService);
+			}
+			
+		};
+		result.add(dummyData);
+		return result;
+		
 		// The result would have to come from the dataDictionary.
 		// So the DictionaryService will need to have something like
 		// public List<ConstraintDefinition> getConstraints(QName model);
@@ -188,12 +230,10 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 		// It currently offers access to ConstraintDefinitions through the
 		// PropertyDefinition, but RM will need to access Constraints not yet associated
 		// with properties.
-		 
-		// TODO Auto-generated method stub
-		return Collections.emptyList();
+
 	}
 
-	public void removeCustomConstraintDefinition(String constraintName) {
+	public void removeCustomConstraintDefinition(QName constraintName) {
 		// TODO Auto-generated method stub
 	}
 }
