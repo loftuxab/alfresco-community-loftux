@@ -50,7 +50,6 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEvent
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService;
-import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigServiceImpl;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.node.integrity.IntegrityException;
@@ -1941,11 +1940,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         if (personService.personExists(userName))
         {
             personService.deletePerson(userName);
-        }
-        
-        if (authenticationService.authenticationExists(userName))
-        {
-            authenticationService.deleteAuthentication(userName);
         }
     }
     

@@ -543,11 +543,6 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         {
             personService.deletePerson(userName);
         }
-        
-        if (authenticationService.authenticationExists(userName))
-        {
-            authenticationService.deleteAuthentication(userName);
-        }
     }
     
     protected void createGroup(String groupShortName)
