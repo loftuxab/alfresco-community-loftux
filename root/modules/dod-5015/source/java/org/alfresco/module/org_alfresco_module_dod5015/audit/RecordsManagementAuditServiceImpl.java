@@ -33,6 +33,7 @@ import org.alfresco.service.cmr.audit.AuditInfo;
 import org.alfresco.service.cmr.audit.AuditService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,8 +47,9 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
 	/** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementAuditServiceImpl.class);
 
-    private NodeService nodeService;
-    private AuditService auditService;
+    protected NodeService nodeService;
+    protected AuditService auditService;
+    protected PersonService personService;
 
     // temporary field to hold imaginary enabled flag
     private boolean enabled = false;
@@ -70,6 +72,16 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
 	public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
+    }
+	
+	/**
+     * Sets the PersonService instance
+     * 
+     * @param personService PersonService instance
+     */
+    public void setPersonService(PersonService personService)
+    {
+        this.personService = personService;
     }
 	
 	/*
@@ -147,32 +159,50 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
     public List<RecordsManagementAuditEntry> getAuditTrail(
                 RecordsManagementAuditQueryParameters params)
     {
+        if (logger.isDebugEnabled())
+            logger.debug("Retrieving audit trail using parameters: " + params);
+        
         List<RecordsManagementAuditEntry> entries = new ArrayList<RecordsManagementAuditEntry>();
         
         if (params != null)
         {
-            // TODO: examine parameters and build up query or call relevant service methods
+            // TODO: examine parameters and build up query or call relevant service methods,
+            //       for now mimic user filter and max entries in here!
             
             if (params.getNodeRef() != null)
             {
                 // get audit trail for provided node
                 List<AuditInfo> auditLog = this.auditService.getAuditTrail(params.getNodeRef());
+                
+                if (logger.isDebugEnabled())
+                    logger.debug("Found " + auditLog.size() + " audit log entries");
+                
                 for (AuditInfo entry: auditLog)
                 {
                     RecordsManagementAuditEntry rmEntry = createRMAuditEntry(entry, params.getNodeRef());
                     if (rmEntry != null)
                     {
-                        entries.add(rmEntry);
+                        // NOTE: temporary user filtering
+                        if (params.getUser() == null || params.getUser().equals(entry.getUserIdentifier()))
+                        {
+                            entries.add(rmEntry);
+                        }
+                        
+                        // NOTE: temporary way to mimic maximum number of results
+                        if (params.getMaxEntries() != -1 && (entries.size() == params.getMaxEntries()))
+                        {
+                            break;
+                        }
                     }
                 }
                 
                 if (logger.isDebugEnabled())
-                    logger.debug("Found " + entries.size() + " audit entries for node: " + params.getNodeRef());
+                    logger.debug("Returning " + entries.size() + " relevant audit log entries");
             }
         }
         else
         {
-            // TODO: return whole RM audit trail
+            // TODO: return whole RM audit trail, for now just let the empty list go back
         }
         
         return entries;
@@ -196,8 +226,8 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
             // construct the event from the service and method
             String event = service + "." + method;
             String userName = entry.getUserIdentifier();
-            String fullName = userName;
-            // TODO: Call the 'to be implemented' RM security service to get user's role
+            String fullName = getFullName(userName);
+            // TODO: Call the [yet to be implemented] RM security service to get user's role
             String userRole = "Records Manager";
             String nodeName = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
             
@@ -207,5 +237,42 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
         }
         
         return rmEntry;
+    }
+    
+    /**
+     * Returns the full name of the given username.
+     * 
+     * @param userName User name to get full name for
+     * @return User's full name
+     */
+    protected String getFullName(String userName)
+    {
+        // TODO: Add caching in here as the same username is going to be potentially
+        //       looked up multiple times for the same request and the processing below
+        //       won't be that cheap!
+        
+        String fullName = null;
+        
+        NodeRef person = personService.getPerson(userName);
+        if (person != null)
+        {
+            String firstName = (String)nodeService.getProperty(person, ContentModel.PROP_FIRSTNAME);
+            String lastName = (String)nodeService.getProperty(person, ContentModel.PROP_LASTNAME);
+            
+            fullName = ((firstName != null && firstName.length() > 0) ? firstName : "");
+            if (lastName != null && lastName.length() > 0)
+            {
+                fullName += (fullName.length() > 0 ? " " : "");
+                fullName += lastName;
+            }
+        }
+        
+        // make sure something is returned
+        if (fullName == null || fullName.length() == 0)
+        {
+            fullName = userName;
+        }
+        
+        return fullName;
     }
 }

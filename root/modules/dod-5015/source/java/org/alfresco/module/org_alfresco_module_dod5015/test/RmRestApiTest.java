@@ -675,6 +675,16 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(auditUrl), 200);
         System.out.println(rsp.getContentAsString());
         
+        // get the audit log with all restrictions in place
+        String filteredAuditUrl = auditUrl + "?user=gavinc&size=5&from=2009-01-01&to=2009-12-31";
+        rsp = sendRequest(new GetRequest(filteredAuditUrl), 200);
+        System.out.println(rsp.getContentAsString());
+        
+        // attempt to get the audit log with invalid restrictions in place
+        filteredAuditUrl = auditUrl + "?user=fred&size=abc&from=2009&to=2010";
+        rsp = sendRequest(new GetRequest(filteredAuditUrl), 200);
+        System.out.println(rsp.getContentAsString());
+        
         // start the RM audit log
         JSONObject jsonPostData = new JSONObject();
         jsonPostData.put("enabled", true);
