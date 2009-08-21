@@ -339,6 +339,9 @@
         <property name="nodeService">
             <ref bean="NodeService" />
         </property>
+        <property name="personService">
+            <ref bean="PersonService" />
+        </property>
     </bean>
     
     <bean id="RecordsManagementAuditService" class="org.springframework.aop.framework.ProxyFactoryBean">

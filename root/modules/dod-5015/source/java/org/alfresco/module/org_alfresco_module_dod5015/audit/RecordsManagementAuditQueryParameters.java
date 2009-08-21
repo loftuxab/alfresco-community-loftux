@@ -36,8 +36,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public final class RecordsManagementAuditQueryParameters
 {
+    private int maxEntries = -1;
     private String user;
-    private int maxEntries;
     private NodeRef nodeRef;
     private Date dateFrom;
     private Date dateTo;
@@ -147,5 +147,21 @@ public final class RecordsManagementAuditQueryParameters
     public void setDateTo(Date dateTo)
     {
         this.dateTo = dateTo;
+    }
+
+    /*
+     * @see java.lang.Object#toString()
+     */
+    @Override 
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder(super.toString());
+        
+        builder.append(" (nodeRef='").append(nodeRef).append("', user='")
+        .append(user).append("', dateFrom='").append(dateFrom)
+        .append("', dateTo='").append(dateTo).append("', maxEntries='")
+        .append(maxEntries).append("')");
+        
+        return builder.toString();
     }
 }

@@ -1,6 +1,17 @@
 <webscript>
   <shortname>Records Management Audit Log</shortname>
-  <description>Returns an audit log of Records Management events</description>
+  <description></description>
+  <description><![CDATA[
+  Returns an audit log of Records Management events.
+  <br/>The following parameters can also be passed:
+  <ul>
+  <li>size: Maximum number of log entries to return</li>
+  <li>user: Only return log entries by the specified user</li>
+  <li>from: Only return log entries after the specified date, date should be in yyyy-MM-dd format</li>
+  <li>to: Only return log entries before the specified date, date should be in yyyy-MM-dd format</li>
+  </ul>
+  ]]>
+  </description>
   <url>/api/rma/admin/rmauditlog</url>
   <url>/api/node/{store_type}/{store_id}/{id}/rmauditlog</url>
   <format default="json">argument</format>

@@ -24,7 +24,8 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
-import java.util.Collections;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +35,8 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Implementation for Java backed webscript to return audit
@@ -43,6 +46,15 @@ import org.alfresco.web.scripts.WebScriptRequest;
  */
 public class AuditLogGet extends BaseAuditLogWebScript
 {
+    /** Logger */
+    private static Log logger = LogFactory.getLog(AuditLogGet.class);
+    
+    protected final static String PARAM_USER = "user";
+    protected final static String PARAM_SIZE = "size";
+    protected final static String PARAM_FROM = "from";
+    protected final static String PARAM_TO = "to";
+    protected final static String DATE_PATTERN = "yyyy-MM-dd";
+    
     /*
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
      */
@@ -66,12 +78,9 @@ public class AuditLogGet extends BaseAuditLogWebScript
             nodeRef = new NodeRef(new StoreRef(storeType, storeId), nodeId);
         }
         
-        // gather all the common filtering parameters
-        // TODO: get result set size, user, date range etc.
-        
         // create model object with the audit model
         Map<String, Object> model = new HashMap<String, Object>(1);
-        model.put("auditlog", generateAuditModel(nodeRef));
+        model.put("auditlog", generateAuditModel(req, nodeRef));
         return model;
     }
     
@@ -79,23 +88,68 @@ public class AuditLogGet extends BaseAuditLogWebScript
      * Generates the audit log model for the optional node. If a node
      * is not supplied the audit log for the whole system is returned.
      * 
+     * @param req The request
      * @param nodeRef The NodeRef to get audit log for
      * @return Map representing the audit log model
      */
-    protected Map<String, Object> generateAuditModel(NodeRef nodeRef)
+    protected Map<String, Object> generateAuditModel(WebScriptRequest req, NodeRef nodeRef)
     {
         Map<String, Object> model = createAuditStatusModel();
         
-        if (nodeRef != null)
+        // gather all the common filtering parameters
+        String size = req.getParameter(PARAM_SIZE);
+        String user = req.getParameter(PARAM_USER);
+        String from = req.getParameter(PARAM_FROM);
+        String to = req.getParameter(PARAM_TO);
+
+        // create parameters for audit trail retrieval
+        RecordsManagementAuditQueryParameters params = new RecordsManagementAuditQueryParameters();
+        params.setNodeRef(nodeRef);
+        params.setUser(user);
+        
+        if (size != null && size.length() > 0)
         {
-            RecordsManagementAuditQueryParameters params = new RecordsManagementAuditQueryParameters();
-            params.setNodeRef(nodeRef);
-            model.put("entries", this.rmAuditService.getAuditTrail(params));
+            try
+            {
+                params.setMaxEntries(Integer.parseInt(size));
+            }
+            catch (NumberFormatException nfe)
+            {
+                if (logger.isWarnEnabled())
+                    logger.warn("Ignoring size parameter as '" + size + "' is not a number!");
+            }
         }
-        else
+        
+        if (from != null && from.length() > 0)
         {
-            model.put("entries", Collections.EMPTY_LIST);
+            try
+            {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
+                params.setDateFrom(dateFormat.parse(from));
+            }
+            catch (ParseException pe)
+            {
+                if (logger.isWarnEnabled())
+                    logger.warn("Ignoring from parameter as '" + from + "' does not conform to the date pattern: " + DATE_PATTERN);
+            }
         }
+        
+        if (to != null && to.length() > 0)
+        {
+            try
+            {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
+                params.setDateTo(dateFormat.parse(to));
+            }
+            catch (ParseException pe)
+            {
+                if (logger.isWarnEnabled())
+                    logger.warn("Ignoring to parameter as '" + to + "' does not conform to the date pattern: " + DATE_PATTERN);
+            }
+        }
+        
+        // get the audit trail
+        model.put("entries", this.rmAuditService.getAuditTrail(params));
         
         return model;
     }
