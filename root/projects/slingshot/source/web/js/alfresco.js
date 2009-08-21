@@ -468,15 +468,16 @@ Alfresco.util.fromISO8601 = function(date)
 };
 
 /**
- * Convert an ISO8601 date exploded into an object literal into a JavaScript native Date object
+ * Convert an JSON date exploded into an object literal into a JavaScript native Date object.
+ * NOTE: Passed-in date will have month as zero-based.
  *
- * @method Alfresco.util.fromExplodedISO8601
+ * @method Alfresco.util.fromExplodedJSONDate
  * @param date {object} object literal of the following example format (UTC):
  * <pre>
  *    date = 
  *    {
  *       year: 2009
- *       month: 4
+ *       month: 4 // NOTE: zero-based
  *       date: 22
  *       hours: 14
  *       minutes: 27
@@ -487,12 +488,16 @@ Alfresco.util.fromISO8601 = function(date)
  * @return {Date|null} JavaScript native Date object
  * @static
  */
-Alfresco.util.fromExplodedISO8601 = function(date)
+Alfresco.util.fromExplodedJSONDate = function(date)
 {
    try
    {
       var isoDate = YAHOO.lang.substitute("{year 4}-{month 2}-{date 2}T{hours 2}:{minutes 2}:{seconds 2}.{milliseconds 3}Z", date, function(p_key, p_value, p_meta)
       {
+         if (p_key == "month")
+         {
+            ++p_value;
+         }
 			p_value = String(p_value);
 			var length = parseInt(p_meta, 10) || 2;
 			while (p_value.length < length)
@@ -3486,6 +3491,7 @@ Alfresco.thirdparty.dateFormat.TIME_PM = Alfresco.util.message("date-format.pm")
 Alfresco.thirdparty.dateFormat.masks =
 {
 	"default":       Alfresco.util.message("date-format.default"),
+	defaultDateOnly: Alfresco.util.message("date-format.defaultDateOnly"),
 	shortDate:       Alfresco.util.message("date-format.shortDate"),
 	mediumDate:      Alfresco.util.message("date-format.mediumDate"),
 	longDate:        Alfresco.util.message("date-format.longDate"),
