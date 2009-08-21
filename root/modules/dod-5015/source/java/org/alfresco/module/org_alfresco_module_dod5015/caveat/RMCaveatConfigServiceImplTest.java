@@ -362,10 +362,20 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         endTransaction();
         
         cleanCaveatConfigData();
-        setupCaveatConfigData();
         
         startNewTransaction();
         
+        caveatConfigService.addRMConstraintList(RM_LIST);
+
+        List<String> values = new ArrayList<String>();
+        values.add(NOFORN);
+        values.add(FOUO);
+        caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "dfranco", values);
+        
+        values.add(FGI);
+        values.add(NOCONTRACT);
+        caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "dmartinz", values);
+   
         // Test list of allowed values for caveats
         
         List<String> allowedValues = AuthenticationUtil.runAs(new RunAsWork<List<String>>()
