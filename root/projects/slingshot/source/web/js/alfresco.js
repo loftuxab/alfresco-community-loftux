@@ -115,6 +115,13 @@ Alfresco.thirdparty = Alfresco.thirdparty || {};
  */
 Alfresco.widget = Alfresco.widget || {};
 
+/**
+ * Alfresco top-level admin namespace.
+ * 
+ * @namespace Alfresco
+ * @class Alfresco.Admin
+ */
+Alfresco.admin = Alfresco.admin || {};
 
 /**
  * Alfresco top-level messages namespace.

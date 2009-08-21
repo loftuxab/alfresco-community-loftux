@@ -1,1 +1,1 @@
-model.action = page.url.args.action || 'default'
+model.action = page.url.args.action || 'view';

@@ -4,9 +4,7 @@
 <input id="yui-history-field" type="hidden" />
 
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RecordsMetaData("${args.htmlid}").setMessages(
-      ${messages}
-   );
+   new Alfresco.RecordsMetaData("${args.htmlid}").setMessages(${messages});
 //]]></script>
 
 <#assign el=args.htmlid>
