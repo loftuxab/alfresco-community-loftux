@@ -243,6 +243,8 @@
                <set id="rm-custom" label-id="label.set.customMetadata" appearance="panel" />
                
                <field id="rma:identifier" label-id="label.recordIdentifier" />
+               <field id="rmDeclared" label-id="label.declared" />
+               <field id="rmRecordType" label-id="label.recordType" />
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
@@ -256,6 +258,11 @@
                </field>
                <field id="size">
                   <control template="/org/alfresco/components/form/controls/size.ftl" />
+               </field>
+               <field id="dod:webSiteURL">
+                  <control>
+                     <control-param name="activateLinks">true</control-param>
+                  </control>
                </field>
             </appearance>
          </form>
@@ -283,6 +290,8 @@
                <set id="rm-custom" label-id="label.set.customMetadata" appearance="panel" />
                
                <field id="rma:identifier" label-id="label.recordIdentifier" />
+               <field id="rmDeclared" label-id="label.declared" />
+               <field id="rmRecordType" label-id="label.recordType" />
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
