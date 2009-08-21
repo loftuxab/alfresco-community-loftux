@@ -2,16 +2,15 @@
    <actionSets>
       <actionSet id="default">
          <action type="action-link" id="onActionCutoff" permission="cutoff" asset="record-folder,record,record-nonelec" label="menu.selected-items.cutoff" />
-         <action type="action-link" id="onActionRetain" permission="HIDDEN" asset="record-folder,record,record-nonelec" label="menu.selected-items.retain" />
          <action type="action-link" id="onActionDestroy" permission="destroy" asset="record-folder,record,record-nonelec" label="menu.selected-items.destroy" />
          <action type="action-link" id="onActionTransfer" permission="transfer" asset="record-folder,record,record-nonelec" label="menu.selected-items.transfer" />
          <action type="action-link" id="onActionTransferComplete" permission="transfer-complete" asset="transfer" label="menu.selected-items.transfer-complete" />
-         <action type="action-link" id="onActionFreeze" permission="ExtendRetentionPeriodOrFreeze" asset="record-folder,record,record-nonelec" label="menu.selected-items.freeze" />
+         <action type="action-link" id="onActionFreeze" permission="freeze" asset="record-folder,record,record-nonelec" label="menu.selected-items.freeze" />
          <action type="action-link" id="onActionUnfreeze" permission="Unfreeze" asset="record-folder,record,record-nonelec" label="menu.selected-items.unfreeze" />
          <action type="action-link" id="onActionCopyTo" permission="" asset="record-category,record-folder,record,record-nonelec,undeclared-record-nonelec" label="menu.selected-items.copy-to" />
-         <action type="action-link" id="onActionMoveTo" permission="delete" asset="record-category,record-folder,record-nonelec,undeclared-record-nonelec" label="menu.selected-items.move-to" />
-         <action type="action-link" id="onActionFileTo" permission="" asset="record-category,record-folder,record-nonelec,undeclared-record-nonelec" label="menu.selected-items.file-to" />
-         <action type="action-link" id="onActionDelete" permission="HIDDEN" label="menu.selected-items.delete" />
+         <action type="action-link" id="onActionMoveTo" permission="" asset="record-category,record-folder,record,record-nonelec,undeclared-record-nonelec" label="menu.selected-items.move-to" />
+         <action type="action-link" id="onActionFileTo" permission="" asset="record-category,record-folder,record,record-nonelec,undeclared-record-nonelec" label="menu.selected-items.file-to" />
+         <action type="action-link" id="onActionDelete" permission="delete" label="menu.selected-items.delete" />
       </actionSet>
    </actionSets>
 </toolbar>

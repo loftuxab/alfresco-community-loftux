@@ -37,9 +37,9 @@
    background-image: url(images/freeze-record-16.png);
 }
 
-.toolbar .onActionRetain
+.toolbar .onActionSplitEmail
 {
-   background-image: url(images/generic-16.png);
+   background-image: url(images/split-email-attachments-16.png);
 }
 
 .toolbar .onActionTransfer

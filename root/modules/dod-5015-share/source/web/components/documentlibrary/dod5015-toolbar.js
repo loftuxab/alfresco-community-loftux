@@ -68,8 +68,21 @@
       "new-category": "dod:recordCategory",
       "new-folder": "rma:recordFolder"
    };
+
+   /**
+    * Extend Alfresco.DocListToolbar
+    */
+   YAHOO.extend(Alfresco.RecordsDocListToolbar, Alfresco.DocListToolbar);
+
+   /**
+    * Augment prototype with RecordsActions module, ensuring overwrite is enabled
+    */
+   YAHOO.lang.augmentProto(Alfresco.RecordsDocListToolbar, Alfresco.doclib.RecordsActions, true);
    
-   YAHOO.extend(Alfresco.RecordsDocListToolbar, Alfresco.DocListToolbar,
+   /**
+    * Augment prototype with main class implementation, ensuring overwrite is enabled
+    */
+   YAHOO.lang.augmentObject(Alfresco.RecordsDocListToolbar.prototype,
    {
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -117,9 +130,10 @@
             disabled: true
          });
          // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
-         this.widgets.selectedItems.getMenu().lazyLoad = false;
-         this.widgets.selectedItems.getMenu().initEvent.fire();
-         this.widgets.selectedItems.getMenu().render();
+         var menu = this.widgets.selectedItems.getMenu();
+         menu.lazyLoad = false;
+         menu.initEvent.fire();
+         menu.render();
 
          // Customize button
          this.widgets.customize = Alfresco.util.createYUIButton(this, "customize-button", this.onCustomize);
@@ -176,7 +190,8 @@
        */
 
        /**
-        * Required because this class has declared itself a button attribute owner
+        * Required because this class has declared itself a button attribute owner.
+        * See declaration of this.widgets.newContainer in onReady()
         *
         * @method fireBeforeChangeEvent
         * @return {boolean} true
@@ -445,229 +460,6 @@
             filterData: ""
          });
          Event.preventDefault(e);
-      },
-
-      /**
-       * Copy Multiple Assets.
-       *
-       * @method onActionCopyTo
-       */
-      onActionCopyTo: function DLTB_onActionCopyTo()
-      {
-         this._copyMoveFileTo("copy");
-      },
-
-      /**
-       * File Multiple Assets.
-       *
-       * @method onActionFileTo
-       */
-      onActionFileTo: function DLTB_onActionFileTo()
-      {
-         this._copyMoveFileTo("file");
-      },
-
-      /**
-       * Move Multiple Assets.
-       *
-       * @method onActionMoveTo
-       */
-      onActionMoveTo: function DLTB_onActionMoveTo()
-      {
-         this._copyMoveFileTo("move");
-      },
-
-      /**
-       * Copy/Move/File To Multiple Assets implementation.
-       *
-       * @method _copyMoveFileTo
-       * @param mode {String} Operation mode: copy|file|move
-       * @private
-       */
-      _copyMoveFileTo: function DLTB__copyMoveFileTo(mode)
-      {
-         var allowedModes =
-         {
-            "copy": true,
-            "file": true,
-            "move": true
-         };
-         
-         if (!mode in allowedModes)
-         {
-            return;
-         }
-         
-         var files = this.modules.docList.getSelectedFiles();
-         
-         if (!this.modules.copyMoveFileTo)
-         {
-            this.modules.copyMoveFileTo = new Alfresco.module.RecordsCopyMoveFileTo(this.id + "-copyMoveFileTo");
-         }
-
-         this.modules.copyMoveFileTo.setOptions(
-         {
-            mode: mode,
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            path: this.currentPath,
-            files: files
-         });
-
-         this.modules.copyMoveFileTo.showDialog();
-      },
-
-      /**
-       * Cut Off action.
-       *
-       * @method onActionCutoff
-       */
-      onActionCutoff: function DLTB_onActionCutoff()
-      {
-         this._dod5015Action("message.cutoff", this.modules.docList.getSelectedFiles(), "cutoff");
-      },
-
-      /**
-       * Destroy action.
-       *
-       * @method onActionDestroy
-       */
-      onActionDestroy: function DLTB_onActionDestroy()
-      {
-         this._dod5015Action("message.destroy", this.modules.docList.getSelectedFiles(), "destro");
-      },
-
-      /**
-       * Freeze action.
-       *
-       * @method onActionFreeze
-       */
-      onActionFreeze: function DLTB_onActionFreeze()
-      {
-         var files = this.modules.docList.getSelectedFiles();
-
-         Alfresco.util.PopupManager.getUserInput(
-         {
-            title: this.msg("message.freeze.reason.title", files.length),
-            text: this.msg("message.freeze.reason.label"),
-            okButtonText: this.msg("button.freeze.record"),
-            callback:
-            {
-               fn: function DLTB_oAF_callback(value)
-               {
-                  this._dod5015Action("message.freeze", files, "freeze",
-                  {
-                     "reason": value
-                  });
-               },
-               scope: this
-            }
-         });
-      },
-
-      /**
-       * Retain action.
-       *
-       * @method onActionRetain
-       */
-      onActionRetain: function DLTB_onActionRetain()
-      {
-         this._dod5015Action("message.retain", this.modules.docList.getSelectedFiles(), "retain");
-      },
-
-      /**
-       * Transfer action.
-       *
-       * @method onActionTransfer
-       */
-      onActionTransfer: function DLTB_onActionTransfer()
-      {
-         this._dod5015Action("message.transfer", this.modules.docList.getSelectedFiles(), "transfer");
-      },
-
-      /**
-       * Transfer Confirmation action.
-       *
-       * @method onActionTransferComplete
-       */
-      onActionTransferComplete: function DLTB_onActionTransferComplete()
-      {
-         this._dod5015Action("message.transfer-complete", this.modules.docList.getSelectedFiles(), "transfer-complete");
-      },
-
-      /**
-       * Unfreeze action.
-       *
-       * @method onActionUnfreeze
-       */
-      onActionUnfreeze: function DL_onActionUnfreeze()
-      {
-         this._dod5015Action("message.unfreeze", this.modules.docList.getSelectedFiles(), "unfreeze");
-      },
-      
-      
-      /**
-       * DOD5015 action.
-       *
-       * @method _dod5015Action
-       * @param i18n {string} Will be appended with ".success" or ".failure" depending on action outcome
-       * @param files {array} Array containig file objects to be actioned
-       * @param actionName {string} Name of repository action to run
-       * @param actionParams {object} Optional object literal to pass parameters to the action
-       * @param configOverride {object} Optional object literal to override default configuration parameters
-       * @private
-       */
-      _dod5015Action: function DL__dod5015Action(i18n, files, actionName, actionParams, configOverride)
-      {
-         var dataObj =
-         {
-            name: actionName,
-            nodeRefs: []
-         };
-         
-         for (var i = 0, ii = files.length; i < ii; i++)
-         {
-            dataObj.nodeRefs.push(files[i].nodeRef);
-         }
-         
-         if (YAHOO.lang.isObject(actionParams))
-         {
-            dataObj.params = actionParams;
-         }
-         
-         var config =
-         {
-            success:
-            {
-               event:
-               {
-                  name: "metadataRefresh"
-               },
-               message: this.msg(i18n + ".success", files.length)
-            },
-            failure:
-            {
-               message: this.msg(i18n + ".failure", files.length)
-            },
-            webscript:
-            {
-               method: Alfresco.util.Ajax.POST,
-               stem: Alfresco.constants.PROXY_URI + "api/rma/actions/",
-               name: "ExecutionQueue"
-            },
-            config:
-            {
-               requestContentType: Alfresco.util.Ajax.JSON,
-               dataObj: dataObj
-            }
-         };
-         
-         if (YAHOO.lang.isObject(configOverride))
-         {
-            config = YAHOO.lang.merge(config, configOverride);
-         }
-
-         this.modules.actions.genericAction(config);
-      }      
-   });
+      }
+   }, true);
 })();

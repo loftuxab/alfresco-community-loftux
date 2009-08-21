@@ -73,12 +73,6 @@
    background-image: url(images/move-record-to-16.png);
 }
 
-.doclist .record .onActionRetain a,
-.doclist .record-nonelec .onActionRetain a
-{
-   background-image: url(images/generic-16.png);
-}
-
 .doclist .record .onActionReviewed a,
 .doclist .record-nonelec .onActionReviewed a
 {
@@ -143,6 +137,13 @@
    background-image: url(images/move-record-to-16.png);
 }
 
+.doclist .undeclared-record .onActionSplitEmail a,
+.doclist .undeclared-record-nonelec .onActionSplitEmail a
+{
+   background-image: url(images/split-email-attachments-16.png);
+}
+
+
 /**
  * Actions: Record Folder
  */
@@ -184,11 +185,6 @@
 .doclist .record-folder .onActionOpenFolder a
 {
    background-image: url(images/record-folder-open-16.png);
-}
-
-.doclist .record-folder .onActionRetain a
-{
-   background-image: url(images/generic-16.png);
 }
 
 .doclist .record-folder .onActionTransfer a

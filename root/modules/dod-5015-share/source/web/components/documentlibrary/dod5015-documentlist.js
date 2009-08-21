@@ -44,7 +44,7 @@
    var $html = Alfresco.util.encodeHTML,
       $links = Alfresco.util.activateLinks,
       $combine = Alfresco.util.combinePaths,
-      $jsonDate = Alfresco.util.fromExplodedISO8601;
+      $jsonDate = Alfresco.util.fromExplodedJSONDate;
 
    /**
     * Preferences
@@ -337,12 +337,15 @@
                isLink = record.isLink,
                locn = record.location,
                dod5015 = record.dod5015,
-               title = record.title || record.displayName;
+               title = record.fileName;
+            
+            // Use title if it's available
+            record.displayName = record.title || record.displayName;
             
             // Link handling
             if (isLink)
             {
-               oRecord.setData("displayName", me.msg("details.link-to", record.displayName));
+               record.displayName = me.msg("details.link-to", record.displayName);
             }
             
             // Identifier
@@ -521,7 +524,7 @@
                       */
                      desc += '<div class="detail"><span class="item"><em>' + me.msg("details.record.identifier") + '</em> ' + rmaIdentifier + '</span></div>';
                      desc += '<div class="detail"><span class="item"><em>' + me.msg("details.record.date-filed") + '</em> ' + Alfresco.util.formatDate($jsonDate(dod5015["rma:dateFiled"])) + '</span>';
-                     desc += '<span class="item"><em>' + me.msg("details.record.publication-date") + '</em> ' + Alfresco.util.formatDate($jsonDate(dod5015["rma:publicationDate"])) + '</span></div>';
+                     desc += '<span class="item"><em>' + me.msg("details.record.publication-date") + '</em> ' + Alfresco.util.formatDate($jsonDate(dod5015["rma:publicationDate"]), "defaultDateOnly") + '</span></div>';
                      desc += '<div class="detail">';
                      desc +=    '<span class="item"><em>' + me.msg("details.record.originator") + '</em> ' + $html(dod5015["rma:originator"]) + '</span>';
                      desc +=    '<span class="item"><em>' + me.msg("details.record.originating-organisation") + '</em> ' + $html(dod5015["rma:originatingOrganization"]) + '</span>';
@@ -843,8 +846,16 @@
 
          var typeMapping =
          {
-            selectRecords: "record",
-            selectUndeclaredRecords: "undeclared-record",
+            selectRecords:
+            {
+               "record": true,
+               "record-nonelec": true
+            },
+            selectUndeclaredRecords:
+            {
+               "undeclared-record": true,
+               "undeclared-record-nonelec": true
+            },
             selectFolders:
             {
                "record-folder": true,
