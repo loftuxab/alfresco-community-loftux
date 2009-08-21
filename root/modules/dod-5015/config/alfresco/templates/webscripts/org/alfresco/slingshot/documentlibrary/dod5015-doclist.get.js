@@ -230,7 +230,7 @@ function main()
       },
       user: user,
       items: items,
-      filePlan: parsedArgs.rootNode,
+      filePlan: parsedArgs.location.containerNode,
       parent: filterParams.variablePath ? null : parsedArgs.parentNode
    });
 }

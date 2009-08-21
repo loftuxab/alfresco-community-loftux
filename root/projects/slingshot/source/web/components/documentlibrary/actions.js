@@ -48,12 +48,12 @@
    Alfresco.doclib.Actions.prototype =
    {
       /**
-       * Asset details.
+       * assets details.
        *
        * @method onActionDetails
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionDetails: function dlA_onActionDetails(asset)
+      onActionDetails: function dlA_onActionDetails(assets)
       {
          if (!this.modules.details)
          {
@@ -63,31 +63,31 @@
          this.modules.details.setOptions(
          {
             siteId: this.options.siteId,
-            file: asset
+            file: assets
          }).showDialog();
       },
 
       /**
-       * Delete Asset.
+       * Delete assets.
        *
        * @method onActionDelete
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionDelete: function dlA_onActionDelete(asset)
+      onActionDelete: function dlA_onActionDelete(assets)
       {
          var me = this;
          
          Alfresco.util.PopupManager.displayPrompt(
          {
             title: this.msg("message.confirm.delete.title"),
-            text: this.msg("message.confirm.delete", asset.displayName),
+            text: this.msg("message.confirm.delete", assets.displayName),
             buttons: [
             {
                text: this.msg("button.delete"),
                handler: function dlA_onActionDelete_delete()
                {
                   this.destroy();
-                  me._onActionDeleteConfirm.call(me, asset);
+                  me._onActionDeleteConfirm.call(me, assets);
                }
             },
             {
@@ -102,18 +102,18 @@
       },
 
       /**
-       * Delete Asset confirmed.
+       * Delete assets confirmed.
        *
        * @method _onActionDeleteConfirm
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        * @private
        */
-      _onActionDeleteConfirm: function dlA__onActionDeleteConfirm(asset)
+      _onActionDeleteConfirm: function dlA__onActionDeleteConfirm(assets)
       {
-         var path = asset.location.path,
-            fileName = asset.fileName,
+         var path = assets.location.path,
+            fileName = assets.fileName,
             filePath = $combine(path, fileName),
-            displayName = asset.displayName;
+            displayName = assets.displayName;
          
          this.modules.actions.genericAction(
          {
@@ -132,7 +132,7 @@
                },
                event:
                {
-                  name: asset.fileType == "folder" ? "folderDeleted" : "fileDeleted",
+                  name: assets.fileType == "folder" ? "folderDeleted" : "fileDeleted",
                   obj:
                   {
                      path: filePath
@@ -157,9 +157,9 @@
        * NOTE: Placeholder only, clients MUST implement their own editOffline action
        *
        * @method onActionEditOffline
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionEditOffline: function dlA_onActionEditOffline(asset)
+      onActionEditOffline: function dlA_onActionEditOffline(assets)
       {
          Alfresco.logger.error("onActionEditOffline", "Abstract implementation not overridden");
       },
@@ -169,9 +169,9 @@
        * NOTE: Placeholder only, clients MUST implement their own editOffline action
        *
        * @method onActionEditOnline
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionEditOnline: function dlA_onActionEditOnline(asset)
+      onActionEditOnline: function dlA_onActionEditOnline(assets)
       {
          Alfresco.logger.error("onActionEditOnline", "Abstract implementation not overridden");
       },
@@ -180,12 +180,12 @@
        * Upload new version.
        *
        * @method onActionUploadNewVersion
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionUploadNewVersion: function dlA_onActionUploadNewVersion(asset)
+      onActionUploadNewVersion: function dlA_onActionUploadNewVersion(assets)
       {
-         var fileName = asset.fileName,
-            nodeRef = asset.nodeRef;
+         var fileName = assets.fileName,
+            nodeRef = assets.nodeRef;
 
          if (!this.fileUpload)
          {
@@ -193,7 +193,7 @@
          }
 
          // Show uploader for multiple files
-         var description = this.msg("label.filter-description", asset.displayName),
+         var description = this.msg("label.filter-description", assets.displayName),
             extensions = "*" + fileName.substring(fileName.lastIndexOf("."));
          
          var singleUpdateConfig =
@@ -260,12 +260,12 @@
        * Cancel editing.
        *
        * @method onActionCancelEditing
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionCancelEditing: function dlA_onActionCancelEditing(asset)
+      onActionCancelEditing: function dlA_onActionCancelEditing(assets)
       {
-         var displayName = asset.displayName,
-            nodeRef = asset.nodeRef;
+         var displayName = assets.displayName,
+            nodeRef = assets.nodeRef;
 
          this.modules.actions.genericAction(
          {
@@ -297,9 +297,9 @@
        * Copy single document or folder.
        *
        * @method onActionCopyTo
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionCopyTo: function dlA_onActionCopyTo(asset)
+      onActionCopyTo: function dlA_onActionCopyTo(assets)
       {
          if (!this.modules.copyTo)
          {
@@ -311,7 +311,7 @@
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             path: this.currentPath,
-            files: asset
+            files: assets
          }).showDialog();
       },
 
@@ -319,9 +319,9 @@
        * Move single document or folder.
        *
        * @method onActionMoveTo
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionMoveTo: function dlA_onActionMoveTo(asset)
+      onActionMoveTo: function dlA_onActionMoveTo(assets)
       {
          if (!this.modules.moveTo)
          {
@@ -333,7 +333,7 @@
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             path: this.currentPath,
-            files: asset
+            files: assets
          }).showDialog();
       },
 
@@ -341,9 +341,9 @@
        * Assign workflow.
        *
        * @method onActionAssignWorkflow
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionAssignWorkflow: function dlA_onActionAssignWorkflow(asset)
+      onActionAssignWorkflow: function dlA_onActionAssignWorkflow(assets)
       {
          if (!this.modules.assignWorkflow)
          {
@@ -355,7 +355,7 @@
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             path: this.currentPath,
-            files: asset
+            files: assets
          }).showDialog();
       },
 
@@ -363,9 +363,9 @@
        * Set permissions on a single document or folder.
        *
        * @method onActionManagePermissions
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionManagePermissions: function dlA_onActionManagePermissions(asset)
+      onActionManagePermissions: function dlA_onActionManagePermissions(assets)
       {
          if (!this.modules.permissions)
          {
@@ -377,7 +377,7 @@
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             path: this.currentPath,
-            files: asset
+            files: assets
          }).showDialog();
       },
 
@@ -385,9 +385,9 @@
        * Manage aspects.
        *
        * @method onActionManageAspects
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionManageAspects: function dlA_onActionManageAspects(asset)
+      onActionManageAspects: function dlA_onActionManageAspects(assets)
       {
          if (!this.modules.aspects)
          {
@@ -396,7 +396,7 @@
 
          this.modules.aspects.setOptions(
          {
-            file: asset
+            file: assets
          }).show();
       },
 
@@ -404,12 +404,12 @@
        * Change Type
        *
        * @method onActionChangeType
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionChangeType: function dlA_onActionChangeType(asset)
+      onActionChangeType: function dlA_onActionChangeType(assets)
       {
-         var nodeRef = asset.nodeRef,
-            displayName = asset.displayName,
+         var nodeRef = assets.nodeRef,
+            displayName = assets.displayName,
             actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/type/node", nodeRef.replace(":/", ""));
 
          var doSetupFormsValidation = function dlA_oACT_doSetupFormsValidation(p_form)

@@ -7,28 +7,27 @@
          <action type="simple-link" id="onActionEditDetails" permission="edit" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionReviewed" permission="reviewed" label="actions.reviewed" />
          <action type="action-link" id="onActionCutoff" permission="cutoff" label="actions.cutoff" />
-         <action type="action-link" id="onActionRetain" permission="hidden" label="actions.retain" />
          <action type="action-link" id="onActionDestroy" permission="destroy" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="transfer" label="actions.transfer" />
          <action type="action-link" id="onActionFreeze" permission="freeze" label="actions.freeze" />
          <action type="action-link" id="onActionUnfreeze" permission="unfreeze" label="actions.unfreeze" />
-         <action type="action-link" id="onActionUndeclare" permission="UndeclareRecords" label="actions.undeclare" />
+         <action type="action-link" id="onActionUndeclare" permission="undeclareRecord" label="actions.undeclare" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
-         <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.move-to" />
+         <action type="action-link" id="onActionMoveTo" permission="" label="actions.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
-         <action type="action-link" id="onActionDelete" permission="HIDDEN" label="actions.delete" />
+         <action type="action-link" id="onActionDelete" permission="delete" label="actions.delete" />
       </actionSet>
 
       <actionSet id="undeclaredRecord">
          <action type="simple-link" id="onActionDownload" permission="download" href="{downloadUrl}" label="actions.download" />
          <action type="simple-link" id="onActionEditDetails" permission="edit" href="{editMetadataUrl}" label="actions.edit-details" />
-         <action type="action-link" id="onActionDeclare" permission="DeclareRecords" label="actions.declare" />
-         <action type="action-link" id="onActionUploadNewVersion" permission="edit" label="actions.upload-new-version" />
+         <action type="action-link" id="onActionDeclare" permission="declareRecord" label="actions.declare" />
+         <action type="action-link" id="onActionUploadNewVersion" permission="HIDDEN" label="actions.upload-new-version" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
-         <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.move-to" />
+         <action type="action-link" id="onActionMoveTo" permission="" label="actions.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
          <action type="action-link" id="onActionSplitEmail" permission="split-email" label="actions.split-email" />
-         <action type="action-link" id="onActionDelete" permission="HIDDEN" label="actions.delete" />
+         <action type="action-link" id="onActionDelete" permission="delete" label="actions.delete" />
       </actionSet>
    </actionSets>
 </documentList>

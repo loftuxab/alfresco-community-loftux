@@ -73,8 +73,21 @@
 
       return this;
    };
+
+   /**
+    * Extend from Alfresco.component.Base
+    */
+   YAHOO.extend(Alfresco.DocListToolbar, Alfresco.component.Base);
    
-   YAHOO.extend(Alfresco.DocListToolbar, Alfresco.component.Base,
+   /**
+    * Augment prototype with Actions module
+    */
+   YAHOO.lang.augmentProto(Alfresco.DocListToolbar, Alfresco.doclib.Actions);
+   
+   /**
+    * Augment prototype with main class implementation, ensuring overwrite is enabled
+    */
+   YAHOO.lang.augmentObject(Alfresco.DocListToolbar.prototype,
    {
       /**
        * Object container for initialization options
@@ -181,9 +194,10 @@
             disabled: true
          });
          // Clear the lazyLoad flag and fire init event to get menu rendered into the DOM
-         this.widgets.selectedItems.getMenu().lazyLoad = false;
-         this.widgets.selectedItems.getMenu().initEvent.fire();
-         this.widgets.selectedItems.getMenu().render();
+         var menu = this.widgets.selectedItems.getMenu();
+         menu.lazyLoad = false;
+         menu.initEvent.fire();
+         menu.render();
 
          // Customize button
          this.widgets.customize = Alfresco.util.createYUIButton(this, "customize-button", this.onCustomize);
@@ -385,102 +399,41 @@
         */
       onSelectedItems: function DLTB_onSelectedItems(sType, aArgs, p_obj)
       {
-         var domEvent = aArgs[0];
-         var eventTarget = aArgs[1];
-         
-         // Get the function related to the clicked item
-         var fn = Alfresco.util.findEventClass(eventTarget);
-         if (fn && (typeof this[fn] == "function"))
+         var domEvent = aArgs[0],
+            eventTarget = aArgs[1];
+
+         // Check mandatory docList module is present
+         if (this.modules.docList)
          {
-            this[fn].call(this);
+            // Get the function related to the clicked item
+            var fn = Alfresco.util.findEventClass(eventTarget);
+            if (fn && (typeof this[fn] == "function"))
+            {
+               this[fn].call(this, this.modules.docList.getSelectedFiles());
+            }
          }
+
          Event.preventDefault(domEvent);
       },
       
       /**
-       * Copy Multiple Assets.
-       *
-       * @method onActionCopyTo
-       */
-      onActionCopyTo: function DLTB_onActionCopyTo()
-      {
-         if (!this.modules.docList)
-         {
-            return;
-         }
-
-         var files = this.modules.docList.getSelectedFiles();
-         
-         if (!this.modules.copyTo)
-         {
-            this.modules.copyTo = new Alfresco.module.DoclibCopyTo(this.id + "-copyTo");
-         }
-
-         this.modules.copyTo.setOptions(
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            path: this.currentPath,
-            files: files
-         });
-
-         this.modules.copyTo.showDialog();
-      },
-
-      /**
-       * Move Multiple Assets.
-       *
-       * @method onActionMoveTo
-       */
-      onActionMoveTo: function DLTB_onActionMoveTo()
-      {
-         if (!this.modules.docList)
-         {
-            return;
-         }
-
-         var files = this.modules.docList.getSelectedFiles();
-         
-         if (!this.modules.moveTo)
-         {
-            this.modules.moveTo = new Alfresco.module.DoclibMoveTo(this.id + "-moveTo");
-         }
-
-         this.modules.moveTo.setOptions(
-         {
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            path: this.currentPath,
-            files: files,
-            width: "40em"
-         });
-
-         this.modules.moveTo.showDialog();
-      },
-
-      /**
        * Delete Multiple Assets.
        *
        * @method onActionDelete
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionDelete: function DLTB_onActionDelete()
+      onActionDelete: function DLTB_onActionDelete(assets)
       {
-         if (!this.modules.docList)
-         {
-            return;
-         }
-
          var me = this,
-            files = this.modules.docList.getSelectedFiles(),
             fileNames = [];
          
-         for (var i = 0, j = files.length; i < j; i++)
+         for (var i = 0, j = assets.length; i < j; i++)
          {
-            fileNames.push("<span class=\"" + files[i].type + "\">" + files[i].displayName + "</span>");
+            fileNames.push("<span class=\"" + assets[i].type + "\">" + assets[i].displayName + "</span>");
          }
          
          var confirmTitle = this.msg("title.multiple-delete.confirm"),
-            confirmMsg = this.msg("message.multiple-delete.confirm", files.length);
+            confirmMsg = this.msg("message.multiple-delete.confirm", assets.length);
          confirmMsg += "<div class=\"toolbar-file-list\">" + fileNames.join("") + "</div>";
 
          Alfresco.util.PopupManager.displayPrompt(
@@ -495,7 +448,7 @@
                handler: function DLTB_onActionDelete_delete()
                {
                   this.destroy();
-                  me._onActionDeleteConfirm.call(me, files);
+                  me._onActionDeleteConfirm.call(me, assets);
                }
             },
             {
@@ -513,19 +466,19 @@
        * Delete Multiple Assets confirmed.
        *
        * @method _onActionDeleteConfirm
-       * @param files {array} Array containing files to be deleted
+       * @param assets {array} Array containing assets to be deleted
        * @private
        */
-      _onActionDeleteConfirm: function DLTB__onActionDeleteConfirm(files)
+      _onActionDeleteConfirm: function DLTB__onActionDeleteConfirm(assets)
       {
-         var multipleFiles = [], i, ii;
-         for (i = 0, ii = files.length; i < ii; i++)
+         var multipleAssets = [], i, ii;
+         for (i = 0, ii = assets.length; i < ii; i++)
          {
-            multipleFiles.push(files[i].nodeRef);
+            multipleAssets.push(assets[i].nodeRef);
          }
          
          // Success callback function
-         var fnSuccess = function DLTB__oADC_success(data, files)
+         var fnSuccess = function DLTB__oADC_success(data, assets)
          {
             var result;
             var successCount = 0;
@@ -602,7 +555,7 @@
                {
                   fn: fnSuccess,
                   scope: this,
-                  obj: files
+                  obj: assets
                }
             },
             failure:
@@ -623,76 +576,10 @@
                requestContentType: Alfresco.util.Ajax.JSON,
                dataObj:
                {
-                  nodeRefs: multipleFiles
+                  nodeRefs: multipleAssets
                }
             }
          });
-      },
-
-      /**
-       * Assign Multiple Assets to Workflow.
-       *
-       * @method onActionAssignWorkflow
-       */
-      onActionAssignWorkflow: function DLTB_onActionAssignWorkflow()
-      {
-         if (!this.modules.docList)
-         {
-            return;
-         }
-
-         var files = this.modules.docList.getSelectedFiles();
-         
-         if (!this.modules.workflow)
-         {
-            this.modules.workflow = new Alfresco.module.DoclibWorkflow(this.id + "-workflow").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               files: files
-            });
-         }
-         else
-         {
-            this.modules.workflow.setOptions(
-            {
-               files: files
-            });
-         }
-         this.modules.workflow.showDialog();
-      },
-
-      /**
-       * Manage Permissions of Multiple Assets.
-       *
-       * @method onActionManagePermissions
-       */
-      onActionManagePermissions: function DLTB_onActionManagePermissions()
-      {
-         if (!this.modules.docList)
-         {
-            return;
-         }
-
-         var files = this.modules.docList.getSelectedFiles();
-         
-         if (!this.modules.permissions)
-         {
-            this.modules.permissions = new Alfresco.module.DoclibPermissions(this.id + "-workflow").setOptions(
-            {
-               siteId: this.options.siteId,
-               containerId: this.options.containerId,
-               files: files
-            });
-         }
-         else
-         {
-            this.modules.permissions.setOptions(
-            {
-               files: files
-            });
-         }
-         this.modules.permissions.showDialog();
       },
 
       /**
@@ -702,10 +589,7 @@
        */
       onActionDeselectAll: function DLTB_onActionDeselectAll()
       {
-         if (this.modules.docList)
-         {
-            this.modules.docList.selectFiles("selectNone");
-         }
+         this.modules.docList.selectFiles("selectNone");
       },
 
       /**
@@ -1060,6 +944,7 @@
             eCrumb = new Element(document.createElement("div"));
             eCrumb.addClass("crumb");
             
+            // First crumb doesn't get an icon
             if (i > 0)
             {
                eIcon = new Element(document.createElement("a"),
@@ -1079,9 +964,8 @@
                {
                   eIcon.addClass("last");
                }
-               eFolder = new Element(document.createElement("a"),
+               eFolder = new Element(document.createElement("span"),
                {
-                  href: "#",
                   innerHTML: displayPaths[i]
                });
                eFolder.addClass("folder");
@@ -1182,5 +1066,5 @@
             this.widgets.rssFeed.set("href", Alfresco.constants.URL_FEEDSERVICECONTEXT + "components/documentlibrary/feed/" + params);
          }
       }
-   });
+   }, true);
 })();

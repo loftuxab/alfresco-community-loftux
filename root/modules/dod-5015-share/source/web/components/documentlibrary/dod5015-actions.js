@@ -43,33 +43,33 @@
        * Copy single document or folder.
        *
        * @method onActionCopyTo
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionCopyTo: function RDLA_onActionCopyTo(asset)
+      onActionCopyTo: function RDLA_onActionCopyTo(assets)
       {
-         this._copyMoveFileTo("copy", asset);
+         this._copyMoveFileTo("copy", assets);
       },
 
       /**
        * File single document or folder.
        *
        * @method onActionFileTo
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionFileTo: function RDLA_onActionFileTo(asset)
+      onActionFileTo: function RDLA_onActionFileTo(assets)
       {
-         this._copyMoveFileTo("file", asset);
+         this._copyMoveFileTo("file", assets);
       },
 
       /**
        * Move single document or folder.
        *
        * @method onActionMoveTo
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionMoveTo: function RDLA_onActionMoveTo(asset)
+      onActionMoveTo: function RDLA_onActionMoveTo(assets)
       {
-         this._copyMoveFileTo("move", asset);
+         this._copyMoveFileTo("move", assets);
       },
       
       /**
@@ -77,11 +77,22 @@
        *
        * @method _copyMoveFileTo
        * @param mode {String} Operation mode: copy|file|move
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        * @private
        */
-      _copyMoveFileTo: function RDLA__copyMoveFileTo(mode, asset)
+      _copyMoveFileTo: function RDLA__copyMoveFileTo(mode, assets)
       {
+         // Check mode is an allowed one
+         if (!mode in
+            {
+               copy: true,
+               file: true,
+               move: true
+            })
+         {
+            throw new Error("'" + mode + "' is not a valid Copy/Move/File to mode.");
+         }
+
          if (!this.modules.copyMoveFileTo)
          {
             this.modules.copyMoveFileTo = new Alfresco.module.RecordsCopyMoveFileTo(this.id + "-copyMoveFileTo");
@@ -93,7 +104,7 @@
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             path: this.currentPath,
-            files: asset
+            files: assets
          }).showDialog();
       },
 
@@ -101,22 +112,22 @@
        * Close Record Folder action.
        *
        * @method onActionCloseFolder
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionCloseFolder: function RDLA_onActionCloseFolder(asset)
+      onActionCloseFolder: function RDLA_onActionCloseFolder(assets)
       {
-         this._dod5015Action("message.close-folder", asset, "closeRecordFolder");
+         this._dod5015Action("message.close-folder", assets, "closeRecordFolder");
       },
 
       /**
        * Cut Off action.
        *
        * @method onActionCutoff
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionCutoff: function RDLA_onActionCutoff(asset)
+      onActionCutoff: function RDLA_onActionCutoff(assets)
       {
-         this._dod5015Action("message.cutoff", asset, "cutoff");
+         this._dod5015Action("message.cutoff", assets, "cutoff");
       },
 
       /**
@@ -124,14 +135,14 @@
        * Special case handling due to the ability to jump to the Edit Metadata page if the action failed.
        *
        * @method onActionDeclare
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionDeclare: function RDLA_onActionDeclare(asset)
+      onActionDeclare: function RDLA_onActionDeclare(assets)
       {
-         var displayName = asset.displayName,
-            editMetadataUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + asset.nodeRef;
+         var displayName = assets.displayName,
+            editMetadataUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + assets.nodeRef;
 
-         this._dod5015Action("message.declare", asset, "declareRecord", null,
+         this._dod5015Action("message.declare", assets, "declareRecord", null,
          {
             failure:
             {
@@ -173,32 +184,32 @@
        * Destroy action.
        *
        * @method onActionDestroy
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionDestroy: function RDLA_onActionDestroy(asset)
+      onActionDestroy: function RDLA_onActionDestroy(assets)
       {
-         this._dod5015Action("message.destroy", asset, "destroy");
+         this._dod5015Action("message.destroy", assets, "destroy");
       },
 
       /**
        * Edit Hold Details action.
        *
        * @method onActionEditHoldDetails
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionEditHoldDetails: function RDLA_onActionEditHoldDetails(asset)
+      onActionEditHoldDetails: function RDLA_onActionEditHoldDetails(assets)
       {
          Alfresco.util.PopupManager.getUserInput(
          {
             title: this.msg("message.edit-hold.title"),
             text: this.msg("message.edit-hold.reason.label"),
-            value: asset.dod5015["rma:holdReason"],
+            value: assets.dod5015["rma:holdReason"],
             okButtonText: this.msg("button.update"),
             callback:
             {
                fn: function RDLA_onActionEditHoldDetails_callback(value)
                {
-                  this._dod5015Action("message.edit-hold", asset, "editHoldReason",
+                  this._dod5015Action("message.edit-hold", assets, "editHoldReason",
                   {
                      "reason": value
                   });
@@ -212,9 +223,9 @@
        * File Transfer Report action.
        *
        * @method onActionFileTransferReport
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionFileTransferReport: function RDLA_onActionFileTransferReport(asset)
+      onActionFileTransferReport: function RDLA_onActionFileTransferReport(assets)
       {
          if (!this.modules.fileTransferReport)
          {
@@ -226,7 +237,7 @@
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             path: this.currentPath,
-            files: asset
+            files: assets
          }).showDialog();
       },
 
@@ -234,20 +245,20 @@
        * Freeze action.
        *
        * @method onActionFreeze
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionFreeze: function RDLA_onActionFreeze(asset)
+      onActionFreeze: function RDLA_onActionFreeze(assets)
       {
          Alfresco.util.PopupManager.getUserInput(
          {
-            title: this.msg("message.freeze.title"),
-            text: this.msg("message.freeze.reason.label"),
+            title: this.msg("message.freeze.title", assets.length),
+            text: this.msg("message.freeze.reason"),
             okButtonText: this.msg("button.freeze.record"),
             callback:
             {
                fn: function RDLA_onActionFreeze_callback(value)
                {
-                  this._dod5015Action("message.freeze", asset, "freeze",
+                  this._dod5015Action("message.freeze", assets, "freeze",
                   {
                      "reason": value
                   });
@@ -261,99 +272,88 @@
        * Open Record Folder action.
        *
        * @method onActionOpenFolder
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionOpenFolder: function RDLA_onActionOpenFolder(asset)
+      onActionOpenFolder: function RDLA_onActionOpenFolder(assets)
       {
-         this._dod5015Action("message.open-folder", asset, "openRecordFolder");
+         this._dod5015Action("message.open-folder", assets, "openRecordFolder");
       },
 
       /**
        * Relinquish Hold action.
        *
        * @method onActionRelinquish
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionRelinquish: function RDLA_onActionRelinquish(asset)
+      onActionRelinquish: function RDLA_onActionRelinquish(assets)
       {
-         this._dod5015Action("message.relinquish", asset, "relinquishHold");
-      },
-
-      /**
-       * Retain action.
-       *
-       * @method onActionRetain
-       * @param asset {object} Object literal representing file or folder to be actioned
-       */
-      onActionRetain: function RDLA_onActionRetain(asset)
-      {
-         this._dod5015Action("message.retain", asset, "retain");
+         this._dod5015Action("message.relinquish", assets, "relinquishHold");
       },
 
       /**
        * Reviewed action.
        *
        * @method onActionReviewed
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionReviewed: function RDLA_onActionReviewed(asset)
+      onActionReviewed: function RDLA_onActionReviewed(assets)
       {
-         this._dod5015Action("message.review", asset, "reviewed");
+         this._dod5015Action("message.review", assets, "reviewed");
       },
 
       /**
        * Split email record action.
        *
        * @method onActionSplitEmail
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionSplitEmail: function RDLA_onActionSplitEmail(asset)
+      onActionSplitEmail: function RDLA_onActionSplitEmail(assets)
       {
-         this._dod5015Action("message.split-email", asset, "splitEmail");
+         this._dod5015Action("message.split-email", assets, "splitEmail");
       },
 
       /**
        * Transfer action.
        *
        * @method onActionTransfer
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionTransfer: function RDLA_onActionTransfer(asset)
+      onActionTransfer: function RDLA_onActionTransfer(assets)
       {
-         this._dod5015Action("message.transfer", asset, "transfer");
+         this._dod5015Action("message.transfer", assets, "transfer");
       },
 
       /**
        * Transfer Confirmation action.
        *
        * @method onActionTransferComplete
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionTransferComplete: function RDLA_onActionTransferComplete(asset)
+      onActionTransferComplete: function RDLA_onActionTransferComplete(assets)
       {
-         this._dod5015Action("message.transfer-complete", asset, "transferComplete");
+         this._dod5015Action("message.transfer-complete", assets, "transferComplete");
       },
 
       /**
        * Undeclare record.
        *
        * @method onActionUndeclare
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionUndeclare: function RDLA_onActionUndeclare(asset)
+      onActionUndeclare: function RDLA_onActionUndeclare(assets)
       {
-         this._dod5015Action("message.undeclare", asset, "undeclareRecord");
+         this._dod5015Action("message.undeclare", assets, "undeclareRecord");
       },
 
       /**
        * Unfreeze record.
        *
        * @method onActionUnfreeze
-       * @param asset {object} Object literal representing file or folder to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionUnfreeze: function RDLA_onActionUnfreeze(asset)
+      onActionUnfreeze: function RDLA_onActionUnfreeze(assets)
       {
-         this._dod5015Action("message.unfreeze", asset, "unfreeze");
+         this._dod5015Action("message.unfreeze", assets, "unfreeze");
       },
       
       /**
@@ -361,31 +361,33 @@
        *
        * @method _dod5015Action
        * @param i18n {string} Will be appended with ".success" or ".failure" depending on action outcome
-       * @param asset {object} Object literal representing file(s) or folder(s) to be actioned
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        * @param actionName {string} Name of repository action to run
        * @param actionParams {object} Optional object literal to pass parameters to the action
        * @param configOverride {object} Optional object literal to override default configuration parameters
        * @private
        */
-      _dod5015Action: function RDLA__dod5015Action(i18n, asset, actionName, actionParams, configOverride)
+      _dod5015Action: function RDLA__dod5015Action(i18n, assets, actionName, actionParams, configOverride)
       {
-         var displayName = asset.displayName,
+         var displayName = "",
             dataObj =
             {
                name: actionName
             };
 
-         if (YAHOO.lang.isArray(asset))
+         if (YAHOO.lang.isArray(assets))
          {
+            displayName = assets.length;
             dataObj.nodeRefs = [];
-            for (var i = 0, ii = asset.length; i < ii; i++)
+            for (var i = 0, ii = assets.length; i < ii; i++)
             {
-               dataObj.nodeRefs.push(asset[i].nodeRef);
+               dataObj.nodeRefs.push(assets[i].nodeRef);
             }
          }
          else
          {
-            dataObj.nodeRef = asset.nodeRef;
+            displayName = assets.displayName;
+            dataObj.nodeRef = assets.nodeRef;
          }
 
          if (YAHOO.lang.isObject(actionParams))

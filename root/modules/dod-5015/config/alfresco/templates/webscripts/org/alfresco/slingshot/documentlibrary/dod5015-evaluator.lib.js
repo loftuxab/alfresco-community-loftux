@@ -109,11 +109,6 @@ var Evaluator =
             delete permissions["destroy"];
          }
          
-         if (actionName !== "retain")
-         {
-            delete permissions["retain"];
-         }
-         
          if (actionName !== "transfer")
          {
             delete permissions["transfer"];
@@ -148,7 +143,7 @@ var Evaluator =
       {
          permissions["edit"] = true;
       }
-      if (asset.hasPermission("Delete"))
+      if (asset.hasPermission("Delete") && people.isAdmin(person))
       {
          permissions["delete"] = true;
       }
@@ -164,6 +159,14 @@ var Evaluator =
       if (parents !== null && parents.length > 1)
       {
          status["multi-parent " + parents.length] = true;
+      }
+      
+      /**
+       * E-mail type
+       */
+      if (asset.mimetype == "message/rfc822")
+      {
+         permissions["split-email"] = true;
       }
 
       switch (assetType)
@@ -205,13 +208,13 @@ var Evaluator =
              */
             if (asset.properties["rma:isClosed"])
             {
-               permissions["reopen"] = true;
+               permissions["openRecordFolder"] = true;
                status["closed"] = true;
             }
             else
             {
                permissions["file"] = true;
-               permissions["close"] = true;
+               permissions["closeRecordFolder"] = true;
                status["open"] = true;
             }
 
@@ -221,7 +224,6 @@ var Evaluator =
             permissions["accession"] = true;
             permissions["cutoff"] = true;
             permissions["destroy"] = true;
-            permissions["retain"] = true;
             permissions["transfer"] = true;
 
             /**
@@ -234,7 +236,7 @@ var Evaluator =
             }
             else
             {
-               permissions["ExtendRetentionPeriodOrFreeze"] = true;
+               permissions["freeze"] = true;
             }
             break;
 
@@ -267,7 +269,6 @@ var Evaluator =
                permissions["accession"] = true;
                permissions["cutoff"] = true;
                permissions["destroy"] = true;
-               permissions["retain"] = true;
                permissions["transfer"] = true;
             }
 
@@ -281,9 +282,9 @@ var Evaluator =
             }
             else
             {
-               permissions["ExtendRetentionPeriodOrFreeze"] = true;
+               permissions["freeze"] = true;
             }
-            permissions["UndeclareRecords"] = true;
+            permissions["undeclareRecord"] = true;
             
             /**
              * Electronic/Non-electronic documents
@@ -304,7 +305,7 @@ var Evaluator =
           */
          case "undeclared-record":
             actionSet = "undeclaredRecord";
-            permissions["DeclareRecords"] = true;
+            permissions["declareRecord"] = true;
 
             /**
              * Electronic/Non-electronic documents
