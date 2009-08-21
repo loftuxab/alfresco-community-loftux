@@ -7,6 +7,10 @@ import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.repo.forms.FieldDefinition;
 import org.alfresco.repo.forms.Form;
+import org.alfresco.repo.forms.PropertyFieldDefinition;
+import org.alfresco.repo.forms.processor.node.ContentModelFormProcessor;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -25,7 +29,22 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
 {
     /** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementNodeFormFilter.class);
+    
+    protected static final String TRANSIENT_DECLARED = "rmDeclared";
+    protected static final String TRANSIENT_RECORD_TYPE = "rmRecordType";
 
+    protected DictionaryService dictionaryService;
+    
+    /**
+     * Sets the data dictionary service
+     * 
+     * @param dictionaryService The DictionaryService instance
+     */
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
+    }
+    
     /*
      * @see org.alfresco.repo.forms.processor.Filter#afterGenerate(java.lang.Object, java.util.List, java.util.List, org.alfresco.repo.forms.Form, java.util.Map)
      */
@@ -52,6 +71,10 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
                     // add field defintions for all the custom properties
                     addCustomRMProperties(CustomisableRmElement.RECORD, form);
                 }
+                
+                // generate property definitions for the 'transient' properties
+                generateDeclaredPropertyField(form, nodeRef);
+                generateRecordTypePropertyField(form, nodeRef);
             }
             else
             {
@@ -123,5 +146,78 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
                     logger.debug("Added \"" + fieldDef.getName() + "\" to RM custom field group");
             }
         }
+    }
+    
+    /**
+     * Generates the field definition for the transient <code>rmDeclared</code> property
+     * 
+     * @param form The Form instance to add the property to
+     * @param nodeRef The node the form is being generated for
+     */
+    protected void generateDeclaredPropertyField(Form form, NodeRef nodeRef)
+    {
+        String dataKeyName = ContentModelFormProcessor.PROP_DATA_PREFIX + TRANSIENT_DECLARED;
+        PropertyFieldDefinition declaredField = new PropertyFieldDefinition(
+                    TRANSIENT_DECLARED, DataTypeDefinition.BOOLEAN.getLocalName());
+        declaredField.setLabel(TRANSIENT_DECLARED);
+        declaredField.setDescription(TRANSIENT_DECLARED);
+        declaredField.setProtectedField(true);
+        declaredField.setDataKeyName(dataKeyName);
+        form.addFieldDefinition(declaredField);
+        form.addData(dataKeyName, this.nodeService.hasAspect(nodeRef, ASPECT_DECLARED_RECORD));
+    }
+    
+    /**
+     * Generates the field definition for the transient <code>rmRecordType</code> property
+     * 
+     * @param form The Form instance to add the property to
+     * @param nodeRef The node the form is being generated for
+     */
+    protected void generateRecordTypePropertyField(Form form, NodeRef nodeRef)
+    {
+        String dataKeyName = ContentModelFormProcessor.PROP_DATA_PREFIX + TRANSIENT_RECORD_TYPE;
+        PropertyFieldDefinition recordTypeField = new PropertyFieldDefinition(
+                    TRANSIENT_RECORD_TYPE, DataTypeDefinition.TEXT.getLocalName());
+        recordTypeField.setLabel(TRANSIENT_RECORD_TYPE);
+        recordTypeField.setDescription(TRANSIENT_RECORD_TYPE);
+        recordTypeField.setProtectedField(true);
+        recordTypeField.setDataKeyName(dataKeyName);
+        form.addFieldDefinition(recordTypeField);
+        
+        // determine what record type value to return, use aspect/type title from model
+        String recordType = null;
+        QName type = this.nodeService.getType(nodeRef);
+        if (TYPE_NON_ELECTRONIC_DOCUMENT.equals(type))
+        {
+            // get the non-electronic type title
+            recordType = dictionaryService.getType(TYPE_NON_ELECTRONIC_DOCUMENT).getTitle();
+        }
+        else
+        {
+            // the aspect applied to record determines it's type
+            if (nodeService.hasAspect(nodeRef, ASPECT_PDF_RECORD))
+            {
+                recordType = dictionaryService.getAspect(ASPECT_PDF_RECORD).getTitle();
+            }
+            else if (nodeService.hasAspect(nodeRef, ASPECT_WEB_RECORD))
+            {
+                recordType = dictionaryService.getAspect(ASPECT_WEB_RECORD).getTitle();
+            }
+            else if (nodeService.hasAspect(nodeRef, ASPECT_SCANNED_RECORD))
+            {
+                recordType = dictionaryService.getAspect(ASPECT_SCANNED_RECORD).getTitle();
+            }
+            else if (nodeService.hasAspect(nodeRef, ASPECT_DIGITAL_PHOTOGRAPH_RECORD))
+            {
+                recordType = dictionaryService.getAspect(ASPECT_DIGITAL_PHOTOGRAPH_RECORD).getTitle();
+            }
+            else
+            {
+                // no specific aspect applied so default to just "Record"
+                recordType = dictionaryService.getAspect(ASPECT_RECORD).getTitle();
+            }
+        }
+        
+        form.addData(dataKeyName, recordType);
     }
 }

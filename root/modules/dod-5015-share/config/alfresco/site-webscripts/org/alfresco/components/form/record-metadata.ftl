@@ -23,6 +23,9 @@
             <#if form.fields["prop_cm_owner"]?? && form.mode == "view">
                <@formLib.renderField field=form.fields["prop_cm_owner"] />
             </#if>
+            <#if form.fields["prop_rmDeclared"]?? && form.mode == "view">
+               <@formLib.renderField field=form.fields["prop_rmDeclared"] />
+            </#if>
             <#if form.fields["prop_cm_author"]??>
                <@formLib.renderField field=form.fields["prop_cm_author"] />
             </#if>
@@ -50,6 +53,9 @@
       <div class="set-panel">
          <div class="set-panel-heading">${msg("label.set.record")}</div>
          <div class="set-panel-body">
+            <#if form.fields["prop_rmRecordType"]?? && form.mode == "view">
+               <@formLib.renderField field=form.fields["prop_rmRecordType"] />
+            </#if>
             <@formLib.renderField field=form.fields["prop_rma_originator"] />
             <@formLib.renderField field=form.fields["prop_rma_originatingOrganization"] />
             <#if form.mode == "view">
