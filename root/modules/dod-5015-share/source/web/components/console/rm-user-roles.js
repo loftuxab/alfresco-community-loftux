@@ -24,21 +24,12 @@
  */
 
 /**
- * Alfresco top-level RM namespace.
- * 
- * @namespace Alfresco.Admin
- * @class Alfresco.Admin.RM
- */
-Alfresco.Admin = Alfresco.Admin || {};
-Alfresco.Admin.RM = Alfresco.Admin.RM || {};
-
-/**
- * RM Roles component
+ * Admin RM Roles component
  * 
  * @namespace Alfresco
- * @class Alfresco.RM.References
+ * @class Alfresco.admin.RMRoles
  */
-(function Admin_RM_Roles()
+(function()
 {
    /**
     * YUI Library aliases
@@ -46,38 +37,37 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
    var Dom = YAHOO.util.Dom,
        Event = YAHOO.util.Event,
        Sel = YAHOO.util.Selector;
-
+   
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML,
-       $links = Alfresco.util.activateLinks;
-
+   var $html = Alfresco.util.encodeHTML;
+   
    /**
-    * RM Roles constructor.
+    * RM UserRoles constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.dashlet.MyDocuments} The new component instance
+    * @return {Alfresco.admin.RMRoles} The new component instance
     * @constructor
     */
-   Alfresco.Admin.RM.Roles = function Admin_RM_ManageRoles_constructor(htmlId)
+   Alfresco.admin.RMRoles = function RMRoles_constructor(htmlId)
    {
-      Alfresco.Admin.RM.Roles.superclass.constructor.call(this, "Alfresco.Admin.RM.ManageRoles", htmlId);     
+      Alfresco.admin.RMRoles.superclass.constructor.call(this, "Alfresco.admin.RMRoles", htmlId);     
       return this;
    };
-    
-    YAHOO.extend(Alfresco.Admin.RM.Roles, Alfresco.component.Base,
+   
+   YAHOO.extend(Alfresco.admin.RMRoles, Alfresco.component.Base,
    {
       /**
        * Fired by YUI when parent element is available for scripting
        * @method onReady
        */
-      onReady: function Admin_RM_ManageRoles_onReady()
+      onReady: function RMRoles_onReady()
       {
          this.initEvents();
          var buttons = Sel.query('button', this.id).concat(Sel.query('input[type=submit]', this.id)),
             button, id;
-
+         
          // Create widget button while reassigning classname to src element (since YUI removes classes). 
          // We need the classname so we can identify what action to take when it is interacted with (event delegation).
          for (var i=0, len = buttons.length; i<len; i++)
@@ -93,7 +83,7 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
        * Initialises event listening and custom events
        * @method: initEvents
        */
-      initEvents: function Admin_RM_ManageRoles_initEvents()
+      initEvents: function RMRoles_initEvents()
       {
          // Requires EventProvider
          Event.on(this.id, 'submit', this.onInteractionEvent, null, this);
@@ -127,7 +117,7 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
        * @method onSelectAll
        * @param {e} Event object
        */
-      onSelectAll: function Admin_RM_ManageRoles_onSelectAll(e, args)
+      onSelectAll: function RMRoles_onSelectAll(e, args)
       {
          var elTarget = Event.getTarget(e), 
             checkedStatus = false, 
@@ -159,7 +149,7 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
        * Validates forms and submits form
        * @method: onSubmit 
        */
-      onSubmit: function Admin_RM_ManageRoles_onSubmit(e, args)
+      onSubmit: function RMRoles_onSubmit(e, args)
       {         
          var isACheckboxSelected = false,
             cbs = Sel.query('input[type="checkbox"]',this.id);
@@ -174,11 +164,12 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
          }
          if ((Dom.get('roleName').value !== '') && (isACheckboxSelected))
          {
-            alert('valid');
+            // valid
+            // TODO: submit
          }
          else
          {
-            alert('invalid');
+            // could not find role name
             Event.preventDefault(e);
          }
       },
@@ -187,7 +178,7 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
        * Cancel button handler
        * @method: onCancel 
        */
-      onCancel: function Admin_RM_ManageRoles_onCancel(e, args)
+      onCancel: function RMRoles_onCancel(e, args)
       {
          Event.preventDefault(e);
       }
@@ -199,9 +190,9 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
  * RM View Roles component
  * 
  * @namespace Alfresco
- * @class Alfresco.RM.References
+ * @class Alfresco.admin.RMViewRoles
  */
-(function Admin_RM_View_Roles()
+(function()
 {
    /**
     * YUI Library aliases
@@ -213,30 +204,28 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML,
-       $links = Alfresco.util.activateLinks;
+   var $html = Alfresco.util.encodeHTML;
 
    /**
-    * RM View Roles componentconstructor.
+    * RM Roles component constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
     * @return {Alfresco.dashlet.MyDocuments} The new component instance
     * @constructor
     */
-   Alfresco.Admin.RM.ViewRoles = function Admin_RM_View_Roles_constructor(htmlId)
+   Alfresco.admin.RMViewRoles = function RMViewRoles_constructor(htmlId)
    {
-      Alfresco.Admin.RM.ViewRoles.superclass.constructor.call(this, "Alfresco.Admin.RM.ManageRoles", htmlId);
+      Alfresco.admin.RMViewRoles.superclass.constructor.call(this, "Alfresco.admin.RMViewRoles", htmlId);
       return this;
    };
-    
-    YAHOO.extend(Alfresco.Admin.RM.ViewRoles, Alfresco.component.Base,
+   
+   YAHOO.extend(Alfresco.admin.RMViewRoles, Alfresco.component.Base,
    {
-      
       /**
        * Initialises event listening and custom events
        * @method: initEvents
        */
-      initEvents: function Admin_RM_View_Roles_initEvents()
+      initEvents: function RMViewRoles_initEvents()
       {
          Event.on(this.id, 'click', this.onInteractionEvent, null, this);
          
@@ -276,9 +265,8 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
       /**
        * Fired by YUI when parent element is available for scripting
        * @method onReady
-       * 
        */
-      onReady: function Admin_RM_View_Roles_onReady()
+      onReady: function RMViewRoles_onReady()
       {
          this.initEvents();
          var buttons = Sel.query('button',this.id),
@@ -296,31 +284,31 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
       },
 
       /**
-      * Event handler for role selection
-      * @method onRoleSelect
-      * @param {e} Event object
-      */
-      onRoleSelect: function Admin_RM_View_Roles_onRoleSelect(e)
+       * Event handler for role selection
+       * @method onRoleSelect
+       * @param {e} Event object
+       */
+      onRoleSelect: function RMViewRoles_onRoleSelect(e)
       {
-         alert('switch tabs');
+         // TODO: switch tabs
       },
 
       /**
-      * Event handler for new role button
-      * @method onNewRole
-      * @param {e} Event object
-      */      
-      onNewRole: function Admin_RM_View_Roles_onNewRole(e)
+       * Event handler for new role button
+       * @method onNewRole
+       * @param {e} Event object
+       */      
+      onNewRole: function RMViewRoles_onNewRole(e)
       {
          window.location.href = Alfresco.constants.URL_CONTEXT + 'page/console/admin-console/define-roles?action=new';
       },
       
       /**
-      * Event handler for edit role button
-      * @method onEditRole
-      * @param {e} Event object
-      */
-      onEditRole: function Admin_RM_View_Roles_onEditRole(e)
+       * Event handler for edit role button
+       * @method onEditRole
+       * @param {e} Event object
+       */
+      onEditRole: function RMViewRoles_onEditRole(e)
       {
          var el = Event.getTarget(e);
          // Get roleId from button value
@@ -329,11 +317,11 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
       }, 
 
       /**
-      * Event handler for delete role button
-      * @method onDeleteRole
-      * @param {e} Event object
-      */
-      onDeleteRole: function Admin_RM_View_Roles_onDeleteRole(e)
+       * Event handler for delete role button
+       * @method onDeleteRole
+       * @param {e} Event object
+       */
+      onDeleteRole: function RMViewRoles_onDeleteRole(e)
       {
          var el = Event.getTarget(e),
             roleId = this.widgets[el.id.replace('-button', '')],
@@ -350,7 +338,7 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
             [
                {
                   text: this.msg("button.ok"),
-                  handler: function Admin_RM_View_Roles_onDeleteRole_ok()
+                  handler: function RMViewRoles_onDeleteRole_ok()
                   {
                      this.destroy();
                      performDelete.call(me, roleId);
@@ -358,7 +346,7 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
                },
                {
                   text: this.msg("button.cancel"),
-                  handler: function Admin_RM_View_Roles_onDeleteRole_cancel()
+                  handler: function RMViewRoles_onDeleteRole_cancel()
                   {
                      this.destroy();
                   }
@@ -368,13 +356,13 @@ Alfresco.Admin.RM = Alfresco.Admin.RM || {};
       },
       
       /**
-      * Method that calls the webservice to delete role
-      * @method performDelete
-      * @param {roleId} role id
-      */ 
-      performDelete: function Admin_RM_View_Roles_performDelete(roleId)
+       * Method that calls the webservice to delete role
+       * @method performDelete
+       * @param {roleId} role id
+       */ 
+      performDelete: function RMViewRoles_performDelete(roleId)
       {
-         alert('role deleted');
+         // TODO: delete role
          // execute ajax request
          // Alfresco.util.Ajax.request(
          // {
