@@ -199,15 +199,15 @@
             type: "",
             label: this._msg("form.notset"),
             hasExpression: false
-         }
+         };
          
          this.periodDefinitionsByType[notSetOption.type] = notSetOption;
          this.periodDefinitionsByLabel[notSetOption.label] = notSetOption;
          
          // split the current value into it's parts
-         var parts = this.options.currentValue.split("|");
-         var periodType = this.options.currentValue;
-         var expression = 1;
+         var parts = this.options.currentValue.split("|"),
+            periodType = this.options.currentValue,
+            expression = 1;
          if (parts.length == 2)
          {
             periodType = parts[0];
@@ -226,9 +226,7 @@
             {
                if (periodDef.hasExpression)
                {
-                  displayValue = expression;
-                  displayValue += " ";
-                  displayValue += periodDef.label;
+                  displayValue = expression + " " + periodDef.label;
                   if (expression > 1)
                   {
                      displayValue += "s";
@@ -255,24 +253,14 @@
 
             // populate the drop down list with period options
             // using the sorted array of labels
-            var def = null;
-            var periodOptions = "";
-            for (var p = 0; p < sortedOptions.length; p++)
+            var def = null,
+               eSelect = Dom.get(this.id + "-type");
+            
+            for (p = 0; p < sortedOptions.length; p++)
             {
                def = this.periodDefinitionsByLabel[sortedOptions[p]];
-               periodOptions += "<option value=\"";
-               periodOptions += def.type;
-               periodOptions += "\"";
-               if (periodType === def.type)
-               {
-                  periodOptions += " selected=\"selected\"";
-               }
-               periodOptions += ">";
-               periodOptions += def.label;
-               periodOptions += "</option>";
+               eSelect.options[p] = new Option(def.label, def.type, periodType === def.type, periodType === def.type);
             }
-            
-            Dom.get(this.id + "-type").innerHTML = periodOptions;
             
             // populate the expression field with the current value
             if (periodDef !== undefined && periodDef.hasExpression)
@@ -300,10 +288,10 @@
       _handleDataChange: function Period__handleDataChange(event)
       {
          // get the current values and construct the new value
-         var type = Dom.get(this.id + "-type").value;
-         var expression = Dom.get(this.id + "-expression").value;
-         var newValue = type + "|" + expression;
-         var valueValid = true;
+         var type = Dom.get(this.id + "-type").value,
+            expression = Dom.get(this.id + "-expression").value,
+            newValue = type + "|" + expression,
+            valueValid = true;
          
          if (type === "")
          {
@@ -337,7 +325,9 @@
             YAHOO.util.Dom.get(this.currentValueHtmlId).value = newValue;
             
             if (Alfresco.logger.isDebugEnabled())
+            {
                Alfresco.logger.debug("Hidden field '" + this.currentValueHtmlId + "' updated to '" + newValue + "'");
+            }
             
             // inform the forms runtime that the control value has been updated (if field is mandatory)
             if (this.options.mandatory)
