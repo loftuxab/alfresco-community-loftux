@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.Set;
 
+import org.alfresco.service.cmr.security.AuthorityService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -23,10 +24,13 @@ public class ScriptConstraint implements Serializable
     
     private RMCaveatConfigService rmCaveatconfigService;
     
-    ScriptConstraint(RMConstraintInfo info, RMCaveatConfigService rmCaveatconfigService)
+    private AuthorityService authorityService;
+    
+    ScriptConstraint(RMConstraintInfo info, RMCaveatConfigService rmCaveatconfigService, AuthorityService authorityService)
     {
         this.info = info;
         this.rmCaveatconfigService = rmCaveatconfigService; 
+        this.authorityService = authorityService;
     }
     
     public void setTitle(String title)
@@ -153,8 +157,28 @@ public class ScriptConstraint implements Serializable
         for(String value : values)
         {
              ScriptConstraintValue constraint = new ScriptConstraintValue();
-             constraint.setValue(value);
-             constraint.setAuthorityNames(pivot.get(value));
+             constraint.setValueName(value);
+             constraint.setValueTitle(value);
+             
+             List<String>authorities = pivot.get(value);
+             List<ScriptAuthority> sauth = new ArrayList<ScriptAuthority>();
+             for(String authority : authorities)
+             {
+                 ScriptAuthority a = new ScriptAuthority();
+                 a.setAuthorityName(authority);
+                 
+                 String displayName = authorityService.getAuthorityDisplayName(authority);
+                 if(displayName != null)
+                 {
+                     a.setAuthorityTitle(displayName);
+                 }
+                 else
+                 {
+                     a.setAuthorityTitle(authority);
+                 }
+                 sauth.add(a);
+             }
+             constraint.setAuthorities(sauth);       
              constraints.add(constraint);             
         }
         ScriptConstraintValue[] retVal = constraints.toArray(new ScriptConstraintValue[constraints.size()]);
