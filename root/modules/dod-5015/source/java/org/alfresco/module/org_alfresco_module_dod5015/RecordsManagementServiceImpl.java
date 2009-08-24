@@ -42,6 +42,9 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -83,7 +86,6 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         // Internal ops use the unprotected services from the voter (e.g. nodeService)
         this.serviceRegistry = serviceRegistry;
         this.dictionaryService = serviceRegistry.getDictionaryService();
-        //this.rmActionService = serviceRegistry.getRecordsManagementActionService();
     }
     
     /**
@@ -96,11 +98,21 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         this.policyComponent = policyComponent;
     }
 
+    /**
+     * Set search service
+     * 
+     * @param nodeService   search service
+     */
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
 
+    /**
+     * Set records management action service
+     * 
+     * @param rmActionService   records management action service
+     */
     public void setRmActionService(RecordsManagementActionService rmActionService)
     {
         this.rmActionService = rmActionService;
@@ -186,6 +198,18 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                             TYPE_DISPOSITION_SCHEDULE);
             }
         }
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getRecordsManagementRoots()
+     */
+    public List<NodeRef> getRecordsManagementRoots()
+    {
+        SearchService searchService = serviceRegistry.getSearchService();
+        StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+        String query = "ASPECT:\"" + ASPECT_RECORDS_MANAGEMENT_ROOT + "\"";        
+        ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, query);
+        return resultSet.getNodeRefs();
     }
     
     /**

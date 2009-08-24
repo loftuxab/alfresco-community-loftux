@@ -39,6 +39,13 @@ import org.alfresco.service.namespace.QName;
 public interface RecordsManagementService
 {
     /**
+     * Gets all the records management root nodes 
+     * 
+     * @return  Set<NodeRef>    set of record management root nodes
+     */
+    List<NodeRef> getRecordsManagementRoots();
+    
+    /**
      * Gets the records management root node for the file plan component specified
      * 
      * @return  NodeRef records management root
