@@ -81,10 +81,10 @@ public interface RecordsManagementSecurityService
     
     boolean existsRole(NodeRef rmRootNode, String role);
     
-    void createRole(NodeRef rmRootNode, String role, String roleDisplayLabel, Set<Capability> capabilities);
+    Role createRole(NodeRef rmRootNode, String role, String roleDisplayLabel, Set<Capability> capabilities);
     
 
-    void updateRole(NodeRef rmRootNode, String role, String roleDisplayLabel, Set<Capability> capabilities);
+    Role updateRole(NodeRef rmRootNode, String role, String roleDisplayLabel, Set<Capability> capabilities);
     
   
     void deleteRole(NodeRef rmRootNode, String role);

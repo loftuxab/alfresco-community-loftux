@@ -219,11 +219,14 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         }, AuthenticationUtil.getAdminUserName()).booleanValue();
     }
     
-    public void createRole(final NodeRef rmRootNode, final String role, final String roleDisplayLabel, final Set<Capability> capabilities)
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#createRole(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.lang.String, java.util.Set)
+     */
+    public Role createRole(final NodeRef rmRootNode, final String role, final String roleDisplayLabel, final Set<Capability> capabilities)
     {
-        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+        return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Role>()
         {
-            public Object doWork() throws Exception
+            public Role doWork() throws Exception
             {
                 String fullRoleName = getFullRoleName(role, rmRootNode);
                 
@@ -245,16 +248,24 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                     permissionService.setPermission(rmRootNode, roleGroup, capability.getName(), true);
                 }
                 
-                return null;
+                Set<String> capStrings = new HashSet<String>(capabilities.size());
+                for (Capability capability : capabilities)
+                {
+                    capStrings.add(capability.getName());
+                }
+                return new Role(role, roleDisplayLabel, capStrings);
             }
         }, AuthenticationUtil.getAdminUserName());
     }
 
-    public void updateRole(final NodeRef rmRootNode, final String role, final String roleDisplayLabel, final Set<Capability> capabilities)
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#updateRole(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.lang.String, java.util.Set)
+     */
+    public Role updateRole(final NodeRef rmRootNode, final String role, final String roleDisplayLabel, final Set<Capability> capabilities)
     {
-        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+        return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Role>()
         {
-            public Boolean doWork() throws Exception
+            public Role doWork() throws Exception
             {                                
                 String roleAuthority = authorityService.getName(AuthorityType.GROUP, getFullRoleName(role, rmRootNode));
 
@@ -269,7 +280,12 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                     permissionService.setPermission(rmRootNode, roleAuthority, capability.getName(), true);
                 }
                 
-                return null;
+                Set<String> capStrings = new HashSet<String>(capabilities.size());
+                for (Capability capability : capabilities)
+                {
+                    capStrings.add(capability.getName());
+                }
+                return new Role(role, roleDisplayLabel, capStrings);
                 
             }
         }, AuthenticationUtil.getAdminUserName());

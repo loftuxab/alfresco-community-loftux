@@ -103,7 +103,17 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
         assertNotNull(roles);
         assertEquals(2, roles.size());    
         
-        rmSecurityService.updateRole(rmRootNode, "MyRole", "SomethingDifferent", getListOfCapabilities(3, 4));
+        Set<Capability> list = getListOfCapabilities(3, 4);
+        assertEquals(3, list.size());
+        
+        Role result = rmSecurityService.updateRole(rmRootNode, "MyRole", "SomethingDifferent", list);
+        
+        assertNotNull(result);
+        assertEquals("MyRole", result.getName());
+        assertEquals("SomethingDifferent", result.getDisplayLabel());
+        assertNotNull(result.getCapabilities());
+        assertEquals(3, result.getCapabilities().size());
+        
 	 
         roles = rmSecurityService.getRoles(rmRootNode);
         assertNotNull(roles);
@@ -137,12 +147,15 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
 	{
 	    Set<Capability> result = new HashSet<Capability>(size);
 	    Set<Capability> caps = rmSecurityService.getCapabilities();
-	    int count = offset;
+	    int count = 0;
 	    for (Capability cap : caps)
         {
-            if (count < size)
+            if (count < size+offset)
             {
-                result.add(cap);
+                if (count >= offset)
+                {
+                    result.add(cap);
+                }
             }
             else
             {
