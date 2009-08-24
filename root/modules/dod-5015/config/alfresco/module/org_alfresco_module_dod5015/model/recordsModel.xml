@@ -31,6 +31,7 @@
       
       <!-- TODO - remove the list of allowed values (test example only) prior to release and fix-up associated unit tests-->
       <constraint name="rma:smList" type="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
+         <parameter name="title"><value>Supplemental Markings</value></parameter>
          <parameter name="allowedValues">
             <list>
                <value>NOFORN</value>      <!-- Not Releasable to Foreign Nationals/Governments/Non-US Citizens -->
@@ -45,6 +46,7 @@
       
       <!-- TODO - remove this constraint (test example only) prior to release and fix-up associated unit tests -->
       <constraint name="rma:prjList" type="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
+         <parameter name="title"><value>Projects</value></parameter>
          <parameter name="allowedValues">
             <list>
                <value>Project A</value>

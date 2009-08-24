@@ -7,13 +7,12 @@ function main()
    var shortName = url.extension;
    
    // Get the constraint
-   var constraintDetails = caveatConfig.getConstraintDetails(shortName);
+   var constraint = caveatConfig.getConstraint(shortName);
    
-   if (constraintDetails != null)
+   if (constraint != null)
    {
       // Pass the constraint detail to the template
-      model.constraintName = shortName;
-      model.constraintDetails = constraintDetails;
+      model.constraint = constraint;
    }
    else
    {

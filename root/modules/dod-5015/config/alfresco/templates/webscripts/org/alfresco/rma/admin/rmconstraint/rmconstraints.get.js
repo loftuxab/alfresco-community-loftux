@@ -5,7 +5,7 @@ function main()
 {
     
    // Pass the information to the template
-   model.constraintNames = caveatConfig.allConstraintNames
+   model.constraints = caveatConfig.allConstraints
 }
 
 main();

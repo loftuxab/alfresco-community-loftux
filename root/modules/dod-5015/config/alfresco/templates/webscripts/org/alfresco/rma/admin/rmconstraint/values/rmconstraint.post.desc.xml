@@ -1,0 +1,29 @@
+<webscript>
+  <shortname>Updates values in an an RM Constraint List</shortname>
+  <description><![CDATA[
+  Updates values in an an RM Constraint List
+  
+  If the authority is missing from the list then the value is deleted. 
+  If an authority does not exist in a list then the authority is added.
+  
+  <br />
+  
+  Only the authorities for the specified values are updated.   
+  If a value is missing it will not be affected.
+  
+  <br />
+  JSON Parameter format
+  "values" : [ ValueName, [ authorityName1, authorityName2 ]]
+  
+  
+      
+      
+
+  ]]>
+  </description>
+  <url>/api/rma/admin/rmconstraints/{listName}/values</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+  <lifecycle>internal</lifecycle>
+</webscript>

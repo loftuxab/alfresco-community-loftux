@@ -58,9 +58,14 @@ public interface RMCaveatConfigService
     public boolean hasAccess(NodeRef nodeRef);
     
     /*
+     *  Get a single RM constraint
+     */
+    public RMConstraintInfo getRMConstraint(String listName);
+    
+    /*
      *  Get the names of all the caveat lists
      */
-    public Set<String> getRMConstraintNames();
+    public Set<RMConstraintInfo> getAllRMConstraints();
     
     /**
      * Get the details of a caveat list
@@ -78,15 +83,23 @@ public interface RMCaveatConfigService
     /**
      * add RM constraint list
      * @param listName the name of the RMConstraintList
+     * @param listTitle 
      */
-    public void addRMConstraintList(String listName);
+    public RMConstraintInfo addRMConstraint(String listName, String listTitle, String[] allowedValues);
+    
+    /**
+     * add RM constraint list
+     * @param listName the name of the RMConstraintList - can not be changed
+     */
+    public RMConstraintInfo updateRMConstraint(String listName, String listTitle, String[] allowedValues);
+
     
     /**
      * delete RM Constraint Name
      * 
      * @param listName the name of the RMConstraintList
      */
-    public void deleteRMConstraintList(String listName);
+    public void deleteRMConstraint(String listName);
      
     /**
      * Add a single value to an authority in a list.   The existing values of the list remain.
@@ -119,4 +132,25 @@ public interface RMCaveatConfigService
      */
     public void removeRMConstraintListAuthority(String listName, String authorityName);
  
+    /**
+     * Replace the values for an authority in a list.   
+     * The existing values are removed.
+     * 
+     * If the authority does not already exist in the list, it will be added
+     * 
+     * @param listName the name of the RMConstraintList
+     * @param value
+     * @param authorities
+     */
+    public void updateRMConstraintListValue(String listName, String value, List<String>authorities);
+     
+    /**
+     * Remove an authority from a list
+     * 
+     * @param listName the name of the RMConstraintList
+     * @param authorityName
+     * @param value
+     */
+    public void removeRMConstraintListValue(String listName, String valueName);
+
 }
