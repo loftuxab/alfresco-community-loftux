@@ -26,43 +26,104 @@ public class ScriptRMCaveatConfigService extends BaseScopableProcessorExtension
         return caveatConfigService;
     }
     
-    public String[] getAllConstraintNames()
+    public ScriptConstraint getConstraint(String listName)
     {
-        Set<String> values = caveatConfigService.getRMConstraintNames();
-        return values.toArray(new String[values.size()]);
-    }
-    
-    /**
-     * Get the details of the constraint list
-     * @param listName
-     * @return the constraint list or null if the list does not exist
-     */
-    public ScriptConstraint[] getConstraintDetails(String listName)
-    {
-        
         //TODO Temporary conversion
         String xxx = listName.replace("_", ":");
         
-        Map<String, List<String>> values = caveatConfigService.getListDetails(xxx);
+        RMConstraintInfo info = caveatConfigService.getRMConstraint(xxx);
         
-        if (values == null)
+        if(info != null)
         {
-            return null;
+            return new ScriptConstraint(info, caveatConfigService);
         }
         
-        // Here with some data to return
-        Set<String> authorities = values.keySet();
-        
-        ArrayList<ScriptConstraint> constraints = new ArrayList<ScriptConstraint>(values.size());
-        for(String authority : authorities)
-        {
-             ScriptConstraint constraint = new ScriptConstraint();
-             constraint.setAuthorityName(authority);
-             constraint.setValues(values.get(authority));
-             constraints.add(constraint);             
-        }
-        
-         return constraints.toArray(new ScriptConstraint[constraints.size()]);
+        return null;
     }
+    
+    public ScriptConstraint[] getAllConstraints()
+    {
+        Set<RMConstraintInfo> values = caveatConfigService.getAllRMConstraints();
+        
+        List<ScriptConstraint> vals = new ArrayList<ScriptConstraint>(values.size());
+        for(RMConstraintInfo value : values)
+        {
+            ScriptConstraint c = new ScriptConstraint(value, caveatConfigService);
+            vals.add(c);
+        }
+        
+        return vals.toArray(new ScriptConstraint[vals.size()]);
+    }
+   
+    /**
+     * Delete list
+     * @param listName
 
+     */
+    public void deleteConstraintList(String listName)
+    {
+        //TODO Temporary conversion
+        String xxx = listName.replace("_", ":");
+        caveatConfigService.deleteRMConstraint(xxx);
+    }
+    
+
+    
+    /**
+     * Update value
+     */
+    public void updateConstraintValues(String listName, String authorityName, String[]values)
+    {
+        //TODO Temporary conversion
+        String xxx = listName.replace("_", ":");
+        
+        List<String> vals = new ArrayList<String>();
+        caveatConfigService.updateRMConstraintListAuthority(listName, authorityName, vals);
+    }
+    
+    /**
+     * Delete the constraint values.   i.e remove an authority from a constraint list
+     */
+    public void deleteRMConstraintListAuthority(String listName, String authorityName)
+    {
+        //TODO Temporary conversion
+        String xxx = listName.replace("_", ":");
+        
+        caveatConfigService.removeRMConstraintListAuthority(xxx, authorityName);
+    }
+    
+    /**
+     * Delete the constraint values.   i.e remove a value from a constraint list
+     */
+    public void deleteRMConstraintListValue(String listName, String valueName)
+    {
+        //TODO Temporary conversion
+        String xxx = listName.replace("_", ":");
+        
+        caveatConfigService.removeRMConstraintListValue(listName, valueName);
+
+    }
+    
+    public ScriptConstraint createConstraint(String listName, String title, String[] allowedValues)
+    {     
+        //TODO Temporary conversion
+        if(listName != null)
+        {
+            listName = listName.replace("_", ":");
+        }
+        
+        RMConstraintInfo info = caveatConfigService.addRMConstraint(listName, title, allowedValues);
+        ScriptConstraint c = new ScriptConstraint(info, caveatConfigService);
+        return c;  
+    }
+    
+    public ScriptConstraint updateConstraint(String listName, String title, String[] allowedValues)
+    {    
+        //TODO Temporary conversion
+        String xxx = listName.replace("_", ":");
+        
+        RMConstraintInfo info = caveatConfigService.updateRMConstraint(xxx, title, allowedValues);
+        ScriptConstraint c = new ScriptConstraint(info, caveatConfigService);
+        return c;  
+    }
 }

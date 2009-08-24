@@ -55,6 +55,8 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
     private List<String> allowedValues;
     private List<String> allowedValuesUpper;
     
+    private String title;
+    
     // note: alternative to static init could be to use 'registered' constraint
     private static RMCaveatConfigService caveatConfigService;
     
@@ -202,5 +204,17 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
                 throw new ConstraintException(ERR_INVALID_VALUE, value);
             }
         }
+    }
+
+
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
+
+    public String getTitle()
+    {
+        return title;
     }
 }

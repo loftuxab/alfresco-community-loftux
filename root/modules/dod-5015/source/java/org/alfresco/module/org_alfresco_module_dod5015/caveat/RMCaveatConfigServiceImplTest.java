@@ -144,26 +144,26 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
          * Now remove the entire list (rma:smList);
          */
         logger.debug("test remove entire list rma:smList");
-        caveatConfigService.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraint(RM_LIST);
         
         /**
          * Now add the list again
          */
         logger.debug("test add back rma:smList");
-        caveatConfigService.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
         
         /**
          * Negative test - add a list that already exists
          */
         logger.debug("try to create duplicate list rma:smList");
-        caveatConfigService.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
         
         /**
          * Negative test - remove a list that does not exist
          */
         logger.debug("test remove entire list rma:smList");
-        caveatConfigService.deleteRMConstraintList(RM_LIST);
-        caveatConfigService.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraint(RM_LIST);
+        caveatConfigService.deleteRMConstraint(RM_LIST);
         
         
         /**
@@ -172,7 +172,7 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         logger.debug("test property does not exist");
         try 
         {
-            caveatConfigService.addRMConstraintList("rma:mer");
+            caveatConfigService.addRMConstraint("rma:mer", "", new String[0]);
             fail("unknown property should have thrown an exception");
         }
         catch (Exception e)
@@ -198,8 +198,7 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         setupCaveatConfigData();
         
         startNewTransaction();
-       
-        caveatConfigService.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
         
         /**
          * Add a user to the list
@@ -264,7 +263,8 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         
         startNewTransaction();
        
-        caveatConfigService.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+ 
         
         /**
          * Add a user to the list
@@ -286,13 +286,13 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
          * Add a group to the list
          */
         caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "Engineering", values);
-        caveatConfigService.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraint(RM_LIST);
         
         /**
          * Add to a list that does not exist
          * Should create a new list
          */
-        caveatConfigService.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraint(RM_LIST);
         caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
         
         
@@ -320,8 +320,8 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         setupCaveatConfigData();
         
         startNewTransaction();
+        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
        
-        caveatConfigService.addRMConstraintList(RM_LIST);
         List<String> values = new ArrayList<String>();
         values.add(FGI);
         caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
@@ -340,7 +340,8 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
          * Negative test - remove a user from a list that does not exist.
          * Should create a new list
          */
-        caveatConfigService.deleteRMConstraintList(RM_LIST);
+  
+        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
         caveatConfigService.updateRMConstraintListAuthority(RM_LIST_ALT, "jrogers", values);
            
         endTransaction();
@@ -365,7 +366,7 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         
         startNewTransaction();
         
-        caveatConfigService.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
 
         List<String> values = new ArrayList<String>();
         values.add(NOFORN);
@@ -411,27 +412,27 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
          * Now remove the entire list (rma:smList);
          */
         logger.debug("test remove entire list rma:smList");
-        caveatConfigService.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraint(RM_LIST);
         
         
         /**
          * Now add the list again
          */
         logger.debug("test add back rma:smList");
-        caveatConfigService.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
         
         /**
          * Negative test - add a list that already exists
          */
         logger.debug("try to create duplicate list rma:smList");
-        caveatConfigService.addRMConstraintList(RM_LIST);
+        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
         
         /**
          * Negative test - remove a list that does not exist
          */
         logger.debug("test remove entire list rma:smList");
-        caveatConfigService.deleteRMConstraintList(RM_LIST);
-        caveatConfigService.deleteRMConstraintList(RM_LIST);
+        caveatConfigService.deleteRMConstraint(RM_LIST);
+        caveatConfigService.deleteRMConstraint(RM_LIST);
         
         
         /**
@@ -440,7 +441,7 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         logger.debug("test property does not exist");
         try 
         {
-            caveatConfigService.addRMConstraintList("rma:mer");
+            caveatConfigService.addRMConstraint("rma:mer", "", new String[0]);
             fail("unknown property should have thrown an exception");
         }
         catch (Exception e)

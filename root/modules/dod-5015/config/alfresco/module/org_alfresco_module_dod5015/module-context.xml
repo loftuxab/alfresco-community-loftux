@@ -177,6 +177,8 @@
         <property name="authorityService" ref="authorityService"/>
         <property name="personService" ref="personService"/>
         <property name="nodeService" ref="nodeService"/>
+        <property name="recordsManagementAdminService" ref = "recordsManagementAdminService" />
+        
     </bean>
     
     <bean id="rmListOfValuesContraintInit" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
@@ -221,7 +223,7 @@
         </property>
         <property name="caveatConfigService" ref="caveatConfigService"/>
     </bean>
-    
+     
     <!-- Form Processor Filters to process RM nodes and types -->
     <bean id="rmNodeFormFilter" parent="baseFormFilter"
           class="org.alfresco.module.org_alfresco_module_dod5015.forms.RecordsManagementNodeFormFilter">

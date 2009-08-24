@@ -4,6 +4,7 @@
   Array of summary details for custom constraint lists
   <br />
   <dl>
+  <dt>constraintTitle</dt><dd>Human readable title for the custom constraint list</dd>
   <dt>constraintName</dt><dd>the name of the constraint list, prefixed </dd>
   <dt>url</dt><dd></dd>
   </dl>

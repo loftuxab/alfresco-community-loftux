@@ -1,14 +1,13 @@
+<#import "rmconstraint.lib.ftl" as rmconstraintLib/>
+
 <#escape x as jsonUtils.encodeJSONString(x)>
 {
    "data":
 
         [
-            <#list constraintNames as constraintName>   
-              {
-              "url" : "${url.serviceContext + "/api/rma/admin/rmconstraints/" + constraintName}",
-              "constraintName" : "${constraintName}"
-              }
-               <#if constraintName_has_next>,</#if>
+            <#list constraints as constraint>   
+               <@rmconstraintLib.constraintSummaryJSON constraint=constraint />        
+               <#if constraint_has_next>,</#if>
             </#list>
         ]
 
