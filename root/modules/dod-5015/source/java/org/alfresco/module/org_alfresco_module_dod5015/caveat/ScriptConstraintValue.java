@@ -10,21 +10,29 @@ public class ScriptConstraintValue implements Serializable
      */
     private static final long serialVersionUID = -4659454215122271811L;
     private String value;
-    private List<String>authorityNames;
+    private List<ScriptAuthority>authorities;
     
-    public void setAuthorityNames(List<String> values)
+    public void setAuthorities(List<ScriptAuthority> values)
     {
-        this.authorityNames = values;
+        this.authorities = values;
     }
-    public List<String> getAuthorityNames()
+    public List<ScriptAuthority> getAuthorities()
     {
-        return authorityNames;
+        return authorities;
     }
-    public void setValue(String authorityName)
+    public void setValueName(String authorityName)
     {
         this.value = authorityName;
     }
-    public String getValue()
+    public String getValueName()
+    {
+        return value;
+    }
+    public void setValueTitle(String authorityName)
+    {
+        this.value = authorityName;
+    }
+    public String getValueTitle()
     {
         return value;
     }

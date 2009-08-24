@@ -222,6 +222,7 @@
             <value>caveatConfig</value>
         </property>
         <property name="caveatConfigService" ref="caveatConfigService"/>
+        <property name="authorityService" ref="authorityService"/>
     </bean>
      
     <!-- Form Processor Filters to process RM nodes and types -->

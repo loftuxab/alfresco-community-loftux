@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.repo.jscript.BaseScopableProcessorExtension;
+import org.alfresco.service.cmr.security.AuthorityService;
 
 /**
  * Script projection of RM Caveat Config Service
@@ -15,6 +16,7 @@ import org.alfresco.repo.jscript.BaseScopableProcessorExtension;
 public class ScriptRMCaveatConfigService extends BaseScopableProcessorExtension
 {
     private RMCaveatConfigService caveatConfigService;
+    private AuthorityService authorityService;
 
     public void setCaveatConfigService(RMCaveatConfigService rmCaveatConfigService)
     {
@@ -26,6 +28,16 @@ public class ScriptRMCaveatConfigService extends BaseScopableProcessorExtension
         return caveatConfigService;
     }
     
+    public void setAuthorityService(AuthorityService authorityService)
+    {
+        this.authorityService = authorityService;
+    }
+
+    public AuthorityService getAuthorityService()
+    {
+        return authorityService;
+    }
+    
     public ScriptConstraint getConstraint(String listName)
     {
         //TODO Temporary conversion
@@ -35,7 +47,7 @@ public class ScriptRMCaveatConfigService extends BaseScopableProcessorExtension
         
         if(info != null)
         {
-            return new ScriptConstraint(info, caveatConfigService);
+            return new ScriptConstraint(info, caveatConfigService, getAuthorityService());
         }
         
         return null;
@@ -48,7 +60,7 @@ public class ScriptRMCaveatConfigService extends BaseScopableProcessorExtension
         List<ScriptConstraint> vals = new ArrayList<ScriptConstraint>(values.size());
         for(RMConstraintInfo value : values)
         {
-            ScriptConstraint c = new ScriptConstraint(value, caveatConfigService);
+            ScriptConstraint c = new ScriptConstraint(value, caveatConfigService, getAuthorityService());
             vals.add(c);
         }
         
@@ -113,7 +125,7 @@ public class ScriptRMCaveatConfigService extends BaseScopableProcessorExtension
         }
         
         RMConstraintInfo info = caveatConfigService.addRMConstraint(listName, title, allowedValues);
-        ScriptConstraint c = new ScriptConstraint(info, caveatConfigService);
+        ScriptConstraint c = new ScriptConstraint(info, caveatConfigService, getAuthorityService());
         return c;  
     }
     
@@ -123,7 +135,9 @@ public class ScriptRMCaveatConfigService extends BaseScopableProcessorExtension
         String xxx = listName.replace("_", ":");
         
         RMConstraintInfo info = caveatConfigService.updateRMConstraint(xxx, title, allowedValues);
-        ScriptConstraint c = new ScriptConstraint(info, caveatConfigService);
+        ScriptConstraint c = new ScriptConstraint(info, caveatConfigService, getAuthorityService());
         return c;  
     }
+
+
 }

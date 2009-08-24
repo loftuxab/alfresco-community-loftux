@@ -34,9 +34,9 @@
     "values" : [ 
          <#list constraint.values as value>   
          {
-              "valueName":"${value.value}", 
-              "valueTitle":"${value.value}",
-              "authorities" : [ <#list value.authorityNames as authority> { "authorityName" : "${authority}", "authorityTitle" : "${authority}"} <#if authority_has_next>,</#if></#list>]
+              "valueName":"${value.valueName}", 
+              "valueTitle":"${value.valueTitle}",
+              "authorities" : [ <#list value.authorities as authority> { "authorityName" : "${authority.authorityName}", "authorityTitle" : "${authority.authorityTitle}"} <#if authority_has_next>,</#if></#list>]
               } <#if value_has_next>,</#if>
               </#list>
        ]
