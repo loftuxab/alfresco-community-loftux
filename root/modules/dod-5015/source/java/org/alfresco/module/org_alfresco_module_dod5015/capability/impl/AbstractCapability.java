@@ -341,7 +341,7 @@ public abstract class AbstractCapability implements Capability
                 return AccessDecisionVoter.ACCESS_DENIED;
 
             }
-            if (isRecordFolder(voter.getNodeService().getType(nodeRef)))
+            else if (isRecordFolder(voter.getNodeService().getType(nodeRef)))
             {
                 if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.FILE_RECORDS) == AccessStatus.DENIED)
                 {
@@ -356,6 +356,35 @@ public abstract class AbstractCapability implements Capability
                 }
 
                 if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DECLARE_RECORDS) == AccessStatus.DENIED)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("\t\tPermission is denied");
+
+                        Thread.dumpStack();
+                    }
+
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+
+                return AccessDecisionVoter.ACCESS_GRANTED;
+
+            }
+            else if (isRecordCategory(voter.getNodeService().getType(nodeRef)))
+            {
+                if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.FILE_RECORDS) == AccessStatus.DENIED)
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("\t\tPermission is denied");
+
+                        Thread.dumpStack();
+                    }
+
+                    return AccessDecisionVoter.ACCESS_DENIED;
+                }
+
+                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS) == AccessStatus.DENIED)
                 {
                     if (logger.isDebugEnabled())
                     {
@@ -693,7 +722,7 @@ public abstract class AbstractCapability implements Capability
         }
         return false;
     }
-    
+
     public boolean isScheduledForDestruction(NodeRef nodeRef)
     {
         // The record is all set up for destruction
@@ -727,13 +756,13 @@ public abstract class AbstractCapability implements Capability
         }
         return false;
     }
-    
+
     public boolean hasDispositionSchedule(NodeRef nodeRef)
     {
         DispositionSchedule dispositionSchedule = voter.getRecordsManagementService().getDispositionSchedule(nodeRef);
         return dispositionSchedule != null;
     }
-    
+
     public boolean isRecordLevelDisposition(NodeRef nodeRef)
     {
         DispositionSchedule dispositionSchedule = voter.getRecordsManagementService().getDispositionSchedule(nodeRef);

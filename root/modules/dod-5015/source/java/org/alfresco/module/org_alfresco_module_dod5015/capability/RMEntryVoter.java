@@ -310,9 +310,9 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     public void init()
     {
-        
+
     }
-    
+
     /**
      * Set the permission service
      * 
@@ -1176,7 +1176,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         {
             System.out.println(capability.getName());
             AccessStatus status = capability.hasPermission(nodeRef);
-            if(answer.put(capability, status) != null)
+            if (answer.put(capability, status) != null)
             {
                 throw new IllegalStateException();
             }
@@ -1189,7 +1189,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     {
         return capabilities.values();
     }
-    
+
     public Capability getCapability(String name)
     {
         return capabilities.get(name);
@@ -1502,7 +1502,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             }
             typeString = st.nextToken();
 
-            if (!(typeString.equals(RM) || typeString.equals(RM_ALLOW) || typeString.equals(RM_CAP) || typeString.equals(RM_DENY) || typeString.equals(RM_QUERY)))
+            if (!(typeString.equals(RM) || typeString.equals(RM_ALLOW) || typeString.equals(RM_CAP) || typeString.equals(RM_DENY) || typeString.equals(RM_QUERY) || typeString.equals(RM_ABSTAIN)))
             {
                 throw new ACLEntryVoterException("Invalid type: must be ACL_NODE, ACL_PARENT or ACL_ALLOW");
             }
@@ -1609,14 +1609,20 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         {
             NodeRef updatee = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(0), cad.parent);
             QName aspectQName = null;
-            if (cad.parameters.get(1) > -1)
+            if (cad.parameters.size() > 1)
             {
-                aspectQName = getQName(invocation, params, cad.parameters.get(1));
+                if (cad.parameters.get(1) > -1)
+                {
+                    aspectQName = getQName(invocation, params, cad.parameters.get(1));
+                }
             }
             Map<QName, Serializable> properties = null;
-            if (cad.parameters.get(2) > -1)
+            if (cad.parameters.size() > 2)
             {
-                properties = getProperties(invocation, params, cad.parameters.get(2));
+                if (cad.parameters.get(2) > -1)
+                {
+                    properties = getProperties(invocation, params, cad.parameters.get(2));
+                }
             }
             return voter.getUpdateCapability().evaluate(updatee, aspectQName, properties);
         }
