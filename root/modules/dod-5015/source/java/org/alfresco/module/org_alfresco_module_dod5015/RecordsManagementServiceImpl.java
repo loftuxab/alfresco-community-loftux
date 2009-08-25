@@ -56,6 +56,7 @@ import org.alfresco.util.GUID;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.util.comparator.NullSafeComparator;
 
 /**
  * Records management service implementation
@@ -189,19 +190,23 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     /**
      * Called after a vitalRecordDefinition property has been updated.
      */
-    public void onChangeToVRDefinition(NodeRef node, Map<QName, Serializable> oldProps,
-                                       Map<QName, Serializable> newProps)
+    public void onChangeToVRDefinition(NodeRef node, Map<QName, Serializable> oldProps, Map<QName, Serializable> newProps)
     {
-        rmActionService.executeRecordsManagementAction(node, "broadcastVitalRecordDefinition");
+        if (nodeService.exists(node) == true)
+        {
+            rmActionService.executeRecordsManagementAction(node, "broadcastVitalRecordDefinition");
+        }
     }
     
     /**
      * Called after any Records Management property has been updated.
      */
-    public void onChangeToAnyRmProperty(NodeRef node, Map<QName, Serializable> oldProps,
-                                       Map<QName, Serializable> newProps)
+    public void onChangeToAnyRmProperty(NodeRef node, Map<QName, Serializable> oldProps, Map<QName, Serializable> newProps)
     {
-    	this.lookupAndExecuteScripts(node, oldProps, newProps);
+        if (nodeService.exists(node) == true)
+        {
+            this.lookupAndExecuteScripts(node, oldProps, newProps);
+        }
     }
     
     /**
@@ -742,15 +747,15 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     	Set<QName> result = new HashSet<QName>();
     	for (QName qn : oldProps.keySet())
     	{
-    		if (!newProps.containsKey(qn) ||
-    		        !oldProps.get(qn).equals(newProps.get(qn)))
+    	    if (newProps.get(qn) == null ||
+    		    newProps.get(qn).equals(oldProps.get(qn)) == false)
     		{
     		    result.add(qn);
     		}
     	}
         for (QName qn : newProps.keySet())
         {
-            if (!oldProps.containsKey(qn))
+            if (oldProps.get(qn) == null)
             {
                 result.add(qn);
             }
