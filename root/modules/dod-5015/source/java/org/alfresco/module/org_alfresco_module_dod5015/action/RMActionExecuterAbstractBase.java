@@ -176,8 +176,6 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
         this.recordsManagementEventService = recordsManagementEventService;
     }
     
-    
-    
     public void setCapability(AbstractCapability capability)
     {
         this.capability = capability;
