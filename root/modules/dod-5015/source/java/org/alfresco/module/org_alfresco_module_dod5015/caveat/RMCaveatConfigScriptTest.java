@@ -194,28 +194,27 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
         caveatConfigService.deleteRMConstraint(RM_LIST);
 
         /**
-         * 
-         */
- 
-        JSONArray array = new JSONArray();
-        array.put("NOFORN");
-        array.put("FGI");
-        
-        JSONObject obj = new JSONObject();
-        obj.put("allowedValues", array);
-        obj.put("constraintName", RM_LIST);
-        obj.put("constraintTitle", "this is the title");
-        
-        System.out.println(obj.toString());
-        
-        /**
-         * Now do a post to create a new list
+         * create a new list 
          */
         {
-            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
-            // Check the response
+            JSONArray array = new JSONArray();
+            array.put("NOFORN");
+            array.put("FGI");
         
-        }
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+            obj.put("constraintName", RM_LIST);
+            obj.put("constraintTitle", "this is the title");
+        
+            System.out.println(obj.toString());
+        
+            /**
+             * Now do a post to create a new list
+             */
+            
+            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
+                // Check the response 
+       }
         
         /**
          * Now go and get the constraint 
@@ -243,10 +242,83 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
         /**
          * Now a constraint with a generated name
          */
+        {
+            JSONArray array = new JSONArray();
+            array.put("NOFORN");
+            array.put("FGI");
+        
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+            obj.put("constraintTitle", "Generated title list");
+        
+            System.out.println(obj.toString());
+        
+            /**
+             * Now do a post to create a new list
+             */  
+            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
+            JSONObject top = new JSONObject(response.getContentAsString());
+            
+            JSONObject data = top.getJSONObject("data");
+            System.out.println(response.getContentAsString());
+            // Check the response 
+       }
+
         
         /**
-         * Negative tests - duplicate list
+         * Now a constraint with an empty list of values.
          */
+        {
+            JSONArray array = new JSONArray();
+
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+            obj.put("constraintName", "rma_whazoo");
+            obj.put("constraintTitle", "this is the title");
+        
+            System.out.println(obj.toString());
+        
+            /**
+             * Now do a post to create a new list
+             */
+            
+            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
+            JSONObject top = new JSONObject(response.getContentAsString());
+            
+            JSONObject data = top.getJSONObject("data");
+            System.out.println(response.getContentAsString());
+
+            // Check the response 
+       }
+
+        
+//        /**
+//         * Negative tests - duplicate list
+//         */
+//        {
+//            JSONArray array = new JSONArray();
+//            array.put("NOFORN");
+//            array.put("FGI");
+//        
+//            JSONObject obj = new JSONObject();
+//            obj.put("allowedValues", array);
+//            obj.put("constraintName", RM_LIST);
+//            obj.put("constraintTitle", "this is the title");
+//        
+//            System.out.println(obj.toString());
+//        
+//            /**
+//             * Now do a post to create a new list
+//             */
+//            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
+//           JSONObject top = new JSONObject(response.getContentAsString());
+//            
+//            JSONObject data = top.getJSONObject("data");
+//            System.out.println(response.getContentAsString());
+//
+//            // Check the response 
+//       }
+
            
     }
     
@@ -271,29 +343,128 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
 
 
         /**
-         * 
+         * Do a post to update values.
          */
  
-        JSONArray array = new JSONArray();
-        array.put("NOFORN");
-        array.put("NOCONTRACT");
-        
-        JSONObject obj = new JSONObject();
-        obj.put("allowedValues", array);
-        obj.put("constraintName", RM_LIST);
-        obj.put("constraintTitle", "this is the new title");
-        
-        System.out.println(obj.toString());
-        
-        /**
-         * Now do a post to create a new list
-         */
         {
+            JSONArray array = new JSONArray();
+            array.put("NOFORN");
+            array.put("NOCONTRACT");
+        
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+            obj.put("constraintName", RM_LIST);
+            obj.put("constraintTitle", "this is the new title");
+        
+            System.out.println(obj.toString());
+        
+            /**
+              * Now do a post to update list
+              */
             Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + RM_LIST, obj.toString(), "application/json"), Status.STATUS_OK); 
             // Check the response
+            JSONObject top = new JSONObject(response.getContentAsString());
+            
+            JSONObject data = top.getJSONObject("data");
+            System.out.println(response.getContentAsString());
         
         }
         
+        /**
+         * Now put without allowed values
+         */
+        {
+        
+            JSONObject obj = new JSONObject();
+
+            obj.put("constraintName", RM_LIST);
+            obj.put("constraintTitle", "this is the new title");
+        
+            System.out.println(obj.toString());
+        
+            /**
+              * Now do a put to update a new list
+              */
+            
+                Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + RM_LIST, obj.toString(), "application/json"), Status.STATUS_OK); 
+                // Check the response
+                JSONObject top = new JSONObject(response.getContentAsString());
+                
+                JSONObject data = top.getJSONObject("data");
+                System.out.println(response.getContentAsString());
+        }
+        
+        /**
+         * Now post without constraint Title
+         */
+        {
+            JSONArray array = new JSONArray();
+            array.put("NOFORN");
+            array.put("NOCONTRACT");
+        
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+        
+            System.out.println(obj.toString());
+        
+            /**
+              * Now do a Put to update the list - title should remain
+              */
+            
+                Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + RM_LIST, obj.toString(), "application/json"), Status.STATUS_OK); 
+                // Check the response
+                JSONObject top = new JSONObject(response.getContentAsString());
+                
+                JSONObject data = top.getJSONObject("data");
+                System.out.println(response.getContentAsString());
+        }
+        
+        /**
+         * Add a new value (FGI) to the list
+         */
+        {
+            JSONArray array = new JSONArray();
+            array.put("NOFORN");
+            array.put("NOCONTRACT");
+            array.put("FGI");
+        
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+        
+            System.out.println(obj.toString());
+        
+            /**
+              * Now do a post to create a new list
+              */
+            
+                Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + RM_LIST, obj.toString(), "application/json"), Status.STATUS_OK); 
+                // Check the response
+                JSONObject top = new JSONObject(response.getContentAsString());
+                
+                JSONObject data = top.getJSONObject("data");
+                System.out.println(response.getContentAsString());
+        }
+        
+        /**
+         * Remove a value (NOFORN) from the list
+         */
+        {
+            JSONArray array = new JSONArray();
+            array.put("NOCONTRACT");
+            array.put("FGI");
+        
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+        
+            System.out.println(obj.toString());
+                    
+            Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + RM_LIST, obj.toString(), "application/json"), Status.STATUS_OK); 
+            // Check the response
+            JSONObject top = new JSONObject(response.getContentAsString());
+                
+            JSONObject data = top.getJSONObject("data");
+            System.out.println(response.getContentAsString());
+        }
               
     }
     
@@ -606,6 +777,5 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
             sendRequest(new DeleteRequest(URL_RM_CONSTRAINTS + "/" + "rma_wibble"), Status.STATUS_NOT_FOUND);    
         }
     }
-    
 }
 

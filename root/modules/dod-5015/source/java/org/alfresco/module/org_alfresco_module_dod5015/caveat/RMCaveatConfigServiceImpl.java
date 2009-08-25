@@ -256,10 +256,12 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                         
                         QName conQName = QName.resolveToQName(namespaceService, conStr);
                         
-                        if (! QName.splitPrefixedQName(conStr)[0].equals(RecordsManagementModel.RM_PREFIX))
-                        {
-                            throw new AlfrescoRuntimeException("Unexpected prefix: "+ conStr +" (expected: "+RecordsManagementModel.RM_PREFIX+")");
-                        }
+// TODO MER Commented out - is this neccessary - need to get the "rmc" namespace working.
+                        
+//                        if (! QName.splitPrefixedQName(conStr)[0].equals(RecordsManagementModel.RM_PREFIX))
+//                        {
+//                            throw new AlfrescoRuntimeException("Unexpected prefix: "+ conStr +" (expected: "+RecordsManagementModel.RM_PREFIX+")");
+//                        }
                         
                         
                         Map<String, List<String>> caveatMap = (Map<String, List<String>>)conEntry.getValue();
@@ -297,7 +299,8 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                         
                         if (! found)
                         {
-                            throw new AlfrescoRuntimeException("Constraint does not exist (or is not used) in RM model: "+conStr);
+                            // TODO MER Removed this temporarily to allow testing.
+                            //throw new AlfrescoRuntimeException("Constraint does not exist (or is not used) in RM model: "+conStr);
                         }
                         
                         if (allowedValues != null)
@@ -562,8 +565,16 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
             listName = "rmc:" + UUID.randomUUID().toString();    
         }
         
+        List<String>allowedValues = new ArrayList<String>();
+        for(String value : values)
+        {
+            allowedValues.add(value);
+        }
+        
+        QName listQName = QName.createQName(listName); 
+        
         //TODO 
-        // recordsManagementAdminService.addCustomConstraintDefinition(constraintName, caseSensitive, allowedValues);
+        recordsManagementAdminService.addCustomConstraintDefinition(listQName, true, allowedValues);
         
         Map<String, List<String>> emptyConstraint =  new HashMap<String, List<String>>(0) ;
         caveatConfig.put(listName, emptyConstraint);
@@ -573,21 +584,16 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
     }
     
     /**
-     * delete RM Constraint Name
+     * delete RM Constraint List
      * 
      * @param listName the name of the RMConstraintList
      */
     public void deleteRMConstraint(String listName)
     {
+        QName listQName = QName.createQName(listName); 
         caveatConfig.remove(listName);
         updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));
-        
-        // TODO
-        //if (getCustomConstraintDefinition(new QName()) != null)
-        //{
-        //    recordsManagementAdminService.removeCustomConstraintDefinition(constraintName);
-        //}
-        
+        recordsManagementAdminService.removeCustomConstraintDefinition(listQName);
     }
     
     private ConstraintDefinition getCustomConstraintDefinition(QName constraintName)
@@ -782,20 +788,23 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
     }
 
     /**
-     * 
+     * Get RM Constraint detail.
      */
-    public RMConstraintInfo getRMConstraint(String name)
+    public RMConstraintInfo getRMConstraint(String listName)
     {
-        // TODO Need to get data from data dictionary
-        //if (getCustomConstraintDefinition(new QName()) != null)
-
+        QName listQName = QName.createQName(listName); 
         
-        if(caveatConfig.keySet().contains(name))
+        ConstraintDefinition dictionaryDef = getCustomConstraintDefinition(listQName);
+        
+        if(caveatConfig.keySet().contains(listName))
         { 
+            // TODO Need to get data from data dictionary
+            //if (getCustomConstraintDefinition(new QName()) != null)
+      
             RMConstraintInfo info = new RMConstraintInfo();
             
-            info.setName(name);
-            info.setTitle("Display title for " + name);
+            info.setName(listName);
+            info.setTitle("Display title for " + listName);
             String[] dummy = new String[3];
             dummy[0]="Alpha";
             dummy[1]="Beta";
@@ -811,20 +820,85 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         }
     }
 
-
-
-    public RMConstraintInfo updateRMConstraint(String listName, String listTitle,
-                String[] allowedValues)
+    /**
+     * Update RM Constraint.
+     * 
+     * @param listName
+     * @param listTitle   The new title for the list, if null then do not update the title.
+     * 
+     */
+    public RMConstraintInfo updateRMConstraintAllowedValues(String listName, String[] allowedValues)
     {
-        //TODO need to update the configuration
-        // recordsManagementAdminService.addCustomConstraintDefinition(constraintName, caseSensitive, allowedValues);
-
+        QName listQName = QName.createQName(listName); 
+        
+        if(allowedValues != null)
+        {
+            /**
+             * Deal with any additions
+             */
+            // TODO Not implemented
+            
+            /**
+             * Deal with any deletions
+             */
+            // TODO Not implemented
+                      
+            List<String>allowedValueList = new ArrayList<String>();
+            for(String value : allowedValues)
+            {
+                allowedValueList.add(value);
+            }
+            recordsManagementAdminService.changeCustomConstraintValues(listQName, allowedValueList);
+        }
+        
         return getRMConstraint(listName);
     }
 
+    /**
+     * Remove a value from a list and cascade delete.
+     */
     public void removeRMConstraintListValue(String listName, String valueName)
     {
+        //TODO need to update the rm constraint definition
+        // recordsManagementAdminService.
+        
+        /**
+         * cascade delete the existing values. 
+         */
+        
+        // members contains member, values[]
+        Map<String, List<String>> members = caveatConfig.get(listName);
+        
+        if(members == null)
+        {
+            // list does not exist
+        }
+        else
+        {
+            // authorities contains authority, values[]
+            // pivot contains value, members[]
+            Map<String, List<String>> pivot = PivotUtil.getPivot(members);
+        
+            // remove all authorities which have this value
+            List<String> existingAuthorities = pivot.get(valueName);
+            if(existingAuthorities != null)
+            {
+                for(String authority : existingAuthorities)
+                {
+                    List<String> vals = members.get(authority);
+                    vals.remove(valueName);
+                }
+            }
+          
+            updateOrCreateCaveatConfig(convertToJSONString(caveatConfig)); 
+        }
     }
-    
-    
+
+    /**
+     * Update the title of this RM Constraint.
+     */
+    public RMConstraintInfo updateRMConstraintTitle(String listName, String newTitle)
+    {
+        return getRMConstraint(listName);
+    }
 }

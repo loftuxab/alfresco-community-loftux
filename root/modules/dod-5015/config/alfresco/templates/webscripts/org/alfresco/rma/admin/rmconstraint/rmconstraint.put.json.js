@@ -13,13 +13,13 @@ function main()
    {
       
       var allowedValues
-      var title
+      var title = null;
       
       if(json.has("constraintTitle"))
       {
-         title = json.get("constraintTitle"); 
+         title = json.get("constraintTitle");
+         constraint.updateTitle(title);
       }
-      
       
       if(json.has("allowedValues"))
       {
@@ -35,14 +35,13 @@ function main()
                allowedValues[i++] = values.get(x);            
             }
          }
-         
+         constraint.updateAllowedValues(allowedValues);
       }
       
-      var constraint = caveatConfig.updateConstraint(shortName, title, allowedValues);
+      var constraint = caveatConfig.getConstraint(shortName);
       
       // Pass the constraint detail to the template
       model.constraint = constraint;
-      
 
    }
    else
