@@ -46,9 +46,9 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Neil McErlean
  */
-public class CustomPropDefinitionsGet extends DeclarativeWebScript
+public class CustomPropertyDefinitionsGet extends DeclarativeWebScript
 {
-    private static Log logger = LogFactory.getLog(CustomPropDefinitionsGet.class);
+    private static Log logger = LogFactory.getLog(CustomPropertyDefinitionsGet.class);
     private RecordsManagementAdminService rmAdminService;
     
     public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)

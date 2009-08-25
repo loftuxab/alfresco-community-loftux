@@ -257,7 +257,7 @@
     </bean>
 
     <!-- REST impl for GET Custom Property Definitions -->
-    <bean id="webscript.org.alfresco.rma.custompropdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropDefinitionsGet" parent="webscript">
+    <bean id="webscript.org.alfresco.rma.custompropdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropertyDefinitionsGet" parent="webscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
 
