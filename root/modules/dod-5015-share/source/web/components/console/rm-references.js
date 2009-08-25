@@ -218,6 +218,7 @@
              */
             renderCellActions = function ViewPanelHandler__setupDataTable_renderCellActions(elCell, oRecord, oColumn, oData)
             {
+               /*
                var editBtn = new YAHOO.widget.Button(
                {
                   container: elCell,
@@ -231,6 +232,7 @@
                   label: parent.msg("button.delete")
                });
                deleteBtn.on("click", me.onDeleteReferenceClick, oRecord, me);
+               */
             };
 
             // DataTable column defintions
