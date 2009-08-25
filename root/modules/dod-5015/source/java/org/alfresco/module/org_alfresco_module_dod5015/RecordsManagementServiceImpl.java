@@ -38,6 +38,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementA
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -205,11 +206,17 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
      */
     public List<NodeRef> getRecordsManagementRoots()
     {
-        SearchService searchService = serviceRegistry.getSearchService();
-        StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-        String query = "ASPECT:\"" + ASPECT_RECORDS_MANAGEMENT_ROOT + "\"";        
-        ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, query);
-        return resultSet.getNodeRefs();
+        return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<List<NodeRef>>()
+        {
+            public List<NodeRef> doWork() throws Exception
+            {
+                SearchService searchService = serviceRegistry.getSearchService();
+                StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+                String query = "ASPECT:\"" + ASPECT_RECORDS_MANAGEMENT_ROOT + "\"";        
+                ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, query);
+                return resultSet.getNodeRefs();
+            }
+        }, AuthenticationUtil.getAdminUserName());        
     }
     
     /**
