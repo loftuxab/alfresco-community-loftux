@@ -53,6 +53,9 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.GUID;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * Records management service implementation
@@ -60,7 +63,8 @@ import org.alfresco.util.GUID;
  * @author Roy Wetherall
  */
 public class RecordsManagementServiceImpl implements RecordsManagementService,
-                                                     RecordsManagementModel
+                                                     RecordsManagementModel,
+                                                     ApplicationContextAware
 {
     /** Service registry */
     private RecordsManagementServiceRegistry serviceRegistry;
@@ -78,11 +82,14 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     private RecordsManagementActionService rmActionService;
     
     /** Configured simple events */
-    Properties configuredSimpleEvents;
+    private Properties configuredSimpleEvents;
 
     /** Well-known location of the scripts folder. */
     private NodeRef scriptsFolderNodeRef = new NodeRef("workspace", "SpacesStore", "rm_scripts");
 
+    /** Application context */
+    private ApplicationContext applicationContext;
+    
     /**
      * Set the service registry service
      * 
@@ -229,7 +236,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         {
             public List<NodeRef> doWork() throws Exception
             {
-                SearchService searchService = serviceRegistry.getSearchService();
+                SearchService searchService = (SearchService)applicationContext.getBean("searchService");
                 StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
                 String query = "ASPECT:\"" + ASPECT_RECORDS_MANAGEMENT_ROOT + "\"";        
                 ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, query);
@@ -655,6 +662,14 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         {
             return GUID.generate();
         }
+    }
+    
+    /**
+     * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
+     */
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    {
+        this.applicationContext = applicationContext;
     }
 
     
