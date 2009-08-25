@@ -1,14 +1,23 @@
 <script type="text/javascript" charset="utf-8">
- new Alfresco.RM.References("${args.htmlid}").setMessages(${messages});
+ new Alfresco.RM.References("${args.htmlid}").setOptions({
+    siteId: "${page.url.templateArgs.site!""}",
+    nodeRef: "${page.url.args.nodeRef!""}",
+    parentNodeRef: "${page.url.args.parentNodeRef!""}",
+    docName: "${page.url.args.docName!""}"
+ }).setMessages(${messages});
 </script>
 <div id="${args.htmlid}" class="manageReferences">
-   <h2 class="title">${msg("label.title",'NAME HERE')}</h2>
+   <h2 class="title">${msg("label.title",'${page.url.args.docName!""}')}</h2>
    <button type="button" id="manageReferences-newReference" name="manageReferences-newReference" value="newRef" class="newRef">${msg('label.new-reference')}</button>
+       <#if (references?size > 0)>
        <ol>
            <#list references as ref>
-           <li><span>${ref.displayName?html}</span><button id="editReference-but-${ref.id?html}" class="editRef refAction" value="${ref.id?html}">${msg('label.edit')}</button><button id="deleteReference-but-${ref.id?html}" class="deleteRef refAction" value="delete-id">${msg('label.delete')}</button></li>
+           <li><span>${ref.displayName?html}</span><button id="deleteReference-but-${ref_index}" class="deleteRef refAction" value="${ref.id}">${msg('label.delete')}</button></li>
            </#list>
        </ol>
+       </#if>
+       <p id="no-refs" <#if (references?size == 0)>class="active"</#if>">${msg('label.no-references')}<p>
+
        <div class="componentFtr">
           <button id="manageReferences-doneRef" class="doneRef refAction" value="done">${msg('label.done')}</button>
        </div>

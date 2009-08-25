@@ -25,17 +25,13 @@
 {
   clear:both;
   padding: 1em 0.5em 1em 3em;
-  background:url();
+  background: transparent url(../../components/images/generic-file-32.png) no-repeat scroll 4px 7px;
   text-align: right;
   border-bottom: 1px solid #999;
 }
 .manageReferences li:last-child 
 {
   border-bottom: none;
-}
-.manageReferences li:hover 
-{
-  background-color:#ccc;
 }
 .manageReferences ol li span 
 {
@@ -54,4 +50,12 @@
    width:100%;
    text-align:center;
 }
-/*.manageReferences div#componentFtr*/
+.manageReferences p#no-refs
+{
+   text-align: left;
+   display:none;
+}
+.manageReferences p#no-refs.active
+{
+   display:block;
+}
