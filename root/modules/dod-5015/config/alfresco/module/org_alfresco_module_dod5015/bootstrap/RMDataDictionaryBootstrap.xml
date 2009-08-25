@@ -48,7 +48,7 @@
                   <cm:title>rm_event_config.json</cm:title>
                   <cm:name>rm_event_config.json</cm:name>
                </view:properties>
-           </cm:content>
+            </cm:content>
 
            <cm:dictionaryModel view:childName="cm:recordsCustomModel.xml">
                <view:aspects>
@@ -73,8 +73,38 @@
 	              <cm:modelActive>true</cm:modelActive>
             
               </view:properties>
-          </cm:dictionaryModel>
+           </cm:dictionaryModel>
            
+	       <cm:folder view:childName="cm:records_management_scripts">
+	          <view:properties>
+	             <sys:store-protocol>workspace</sys:store-protocol>
+	             <sys:store-identifier>SpacesStore</sys:store-identifier>
+	             <sys:node-uuid>rm_scripts</sys:node-uuid>
+	             <cm:name>Records Management Scripts</cm:name>
+	             <cm:title>Records Management Scripts</cm:title>
+	             <cm:description>Scripts intended for execution in response to RM events.</cm:description>
+	          </view:properties>
+	          <view:associations>
+	             <cm:contains>
+	                <!-- TODO Will likely remove this script. Here for test purposes.
+	                          Or perhaps replace it with a product-ready script -->
+	                <cm:content view:childName="cm:rma_isClosed.js">
+	                   <view:aspects>
+	                      <cm:titled></cm:titled>
+	                   </view:aspects>
+	                   <view:properties>
+	                      <sys:store-protocol>workspace</sys:store-protocol>
+	                      <sys:store-identifier>SpacesStore</sys:store-identifier>
+	                      <cm:description>Records management sample script.</cm:description>
+	                      <cm:content>contentUrl=classpath:alfresco/module/org_alfresco_module_dod5015/bootstrap/content/rma_isClosed.js|mimetype=text/javascript|encoding=UTF-8</cm:content>
+	                      <cm:title>rma_isClosed.js</cm:title>
+	                      <cm:name>rma_isClosed.js</cm:name>
+	                   </view:properties>
+	               </cm:content>
+	             </cm:contains>
+	          </view:associations>
+	       </cm:folder>
+
          </cm:contains>
       </view:associations>
         

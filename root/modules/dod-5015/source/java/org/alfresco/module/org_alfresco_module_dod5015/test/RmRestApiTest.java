@@ -393,7 +393,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertNotNull("JSON 'data' object was null", dataObj);
         
         JSONArray customRefsObj = (JSONArray)dataObj.get("customReferences");
-        assertNotNull("JSON 'customProperties' object was null", customRefsObj);
+        assertNotNull("JSON 'customReferences' object was null", customRefsObj);
 
         assertTrue("There should be at least two custom references. Found " + customRefsObj, customRefsObj.length() >= 2);
 
@@ -489,6 +489,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     
     public void testPostCustomProperty() throws Exception
     {
+    	//TODO Strip out the rmc prefix below
         final String propertyName = "rmc:customProperty" + System.currentTimeMillis();
         
         String jsonString = new JSONStringer().object()
