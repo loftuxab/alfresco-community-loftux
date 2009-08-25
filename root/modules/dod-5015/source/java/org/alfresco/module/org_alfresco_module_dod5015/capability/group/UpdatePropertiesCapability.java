@@ -88,6 +88,10 @@ public class UpdatePropertiesCapability extends AbstractCapability
         {
             return AccessDecisionVoter.ACCESS_GRANTED;
         }
+        if(voter.getCreateModifyRecordsInCuttoffFoldersCapability().evaluate(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+        {
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
         return AccessDecisionVoter.ACCESS_DENIED;
     }
 
