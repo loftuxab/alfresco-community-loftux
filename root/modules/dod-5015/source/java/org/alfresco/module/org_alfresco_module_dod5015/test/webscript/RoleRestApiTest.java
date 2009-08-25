@@ -122,7 +122,7 @@ public class RoleRestApiTest extends BaseWebScriptTest implements RecordsManagem
             assertEquals("My Test Role Too", roleObj.get("displayLabel"));
             caps = roleObj.getJSONArray("capabilities");
             assertNotNull(caps);
-            assertEquals(5, caps.length());
+            assertEquals(5, caps.length());                       
         }
         finally
         {
@@ -204,7 +204,10 @@ public class RoleRestApiTest extends BaseWebScriptTest implements RecordsManagem
             assertEquals("Changed", roleObj.get("displayLabel"));
             JSONArray bob = roleObj.getJSONArray("capabilities");
             assertNotNull(bob);
-            assertEquals(4, bob.length());         
+            assertEquals(4, bob.length());      
+            
+            // Bad requests
+            sendRequest(new PutRequest(GET_ROLES_URL + "/cheese", obj.toString(), APPLICATION_JSON), 404);   
         }
         finally
         {
@@ -234,7 +237,10 @@ public class RoleRestApiTest extends BaseWebScriptTest implements RecordsManagem
             assertEquals("My Test Role", roleObj.get("displayLabel"));
             JSONArray caps = roleObj.getJSONArray("capabilities");
             assertNotNull(caps);
-            assertEquals(5, caps.length());         
+            assertEquals(5, caps.length());       
+            
+            // Bad requests
+            sendRequest(new GetRequest(GET_ROLES_URL + "/cheese"), 404);
         }
         finally
         {
@@ -251,7 +257,10 @@ public class RoleRestApiTest extends BaseWebScriptTest implements RecordsManagem
         rmSecurityService.createRole(rmRootNode, role1, "My Test Role", getListOfCapabilities(5));        
         assertTrue(rmSecurityService.existsRole(rmRootNode, role1));        
         sendRequest(new DeleteRequest(GET_ROLES_URL + "/" + role1),200);        
-        assertFalse(rmSecurityService.existsRole(rmRootNode, role1));        
+        assertFalse(rmSecurityService.existsRole(rmRootNode, role1));     
+        
+        // Bad request
+        sendRequest(new DeleteRequest(GET_ROLES_URL + "/cheese"), 404);  
     }
     
     private Set<Capability> getListOfCapabilities(int size)

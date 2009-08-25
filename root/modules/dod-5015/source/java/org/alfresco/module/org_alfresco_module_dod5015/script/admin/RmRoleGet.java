@@ -27,11 +27,9 @@ package org.alfresco.module.org_alfresco_module_dod5015.script.admin;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
-import org.alfresco.module.org_alfresco_module_dod5015.security.Role;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
@@ -48,6 +46,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RmRoleGet extends DeclarativeWebScript
 {
+    @SuppressWarnings("unused")
     private static Log logger = LogFactory.getLog(RmRoleGet.class);
     
     private RecordsManagementService rmService;
@@ -76,8 +75,16 @@ public class RmRoleGet extends DeclarativeWebScript
             throw new WebScriptException(Status.STATUS_NOT_FOUND, "No role name was provided on the URL.");
         }
         
+        // Get the root records management node
+        // TODO this should be passed
         List<NodeRef> roots = rmService.getRecordsManagementRoots();
         NodeRef root = roots.get(0);
+        
+        // Check that the role exists
+        if (rmSecurityService.existsRole(root, roleParam) == false)
+        {
+            throw new WebScriptException(Status.STATUS_NOT_FOUND, "The role " + roleParam + " does not exist on the records managment root " + root);
+        }
         
         model.put("role", rmSecurityService.getRole(root, roleParam));
         

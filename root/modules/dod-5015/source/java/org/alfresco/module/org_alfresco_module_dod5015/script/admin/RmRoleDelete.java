@@ -46,6 +46,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RmRoleDelete extends DeclarativeWebScript
 {
+    @SuppressWarnings("unused")
     private static Log logger = LogFactory.getLog(RmRoleDelete.class);
     
     private RecordsManagementService rmService;
@@ -76,6 +77,12 @@ public class RmRoleDelete extends DeclarativeWebScript
         
         List<NodeRef> roots = rmService.getRecordsManagementRoots();
         NodeRef root = roots.get(0);
+     
+        // Check that the role exists
+        if (rmSecurityService.existsRole(root, roleParam) == false)
+        {
+            throw new WebScriptException(Status.STATUS_NOT_FOUND, "The role " + roleParam + " does not exist on the records managment root " + root);
+        }
         
         rmSecurityService.deleteRole(root, roleParam);
         
