@@ -137,9 +137,9 @@
       };
       
       return this;
-   }
+   };
    
-   Alfresco.ConsoleTool.prototype =
+   YAHOO.extend(Alfresco.ConsoleTool, Alfresco.component.Base,
    {
       /**
        * Object container for storing YUI widget instances.
@@ -180,33 +180,7 @@
        * @type string
        */
       currentPanelId: "",
-      
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.ConsoleTool} returns 'this' for method chaining
-       */
-      setOptions: function ConsoleTool_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.ConsoleTool} returns 'this' for method chaining
-       */
-      setMessages: function ConsoleTool_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-   
+
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -440,5 +414,5 @@
       {
          YAHOO.util.History.navigate("state", this.encodeHistoryState(state));
       }
-   };
+   });
 })();
