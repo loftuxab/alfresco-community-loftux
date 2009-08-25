@@ -765,6 +765,12 @@
             <property name="rma:recordSearchDispositionEvents">
                <type>d:text</type>           
                <multiple>true</multiple>   
+            </property>                          
+            <property name="rma:recordSearchVitalRecordReviewPeriod">
+               <type>d:text</type>         
+            </property>                                                    
+            <property name="rma:recordSearchVitalRecordReviewPeriodExpression">
+               <type>d:text</type>         
             </property>  
          </properties>
       </aspect>

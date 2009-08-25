@@ -422,7 +422,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         System.out.println("Disposition as of: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
         
         // Check for the search properties having been populated
-        checkSearchAspect(ndNodeRef, recordFolder, 0);
+        checkSearchAspect(recordFolder);
         
 	    // Test the declaration of a record by editing properties
         Map<QName, Serializable> propValues = new HashMap<QName, Serializable>();   
@@ -542,7 +542,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         //System.out.println("Previous aciont date: " + this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE).toString());
 
         // Check for the search properties having been populated
-        checkSearchAspect(ndNodeRef, recordFolder, 0);
+        checkSearchAspect(recordFolder);
         
         // Execute the destroy action
         ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
@@ -859,24 +859,43 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         txn.commit();
     }
 	
-	private void checkSearchAspect(NodeRef dispositionAction, NodeRef record, int eventCount)
+	private void checkSearchAspect(NodeRef record)
 	{
-        assertTrue(this.nodeService.hasAspect(record, RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH));
-        assertEquals(this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_ACTION),
-                     this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_ACTION_NAME));
-        assertEquals(this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_AS_OF),
-                     this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_ACTION_AS_OF));
-        assertEquals(this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_EVENTS_ELIGIBLE),
-                     this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS_ELIGIBLE));
+	    DispositionAction da = rmService.getNextDispositionAction(record);
+	    if (da != null)
+	    {
+            assertTrue(this.nodeService.hasAspect(record, RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH));
+            assertEquals(da.getName(),
+                         this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_ACTION_NAME));
+            assertEquals(da.getAsOfDate(),
+                         this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_ACTION_AS_OF));
+            assertEquals(this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE),
+                         this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS_ELIGIBLE));
+            
+            int eventCount = da.getEventCompletionDetails().size();
+            Collection<String> events = (Collection<String>)this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS);
+            if (eventCount == 0)
+            {
+                assertNull(events);
+            }
+            else
+            {
+                assertEquals(eventCount, events.size());
+            }
+	    }
         
-        Collection<String> events = (Collection<String>)this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS);
-        if (eventCount == 0)
+        VitalRecordDefinition vrd = this.rmService.getVitalRecordDefinition(record);
+        if (vrd == null)
         {
-            assertNull(events);
+            assertNull(this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD));
+            assertNull(this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD_EXPRESSION));
         }
         else
         {
-            assertEquals(eventCount, events.size());
+            assertEquals(vrd.getReviewPeriod().getPeriodType(),
+                         this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD));
+            assertEquals(vrd.getReviewPeriod().getExpression(),
+                         this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD_EXPRESSION));            
         }
 	}
 
@@ -996,7 +1015,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertNotNull(events);
         assertEquals(3, events.size());
         
-        checkSearchAspect(da.getNodeRef(), recordFolder, 3);
+        checkSearchAspect(recordFolder);
         
         txn.commit();
         txn = transactionService.getUserTransaction(false);
@@ -1012,7 +1031,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
         
-        checkSearchAspect(da.getNodeRef(), recordFolder, 3);
+        checkSearchAspect(recordFolder);
         
         this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
         
@@ -1031,7 +1050,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
         
-        checkSearchAspect(da.getNodeRef(), recordFolder, 3);
+        checkSearchAspect(recordFolder);
         
         this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
         
@@ -1046,7 +1065,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
         
-        checkSearchAspect(da.getNodeRef(), recordFolder, 3);
+        checkSearchAspect(recordFolder);
         
         this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
         
@@ -1066,7 +1085,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             assertNotNull(e.getEventCompletedAt());
         }
         
-        checkSearchAspect(da.getNodeRef(), recordFolder, 3);
+        checkSearchAspect(recordFolder);
         
         // Test undo
         
@@ -1111,7 +1130,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertNotNull(events);
         assertEquals(0, events.size());
         
-        checkSearchAspect(da.getNodeRef(), recordFolder, 0);
+        checkSearchAspect(recordFolder);
         
         txn.commit();
     }
