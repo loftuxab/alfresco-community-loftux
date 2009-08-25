@@ -55,6 +55,7 @@ import org.json.JSONTokener;
  */
 public class RmRolesPost extends DeclarativeWebScript
 {
+    @SuppressWarnings("unused")
     private static Log logger = LogFactory.getLog(RmRolesPost.class);
     
     private RecordsManagementService rmService;

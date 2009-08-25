@@ -47,6 +47,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class RmRolesGet extends DeclarativeWebScript
 {
+    @SuppressWarnings("unused")
     private static Log logger = LogFactory.getLog(RmRolesGet.class);
     
     private RecordsManagementService rmService;

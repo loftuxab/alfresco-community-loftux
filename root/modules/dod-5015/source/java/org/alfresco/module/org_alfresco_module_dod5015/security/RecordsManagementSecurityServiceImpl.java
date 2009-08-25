@@ -187,6 +187,13 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         }, AuthenticationUtil.getAdminUserName());
     }
     
+    /**
+     * Gets the capabilities of a role on a node
+     * 
+     * @param rmRootNode
+     * @param roleAuthority
+     * @return
+     */
     private Set<String> getCapabilities(NodeRef rmRootNode, String roleAuthority)
     {
         Set<AccessPermission> permissions = permissionService.getAllSetPermissions(rmRootNode);

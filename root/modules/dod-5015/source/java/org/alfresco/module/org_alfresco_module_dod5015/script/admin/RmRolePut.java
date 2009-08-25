@@ -55,6 +55,7 @@ import org.json.JSONTokener;
  */
 public class RmRolePut extends DeclarativeWebScript
 {
+    @SuppressWarnings("unused")
     private static Log logger = LogFactory.getLog(RmRolePut.class);
     
     private RecordsManagementService rmService;
@@ -101,6 +102,12 @@ public class RmRolePut extends DeclarativeWebScript
             
             List<NodeRef> roots = rmService.getRecordsManagementRoots();
             NodeRef root = roots.get(0);
+            
+            // Check that the role exists
+            if (rmSecurityService.existsRole(root, roleParam) == false)
+            {
+                throw new WebScriptException(Status.STATUS_NOT_FOUND, "The role " + roleParam + " does not exist on the records managment root " + root);
+            }
             
             Role role = rmSecurityService.updateRole(root, name, displayLabel, capabilites);                      
             model.put("role", role);
