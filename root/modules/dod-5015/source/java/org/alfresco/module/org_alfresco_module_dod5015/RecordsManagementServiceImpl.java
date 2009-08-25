@@ -28,9 +28,12 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
@@ -76,7 +79,10 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     
     /** Configured simple events */
     Properties configuredSimpleEvents;
-    
+
+    /** Well-known location of the scripts folder. */
+    private NodeRef scriptsFolderNodeRef = new NodeRef("workspace", "SpacesStore", "rm_scripts");
+
     /**
      * Set the service registry service
      * 
@@ -144,6 +150,10 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                 ASPECT_SCHEDULED, 
                 new JavaBehaviour(this, "onAddAspect", NotificationFrequency.TRANSACTION_COMMIT));
         
+        // Register script execution behaviour on RM property update.
+        this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"),
+        		ASPECT_FILE_PLAN_COMPONENT,
+                new JavaBehaviour(this, "onChangeToAnyRmProperty", NotificationFrequency.TRANSACTION_COMMIT));
     }
     
     /**
@@ -176,6 +186,15 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                                        Map<QName, Serializable> newProps)
     {
         rmActionService.executeRecordsManagementAction(node, "broadcastVitalRecordDefinition");
+    }
+    
+    /**
+     * Called after any Records Management property has been updated.
+     */
+    public void onChangeToAnyRmProperty(NodeRef node, Map<QName, Serializable> oldProps,
+                                       Map<QName, Serializable> newProps)
+    {
+    	this.lookupAndExecuteScripts(node, oldProps, newProps);
     }
     
     /**
@@ -636,5 +655,98 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         {
             return GUID.generate();
         }
+    }
+
+    
+    /**
+     * This method examines the old and new property sets and for those properties which
+     * have changed, looks for script resources corresponding to those properties.
+     * Those scripts are then called via the ScriptService.
+     * 
+     * @param nodeWithChangedProperties the node whose properties have changed.
+     * @param oldProps the old properties and their values.
+     * @param newProps the new properties and their values.
+     * 
+     * @see #lookupScripts(Map<QName, Serializable>, Map<QName, Serializable>)
+     */
+    private void lookupAndExecuteScripts(NodeRef nodeWithChangedProperties,
+    		Map<QName, Serializable> oldProps, Map<QName, Serializable> newProps)
+    {
+	    List<NodeRef> scriptRefs = lookupScripts(oldProps, newProps);
+	    
+        Map<String, Object> objectModel = new HashMap<String, Object>(1);
+        objectModel.put("node", nodeWithChangedProperties);
+        objectModel.put("oldProperties", oldProps);
+        objectModel.put("newProperties", newProps);
+
+        for (NodeRef scriptRef : scriptRefs)
+        {
+            serviceRegistry.getScriptService().executeScript(scriptRef, null, objectModel);
+        }
+    }
+    
+    /**
+     * This method determines which properties have changed and for each such property
+     * looks for a script resource in a well-known location.
+     * 
+     * @param oldProps the old properties and their values.
+     * @param newProps the new properties and their values.
+     * @return A list of nodeRefs corresponding to the Script resources.
+     * 
+     * @see #determineChangedProps(Map<QName, Serializable>, Map<QName, Serializable>)
+     */
+    private List<NodeRef> lookupScripts(Map<QName, Serializable> oldProps, Map<QName, Serializable> newProps)
+    {
+        List<NodeRef> result = new ArrayList<NodeRef>();
+
+        Set<QName> changedProps = determineChangedProps(oldProps, newProps);
+        for (QName propQName : changedProps)
+        {
+            QName prefixedQName = propQName.getPrefixedQName(serviceRegistry.getNamespaceService());
+
+            String [] splitQName = QName.splitPrefixedQName(prefixedQName.toPrefixString());
+            final String shortPrefix = splitQName[0];
+            final String localName = splitQName[1];
+
+            // This is the filename pattern which is assumed.
+            // e.g. a script file cm_name.js would be called for changed to cm:name
+            String expectedScriptName = shortPrefix + "_" + localName + ".js";
+            
+            NodeRef nextElement = nodeService.getChildByName(scriptsFolderNodeRef, ContentModel.ASSOC_CONTAINS, expectedScriptName);
+            if (nextElement != null) result.add(nextElement);
+        }
+
+    	return result;
+    }
+    
+    /**
+     * This method compares the oldProps map against the newProps map and returns
+     * a set of QNames of the properties that have changed. Changed here means one of
+     * <ul>
+     * <li>the property has been removed</li>
+     * <li>the property has had its value changed</li>
+     * <li>the property has been added</li>
+     * </ul>
+     */
+    private Set<QName> determineChangedProps(Map<QName, Serializable> oldProps, Map<QName, Serializable> newProps)
+    {
+    	Set<QName> result = new HashSet<QName>();
+    	for (QName qn : oldProps.keySet())
+    	{
+    		if (!newProps.containsKey(qn) ||
+    		        !oldProps.get(qn).equals(newProps.get(qn)))
+    		{
+    		    result.add(qn);
+    		}
+    	}
+        for (QName qn : newProps.keySet())
+        {
+            if (!oldProps.containsKey(qn))
+            {
+                result.add(qn);
+            }
+        }
+    	
+    	return result;
     }
 }
