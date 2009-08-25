@@ -2,13 +2,18 @@
 {
 	"data":
 	{
-		"roles":
+		"customProperties":
 		{
-			<#list roles as role>
-			"${role.name}":
+			<#list customProps as prop>
+			"${prop.name.toPrefixString()}":
 			{
-				"name": "${role.name}",
-				"displayLabel": "${role.displayLabel}"
+				"dataType": "<#if prop.dataType??>${prop.dataType.name.toPrefixString()}</#if>",
+				"title": "${prop.title!""}",
+				"description": "${prop.description!""}",
+				"mandatory": ${prop.mandatory?string},
+				"multiValued": ${prop.multiValued?string},
+				"defaultValue": "${prop.defaultValue!""}",
+				"protected": ${prop.protected?string}
 			}<#if prop_has_next>,</#if>
 			</#list>
 		}
