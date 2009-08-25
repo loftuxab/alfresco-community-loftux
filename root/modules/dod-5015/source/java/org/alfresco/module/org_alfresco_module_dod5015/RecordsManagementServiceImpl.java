@@ -232,17 +232,11 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
      */
     public List<NodeRef> getRecordsManagementRoots()
     {
-        return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<List<NodeRef>>()
-        {
-            public List<NodeRef> doWork() throws Exception
-            {
-                SearchService searchService = (SearchService)applicationContext.getBean("searchService");
-                StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-                String query = "ASPECT:\"" + ASPECT_RECORDS_MANAGEMENT_ROOT + "\"";        
-                ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, query);
-                return resultSet.getNodeRefs();
-            }
-        }, AuthenticationUtil.getAdminUserName());        
+        SearchService searchService = (SearchService)applicationContext.getBean("searchService");
+        StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+        String query = "ASPECT:\"" + ASPECT_RECORDS_MANAGEMENT_ROOT + "\"";        
+        ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, query);
+        return resultSet.getNodeRefs();
     }
     
     /**
