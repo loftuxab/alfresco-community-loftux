@@ -57,6 +57,13 @@ public class CreateModifyRecordsInCuttoffFoldersCapability extends AbstractCapab
                         return AccessDecisionVoter.ACCESS_GRANTED;
                     }
                 }
+                if (isRecord(nodeRef))
+                {
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS) == AccessStatus.ALLOWED)
+                    {
+                        return AccessDecisionVoter.ACCESS_GRANTED;
+                    }
+                }
             }
             return AccessDecisionVoter.ACCESS_DENIED;
         }

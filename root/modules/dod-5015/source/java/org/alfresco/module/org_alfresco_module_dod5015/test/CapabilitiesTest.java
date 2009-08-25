@@ -195,7 +195,7 @@ public class CapabilitiesTest extends TestCase
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
         props.put(ContentModel.PROP_NAME, "MyRecord.txt");
         NodeRef recordOne = this.nodeService.createNode(recordFolder, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
-                ContentModel.TYPE_CONTENT).getChildRef();
+                ContentModel.TYPE_CONTENT, props).getChildRef();
 
         // Set the content
         ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
@@ -2325,7 +2325,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
@@ -2391,7 +2391,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
@@ -2457,7 +2457,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
@@ -2522,7 +2522,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
@@ -4962,7 +4962,278 @@ public class CapabilitiesTest extends TestCase
 
     public void testCreateModifyRecordsInCuttoffFoldersCapability()
     {
-        // fail();
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission("rm_security_officer", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkPermission("rm_power_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkPermission("rm_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission("rm_administrator", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission("rm_records_manager", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission("rm_security_officer", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkPermission("rm_power_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkPermission("rm_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        // folder level - no preconditions
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("rm_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_administrator", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_records_manager", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_security_officer", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("rm_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("rm_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_administrator", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_records_manager", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("rm_security_officer", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("rm_power_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("rm_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, "test_user", RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, "test_user", RMPermissionModel.FILING);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+
+        // check frozen
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "freeze", params);
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "unfreeze");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+
+        // Check closed
+        // should make no difference
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        
+        // Check cutoff
+        // should make no difference
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_1, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_1, "declareRecord");
+
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_2, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "declareRecord");
+
+        NodeRef ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        ndNodeRef = this.nodeService.getChildAssocs(record_2, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        
+        
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff");
+
+        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+
+
+        // create
+
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+        properties.put(ContentModel.PROP_NAME, "MyRecordCreate.txt");
+        NodeRef newRecord = this.nodeService.createNode(recordFolder_1, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
+                ContentModel.TYPE_CONTENT, properties).getChildRef();
+
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(newRecord, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+        
+       
+        recordsManagementActionService.executeRecordsManagementAction(newRecord, "file");
+        // modify
+
+        publicNodeService.addAspect(newRecord, ContentModel.ASPECT_OWNABLE, null);
+        properties = new HashMap<QName, Serializable>();
+        properties.put(ContentModel.PROP_OWNER, "me");
+        publicNodeService.addProperties(newRecord, properties);
+        // move should fail ...
+        try
+        {
+            publicNodeService.moveNode(newRecord, recordCategory_2, ContentModel.ASSOC_CONTAINS, DOD5015Model.TYPE_RECORD_FOLDER);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        publicNodeService.removeProperty(newRecord, ContentModel.PROP_TITLE);
+        publicNodeService.setProperty(newRecord, ContentModel.PROP_TITLE, "title");
+        publicNodeService.addAspect(newRecord, ContentModel.ASPECT_TEMPORARY, null);
+        publicNodeService.removeAspect(newRecord, ContentModel.ASPECT_TEMPORARY);
+        publicNodeService.setProperties(newRecord, publicNodeService.getProperties(newRecord));
+        try
+        {
+            // abstains
+            publicNodeService.setType(newRecord, DOD5015Model.TYPE_RECORD_FOLDER);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        
+      
     }
 
     public void testCycleVitalRecordsCapability()
