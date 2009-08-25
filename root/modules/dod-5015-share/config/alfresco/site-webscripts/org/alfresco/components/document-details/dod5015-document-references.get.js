@@ -6,10 +6,9 @@ function getDocReferences()
    if (result.status == 200)
    {
       var data = eval('(' + result.data.customReferences + ')');
-      return data.data.customReferences;
+      return data.data.customReferences
    }
-   else
-   {
+   else {
       return []
    }
 }

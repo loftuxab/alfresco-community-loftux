@@ -63,7 +63,6 @@ Alfresco.RM = Alfresco.RM || {};
    {
       Alfresco.RM.References.superclass.constructor.call(this, "Alfresco.RM.References", htmlId, []);
      
-      // this.eventHandlers = {};
       return this;
    };
     
@@ -76,20 +75,10 @@ Alfresco.RM = Alfresco.RM || {};
        */
       initEvents : function RM_References_initEvents()
       {
-         //requires EventProvider
-         //this.createEvent('newReference')
+
          Event.on(this.id,'click',this.onInteractionEvent, null, this);
 
          this.registerEventHandler('click',[
-            {
-               rule : 'button.editRef',
-               o : {
-                     handler:function editReference(e,args){
-                        alert('editReference');
-                     },
-                     scope : this
-               }
-            },
             {
                rule : 'button.deleteRef',
                o : {
@@ -100,28 +89,93 @@ Alfresco.RM = Alfresco.RM || {};
             {
                rule : 'button.doneRef',
                o : {
-                     handler:function doneReference(e,args){
-                        alert('doneReference');
-                     },
+                     handler:this.onDoneReference,
                      scope : this
                }
             },                       
             {
                rule : 'button.newRef',
                o : {
-                      handler:function newReference(e,args){
-                         alert('newReference');
-                      },
+                      handler:this.onNewReference,
                       scope:this
                    }
             }
          ]);
          return this;
       },
+      /**
+       * Handler for Done button
+       *  
+       */
+      onDoneReference : function RM_References_onDoneReference(e, args)
+      {
+         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/document-details?nodeRef={nodeRef}';
+
+         var pageUrl = YAHOO.lang.substitute(uriTemplate,
+         {
+            site: encodeURIComponent(this.options.siteId),
+            nodeRef: this.options.nodeRef
+         });
+
+         window.location.href = pageUrl;
+      },
+      /**
+       * Handler for delete button
+       *  
+       */
       onDeleteReference : function RM_References_onDeleteReference(e, args)
       {
-         alert('deleteReference');
+         var refId = this.widgets[Event.getTarget(e).id.replace('-button','')].get('value');         
+
+         Alfresco.util.Ajax.jsonRequest(
+         {
+            method: Alfresco.util.Ajax.DELETE,
+            url: Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.replace(':/','')+'/customreferences'+'/'+refId,
+            successCallback:
+            {
+               fn: this.onDeleteSuccess,
+               scope: this
+            },
+            successMessage: Alfresco.util.message("message.delete.success", 'Alfresco.RM.References'),
+            failureMessage: Alfresco.util.message("message.delete.fail", 'Alfresco.RM.References')
+         });
       },
+      
+      /**
+       * Handler for new reference  button 
+       */
+      onNewReference : function RM_References_onNewReference(e, args)
+      {
+        var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/new-rmreference?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}';
+         var url = YAHOO.lang.substitute(uriTemplate,
+         {
+            site: encodeURIComponent(this.options.siteId),
+            nodeRef: this.options.nodeRef,
+            parentNodeRef: this.options.parentNodeRef,
+            docName: encodeURIComponent(this.options.docName)
+         });
+
+         window.location.href = url; 
+      },
+      
+      /**
+       * Handler for deletion success 
+       *  
+       */
+       onDeleteSuccess : function RM_References_onDeleteSuccess(e)
+       {
+          //remove list item
+          var parent = Dom.getAncestorByTagName(Event.getTarget(e),'li');
+          parent.parentNode.removeChild(parent);
+          //if no more references, remove list and display msg
+          if (Sel.query('li', this.id).length==0)
+          {
+             var ol  = (Sel.query('ol', this.id)[0]);
+             ol.parentNode.removeChild(ol);
+             Dom.addClass("no-refs",'active');
+          }
+       },
+       
       /**
        * Fired by YUI when parent element is available for scripting
        * @method onReady

@@ -42,6 +42,10 @@
             <div class="yui-u">
                <@region id=doclibType + "document-actions" scope="template" protected=true />
                <@region id=doclibType + "document-links" scope="template" protected=true />
+               <#if doclibType?starts_with("dod5015")>
+                  <@region id=doclibType + "document-references" scope="template" protected=true />                                 
+               </#if>
+
             </div>
          </div>
       </div>
