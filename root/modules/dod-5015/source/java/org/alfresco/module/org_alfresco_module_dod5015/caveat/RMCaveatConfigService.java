@@ -88,14 +88,22 @@ public interface RMCaveatConfigService
     public RMConstraintInfo addRMConstraint(String listName, String listTitle, String[] allowedValues);
     
     /**
-     * add RM constraint list
+     * update RM constraint list allowed values
      * @param listName the name of the RMConstraintList - can not be changed
+     * @param allowedValues
      */
-    public RMConstraintInfo updateRMConstraint(String listName, String listTitle, String[] allowedValues);
+    public RMConstraintInfo updateRMConstraintAllowedValues(String listName, String[] allowedValues);
+
+    /**
+     * update RM constraint Title
+     * @param listName the name of the RMConstraintList - can not be changed
+     * @param allowedValues
+     */
+    public RMConstraintInfo updateRMConstraintTitle(String listName, String newTitle);
 
     
     /**
-     * delete RM Constraint Name
+     * delete RM Constraint
      * 
      * @param listName the name of the RMConstraintList
      */

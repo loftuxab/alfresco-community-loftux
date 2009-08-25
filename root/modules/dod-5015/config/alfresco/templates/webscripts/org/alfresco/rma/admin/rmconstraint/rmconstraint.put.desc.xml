@@ -7,8 +7,8 @@
    The following properties may be updatedConstraint object
    <BR />
    <dl>
-   <dt>constraintTitle</dt> <dd>the title of the contsraint (Human readable)</dd>
-   <dt>allowedValues</dt> <dd>array of allowed values, the complete list must be specified</dd>
+   <dt>constraintTitle</dt> <dd>Optional, the title of the contsraint (Human readable)</dd>
+   <dt>allowedValues</dt> <dd>Optional, array of allowed values, the complete list must be specified</dd>
    </dl>
    <BR />
 

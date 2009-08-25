@@ -89,6 +89,22 @@ public class ScriptConstraint implements Serializable
     }
     
     /**
+     * updateTitle
+     */
+    public void updateTitle(String newTitle)
+    {
+        rmCaveatconfigService.updateRMConstraintTitle(info.getName(), newTitle)  ;
+    }
+    
+    /**
+     * updateAllowedValues
+     */
+    public void updateAllowedValues(String[] allowedValues)
+    {
+        rmCaveatconfigService.updateRMConstraintAllowedValues(info.getName(), allowedValues);
+    }
+    
+    /**
      * Update a value
      * @param values
      * @param authorities

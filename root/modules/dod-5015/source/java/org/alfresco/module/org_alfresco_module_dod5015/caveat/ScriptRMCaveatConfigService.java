@@ -112,7 +112,7 @@ public class ScriptRMCaveatConfigService extends BaseScopableProcessorExtension
         //TODO Temporary conversion
         String xxx = listName.replace("_", ":");
         
-        caveatConfigService.removeRMConstraintListValue(listName, valueName);
+        caveatConfigService.removeRMConstraintListValue(xxx, valueName);
 
     }
     
@@ -128,16 +128,5 @@ public class ScriptRMCaveatConfigService extends BaseScopableProcessorExtension
         ScriptConstraint c = new ScriptConstraint(info, caveatConfigService, getAuthorityService());
         return c;  
     }
-    
-    public ScriptConstraint updateConstraint(String listName, String title, String[] allowedValues)
-    {    
-        //TODO Temporary conversion
-        String xxx = listName.replace("_", ":");
-        
-        RMConstraintInfo info = caveatConfigService.updateRMConstraint(xxx, title, allowedValues);
-        ScriptConstraint c = new ScriptConstraint(info, caveatConfigService, getAuthorityService());
-        return c;  
-    }
-
 
 }
