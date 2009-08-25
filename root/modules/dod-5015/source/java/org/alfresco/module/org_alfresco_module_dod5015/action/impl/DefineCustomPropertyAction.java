@@ -51,7 +51,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
 
     public static final String PARAM_ELEMENT = "element";
     
-    //TODO Many of these parameters are unnecessary and should be deleted.
+    //TODO Some of these parameters are unnecessary and could be deleted.
     public static final String PARAM_DATATYPE = "dataType";
     public static final String PARAM_TITLE = "title";
     public static final String PARAM_DESCRIPTION = "description";
@@ -69,19 +69,6 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
         Map<String, Serializable> params = action.getParameterValues();
-        if (logger.isDebugEnabled())
-        {
-            StringBuilder msg = new StringBuilder();
-            msg.append("Creating custom property: ");
-            for (String n : params.keySet())
-            {
-                msg.append(n).append(" = ");
-                msg.append(params.get(n));
-                msg.append(LINE_SEPARATOR);
-                //TODO Log where I'm putting it.
-            }
-            logger.debug(msg.toString());
-        }
 
         CustomModelUtil customModelUtil = new CustomModelUtil();
         customModelUtil.setContentService(contentService);
@@ -92,6 +79,21 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         String customisableElement = (String)params.get(PARAM_ELEMENT);
         CustomisableRmElement ce = CustomisableRmElement.getEnumFor(customisableElement);
         String aspectName = ce.getCorrespondingAspect();
+
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("Creating [")
+                .append(ce.toString())
+                .append("] custom property:");
+            for (String n : params.keySet())
+            {
+                msg.append(n).append(" = ");
+                msg.append(params.get(n));
+                msg.append(LINE_SEPARATOR);
+            }
+            logger.debug(msg.toString());
+        }
 
         M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
 
@@ -104,6 +106,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         M2Property newProp = customPropsAspect.createProperty(propQNameAsString);
         newProp.setName(qname);
 
+        //TODO According to the wireframes, type here can only be date|text|number
         Serializable serializableType = params.get(PARAM_DATATYPE);
         QName type = null;
         if (serializableType instanceof String)
@@ -120,6 +123,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         newProp.setDescription((String)params.get(PARAM_DESCRIPTION));
         newProp.setDefaultValue((String)params.get(PARAM_DEFAULT_VALUE));
 
+        // 'mandatory' should be an available parameter.
         Serializable serializableParam = params.get(PARAM_MANDATORY);
         if (serializableParam != null)
         {
