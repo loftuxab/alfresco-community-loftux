@@ -57,7 +57,8 @@
         </property>
         <property name="objectDefinitionSource">
             <value>
-                <![CDATA[  
+                <![CDATA[
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getRecordsManagementRoots=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getRecordsManagementRoot=RM.Read.0,AFTER_RM.FilterNode
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isRecord=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isRecordDeclared=RM.Read.0

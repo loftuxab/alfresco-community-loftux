@@ -65,8 +65,6 @@ public class RmRolesGet extends DeclarativeWebScript
     @Override
     public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
-        System.out.println("This is a test in rmRoles");
-        
         Map<String, Object> model = new HashMap<String, Object>();
         
         List<NodeRef> roots = rmService.getRecordsManagementRoots();
