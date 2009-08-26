@@ -29,9 +29,8 @@ import java.util.List;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
+import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventType;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.BaseSpringTest;
 
@@ -43,18 +42,8 @@ import org.alfresco.util.BaseSpringTest;
 public class RecordsManagementEventServiceImplTest extends BaseSpringTest implements RecordsManagementModel
 {    
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-    
-	private NodeService nodeService;
-	private RecordsManagementEventService rmEventService;
 
-	private NodeRef nodeRef;
-	private List<NodeRef> nodeRefs;
-	
-	//@Override
-    //protected String[] getConfigLocations()
-    //{
-    //    return new String[] { "classpath:alfresco/application-context.xml", "classpath:org/alfresco/module/org_alfresco_module_dod5015/test/test-context.xml" };
-    //}
+	private RecordsManagementEventService rmEventService;
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -62,7 +51,6 @@ public class RecordsManagementEventServiceImplTest extends BaseSpringTest implem
 		super.onSetUpInTransaction();
 
 		// Get the service required in the tests
-		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); 
 		this.rmEventService = (RecordsManagementEventService)this.applicationContext.getBean("RecordsManagementEventService");
 
 		// Set the current security context as admin
@@ -71,11 +59,11 @@ public class RecordsManagementEventServiceImplTest extends BaseSpringTest implem
 	
 	public void testGetEventTypes()
 	{
-	    List<String> eventTypes = this.rmEventService.getEventTypes();
+	    List<RecordsManagementEventType> eventTypes = this.rmEventService.getEventTypes();
 	    assertNotNull(eventTypes);
-	    for (String eventType : eventTypes)
+	    for (RecordsManagementEventType eventType : eventTypes)
         {
-            System.out.println(eventType);
+            System.out.println(eventType.getName() + " - " + eventType.getDisplayLabel());
         }
 	}
 	

@@ -148,7 +148,11 @@
     
     <!-- RM Event API-->
     
-   <bean id="webscript.org.alfresco.rma.admin.rmevent.rmevents.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.admin.RmEventsGet" parent="webscript">
+    <bean id="webscript.org.alfresco.rma.admin.rmevent.rmeventtypes.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.admin.RmEventTypesGet" parent="webscript">
+       <property name="recordsManagementEventService" ref="RecordsManagementEventService"/>
+    </bean>
+    
+    <bean id="webscript.org.alfresco.rma.admin.rmevent.rmevents.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.admin.RmEventsGet" parent="webscript">
        <property name="recordsManagementEventService" ref="RecordsManagementEventService"/>
     </bean>
     

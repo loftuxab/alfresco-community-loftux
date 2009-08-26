@@ -48,6 +48,7 @@ public class EventRestApiTest extends BaseWebScriptTest implements RecordsManage
 {
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     protected static final String GET_EVENTS_URL = "/api/rma/admin/rmevents";
+    protected static final String GET_EVENTTYPES_URL = "/api/rma/admin/rmeventtypes";
     protected static final String SERVICE_URL_PREFIX = "/alfresco/service";
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String DISPLAY_LABEL = "display label";
@@ -71,6 +72,23 @@ public class EventRestApiTest extends BaseWebScriptTest implements RecordsManage
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());        
     }    
 
+    public void testGetEventTypes() throws Exception
+    {
+        Response rsp = sendRequest(new GetRequest(GET_EVENTTYPES_URL),200);
+        String rspContent = rsp.getContentAsString();
+        
+        JSONObject obj = new JSONObject(rspContent);
+        JSONObject types = obj.getJSONObject("data");
+        assertNotNull(types);
+        
+        JSONObject type = types.getJSONObject("rmEventType.simple");
+        assertNotNull(type);
+        assertEquals("rmEventType.simple", type.getString("eventTypeName"));
+        assertNotNull(type.getString("eventTypeDisplayLabel"));
+        
+        System.out.println(rspContent);
+    }
+    
     public void testGetEvents() throws Exception
     {
         String event1 = GUID.generate();

@@ -22,9 +22,9 @@ public interface RecordsManagementEventService
     /**
      * Get a list of the event types
      * 
-     * @return  List<String>    list of the event types
+     * @return  List<RecordsManagementEventType>    list of the event types
      */
-    List<String> getEventTypes();
+    List<RecordsManagementEventType> getEventTypes();
     
     /**
      * Get the records management event type

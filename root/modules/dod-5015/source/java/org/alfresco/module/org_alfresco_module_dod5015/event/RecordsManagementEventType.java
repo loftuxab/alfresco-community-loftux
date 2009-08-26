@@ -18,6 +18,13 @@ public interface RecordsManagementEventType
     String getName();
     
     /**
+     * Gets the display label of the event type
+     * 
+     * @return  String  display label
+     */
+    String getDisplayLabel();
+    
+    /**
      * Indicates whether the event is automatic or not
      * 
      * @return  boolean     true if automatic, false otherwise
