@@ -57,6 +57,7 @@ import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.repo.security.permissions.impl.model.PermissionModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -1664,8 +1665,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
         
-        // Requires explicit RM permissions
-        permissionService.setPermission(recordFolder, PermissionService.ALL_AUTHORITIES, RMPermissionModel.ROLE_USER, true);
+        // TODO review RM permissions
+        permissionService.setPermission(recordCategory, PermissionService.ALL_AUTHORITIES, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(recordCategory, PermissionService.ALL_AUTHORITIES, RMPermissionModel.READ_RECORDS, true);
         
         setComplete();
         endTransaction();
@@ -1675,10 +1677,11 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         int expectedChildCount = 1;
         assertEquals(expectedChildCount, nodeService.getChildAssocs(recordFolder).size());
         
-        final String RECORD_NAME = "MyRecord.txt";
+        final String RECORD_NAME = "MyRecord"+System.currentTimeMillis()+".txt";
         final String SOME_CONTENT = "There is some content in this record";
         
-        AuthenticationUtil.setFullyAuthenticatedUser("dfranco");
+        // TODO review RM permissions
+        //AuthenticationUtil.setFullyAuthenticatedUser("dfranco");
         
         // Create the document
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
@@ -1718,6 +1721,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // Set supplemental markings list (on record)
         // TODO - set supplemental markings list (on record folder)
+        
+        // TODO review RM permissions
+        permissionService.setPermission(recordCategory, "dfranco", RMPermissionModel.FILE_RECORDS, true);
         
         AuthenticationUtil.setFullyAuthenticatedUser("dfranco");
         assertEquals(AccessStatus.ALLOWED, publicServiceAccessService.hasAccess("NodeService", "exists", recordFolder));
