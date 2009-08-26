@@ -625,6 +625,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
              * FGI - fbloggs, jdoe
              * NOCON - fbloggs, jrogers
              */
+            System.out.println(obj.toString());
             Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS + "/" + RM_LIST + "/values" , obj.toString(), "application/json"), Status.STATUS_OK);   
             JSONObject top = new JSONObject(response.getContentAsString());
         
