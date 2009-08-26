@@ -86,12 +86,27 @@ public class RmEventPut extends DeclarativeWebScript
             }
             
             json = new JSONObject(new JSONTokener(req.getContent().getContent()));
-            String name = json.getString("eventName");
-            // TODO check
-            String eventDisplayLabel = json.getString("eventDisplayLabel");
-            // TODO check
-            String eventType = json.getString("eventType");
-            // TODO check
+           
+            String eventDisplayLabel = null;
+            if (json.has("eventDisplayLabel") == true)
+            {
+                eventDisplayLabel = json.getString("eventDisplayLabel");
+            }
+            if (eventDisplayLabel == null || eventDisplayLabel.length() == 0)
+            {
+                throw new WebScriptException(Status.STATUS_BAD_REQUEST, "No event display label provided.");
+            }
+            
+            String eventType = null;
+            if (json.has("eventType") == true)
+            {
+                eventType = json.getString("eventType");
+            }
+            if (eventType == null || eventType.length() == 0)
+            {
+                throw new WebScriptException(Status.STATUS_BAD_REQUEST, "No event type provided.");
+            }
+            
             
             RecordsManagementEvent event = rmEventService.addEvent(eventType, eventName, eventDisplayLabel);
             model.put("event", event);

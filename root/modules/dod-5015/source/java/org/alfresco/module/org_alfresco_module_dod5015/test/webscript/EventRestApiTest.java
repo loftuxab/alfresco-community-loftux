@@ -24,20 +24,11 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test.webscript;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.alfresco.model.ContentModel;
-import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
-import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
-import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.GUID;
@@ -46,7 +37,6 @@ import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PutRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -69,8 +59,6 @@ public class EventRestApiTest extends BaseWebScriptTest implements RecordsManage
     protected NodeService nodeService;
     protected RecordsManagementService rmService;
     protected RecordsManagementEventService rmEventService;
-    
-    private NodeRef rmRootNode;
     
     @Override
     protected void setUp() throws Exception
@@ -149,7 +137,31 @@ public class EventRestApiTest extends BaseWebScriptTest implements RecordsManage
         finally
         {
             rmEventService.removeEvent(eventName);
-        }        
+        }  
+        
+        // Test with no event name set
+        obj = new JSONObject();
+        obj.put(KEY_EVENT_DISPLAY_LABEL, DISPLAY_LABEL);
+        obj.put(KEY_EVENT_TYPE, EVENT_TYPE);
+        rsp = sendRequest(new PostRequest(GET_EVENTS_URL, obj.toString(), APPLICATION_JSON),200);
+        try
+        {
+            String rspContent = rsp.getContentAsString();
+            
+            JSONObject resultObj = new JSONObject(rspContent);
+            JSONObject eventObj = resultObj.getJSONObject("data");
+            assertNotNull(eventObj);
+            
+            assertNotNull(eventObj.get(KEY_EVENT_NAME));
+            assertEquals(DISPLAY_LABEL, eventObj.get(KEY_EVENT_DISPLAY_LABEL));
+            assertEquals(EVENT_TYPE, eventObj.get(KEY_EVENT_TYPE));
+           
+            eventName = eventObj.getString(KEY_EVENT_NAME);
+        }
+        finally
+        {
+            rmEventService.removeEvent(eventName);
+        }
     }
     
     public void testPutRole() throws Exception
