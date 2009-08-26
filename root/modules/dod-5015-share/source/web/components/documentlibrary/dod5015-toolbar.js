@@ -35,21 +35,8 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event,
-      Element = YAHOO.util.Element;
+      Event = YAHOO.util.Event;
 
-   /**
-    * Alfresco Slingshot aliases
-    */
-   var $html = Alfresco.util.encodeHTML,
-      $combine = Alfresco.util.combinePaths;
-
-   /**
-    * Preferences
-    */
-   var PREFERENCES_ROOT = "org.alfresco.share.documentList",
-      PREF_HIDE_NAVBAR = PREFERENCES_ROOT + ".hideNavBar";
-   
    /**
     * RecordsDocListToolbar constructor.
     * 
