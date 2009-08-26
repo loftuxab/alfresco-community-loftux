@@ -39,16 +39,33 @@ import org.alfresco.service.namespace.QName;
  */
 public interface RecordsManagementPolicies
 {
+    /** Policy names */
     public static final QName BEFORE_RM_ACTION_EXECUTION = QName.createQName(NamespaceService.ALFRESCO_URI, "beforeRMActionExecution");
     public static final QName ON_RM_ACTION_EXECUTION = QName.createQName(NamespaceService.ALFRESCO_URI, "onRMActionExecution");
+    public static final QName BEFORE_CREATE_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, "beforeCreateReference");
+    public static final QName ON_CREATE_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateReference");
     
+    /** Before records management action execution */
     public interface BeforeRMActionExecution extends ClassPolicy
     {        
         public void beforeRMActionExecution(NodeRef nodeRef, String name, Map<String, Serializable> parameters);
     }
     
+    /** On records management action execution */
     public interface OnRMActionExecution extends ClassPolicy
     {        
         public void onRMActionExecution(NodeRef nodeRef, String name, Map<String, Serializable> parameters);
+    }
+    
+    /** Before creation of reference */
+    public interface BeforeCreateReference extends ClassPolicy
+    {
+        public void beforeCreateReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference);
+    }
+    
+    /** On creation of reference */
+    public interface OnCreateReference extends ClassPolicy
+    {
+        public void onCreateReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference);
     }
 }
