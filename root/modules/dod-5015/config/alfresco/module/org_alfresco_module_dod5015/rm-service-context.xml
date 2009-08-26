@@ -141,7 +141,10 @@
     
     <!-- Records Management Action Service -->
     
-    <bean id="recordsManagementActionService" class="org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionServiceImpl"/>
+    <bean id="recordsManagementActionService" class="org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionServiceImpl" init-method="init">        
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="nodeService" ref="NodeService"/>
+    </bean>
     
     <bean id="RecordsManagementActionService" class="org.springframework.aop.framework.ProxyFactoryBean">
         <property name="proxyInterfaces">

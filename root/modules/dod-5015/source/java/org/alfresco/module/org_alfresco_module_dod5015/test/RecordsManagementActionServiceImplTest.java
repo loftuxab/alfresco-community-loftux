@@ -32,8 +32,14 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeRMActionExecution;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnRMActionExecution;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -43,16 +49,20 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 
 /**
- * 
+ * Records management action service implementation test
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementActionServiceImplTest extends BaseSpringTest implements RecordsManagementModel
+public class RecordsManagementActionServiceImplTest extends BaseSpringTest 
+                                                    implements RecordsManagementModel,
+                                                               BeforeRMActionExecution,
+                                                               OnRMActionExecution
 {    
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     
 	private NodeService nodeService;
 	private RecordsManagementActionService rmActionService;
+	private PolicyComponent policyComponent;
 
 	private NodeRef nodeRef;
 	private List<NodeRef> nodeRefs;
@@ -71,6 +81,7 @@ public class RecordsManagementActionServiceImplTest extends BaseSpringTest imple
 		// Get the service required in the tests
 		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); 
 		this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
+		this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
 
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -134,14 +145,67 @@ public class RecordsManagementActionServiceImplTest extends BaseSpringTest imple
         assertNull(this.rmActionService.getRecordsManagementAction("notThere"));
 	}
 	
+	private boolean beforeMarker = false;
+	private boolean onMarker = false;
+	private boolean inTest = false;
+	
 	public void testExecution()
 	{
-	    assertFalse(this.nodeService.hasAspect(this.nodeRef, ASPECT_RECORD));
-	    Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-	    params.put(TestAction.PARAM, TestAction.PARAM_VALUE);
-	    this.rmActionService.executeRecordsManagementAction(this.nodeRef, TestAction.NAME, params);
-	    assertTrue(this.nodeService.hasAspect(this.nodeRef, ASPECT_RECORD));
+	    inTest = true;
+	    try
+	    {
+    	    policyComponent.bindClassBehaviour(
+    	            RecordsManagementPolicies.BEFORE_RM_ACTION_EXECUTION, 
+    	            this, 
+    	            new JavaBehaviour(this, "beforeRMActionExecution", NotificationFrequency.EVERY_EVENT));
+    	    policyComponent.bindClassBehaviour(
+                    RecordsManagementPolicies.ON_RM_ACTION_EXECUTION, 
+                    this, 
+                    new JavaBehaviour(this, "onRMActionExecution", NotificationFrequency.EVERY_EVENT));
+    	    
+    	    assertFalse(beforeMarker);
+    	    assertFalse(onMarker);
+    	    assertFalse(this.nodeService.hasAspect(this.nodeRef, ASPECT_RECORD));
+    	    
+    	    Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+    	    params.put(TestAction.PARAM, TestAction.PARAM_VALUE);
+    	    this.rmActionService.executeRecordsManagementAction(this.nodeRef, TestAction.NAME, params);
+    	    
+    	    assertTrue(beforeMarker);
+            assertTrue(onMarker);
+            assertTrue(this.nodeService.hasAspect(this.nodeRef, ASPECT_RECORD));
+	    }
+	    finally
+	    {
+	        inTest = false;
+	    }
 	}
+	
+    public void beforeRMActionExecution(NodeRef nodeRef, String name, Map<String, Serializable> parameters)
+    {
+        if (inTest == true)
+        {
+            assertEquals(this.nodeRef, nodeRef);
+            assertEquals(TestAction.NAME, name);
+            assertEquals(1, parameters.size());
+            assertTrue(parameters.containsKey(TestAction.PARAM));
+            assertEquals(TestAction.PARAM_VALUE, parameters.get(TestAction.PARAM));
+            beforeMarker = true;
+        }
+    }
+
+    public void onRMActionExecution(NodeRef nodeRef, String name, Map<String, Serializable> parameters)
+    {
+        if (inTest == true)
+        {
+            assertEquals(this.nodeRef, nodeRef);
+            assertEquals(TestAction.NAME, name);
+            assertEquals(1, parameters.size());
+            assertTrue(parameters.containsKey(TestAction.PARAM));
+            assertEquals(TestAction.PARAM_VALUE, parameters.get(TestAction.PARAM));
+            onMarker = true;
+        }
+    }
 	
 	public void testBulkExecution()
 	{
