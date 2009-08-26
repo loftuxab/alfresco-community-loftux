@@ -871,10 +871,10 @@
         <property name="objectDefinitionSource">
             <value>
                 <![CDATA[ 
-                org.alfresco.service.cmr.security.OwnableService.getOwner=ACL_NODE.0.sys:base.ReadProperties,RM_ABSTAIN 
-                org.alfresco.service.cmr.security.OwnableService.setOwner=ACL_NODE.0.cm:ownable.SetOwner,RM_ABSTAIN 
-                org.alfresco.service.cmr.security.OwnableService.takeOwnership=ACL_NODE.0.cm:ownable.TakeOwnership,RM_ABSTAIN
-                org.alfresco.service.cmr.security.OwnableService.hasOwner=ACL_NODE.0.sys:base.ReadProperties,RM_ABSTAIN 
+                org.alfresco.service.cmr.security.OwnableService.getOwner=ACL_NODE.0.sys:base.ReadProperties,RM.Capability.0
+                org.alfresco.service.cmr.security.OwnableService.setOwner=ACL_NODE.0.cm:ownable.SetOwner,RM.Capability.0
+                org.alfresco.service.cmr.security.OwnableService.takeOwnership=ACL_NODE.0.cm:ownable.TakeOwnership,RM.Capability.0
+                org.alfresco.service.cmr.security.OwnableService.hasOwner=ACL_NODE.0.sys:base.ReadProperties,RM.Capability.0 
                 org.alfresco.service.cmr.security.OwnableService.*=ACL_DENY,RM_DENY 
             ]]>
             </value>

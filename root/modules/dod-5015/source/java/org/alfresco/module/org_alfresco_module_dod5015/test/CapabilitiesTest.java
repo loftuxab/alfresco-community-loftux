@@ -63,10 +63,13 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.view.ImporterBinding;
-import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -89,8 +92,6 @@ public class CapabilitiesTest extends TestCase
     private NodeService publicNodeService;
 
     private TransactionService transactionService;
-
-    private ImporterService importerService;
 
     private UserTransaction testTX;
 
@@ -124,6 +125,34 @@ public class CapabilitiesTest extends TestCase
 
     private RMEntryVoter rmEntryVoter;
 
+    private AuthorityService authorityService;
+
+    private String rmUsers;
+
+    private String rmPowerUsers;
+
+    private String rmSecurityOfficers;
+
+    private String rmRecordsManagers;
+
+    private String rmAdministrators;
+
+    private PersonService personService;
+
+    private String rm_user;
+
+    private String rm_power_user;
+
+    private String rm_security_officer;
+
+    private String rm_records_manager;
+
+    private String rm_administrator;
+
+    private String test_user;
+
+    private String testers;
+
     /**
      * @param name
      */
@@ -143,10 +172,11 @@ public class CapabilitiesTest extends TestCase
         nodeService = (NodeService) ctx.getBean("dbNodeService");
         publicNodeService = (NodeService) ctx.getBean("NodeService");
         transactionService = (TransactionService) ctx.getBean("transactionComponent");
-        importerService = (ImporterService) ctx.getBean("ImporterService");
         permissionService = (PermissionService) ctx.getBean("permissionService");
         permissionModel = (PermissionModel) ctx.getBean("permissionsModelDAO");
         contentService = (ContentService) ctx.getBean("contentService");
+        authorityService = (AuthorityService) ctx.getBean("authorityService");
+        personService = (PersonService) ctx.getBean("personService");
 
         recordsManagementSecurityService = (RecordsManagementSecurityService) ctx.getBean("RecordsManagementSecurityService");
         recordsManagementActionService = (RecordsManagementActionService) ctx.getBean("RecordsManagementActionService");
@@ -174,22 +204,90 @@ public class CapabilitiesTest extends TestCase
         record_1 = createRecord(recordFolder_1);
         record_2 = createRecord(recordFolder_2);
 
-        permissionService.setPermission(filePlan, "rm_user", RMPermissionModel.ROLE_USER, true);
-        permissionService.setPermission(filePlan, "rm_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(filePlan, "rm_power_user", RMPermissionModel.ROLE_POWER_USER, true);
-        permissionService.setPermission(filePlan, "rm_power_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(filePlan, "rm_security_officer", RMPermissionModel.ROLE_SECURITY_OFFICER, true);
-        permissionService.setPermission(filePlan, "rm_security_officer", RMPermissionModel.FILING, true);
-        permissionService.setPermission(filePlan, "rm_records_manager", RMPermissionModel.ROLE_RECORDS_MANAGER, true);
-        permissionService.setPermission(filePlan, "rm_records_manager", RMPermissionModel.FILING, true);
-        permissionService.setPermission(filePlan, "rm_administrator", RMPermissionModel.ROLE_ADMINISTRATOR, true);
+        // create people ...
+        
+        rm_user = "rm_user_"+ storeRef.getIdentifier();
+        rm_power_user = "rm_power_user_"+ storeRef.getIdentifier();
+        rm_security_officer = "rm_security_officer_"+ storeRef.getIdentifier();
+        rm_records_manager = "rm_records_manager_"+ storeRef.getIdentifier();
+        rm_administrator = "rm_administrator_"+ storeRef.getIdentifier();
+        
+        test_user = "test_user_"+ storeRef.getIdentifier();
+        
+        personService.createPerson(createDefaultProperties(rm_user));
+        personService.createPerson(createDefaultProperties(rm_power_user));
+        personService.createPerson(createDefaultProperties(rm_security_officer));
+        personService.createPerson(createDefaultProperties(rm_records_manager));
+        personService.createPerson(createDefaultProperties(rm_administrator));
+        personService.createPerson(createDefaultProperties(test_user));
+        
+        
+        // create roles as groups
 
+        rmUsers = authorityService.createAuthority(AuthorityType.GROUP, "RM_USER_" + storeRef.getIdentifier());
+        rmPowerUsers = authorityService.createAuthority(AuthorityType.GROUP, "RM_POWER_USER_" + storeRef.getIdentifier());
+        rmSecurityOfficers = authorityService.createAuthority(AuthorityType.GROUP, "RM_SECURITY_OFFICER_" + storeRef.getIdentifier());
+        rmRecordsManagers = authorityService.createAuthority(AuthorityType.GROUP, "RM_RECORDS_MANAGER_" + storeRef.getIdentifier());
+        rmAdministrators = authorityService.createAuthority(AuthorityType.GROUP, "RM_ADMINISTRATOR_" + storeRef.getIdentifier());
+        testers = authorityService.createAuthority(AuthorityType.GROUP, "RM_TESTOR_" + storeRef.getIdentifier());
+        
+        authorityService.addAuthority(testers, test_user);
+
+        for (PermissionReference pr : permissionModel.getImmediateGranteePermissions(permissionModel.getPermissionReference(null, RMPermissionModel.ROLE_USER)))
+        {   
+            permissionService.setPermission(filePlan, rmUsers, pr.getName(), true);
+        }
+        authorityService.addAuthority(rmUsers, rm_user);
+        permissionService.setPermission(filePlan, rm_user, RMPermissionModel.FILING, true);
+       
+        for (PermissionReference pr : permissionModel.getImmediateGranteePermissions(permissionModel.getPermissionReference(null, RMPermissionModel.ROLE_POWER_USER)))
+        {   
+            permissionService.setPermission(filePlan, rmPowerUsers, pr.getName(), true);
+        }
+        authorityService.addAuthority(rmPowerUsers, rm_power_user);
+        permissionService.setPermission(filePlan, rm_power_user, RMPermissionModel.FILING, true);
+        
+        for (PermissionReference pr : permissionModel.getImmediateGranteePermissions(permissionModel.getPermissionReference(null, RMPermissionModel.ROLE_SECURITY_OFFICER)))
+        {   
+            permissionService.setPermission(filePlan, rmSecurityOfficers, pr.getName(), true);
+        }
+        authorityService.addAuthority(rmSecurityOfficers, rm_security_officer);
+        permissionService.setPermission(filePlan, rm_security_officer, RMPermissionModel.FILING, true);
+       
+        for (PermissionReference pr : permissionModel.getImmediateGranteePermissions(permissionModel.getPermissionReference(null, RMPermissionModel.ROLE_RECORDS_MANAGER)))
+        {   
+            permissionService.setPermission(filePlan, rmRecordsManagers, pr.getName(), true);
+        }
+        authorityService.addAuthority(rmRecordsManagers, rm_records_manager);
+        permissionService.setPermission(filePlan, rm_records_manager, RMPermissionModel.FILING, true);
+        
+        
+        for (PermissionReference pr : permissionModel.getImmediateGranteePermissions(permissionModel.getPermissionReference(null, RMPermissionModel.ROLE_ADMINISTRATOR)))
+        {   
+            permissionService.setPermission(filePlan, rmAdministrators, pr.getName(), true);
+        }
+        authorityService.addAuthority(rmAdministrators, rm_administrator);
+        permissionService.setPermission(filePlan, rm_administrator, RMPermissionModel.FILING, true);
+        
         testTX.commit();
         testTX = transactionService.getUserTransaction();
         testTX.begin();
 
+        
     }
 
+    private Map<QName, Serializable> createDefaultProperties(String userName)
+    {
+        HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
+        properties.put(ContentModel.PROP_USERNAME, userName);
+        properties.put(ContentModel.PROP_HOMEFOLDER, null);
+        properties.put(ContentModel.PROP_FIRSTNAME, userName);
+        properties.put(ContentModel.PROP_LASTNAME, userName);
+        properties.put(ContentModel.PROP_EMAIL, userName);
+        properties.put(ContentModel.PROP_ORGID, "");
+        return properties;
+    }
+    
     private NodeRef createRecord(NodeRef recordFolder)
     {
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
@@ -607,7 +705,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testFilePlanAsAdministrator()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -672,7 +770,13 @@ public class CapabilitiesTest extends TestCase
 
     public void testFilePlanAsRecordsManager()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
+        Set<AccessPermission> permissions = permissionService.getAllSetPermissions(filePlan);
+        for(AccessPermission ap : permissions)
+        {
+            System.out.println(ap.getAuthority() +" -> " + ap.getPermission() +" ("+ap.getPosition()+")");
+        }
+        
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -738,7 +842,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testFilePlanAsSecurityOfficer()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -803,7 +907,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testFilePlanAsPowerUser()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -868,7 +972,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testFilePlanAsUser()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1064,7 +1168,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordSeriesAsAdministrator()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -1129,7 +1233,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordSeriesAsRecordsManager()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -1195,7 +1299,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordSeriesAsSecurityOfficer()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1260,7 +1364,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordSeriesAsPowerUser()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1325,7 +1429,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordSeriesAsUser()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1521,7 +1625,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordCategoryAsAdministrator()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -1586,7 +1690,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordCategoryAsRecordsManager()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -1652,7 +1756,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordCategoryAsSecurityOfficer()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1717,7 +1821,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordCategoryAsPowerUser()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1782,7 +1886,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordCategoryAsUser()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1978,7 +2082,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordFolderAsAdministrator()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -2043,7 +2147,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordFolderAsRecordsManager()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -2109,7 +2213,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordFolderAsSecurityOfficer()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2174,7 +2278,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordFolderAsPowerUser()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2239,7 +2343,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordFolderAsUser()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2435,7 +2539,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordAsAdministrator()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_administrator");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -2500,7 +2604,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordAsRecordsManager()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_records_manager");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -2566,7 +2670,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordAsSecurityOfficer()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_security_officer");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2631,7 +2735,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordAsPowerUser()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_power_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2696,7 +2800,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testRecordAsUser()
     {
-        AuthenticationUtil.setFullyAuthenticatedUser("rm_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(59, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2776,141 +2880,141 @@ public class CapabilitiesTest extends TestCase
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
     }
 
     public void testAddModifyEventDatesCapability()
     {
         // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkPermission("rm_power_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkPermission("rm_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
         // Record
         checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkPermission("rm_power_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkPermission("rm_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
         // folder level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
         // record level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("rm_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(rm_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
         // check person with no access and add read and write
         // Filing
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
         permissionService.setInheritParentPermissions(recordCategory_1, false);
         permissionService.setInheritParentPermissions(recordCategory_2, false);
-        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.ADD_MODIFY_EVENT_DATES, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.ADD_MODIFY_EVENT_DATES, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(recordFolder_1, "test_user", RMPermissionModel.FILING);
-        permissionService.deletePermission(recordFolder_2, "test_user", RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
 
         // check frozen
 
@@ -2919,29 +3023,29 @@ public class CapabilitiesTest extends TestCase
         params.put(FreezeAction.PARAM_REASON, "one");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
 
         // Check closed
         // should make no difference
@@ -2949,27 +3053,27 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
 
         // try and complete some events
 
-        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
         Map<String, Serializable> eventDetails = new HashMap<String, Serializable>(3);
         eventDetails.put(CompleteEventAction.PARAM_EVENT_NAME, "event");
         eventDetails.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
-        eventDetails.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "test_user");
+        eventDetails.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, test_user);
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "completeEvent", eventDetails);
         try
         {
@@ -3048,61 +3152,61 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
         recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
     }
 
     public void testApproveRecordsScheduledForCutoffCapability()
     {
         // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkPermission("rm_power_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkPermission("rm_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         // Record
         checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkPermission("rm_power_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkPermission("rm_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkPermission(rm_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         // folder level - not eligible all deny
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         // record level - not eligible all deny
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         // Set appropriate state - declare records and make eligible
 
@@ -3132,113 +3236,113 @@ public class CapabilitiesTest extends TestCase
         // folder level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         // record level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("rm_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         // check person with no access and add read and write
         // Filing
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
         permissionService.setInheritParentPermissions(recordCategory_1, false);
         permissionService.setInheritParentPermissions(recordCategory_2, false);
-        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(recordFolder_1, "test_user", RMPermissionModel.FILING);
-        permissionService.deletePermission(recordFolder_2, "test_user", RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
 
         // check frozen
 
@@ -3247,29 +3351,29 @@ public class CapabilitiesTest extends TestCase
         params.put(FreezeAction.PARAM_REASON, "one");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
 
         // Check closed
         // should make no difference
@@ -3277,23 +3381,23 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.ALLOWED);
 
         // try and cut off
 
-        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
         try
         {
@@ -3348,72 +3452,72 @@ public class CapabilitiesTest extends TestCase
 
         }
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
     }
 
     public void testAttachRulesToMetadataPropertiesCapability()
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
     }
 
     public void testAuthorizeAllTransfersCapability()
     {
         // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkPermission("rm_power_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkPermission("rm_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         // Record
         checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkPermission("rm_power_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkPermission("rm_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         // folder level - not eligible all deny
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         // record level - not eligible all deny
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         // Set appropriate state - declare records and make eligible
 
@@ -3451,113 +3555,113 @@ public class CapabilitiesTest extends TestCase
         // folder level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         // record level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         // check person with no access and add read and write
         // Filing
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
         permissionService.setInheritParentPermissions(recordCategory_1, false);
         permissionService.setInheritParentPermissions(recordCategory_2, false);
-        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(recordFolder_1, "test_user", RMPermissionModel.FILING);
-        permissionService.deletePermission(recordFolder_2, "test_user", RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
         // check frozen
 
@@ -3566,29 +3670,29 @@ public class CapabilitiesTest extends TestCase
         params.put(FreezeAction.PARAM_REASON, "one");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
         // Check closed
         // should make no difference
@@ -3596,23 +3700,23 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
         // try and transfer
 
-        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "transfer", null);
         try
         {
@@ -3710,10 +3814,10 @@ public class CapabilitiesTest extends TestCase
 
         }
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.ALLOWED);
 
         // check each action
 
@@ -3731,7 +3835,7 @@ public class CapabilitiesTest extends TestCase
 
         // try and complete the transfer
 
-        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
         recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "transferComplete", null);
         try
         {
@@ -3801,51 +3905,51 @@ public class CapabilitiesTest extends TestCase
     {
         // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkPermission("rm_power_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkPermission("rm_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         // Record
         checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkPermission("rm_power_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkPermission("rm_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkPermission(rm_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         // folder level - not eligible all deny
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         // record level - not eligible all deny
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         // Set appropriate state - declare records and make eligible
 
@@ -3895,113 +3999,113 @@ public class CapabilitiesTest extends TestCase
 
         assertTrue(this.nodeService.exists(recordFolder_1));
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         // record level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         // check person with no access and add read and write
         // Filing
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
         permissionService.setInheritParentPermissions(recordCategory_1, false);
         permissionService.setInheritParentPermissions(recordCategory_2, false);
-        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(recordFolder_1, "test_user", RMPermissionModel.FILING);
-        permissionService.deletePermission(recordFolder_2, "test_user", RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
         // check frozen
 
@@ -4010,29 +4114,29 @@ public class CapabilitiesTest extends TestCase
         params.put(FreezeAction.PARAM_REASON, "one");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
         // Check closed
         // should make no difference
@@ -4040,23 +4144,23 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
         // try accession
 
-        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "accession", null);
         try
         {
@@ -4154,10 +4258,10 @@ public class CapabilitiesTest extends TestCase
 
         }
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.ALLOWED);
 
         // check each action
 
@@ -4175,7 +4279,7 @@ public class CapabilitiesTest extends TestCase
 
         // try and complete the transfer
 
-        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
         recordsManagementActionService.executeRecordsManagementAction(getTranferObject(recordFolder_1), "accessionComplete", null);
         try
         {
@@ -4252,62 +4356,62 @@ public class CapabilitiesTest extends TestCase
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
     }
 
     public void testCloseFoldersCapability()
     {
         // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_power_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         // Record
         checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_power_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         // folder level - no preconditions
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         // record level - record denies - folder allows
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         // Set appropriate state - declare records and make eligible for cut off
 
@@ -4338,113 +4442,113 @@ public class CapabilitiesTest extends TestCase
 
         assertTrue(this.nodeService.exists(recordFolder_1));
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         // record level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         // check person with no access and add read and write
         // Filing
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
         permissionService.setInheritParentPermissions(recordCategory_1, false);
         permissionService.setInheritParentPermissions(recordCategory_2, false);
-        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.CLOSE_FOLDERS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.CLOSE_FOLDERS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.deletePermission(recordFolder_1, "test_user", RMPermissionModel.FILING);
-        permissionService.deletePermission(recordFolder_2, "test_user", RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         // check frozen
 
@@ -4453,40 +4557,40 @@ public class CapabilitiesTest extends TestCase
         params.put(FreezeAction.PARAM_REASON, "one");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "unfreeze");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         // Check closed
         // should make no difference
@@ -4494,23 +4598,23 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
 
         // try to close
 
-        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder", null);
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder", null);
 
@@ -4549,7 +4653,7 @@ public class CapabilitiesTest extends TestCase
 
         // check close again (it is already closed)
 
-        AuthenticationUtil.setFullyAuthenticatedUser("test_user");
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
         try
         {
             recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder", null);
@@ -4592,185 +4696,185 @@ public class CapabilitiesTest extends TestCase
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
     }
 
     public void testCreateModifyDestroyClassificationGuidesCapability()
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
     }
 
     public void testCreateModifyDestroyEventsCapability()
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.DENIED);
     }
 
     public void testCreateModifyDestroyFileplanMetadataCapability()
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
     }
 
     public void testCreateModifyDestroyFileplanTypesCapability()
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.DENIED);
     }
 
     public void testCreateModifyDestroyFoldersCapability()
     {
         // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_power_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         // Record
         checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_power_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         // folder level - no preconditions
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         // record level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         // check person with no access and add read and write
         // Filing
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
         permissionService.setInheritParentPermissions(recordCategory_1, false);
         permissionService.setInheritParentPermissions(recordCategory_2, false);
-        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.deletePermission(recordFolder_1, "test_user", RMPermissionModel.FILING);
-        permissionService.deletePermission(recordFolder_2, "test_user", RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         // check frozen
 
@@ -4779,40 +4883,40 @@ public class CapabilitiesTest extends TestCase
         params.put(FreezeAction.PARAM_REASON, "one");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "unfreeze");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         // Check closed
         // should make no difference
@@ -4820,32 +4924,32 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
         // series level capabilities
 
         // fails as no filling rights ...
 
-        checkCapability("test_user", recordCategory_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordCategory_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordCategory_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordCategory_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordCategory_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", recordCategory_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordCategory_1, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordCategory_2, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
 
         // create
 
@@ -4893,201 +4997,200 @@ public class CapabilitiesTest extends TestCase
 
         // try move
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.MOVE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.MOVE_RECORDS, true);
         publicNodeService.moveNode(newFolder, recordCategory_2, ContentModel.ASSOC_CONTAINS, DOD5015Model.TYPE_RECORD_FOLDER);
-        
+
         // delete
 
         publicNodeService.deleteNode(newFolder);
         publicNodeService.deleteNode(recordFolder_1);
         publicNodeService.deleteNode(recordFolder_2);
 
-     
     }
 
     public void testCreateModifyDestroyRecordTypesCapability()
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.DENIED);
     }
 
     public void testCreateModifyDestroyReferenceTypesCapability()
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES, AccessStatus.DENIED);
     }
 
     public void testCreateModifyDestroyRolesCapability()
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES, AccessStatus.DENIED);
     }
 
     public void testCreateModifyDestroyTimeframesCapability()
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
     }
 
     public void testCreateModifyDestroyUsersAndGroupsCapability()
     {
         // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
-        checkPermission("rm_power_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
-        checkPermission("rm_user", filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
     }
 
     public void testCreateModifyRecordsInCuttoffFoldersCapability()
     {
         // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkPermission("rm_power_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkPermission("rm_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
         // Record
         checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_administrator", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_records_manager", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkPermission("rm_security_officer", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkPermission("rm_power_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkPermission("rm_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkPermission(rm_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
         // folder level - no preconditions
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
         // record level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_administrator", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_records_manager", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("rm_security_officer", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_power_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("rm_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
         // check person with no access and add read and write
         // Filing
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
         permissionService.setInheritParentPermissions(recordCategory_1, false);
         permissionService.setInheritParentPermissions(recordCategory_2, false);
-        permissionService.setPermission(recordCategory_1, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordCategory_2, "test_user", RMPermissionModel.READ_RECORDS, true);
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.DECLARE_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS);
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(filePlan, "test_user", RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
 
-        permissionService.deletePermission(recordFolder_1, "test_user", RMPermissionModel.FILING);
-        permissionService.deletePermission(recordFolder_2, "test_user", RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
-        permissionService.setPermission(recordFolder_1, "test_user", RMPermissionModel.FILING, true);
-        permissionService.setPermission(recordFolder_2, "test_user", RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
 
         // check frozen
 
@@ -5096,40 +5199,40 @@ public class CapabilitiesTest extends TestCase
         params.put(FreezeAction.PARAM_REASON, "one");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "freeze", params);
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "unfreeze");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
 
         // Check closed
         // should make no difference
@@ -5137,20 +5240,20 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+
         // Check cutoff
         // should make no difference
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
@@ -5175,16 +5278,14 @@ public class CapabilitiesTest extends TestCase
         this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
         ndNodeRef = this.nodeService.getChildAssocs(record_2, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
         this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
-        
-        
+
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff");
 
-        checkCapability("test_user", recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        checkCapability("test_user", record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
 
         // create
 
@@ -5198,8 +5299,7 @@ public class CapabilitiesTest extends TestCase
         writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         writer.setEncoding("UTF-8");
         writer.putContent("There is some content in this record");
-        
-       
+
         recordsManagementActionService.executeRecordsManagementAction(newRecord, "file");
         // modify
 
@@ -5232,203 +5332,539 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
-        
-      
+
     }
 
     public void testCycleVitalRecordsCapability()
     {
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
 
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.CYCLE_VITAL_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+
+        // check frozen
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+
+        // Check closed
+        // should make no difference
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+
+        // try and cycle
+
+        recordsManagementActionService.executeRecordsManagementAction(record_1, "reviewed");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "reviewed");
+
+        recordsManagementActionService.executeRecordsManagementAction(record_1, "reviewed");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "reviewed");
+
+        // check cutoff
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_1, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_1, "declareRecord");
+
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_2, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "declareRecord");
+
+        NodeRef ndNodeRef = this.nodeService.getChildAssocs(recordFolder_1, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        ndNodeRef = this.nodeService.getChildAssocs(record_2, RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+        this.nodeService.setProperty(ndNodeRef, RecordsManagementModel.PROP_DISPOSITION_AS_OF, calendar.getTime());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_1, "reviewed");
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(record_2, "reviewed");
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
     }
 
     public void testDeclareAuditAsRecordCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
     }
 
     public void testDeclareRecordsCapability()
     {
-
+        //fail();
     }
 
     public void testDeclareRecordsInClosedFoldersCapability()
     {
-
+        //fail();
     }
 
     public void testDeleteAuditCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.DELETE_AUDIT, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.DELETE_AUDIT, AccessStatus.DENIED);
     }
 
     public void testDeleteLinksCapability()
     {
-
+        //fail();
     }
 
     public void testDeleteRecordsCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.DELETE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.DELETE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.DELETE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.DELETE_RECORDS, AccessStatus.DENIED);
     }
 
     public void testDestroyRecordsCapability()
     {
-
+        //fail();
     }
 
     public void testDestroyRecordsScheduledForDestructionCapability()
     {
-
+        //fail();
     }
 
     public void testDisplayRightsReportCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.DISPLAY_RIGHTS_REPORT, AccessStatus.DENIED);
     }
 
     public void testEditDeclaredRecordMetadataCapability()
     {
-
+        //fail();
     }
 
     public void testEditNonRecordMetadataCapability()
     {
-
+        //fail();
     }
 
     public void testEditRecordMetadataCapability()
     {
-
+        //fail();
     }
 
     public void testEditSelectionListsCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.EDIT_SELECTION_LISTS, AccessStatus.DENIED);
     }
 
     public void testEnableDisableAuditByTypesCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.ENABLE_DISABLE_AUDIT_BY_TYPES, AccessStatus.DENIED);
     }
 
     public void testExportAuditCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.EXPORT_AUDIT, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.EXPORT_AUDIT, AccessStatus.DENIED);
     }
 
     public void testExtendRetentionPeriodOrFreezeCapability()
     {
-
+        //fail();
     }
 
     public void testFileRecordsCapability()
     {
-
+        //fail();
     }
 
     public void testMakeOptionalPropertiesMandatoryCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.DENIED);
     }
 
     public void testManageAccessControlsCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
     }
 
     public void testManageAccessRightsCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.DENIED);
     }
 
     public void testManuallyChangeDispositionDatesCapability()
     {
-
+        //fail();
     }
 
     public void testMapClassificationGuideMetadataCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.DENIED);
     }
 
     public void testMapEmailMetadataCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.DENIED);
     }
 
     public void testMoveRecordsCapability()
     {
-
+        //fail();
     }
 
     public void testPasswordControlCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.PASSWORD_CONTROL, AccessStatus.DENIED);
     }
 
     public void testPlanningReviewCyclesCapability()
     {
-
+        //fail();
     }
 
     public void testReOpenFoldersCapability()
     {
-
+        //fail();
     }
 
     public void testSelectAuditMetadataCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
     }
 
     public void testTriggerAnEventCapability()
     {
-
+        //fail();
     }
 
     public void testUndeclareRecordsCapability()
     {
-
+        //fail();
     }
 
     public void testUnfreezeCapability()
     {
-
+        //fail();
     }
 
     public void testUpdateClassificationDatesCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
     }
 
     public void testUpdateExemptionCategoriesCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.UPDATE_EXEMPTION_CATEGORIES, AccessStatus.DENIED);
     }
 
     public void testUpdateTriggerDatesCapability()
     {
-
+        //fail();
     }
 
     public void testUpdateVitalRecordCycleInformationCapability()
     {
-
+        //fail();
     }
 
     public void testUpgradeDowngradeAndDeclassifyRecordsCapability()
     {
-
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.DENIED);
     }
 
     public void testViewRecordsCapability()
     {
-
+        //fail();
     }
 
     public void testViewUpdateReasonsForFreezeCapability()
     {
-
+        //fail();
     }
 
     private void check(Map<Capability, AccessStatus> access, String name, AccessStatus accessStatus)
