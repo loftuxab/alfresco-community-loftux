@@ -213,11 +213,23 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 					}
 
 					public void initialize() {}
+
+                    public String getTitle() {
+                        return "title";
+                    }
 				};
 			}
 			public QName getName() {
 				return QName.createQName("rmc:dummy", namespaceService);
 			}
+            public String getDescription()
+            {
+                return "description";
+            }
+            public String getTitle()
+            {
+                return "title";
+            }
 			
 		};
 		result.add(dummyData);
