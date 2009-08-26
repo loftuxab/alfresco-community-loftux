@@ -100,9 +100,17 @@ public class RecordsManagementEventServiceImpl implements RecordsManagementEvent
     }
     
     /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService#existsEvent(java.lang.String)
+     */
+    public boolean existsEvent(String eventName)
+    {
+        return getEventMap().containsKey(eventName);
+    }
+    
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService#addEvent(java.lang.String, java.lang.String, java.lang.String)
      */
-    public void addEvent(String eventType, String eventName, String eventDisplayLabel)
+    public RecordsManagementEvent addEvent(String eventType, String eventName, String eventDisplayLabel)
     {
         // Check that the eventType is valid
         if (eventTypes.containsKey(eventType) == false)
@@ -116,10 +124,12 @@ public class RecordsManagementEventServiceImpl implements RecordsManagementEvent
         
         // Create event and add to map
         RecordsManagementEvent event = new RecordsManagementEvent(eventType, eventName, eventDisplayLabel);
-        events.put(event.getName(), event);
+        getEventMap().put(event.getName(), event);
         
         // Persist the changes to the event list
         saveEvents();
+        
+        return new RecordsManagementEvent(eventType, eventName, eventDisplayLabel);
     }
 
     /**
@@ -128,7 +138,7 @@ public class RecordsManagementEventServiceImpl implements RecordsManagementEvent
     public void removeEvent(String eventName)
     {
         // Remove the event from the map
-        this.events.remove(eventName);
+        getEventMap().remove(eventName);
         
         // Persist the changes to the event list
         saveEvents();
@@ -149,7 +159,7 @@ public class RecordsManagementEventServiceImpl implements RecordsManagementEvent
     }
     
     /**
-     * 
+     * Load the events from the persistant storage
      */
     private void loadEvents()
     {
@@ -202,6 +212,9 @@ public class RecordsManagementEventServiceImpl implements RecordsManagementEvent
         }, AuthenticationUtil.getSystemUserName());
     }
     
+    /**
+     * Save the events to the peristant storage
+     */
     private void saveEvents()
     {
         AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
