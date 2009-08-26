@@ -51,13 +51,21 @@ public interface RecordsManagementEventService
     RecordsManagementEvent getEvent(String eventName);
     
     /**
+     * Indicates whether a perticular event exists.  Returns true if it does, false otherwise.
+     * 
+     * @param eventName     event name
+     * @return boolean      true if event exists, false otherwise
+     */
+    boolean existsEvent(String eventName);
+    
+    /**
      * Add an event
      * 
      * @param eventType             event type
      * @param eventName             event name
      * @param eventDisplayLabel     event display label
      */
-    void addEvent(String eventType, String eventName, String eventDisplayLabel);
+    RecordsManagementEvent addEvent(String eventType, String eventName, String eventDisplayLabel);
     
     /**
      * Remove an event
