@@ -30,10 +30,18 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPoliciesUtil;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeRMActionExecution;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnRMActionExecution;
+import org.alfresco.repo.policy.ClassPolicyDelegate;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,6 +58,46 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
     /** Registered records management actions */
     private Map<String, RecordsManagementAction> rmActions = new HashMap<String, RecordsManagementAction>(6);
     private Map<String, RecordsManagementAction> dispositionActions = new HashMap<String, RecordsManagementAction>(4);
+    
+    /** Policy component */
+    PolicyComponent policyComponent;
+    
+    /** Node service */
+    NodeService nodeService;
+    
+    /** Policy delegates */
+    private ClassPolicyDelegate<BeforeRMActionExecution> beforeRMActionExecutionDelegate;
+    private ClassPolicyDelegate<OnRMActionExecution> onRMActionExecutionDelegate;
+    
+    /**
+     * Set the policy component
+     * 
+     * @param policyComponent policy component
+     */
+    public void setPolicyComponent(PolicyComponent policyComponent)
+    {
+        this.policyComponent = policyComponent;
+    }
+    
+    /**
+     * Set the node service
+     * 
+     * @param nodeService   node service
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+    
+    /**
+     * Initialise RM action service
+     */
+    public void init()
+    {
+        // Register the various policies
+        beforeRMActionExecutionDelegate = policyComponent.registerClassPolicy(BeforeRMActionExecution.class);
+        onRMActionExecutionDelegate = policyComponent.registerClassPolicy(OnRMActionExecution.class);
+    }
     
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#register(org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction)
@@ -69,6 +117,38 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
                 this.dispositionActions.put(rmAction.getName(), rmAction);
             }
         }
+    }
+    
+    /**
+     * Invoke beforeRMActionExecution policy
+     * 
+     * @param nodeRef       node reference
+     * @param name          action name
+     * @param parameters    action parameters
+     */
+    protected void invokeBeforeRMActionExecution(NodeRef nodeRef, String name, Map<String, Serializable> parameters)
+    {
+        // get qnames to invoke against
+        Set<QName> qnames = RecordsManagementPoliciesUtil.getTypeAndAspectQNames(nodeService, nodeRef);
+        // execute policy for node type and aspects
+        BeforeRMActionExecution policy = beforeRMActionExecutionDelegate.get(qnames);
+        policy.beforeRMActionExecution(nodeRef, name, parameters);
+    }
+    
+    /**
+     * Invoke onRMActionExecution policy
+     * 
+     * @param nodeRef       node reference
+     * @param name          action name
+     * @param parameters    action parameters
+     */
+    protected void invokeOnRMActionExecution(NodeRef nodeRef, String name, Map<String, Serializable> parameters)
+    {
+        // get qnames to invoke against
+        Set<QName> qnames = RecordsManagementPoliciesUtil.getTypeAndAspectQNames(nodeService, nodeRef);
+        // execute policy for node type and aspects
+        OnRMActionExecution policy = onRMActionExecutionDelegate.get(qnames);
+        policy.onRMActionExecution(nodeRef, name, parameters);
     }
 
     /**
@@ -91,9 +171,7 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
         
         for (RecordsManagementAction action : this.rmActions.values())
         {
-            // TODO check the permissions on the action ...
-            
-            // Check the 
+            // TODO check the permissions on the action ...           
         }
         
         return Collections.unmodifiableList(result);
@@ -167,7 +245,10 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
             throw new AlfrescoRuntimeException(msg.toString());
         }
         
+        // Execute action
+        invokeBeforeRMActionExecution(nodeRef, name, parameters);
         rmAction.execute(nodeRef, parameters);
+        invokeOnRMActionExecution(nodeRef, name, parameters);
     }
 
     /**
