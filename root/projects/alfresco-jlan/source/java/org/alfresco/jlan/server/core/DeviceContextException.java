@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2008 Alfresco Software Limited.
+ * Copyright (C) 2006-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,34 +22,39 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-
 package org.alfresco.jlan.server.core;
 
 /**
  * Device Context Exception Class
+ * <p>
+ * Thrown when a device context parameter string is invalid.
  * 
- * <p>Thrown when a device context parameter string is invalid.
- *
  * @author gkspencer
  */
-public class DeviceContextException extends Exception {
+public class DeviceContextException extends Exception
+{
+    private static final long serialVersionUID = -2282554065425234959L;
 
-  private static final long serialVersionUID = -2282554065425234959L;
+    /**
+     * Class constructor
+     */
+    public DeviceContextException()
+    {
+        super();
+    }
 
-  /**
-   * Class constructor
-   */
-  public DeviceContextException() {
-    super();
-  }
-  
-  /**
-   * Class constructor
-   * 
-   * @param s java.lang.String
-   */
-  public DeviceContextException(String s) {
-    super(s);
-  }
+    /**
+     * Class constructor
+     * 
+     * @param s java.lang.String
+     */
+    public DeviceContextException(String s)
+    {
+        super(s);
+    }
 
+    public DeviceContextException(String s, Throwable cause)
+    {
+        super(s, cause);
+    }
 }
