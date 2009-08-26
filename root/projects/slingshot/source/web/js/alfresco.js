@@ -124,6 +124,14 @@ Alfresco.widget = Alfresco.widget || {};
 Alfresco.admin = Alfresco.admin || {};
 
 /**
+ * Alfresco top-level doclib namespace.
+ *
+ * @namespace Alfresco
+ * @class Alfresco.doclib
+ */
+Alfresco.doclib = Alfresco.doclib || {};
+
+/**
  * Alfresco top-level messages namespace.
  * 
  * @namespace Alfresco

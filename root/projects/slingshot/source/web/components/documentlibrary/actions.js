@@ -35,16 +35,11 @@
     * Alfresco Slingshot aliases
     */
    var $combine = Alfresco.util.combinePaths;
-
-   /**
-    * Alfresco.doclib namespace
-    */
-   Alfresco.doclib = Alfresco.doclib || {};
-   Alfresco.doclib.Actions = {};
    
    /**
     * Alfresco.doclib.Actions implementation
     */
+   Alfresco.doclib.Actions = {};
    Alfresco.doclib.Actions.prototype =
    {
       /**
