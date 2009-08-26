@@ -33,7 +33,6 @@ import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
@@ -245,8 +244,9 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 }
                 
                 // Create a group that relates to the records management role
-                Set<String> zones = new HashSet<String>(1);
+                Set<String> zones = new HashSet<String>(2);
                 zones.add(getZoneName(rmRootNode));
+                zones.add(AuthorityService.ZONE_APP_DEFAULT);
                 String roleGroup = authorityService.createAuthority(AuthorityType.GROUP, fullRoleName, roleDisplayLabel, zones);
                 
                 // Assign the various capabilities to the group on the root records management node
