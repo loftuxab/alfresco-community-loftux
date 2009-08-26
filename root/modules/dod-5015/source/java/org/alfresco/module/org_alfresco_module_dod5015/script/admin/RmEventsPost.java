@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
+import org.alfresco.util.GUID;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
@@ -73,12 +74,38 @@ public class RmEventsPost extends DeclarativeWebScript
         try
         {
             json = new JSONObject(new JSONTokener(req.getContent().getContent()));
-            String eventName = json.getString("eventName");
-            // TODO check
-            String eventDisplayLabel = json.getString("eventDisplayLabel");
-            // TODO check
-            String eventType = json.getString("eventType");
-            // TODO check
+            
+            String eventName = null;
+            if (json.has("eventName") == true)
+            {
+                eventName = json.getString("eventName");
+            }
+            
+            if (eventName == null || eventName.length() == 0)
+            {
+                // Generate the event name
+                eventName = GUID.generate();
+            }
+            
+            String eventDisplayLabel = null;
+            if (json.has("eventDisplayLabel") == true)
+            {
+                eventDisplayLabel = json.getString("eventDisplayLabel");
+            }
+            if (eventDisplayLabel == null || eventDisplayLabel.length() == 0)
+            {
+                throw new WebScriptException(Status.STATUS_BAD_REQUEST, "No event display label provided.");
+            }
+            
+            String eventType = null;
+            if (json.has("eventType") == true)
+            {
+                eventType = json.getString("eventType");
+            }
+            if (eventType == null || eventType.length() == 0)
+            {
+                throw new WebScriptException(Status.STATUS_BAD_REQUEST, "No event type provided.");
+            }
             
             RecordsManagementEvent event = rmEventService.addEvent(eventType, eventName, eventDisplayLabel);
             model.put("event", event);
