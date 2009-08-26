@@ -74,9 +74,9 @@ public class RecordsManagementEventServiceImpl implements RecordsManagementEvent
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService#getEventTypes()
      */
-    public List<String> getEventTypes()
+    public List<RecordsManagementEventType> getEventTypes()
     {
-        return new ArrayList<String>(this.eventTypes.keySet());
+        return new ArrayList<RecordsManagementEventType>(this.eventTypes.values());
     }
     
     /**
