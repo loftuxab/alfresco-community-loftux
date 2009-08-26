@@ -27,6 +27,7 @@ package org.alfresco.web.site;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -103,7 +104,7 @@ public abstract class AbstractRequestContext implements RequestContext
         // initialize maps
         this.valuesMap = new HashMap<String, Serializable>(16, 1.0f);
         this.parametersMap = new HashMap<String, Serializable>(16, 1.0f);
-        this.components = new HashMap<String, Component>(16, 1.0f);
+        this.components = new LinkedHashMap<String, Component>(16, 1.0f);
         
         // set request
         this.request = request;
