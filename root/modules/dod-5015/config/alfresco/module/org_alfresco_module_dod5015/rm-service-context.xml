@@ -269,10 +269,7 @@
     
     <!-- Records Management Admin Service -->
     
-    <bean id="recordsManagementAdminService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl">
-        <property name="serviceRegistry">
-            <ref bean="ServiceRegistry" />
-        </property>
+    <bean id="recordsManagementAdminService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl" init-method="init">
         <property name="dictionaryService">
             <ref bean="DictionaryService" />
         </property>
@@ -281,6 +278,9 @@
         </property>
         <property name="nodeService">
             <ref bean="NodeService" />
+        </property>
+        <property name="policyComponent">
+            <ref bean="policyComponent" />
         </property>
     </bean>
     
@@ -329,7 +329,16 @@
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getAvailableCustomProperties=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getAvailableCustomProperties=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getAvailableCustomReferences=RM_ALLOW
-                    org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.*=RM_DENY
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomReferencesFor=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomChildReferencesFor=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.addCustomReference=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.removeCustomReference=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomConstraintDefinitions=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.addCustomConstraintDefinition=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.addCustomConstraintDefinition=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.removeCustomConstraintDefinition=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.changeCustomConstraintValues=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.*=RM_DENY
                 ]]>
             </value>
         </property>

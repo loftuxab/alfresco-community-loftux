@@ -36,12 +36,19 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeCreateReference;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomPropertyAction;
 import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
@@ -70,7 +77,10 @@ import org.alfresco.util.BaseSpringTest;
  * 
  * @author Neil McErlean
  */
-public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD5015Model
+public class CustomPropertyReferenceTest extends BaseSpringTest 
+                                         implements DOD5015Model,
+                                                    BeforeCreateReference,
+                                                    OnCreateReference
 {    
 	private NodeRef filePlan;
 	
@@ -83,6 +93,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
     private RecordsManagementActionService rmActionService;
     private RecordsManagementAdminService rmAdminService;
 	private TransactionService transactionService;
+	private PolicyComponent policyComponent;
 	
 	private PermissionService permissionService;
 	
@@ -107,6 +118,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         this.rmAdminService = (RecordsManagementAdminService)this.applicationContext.getBean("RecordsManagementAdminService");
         this.searchService = (SearchService)this.applicationContext.getBean("SearchService");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
+		this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
 		
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -319,6 +331,74 @@ public class CustomPropertyReferenceTest extends BaseSpringTest implements DOD50
         			customAssocsAspect.getAssociations().get(refDefinitionQName));
         }
 	}
+	
+	public void testGetAllReferences()
+	{
+	    // Just dump them out for visual inspection
+	    System.out.println("Available custom references:");
+	    Map<QName, AssociationDefinition> references = rmAdminService.getAvailableCustomReferences();
+	    for (QName reference : references.keySet())
+	    {
+            System.out.println("   - " + reference.toString());
+	    }	  
+	}
+	
+	private boolean beforeMarker = false;
+    private boolean onMarker = false;
+    private boolean inTest = false;
+	
+	public void testCreateReference() throws Exception
+	{
+	    inTest = true;
+        try
+        {
+            // Create the necessary test objects in the db: two records.
+            NodeRef recordFolder = retrievePreexistingRecordFolder();
+            NodeRef testRecord1 = createRecord(recordFolder, "testRecordA" + System.currentTimeMillis());
+            NodeRef testRecord2 = createRecord(recordFolder, "testRecordB" + System.currentTimeMillis());
+            
+            setComplete();
+            endTransaction();
+            
+            UserTransaction txn1 = transactionService.getUserTransaction(false);
+            txn1.begin();
+    
+            declareRecord(testRecord1);
+            declareRecord(testRecord2);
+            
+            policyComponent.bindClassBehaviour(
+                    RecordsManagementPolicies.BEFORE_CREATE_REFERENCE, 
+                    this, 
+                    new JavaBehaviour(this, "beforeCreateReference", NotificationFrequency.EVERY_EVENT));
+            policyComponent.bindClassBehaviour(
+                    RecordsManagementPolicies.ON_CREATE_REFERENCE, 
+                    this, 
+                    new JavaBehaviour(this, "onCreateReference", NotificationFrequency.EVERY_EVENT));
+            
+            assertFalse(beforeMarker);
+            assertFalse(onMarker);
+            
+            QName refName = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, "null__VersionedBy__Versions");
+            rmAdminService.addCustomReference(testRecord1, testRecord2, refName);
+            
+            assertTrue(beforeMarker);
+            assertTrue(onMarker);
+        }
+        finally
+        {
+            inTest = false;
+        }
+	} 
+	
+	public void beforeCreateReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference)
+    {
+        beforeMarker = true;
+    }
+
+    public void onCreateReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference)
+    {
+        onMarker = true;
+    }
     
     private NodeRef retrievePreexistingRecordFolder()
     {

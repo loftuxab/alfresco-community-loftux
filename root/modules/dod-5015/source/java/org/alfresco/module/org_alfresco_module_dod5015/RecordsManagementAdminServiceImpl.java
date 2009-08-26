@@ -29,9 +29,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.alfresco.repo.dictionary.M2Model;
-import org.alfresco.service.ServiceRegistry;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeCreateReference;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
+import org.alfresco.repo.policy.ClassPolicyDelegate;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.Constraint;
@@ -62,31 +65,79 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     public static final String CUSTOM_MODEL_PREFIX = "rmc";
     public static final String RMC_CUSTOM_ASSOCS = CUSTOM_MODEL_PREFIX + ":customAssocs";
 
-    private ServiceRegistry serviceRegistry;
+    /** Services */
     private DictionaryService dictionaryService;
     private NamespaceService namespaceService;
     private NodeService nodeService;
+    private PolicyComponent policyComponent;
+    
+    /** Policy delegates */
+    private ClassPolicyDelegate<BeforeCreateReference> beforeCreateReferenceDelegate;
+    private ClassPolicyDelegate<OnCreateReference> onCreateReferenceDelegate;
 
-    public void setServiceRegistry(ServiceRegistry serviceRegistry)
-    {
-        this.serviceRegistry = serviceRegistry;
-    }
-
+    /**
+     * @param dictionaryService     the dictionary service
+     */
     public void setDictionaryService(DictionaryService dictionaryService)
     {
 		this.dictionaryService = dictionaryService;
 	}
 
+    /**
+     * @param namespaceService      the namespace service
+     */
 	public void setNamespaceService(NamespaceService namespaceService)
 	{
 		this.namespaceService = namespaceService;
 	}
 
+	/**
+	 * @param nodeService      the node service
+	 */
 	public void setNodeService(NodeService nodeService)
 	{
 		this.nodeService = nodeService;
 	}
+	
+	/**
+	 * @param policyComponent  the policy component
+	 */
+	public void setPolicyComponent(PolicyComponent policyComponent)
+    {
+        this.policyComponent = policyComponent;
+    }
+	
+	/**
+	 * Initialisation method
+	 */
+	public void init()
+    {
+        // Register the various policies
+        beforeCreateReferenceDelegate = policyComponent.registerClassPolicy(BeforeCreateReference.class);
+        onCreateReferenceDelegate = policyComponent.registerClassPolicy(OnCreateReference.class);
+    }
+	
+    protected void invokeBeforeCreateReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference)
+    {
+        // get qnames to invoke against
+        Set<QName> qnames = RecordsManagementPoliciesUtil.getTypeAndAspectQNames(nodeService, fromNodeRef);
+        // execute policy for node type and aspects
+        BeforeCreateReference policy = beforeCreateReferenceDelegate.get(qnames);
+        policy.beforeCreateReference(fromNodeRef, toNodeRef, reference);
+    }
+    
+    protected void invokeOnCreateReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference)
+    {
+        // get qnames to invoke against
+        Set<QName> qnames = RecordsManagementPoliciesUtil.getTypeAndAspectQNames(nodeService, fromNodeRef);
+        // execute policy for node type and aspects
+        OnCreateReference policy = onCreateReferenceDelegate.get(qnames);
+        policy.onCreateReference(fromNodeRef, toNodeRef, reference);
+    }
 
+	/**
+	 * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#getAvailableCustomReferences()
+	 */
     public Map<QName, AssociationDefinition> getAvailableCustomReferences()
     {
 		QName relevantAspectQName = QName.createQName(RMC_CUSTOM_ASSOCS, namespaceService);
@@ -96,6 +147,9 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return assocDefns;
     }
 
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#getAvailableCustomProperties()
+     */
     public Map<QName, PropertyDefinition> getAvailableCustomProperties()
     {
     	Map<QName, PropertyDefinition> result = new HashMap<QName, PropertyDefinition>();
@@ -106,6 +160,9 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return result;
     }
 
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#getAvailableCustomProperties(org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement)
+     */
     public Map<QName, PropertyDefinition> getAvailableCustomProperties(CustomisableRmElement rmElement)
     {
 		QName relevantAspectQName = QName.createQName(rmElement.getCorrespondingAspect(), namespaceService);
@@ -115,6 +172,9 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return propDefns;
     }
 
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#addCustomReference(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+     */
 	public void addCustomReference(NodeRef fromNode, NodeRef toNode, QName refId)
 	{
 		Map<QName, AssociationDefinition> availableAssocs = this.getAvailableCustomReferences();
@@ -125,6 +185,9 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 			throw new IllegalArgumentException("No such custom reference: " + refId);
 		}
 
+		// Invoke before create reference policy
+		invokeBeforeCreateReference(fromNode, toNode, refId);
+		
 		if (assocDef.isChild())
 		{
 			this.nodeService.addChild(fromNode, toNode, refId, refId);
@@ -133,9 +196,13 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 		{
 			this.nodeService.createAssociation(fromNode, toNode, refId);
 		}
+		
+		// Invoke on create reference policy
+        invokeOnCreateReference(fromNode, toNode, refId);
 	}
 
-	public void removeCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId) {
+	public void removeCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId) 
+	{
 		Map<QName, AssociationDefinition> availableAssocs = this.getAvailableCustomReferences();
 
 		AssociationDefinition assocDef = availableAssocs.get(assocId);
