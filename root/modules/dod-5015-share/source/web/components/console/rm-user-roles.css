@@ -1,3 +1,117 @@
+#viewRoles
+{
+   text-align: left;
+   padding: 1em;
+}
+
+#viewRoles h2
+{
+   font-size: 123.1%;
+   margin: 0.5em 0 0.5em 0;
+   color: #515D6B;
+   float: left;
+   font-weight: bold;
+}
+
+#viewRoles h3
+{
+   font-size: 118%;
+   margin: 0.5em 0;
+   color: #515D6B;
+   font-weight: bold;
+   padding: 0 0 0 0.5em;
+}
+
+#viewRoles div.capabilities-header
+{
+   font-size: 118%;
+   color: #515D6B;
+   font-weight: bold;
+   padding: 0.5em 0 0.5em 0.5em;
+}
+
+#viewRoles span.yui-button
+{
+   float: right;
+}
+
+#newRole
+{
+   float: right;
+   margin-bottom: 1em;
+}
+
+.view-role-list
+{
+   clear: both;
+   border: 1px solid #444444;
+}
+
+#roleContent
+{
+   text-align: right;
+   border-left: 1px solid #444444;
+}
+
+#roleContent *
+{
+   text-align: left;
+}
+
+#roleSelection .list-header
+{
+   margin-right: -7%;
+   border-bottom: 1px solid #999;
+}
+
+#roleContent .list-header
+{
+   border-bottom: 1px solid #999;
+}
+
+#roleContent ul.capabilities-list
+{
+   text-align: left;
+   margin: 0 0;
+   clear: both;
+}
+
+#roleContent ul.capabilities-list li
+{
+   clear: both;
+   padding: 0.4em;
+}
+
+#editRole,
+#deleteRole
+{
+   margin-top: 0.333em;
+}
+
+#roles
+{
+   width: 100%;
+}
+
+#roles,
+.roleCapabilities
+{
+   overflow: auto;
+   height: 24em;
+}
+
+#roles ul
+{
+   margin: 0.5em;
+}
+
+#roles a
+{
+   display: block;
+   padding: 0.333em;
+   text-decoration: none;
+}
+
 #manageRoles
 {
    text-align: left;
@@ -14,12 +128,20 @@
    color: #515D6B;
    float: left;
    font-weight: bold;
-   padding-top: 0.5em;
+   padding-top: 0.333em;
+}
+
+#manageRoles h2
+{
+   float: none;
+   font-size: 123.1%;
+   margin-bottom: 0.5em;
 }
 
 #manageRoles h3
 {
    float: none;
+   padding-left: 0;
 }
 
 #manageRoles fieldset
@@ -31,8 +153,12 @@
 
 #manageRoles label
 {
-   display: block;
-   clear: both;
+   margin-left: 0.5em;
+}
+
+#manageRoles input
+{
+   margin-left: 0.5em;
 }
 
 #manageRoles #roleName
@@ -42,9 +168,8 @@
 
 #manageRoles ul.capabilities
 {
+   border-top: 1px solid #999999;
    text-align: left;
-   border: 1px solid #999;
-   border-width: 1px 0 0 0;
    margin: 0 0;
    clear: both;
 }
@@ -52,7 +177,7 @@
 #manageRoles ul.capabilities li
 {
    clear: both;
-   padding: 0.5em 0;
+   padding: 0.4em;
 }
 
 #manageRoles ul.capabilities li label
@@ -61,121 +186,18 @@
    margin: 0 0.5em;
 }
 
-#manageRoles ul.capabilities li:last-child
-{
-   border-bottom: none;
-}
-
 #manageRoles span.yui-button
 {
    float: right;
 }
 
-#manageRoles #submitCreate,
-#manageRoles #submitCreateAnother,
-#manageRoles #submitCancel,
-#manageRoles #submitSave
+#manageRoles #submit,
+#manageRoles #submitCancel
 {
-   float: none;
+   float: left;
 }
 
 #manageRoles ol li button
 {
    margin: 0 0.5em;
-}
-
-/*default page */
-
-#newRole
-{
-   float: right;
-   margin-bottom: 1em;
-}
-
-#defaultRole
-{
-   clear: both;
-   border: 1px solid black;
-   margin-top: 1em;
-}
-
-#roleContent
-{
-   text-align: right;
-   border-left: 1px solid black;
-   width: 75.9%;
-}
-
-#roleContent .title
-{
-   float: left;
-}
-
-#roleContent *
-{
-   text-align: left;
-}
-
-#defaultRole .title,
-#editRole,
-#deleteRole
-{
-   margin: 0.5em 0.5em 0 0.5em
-}
-
-#roles ul
-{
-   margin: 0.5em;
-}
-
-#roles ul li
-{
-   margin: 0.5em 0;
-}
-
-#roles a
-{
-   text-decoration: none;
-}
-
-#roles
-{
-   border-top: 1px solid #999;
-   width: 100%;
-}
-
-#roles,
-.roleCapabilities
-{
-   overflow: auto;
-   height: 20em;
-}
-
-.roleCapabilities
-{
-   margin: 0.5em;
-   display: none;
-   width: 99.5%;
-}
-
-#manageRoles #defaultRole span.yui-button
-{
-   float: none;
-}
-
-#defaultRole ul.capabilities
-{
-   border-top: 1px solid #999;
-   margin-right: 0.5em;
-}
-
-#defaultRole ul.capabilities li
-{
-   padding-left: 1em;
-   margin: 0.5em 0;
-}
-
-#defaultRole .active
-{
-   display: block;
 }

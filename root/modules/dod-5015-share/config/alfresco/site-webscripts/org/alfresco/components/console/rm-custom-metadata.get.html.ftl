@@ -54,7 +54,7 @@
          <span id="${el}-create-metadata-item"></span>
       </div>
       
-      <form id="${el}-create-form">
+      <form id="${el}-create-form" action="">
       <div class="create-main">
          <div class="label-row">
             <span>${msg("label.label")}:</span>
@@ -103,7 +103,7 @@
          <span id="${el}-edit-metadata-item"></span>
       </div>
       
-      <form id="${el}-edit-form">
+      <form id="${el}-edit-form" action="">
       <div class="edit-main">
          <div class="label-row">
             <span>${msg("label.label")}:</span>
