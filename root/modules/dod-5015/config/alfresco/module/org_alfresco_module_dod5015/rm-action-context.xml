@@ -452,6 +452,7 @@
     <bean id="defineCustomProperty" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomPropertyAction"
           parent="rmAction" depends-on="rmCreateModifyDestroyRecordTypesCapability">
         <property name="capability" ref="rmCreateModifyDestroyRecordTypesCapability"/>
+        <property name="recordsManagementAdminService" ref ="recordsManagementAdminService"/>
     </bean>    
     
     <!-- delete custom property -->
@@ -480,6 +481,7 @@
     <bean id="deleteCustomProperty" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.DeleteCustomPropertyAction"
           parent="rmAction" depends-on="rmCreateModifyDestroyRecordTypesCapability">
         <property name="capability" ref="rmCreateModifyDestroyRecordTypesCapability"/>
+        <property name="recordsManagementAdminService" ref ="recordsManagementAdminService"/>
     </bean>    
 
     <!-- define custom association -->
@@ -508,6 +510,7 @@
     <bean id="defineCustomAssociation" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomAssociationAction"
           parent="rmAction" depends-on="rmCreateModifyDestroyReferenceTypesCapability">
         <property name="capability" ref="rmCreateModifyDestroyReferenceTypesCapability"/>
+        <property name="recordsManagementAdminService" ref ="recordsManagementAdminService"/>
     </bean>    
     
     <!-- complete event -->

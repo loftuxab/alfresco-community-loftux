@@ -2,17 +2,17 @@ package org.alfresco.module.org_alfresco_module_dod5015.caveat;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.util.PropertyMap;
 import org.alfresco.web.scripts.Status;
+import org.alfresco.web.scripts.TestWebScriptServer.DeleteRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
-import org.alfresco.web.scripts.TestWebScriptServer.DeleteRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PutRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
 import org.json.JSONArray;
@@ -27,7 +27,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
     private static final String USER_ONE = "RMCaveatConfigTestOne";
     private static final String USER_TWO = "RMCaveatConfigTestTwo";
     
-    protected final static String RM_LIST = "rma:smList";
+    protected final static String RM_LIST = "rmc:smList";
     
     private static final String URL_RM_CONSTRAINTS = "/api/rma/admin/rmconstraints";
   
@@ -80,7 +80,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
         /**
          * Add a list, then get it back via the list rest script
          */
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         {
             Response response = sendRequest(new GetRequest(URL_RM_CONSTRAINTS), Status.STATUS_OK);    
@@ -120,7 +120,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
          * Delete the list to remove any junk then recreate it.
          */
         caveatConfigService.deleteRMConstraint(RM_LIST);
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -141,7 +141,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
          * Positive test Get the constraint 
          */
         {
-            String url = URL_RM_CONSTRAINTS + "/" + "rma_smList";
+            String url = URL_RM_CONSTRAINTS + "/" + "rmc_smList";
             Response response = sendRequest(new GetRequest(url), Status.STATUS_OK);
             JSONObject top = new JSONObject(response.getContentAsString());
             
@@ -169,7 +169,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
          * Negative test - Attempt to get a constraint that does exist
          */
         {
-            String url = URL_RM_CONSTRAINTS + "/" + "rma_wibble";
+            String url = URL_RM_CONSTRAINTS + "/" + "rmc_wibble";
             sendRequest(new GetRequest(url), Status.STATUS_NOT_FOUND); 
         }
         
@@ -220,7 +220,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
          * Now go and get the constraint 
          */
         {
-            String url = URL_RM_CONSTRAINTS + "/" + "rma_smList";
+            String url = URL_RM_CONSTRAINTS + "/" + "rmc_smList";
             Response response = sendRequest(new GetRequest(url), Status.STATUS_OK);
             JSONObject top = new JSONObject(response.getContentAsString());
             
@@ -273,7 +273,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
 
             JSONObject obj = new JSONObject();
             obj.put("allowedValues", array);
-            obj.put("constraintName", "rma_whazoo");
+            obj.put("constraintName", "rmc_whazoo");
             obj.put("constraintTitle", "this is the title");
         
             System.out.println(obj.toString());
@@ -332,7 +332,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
          * Delete the list to remove any junk then recreate it.
          */
         caveatConfigService.deleteRMConstraint(RM_LIST);
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         List<String> values = new ArrayList<String>();
         values.add("NOFORN");
@@ -482,7 +482,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
          */
         {
             caveatConfigService.deleteRMConstraint(RM_LIST);
-            caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+            caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
       
            
             List<String> values = new ArrayList<String>();
@@ -497,7 +497,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
          * Positive test Get the constraint 
          */
         {
-            String url = URL_RM_CONSTRAINTS + "/rma_smList/values";
+            String url = URL_RM_CONSTRAINTS + "/rmc_smList/values";
             Response response = sendRequest(new GetRequest(url), Status.STATUS_OK);
             JSONObject top = new JSONObject(response.getContentAsString());
             
@@ -550,7 +550,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
     public void testUpdateRMConstraintValue() throws Exception
     {
         caveatConfigService.deleteRMConstraint(RM_LIST);
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         /**
          * Add some data to an empty list
@@ -757,7 +757,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
          * Delete the list to remove any junk then recreate it.
          */
         caveatConfigService.deleteRMConstraint(RM_LIST);
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         /**
          * Now do a delete
@@ -775,7 +775,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
          * Negative test - delete list that does not exist
          */
         {
-            sendRequest(new DeleteRequest(URL_RM_CONSTRAINTS + "/" + "rma_wibble"), Status.STATUS_NOT_FOUND);    
+            sendRequest(new DeleteRequest(URL_RM_CONSTRAINTS + "/" + "rmc_wibble"), Status.STATUS_NOT_FOUND);
         }
     }
 }

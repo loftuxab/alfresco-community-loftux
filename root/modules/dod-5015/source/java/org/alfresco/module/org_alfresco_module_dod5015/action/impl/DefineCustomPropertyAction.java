@@ -28,12 +28,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
-import org.alfresco.repo.dictionary.M2Aspect;
-import org.alfresco.repo.dictionary.M2Model;
-import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
@@ -59,7 +56,14 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
     public static final String PARAM_MULTI_VALUED = "multiValued";
     public static final String PARAM_MANDATORY = "mandatory";
     public static final String PARAM_PROTECTED = "protected";
-
+    
+    private RecordsManagementAdminService rmAdminService;
+    
+    public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
+    {
+        this.rmAdminService = rmAdminService;
+    }
+    
     /**
 	 * 
 	 * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
@@ -69,17 +73,12 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
         Map<String, Serializable> params = action.getParameterValues();
-
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
-
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
-
+        
         // Need to select the correct aspect in the customModel to which we'll add the property.
         String customisableElement = (String)params.get(PARAM_ELEMENT);
         CustomisableRmElement ce = CustomisableRmElement.getEnumFor(customisableElement);
         String aspectName = ce.getCorrespondingAspect();
-
+        
         if (logger.isDebugEnabled())
         {
             StringBuilder msg = new StringBuilder();
@@ -94,18 +93,10 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
             }
             logger.debug(msg.toString());
         }
-
-        M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
-
+        
         String qname = (String)params.get(PARAM_NAME);
-		QName propQName = QName.createQName(qname, namespaceService);
-        String propQNameAsString = propQName.toPrefixString(namespaceService);
-
-        //TODO Handle a post where the prop already exists - replace.
-
-        M2Property newProp = customPropsAspect.createProperty(propQNameAsString);
-        newProp.setName(qname);
-
+        QName propQName = QName.createQName(qname, namespaceService);
+        
         //TODO According to the wireframes, type here can only be date|text|number
         Serializable serializableType = params.get(PARAM_DATATYPE);
         QName type = null;
@@ -117,33 +108,34 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         {
             type = (QName)serializableType;
         }
-
-        newProp.setType(type.toPrefixString(namespaceService));
-        newProp.setTitle((String)params.get(PARAM_TITLE));
-        newProp.setDescription((String)params.get(PARAM_DESCRIPTION));
-        newProp.setDefaultValue((String)params.get(PARAM_DEFAULT_VALUE));
-
+        
+        String title = (String)params.get(PARAM_TITLE);
+        String description = (String)params.get(PARAM_DESCRIPTION);
+        String defaultValue = (String)params.get(PARAM_DEFAULT_VALUE);
+        
         // 'mandatory' should be an available parameter.
+        boolean mandatory = false;
         Serializable serializableParam = params.get(PARAM_MANDATORY);
         if (serializableParam != null)
         {
-            Boolean bool = Boolean.valueOf(serializableParam.toString());
-            newProp.setMandatory(bool);
+            mandatory = Boolean.valueOf(serializableParam.toString());
         }
+        
+        boolean isProtected = false;
         serializableParam = params.get(PARAM_PROTECTED);
         if (serializableParam != null)
         {
-            Boolean bool = Boolean.valueOf(serializableParam.toString());
-            newProp.setProtected(bool);
+            isProtected = Boolean.valueOf(serializableParam.toString());
         }
+        
+        boolean multiValued = false;
         serializableParam = params.get(PARAM_MULTI_VALUED);
         if (serializableParam != null)
         {
-            Boolean bool = Boolean.valueOf(serializableParam.toString());
-            newProp.setMultiValued(bool);
+            multiValued = Boolean.valueOf(serializableParam.toString());
         }
-
-        customModelUtil.writeCustomContentModel(deserializedModel);
+        
+        rmAdminService.addCustomPropertyDefinition(aspectName, propQName, type, title, description, defaultValue, multiValued, mandatory, isProtected);
     }
 
     @Override

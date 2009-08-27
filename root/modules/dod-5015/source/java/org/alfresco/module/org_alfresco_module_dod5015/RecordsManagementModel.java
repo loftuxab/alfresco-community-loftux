@@ -31,7 +31,7 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Roy Wetherall
  */
-public interface RecordsManagementModel 
+public interface RecordsManagementModel extends RecordsManagementCustomModel
 {	
 	// Namespace details
 	public static String RM_URI = "http://www.alfresco.org/model/recordsmanagement/1.0";
@@ -86,7 +86,6 @@ public interface RecordsManagementModel
     public static QName PROP_DATE_RECEIVED = QName.createQName(RM_URI, "dateReceived");  
     
     // Common record details
-    public static QName PROP_SUPPLEMENTAL_MARKING_LIST = QName.createQName(RM_URI, "supplementalMarkingList");
     public static QName PROP_LOCATION = QName.createQName(RM_URI, "location");
     
     // Fileable aspect

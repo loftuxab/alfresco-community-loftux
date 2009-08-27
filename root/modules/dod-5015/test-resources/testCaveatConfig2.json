@@ -1,12 +1,12 @@
 {
-   "rma:prjList": {
+   "rmc:prjList": {
         "dmartinz"          : ["Project A", "Project B", "Project C"],
         "jrogers"           : ["Project A", "Project B"],
         "GROUP_Engineering" : ["Project A"],
         "dfranco"           : ["Project A", "Project C"],
         "GROUP_Finance"     : ["Project C"]
     },
-   "rma:smList": {
+   "rmc:smList": {
         "jrangel"     : ["NOFORN", "NOCONTRACT", "FOUO", "FGI"],
         "dmartinz"    : ["NOFORN", "NOCONTRACT", "FOUO", "FGI"],
         "jrogers"     : ["NOFORN", "NOCONTRACT", "FOUO", "FGI"],

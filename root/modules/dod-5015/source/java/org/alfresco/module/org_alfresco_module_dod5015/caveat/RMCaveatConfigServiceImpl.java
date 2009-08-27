@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.content.ContentServicePolicies;
 import org.alfresco.repo.content.MimetypeMap;
@@ -68,7 +69,6 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.util.JSONtoFmModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -99,6 +99,8 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
     private static final String CAVEAT_CONFIG_NAME = "caveatConfig.json";
     
     private static final QName DATATYPE_TEXT = DataTypeDefinition.TEXT;
+    
+    private static final String RESERVED_TITLE = "RESERVED_TITLE";
     
     
     /*
@@ -256,13 +258,10 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                         
                         QName conQName = QName.resolveToQName(namespaceService, conStr);
                         
-// TODO MER Commented out - is this neccessary - need to get the "rmc" namespace working.
-                        
-//                        if (! QName.splitPrefixedQName(conStr)[0].equals(RecordsManagementModel.RM_PREFIX))
-//                        {
-//                            throw new AlfrescoRuntimeException("Unexpected prefix: "+ conStr +" (expected: "+RecordsManagementModel.RM_PREFIX+")");
-//                        }
-                        
+                        if (! QName.splitPrefixedQName(conStr)[0].equals(RecordsManagementCustomModel.RM_CUSTOM_PREFIX))
+                        {
+                            throw new AlfrescoRuntimeException("Unexpected prefix: "+ conStr +" (expected: "+RecordsManagementModel.RM_CUSTOM_PREFIX+")");
+                        }
                         
                         Map<String, List<String>> caveatMap = (Map<String, List<String>>)conEntry.getValue();
                         
@@ -562,7 +561,7 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         if(listName == null)
         {
             // Generate a list name
-            listName = "rmc:" + UUID.randomUUID().toString();    
+            listName = "rmc:" + UUID.randomUUID().toString();
         }
         
         List<String>allowedValues = new ArrayList<String>();
@@ -573,8 +572,20 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         
         QName listQName = QName.createQName(listName); 
         
-        //TODO 
-        recordsManagementAdminService.addCustomConstraintDefinition(listQName, true, allowedValues);
+        // TODO review - constraints cannot be deleted
+        // TEMP review - if it already exists then change it for now
+        try
+        {
+            recordsManagementAdminService.addCustomConstraintDefinition(listQName, title, true, allowedValues);
+        }
+        catch (AlfrescoRuntimeException e)
+        {
+            if (e.getMessage().contains("Constraint already exists"))
+            {
+                recordsManagementAdminService.changeCustomConstraintValues(listQName, allowedValues);
+                recordsManagementAdminService.changeCustomConstraintTitle(listQName, title);
+            }
+        }
         
         Map<String, List<String>> emptyConstraint =  new HashMap<String, List<String>>(0) ;
         caveatConfig.put(listName, emptyConstraint);
@@ -590,12 +601,22 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
      */
     public void deleteRMConstraint(String listName)
     {
-        QName listQName = QName.createQName(listName); 
         caveatConfig.remove(listName);
         updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));
-        recordsManagementAdminService.removeCustomConstraintDefinition(listQName);
+        
+        QName listQName = QName.createQName(listName);
+        
+        // TODO - incremental delete not currently supported, for now change title and set empty list
+        
+        // UnsupportedOperationException
+        //recordsManagementAdminService.removeCustomConstraintDefinition(listQName);
+        
+        List<String> empty = new ArrayList<String>(0);
+        recordsManagementAdminService.changeCustomConstraintValues(listQName, empty);
+        recordsManagementAdminService.changeCustomConstraintTitle(listQName, RESERVED_TITLE);
     }
     
+    @SuppressWarnings("unused")
     private ConstraintDefinition getCustomConstraintDefinition(QName constraintName)
     {
         //TODO

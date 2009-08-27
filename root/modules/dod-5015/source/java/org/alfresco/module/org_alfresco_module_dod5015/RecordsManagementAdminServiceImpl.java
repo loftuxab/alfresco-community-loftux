@@ -25,14 +25,24 @@
 package org.alfresco.module.org_alfresco_module_dod5015;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomAssociationAction;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint;
+import org.alfresco.repo.dictionary.M2Aspect;
+import org.alfresco.repo.dictionary.M2Association;
+import org.alfresco.repo.dictionary.M2ChildAssociation;
+import org.alfresco.repo.dictionary.M2Constraint;
+import org.alfresco.repo.dictionary.M2Model;
+import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
@@ -40,35 +50,42 @@ import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.Constraint;
 import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.dictionary.ModelDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.util.ParameterCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * Records Management AdminService Implementation.
  * 
- * @author Neil McErlean
+ * @author Neil McErlean, janv
  */
 public class RecordsManagementAdminServiceImpl implements RecordsManagementAdminService
 {
-	/** Logger */
+    /** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementAdminServiceImpl.class);
-
-    public static final String CUSTOM_MODEL_PREFIX = "rmc";
-    public static final String RMC_CUSTOM_ASSOCS = CUSTOM_MODEL_PREFIX + ":customAssocs";
-
+    
+    public static final String RMC_CUSTOM_ASSOCS = CustomModelUtil.RMC_CUSTOM_ASSOCS;
+    
+    private static final String CUSTOM_CONSTRAINT_TYPE = org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint.class.getName();
+    
+    private static final String PARAM_ALLOWED_VALUES = "allowedValues";
+    private static final String PARAM_CASE_SENSITIVE = "caseSensitive";
+    
     /** Services */
     private DictionaryService dictionaryService;
     private NamespaceService namespaceService;
     private NodeService nodeService;
+    private ContentService contentService;
+
     private PolicyComponent policyComponent;
     
     /** Policy delegates */
@@ -97,6 +114,11 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 	public void setNodeService(NodeService nodeService)
 	{
 		this.nodeService = nodeService;
+	}
+	
+	public void setContentService(ContentService contentService)
+	{
+	    this.contentService = contentService;
 	}
 	
 	/**
@@ -171,6 +193,97 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 
         return propDefns;
     }
+    
+    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected)
+    {
+        ParameterCheck.mandatoryString("aspectName", aspectName);
+        ParameterCheck.mandatory("propQName", propQName);
+        ParameterCheck.mandatory("dataType", dataType);
+        
+        CustomModelUtil customModelUtil = new CustomModelUtil();
+        customModelUtil.setContentService(contentService);
+        
+        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
+        
+        String propQNameAsString = propQName.toPrefixString(namespaceService);
+        
+        M2Property newProp = customPropsAspect.createProperty(propQNameAsString);
+        newProp.setName(propQNameAsString);
+        newProp.setType(dataType.toPrefixString(namespaceService));
+        
+        newProp.setTitle(title);
+        newProp.setDescription(description);
+        newProp.setDefaultValue(defaultValue);
+        
+        newProp.setMandatory(mandatory);
+        newProp.setProtected(isProtected);
+        newProp.setMultiValued(multiValued);
+        
+        customModelUtil.writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("addCustomPropertyDefinition: "+propQName+" to aspect: "+aspectName);
+        }
+    }
+    
+    public void removeCustomPropertyDefinition(QName propQName)
+    {
+        // data dictionary does not currently support incremental deletes
+        throw new UnsupportedOperationException("removeCustomConstraintDefinition: "+propQName);
+        
+        /*
+        ParameterCheck.mandatory("propQName", propQName);
+        
+        CustomModelUtil customModelUtil = new CustomModelUtil();
+        customModelUtil.setContentService(contentService);
+        
+        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        
+        String propQNameAsString = propQName.toPrefixString(namespaceService);
+        
+        String aspectName = null;
+        
+        boolean found = false;
+        
+        // Need to select the correct aspect in the customModel from which we'll
+        // attempt to delete the property definition.
+        for (CustomisableRmElement elem : CustomisableRmElement.values())
+        {
+            aspectName = elem.getCorrespondingAspect();
+            M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
+            
+            M2Property prop = customPropsAspect.getProperty(propQNameAsString);
+            if (prop != null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    StringBuilder msg = new StringBuilder();
+                    msg.append("Attempting to delete custom property: ");
+                    msg.append(propQNameAsString);
+                    logger.debug(msg.toString());
+                }
+                
+                found = true;
+                customPropsAspect.removeProperty(propQNameAsString);
+                break;
+            }
+        }
+        
+        if (! found)
+        {
+            throw new AlfrescoRuntimeException("Could not find property to delete: "+propQName);
+        }
+        
+        customModelUtil.writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("deleteCustomPropertyDefinition: "+propQName+" from aspect: "+aspectName);
+        }
+        */
+    }
 
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#addCustomReference(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
@@ -239,80 +352,200 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     	List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(node);
     	return childAssocs;
 	}
-
-	public void addCustomConstraintDefinition(QName constraintName,
-			boolean caseSensitive, List<String> allowedValues) {
-		// TODO Auto-generated method stub
-	}
-
-	public void addCustomConstraintDefinition(QName constraintName,
-			String description, Map<String, Object> parameters) {
-		// TODO Auto-generated method stub
-	}
-
-	public void changeCustomConstraintValues(QName constraintName,
-			List<String> newValues) {
-		// TODO Auto-generated method stub
-	}
-
-	public List<ConstraintDefinition> getCustomConstraintDefinitions() {
-		// TODO I'm returning dummy data here for testing purposes.
-		//      Obviously this will have to return live data
-		List<ConstraintDefinition> result = new ArrayList<ConstraintDefinition>();
-		
-		ConstraintDefinition dummyData = new ConstraintDefinition() {
-			public ModelDefinition getModel() {
-				return null;
- 			}
-			public Constraint getConstraint() {
-				return new Constraint() {
-					public void evaluate(Object value) {}
-
-					public Map<String, Object> getParameters() {
-						HashMap<String, Object> hashMap = new HashMap<String, Object>();
-						hashMap.put("caseSensitive", false);
-						hashMap.put("allowedValues", Arrays.asList(new String[]{"foo", "bar", "other"}));
-						return hashMap;
-					}
-
-					public String getType() {
-						return "LIST";
-					}
-
-					public void initialize() {}
-
-                    public String getTitle() {
-                        return "title";
-                    }
-				};
-			}
-			public QName getName() {
-				return QName.createQName("rmc:dummy", namespaceService);
-			}
-            public String getDescription()
+	
+    public void addCustomAssocDefinition(String label)
+    {
+        ParameterCheck.mandatoryString("label", label);
+        
+        CustomModelUtil customModelUtil = new CustomModelUtil();
+        customModelUtil.setContentService(contentService);
+        
+        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
+        
+        CustomReferenceId crId = new CustomReferenceId(label, null, null);
+        
+        M2Association newAssoc = customAssocsAspect.createAssociation(crId.getReferenceId());
+        newAssoc.setSourceMandatory(false);
+        newAssoc.setTargetMandatory(false);
+        
+        // TODO Could be the customAssocs aspect
+        newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
+        
+        customModelUtil.writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("addCustomAssocDefinition: ("+label+")");
+        }
+    }
+    
+    public void addCustomChildAssocDefinition(String source, String target)
+    {
+        ParameterCheck.mandatoryString("source", source);
+        ParameterCheck.mandatoryString("target", target);
+        
+        CustomModelUtil customModelUtil = new CustomModelUtil();
+        customModelUtil.setContentService(contentService);
+        
+        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
+        
+        CustomReferenceId crId = new CustomReferenceId(null, source, target);
+        
+        M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(crId.getReferenceId());
+        newAssoc.setSourceMandatory(false);
+        newAssoc.setTargetMandatory(false);
+        
+        // TODO Could be the custom assocs aspect
+        newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
+        
+        customModelUtil.writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("addCustomChildAssocDefinition: ("+source+","+target+")");
+        }
+    }
+    
+    public void addCustomConstraintDefinition(QName constraintName, String title, boolean caseSensitive, List<String> allowedValues) 
+    {
+        ParameterCheck.mandatory("constraintName", constraintName);
+        ParameterCheck.mandatoryString("title", title);
+        ParameterCheck.mandatory("allowedValues", allowedValues);
+        
+        CustomModelUtil customModelUtil = new CustomModelUtil();
+        customModelUtil.setContentService(contentService);
+        
+        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        
+        String constraintNameAsPrefixString = constraintName.toPrefixString(namespaceService);
+        
+        M2Constraint customConstraint = deserializedModel.getConstraint(constraintNameAsPrefixString);
+        if (customConstraint != null)
+        {
+            throw new AlfrescoRuntimeException("Constraint already exists: "+constraintNameAsPrefixString);
+        }
+        
+        customConstraint = deserializedModel.createConstraint(constraintNameAsPrefixString, CUSTOM_CONSTRAINT_TYPE);
+        
+        customConstraint.setTitle(title);
+        customConstraint.createParameter(PARAM_ALLOWED_VALUES, allowedValues);
+        customConstraint.createParameter(PARAM_CASE_SENSITIVE, caseSensitive ? "true" : "false");
+        
+        customModelUtil.writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("addCustomConstraintDefinition: "+constraintNameAsPrefixString+" (valueCnt: "+allowedValues.size()+")");
+        }
+    }
+    
+    /*
+    public void addCustomConstraintDefinition(QName constraintName, String description, Map<String, Object> parameters) 
+    {
+        // TODO Auto-generated method stub
+    }
+    */
+    
+    public void changeCustomConstraintValues(QName constraintName, List<String> newAllowedValues)
+    {
+        ParameterCheck.mandatory("constraintName", constraintName);
+        ParameterCheck.mandatory("newAllowedValues", newAllowedValues);
+        
+        CustomModelUtil customModelUtil = new CustomModelUtil();
+        customModelUtil.setContentService(contentService);
+        
+        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        
+        String constraintNameAsPrefixString = constraintName.toPrefixString(namespaceService);
+        
+        M2Constraint customConstraint = deserializedModel.getConstraint(constraintNameAsPrefixString);
+        if (customConstraint == null)
+        {
+            throw new AlfrescoRuntimeException("Unknown constraint ("+constraintNameAsPrefixString+")");
+        }
+        
+        String type = customConstraint.getType();
+        if ((type == null) || (! type.equals(CUSTOM_CONSTRAINT_TYPE)))
+        {
+            throw new AlfrescoRuntimeException("Unexpected type '"+type+"' for constraint: "+constraintNameAsPrefixString+" (expected '"+CUSTOM_CONSTRAINT_TYPE+"')");
+        }
+        
+        customConstraint.removeParameter(PARAM_ALLOWED_VALUES);
+        customConstraint.createParameter(PARAM_ALLOWED_VALUES, newAllowedValues);
+        
+        customModelUtil.writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("changeCustomConstraintValues: "+constraintNameAsPrefixString+" (valueCnt: "+newAllowedValues.size()+")");
+        }
+    }
+    
+    public void changeCustomConstraintTitle(QName constraintName, String title)
+    {
+        ParameterCheck.mandatory("constraintName", constraintName);
+        ParameterCheck.mandatoryString("title", title);
+        
+        CustomModelUtil customModelUtil = new CustomModelUtil();
+        customModelUtil.setContentService(contentService);
+        
+        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        
+        String constraintNameAsPrefixString = constraintName.toPrefixString(namespaceService);
+        
+        M2Constraint customConstraint = deserializedModel.getConstraint(constraintNameAsPrefixString);
+        if (customConstraint == null)
+        {
+            throw new AlfrescoRuntimeException("Unknown constraint ("+constraintNameAsPrefixString+")");
+        }
+        
+        String type = customConstraint.getType();
+        if ((type == null) || (! type.equals(CUSTOM_CONSTRAINT_TYPE)))
+        {
+            throw new AlfrescoRuntimeException("Unexpected type '"+type+"' for constraint: "+constraintNameAsPrefixString+" (expected '"+CUSTOM_CONSTRAINT_TYPE+"')");
+        }
+        
+        customConstraint.setTitle(title);
+        
+        customModelUtil.writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("changeCustomConstraintTitle: "+constraintNameAsPrefixString+" (title: "+title+")");
+        }
+    }
+    
+    public List<ConstraintDefinition> getCustomConstraintDefinitions() 
+    {
+        // all resolved defs (ie. constraint defs + property constraint defs (references + in-line defs)
+        Collection<ConstraintDefinition> conDefs = dictionaryService.getConstraints(RecordsManagementCustomModel.RM_CUSTOM_MODEL);
+        
+        Collection<QName> customProps = dictionaryService.getProperties(RecordsManagementCustomModel.RM_CUSTOM_MODEL);
+        for (QName customProp : customProps)
+        {
+            PropertyDefinition propDef = dictionaryService.getProperty(customProp);
+            for (ConstraintDefinition conDef : propDef.getConstraints())
             {
-                return "description";
+                conDefs.remove(conDef);
             }
-            public String getTitle()
+        }
+        
+        for (ConstraintDefinition conDef : conDefs)
+        {
+            Constraint con = conDef.getConstraint();
+            if (! (con instanceof RMListOfValuesConstraint))
             {
-                return "title";
+                conDefs.remove(conDef);
             }
-			
-		};
-		result.add(dummyData);
-		return result;
-		
-		// The result would have to come from the dataDictionary.
-		// So the DictionaryService will need to have something like
-		// public List<ConstraintDefinition> getConstraints(QName model);
-		//
-		// It currently offers access to ConstraintDefinitions through the
-		// PropertyDefinition, but RM will need to access Constraints not yet associated
-		// with properties.
-
-	}
-
-	public void removeCustomConstraintDefinition(QName constraintName) {
-		// TODO Auto-generated method stub
-	}
+        }
+        
+        return new ArrayList<ConstraintDefinition>(conDefs);
+    }
+    
+    public void removeCustomConstraintDefinition(QName constraintQName) 
+    {
+        throw new UnsupportedOperationException("removeCustomConstraintDefinition: "+ constraintQName);
+    }
 }
