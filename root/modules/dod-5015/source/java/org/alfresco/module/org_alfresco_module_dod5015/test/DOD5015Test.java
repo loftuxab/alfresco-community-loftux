@@ -59,6 +59,7 @@ import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -116,6 +117,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	private PersonService personService;
 	private AuthorityService authorityService;
 	private PermissionService permissionService;
+	private RetryingTransactionHelper transactionHelper;
 
     private PublicServiceAccessService publicServiceAccessService;
 	
@@ -139,13 +141,11 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 		super.onSetUpInTransaction();
 
 		// Get the service required in the tests
-		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); // use upper 'N'odeService (to test access config interceptor)
-		
+		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); // use upper 'N'odeService (to test access config interceptor)		
 		this.authenticationService = (AuthenticationService)this.applicationContext.getBean("AuthenticationService");
 		this.personService = (PersonService)this.applicationContext.getBean("PersonService");
 		this.authorityService = (AuthorityService)this.applicationContext.getBean("AuthorityService");
-		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
-		
+		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");		
 		this.searchService = (SearchService)this.applicationContext.getBean("SearchService"); // use upper 'S'earchService (to test access config interceptor)
 		this.importService = (ImporterService)this.applicationContext.getBean("importerComponent");
 		this.contentService = (ContentService)this.applicationContext.getBean("ContentService");
@@ -155,8 +155,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		this.rmAdminService = (RecordsManagementAdminService)this.applicationContext.getBean("RecordsManagementAdminService");
 		this.caveatConfigService = (RMCaveatConfigService)this.applicationContext.getBean("caveatConfigService");
-		
 		this.publicServiceAccessService = (PublicServiceAccessService)this.applicationContext.getBean("PublicServiceAccessService");
+		this.transactionHelper = (RetryingTransactionHelper)this.applicationContext.getBean("retryingTransactionHelper");
 		
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -193,31 +193,19 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
     @Override
     protected void onTearDownInTransaction() throws Exception
     {
-        try
-        {
-            UserTransaction txn = transactionService.getUserTransaction(false);
-            txn.begin();
-            this.nodeService.deleteNode(filePlan);
-            txn.commit();
-        }
-        catch (Exception e)
-        {
-            // Nothing
-            //System.out.println("DID NOT DELETE FILE PLAN!");
-        }
-    }
-    
-    @Override
-    protected void onTearDownAfterTransaction() throws Exception
-    {
-        // TODO Auto-generated method stub
-        super.onTearDownAfterTransaction();
-    }
-    
-    public void testSetup()
-    {
-        // NOOP
-    }    
+//        try
+//        {
+//            UserTransaction txn = transactionService.getUserTransaction(false);
+//            txn.begin();
+//            this.nodeService.deleteNode(filePlan);
+//            txn.commit();
+//        }
+//        catch (Exception e)
+//        {
+//            // Nothing
+//            //System.out.println("DID NOT DELETE FILE PLAN!");
+//        }
+    }  
 
     /**
      * This test method creates a non-vital record and then moves it to a vital folder
@@ -230,88 +218,116 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
      */
     public void testMoveRefileRecord() throws Exception
     {
-        // Create a record folder under a "non-vital" category
-        NodeRef nonVitalRecordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "Unit Manning Documents");    
-        assertNotNull(nonVitalRecordCategory);
-
-        NodeRef nonVitalFolder = createRecFolderNode(nonVitalRecordCategory);
         // Commit in order to trigger the setUpRecordFolder behaviour
         setComplete();
         endTransaction();
         
-        UserTransaction tx1 = transactionService.getUserTransaction(false);
-        tx1.begin();
-        
-        // Create a (non-vital) record under the above folder
-        NodeRef recordUnderTest = createRecordNode(nonVitalFolder);
+        final NodeRef nonVitalFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                // Create a record folder under a "non-vital" category
+                NodeRef nonVitalRecordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "Unit Manning Documents");    
+                assertNotNull(nonVitalRecordCategory);
 
-        rmActionService.executeRecordsManagementAction(recordUnderTest, "file");
-        this.declareRecord(recordUnderTest);
+                return createRecFolderNode(nonVitalRecordCategory);
+            }          
+        });        
+        
+        final NodeRef recordUnderTest = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                // Create a (non-vital) record under the above folder
+                NodeRef recordUnderTest = createRecordNode(nonVitalFolder);
 
-        // No need to commit the transaction here as the record is non-vital and
-        // there is no metadata to copy down.
+                rmActionService.executeRecordsManagementAction(recordUnderTest, "file");
+                declareRecord(recordUnderTest);
+                
+                return recordUnderTest;
+            }          
+        });        
         
-        NodeRef vitalFolder = retrieveJanuaryAISVitalFolder();
+        final NodeRef vitalFolder =transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {                
+                // No need to commit the transaction here as the record is non-vital and
+                // there is no metadata to copy down.
+                
+                NodeRef vitalFolder = retrieveJanuaryAISVitalFolder();
+                
+                // Move the non-vital record under the vital folder.
+                serviceRegistry.getFileFolderService().move(recordUnderTest, vitalFolder, null);
+                
+                return vitalFolder;
+            }          
+        });
         
-        // Move the non-vital record under the vital folder.
-        serviceRegistry.getFileFolderService().move(recordUnderTest, vitalFolder, null);
+        final NodeRef secondVitalFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                // At this point, the formerly nonVitalRecord is now actually vital.
+                assertTrue("Expected record.", rmService.isRecord(recordUnderTest));
+                assertTrue("Expected declared.", rmService.isRecordDeclared(recordUnderTest));
+                
+                final VitalRecordDefinition recordVrd = rmService.getVitalRecordDefinition(recordUnderTest);
+                assertNotNull("Moved record should now have a Vital Rec Defn", recordVrd);
+                assertEquals("Moved record had wrong review period",
+                        rmService.getVitalRecordDefinition(vitalFolder).getReviewPeriod(), recordVrd.getReviewPeriod());
+                assertNotNull("Moved record should now have a review-as-of date", nodeService.getProperty(recordUnderTest, PROP_REVIEW_AS_OF));
+                
+                // Create another folder with different vital/disposition instructions
+                //TODO Change disposition instructions
+                NodeRef vitalRecordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");    
+                assertNotNull(vitalRecordCategory);
+                return createRecFolderNode(vitalRecordCategory);
+            }          
+        });
+        
+        final Date reviewDate = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Date>()
+        {
+            public Date execute() throws Throwable
+            {
+                Map<QName, Serializable> props = nodeService.getProperties(secondVitalFolder);
+                final Serializable secondVitalFolderReviewPeriod = props.get(PROP_REVIEW_PERIOD);
+                assertEquals("Unexpected review period.", weeklyReview, secondVitalFolderReviewPeriod);
+                
+                // We are changing the review period of this second record folder.
+                nodeService.setProperty(secondVitalFolder, PROP_REVIEW_PERIOD, dailyReview);
+                
+                Date reviewDate = (Date)nodeService.getProperty(recordUnderTest, PROP_REVIEW_AS_OF);
+                
+                // Move the newly vital record under the second vital folder. I expect the reviewPeriod
+                // for the record to be changed again.
+                serviceRegistry.getFileFolderService().move(recordUnderTest, secondVitalFolder, null);
+                
+                return reviewDate;
+            }          
+        });
 
-        tx1.commit();
-        UserTransaction tx2 = transactionService.getUserTransaction(false);
-        tx2.begin();
-        
-        // At this point, the formerly nonVitalRecord is now actually vital.
-        assertTrue("Expected record.", rmService.isRecord(recordUnderTest));
-        assertTrue("Expected declared.", rmService.isRecordDeclared(recordUnderTest));
-        
-        final VitalRecordDefinition recordVrd = rmService.getVitalRecordDefinition(recordUnderTest);
-        assertNotNull("Moved record should now have a Vital Rec Defn", recordVrd);
-        assertEquals("Moved record had wrong review period",
-                rmService.getVitalRecordDefinition(vitalFolder).getReviewPeriod(), recordVrd.getReviewPeriod());
-        assertNotNull("Moved record should now have a review-as-of date", nodeService.getProperty(recordUnderTest, PROP_REVIEW_AS_OF));
-        
-        // Create another folder with different vital/disposition instructions
-        //TODO Change disposition instructions
-        NodeRef vitalRecordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");    
-        assertNotNull(vitalRecordCategory);
-        NodeRef secondVitalFolder = createRecFolderNode(vitalRecordCategory);
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                Period newReviewPeriod = rmService.getVitalRecordDefinition(recordUnderTest).getReviewPeriod();
+                assertEquals("Unexpected review period.", dailyReview, newReviewPeriod);
+                
+                Date updatedReviewDate = (Date)nodeService.getProperty(recordUnderTest, PROP_REVIEW_AS_OF);
+                // The reviewAsOf date should have changed to "24 hours from now".
+                assertFalse("reviewAsOf date was unchanged", reviewDate.equals(updatedReviewDate));
+                long millisecondsUntilNextReview = updatedReviewDate.getTime() - new Date().getTime();
+                assertTrue("new reviewAsOf date was not within 24 hours of now.",
+                        millisecondsUntilNextReview <= TWENTY_FOUR_HOURS_IN_MS);
 
-        tx2.commit();
-        UserTransaction tx3 = transactionService.getUserTransaction(false);
-        tx3.begin();
-        
-        Map<QName, Serializable> props = nodeService.getProperties(secondVitalFolder);
-        final Serializable secondVitalFolderReviewPeriod = props.get(PROP_REVIEW_PERIOD);
-        assertEquals("Unexpected review period.", weeklyReview, secondVitalFolderReviewPeriod);
-        
-        // We are changing the review period of this second record folder.
-        this.nodeService.setProperty(secondVitalFolder, PROP_REVIEW_PERIOD, dailyReview);
-        
-        Date reviewDate = (Date)nodeService.getProperty(recordUnderTest, PROP_REVIEW_AS_OF);
-        
-        // Move the newly vital record under the second vital folder. I expect the reviewPeriod
-        // for the record to be changed again.
-        serviceRegistry.getFileFolderService().move(recordUnderTest, secondVitalFolder, null);
-        
-        // Commit to trigger the copy-down behaviour. Necessary?
-        tx3.commit();
-        UserTransaction tx4 = transactionService.getUserTransaction(false);
-        tx4.begin();
-
-        Period newReviewPeriod = rmService.getVitalRecordDefinition(recordUnderTest).getReviewPeriod();
-        assertEquals("Unexpected review period.", dailyReview, newReviewPeriod);
-        
-        Date updatedReviewDate = (Date)nodeService.getProperty(recordUnderTest, PROP_REVIEW_AS_OF);
-        // The reviewAsOf date should have changed to "24 hours from now".
-        assertFalse("reviewAsOf date was unchanged", reviewDate.equals(updatedReviewDate));
-        long millisecondsUntilNextReview = updatedReviewDate.getTime() - new Date().getTime();
-        assertTrue("new reviewAsOf date was not within 24 hours of now.",
-                millisecondsUntilNextReview <= TWENTY_FOUR_HOURS_IN_MS);
-
-        nodeService.deleteNode(recordUnderTest);
-        nodeService.deleteNode(nonVitalFolder);
-        nodeService.deleteNode(secondVitalFolder);
-        tx4.commit();
+                nodeService.deleteNode(recordUnderTest);
+                nodeService.deleteNode(nonVitalFolder);
+                nodeService.deleteNode(secondVitalFolder);
+                
+                return null;
+            }          
+        });
     }
 
     public void off_testMoveRefileRecordFolder() throws Exception
@@ -375,161 +391,188 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
     }
 
     public void testDispositionLifecycle_0318_01_basictest() throws Exception
-	{	    
-	    NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
-	    assertNotNull(recordCategory);
-	    assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
-        	    
-	    NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
-	    
-	    setComplete();
+	{	   
+        final NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records"); 
+        setComplete();
         endTransaction();
-	    
-        UserTransaction txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        	    
+        final NodeRef recordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                   
+                assertNotNull(recordCategory);
+                assertEquals("AIS Audit Records", nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+                        
+                return createRecordFolder(recordCategory, "March AIS Audit Records");                        
+            }          
+        });
         
-        // Check the folder to ensure everything has been inherited correctly
-        assertTrue(((Boolean)this.nodeService.getProperty(recordFolder, PROP_VITAL_RECORD_INDICATOR)).booleanValue());
-        assertEquals(this.nodeService.getProperty(recordCategory, PROP_REVIEW_PERIOD),
-                     this.nodeService.getProperty(recordFolder, PROP_REVIEW_PERIOD));
-	    
-        // Create the document
-	    Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
-	    props.put(ContentModel.PROP_NAME, "MyRecord.txt");
-	    NodeRef recordOne = this.nodeService.createNode(recordFolder, 
-	                                                    ContentModel.ASSOC_CONTAINS, 
-	                                                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
-	                                                    ContentModel.TYPE_CONTENT).getChildRef();
-	    
-	    // Set the content
-	    ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
-	    writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-	    writer.setEncoding("UTF-8");
-	    writer.putContent("There is some content in this record");
-	    
-	    txn.commit(); // - triggers FileAction
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        final NodeRef recordOne = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                // Check the folder to ensure everything has been inherited correctly
+                assertTrue(((Boolean)nodeService.getProperty(recordFolder, PROP_VITAL_RECORD_INDICATOR)).booleanValue());
+                assertEquals(nodeService.getProperty(recordCategory, PROP_REVIEW_PERIOD),
+                             nodeService.getProperty(recordFolder, PROP_REVIEW_PERIOD));
+                
+                // Create the document
+                Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+                props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+                NodeRef recordOne = nodeService.createNode(recordFolder, 
+                                                           ContentModel.ASSOC_CONTAINS, 
+                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                           ContentModel.TYPE_CONTENT).getChildRef();
+                
+                // Set the content
+                ContentWriter writer = contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+                writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+                writer.setEncoding("UTF-8");
+                writer.putContent("There is some content in this record");
+                
+                return recordOne;
+            }          
+        });
         
 	    // Checked that the document has been marked as incomplete
 	    System.out.println("recordOne ...");
-	    
-	    assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_RECORD));
-        assertNotNull(this.nodeService.getProperty(recordOne, PROP_IDENTIFIER));
-        System.out.println("Record id: " + this.nodeService.getProperty(recordOne, PROP_IDENTIFIER));
-        assertNotNull(this.nodeService.getProperty(recordOne, PROP_DATE_FILED));
-        System.out.println("Date filed: " + this.nodeService.getProperty(recordOne, PROP_DATE_FILED));
-        
-        // Check the review schedule
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_VITAL_RECORD));
-        assertNotNull(this.nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
-        System.out.println("Review as of: " + this.nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
+ 
+	    transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_RECORD));
+                assertNotNull(nodeService.getProperty(recordOne, PROP_IDENTIFIER));
+                System.out.println("Record id: " + nodeService.getProperty(recordOne, PROP_IDENTIFIER));
+                assertNotNull(nodeService.getProperty(recordOne, PROP_DATE_FILED));
+                System.out.println("Date filed: " + nodeService.getProperty(recordOne, PROP_DATE_FILED));
+                
+                // Check the review schedule
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_VITAL_RECORD));
+                assertNotNull(nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
+                System.out.println("Review as of: " + nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
 
-        // NOTE the disposition is being managed at a folder level ...
-        
-        // Check the disposition action
-        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
-        assertTrue(this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
-        
-        NodeRef ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
-        assertNotNull(ndNodeRef);        
-        
-        assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
-        System.out.println("Disposition action id: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
-        assertEquals("cutoff", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
-        System.out.println("Disposition action: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
-        assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
-        System.out.println("Disposition as of: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
-        
-        // Check for the search properties having been populated
-        checkSearchAspect(recordFolder);
-        
-	    // Test the declaration of a record by editing properties
-        Map<QName, Serializable> propValues = new HashMap<QName, Serializable>();   
-	    propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());	    
-	    List<String> smList = new ArrayList<String>(2);
-        smList.add(FOUO);
-        smList.add(NOFORN);
-	    propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);	    
-	    propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
-	    propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
-	    propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());
-	    this.nodeService.addProperties(recordOne, propValues);
-	    
-	    txn.commit(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        // Try and declare, expected failure
-        try
+                // NOTE the disposition is being managed at a folder level ...
+                
+                // Check the disposition action
+                assertFalse(nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
+                assertTrue(nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+                
+                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);        
+                
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+                System.out.println("Disposition action id: " + nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+                assertEquals("cutoff", nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+                System.out.println("Disposition action: " + nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+                System.out.println("Disposition as of: " + nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(recordFolder);
+                
+                // Test the declaration of a record by editing properties
+                Map<QName, Serializable> propValues = new HashMap<QName, Serializable>();   
+                propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
+                List<String> smList = new ArrayList<String>(2);
+                smList.add(FOUO);
+                smList.add(NOFORN);
+                propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
+                propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
+                propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
+                propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());
+                nodeService.addProperties(recordOne, propValues);
+                
+                return null;
+            }          
+        });
+
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
         {
-            this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
-            fail("Should not be able to declare a record that still has mandatory properties unset");
-        }
-        catch (Exception e)
+            public Object execute() throws Throwable
+            {
+                // Try and declare, expected failure
+                try
+                {
+                    rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
+                    fail("Should not be able to declare a record that still has mandatory properties unset");
+                }
+                catch (Exception e)
+                {
+                    // Expected
+                }
+                
+                return null;
+            }          
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
         {
-            // Expected
-        }
+            public Object execute() throws Throwable
+            {
+                assertTrue("Before test DECLARED aspect was set", 
+                           nodeService.hasAspect(recordOne, ASPECT_DECLARED_RECORD) == false);    
+                                     
+                nodeService.setProperty(recordOne, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+                nodeService.setProperty(recordOne, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+                nodeService.setProperty(recordOne, ContentModel.PROP_TITLE, "titleValue");
+                
+                // Declare the record as we have set everything we should have
+                rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
+                assertTrue(" the record is not declared", nodeService.hasAspect(recordOne, ASPECT_DECLARED_RECORD));
+                
+                return null;
+            }          
+        });     
         
-        txn.rollback(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        assertTrue("Before test DECLARED aspect was set", 
-        		this.nodeService.hasAspect(recordOne, ASPECT_DECLARED_RECORD) == false);    
-        
-             
-        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
-        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
-        this.nodeService.setProperty(recordOne, ContentModel.PROP_TITLE, "titleValue");
-        
-        // Declare the record as we have set everything we should have
-        this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
-        assertTrue(" the record is not declared", this.nodeService.hasAspect(recordOne, ASPECT_DECLARED_RECORD));
-        
-        txn.commit(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        // Execute the cutoff action (should fail because this is being done at the record level)
-        try
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
         {
-            this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
-            fail(("Shouldn't have been able to execute cut off at the record level"));
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
+            public Object execute() throws Throwable
+            {
+                // Execute the cutoff action (should fail because this is being done at the record level)
+                try
+                {
+                    rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+                    fail(("Shouldn't have been able to execute cut off at the record level"));
+                }
+                catch (Exception e)
+                {
+                    // expected
+                }
+                
+                // Execute the cutoff action (should fail becuase it is not yet eligiable)
+                try
+                {
+                    rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+                    fail(("Shouldn't have been able to execute because it is not yet eligiable"));
+                }
+                catch (Exception e)
+                {
+                    // expected
+                }
+                
+                return null;
+            }          
+        });
         
-        // Execute the cutoff action (should fail becuase it is not yet eligiable)
-        try
-        {
-            this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
-            fail(("Shouldn't have been able to execute because it is not yet eligiable"));
-        }
-        catch (Exception e)
-        {
-            // expected
-        }
-        
-        Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         
-        txn.rollback();
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        // Clock the asOf date back to ensure eligibility
-        ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
-        this.nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());        
-        this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
-        
-        txn.commit();
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // Clock the asOf date back to ensure eligibility
+                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());        
+                rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+                
+                return null;
+            }          
+        });
         
 //        System.out.println("Completed at :"  + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT )); 
 //        assertNotNull("PROP_DISPOSITION_ACTION_COMPLETED_AT", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT));
@@ -538,251 +581,281 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 //        assertNotNull("PROP_DISPOSITION_ACTION_STARTED_BY", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_STARTED_BY));              
 //        
         
-        // Check the disposition action
-        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
-        assertTrue(this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
-        
-        ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
-        assertNotNull(ndNodeRef);                
-        
-        assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
-        System.out.println("Disposition action id: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
-        assertEquals("destroy", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
-        System.out.println("Disposition action: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
-        assertNotNull(this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
-        System.out.println("Disposition as of: " + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
-        assertNull(this.nodeService.getProperty(recordFolder, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS));
-          
-          
-        
-        // Check the previous action details
-        // TODO check the history association
-        //assertEquals("cutoff", this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
-        //assertNotNull(this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
-        //System.out.println("Previous aciont date: " + this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE).toString());
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // Check the disposition action
+                assertFalse(nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
+                assertTrue(nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+                
+                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);                
+                
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+                System.out.println("Disposition action id: " + nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+                assertEquals("destroy", nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+                System.out.println("Disposition action: " + nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+                System.out.println("Disposition as of: " + nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+                assertNull(nodeService.getProperty(recordFolder, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS));
+                                 
+                // Check the previous action details
+                // TODO check the history association
+                //assertEquals("cutoff", this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
+                //assertNotNull(this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
+                //System.out.println("Previous aciont date: " + this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE).toString());
 
-        // Check for the search properties having been populated
-        checkSearchAspect(recordFolder);
-        
-        // Execute the destroy action
-        ndNodeRef = this.nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
-        this.nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());
-        this.rmActionService.executeRecordsManagementAction(recordFolder, "destroy", null);
-        
-        // Check that the node has been destroyed
-        assertFalse(this.nodeService.exists(recordFolder));
-        assertFalse(this.nodeService.exists(recordOne));
-        
-        txn.commit();
+                // Check for the search properties having been populated
+                checkSearchAspect(recordFolder);
+                
+                // Execute the destroy action
+                ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());
+                rmActionService.executeRecordsManagementAction(recordFolder, "destroy", null);
+                
+                // Check that the node has been destroyed
+                assertFalse(nodeService.exists(recordFolder));
+                assertFalse(nodeService.exists(recordOne));
+                
+                return null;
+            }          
+        });
     }
     
     public void testFreeze() throws Exception
     {      
-        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
+        final NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
         assertNotNull(recordCategory);
         assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
         
         // Before we start just remove any outstanding holds
-        NodeRef rootNode = this.rmService.getRecordsManagementRoot(recordCategory);
+        final NodeRef rootNode = this.rmService.getRecordsManagementRoot(recordCategory);
         List<ChildAssociationRef> tempAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
         for (ChildAssociationRef tempAssoc : tempAssocs)
         {
             this.nodeService.deleteNode(tempAssoc.getChildRef());
         }
         
-        NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
+        final NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
         
         setComplete();
         endTransaction();
         
-        UserTransaction txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        //createRecord(recordFolder);
         
-        createRecord(recordFolder);
-        
-        NodeRef recordOne = createRecord(recordFolder, "one.txt");
-        NodeRef recordTwo = createRecord(recordFolder, "two.txt");
-        NodeRef recordThree = createRecord(recordFolder, "three.txt");
-        
-        txn.commit(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_RECORD));
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FILE_PLAN_COMPONENT));
-        
-        // Freeze the record
-        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-        params.put(FreezeAction.PARAM_REASON, "one");
-        this.rmActionService.executeRecordsManagementAction(recordOne, "freeze", params);
-        
-        txn.commit(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        // Check the hold exists 
-        List<ChildAssociationRef> holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
-        assertNotNull(holdAssocs);
-        assertEquals(1, holdAssocs.size());        
-        NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
-        assertEquals("one", this.nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
-        List<ChildAssociationRef> freezeAssocs = this.nodeService.getChildAssocs(holdNodeRef);
-        assertNotNull(freezeAssocs);
-        assertEquals(1, freezeAssocs.size());
-        
-        // Check the nodes are frozen
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
-      //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-      //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-        assertFalse(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
-        assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
-        
-        // Freeze a number of records
-        params = new HashMap<String, Serializable>(1);
-        params.put(FreezeAction.PARAM_REASON, "two");
-        List<NodeRef> records = new ArrayList<NodeRef>(2);
-        records.add(recordOne);
-        records.add(recordTwo);
-        records.add(recordThree);
-        this.rmActionService.executeRecordsManagementAction(records, "freeze", params);
-        
-        txn.commit(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        // Check the holds exist
-        holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
-        assertNotNull(holdAssocs);
-        assertEquals(2, holdAssocs.size());
-        for (ChildAssociationRef holdAssoc : holdAssocs)
+        final NodeRef recordOne = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
         {
-            String reason = (String)this.nodeService.getProperty(holdAssoc.getChildRef(), PROP_HOLD_REASON);
-            if (reason.equals("two") == true)
+            public NodeRef execute() throws Throwable
             {
-                freezeAssocs = this.nodeService.getChildAssocs(holdAssoc.getChildRef());
-                assertNotNull(freezeAssocs);
-                assertEquals(3, freezeAssocs.size());
-            }
-            else if (reason.equals("one") == true)
+                return createRecord(recordFolder, "one.txt");
+            }          
+        });
+        final NodeRef recordTwo = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
             {
-                freezeAssocs = this.nodeService.getChildAssocs(holdAssoc.getChildRef());
+                return createRecord(recordFolder, "two.txt");
+            }          
+        });
+        final NodeRef recordThree = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecord(recordFolder, "three.txt");
+            }          
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_RECORD));
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_FILE_PLAN_COMPONENT));
+                
+                // Freeze the record
+                Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+                params.put(FreezeAction.PARAM_REASON, "one");
+                rmActionService.executeRecordsManagementAction(recordOne, "freeze", params);
+                
+                return null;
+            }          
+        });        
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // Check the hold exists 
+                List<ChildAssociationRef> holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                assertNotNull(holdAssocs);
+                assertEquals(1, holdAssocs.size());        
+                NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
+                assertEquals("one", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+                List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdNodeRef);
                 assertNotNull(freezeAssocs);
                 assertEquals(1, freezeAssocs.size());
-            }
-        }
+                
+                // Check the nodes are frozen
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+              //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+              //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertFalse(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+                assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+                
+                // Freeze a number of records
+                Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+                params.put(FreezeAction.PARAM_REASON, "two");
+                List<NodeRef> records = new ArrayList<NodeRef>(2);
+                records.add(recordOne);
+                records.add(recordTwo);
+                records.add(recordThree);
+                rmActionService.executeRecordsManagementAction(records, "freeze", params);
+                
+                return null;
+            }          
+        });
         
-        // Check the nodes are frozen
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-        assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-        //assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-        assertTrue(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-        
-        // Unfreeze a node
-        this.rmActionService.executeRecordsManagementAction(recordThree, "unfreeze");
-        
-        // Check the holds
-        holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
-        assertNotNull(holdAssocs);
-        assertEquals(2, holdAssocs.size());
-        for (ChildAssociationRef holdAssoc : holdAssocs)
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
         {
-            String reason = (String)this.nodeService.getProperty(holdAssoc.getChildRef(), PROP_HOLD_REASON);
-            if (reason.equals("two") == true)
+            public Object execute() throws Throwable
             {
-                freezeAssocs = this.nodeService.getChildAssocs(holdAssoc.getChildRef());
+                // Check the holds exist
+                List<ChildAssociationRef> holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                assertNotNull(holdAssocs);
+                assertEquals(2, holdAssocs.size());
+                for (ChildAssociationRef holdAssoc : holdAssocs)
+                {
+                    String reason = (String)nodeService.getProperty(holdAssoc.getChildRef(), PROP_HOLD_REASON);
+                    if (reason.equals("two") == true)
+                    {
+                        List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdAssoc.getChildRef());
+                        assertNotNull(freezeAssocs);
+                        assertEquals(3, freezeAssocs.size());
+                    }
+                    else if (reason.equals("one") == true)
+                    {
+                        List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdAssoc.getChildRef());
+                        assertNotNull(freezeAssocs);
+                        assertEquals(1, freezeAssocs.size());
+                    }
+                }
+                
+                // Check the nodes are frozen
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+                //assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertTrue(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                
+                // Unfreeze a node
+                rmActionService.executeRecordsManagementAction(recordThree, "unfreeze");
+                
+                // Check the holds
+                holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                assertNotNull(holdAssocs);
+                assertEquals(2, holdAssocs.size());
+                for (ChildAssociationRef holdAssoc : holdAssocs)
+                {
+                    String reason = (String)nodeService.getProperty(holdAssoc.getChildRef(), PROP_HOLD_REASON);
+                    if (reason.equals("two") == true)
+                    {
+                        List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdAssoc.getChildRef());
+                        assertNotNull(freezeAssocs);
+                        assertEquals(2, freezeAssocs.size());
+                    }
+                    else if (reason.equals("one") == true)
+                    {
+                        List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdAssoc.getChildRef());
+                        assertNotNull(freezeAssocs);
+                        assertEquals(1, freezeAssocs.size());
+                    }
+                }
+                
+                // Check the nodes are frozen
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+              //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+                
+                // Relinquish the first hold
+                NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
+                rmActionService.executeRecordsManagementAction(holdNodeRef, "relinquishHold");
+                
+                // Check the holds
+                holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                assertNotNull(holdAssocs);
+                assertEquals(1, holdAssocs.size());
+                holdNodeRef = holdAssocs.get(0).getChildRef();
+                assertEquals("two", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+                List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdNodeRef);
                 assertNotNull(freezeAssocs);
                 assertEquals(2, freezeAssocs.size());
-            }
-            else if (reason.equals("one") == true)
-            {
-                freezeAssocs = this.nodeService.getChildAssocs(holdAssoc.getChildRef());
+                
+                // Check the nodes are frozen
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+                
+                // Unfreeze
+                rmActionService.executeRecordsManagementAction(recordOne, "unfreeze");
+                
+                // Check the holds
+                holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                assertNotNull(holdAssocs);
+                assertEquals(1, holdAssocs.size());
+                holdNodeRef = holdAssocs.get(0).getChildRef();
+                assertEquals("two", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+                freezeAssocs = nodeService.getChildAssocs(holdNodeRef);
                 assertNotNull(freezeAssocs);
                 assertEquals(1, freezeAssocs.size());
-            }
-        }
-        
-        // Check the nodes are frozen
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-        assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-      //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-        assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
-        
-        // Relinquish the first hold
-        this.rmActionService.executeRecordsManagementAction(holdNodeRef, "relinquishHold");
-        
-        // Check the holds
-        holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
-        assertNotNull(holdAssocs);
-        assertEquals(1, holdAssocs.size());
-        holdNodeRef = holdAssocs.get(0).getChildRef();
-        assertEquals("two", this.nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
-        freezeAssocs = this.nodeService.getChildAssocs(holdNodeRef);
-        assertNotNull(freezeAssocs);
-        assertEquals(2, freezeAssocs.size());
-        
-        // Check the nodes are frozen
-        assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-        assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-        assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
-        
-        // Unfreeze
-        this.rmActionService.executeRecordsManagementAction(recordOne, "unfreeze");
-        
-        // Check the holds
-        holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
-        assertNotNull(holdAssocs);
-        assertEquals(1, holdAssocs.size());
-        holdNodeRef = holdAssocs.get(0).getChildRef();
-        assertEquals("two", this.nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
-        freezeAssocs = this.nodeService.getChildAssocs(holdNodeRef);
-        assertNotNull(freezeAssocs);
-        assertEquals(1, freezeAssocs.size());
-        
-        // Check the nodes are frozen
-        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
-        assertTrue(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-       // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-        assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
-        
-        // Unfreeze
-        this.rmActionService.executeRecordsManagementAction(recordTwo, "unfreeze");
-        
-        // Check the holds
-        holdAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
-        assertNotNull(holdAssocs);
-        assertEquals(0, holdAssocs.size());
-        
-        // Check the nodes are frozen
-        assertFalse(this.nodeService.hasAspect(recordOne, ASPECT_FROZEN));
-        assertFalse(this.nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
-        assertFalse(this.nodeService.hasAspect(recordThree, ASPECT_FROZEN));
-        
-        txn.commit();         
+                
+                // Check the nodes are frozen
+                assertFalse(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+                assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+                
+                // Unfreeze
+                rmActionService.executeRecordsManagementAction(recordTwo, "unfreeze");
+                
+                // Check the holds
+                holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                assertNotNull(holdAssocs);
+                assertEquals(0, holdAssocs.size());
+                
+                // Check the nodes are frozen
+                assertFalse(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+                assertFalse(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
+                assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+                
+                return null;
+            }          
+        });                  
     }
     
     public void testDispositionLifecycle_0430_02_transfer() throws Exception
     {
-        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Civilian Files", "Foreign Employee Award Files");    
+        final NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Civilian Files", "Foreign Employee Award Files");    
         assertNotNull(recordCategory);
         assertEquals("Foreign Employee Award Files", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
         
-        NodeRef recordFolder = createRecordFolder(recordCategory, "Test Record Folder");
+        final NodeRef recordFolder = createRecordFolder(recordCategory, "Test Record Folder");
         
         // Before we start just remove any outstanding transfers
-        NodeRef rootNode = this.rmService.getRecordsManagementRoot(recordCategory);
+        final NodeRef rootNode = this.rmService.getRecordsManagementRoot(recordCategory);
         List<ChildAssociationRef> tempAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
         for (ChildAssociationRef tempAssoc : tempAssocs)
         {
@@ -792,91 +865,116 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         setComplete();
         endTransaction();
         
-        UserTransaction txn = transactionService.getUserTransaction(false);
-        txn.begin();        
-        
-        NodeRef recordOne = createRecord(recordFolder, "one.txt");
-        NodeRef recordTwo = createRecord(recordFolder, "two.txt");
-        NodeRef recordThree = createRecord(recordFolder, "three.txt");
-        
-        txn.commit(); 
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        // Declare the records
-        declareRecord(recordOne);
-        declareRecord(recordTwo);
-        declareRecord(recordThree);
-        
-        // Cutoff
-        Map<String, Serializable> params = new HashMap<String, Serializable>(3);
-        params.put(CompleteEventAction.PARAM_EVENT_NAME, "case_complete");
-        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
-        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
-        this.rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
-        this.rmActionService.executeRecordsManagementAction(recordFolder, "cutoff");
-        
-        DispositionAction da = this.rmService.getNextDispositionAction(recordFolder);
-        assertNotNull(da);
-        assertEquals("transfer", da.getName());
+        final NodeRef recordOne = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecord(recordFolder, "one.txt");
+            }          
+        });
+        final NodeRef recordTwo = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecord(recordFolder, "two.txt");
+            }          
+        });
+        final NodeRef recordThree = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecord(recordFolder, "three.txt");
+            }          
+        });
+
+        final DispositionAction da = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<DispositionAction>()
+        {
+            public DispositionAction execute() throws Throwable
+            {
+                // Declare the records
+                declareRecord(recordOne);
+                declareRecord(recordTwo);
+                declareRecord(recordThree);
+                
+                // Cutoff
+                Map<String, Serializable> params = new HashMap<String, Serializable>(3);
+                params.put(CompleteEventAction.PARAM_EVENT_NAME, "case_complete");
+                params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+                params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "roy");
+                rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
+                rmActionService.executeRecordsManagementAction(recordFolder, "cutoff");
+                
+                DispositionAction da = rmService.getNextDispositionAction(recordFolder);
+                assertNotNull(da);
+                assertEquals("transfer", da.getName());
+                
+                return da;
+            }          
+        });
         
         // Do the transfer
-        Calendar calendar = Calendar.getInstance();
+        final Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR, 0);
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         
-        txn.commit();
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {        
+                // Clock the asOf date back to ensure eligibility
+                nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_AS_OF, calendar.getTime());        
+                rmActionService.executeRecordsManagementAction(recordFolder, "transfer", null);
+                
+                return null;
+            }          
+        });
         
-        // Clock the asOf date back to ensure eligibility
-        this.nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_AS_OF, calendar.getTime());        
-        this.rmActionService.executeRecordsManagementAction(recordFolder, "transfer", null);
-        
-        txn.commit();
-        txn = transactionService.getUserTransaction(false);
-        txn.begin();
-        
-        // Check that the next disposition action is stil in the correct state
-        da = this.rmService.getNextDispositionAction(recordFolder);
-        assertNotNull(da);
-        assertEquals("transfer", da.getName());
-        assertNotNull(da.getStartedAt());
-        assertNotNull(da.getStartedBy());
-        assertNull(da.getCompletedAt());
-        assertNull(da.getCompletedBy());        
-        
-        // Check that the transfer object is created
-        assertNotNull(rootNode);
-        List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
-        assertNotNull(assocs);
-        assertEquals(1, assocs.size());
-        NodeRef transferNodeRef = assocs.get(0).getChildRef();
-        assertEquals(TYPE_TRANSFER, this.nodeService.getType(transferNodeRef));
-        List<ChildAssociationRef> children = this.nodeService.getChildAssocs(transferNodeRef, ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
-        assertNotNull(children);
-        assertEquals(1, children.size());
-        
-        // Complete the transfer
-        this.rmActionService.executeRecordsManagementAction(assocs.get(0).getChildRef(), "transferComplete");
-        
-        // Check the transfer object is deleted
-        assocs = this.nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
-        assertNotNull(assocs);
-        assertEquals(0, assocs.size());
-        
-        // Check the disposition action has been moved on        
-        da = this.rmService.getNextDispositionAction(recordFolder);
-        assertNotNull(da);
-        assertEquals("transfer", da.getName());
-        assertNull(da.getStartedAt());
-        assertNull(da.getStartedBy());
-        assertNull(da.getCompletedAt());
-        assertNull(da.getCompletedBy());    
-        assertFalse(this.rmService.isNextDispositionActionEligible(recordFolder));
-        
-        txn.commit();
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // Check that the next disposition action is stil in the correct state
+                DispositionAction da = rmService.getNextDispositionAction(recordFolder);
+                assertNotNull(da);
+                assertEquals("transfer", da.getName());
+                assertNotNull(da.getStartedAt());
+                assertNotNull(da.getStartedBy());
+                assertNull(da.getCompletedAt());
+                assertNull(da.getCompletedBy());        
+                
+                // Check that the transfer object is created
+                assertNotNull(rootNode);
+                List<ChildAssociationRef> assocs = nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
+                assertNotNull(assocs);
+                assertEquals(1, assocs.size());
+                NodeRef transferNodeRef = assocs.get(0).getChildRef();
+                assertEquals(TYPE_TRANSFER, nodeService.getType(transferNodeRef));
+                List<ChildAssociationRef> children = nodeService.getChildAssocs(transferNodeRef, ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
+                assertNotNull(children);
+                assertEquals(1, children.size());
+                
+                // Complete the transfer
+                rmActionService.executeRecordsManagementAction(assocs.get(0).getChildRef(), "transferComplete");
+                
+                // Check the transfer object is deleted
+                assocs = nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
+                assertNotNull(assocs);
+                assertEquals(0, assocs.size());
+                
+                // Check the disposition action has been moved on        
+                da = rmService.getNextDispositionAction(recordFolder);
+                assertNotNull(da);
+                assertEquals("transfer", da.getName());
+                assertNull(da.getStartedAt());
+                assertNull(da.getStartedBy());
+                assertNull(da.getCompletedAt());
+                assertNull(da.getCompletedBy());    
+                assertFalse(rmService.isNextDispositionActionEligible(recordFolder));
+                
+                return null;
+            }          
+        });
     }
 	
 	private void checkSearchAspect(NodeRef record)
