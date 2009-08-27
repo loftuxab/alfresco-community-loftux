@@ -18,13 +18,7 @@
   The input format for values is different to the output format.
   
   <br />
-  Data Return format.
-  
-  
-  
-      
-      
-
+  Data Return format. 
   ]]>
   </description>
   <url>/api/rma/admin/rmconstraints/{listName}/values</url>

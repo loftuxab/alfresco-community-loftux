@@ -45,6 +45,11 @@ public interface RecordsManagementModel extends RecordsManagementCustomModel
     
     public static QName ASPECT_CAVEAT_CONFIG_ROOT = QName.createQName(RM_URI, "caveatConfigRoot");
     public static QName ASSOC_CAVEAT_CONFIG = QName.createQName(RM_URI, "caveatConfigAssoc");
+    
+    // Email config
+    public static QName TYPE_EMAIL_CONFIG = QName.createQName(RM_URI, "emailConfig");    
+    public static QName ASPECT_EMAIL_CONFIG_ROOT = QName.createQName(RM_URI, "emailConfigRoot");
+    public static QName ASSOC_EMAIL_CONFIG = QName.createQName(RM_URI, "emailConfigAssoc");
 
     // Records management container
     public static QName TYPE_RECORDS_MANAGEMENT_CONTAINER = QName.createQName(RM_URI, "recordsManagementContainer");

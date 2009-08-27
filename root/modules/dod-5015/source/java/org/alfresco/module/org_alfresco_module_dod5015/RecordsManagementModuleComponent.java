@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015;
 
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService;
+import org.alfresco.module.org_alfresco_module_dod5015.email.CustomEmailMappingService;
 import org.alfresco.repo.module.AbstractModuleComponent;
 
 
@@ -37,9 +38,21 @@ public class RecordsManagementModuleComponent extends AbstractModuleComponent
 {
     private RMCaveatConfigService caveatConfigService;
     
+    private CustomEmailMappingService customEmailMappingService;
+    
     public void setCaveatConfigService(RMCaveatConfigService caveatConfigService)
     {
         this.caveatConfigService = caveatConfigService;
+    }
+    
+    public void setCustomEmailMappingService(CustomEmailMappingService customEmailMappingService)
+    {
+        this.customEmailMappingService = customEmailMappingService;
+    }
+
+    public CustomEmailMappingService getCustomEmailMappingService()
+    {
+        return customEmailMappingService;
     }
     
     @Override
@@ -47,5 +60,13 @@ public class RecordsManagementModuleComponent extends AbstractModuleComponent
     {
         // initialse caveat config
         caveatConfigService.init();
+        
+        // initialse caveat config
+        customEmailMappingService.init();
+        
     }
+
+
+    
+
 }

@@ -9,4 +9,6 @@ public interface CustomEmailMappingService
     public void addCustomMapping(String from, String to);
     
     public void deleteCustomMapping(String from, String to);
+    
+    public void init();
 }

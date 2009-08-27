@@ -32,9 +32,9 @@ public class CustomMapping
     
     public int hashCode()
     {
-        if(from != null)
+        if(from != null && to != null)
         {
-            return from.hashCode();
+            return (from + to).hashCode();
         }
         else
         {
