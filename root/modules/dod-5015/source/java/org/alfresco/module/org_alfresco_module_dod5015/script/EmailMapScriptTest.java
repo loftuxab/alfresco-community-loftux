@@ -1,19 +1,11 @@
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
 import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.util.PropertyMap;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.PostRequest;
-import org.alfresco.web.scripts.TestWebScriptServer.DeleteRequest;
-import org.alfresco.web.scripts.TestWebScriptServer.PutRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.Response;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,13 +15,19 @@ public class EmailMapScriptTest extends BaseWebScriptTest
 
     public final static String URL_RM_EMAILMAP = "/api/rma/admin/emailmap";
     
+    AuthenticationService authenticationService;
+    
     @Override
     protected void setUp() throws Exception
     {
+        this.authenticationService = (AuthenticationService)getServer().getApplicationContext().getBean("AuthenticationService");
+//        setCurrentUser(AuthenticationUtil.getAdminUserName());
         super.setUp();
+        
+        // Set the current security context as admin
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
     }
-    
-
     
     @Override
     protected void tearDown() throws Exception
@@ -47,13 +45,10 @@ public class EmailMapScriptTest extends BaseWebScriptTest
             System.out.println(response.getContentAsString());
             //JSONArray data = top.getJSONArray("data");
         }
-    }
-    
-  
+    } 
     
     public void testUpdateEmailMap() throws Exception
     {
-        
         /**
          * Update the list  
          */
@@ -73,7 +68,6 @@ public class EmailMapScriptTest extends BaseWebScriptTest
            obj.put("add", add);
            
            System.out.println(obj.toString());
-    
            /**
              * Now do a post to delete a value
              */
