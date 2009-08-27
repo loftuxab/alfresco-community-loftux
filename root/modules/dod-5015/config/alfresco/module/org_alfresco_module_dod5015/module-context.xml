@@ -200,14 +200,12 @@
     </bean>
     -->
     
-    <bean id="RMModuleComponent" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModuleComponent" parent="module.baseComponent">
-        <!-- init caveatConfig behaviours  -->
-        <property name="executeOnceOnly" value="false"/>
+    <bean id="RecordsManagementBootstrap" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementBootstrap">
+        <property name="transactionService" ref="transactionService"/>
         
-        <property name="moduleId" value="org_alfresco_module_dod5015"/>
+        <!-- init caveatConfig behaviours  -->
         <property name="caveatConfigService" ref="caveatConfigService"/>
         <property name="customEmailMappingService" ref="customEmailMappingService"/>
-        
     </bean>
     
     <!-- RM caveats -->
