@@ -9,7 +9,7 @@
    <description>Records Management Model</description>
    <author>Roy Wetherall</author>
    <version>1.0</version>
-
+   
    <!-- Imports are required to allow references to definitions in other models -->
    <imports>
       <!-- Import Alfresco Dictionary Definitions -->
@@ -19,45 +19,11 @@
       <!-- Import Alfresco Content Domain Model Definitions -->
       <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys" />
    </imports>
-
+   
    <!-- Records Management Namespace -->
    <namespaces>
       <namespace uri="http://www.alfresco.org/model/recordsmanagement/1.0" prefix="rma"/>
    </namespaces>
-
-   <constraints>
-   
-      <!-- Pre-defined caveat (Supplemental Markings List) -->
-      
-      <!-- TODO - remove the list of allowed values (test example only) prior to release and fix-up associated unit tests-->
-      <constraint name="rma:smList" type="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
-         <parameter name="title"><value>Supplemental Markings</value></parameter>
-         <parameter name="allowedValues">
-            <list>
-               <value>NOFORN</value>      <!-- Not Releasable to Foreign Nationals/Governments/Non-US Citizens -->
-               <value>NOCONTRACT</value>  <!-- Not Releasable to Contractors or Contractor/Consultants -->
-               <value>FOUO</value>        <!-- For Official Use Only -->
-            </list>
-         </parameter>
-         <parameter name="caseSensitive"><value>true</value></parameter>
-      </constraint>
-      
-      <!--  User-defined caveats (if any) -->
-      
-      <!-- TODO - remove this constraint (test example only) prior to release and fix-up associated unit tests -->
-      <constraint name="rma:prjList" type="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
-         <parameter name="title"><value>Projects</value></parameter>
-         <parameter name="allowedValues">
-            <list>
-               <value>Project A</value>
-               <value>Project B</value>
-               <value>Project C</value>
-            </list>
-         </parameter>
-         <parameter name="caseSensitive"><value>true</value></parameter>
-      </constraint>
-      
-   </constraints>
    
    <types>
       
@@ -206,7 +172,7 @@
          
          <mandatory-aspects>         
             <aspect>cm:titled</aspect>
-            <aspect>rma:recordComponentIdentifier</aspect>           
+            <aspect>rma:recordComponentIdentifier</aspect>
             <aspect>rma:commonRecordDetails</aspect>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
@@ -567,17 +533,6 @@
                <title>Other Address</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property>    
-            
-            <!-- TODO - remove this user-defined property (test example only) prior to release and fix-up associated unit tests -->
-            <property name="rma:projectNameList">
-               <title>Project Name</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-               <multiple>true</multiple>
-               <constraints>
-                  <constraint ref="rma:prjList"/>
-               </constraints>
             </property>
             
          </properties>
@@ -598,23 +553,13 @@
                <title>Location</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property> 
-            
-            <property name="rma:supplementalMarkingList">
-               <title>Supplemental Marking List</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-               <multiple>true</multiple>
-               <constraints>
-                  <constraint ref="rma:smList"/>
-               </constraints>
             </property>
             
         </properties>
         <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
         </mandatory-aspects>
-      </aspect>                         
+      </aspect>
    
       <!-- State management aspects -->   
    

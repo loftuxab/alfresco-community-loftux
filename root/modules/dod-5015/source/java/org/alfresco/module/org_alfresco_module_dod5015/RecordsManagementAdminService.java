@@ -27,7 +27,6 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.repo.dictionary.M2NamedValue;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -39,7 +38,7 @@ import org.alfresco.service.namespace.QName;
 /**
  * Records management custom model service interface.
  * 
- * @author Neil McErlean
+ * @author Neil McErlean, janv
  */
 public interface RecordsManagementAdminService
 {
@@ -51,13 +50,34 @@ public interface RecordsManagementAdminService
      * @return
      */
     public Map<QName, PropertyDefinition> getAvailableCustomProperties(CustomisableRmElement customisedElement);
-
+    
     /**
      * This method returns the custom properties that have been defined for all of
      * the specified customisable RM elements.
      */
     public Map<QName, PropertyDefinition> getAvailableCustomProperties();
-
+    
+    /**
+     * 
+     * @param aspectName
+     * @param propQName
+     * @param dataType
+     * @param title
+     * @param description
+     * @param defaultValue
+     * @param multiValued
+     * @param mandatory
+     * @param isProtected
+     */
+    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected);
+    
+    /**
+     * 
+     * @param propQName
+     * @deprecated currently throws UnsupportedOperationException
+     */
+    public void removeCustomPropertyDefinition(QName propQName);
+    
     /**
      * This method returns the custom references that have been defined in the custom
      * model.
@@ -66,8 +86,18 @@ public interface RecordsManagementAdminService
      */
     public Map<QName, AssociationDefinition> getAvailableCustomReferences();
     
+    /**
+     * 
+     * @param node
+     * @return
+     */
     public List<AssociationRef> getCustomReferencesFor(NodeRef node);
     
+    /**
+     * 
+     * @param node
+     * @return
+     */
     public List<ChildAssociationRef> getCustomChildReferencesFor(NodeRef node);
     
     /**
@@ -87,10 +117,13 @@ public interface RecordsManagementAdminService
      * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}supported__null__null
      */
     public void removeCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId);
-
+    
+    public void addCustomAssocDefinition(String label);
+    
+    public void addCustomChildAssocDefinition(String source, String target);
+    
     /**
-     * This method returns ConstraintDefinition objects for all constraints defined
-     * in the rmc model.
+     * This method returns ConstraintDefinition objects defined in the rmc model (note: not property references or in-line defs)
      */
     public List<ConstraintDefinition> getCustomConstraintDefinitions();
 
@@ -101,25 +134,15 @@ public interface RecordsManagementAdminService
      * 
      * param type not included as it would always be RMListOfValuesConstraint for RM.
      * 
-     * @param constraintName the name e.g. rmc:foo.
+     * @param constraintName the name e.g. rmc:foo
+     * @param title the human-readable title e.g. My foo list
      * @param caseSensitive
      * @param allowedValues the allowed values list
      * 
      * TODO exceptions?
      */
-    public void addCustomConstraintDefinition(QName constraintName, boolean caseSensitive, List<String> allowedValues);
-
-    /**
-     * This method adds a constraint definition to the custom model.
-     * @param constraintName the name e.g. rmc:foo
-     * @param description a description string.
-     * @param parameters parameters should contain "caseSensitive" : Boolean, "allowedValues" : List<String>.
-     *                   It can probably be made to accept a title and other parameters too.
-     *                   
-     * TODO Exceptions?
-     */
-    public void addCustomConstraintDefinition(QName constraintName, String description, Map<String, Object> parameters);
-
+    public void addCustomConstraintDefinition(QName constraintName, String title, boolean caseSensitive, List<String> allowedValues);
+    
     /**
      * This method would remove a constraint definition from the custom model.
      * The implementation of this method would have to go into the M2Model and
@@ -129,6 +152,8 @@ public interface RecordsManagementAdminService
      * @param constraintName the name e.g. rmc:foo.
      * 
      * TODO exceptions?
+     * 
+     * @deprecated currently throws UnsupportedOperationException
      */
     public void removeCustomConstraintDefinition(QName constraintName);
     
@@ -141,4 +166,11 @@ public interface RecordsManagementAdminService
      * TODO exceptions?
      */
     public void changeCustomConstraintValues(QName constraintName, List<String> newValues);
+    
+    /**
+     * 
+     * @param constraintName
+     * @param title
+     */
+    public void changeCustomConstraintTitle(QName constraintName, String title);
 }

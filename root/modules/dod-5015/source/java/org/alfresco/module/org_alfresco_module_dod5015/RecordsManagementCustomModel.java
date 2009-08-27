@@ -31,11 +31,20 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author Gavin Cornwell
  */
-public interface RecordsManagementCustomModel 
-{	
-	// Namespace details
-	public static String RM_CUSTOM_URI = "http://www.alfresco.org/model/rmcustom/1.0";
-	public static String RM_CUSTOM_PREFIX = "rmc";    
+public interface RecordsManagementCustomModel
+{
+    // Namespace details
+    public static String RM_CUSTOM_URI = "http://www.alfresco.org/model/rmcustom/1.0";
+    public static String RM_CUSTOM_PREFIX = "rmc";
+    
+    // Model
+    public static QName RM_CUSTOM_MODEL = QName.createQName(RM_CUSTOM_URI, "rmcustom");
+    
+    // Custom constraint for Supplemental Marking List
+    public static QName CONSTRAINT_CUSTOM_SMLIST = QName.createQName(RM_CUSTOM_URI, "smList");
+    
+    // Custom property for for Supplemental Marking List
+    public static QName PROP_SUPPLEMENTAL_MARKING_LIST = QName.createQName(RM_CUSTOM_URI, "supplementalMarkingList");
     
     // Custom associations aspect
     public static QName ASPECT_CUSTOM_ASSOCIATIONS = QName.createQName(RM_CUSTOM_URI, "customAssocs");

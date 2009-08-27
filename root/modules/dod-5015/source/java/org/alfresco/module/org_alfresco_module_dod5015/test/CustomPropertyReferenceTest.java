@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
@@ -44,6 +46,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomPropertyAction;
+import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint;
 import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.policy.JavaBehaviour;
@@ -52,6 +55,8 @@ import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
+import org.alfresco.service.cmr.dictionary.Constraint;
+import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -383,6 +388,8 @@ public class CustomPropertyReferenceTest extends BaseSpringTest
             
             assertTrue(beforeMarker);
             assertTrue(onMarker);
+            
+            txn1.commit();
         }
         finally
         {
@@ -452,4 +459,119 @@ public class CustomPropertyReferenceTest extends BaseSpringTest
         this.nodeService.setProperty(recordOne, ContentModel.PROP_TITLE, "titleValue");
         this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
 	}
+    
+    public void testCustomConstraints() throws Exception
+    {
+        setComplete();
+        endTransaction();
+        
+        startNewTransaction();
+        
+        UserTransaction txn1 = transactionService.getUserTransaction(true);
+        txn1.begin();
+        
+        List<ConstraintDefinition> customConstraintDefs = rmAdminService.getCustomConstraintDefinitions();
+        assertNotNull(customConstraintDefs);
+        int beforeCnt = customConstraintDefs.size();
+        
+        txn1.commit();
+        
+        UserTransaction txn2 = transactionService.getUserTransaction(false);
+        txn2.begin();
+        
+        long testRunID = System.currentTimeMillis();
+        String conLocalName = "test-"+testRunID;
+        
+        final QName testCon = QName.createQName(CustomModelUtil.CUSTOM_MODEL_URI, conLocalName);
+        final String title = "test title - "+testRunID;
+        
+        List<String> allowedValues = new ArrayList<String>(3);
+        allowedValues.add("RED");
+        allowedValues.add("AMBER");
+        allowedValues.add("GREEN");
+        
+        rmAdminService.addCustomConstraintDefinition(testCon, title, true, allowedValues);
+        
+        txn2.commit();
+        
+        setComplete();
+        endTransaction();
+        
+        // Set the current security context as System - to see allowed values (unless caveat config is also updated for admin)
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        
+        UserTransaction txn3 = transactionService.getUserTransaction(true);
+        txn3.begin();
+        
+        customConstraintDefs = rmAdminService.getCustomConstraintDefinitions();
+        assertEquals(beforeCnt+1, customConstraintDefs.size());
+        
+        boolean found = false;
+        for (ConstraintDefinition conDef : customConstraintDefs)
+        {
+            if (conDef.getName().equals(testCon))
+            {
+                assertEquals(title, conDef.getTitle());
+                
+                Constraint con = conDef.getConstraint();
+                assertTrue(con instanceof RMListOfValuesConstraint);
+                
+                assertEquals("LIST", ((RMListOfValuesConstraint)con).getType());
+                assertEquals(3, ((RMListOfValuesConstraint)con).getAllowedValues().size());
+                
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
+        
+        txn3.commit();
+        
+        // Set the current security context as admin
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
+        UserTransaction txn4 = transactionService.getUserTransaction(false);
+        txn4.begin();
+        
+        allowedValues = new ArrayList<String>(2);
+        allowedValues.add("RED");
+        allowedValues.add("YELLOW");
+        
+        rmAdminService.changeCustomConstraintValues(testCon, allowedValues);
+        
+        txn4.commit();
+        
+        // Set the current security context as System - to see allowed values (unless caveat config is also updated for admin)
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        
+        UserTransaction txn5 = transactionService.getUserTransaction(true);
+        txn5.begin();
+        
+        customConstraintDefs = rmAdminService.getCustomConstraintDefinitions();
+        assertEquals(beforeCnt+1, customConstraintDefs.size());
+        
+        found = false;
+        for (ConstraintDefinition conDef : customConstraintDefs)
+        {
+            if (conDef.getName().equals(testCon))
+            {
+                assertEquals(title, conDef.getTitle());
+                
+                Constraint con = conDef.getConstraint();
+                assertTrue(con instanceof RMListOfValuesConstraint);
+                
+                assertEquals("LIST", ((RMListOfValuesConstraint)con).getType());
+                assertEquals(2, ((RMListOfValuesConstraint)con).getAllowedValues().size());
+                
+                found = true;
+                break;
+            }
+        }
+        assertTrue(found);
+        
+        txn5.commit();
+        
+        // Set the current security context as admin
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+    }
 }

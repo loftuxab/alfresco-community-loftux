@@ -62,14 +62,14 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
 	private AuthorityService authorityService;
 
 	
-	// example base test data for supplemental markings list (see also recordsModel.xml)
+	// example base test data for supplemental markings list
 	protected final static String NOFORN     = "NOFORN";     // Not Releasable to Foreign Nationals/Governments/Non-US Citizens
 	protected final static String NOCONTRACT = "NOCONTRACT"; // Not Releasable to Contractors or Contractor/Consultants
 	protected final static String FOUO       = "FOUO";       // For Official Use Only 
 	protected final static String FGI        = "FGI";        // Foreign Government Information
 	
-	protected final static String RM_LIST = "rma:smList";
-	protected final static String RM_LIST_ALT = "rma:prjList"; // valid but empty list
+	protected final static String RM_LIST = "rmc:smList"; // existing pre-defined list
+	protected final static String RM_LIST_ALT = "rmc:anoList";
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -143,25 +143,25 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         /**
          * Now remove the entire list (rma:smList);
          */
-        logger.debug("test remove entire list rma:smList");
+        logger.debug("test remove entire list rmc:smList");
         caveatConfigService.deleteRMConstraint(RM_LIST);
         
         /**
          * Now add the list again
          */
-        logger.debug("test add back rma:smList");
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        logger.debug("test add back rmc:smList");
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         /**
          * Negative test - add a list that already exists
          */
-        logger.debug("try to create duplicate list rma:smList");
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        logger.debug("try to create duplicate list rmc:smList");
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         /**
          * Negative test - remove a list that does not exist
          */
-        logger.debug("test remove entire list rma:smList");
+        logger.debug("test remove entire list rmc:smList");
         caveatConfigService.deleteRMConstraint(RM_LIST);
         caveatConfigService.deleteRMConstraint(RM_LIST);
         
@@ -198,7 +198,7 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         setupCaveatConfigData();
         
         startNewTransaction();
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         /**
          * Add a user to the list
@@ -212,7 +212,7 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
          * Add another value to that list
          */
         caveatConfigService.addRMConstraintListValue(RM_LIST, "jrogers", FGI);
-     
+        
         /**
          * Negative test - attempt to add a duplicate value
          */
@@ -262,9 +262,8 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         setupCaveatConfigData();
         
         startNewTransaction();
-       
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
- 
+        
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         /**
          * Add a user to the list
@@ -320,7 +319,7 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         setupCaveatConfigData();
         
         startNewTransaction();
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
        
         List<String> values = new ArrayList<String>();
         values.add(FGI);
@@ -340,10 +339,10 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
          * Negative test - remove a user from a list that does not exist.
          * Should create a new list
          */
-  
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
-        caveatConfigService.updateRMConstraintListAuthority(RM_LIST_ALT, "jrogers", values);
-           
+        
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
+        caveatConfigService.updateRMConstraintListAuthority(RM_LIST, "jrogers", values);
+        
         endTransaction();
         cleanCaveatConfigData();
  
@@ -366,7 +365,7 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         
         startNewTransaction();
         
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
 
         List<String> values = new ArrayList<String>();
         values.add(NOFORN);
@@ -406,31 +405,32 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         assertTrue(allowedValues.contains(NOFORN));
         assertTrue(allowedValues.contains(NOCONTRACT));
         assertTrue(allowedValues.contains(FOUO));
-        assertTrue(allowedValues.contains(FGI));   
-       
+        assertTrue(allowedValues.contains(FGI));
+        
         /**
+        //
          * Now remove the entire list (rma:smList);
          */
-        logger.debug("test remove entire list rma:smList");
+        logger.debug("test remove entire list rmc:smList");
         caveatConfigService.deleteRMConstraint(RM_LIST);
         
         
         /**
          * Now add the list again
          */
-        logger.debug("test add back rma:smList");
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        logger.debug("test add back rmc:smList");
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         /**
          * Negative test - add a list that already exists
          */
-        logger.debug("try to create duplicate list rma:smList");
-        caveatConfigService.addRMConstraint(RM_LIST, "", new String[0]);
+        logger.debug("try to create duplicate list rmc:smList");
+        caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
         /**
          * Negative test - remove a list that does not exist
          */
-        logger.debug("test remove entire list rma:smList");
+        logger.debug("test remove entire list rmc:smList");
         caveatConfigService.deleteRMConstraint(RM_LIST);
         caveatConfigService.deleteRMConstraint(RM_LIST);
         
@@ -450,7 +450,6 @@ public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD
         }
         endTransaction();
         cleanCaveatConfigData();
- 
     }
     
     private void cleanCaveatConfigData()

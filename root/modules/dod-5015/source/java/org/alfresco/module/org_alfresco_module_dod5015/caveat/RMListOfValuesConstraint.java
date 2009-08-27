@@ -55,8 +55,6 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
     private List<String> allowedValues;
     private List<String> allowedValuesUpper;
     
-    private String title;
-    
     // note: alternative to static init could be to use 'registered' constraint
     private static RMCaveatConfigService caveatConfigService;
     
@@ -71,7 +69,7 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
     {
         StringBuilder sb = new StringBuilder(80);
         sb.append("RMListOfValuesConstraint")
-          .append("[ allowedValues=").append(getAllowedValues())
+          .append("[allowedValues=").append(getAllowedValues())
           .append(", caseSensitive=").append(isCaseSensitive())
           .append("]");
         return sb.toString();
@@ -142,13 +140,9 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
     {
         if (allowedValues == null)
         {
-            throw new DictionaryException(ERR_NO_VALUES);
+            allowedValues = new ArrayList<String>(0);
         }
         int valueCount = allowedValues.size();
-        if (valueCount == 0)
-        {
-            throw new DictionaryException(ERR_NO_VALUES);
-        }
         this.allowedValues = Collections.unmodifiableList(allowedValues);
         
         // make the upper case versions
@@ -204,17 +198,5 @@ public class RMListOfValuesConstraint extends ListOfValuesConstraint
                 throw new ConstraintException(ERR_INVALID_VALUE, value);
             }
         }
-    }
-
-
-    public void setTitle(String title)
-    {
-        this.title = title;
-    }
-
-
-    public String getTitle()
-    {
-        return title;
     }
 }

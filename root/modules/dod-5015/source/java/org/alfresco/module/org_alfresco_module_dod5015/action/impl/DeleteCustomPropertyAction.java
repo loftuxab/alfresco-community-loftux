@@ -28,12 +28,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
-import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
-import org.alfresco.repo.dictionary.M2Aspect;
-import org.alfresco.repo.dictionary.M2Model;
-import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
@@ -48,7 +44,14 @@ import org.apache.commons.logging.LogFactory;
 public class DeleteCustomPropertyAction extends DefineCustomElementAbstractAction
 {
     private static Log logger = LogFactory.getLog(DeleteCustomPropertyAction.class);
-
+    
+    private RecordsManagementAdminService rmAdminService;
+    
+    public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
+    {
+        this.rmAdminService = rmAdminService;
+    }
+    
     /**
 	 * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
 	 *      org.alfresco.service.cmr.repository.NodeRef)
@@ -57,38 +60,11 @@ public class DeleteCustomPropertyAction extends DefineCustomElementAbstractActio
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
         Map<String, Serializable> params = action.getParameterValues();
-
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
-
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
-
+        
         String qname = (String)params.get(PARAM_NAME);
         QName propQName = QName.createQName(qname, namespaceService);
-        String propQNameAsString = propQName.toPrefixString(namespaceService);
-
-        // Need to select the correct aspect in the customModel from which we'll
-        // attempt to delete the property definition.
-        for (CustomisableRmElement elem : CustomisableRmElement.values())
-        {
-        	String aspectName = elem.getCorrespondingAspect();
-        	M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
-        	
-        	M2Property prop = customPropsAspect.getProperty(propQNameAsString);
-        	if (prop != null)
-        	{
-                if (logger.isDebugEnabled())
-                {
-                    StringBuilder msg = new StringBuilder();
-                    msg.append("Attempting to delete custom property: ");
-                    msg.append(propQNameAsString);
-                    logger.debug(msg.toString());
-                }
-        		customPropsAspect.removeProperty(propQNameAsString);
-        	}
-        }
-
-        customModelUtil.writeCustomContentModel(deserializedModel);
+        
+        rmAdminService.removeCustomPropertyDefinition(propQName);
     }
 
     @Override

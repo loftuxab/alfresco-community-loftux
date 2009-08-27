@@ -41,6 +41,8 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
@@ -57,7 +59,6 @@ import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
-import org.alfresco.repo.security.permissions.impl.model.PermissionModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -108,6 +109,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
     private RecordsManagementActionService rmActionService;
     private ServiceRegistry serviceRegistry;
 	private TransactionService transactionService;
+	private RecordsManagementAdminService rmAdminService;
 	private RMCaveatConfigService caveatConfigService;
 	
 	private AuthenticationService authenticationService;
@@ -122,6 +124,14 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	protected final static String NOCONTRACT = "NOCONTRACT"; // Not Releasable to Contractors or Contractor/Consultants
 	protected final static String FOUO       = "FOUO";       // For Official Use Only 
 	protected final static String FGI        = "FGI";        // Foreign Government Information
+	
+	// example user-defined field
+	protected final static QName CONSTRAINT_CUSTOM_PRJLIST = QName.createQName(RM_CUSTOM_URI, "prjList");
+	protected final static QName PROP_CUSTOM_PRJLIST = QName.createQName(RM_CUSTOM_URI, "projectNameList");
+	
+	protected final static String PRJ_A = "Project A";
+	protected final static String PRJ_B = "Project B";
+	protected final static String PRJ_C = "Project C";
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -143,7 +153,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
         this.serviceRegistry = (ServiceRegistry)this.applicationContext.getBean("ServiceRegistry");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
-		
+		this.rmAdminService = (RecordsManagementAdminService)this.applicationContext.getBean("RecordsManagementAdminService");
 		this.caveatConfigService = (RMCaveatConfigService)this.applicationContext.getBean("caveatConfigService");
 		
 		this.publicServiceAccessService = (PublicServiceAccessService)this.applicationContext.getBean("PublicServiceAccessService");
@@ -160,6 +170,15 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertTrue(file.exists());
         
         caveatConfigService.updateOrCreateCaveatConfig(file);
+        
+        // set/reset allowed values (empty list by default)
+        List<String> newValues = new ArrayList<String>(4);
+        newValues.add(NOFORN);
+        newValues.add(NOCONTRACT);
+        newValues.add(FOUO);
+        newValues.add(FGI);
+        
+        rmAdminService.changeCustomConstraintValues(RecordsManagementCustomModel.CONSTRAINT_CUSTOM_SMLIST, newValues);
 	}
 	
 	private void setUpTestData()
@@ -1142,6 +1161,11 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	}
 	
 	private NodeRef createRecord(NodeRef recordFolder, String name)
+    {
+	    return createRecord(recordFolder, name, "There is some content in this record");
+    }
+	
+	private NodeRef createRecord(NodeRef recordFolder, String name, String someTextContent)
 	{
     	// Create the document
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
@@ -1149,13 +1173,14 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         NodeRef recordOne = this.nodeService.createNode(recordFolder, 
                                                         ContentModel.ASSOC_CONTAINS, 
                                                         QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name), 
-                                                        ContentModel.TYPE_CONTENT).getChildRef();
+                                                        ContentModel.TYPE_CONTENT,
+                                                        props).getChildRef();
         
         // Set the content
         ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
         writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         writer.setEncoding("UTF-8");
-        writer.putContent("There is some content in this record");
+        writer.putContent(someTextContent);
         
         return recordOne;
 	}   
@@ -1625,6 +1650,21 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         startNewTransaction();
         
+        // set/reset allowed values (empty list by default)
+        
+        List<String> newValues = new ArrayList<String>(4);
+        newValues.add(NOFORN);
+        newValues.add(NOCONTRACT);
+        newValues.add(FOUO);
+        newValues.add(FGI);
+        
+        rmAdminService.changeCustomConstraintValues(RecordsManagementCustomModel.CONSTRAINT_CUSTOM_SMLIST, newValues);
+        
+        setComplete();
+        endTransaction();
+        
+        startNewTransaction();
+        
         // Test list of allowed values for caveats
         
         List<String> allowedValues = AuthenticationUtil.runAs(new RunAsWork<List<String>>()
@@ -1632,7 +1672,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             public List<String> doWork()
             {
                 // get allowed values for given caveat (for current user)
-                return caveatConfigService.getRMAllowedValues("rma:smList");
+                return caveatConfigService.getRMAllowedValues("rmc:smList");
             }
         }, "dfranco");
         
@@ -1646,7 +1686,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             public List<String> doWork()
             {
                 // get allowed values for given caveat (for current user)
-                return caveatConfigService.getRMAllowedValues("rma:smList");
+                return caveatConfigService.getRMAllowedValues("rmc:smList");
             }
         }, "dmartinz");
         
@@ -1674,8 +1714,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         startNewTransaction();
         
-        int expectedChildCount = 1;
-        assertEquals(expectedChildCount, nodeService.getChildAssocs(recordFolder).size());
+        int expectedChildCount = nodeService.getChildAssocs(recordFolder).size();
         
         final String RECORD_NAME = "MyRecord"+System.currentTimeMillis()+".txt";
         final String SOME_CONTENT = "There is some content in this record";
@@ -1683,20 +1722,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         // TODO review RM permissions
         //AuthenticationUtil.setFullyAuthenticatedUser("dfranco");
         
-        // Create the document
-        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
-        props.put(ContentModel.PROP_NAME, RECORD_NAME);
-        NodeRef recordOne = this.nodeService.createNode(recordFolder, 
-                                                        ContentModel.ASSOC_CONTAINS, 
-                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, RECORD_NAME), 
-                                                        ContentModel.TYPE_CONTENT,
-                                                        props).getChildRef();
+        NodeRef recordOne = createRecord(recordFolder, RECORD_NAME, SOME_CONTENT);
         
-        // Set the content
-        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
-        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        writer.setEncoding("UTF-8");
-        writer.putContent(SOME_CONTENT);
+        assertEquals(expectedChildCount+1, nodeService.getChildAssocs(recordFolder).size());
         
         // force behaviours
         setComplete();
@@ -1786,7 +1814,63 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         setComplete();
         endTransaction();
         
-        // Set user-defined field (in this case, "prjList" on record)
+        // User-defined field (in this case, "rmc:prjList" on record)
+        
+        /*
+        // TODO create custom constraint (or reset values if it already exists)
+        
+        startNewTransaction();
+        
+        newValues = new ArrayList<String>(3);
+        newValues.add(PRJ_A);
+        newValues.add(PRJ_B);
+        newValues.add(PRJ_C);
+        
+        // set / reset allowed values for custom constraint
+        try
+        {
+            rmAdminService.addCustomConstraintDefinition(CONSTRAINT_CUSTOM_PRJLIST, "Some Projects", true, newValues);
+        } 
+        catch (AlfrescoRuntimeException e)
+        {
+            // assume it already exists, so change existing values
+            rmAdminService.changeCustomConstraintValues(CONSTRAINT_CUSTOM_PRJLIST, newValues);
+        }
+        
+        setComplete();
+        endTransaction();
+        */
+        
+        startNewTransaction();
+        
+        newValues = new ArrayList<String>(3);
+        newValues.add(PRJ_A);
+        newValues.add(PRJ_B);
+        newValues.add(PRJ_C);
+        
+        // TODO currently assumes this constraint already exists
+        rmAdminService.changeCustomConstraintValues(CONSTRAINT_CUSTOM_PRJLIST, newValues);
+        
+        setComplete();
+        endTransaction();
+        
+        /*
+        // TODO define custom property and reference custom constraint
+        
+        startNewTransaction();
+
+        // Define a custom property.
+        final String propName = "rmc:customProperty" + System.currentTimeMillis();
+
+        Map <String, Serializable> params = new HashMap<String, Serializable>();
+        params.put("name", propName);
+        params.put("dataType", DataTypeDefinition.BOOLEAN);
+        params.put(DefineCustomPropertyAction.PARAM_ELEMENT, "recordFolder");
+        rmActionService.executeRecordsManagementAction("defineCustomProperty", params);
+        
+        setComplete();
+        endTransaction();
+        */
         
         try
         {
@@ -1796,9 +1880,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             
             Map<QName, Serializable> propValues = new HashMap<QName, Serializable>(1);
             List<String> prjList = new ArrayList<String>(3);
-            prjList.add("Project A");
-            prjList.add("Project B");
-            propValues.put(QName.createQName(RecordsManagementModel.RM_URI, "projectNameList"), (Serializable)prjList);
+            prjList.add(PRJ_A);
+            prjList.add(PRJ_B);
+            propValues.put(PROP_CUSTOM_PRJLIST, (Serializable)prjList);
             this.nodeService.addProperties(recordOne, propValues);
             
             // force integrity checking
@@ -1820,8 +1904,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             
             Map<QName, Serializable> propValues = new HashMap<QName, Serializable>(1);
             List<String> prjList = new ArrayList<String>(3);
-            prjList.add("Project A");
-            propValues.put(QName.createQName(RecordsManagementModel.RM_URI, "projectNameList"), (Serializable)prjList);
+            prjList.add(PRJ_A);
+            propValues.put(PROP_CUSTOM_PRJLIST, (Serializable)prjList);
             this.nodeService.addProperties(recordOne, propValues);
             
             // force integrity checking
@@ -1836,9 +1920,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         startNewTransaction();
         
         @SuppressWarnings("unchecked")
-        List<String> prjList = (List<String>)this.nodeService.getProperty(recordOne, QName.createQName(RecordsManagementModel.RM_URI, "projectNameList"));
+        List<String> prjList = (List<String>)this.nodeService.getProperty(recordOne, PROP_CUSTOM_PRJLIST);
         assertEquals(1, prjList.size());
-        assertTrue(prjList.contains("Project A"));
+        assertTrue(prjList.contains(PRJ_A));
         
         setComplete();
         endTransaction();

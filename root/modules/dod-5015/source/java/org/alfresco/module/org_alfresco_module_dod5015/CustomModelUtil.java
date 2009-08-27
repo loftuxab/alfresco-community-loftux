@@ -42,10 +42,12 @@ import org.alfresco.service.cmr.repository.ContentWriter;
  */
 public class CustomModelUtil
 {
-    public static final String CUSTOM_MODEL_PREFIX = "rmc";
-    protected static final String RMA_RECORD = "rma:record";
-    protected static final String RMC_CUSTOM_PROPS = CUSTOM_MODEL_PREFIX + ":customProperties";
-    protected static final String RMC_CUSTOM_ASSOCS = CUSTOM_MODEL_PREFIX + ":customAssocs";
+    public static final String CUSTOM_MODEL_URI = RecordsManagementCustomModel.RM_CUSTOM_URI;
+    public static final String CUSTOM_MODEL_PREFIX = RecordsManagementCustomModel.RM_CUSTOM_PREFIX;
+    public static final String CUSTOM_MODEL_NAME = "rmcustom";
+
+    public static final String RMC_CUSTOM_PROPS = CUSTOM_MODEL_PREFIX + ":customProperties";
+    public static final String RMC_CUSTOM_ASSOCS = CUSTOM_MODEL_PREFIX + ":customAssocs";
 
     private ContentService contentService;
 

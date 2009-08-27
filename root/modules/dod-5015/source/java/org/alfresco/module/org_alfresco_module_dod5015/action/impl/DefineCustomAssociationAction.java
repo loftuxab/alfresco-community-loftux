@@ -28,14 +28,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
-import org.alfresco.repo.dictionary.M2Aspect;
-import org.alfresco.repo.dictionary.M2Association;
-import org.alfresco.repo.dictionary.M2ChildAssociation;
-import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ParameterDefinition;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
@@ -54,8 +49,15 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
     private static final String PARAM_SOURCE = "source";
     private static final String PARAM_REFERENCE_TYPE = "referenceType";
     private static Log logger = LogFactory.getLog(DefineCustomAssociationAction.class);
-	public static final String RMA_RECORD = "rma:record";
-
+    public static final String RMA_RECORD = "rma:record";
+    
+    private RecordsManagementAdminService rmAdminService;
+    
+    public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
+    {
+        this.rmAdminService = rmAdminService;
+    }
+    
 	/**
 	 * 
 	 * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
@@ -81,11 +83,19 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
 
         if (isChildAssoc)
         {
-            this.createCustomChildAssoc(action, actionedUponNodeRef);
+            Map<String, Serializable> params = action.getParameterValues();
+            
+            String source = (String)params.get(PARAM_SOURCE);
+            String target = (String)params.get(PARAM_TARGET);
+            
+            rmAdminService.addCustomChildAssocDefinition(source, target);
         }
         else
         {
-            this.createCustomStandardAssoc(action, actionedUponNodeRef);
+            Map<String, Serializable> params = action.getParameterValues();
+            String label = (String)params.get(PARAM_LABEL);
+            
+            rmAdminService.addCustomAssocDefinition(label);
         }
 	}
 	
@@ -94,55 +104,6 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
     protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
     {
         return true;
-    }
-
-    private void createCustomStandardAssoc(Action action, NodeRef actionedUponNodeRef)
-    {
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
-
-        Map<String, Serializable> params = action.getParameterValues();
-        
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
-        M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
-
-        String label = (String)params.get(PARAM_LABEL);
-        
-        CustomReferenceId crId = new CustomReferenceId(label, null, null);
-        
-        M2Association newAssoc = customAssocsAspect.createAssociation(crId.getReferenceId());
-        newAssoc.setSourceMandatory(false);
-        newAssoc.setTargetMandatory(false);
-
-        //TODO Could be the customAssocs aspect
-        newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
-        
-        customModelUtil.writeCustomContentModel(deserializedModel);
-    }
-    
-    private void createCustomChildAssoc(Action action, NodeRef actionedUponNodeRef)
-    {
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
-
-        Map<String, Serializable> params = action.getParameterValues();
-
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
-        M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
-
-        String source = (String)params.get(PARAM_SOURCE);
-        String target = (String)params.get(PARAM_TARGET);
-
-        CustomReferenceId crId = new CustomReferenceId(null, source, target);
-
-        M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(crId.getReferenceId());
-        newAssoc.setSourceMandatory(false);
-        newAssoc.setTargetMandatory(false);
-
-        //TODO Could be the cstom assocs aspect
-        newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
-
-        customModelUtil.writeCustomContentModel(deserializedModel);
     }
     
     /**

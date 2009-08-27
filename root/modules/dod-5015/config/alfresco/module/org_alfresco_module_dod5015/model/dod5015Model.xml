@@ -26,19 +26,6 @@
       <namespace uri="http://www.alfresco.org/model/dod5015/1.0" prefix="dod"/>
    </namespaces>
    
-   <constraints>
-      <constraint name="dod:smList" type="LIST">
-         <parameter name="allowedValues">
-            <list>
-               <value>NOFORN</value>      <!-- Not Releasable to Foreign Nationals/Governments/Non-US Citizens -->
-               <value>NOCONTRACT</value>  <!-- Not Releasable to Contractors or Contractor/Consultants -->
-               <value>FOUO</value>        <!-- For Official Use Only -->
-            </list>
-         </parameter>
-         <parameter name="caseSensitive"><value>true</value></parameter>
-      </constraint>
-   </constraints>
-   
    <types>
    
       <type name="dod:filePlan">      

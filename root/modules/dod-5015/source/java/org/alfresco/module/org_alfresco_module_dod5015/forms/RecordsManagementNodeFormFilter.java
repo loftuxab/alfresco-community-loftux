@@ -129,7 +129,7 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
      * Adds the Custom RM field group (id 'rm-custom') to all the field 
      * definitions representing RM custom properties.
      * 
-     * @param form The form holding the field defintions
+     * @param form The form holding the field definitions
      */
     protected void addCustomRMGroup(Form form)
     {
@@ -138,7 +138,7 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
         List<FieldDefinition> fieldDefs = form.getFieldDefinitions(); 
         for (FieldDefinition fieldDef : fieldDefs)
         {
-            if (fieldDef.getName().startsWith(RM_CUSTOM_PREFIX))
+            if (fieldDef.getName().startsWith(RecordsManagementCustomModel.RM_CUSTOM_PREFIX))
             {
                 fieldDef.setGroup(CUSTOM_RM_FIELD_GROUP);
                 
