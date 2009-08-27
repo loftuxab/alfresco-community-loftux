@@ -370,7 +370,7 @@
          <fileset dir="${dir.module.gg.dist}"                   includes="${file.name.zip.gg}" />
          <fileset dir="${dir.module.sharepoint.dist}"           includes="${file.name.amp.sharepoint}" />
          <fileset dir="${dir.module.dod5015.dist}"              includes="${file.name.amp.dod5015}" />
-         <fileset dir="${dir.module.dod5015.share.dist}"        includes="${file.name.zip.dod5015.share}" />
+         <fileset dir="${dir.module.dod5015.share.dist}"        includes="${file.name.amp.dod5015.share}" />
       </copy>
    </target>
 

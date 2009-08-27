@@ -2307,10 +2307,22 @@
    <target name="package-dod5015-share-extension" 
            depends="assemble-dod5015-share, minimize-dod5015-share-javascript">
       <mkdir dir="${dir.module.dod5015.share.dist}" />
-      <zip destfile="${dir.module.dod5015.share.dist}/${file.name.zip.dod5015.share}">
+      <zip destfile="${dir.module.dod5015.share.dist}/${file.name.amp.dod5015.share}" excludes="**/modules/*">
+         <zipfileset file="${dir.module.dod5015.share.config}/module/module.properties"/>
+         <zipfileset file="${dir.module.dod5015.share.config}/module/file-mapping.properties"/>
          <zipfileset dir="${dir.module.dod5015.share.config}" prefix="WEB-INF/classes" />
-         <zipfileset dir="${dir.module.dod5015.share.assemble}" />
+         <zipfileset dir="${dir.module.dod5015.share.assemble}"  prefix="web"/>
       </zip>
+   </target>
+
+   <target name="package-dod5015-share"
+           depends="package-dod5015-share-war, deploy-slingshot-tomcat" />
+
+   <target name="package-dod5015-share-war"
+           depends="package-dod5015-share_extension">
+      <echo>Installing DOD 5015 into Share WAR...</echo>
+      <install-amp ampfile="${dir.module.dod5015.dist}/${file.name.amp.dod5015.share}" 
+                   warfile="${dir.project.slingshot.dist}/${file.name.war.slingshot}" />
    </target>
     
    <!-- ******************************************************************* -->
