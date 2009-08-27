@@ -26,19 +26,29 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService;
 import org.alfresco.module.org_alfresco_module_dod5015.email.CustomEmailMappingService;
-import org.alfresco.repo.module.AbstractModuleComponent;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.AbstractLifecycleBean;
+import org.springframework.context.ApplicationEvent;
 
 
 /**
- * RM module init
+ * RM module bootstrap
  * 
  * @author janv
  */
-public class RecordsManagementModuleComponent extends AbstractModuleComponent
+public class RecordsManagementBootstrap extends AbstractLifecycleBean
 {
+    private TransactionService transactionService;
     private RMCaveatConfigService caveatConfigService;
-    
     private CustomEmailMappingService customEmailMappingService;
+    
+    public void setTransactionService(TransactionService transactionService)
+    {
+        this.transactionService = transactionService;
+    }
     
     public void setCaveatConfigService(RMCaveatConfigService caveatConfigService)
     {
@@ -56,17 +66,37 @@ public class RecordsManagementModuleComponent extends AbstractModuleComponent
     }
     
     @Override
-    protected void executeInternal() throws Throwable
+    protected void onBootstrap(ApplicationEvent event)
     {
-        // initialse caveat config
-        caveatConfigService.init();
-        
-        // initialse caveat config
-        customEmailMappingService.init();
-        
+        // run as System on bootstrap
+        AuthenticationUtil.runAs(new RunAsWork<Object>()
+        {
+            public Object doWork()
+            {
+                RetryingTransactionCallback<Void> callback = new RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        // initialise caveat config
+                        caveatConfigService.init();
+                        
+                        // initialise custom email mapping
+                        customEmailMappingService.init();
+                        
+                        return null;
+                    }
+                };
+                transactionService.getRetryingTransactionHelper().doInTransaction(callback);
+                
+                return null;
+            }
+        }, AuthenticationUtil.getSystemUserName());
     }
-
-
     
-
+    @Override
+    protected void onShutdown(ApplicationEvent event)
+    {
+        // NOOP
+    }
 }
+
