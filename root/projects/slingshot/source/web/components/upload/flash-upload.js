@@ -74,6 +74,27 @@
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf?dt=" + (new Date()).getTime();
       this.hasRequiredFlashPlayer = Alfresco.util.hasRequiredFlashPlayer(9, 0, 45);
       
+      this.fileStore = {};
+      this.addedFiles = {};
+      this.defaultShowConfig =
+      {
+         siteId: null,
+         containerId: null,
+         uploadDirectory: null,
+         updateNodeRef: null,
+         updateFilename: null,
+         mode: this.MODE_SINGLE_UPLOAD,
+         filter: [],
+         onFileUploadComplete: null,
+         overwrite: false,
+         thumbnails: null,
+         uploadURL: null,
+         username: null
+      };
+      this.suppliedConfig = {};
+      this.showConfig = {};
+      this.fileItemTemplates = {};
+      
       return this;
    };
 
@@ -159,7 +180,7 @@
        *          nodeRef: {string}                  // nodeRef if the file has been uploaded successfully
        *       }
        */
-      fileStore: {},
+      fileStore: null,
 
       /**
        * The number of successful uploads since upload was clicked.
@@ -184,7 +205,7 @@
        * @property addedFiles
        * @type object
        */
-      addedFiles: {},
+      addedFiles: null,
 
       /**
        * Shows uploader in single upload mode.
@@ -221,30 +242,24 @@
        * @property defaultShowConfig
        * @type object
        */
-      defaultShowConfig:
-      {
-         siteId: null,
-         containerId: null,
-         uploadDirectory: null,
-         updateNodeRef: null,
-         updateFilename: null,
-         mode: this.MODE_SINGLE_UPLOAD,
-         filter: [],
-         onFileUploadComplete: null,
-         overwrite: false,
-         thumbnails: null,
-         uploadURL: null,
-         username: null
-      },
+      defaultShowConfig: null,
+
+      /**
+       * The config passed in to the show method.
+       *
+       * @property suppliedConfig
+       * @type object
+       */
+      suppliedConfig: null,
 
       /**
        * The merged result of the defaultShowConfig and the config passed in
        * to the show method.
        *
-       * @property defaultShowConfig
+       * @property showConfig
        * @type object
        */
-      showConfig: {},
+      showConfig: null,
 
       /**
        * Contains the upload gui
@@ -350,7 +365,7 @@
        * @property fileItemTemplates
        * @type HTMLElement
        */
-      fileItemTemplates: {},
+      fileItemTemplates: null,
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -467,6 +482,7 @@
          }
 
          // Merge the supplied config with default config and check mandatory properties
+         this.suppliedConfig = config;
          this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
          if (this.showConfig.uploadDirectory === undefined && this.showConfig.updateNodeRef === undefined)
          {
@@ -1019,6 +1035,14 @@
          }
       },
 
+      /**
+       * Function to try to apply configuration to Flash movie.
+       *
+       * @method _applyUploaderConfig
+       * @param obj {Object} Object literal containing configuration
+       * @param attempt {int} Counter for retry attempts
+       * @private
+       */
       _applyUploaderConfig: function (obj, attempt)
       {
          try
@@ -1031,9 +1055,36 @@
          {
             if (attempt == 7)
             {
-               Alfresco.util.PopupManager.displayMessage(
+               Alfresco.util.PopupManager.displayPrompt(
                {
-                  text: this.msg("message.flashConfigError")
+                  title: this.msg("message.flashError.title"),
+                  text: this.msg("message.flashError.message"),
+                  buttons: [
+                  {
+                     text: Alfresco.util.message("button.ok"),
+                     handler:
+                     {
+                        fn: function _applyUploaderConfig_onOk(e, p_obj)
+                        {
+                           this.destroy();
+                           p_obj.panel.destroy();
+                           var fileUpload = p_obj._disableFlashUploader();
+                           if (fileUpload)
+                           {
+                              fileUpload.show(p_obj.suppliedConfig);
+                           }
+                        },
+                        obj: this
+                     },
+                     isDefault: true
+                  },
+                  {
+                     text: Alfresco.util.message("button.refreshPage"),
+                     handler: function _applyUploaderConfig_onRefreshPage()
+                     {
+                        window.location.reload(true);
+                     }
+                  }]
                });
             }
             else
@@ -1041,6 +1092,23 @@
                YAHOO.lang.later(100, this, this._applyUploaderConfig, [obj, ++attempt]);
             }
          }
+      },
+      
+      /**
+       * Disables Flash uploader if an error is detected.
+       * Possibly a temporary workaround for bugs in SWFObject v1.5
+       *
+       * @method _disableFlashUploader
+       */
+      _disableFlashUploader: function FlashUpload__disableFlashUploader()
+      {
+         var fileUpload = Alfresco.util.ComponentManager.findFirst("Alfresco.FileUpload");
+         if (fileUpload)
+         {
+            fileUpload.hasRequiredFlashPlayer = false;
+            fileUpload.onComponentsLoaded();
+         }
+         return fileUpload;
       },
 
       /**
