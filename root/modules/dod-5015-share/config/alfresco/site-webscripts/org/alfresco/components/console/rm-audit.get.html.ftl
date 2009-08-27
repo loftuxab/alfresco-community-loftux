@@ -1,16 +1,26 @@
 <script type="text/javascript" charset="utf-8">    
-    new Alfresco.RM_Audit('audit').setOptions({'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT}).setMessages(${messages});
+    new Alfresco.RM_Audit('audit').setOptions({
+       'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT,
+       'enabled' : ${auditStatus.enabled?string},
+       'startDate':"${auditStatus.started}",
+       'stopDate':"${auditStatus.stopped}",
+       'pollInterval':5000
+    }).setMessages(${messages});
   </script>
   
   <div id="audit">
     <div class="yui-gc">
    	<div class="yui-u first">
-          <h2>${msg("label.title")}</h2>
-          <h3>${msg("label.started-at", logStartDate?string("EEE, dd MMM yyyy HH:mm:ss 'GMT'"))}</h3>
+          <div id="audit-info">
+             <h2>${msg("label.title")}</h2>
+             <p id="audit-status-date"></p>
+          </div>
    	</div>
 	   <div class="yui-u">
 		   <div id="auditActions">
-            <button id="audit-stop" name="audit-stop">${msg("label.button-stop")}</button>
+            <button id="audit-toggle" name="audit-toggle" value="${auditStatus.enabled?string}">
+               <#if (auditStatus.enabled)>${msg("label.button-stop")}<#else>${msg("label.button-start")}</#if>
+            </button>
             <button id="audit-view" name="audit-view">${msg("label.button-view-log")}</button>
             <button id="audit-clear" name="audit-clear">${msg("label.button-clear")}</button>
          </div>

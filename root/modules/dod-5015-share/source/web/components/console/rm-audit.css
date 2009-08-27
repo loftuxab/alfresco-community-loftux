@@ -31,12 +31,18 @@
 #audit-log .yui-dt caption
 {
    text-align: left;
-   font:107% normal Arial,sans-serif;
+   font:100% normal Arial,sans-serif;
 }
 #audit-log .first
 {
    text-align: right;
 }
+#audit-info p
+{
+   margin-top:0.5em;
+   padding:0;
+}
+
 #filterActions
 {
    float: right;
@@ -91,19 +97,27 @@
 {
    width: 30em;
 }
+
 /* audit log popup page */
 #doc3
 {
    margin: 0;
 }
-#audit-popup-log #audit-info,
-#audit-popup-log #auditDT
+#audit-popup-log #audit-info
 {
    margin: 1em;
+}
+#audit-popup-log #auditDT
+{
+   margin:0 1em;
 }
 #audit-popup-log #auditDT table
 {
    width: 100%;
+}
+#audit-popup-log #auditDT caption
+{
+   visibility: hidden;
 }
 #audit-popup-log #audit
 {
@@ -118,4 +132,8 @@
 #audit-popup-log #search
 {
    vertical-align: middle;
+}
+#audit-popup-log #audit #defaultActions.active
+{
+   margin-right:1em;
 }
