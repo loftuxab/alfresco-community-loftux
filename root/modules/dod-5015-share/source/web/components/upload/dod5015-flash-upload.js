@@ -113,6 +113,24 @@
       },
 
       /**
+       * Disables Flash uploader if an error is detected.
+       * Possibly a temporary workaround for bugs in SWFObject v1.5
+       *
+       * @method _disableFlashUploader
+       * @override
+       */
+      _disableFlashUploader: function FlashUpload__disableFlashUploader()
+      {
+         var fileUpload = Alfresco.util.ComponentManager.findFirst("Alfresco.RecordsFileUpload");
+         if (fileUpload)
+         {
+            fileUpload.hasRequiredFlashPlayer = false;
+            fileUpload.onComponentsLoaded();
+         }
+         return fileUpload;
+      },
+
+      /**
        * Starts to upload as many files as specified by noOfUploadsToStart
        * as long as there are files left to upload.
        *

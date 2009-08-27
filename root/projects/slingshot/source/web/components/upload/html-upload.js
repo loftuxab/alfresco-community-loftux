@@ -69,6 +69,22 @@
    {
       Alfresco.HtmlUpload.superclass.constructor.call(this, "Alfresco.HtmlUpload", htmlId, ["button", "container"]); 
 
+      this.defaultShowConfig =
+      {
+         siteId: null,
+         containerId: null,
+         uploadDirectory: null,
+         updateNodeRef: null,
+         updateFilename: null,
+         mode: this.MODE_SINGLE_UPLOAD,
+         onFileUploadComplete: null,
+         overwrite: false,
+         thumbnails: null,
+         uploadURL: null,
+         username: null
+      };
+      this.showConfig = {};
+
       return this;
    };
 
@@ -100,20 +116,7 @@
        * @property defaultShowConfig
        * @type object
        */
-      defaultShowConfig:
-      {
-         siteId: null,
-         containerId: null,
-         uploadDirectory: null,
-         updateNodeRef: null,
-         updateFilename: null,
-         mode: this.MODE_SINGLE_UPLOAD,
-         onFileUploadComplete: null,
-         overwrite: false,
-         thumbnails: null,
-         uploadURL: null,
-         username: null
-      },
+      defaultShowConfig: null,
 
       /**
        * The merged result of the defaultShowConfig and the config passed in
@@ -122,7 +125,7 @@
        * @property defaultShowConfig
        * @type object
        */
-      showConfig: {},
+      showConfig: null,
 
       /**
        * HTMLElement of type div that displays the version input form.
