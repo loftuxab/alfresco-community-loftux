@@ -115,12 +115,14 @@
             <@formLib.renderField field=form.fields["prop_rma_otherAddress"] />
          </div>
       </div>
+      <#-- mjh 28-aug-09: Removed due to r15971
       <div class="set-panel">
          <div class="set-panel-heading">${msg("label.set.security")}</div>
          <div class="set-panel-body">
             <@formLib.renderField field=form.fields["prop_rma_supplementalMarkingList"] />
          </div>
       </div>
+      -->
       
       <#if form.fields["prop_rma_vitalRecordIndicator"]?? || form.fields["prop_rma_reviewPeriod"]?? ||
            (form.fields["prop_rma_reviewAsOf"]?? && form.mode == "view")>
