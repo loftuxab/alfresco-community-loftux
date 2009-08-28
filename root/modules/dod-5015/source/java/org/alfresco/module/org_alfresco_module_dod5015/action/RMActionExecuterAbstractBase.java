@@ -25,9 +25,11 @@
 package org.alfresco.module.org_alfresco_module_dod5015.action;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -94,7 +96,7 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     /** Records management event service */
     protected RecordsManagementEventService recordsManagementEventService;
     
-    protected AbstractCapability capability;
+    protected LinkedList<AbstractCapability> capabilities = new LinkedList<AbstractCapability>();;
     
     /**
      * Set node service
@@ -178,7 +180,12 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     
     public void setCapability(AbstractCapability capability)
     {
-        this.capability = capability;
+        capabilities.add(capability);
+    }
+    
+    public void setCapabilities(Collection<AbstractCapability> capabilities)
+    {
+        this.capabilities.addAll(capabilities);
     }
 
     /**
@@ -187,9 +194,9 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     @Override
     public void init()
     {
-        if(this.capability != null)
+        for(AbstractCapability capability : capabilities)
         {
-            this.capability.registerAction(this);
+            capability.registerAction(this);
         }
     }
     

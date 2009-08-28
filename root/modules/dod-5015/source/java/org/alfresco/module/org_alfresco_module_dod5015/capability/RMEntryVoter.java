@@ -44,6 +44,7 @@ import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.CreateCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.group.DeclareCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.DeleteCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.UpdateCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.UpdatePropertiesCapability;
@@ -292,6 +293,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
     public UpdatePropertiesCapability updatePropertiesCapability;
 
+    public DeclareCapability declareCapability;
+
     static
     {
         policies.put("Read", new ReadPolicy());
@@ -303,6 +306,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         policies.put("Assoc", new AssocPolicy());
         policies.put("WriteContent", new WriteContentPolicy());
         policies.put("Capability", new CapabilityPolicy());
+        policies.put("Declare", new DeclarePolicy());
 
         // restrictedProperties.put(RecordsManagementModel.PROP_IS_CLOSED, value)
 
@@ -1042,6 +1046,16 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         this.updatePropertiesCapability = updatePropertiesCapability;
     }
 
+    public DeclareCapability getDeclareCapability()
+    {
+        return declareCapability;
+    }
+
+    public void setDeclareCapability(DeclareCapability declareCapability)
+    {
+        this.declareCapability = declareCapability;
+    }
+
     public boolean supports(ConfigAttribute attribute)
     {
         if ((attribute.getAttribute() != null)
@@ -1502,7 +1516,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             }
             typeString = st.nextToken();
 
-            if (!(typeString.equals(RM) || typeString.equals(RM_ALLOW) || typeString.equals(RM_CAP) || typeString.equals(RM_DENY) || typeString.equals(RM_QUERY) || typeString.equals(RM_ABSTAIN)))
+            if (!(typeString.equals(RM) || typeString.equals(RM_ALLOW) || typeString.equals(RM_CAP) || typeString.equals(RM_DENY) || typeString.equals(RM_QUERY) || typeString
+                    .equals(RM_ABSTAIN)))
             {
                 throw new ACLEntryVoterException("Invalid type: must be ACL_NODE, ACL_PARENT or ACL_ALLOW");
             }
@@ -1735,6 +1750,17 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             {
                 return policy.evaluate(voter, invocation, params, cad);
             }
+        }
+
+    }
+
+    private static class DeclarePolicy implements Policy
+    {
+
+        public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
+        {
+            NodeRef declaree = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(0), cad.parent);
+            return voter.getDeclareCapability().evaluate(declaree);
         }
 
     }

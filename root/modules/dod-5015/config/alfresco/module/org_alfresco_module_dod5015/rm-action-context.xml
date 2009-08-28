@@ -289,7 +289,7 @@
     <bean id="declareRecord_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
         <property name="objectDefinitionSource">
             <value>
-                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.DeclareRecords
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM.Declare.0
                    org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
                    org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
             </value>
@@ -297,8 +297,14 @@
     </bean>
     
     <bean id="declareRecord" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.DeclareRecordAction" parent="rmAction" depends-on="rmDeclareRecordsCapability">
+        <property name="capabilities">
+            <list>
+                <ref bean="rmDeclareRecordsCapability" />
+                <ref bean="rmDeclareRecordsInClosedFoldersCapability" />
+            </list>
+        </property>
         <property name="capability" ref="rmDeclareRecordsCapability"/>
-    </bean>     
+    </bean>    
     
     <!-- undeclare record -->
     
