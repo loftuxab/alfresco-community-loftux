@@ -31,6 +31,7 @@
       <type name="rma:caveatConfig">
          <title>Caveat Config</title>
          <parent>cm:content</parent>
+         <archive>false</archive>
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
@@ -48,6 +49,7 @@
       <type name="rma:recordsManagementContainer">
          <title>Records Managment Container</title>
          <parent>cm:folder</parent>
+         <archive>false</archive>
          
          <mandatory-aspects>
             <aspect>cm:titled</aspect>
@@ -161,6 +163,7 @@
          
          <title>Record Folder</title>
          <parent>cm:folder</parent>
+         <archive>false</archive>
          
          <properties>
                     
@@ -190,7 +193,8 @@
       <type name="rma:nonElectronicDocument">
          
          <title>Non-Electronic Document</title>
-         <parent>cm:content</parent>           
+         <parent>cm:content</parent>
+         <archive>false</archive>           
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
@@ -312,6 +316,7 @@
       <type name="rma:hold">
          <title>Hold</title>
          <parent>cm:folder</parent>
+         <archive>false</archive>
          
          <properties>
          
@@ -350,6 +355,7 @@
       <type name="rma:transfer">
          <title>Transfer</title>
          <parent>cm:folder</parent>
+         <archive>false</archive>
   
          <properties>
          
@@ -480,6 +486,8 @@
          
       <aspect name="rma:record">
          <title>Record</title>
+         <!-- Explicitly turn off archiving for all nodes with this aspect -->
+         <archive>false</archive>
          
          <properties>
          
@@ -753,6 +761,12 @@
          </properties>
       </aspect>
       
+      <aspect name="rma:ghosted">
+         <title>Ghosted Record</title>         
+         <properties>                
+         </properties>
+      </aspect> 
+
    </aspects>
    
 </model>
