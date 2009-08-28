@@ -251,7 +251,9 @@
             params += "&records=" + (Dom.get(this.id + "-records").checked);
             params += "&undeclared=" + (Dom.get(this.id + "-undeclared").checked);
             params += "&vital=" + (Dom.get(this.id + "-vital").checked);
-            params += "&containers=" + (Dom.get(this.id + "-containers").checked);
+            params += "&folders=" + (Dom.get(this.id + "-folders").checked);
+            params += "&categories=" + (Dom.get(this.id + "-categories").checked);
+            params += "&series=" + (Dom.get(this.id + "-series").checked);
             
             // TODO: prepopulate dialog with current saved search name if any selected
             
@@ -287,7 +289,9 @@
          Dom.get(this.id + "-vital").disabled = false;
          Dom.get(this.id + "-undeclared").checked = false;
          Dom.get(this.id + "-vital").checked = false;
-         Dom.get(this.id + "-containers").checked = false;
+         Dom.get(this.id + "-folders").checked = false;
+         Dom.get(this.id + "-categories").checked = false;
+         Dom.get(this.id + "-series").checked = false;
          Dom.get(this.id + "-terms").value = "";
          
          // reset sorting options
@@ -435,18 +439,33 @@
          {
             query += (query.length != 0 ? ' AND ' : '') + 'ASPECT:"rma:vitalRecord"';
          }
-         if (Dom.get(this.id + "-containers").checked)
+         
+         var containerQuery = "";
+         if (Dom.get(this.id + "-folders").checked)
+         {
+            containerQuery += ' TYPE:"rma:recordFolder"';
+         }
+         if (Dom.get(this.id + "-categories").checked)
+         {
+            containerQuery += ' TYPE:"dod:recordCategory"';
+         }
+         if (Dom.get(this.id + "-series").checked)
+         {
+            containerQuery += ' TYPE:"dod:recordSeries"';
+         }
+         if (containerQuery.length !== 0)
          {
             if (query.length != 0)
             {
-               query = '(' + query + ') OR (TYPE:"rma:recordFolder" TYPE:"dod:recordCategory" TYPE:"dod:recordSeries")';
+               query = '(' + query + ') (' + containerQuery + ')';
             }
             else
             {
-               query = '(TYPE:"rma:recordFolder" TYPE:"dod:recordCategory" TYPE:"dod:recordSeries")';
+               query = containerQuery;
             }
          }
-         if (query.length != 0)
+         
+         if (query.length !== 0)
          {
             query = '(' + query + ') AND (' + userQuery + ')';
          }
@@ -454,7 +473,7 @@
          {
             query = null;
          }
-         
+         alert(query);
          return query;
       },
       
@@ -542,9 +561,21 @@
                         break;
                      }
                      
-                     case "containers":
+                     case "folders":
                      {
-                        Dom.get(me.id + "-containers").checked = (pair[1] === "true");
+                        Dom.get(me.id + "-folders").checked = (pair[1] === "true");
+                        break;
+                     }
+                     
+                     case "categories":
+                     {
+                        Dom.get(me.id + "-categories").checked = (pair[1] === "true");
+                        break;
+                     }
+                     
+                     case "series":
+                     {
+                        Dom.get(me.id + "-series").checked = (pair[1] === "true");
                         break;
                      }
                      
