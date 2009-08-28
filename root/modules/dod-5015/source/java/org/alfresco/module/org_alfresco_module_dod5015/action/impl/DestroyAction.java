@@ -24,9 +24,16 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Set;
+
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Destroy action
@@ -35,19 +42,42 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public class DestroyAction extends RMDispositionActionExecuterAbstractBase
 {
+    private static final QName ASPECT_RM_GHOSTED = QName.createQName(RecordsManagementModel.RM_URI, "ghosted");
+
+    private boolean ghostingEnabled = true;
+
+    public void setGhostingEnabled(boolean ghostingEnabled)
+    {
+        this.ghostingEnabled = ghostingEnabled;
+    }
+
     @Override
     protected void executeRecordFolderLevelDisposition(Action action, NodeRef recordFolder)
     {
-        // Destroy
-        this.nodeService.deleteNode(recordFolder);        
+        this.nodeService.deleteNode(recordFolder);
     }
 
     @Override
     protected void executeRecordLevelDisposition(Action action, NodeRef record)
     {
-        // Destroy
-        this.nodeService.deleteNode(record);
-    }
- 
+        // Do ghosting, if it is enabled
+        if (this.ghostingEnabled)
+        {
+            // First purge (synchronously) all content properties
+            Set<QName> props = this.nodeService.getProperties(record).keySet();
+            props.retainAll(this.dictionaryService.getAllProperties(DataTypeDefinition.CONTENT));
+            for (QName prop : props)
+            {
+                this.nodeService.removeProperty(record, prop);
+            }
 
+            // Finally, add the ghosted aspect (TODO: Any properties?)
+            this.nodeService.addAspect(record, DestroyAction.ASPECT_RM_GHOSTED, Collections
+                    .<QName, Serializable> emptyMap());
+        }
+        else
+        {
+            this.nodeService.deleteNode(record);
+        }
+    }
 }

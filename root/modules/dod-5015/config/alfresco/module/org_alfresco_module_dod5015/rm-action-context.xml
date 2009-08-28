@@ -134,9 +134,13 @@
             </value>
         </property>
     </bean>
-    
-    <bean id="destroy" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.DestroyAction" parent="rmAction" depends-on="rmDestroyRecordsScheduledForDestructionCapability">
-        <property name="capability" ref="rmDestroyRecordsScheduledForDestructionCapability"/>
+
+    <bean id="destroy" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.DestroyAction" parent="rmAction"
+        depends-on="rmDestroyRecordsScheduledForDestructionCapability">
+        <property name="ghostingEnabled">
+            <value>${rm.ghosting.enabled}</value>
+        </property>
+        <property name="capability" ref="rmDestroyRecordsScheduledForDestructionCapability" />
     </bean>    
     
     <!-- retain -->
