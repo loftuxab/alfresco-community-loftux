@@ -473,7 +473,7 @@
          {
             query = null;
          }
-         alert(query);
+         
          return query;
       },
       
