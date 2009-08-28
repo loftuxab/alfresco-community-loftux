@@ -331,10 +331,7 @@ public abstract class AbstractCapability implements Capability
                     {
                         if (voter.getPermissionService().hasPermission(car.getParentRef(), RMPermissionModel.FILE_RECORDS) == AccessStatus.ALLOWED)
                         {
-                            if (voter.getPermissionService().hasPermission(getFilePlan(car.getParentRef()), RMPermissionModel.DECLARE_RECORDS) == AccessStatus.ALLOWED)
-                            {
-                                return AccessDecisionVoter.ACCESS_GRANTED;
-                            }
+                            return AccessDecisionVoter.ACCESS_GRANTED;
                         }
                     }
                 }
@@ -344,18 +341,6 @@ public abstract class AbstractCapability implements Capability
             else if (isRecordFolder(voter.getNodeService().getType(nodeRef)))
             {
                 if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.FILE_RECORDS) == AccessStatus.DENIED)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("\t\tPermission is denied");
-
-                        Thread.dumpStack();
-                    }
-
-                    return AccessDecisionVoter.ACCESS_DENIED;
-                }
-
-                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DECLARE_RECORDS) == AccessStatus.DENIED)
                 {
                     if (logger.isDebugEnabled())
                     {
@@ -495,91 +480,7 @@ public abstract class AbstractCapability implements Capability
         return AccessDecisionVoter.ACCESS_ABSTAIN;
     }
 
-    public int checkCreatexx(NodeRef nodeRef, QName type)
-    {
-        if (voter.getNodeService().hasAspect(nodeRef, RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT))
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("\t\tNode ref is not null");
-            }
-
-            // we can read
-            // we file into arg 0
-
-            // Filing Record
-            if (isRecordFolder(voter.getNodeService().getType(nodeRef)))
-            {
-
-                if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.DECLARE_RECORDS) == AccessStatus.DENIED)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("\t\tPermission is denied");
-                        Thread.dumpStack();
-                    }
-
-                    return AccessDecisionVoter.ACCESS_DENIED;
-                }
-                else
-                {
-
-                    if (isClosed(nodeRef))
-                    {
-                        if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS) == AccessStatus.DENIED)
-                        {
-                            return AccessDecisionVoter.ACCESS_DENIED;
-                        }
-                    }
-                    if (isCutoff(nodeRef))
-                    {
-                        if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS) == AccessStatus.DENIED)
-                        {
-                            return AccessDecisionVoter.ACCESS_DENIED;
-                        }
-                    }
-                    return AccessDecisionVoter.ACCESS_GRANTED;
-                }
-            }
-            // Create Record Folder
-            else if (isRecordFolder(type))
-            {
-                if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS) == AccessStatus.DENIED)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("\t\tPermission is denied");
-                        Thread.dumpStack();
-                    }
-                    return AccessDecisionVoter.ACCESS_DENIED;
-                }
-                else
-                {
-                    return AccessDecisionVoter.ACCESS_GRANTED;
-                }
-            }
-            // else other file plan component
-            else
-            {
-                if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA) == AccessStatus.DENIED)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        logger.debug("\t\tPermission is denied");
-                        Thread.dumpStack();
-                    }
-                    return AccessDecisionVoter.ACCESS_DENIED;
-                }
-                else
-                {
-                    return AccessDecisionVoter.ACCESS_GRANTED;
-                }
-            }
-        }
-
-        return AccessDecisionVoter.ACCESS_ABSTAIN;
-
-    }
+    
 
     public int checkDelete(NodeRef nodeRef)
     {
@@ -679,13 +580,37 @@ public abstract class AbstractCapability implements Capability
 
     public boolean isClosed(NodeRef nodeRef)
     {
-        Serializable serializableValue = voter.getNodeService().getProperty(nodeRef, RecordsManagementModel.PROP_IS_CLOSED);
-        if (serializableValue == null)
+        if (isRecordFolder(voter.getNodeService().getType(nodeRef)))
+        {
+            Serializable serializableValue = voter.getNodeService().getProperty(nodeRef, RecordsManagementModel.PROP_IS_CLOSED);
+            if (serializableValue == null)
+            {
+                return false;
+            }
+            Boolean isClosed = DefaultTypeConverter.INSTANCE.convert(Boolean.class, serializableValue);
+            return isClosed;
+        }
+        else if (isRecord(nodeRef))
+        {
+            for (ChildAssociationRef car : voter.getNodeService().getParentAssocs(nodeRef))
+            {
+                Serializable serializableValue = voter.getNodeService().getProperty(car.getParentRef(), RecordsManagementModel.PROP_IS_CLOSED);
+                if (serializableValue == null)
+                {
+                    return false;
+                }
+                Boolean isClosed = DefaultTypeConverter.INSTANCE.convert(Boolean.class, serializableValue);
+                if (!isClosed)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        else
         {
             return false;
         }
-        Boolean isClosed = DefaultTypeConverter.INSTANCE.convert(Boolean.class, serializableValue);
-        return isClosed;
     }
 
     public boolean isRm(NodeRef nodeRef)
@@ -744,6 +669,14 @@ public abstract class AbstractCapability implements Capability
     {
         DispositionSchedule dispositionSchedule = voter.getRecordsManagementService().getDispositionSchedule(nodeRef);
         if (dispositionSchedule == null)
+        {
+            return false;
+        }
+        if (isRecord(nodeRef) && !dispositionSchedule.isRecordLevelDisposition())
+        {
+            return false;
+        }
+        if (isRecordFolder(voter.getNodeService().getType(nodeRef)) && dispositionSchedule.isRecordLevelDisposition())
         {
             return false;
         }

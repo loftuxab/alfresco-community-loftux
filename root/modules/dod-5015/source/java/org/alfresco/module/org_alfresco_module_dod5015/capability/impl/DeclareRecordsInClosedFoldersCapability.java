@@ -50,7 +50,7 @@ public class DeclareRecordsInClosedFoldersCapability extends AbstractCapability
         {
             if (checkFilingUnfrozenUncutoff(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (isRecordFolder(voter.getNodeService().getType(nodeRef)))
+                if (isRecord(nodeRef))
                 {
                     if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS) == AccessStatus.ALLOWED)
                     {

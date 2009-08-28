@@ -48,13 +48,16 @@ public class DestroyRecordsCapability extends AbstractCapability
     {
         if (isRm(nodeRef))
         {
-            if (isRecord(nodeRef))
+            if (isRecord(nodeRef) || isRecordFolder(voter.getNodeService().getType(nodeRef)))
             {
-                if (mayBeScheduledForDestruction(nodeRef))
+                if (!isFrozen(nodeRef))
                 {
-                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DESTROY_RECORDS) == AccessStatus.ALLOWED)
+                    if (mayBeScheduledForDestruction(nodeRef))
                     {
-                        return AccessDecisionVoter.ACCESS_GRANTED;
+                        if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DESTROY_RECORDS) == AccessStatus.ALLOWED)
+                        {
+                            return AccessDecisionVoter.ACCESS_GRANTED;
+                        }
                     }
                 }
             }
