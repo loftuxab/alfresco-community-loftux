@@ -26,7 +26,6 @@ package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.File;
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -37,7 +36,9 @@ import java.util.Map;
 
 import javax.transaction.UserTransaction;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
@@ -53,7 +54,6 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.node.integrity.IntegrityException;
 import org.alfresco.repo.search.impl.lucene.LuceneQueryParser;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -61,6 +61,7 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -164,9 +165,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 		// Get the test data
 		setUpTestData();
         
-        URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig1.json"); // from test-resources
-        assertNotNull(url);
-        File file = new File(url.getFile());
+        File file = new File(System.getProperty("user.dir")+"/test-resources/testCaveatConfig1.json"); // from test-resources
         assertTrue(file.exists());
         
         caveatConfigService.updateOrCreateCaveatConfig(file);
@@ -1914,8 +1913,27 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // User-defined field (in this case, "rmc:prjList" on record)
         
-        /*
-        // TODO create custom constraint (or reset values if it already exists)
+        // Create custom constraint (or reset values if it already exists)
+        
+        // create new custom constraint
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                try
+                {
+                    List<String> emptyList = new ArrayList<String>(0);
+                    rmAdminService.addCustomConstraintDefinition(CONSTRAINT_CUSTOM_PRJLIST, "Some Projects", true, emptyList);
+                } 
+                catch (AlfrescoRuntimeException e)
+                {
+                    // ignore - ie. assume exception is due to the fact that it already exists
+                }
+                
+                return null;
+            }
+        });
         
         startNewTransaction();
         
@@ -1924,51 +1942,30 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         newValues.add(PRJ_B);
         newValues.add(PRJ_C);
         
-        // set / reset allowed values for custom constraint
-        try
-        {
-            rmAdminService.addCustomConstraintDefinition(CONSTRAINT_CUSTOM_PRJLIST, "Some Projects", true, newValues);
-        } 
-        catch (AlfrescoRuntimeException e)
-        {
-            // assume it already exists, so change existing values
-            rmAdminService.changeCustomConstraintValues(CONSTRAINT_CUSTOM_PRJLIST, newValues);
-        }
-        
-        setComplete();
-        endTransaction();
-        */
-        
-        startNewTransaction();
-        
-        newValues = new ArrayList<String>(3);
-        newValues.add(PRJ_A);
-        newValues.add(PRJ_B);
-        newValues.add(PRJ_C);
-        
-        // TODO currently assumes this constraint already exists
         rmAdminService.changeCustomConstraintValues(CONSTRAINT_CUSTOM_PRJLIST, newValues);
         
         setComplete();
         endTransaction();
         
-        /*
-        // TODO define custom property and reference custom constraint
+        // define custom property and reference custom constraint
         
-        startNewTransaction();
-
-        // Define a custom property.
-        final String propName = "rmc:customProperty" + System.currentTimeMillis();
-
-        Map <String, Serializable> params = new HashMap<String, Serializable>();
-        params.put("name", propName);
-        params.put("dataType", DataTypeDefinition.BOOLEAN);
-        params.put(DefineCustomPropertyAction.PARAM_ELEMENT, "recordFolder");
-        rmActionService.executeRecordsManagementAction("defineCustomProperty", params);
-        
-        setComplete();
-        endTransaction();
-        */
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                try
+                {
+                    // Define a custom "project list" property (for records) - note: multi-valued
+                    rmAdminService.addCustomPropertyDefinition(CustomisableRmElement.RECORD.getCorrespondingAspect(), PROP_CUSTOM_PRJLIST, DataTypeDefinition.TEXT, "Projects", null, null, true, false, false, CONSTRAINT_CUSTOM_PRJLIST);
+                } 
+                catch (AlfrescoRuntimeException e)
+                {
+                    // ignore - ie. assume exception is due to the fact that it already exists
+                }
+                
+                return null;
+            }
+        });
         
         try
         {
@@ -2110,10 +2107,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         // not in grouo to start with - added later
         //addToGroup("gsmith", "Engineering");
         
-        
-        URL url = AbstractContentTransformerTest.class.getClassLoader().getResource("testCaveatConfig2.json"); // from test-resources
-        assertNotNull(url);
-        File file = new File(url.getFile());
+        File file = new File(System.getProperty("user.dir")+"/test-resources/testCaveatConfig2.json"); // from test-resources
         assertTrue(file.exists());
         
         caveatConfigService.updateOrCreateCaveatConfig(file);

@@ -26,8 +26,6 @@ package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * This superclass of DefineCustomPropertyAction and DefineCustomAssociationAction provides handling of bad 'name'
@@ -37,14 +35,12 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class DefineCustomElementAbstractAction extends RMActionExecuterAbstractBase
 {
-    private static Log logger = LogFactory.getLog(DefineCustomElementAbstractAction.class);
-
     public static final String PARAM_NAME = "name";
     /**
-     * This is the hard-coded NodeRef where the RMC Custom Model is stored.
+     * This is the hard-coded NodeRef where the RMC Custom Model is stored (refer to RMDataDictionaryBootstrap.xml).
      */
     public static final NodeRef RM_CUSTOM_MODEL_NODE_REF = new NodeRef("workspace://SpacesStore/records_management_custom_model");
-
+    
     @Override
     public NodeRef getImplicitTargetNodeRef()
     {

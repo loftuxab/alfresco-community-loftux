@@ -24,6 +24,9 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,14 +35,18 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomAssociationAction;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2Association;
 import org.alfresco.repo.dictionary.M2ChildAssociation;
+import org.alfresco.repo.dictionary.M2ClassAssociation;
 import org.alfresco.repo.dictionary.M2Constraint;
 import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Property;
@@ -49,11 +56,14 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.Constraint;
 import org.alfresco.service.cmr.dictionary.ConstraintDefinition;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -73,7 +83,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     /** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementAdminServiceImpl.class);
     
-    public static final String RMC_CUSTOM_ASSOCS = CustomModelUtil.RMC_CUSTOM_ASSOCS;
+    public static final String RMC_CUSTOM_ASSOCS = RecordsManagementCustomModel.RM_CUSTOM_PREFIX + ":customAssocs";
     
     private static final String CUSTOM_CONSTRAINT_TYPE = org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint.class.getName();
     
@@ -194,19 +204,32 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return propDefns;
     }
     
-    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected)
+    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description)
+    {
+        addCustomPropertyDefinition(aspectName, propQName, dataType, title, description, null, false, false, false, null);
+    }
+    
+    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraint)
     {
         ParameterCheck.mandatoryString("aspectName", aspectName);
         ParameterCheck.mandatory("propQName", propQName);
         ParameterCheck.mandatory("dataType", dataType);
         
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
-        
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        M2Model deserializedModel = readCustomContentModel();
         M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
         
+        if (customPropsAspect == null)
+        {
+            throw new AlfrescoRuntimeException("Unknown aspect: "+aspectName);
+        }
+        
         String propQNameAsString = propQName.toPrefixString(namespaceService);
+        
+        M2Property customProp = customPropsAspect.getProperty(propQNameAsString);
+        if (customProp != null)
+        {
+            throw new AlfrescoRuntimeException("Property already exists: "+propQNameAsString);
+        }
         
         M2Property newProp = customPropsAspect.createProperty(propQNameAsString);
         newProp.setName(propQNameAsString);
@@ -220,11 +243,22 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         newProp.setProtected(isProtected);
         newProp.setMultiValued(multiValued);
         
-        customModelUtil.writeCustomContentModel(deserializedModel);
+        if (lovConstraint != null)
+        {
+            if (! dataType.equals(DataTypeDefinition.TEXT))
+            {
+                throw new AlfrescoRuntimeException("Cannot apply constraint '"+lovConstraint+"' to property '"+propQNameAsString+"' with datatype '"+dataType+"' (expected: dataType = TEXT)");
+            }
+            
+            String lovConstraintQNameAsString = lovConstraint.toPrefixString(namespaceService);
+            newProp.addConstraintRef(lovConstraintQNameAsString);
+        }
+        
+        writeCustomContentModel(deserializedModel);
         
         if (logger.isInfoEnabled())
         {
-            logger.info("addCustomPropertyDefinition: "+propQName+" to aspect: "+aspectName);
+            logger.info("addCustomPropertyDefinition: "+propQNameAsString+" to aspect: "+aspectName);
         }
     }
     
@@ -236,10 +270,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         /*
         ParameterCheck.mandatory("propQName", propQName);
         
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
-        
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        M2Model deserializedModel = readCustomContentModel();
         
         String propQNameAsString = propQName.toPrefixString(namespaceService);
         
@@ -253,6 +284,11 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         {
             aspectName = elem.getCorrespondingAspect();
             M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
+            
+            if (customPropsAspect == null)
+            {
+                throw new AlfrescoRuntimeException("Unknown aspect: "+aspectName);
+            }
             
             M2Property prop = customPropsAspect.getProperty(propQNameAsString);
             if (prop != null)
@@ -273,14 +309,14 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         
         if (! found)
         {
-            throw new AlfrescoRuntimeException("Could not find property to delete: "+propQName);
+            throw new AlfrescoRuntimeException("Could not find property to delete: "+propQNameAsString);
         }
         
-        customModelUtil.writeCustomContentModel(deserializedModel);
+        writeCustomContentModel(deserializedModel);
         
         if (logger.isInfoEnabled())
         {
-            logger.info("deleteCustomPropertyDefinition: "+propQName+" from aspect: "+aspectName);
+            logger.info("deleteCustomPropertyDefinition: "+propQNameAsString+" from aspect: "+aspectName);
         }
         */
     }
@@ -357,22 +393,33 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     {
         ParameterCheck.mandatoryString("label", label);
         
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
+        M2Model deserializedModel = readCustomContentModel();
         
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
-        M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
+        String aspectName = RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS;
+        M2Aspect customAssocsAspect = deserializedModel.getAspect(aspectName);
+        
+        if (customAssocsAspect == null)
+        {
+            throw new AlfrescoRuntimeException("Unknown aspect: "+aspectName);
+        }
         
         CustomReferenceId crId = new CustomReferenceId(label, null, null);
+        String assocName = crId.getReferenceId();
         
-        M2Association newAssoc = customAssocsAspect.createAssociation(crId.getReferenceId());
+        M2ClassAssociation customAssoc = customAssocsAspect.getAssociation(assocName);
+        if (customAssoc != null)
+        {
+            throw new AlfrescoRuntimeException("Assoc already exists: "+assocName);
+        }
+        
+        M2Association newAssoc = customAssocsAspect.createAssociation(assocName);
         newAssoc.setSourceMandatory(false);
         newAssoc.setTargetMandatory(false);
         
         // TODO Could be the customAssocs aspect
         newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
         
-        customModelUtil.writeCustomContentModel(deserializedModel);
+        writeCustomContentModel(deserializedModel);
         
         if (logger.isInfoEnabled())
         {
@@ -385,22 +432,33 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         ParameterCheck.mandatoryString("source", source);
         ParameterCheck.mandatoryString("target", target);
         
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
+        M2Model deserializedModel = readCustomContentModel();
         
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
-        M2Aspect customAssocsAspect = deserializedModel.getAspect(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS);
+        String aspectName = RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS;
+        M2Aspect customAssocsAspect = deserializedModel.getAspect(aspectName);
+        
+        if (customAssocsAspect == null)
+        {
+            throw new AlfrescoRuntimeException("Unknown aspect: "+aspectName);
+        }
         
         CustomReferenceId crId = new CustomReferenceId(null, source, target);
+        String assocName = crId.getReferenceId();
         
-        M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(crId.getReferenceId());
+        M2ClassAssociation customAssoc = customAssocsAspect.getAssociation(assocName);
+        if (customAssoc != null)
+        {
+            throw new AlfrescoRuntimeException("ChildAssoc already exists: "+assocName);
+        }
+        
+        M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(assocName);
         newAssoc.setSourceMandatory(false);
         newAssoc.setTargetMandatory(false);
         
         // TODO Could be the custom assocs aspect
         newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
         
-        customModelUtil.writeCustomContentModel(deserializedModel);
+        writeCustomContentModel(deserializedModel);
         
         if (logger.isInfoEnabled())
         {
@@ -414,10 +472,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         ParameterCheck.mandatoryString("title", title);
         ParameterCheck.mandatory("allowedValues", allowedValues);
         
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
-        
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        M2Model deserializedModel = readCustomContentModel();
         
         String constraintNameAsPrefixString = constraintName.toPrefixString(namespaceService);
         
@@ -427,13 +482,13 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
             throw new AlfrescoRuntimeException("Constraint already exists: "+constraintNameAsPrefixString);
         }
         
-        customConstraint = deserializedModel.createConstraint(constraintNameAsPrefixString, CUSTOM_CONSTRAINT_TYPE);
+        M2Constraint newCon = deserializedModel.createConstraint(constraintNameAsPrefixString, CUSTOM_CONSTRAINT_TYPE);
         
-        customConstraint.setTitle(title);
-        customConstraint.createParameter(PARAM_ALLOWED_VALUES, allowedValues);
-        customConstraint.createParameter(PARAM_CASE_SENSITIVE, caseSensitive ? "true" : "false");
+        newCon.setTitle(title);
+        newCon.createParameter(PARAM_ALLOWED_VALUES, allowedValues);
+        newCon.createParameter(PARAM_CASE_SENSITIVE, caseSensitive ? "true" : "false");
         
-        customModelUtil.writeCustomContentModel(deserializedModel);
+        writeCustomContentModel(deserializedModel);
         
         if (logger.isInfoEnabled())
         {
@@ -453,17 +508,14 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         ParameterCheck.mandatory("constraintName", constraintName);
         ParameterCheck.mandatory("newAllowedValues", newAllowedValues);
         
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
-        
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        M2Model deserializedModel = readCustomContentModel();
         
         String constraintNameAsPrefixString = constraintName.toPrefixString(namespaceService);
         
         M2Constraint customConstraint = deserializedModel.getConstraint(constraintNameAsPrefixString);
         if (customConstraint == null)
         {
-            throw new AlfrescoRuntimeException("Unknown constraint ("+constraintNameAsPrefixString+")");
+            throw new AlfrescoRuntimeException("Unknown constraint: "+constraintNameAsPrefixString);
         }
         
         String type = customConstraint.getType();
@@ -475,7 +527,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         customConstraint.removeParameter(PARAM_ALLOWED_VALUES);
         customConstraint.createParameter(PARAM_ALLOWED_VALUES, newAllowedValues);
         
-        customModelUtil.writeCustomContentModel(deserializedModel);
+        writeCustomContentModel(deserializedModel);
         
         if (logger.isInfoEnabled())
         {
@@ -488,17 +540,14 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         ParameterCheck.mandatory("constraintName", constraintName);
         ParameterCheck.mandatoryString("title", title);
         
-        CustomModelUtil customModelUtil = new CustomModelUtil();
-        customModelUtil.setContentService(contentService);
-        
-        M2Model deserializedModel = customModelUtil.readCustomContentModel();
+        M2Model deserializedModel = readCustomContentModel();
         
         String constraintNameAsPrefixString = constraintName.toPrefixString(namespaceService);
         
         M2Constraint customConstraint = deserializedModel.getConstraint(constraintNameAsPrefixString);
         if (customConstraint == null)
         {
-            throw new AlfrescoRuntimeException("Unknown constraint ("+constraintNameAsPrefixString+")");
+            throw new AlfrescoRuntimeException("Unknown constraint: "+constraintNameAsPrefixString);
         }
         
         String type = customConstraint.getType();
@@ -509,7 +558,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         
         customConstraint.setTitle(title);
         
-        customModelUtil.writeCustomContentModel(deserializedModel);
+        writeCustomContentModel(deserializedModel);
         
         if (logger.isInfoEnabled())
         {
@@ -546,6 +595,71 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     
     public void removeCustomConstraintDefinition(QName constraintQName) 
     {
-        throw new UnsupportedOperationException("removeCustomConstraintDefinition: "+ constraintQName);
+        // throw new UnsupportedOperationException("removeCustomConstraintDefinition: "+ constraintQName);
+        
+        ParameterCheck.mandatory("constraintQName", constraintQName);
+        
+        M2Model deserializedModel = readCustomContentModel();
+        
+        String constraintNameAsPrefixString = constraintQName.toPrefixString(namespaceService);
+        
+        M2Constraint customConstraint = deserializedModel.getConstraint(constraintNameAsPrefixString);
+        if (customConstraint == null)
+        {
+            throw new AlfrescoRuntimeException("Constraint does not exist: "+constraintNameAsPrefixString);
+        }
+        
+        deserializedModel.removeConstraint(constraintNameAsPrefixString);
+        
+        writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("deleteCustomConstraintDefinition: "+constraintNameAsPrefixString);
+        }
+    }
+    
+    private M2Model readCustomContentModel()
+    {
+        ContentReader reader = this.contentService.getReader(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF,
+                                                             ContentModel.TYPE_CONTENT);
+        
+        if (reader.exists() == false) {throw new AlfrescoRuntimeException("RM CustomModel has no content.");}
+        
+        InputStream contentIn = null;
+        M2Model deserializedModel = null;
+        try
+        {
+            contentIn = reader.getContentInputStream();
+            deserializedModel = M2Model.createModel(contentIn);
+        }
+        finally
+        {
+            try
+            {
+                if (contentIn != null) contentIn.close();
+            }
+            catch (IOException ignored)
+            {
+                // Intentionally empty.`
+            }
+        }
+        return deserializedModel;
+    }
+    
+    private void writeCustomContentModel(M2Model deserializedModel)
+    {
+        ContentWriter writer = this.contentService.getWriter(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF,
+                                                             ContentModel.TYPE_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_XML);
+        writer.setEncoding("UTF-8");
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        deserializedModel.toXML(baos);
+        
+        final String updatedModelXml = baos.toString();
+        
+        writer.putContent(updatedModelXml);
+        // putContent closes all resources.
     }
 }
