@@ -400,8 +400,21 @@
       </tar>
       <delete quiet="yes"
               file="${dir.installer.quick}/output/Alfresco-${file.name.codeline}-${file.name.exe.version}-MacOS-X-Install" />
+
+      <delete quiet="yes"
+              includeEmptyDirs="true"
+              dir="${dir.installer.rm}/output" />
+      <exec dir="${dir.installer.rm}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
+         <arg line='-DVersion "${file.name.exe.version}" -DCodeline "${file.name.codeline}" --build --quiet "${file.name.installer.rm}"'/>
+      </exec>
+
       <move todir="${dir.continuous.dist}" failonerror="no">
          <fileset dir="${dir.installer.quick}/output">
+            <include name="**/*"/>
+         </fileset>
+      </move>
+      <move todir="${dir.continuous.dist}" failonerror="no">
+         <fileset dir="${dir.installer.rm}/output">
             <include name="**/*"/>
          </fileset>
       </move>
@@ -1188,7 +1201,7 @@
             file="${dir.project.installer.licenses}/license.txt" />
       <mkdir dir="${dir.continuous.assemble.sdk}/licenses" />
       <copy todir="${dir.continuous.assemble.sdk}/licenses">
-         <fileset dir="${dir.project.installer.licenses}/3rd-party" 
+         <fileset dir="${dir.project.installer.licenses}/3rd-party"
                   includes="*.*" />
       </copy>
 
