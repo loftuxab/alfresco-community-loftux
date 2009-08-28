@@ -41,19 +41,6 @@
          <parameter name="caseSensitive"><value>true</value></parameter>
       </constraint>
       
-      <!-- TODO - remove this constraint (test example only) prior to release and fix-up associated unit tests -->
-      <constraint name="rmc:prjList" type="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
-         <title>Projects</title>
-         <parameter name="allowedValues">
-            <list>
-               <value>Project A</value>
-               <value>Project B</value>
-               <value>Project C</value>
-            </list>
-         </parameter>
-         <parameter name="caseSensitive"><value>true</value></parameter>
-      </constraint>
-      
    </constraints>
    
    <aspects>
@@ -119,7 +106,7 @@
          
          </associations>
       </aspect>
-
+      
       <aspect name="rmc:customRecordSeriesProperties">
          <title>Properties for DOD5015 Custom Record Series</title>
       </aspect>
@@ -131,24 +118,7 @@
       </aspect>
       <aspect name="rmc:customRecordProperties">
          <title>Properties for Custom Record</title>
-            
-            <properties>
-            
-            <!--  TODO - remove this user-defined property (test example only) prior to release 
-                  and fix-up associated unit tests to create it dynamically (eg. DOD5015Test.testCaveatConfig) 
-              -->
-            <property name="rmc:projectNameList">
-               <title>Project Name</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-               <multiple>true</multiple>
-               <constraints>
-                  <constraint ref="rmc:prjList"/>
-               </constraints>
-            </property>
-            
-            </properties>
-            
       </aspect>
    </aspects>
+   
 </model>

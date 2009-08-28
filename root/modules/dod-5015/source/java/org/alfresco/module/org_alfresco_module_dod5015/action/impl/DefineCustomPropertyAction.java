@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.repo.action.ParameterDefinitionImpl;
@@ -56,6 +57,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
     public static final String PARAM_MULTI_VALUED = "multiValued";
     public static final String PARAM_MANDATORY = "mandatory";
     public static final String PARAM_PROTECTED = "protected";
+    public static final String PARAM_CONSTRAINT_REF = "constraintRef";
     
     private RecordsManagementAdminService rmAdminService;
     
@@ -98,15 +100,22 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         QName propQName = QName.createQName(qname, namespaceService);
         
         //TODO According to the wireframes, type here can only be date|text|number
-        Serializable serializableType = params.get(PARAM_DATATYPE);
+        Serializable serializableParam = params.get(PARAM_DATATYPE);
         QName type = null;
-        if (serializableType instanceof String)
+        if (serializableParam != null)
         {
-            type = QName.createQName((String)serializableType);
-        }
-        else
-        {
-            type = (QName)serializableType;
+            if (serializableParam instanceof String)
+            {
+                type = QName.createQName((String)serializableParam);
+            }
+            else if (serializableParam instanceof QName)
+            {
+                type = (QName)serializableParam;
+            }
+            else
+            {
+                throw new AlfrescoRuntimeException("Unexpected type of dataType param: "+serializableParam+" (expected String or QName)");
+            }
         }
         
         String title = (String)params.get(PARAM_TITLE);
@@ -115,7 +124,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
         
         // 'mandatory' should be an available parameter.
         boolean mandatory = false;
-        Serializable serializableParam = params.get(PARAM_MANDATORY);
+        serializableParam = params.get(PARAM_MANDATORY);
         if (serializableParam != null)
         {
             mandatory = Boolean.valueOf(serializableParam.toString());
@@ -135,7 +144,25 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
             multiValued = Boolean.valueOf(serializableParam.toString());
         }
         
-        rmAdminService.addCustomPropertyDefinition(aspectName, propQName, type, title, description, defaultValue, multiValued, mandatory, isProtected);
+        serializableParam = params.get(PARAM_CONSTRAINT_REF);
+        QName constraintRef = null;
+        if (serializableParam != null)
+        {
+            if (serializableParam instanceof String)
+            {
+                constraintRef = QName.createQName((String)serializableParam);
+            }
+            else if (serializableParam instanceof QName)
+            {
+                constraintRef = (QName)serializableParam;
+            }
+            else
+            {
+                throw new AlfrescoRuntimeException("Unexpected type of constraintRef param: "+serializableParam+" (expected String or QName)");
+            }
+        }
+        
+        rmAdminService.addCustomPropertyDefinition(aspectName, propQName, type, title, description, defaultValue, multiValued, mandatory, isProtected, constraintRef);
     }
 
     @Override

@@ -58,18 +58,33 @@ public interface RecordsManagementAdminService
     public Map<QName, PropertyDefinition> getAvailableCustomProperties();
     
     /**
+     * Add custom property definition
      * 
-     * @param aspectName
-     * @param propQName
-     * @param dataType
-     * @param title
-     * @param description
-     * @param defaultValue
-     * @param multiValued
-     * @param mandatory
-     * @param isProtected
+     * Note: no default value, single valued, optional, not system protected, no constraints
+     * 
+     * @param aspectName - mandatory
+     * @param propQName - mandatory
+     * @param dataType - mandatory
+     * @param title - optional
+     * @param description - optional
      */
-    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected);
+    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description);
+    
+    /**
+     * Add custom property definition with one optional constraint reference
+     * 
+     * @param aspectName - mandatory
+     * @param propQName - mandatory
+     * @param dataType - mandatory
+     * @param title - optional
+     * @param description - optional
+     * @param defaultValue - optional
+     * @param multiValued - TRUE if multi-valued property
+     * @param mandatory - TRUE if mandatory property
+     * @param isProtected - TRUE if protected property
+     * @param lovConstraintQName - optional custom constraint
+     */
+    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
     
     /**
      * 

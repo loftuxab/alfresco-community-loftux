@@ -34,7 +34,6 @@ import java.util.Map;
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.module.org_alfresco_module_dod5015.CustomModelUtil;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
@@ -77,70 +76,67 @@ import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 
 /**
- * This test class tests the definition and use of a custom property and a custom
- * reference at the Java services layer.
+ * This test class tests the definition and use of a custom RM elements at the Java services layer.
  * 
- * @author Neil McErlean
+ * Also currently being used to test related actions such as DefineCustomPropertyAction & DefineCustomAssociationAction.
+ * 
+ * @author Neil McErlean, janv
  */
-public class CustomPropertyReferenceTest extends BaseSpringTest 
+public class RecordsManagementAdminServiceImplTest extends BaseSpringTest 
                                          implements DOD5015Model,
                                                     BeforeCreateReference,
                                                     OnCreateReference
 {    
-	private NodeRef filePlan;
-	
+    private NodeRef filePlan;
+    
     private ContentService contentService;
     private DictionaryService dictionaryService;
-	private ImporterService importService;
+    private ImporterService importService;
     private NamespaceService namespaceService;
     private NodeService nodeService;
-	private SearchService searchService;
+    private SearchService searchService;
     private RecordsManagementActionService rmActionService;
     private RecordsManagementAdminService rmAdminService;
-	private TransactionService transactionService;
-	private PolicyComponent policyComponent;
-	
-	private PermissionService permissionService;
-	
-	// example base test data for supplemental markings list (see also recordsModel.xml)
-	protected final static String NOFORN     = "NOFORN";     // Not Releasable to Foreign Nationals/Governments/Non-US Citizens
-	protected final static String NOCONTRACT = "NOCONTRACT"; // Not Releasable to Contractors or Contractor/Consultants
-	protected final static String FOUO       = "FOUO";       // For Official Use Only 
-	protected final static String FGI        = "FGI";        // Foreign Government Information
-	
-	@Override
-	protected void onSetUpInTransaction() throws Exception 
-	{
-		super.onSetUpInTransaction();
-
+    private TransactionService transactionService;
+    private PolicyComponent policyComponent;
+    
+    private PermissionService permissionService;
+    
+    private final static long testRunID = System.currentTimeMillis();
+    
+    @Override
+    protected void onSetUpInTransaction() throws Exception 
+    {
+        super.onSetUpInTransaction();
+        
         this.dictionaryService = (DictionaryService)this.applicationContext.getBean("DictionaryService");
         this.contentService = (ContentService)this.applicationContext.getBean("ContentService");
-		this.importService = (ImporterService)this.applicationContext.getBean("importerComponent");
-		this.namespaceService = (NamespaceService)this.applicationContext.getBean("NamespaceService");
+        this.importService = (ImporterService)this.applicationContext.getBean("importerComponent");
+        this.namespaceService = (NamespaceService)this.applicationContext.getBean("NamespaceService");
         this.nodeService = (NodeService)this.applicationContext.getBean("NodeService");
         this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
         this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
         this.rmAdminService = (RecordsManagementAdminService)this.applicationContext.getBean("RecordsManagementAdminService");
         this.searchService = (SearchService)this.applicationContext.getBean("SearchService");
-		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
-		this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
-		
-		// Set the current security context as admin
-		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
-		
-		// Get the test data
-		setUpTestData();
-	}
-	
-	private void setUpTestData()
-	{
-	    // Don't reload the fileplan data on each test method.
-	    if (retrieveJanuaryAISVitalFolders().size() != 1)
-	    {
+        this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
+        this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
+        
+        // Set the current security context as admin
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
+        // Get the test data
+        setUpTestData();
+    }
+    
+    private void setUpTestData()
+    {
+        // Don't reload the fileplan data on each test method.
+        if (retrieveJanuaryAISVitalFolders().size() != 1)
+        {
             filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService);
-	    }
-	}
-
+        }
+    }
+    
     @Override
     protected void onTearDownInTransaction() throws Exception
     {
@@ -156,6 +152,37 @@ public class CustomPropertyReferenceTest extends BaseSpringTest
             // Nothing
             //System.out.println("DID NOT DELETE FILE PLAN!");
         }
+    }
+    
+    public void testCreateSimpleCustomProperties() throws Exception
+    {
+        setComplete();
+        endTransaction();
+        
+        startNewTransaction();
+        
+        UserTransaction txn1 = transactionService.getUserTransaction(true);
+        txn1.begin();
+        
+        // Create simple custom property definition (no constraint) for each type of customisable RM element
+        for (CustomisableRmElement ce : CustomisableRmElement.values())
+        {
+            String aspectName = ce.getCorrespondingAspect();
+            
+            String propLocalName = "myProp-for-"+aspectName+"-"+testRunID;
+            
+            QName propQName = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, propLocalName);
+            
+            QName dataType = DataTypeDefinition.TEXT;
+            String propTitle = "My property title";
+            String description = "My property description";
+            
+            rmAdminService.addCustomPropertyDefinition(aspectName, propQName, dataType, propTitle, description);
+        }
+        
+        txn1.commit();
+        
+        // TODO test usages
     }
     
     public void testCreateAndUseCustomProperty() throws Exception
@@ -445,22 +472,17 @@ public class CustomPropertyReferenceTest extends BaseSpringTest
     private void declareRecord(NodeRef recordOne)
     {
         // Declare record
-        //Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
-        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
-//        List<String> smList = new ArrayList<String>(2);
-//        smList.add(FOUO);
-//        smList.add(NOFORN);
-//        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
+        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
         this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
         this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_FORMAT, "formatValue"); 
-        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_DATE_RECEIVED, new Date());       
+        this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_DATE_RECEIVED, new Date());
         this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
         this.nodeService.setProperty(recordOne, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
         this.nodeService.setProperty(recordOne, ContentModel.PROP_TITLE, "titleValue");
-        this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
+        this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
 	}
     
-    public void testCustomConstraints() throws Exception
+    public void testCreateCustomConstraints() throws Exception
     {
         setComplete();
         endTransaction();
@@ -479,18 +501,17 @@ public class CustomPropertyReferenceTest extends BaseSpringTest
         UserTransaction txn2 = transactionService.getUserTransaction(false);
         txn2.begin();
         
-        long testRunID = System.currentTimeMillis();
         String conLocalName = "test-"+testRunID;
         
-        final QName testCon = QName.createQName(CustomModelUtil.CUSTOM_MODEL_URI, conLocalName);
-        final String title = "test title - "+testRunID;
+        final QName testCon = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, conLocalName);
+        final String conTitle = "test title - "+testRunID;
         
         List<String> allowedValues = new ArrayList<String>(3);
         allowedValues.add("RED");
         allowedValues.add("AMBER");
         allowedValues.add("GREEN");
         
-        rmAdminService.addCustomConstraintDefinition(testCon, title, true, allowedValues);
+        rmAdminService.addCustomConstraintDefinition(testCon, conTitle, true, allowedValues);
         
         txn2.commit();
         
@@ -511,7 +532,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest
         {
             if (conDef.getName().equals(testCon))
             {
-                assertEquals(title, conDef.getTitle());
+                assertEquals(conTitle, conDef.getTitle());
                 
                 Constraint con = conDef.getConstraint();
                 assertTrue(con instanceof RMListOfValuesConstraint);
@@ -555,7 +576,7 @@ public class CustomPropertyReferenceTest extends BaseSpringTest
         {
             if (conDef.getName().equals(testCon))
             {
-                assertEquals(title, conDef.getTitle());
+                assertEquals(conTitle, conDef.getTitle());
                 
                 Constraint con = conDef.getConstraint();
                 assertTrue(con instanceof RMListOfValuesConstraint);
@@ -573,5 +594,27 @@ public class CustomPropertyReferenceTest extends BaseSpringTest
         
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+        
+        UserTransaction txn6 = transactionService.getUserTransaction(false);
+        txn6.begin();
+        
+        // Add custom property to record with test constraint
+        
+        String aspectName = CustomisableRmElement.RECORD.getCorrespondingAspect();
+        
+        String propLocalName = "myProp-"+testRunID;
+        QName propQName = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, propLocalName);
+        
+        QName dataType = DataTypeDefinition.TEXT;
+        String propTitle = "My property title";
+        String description = "My property description";
+        String defaultValue = null;
+        boolean multiValued = false;
+        boolean mandatory = false;
+        boolean isProtected = false;
+        
+        rmAdminService.addCustomPropertyDefinition(aspectName, propQName, dataType, propTitle, description, defaultValue, multiValued, mandatory, isProtected, testCon);
+        
+        txn6.commit();
     }
 }
