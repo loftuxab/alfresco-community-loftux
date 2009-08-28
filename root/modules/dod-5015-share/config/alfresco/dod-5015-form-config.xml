@@ -216,7 +216,6 @@
                <field id="rma:reviewPeriod" set="rm" />
                <field id="rma:identifier" set="rm" label-id="label.folderIdentifier" />
                <field id="rma:location" set="rm" />
-               <field id="rma:supplementalMarkingList" set="rm" />
             </appearance>
          </form>
       </forms>
@@ -229,9 +228,6 @@
             <edit-form template="record-metadata.ftl" />
             
             <field-visibility>
-               <!-- NOTE: This is a test property and should be removed from the model! -->
-               <hide id="rma:projectNameList" />
-               
                <!-- explicitly hide mandatory fields we don't want in edit mode -->
                <hide id="cm:automaticUpdate" />
                <hide id="rma:dateFiled" for-mode="edit" />
@@ -276,9 +272,6 @@
             <edit-form template="record-metadata.ftl" />
             
             <field-visibility>
-               <!-- NOTE: This is a test property and should be removed from the model! -->
-               <hide id="rma:projectNameList" />
-               
                <!-- explicitly hide mandatory fields we don't want in edit mode -->
                <hide id="cm:automaticUpdate" />
                <hide id="rma:dateFiled" for-mode="edit" />
