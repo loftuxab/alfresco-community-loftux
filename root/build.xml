@@ -74,6 +74,7 @@
          </fileset>
          -->
          <pathelement location="${dir.project.core.classes}" />
+         <pathelement location="${dir.project.core.src.java}" />
          <pathelement location="${dir.project.catalinavirtual.classes}" />
          <pathelement location="${dir.project.jlan.classes}" />
          <pathelement location="${dir.project.mbeans.classes}" />
