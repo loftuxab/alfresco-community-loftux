@@ -329,12 +329,12 @@
         <property name="objectDefinitionSource">
             <value>
                 <![CDATA[  
-                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getAvailableCustomProperties=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomPropertyDefinitions=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.addCustomPropertyDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.removeCustomPropertyDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.addCustomAssocDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.addCustomChildAssocDefinition=RM_ALLOW
-                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getAvailableCustomReferences=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomReferenceDefinitions=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomReferencesFor=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomChildReferencesFor=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.addCustomReference=RM_ALLOW

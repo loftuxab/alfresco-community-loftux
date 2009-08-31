@@ -160,7 +160,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
      */
     public void testGetPristineCustomReferenceDefinitions() throws Exception
     {
-        Map<QName, AssociationDefinition> availableRefs = rmAdminService.getAvailableCustomReferences();
+        Map<QName, AssociationDefinition> availableRefs = rmAdminService.getCustomReferenceDefinitions();
         assertFalse("Expected some custom references.", availableRefs.isEmpty());
         
         AssociationDefinition assocDef = availableRefs.get(CUSTOM_REF_SUPERSEDES);
@@ -235,7 +235,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         // Confirm the custom property is included in the list from rmAdminService.
         final QName propQName = this.rmAdminService.getQNameForClientId(propClientSideName);
 
-        Map<QName, PropertyDefinition> customPropDefinitions = rmAdminService.getAvailableCustomProperties(CustomisableRmElement.RECORD_FOLDER);
+        Map<QName, PropertyDefinition> customPropDefinitions = rmAdminService.getCustomPropertyDefinitions(CustomisableRmElement.RECORD_FOLDER);
         PropertyDefinition propDefn = customPropDefinitions.get(propQName);
         assertNotNull("Custom property definition from rmAdminService was null.", propDefn);
         assertEquals(propQName, propDefn.getName());
@@ -321,7 +321,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         }
         
         // Confirm the custom reference is included in the list from rmAdminService.
-        Map<QName, AssociationDefinition> customRefDefinitions = rmAdminService.getAvailableCustomReferences();
+        Map<QName, AssociationDefinition> customRefDefinitions = rmAdminService.getCustomReferenceDefinitions();
         AssociationDefinition retrievedRefDefn = customRefDefinitions.get(backendQName);
         assertNotNull("Custom reference definition from rmAdminService was null.", retrievedRefDefn);
         assertEquals(backendQName, retrievedRefDefn.getName());
@@ -388,7 +388,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
     {
         // Just dump them out for visual inspection
         System.out.println("Available custom properties:");
-        Map<QName, PropertyDefinition> props = rmAdminService.getAvailableCustomProperties();
+        Map<QName, PropertyDefinition> props = rmAdminService.getCustomPropertyDefinitions();
         for (QName prop : props.keySet())
         {
             System.out.println("   - " + prop.toString());
@@ -400,22 +400,34 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         }     
     }
 	
-	public void testGetAllReferences()
-	{
-	    // Just dump them out for visual inspection
-	    System.out.println("Available custom references:");
-	    Map<QName, AssociationDefinition> references = rmAdminService.getAvailableCustomReferences();
-	    for (QName reference : references.keySet())
-	    {
+    public void testGetAllReferences()
+    {
+        // Just dump them out for visual inspection
+        System.out.println("Available custom references:");
+        Map<QName, AssociationDefinition> references = rmAdminService.getCustomReferenceDefinitions();
+        for (QName reference : references.keySet())
+        {
             System.out.println("   - " + reference.toString());
 
             String clientIdForQName = rmAdminService.getClientIdForQName(reference);
             assertNotNull("null client-id for " + reference, clientIdForQName);
 
             System.out.println("       " + clientIdForQName);
-	    }
-	}
-	
+        }
+    }
+    
+    public void testGetAllConstraints()
+    {
+        // Just dump them out for visual inspection
+        System.out.println("Available custom constraints:");
+        List<ConstraintDefinition> constraints = rmAdminService.getCustomConstraintDefinitions();
+        for (ConstraintDefinition constraint : constraints)
+        {
+            System.out.println("   - " + constraint.getName());
+            System.out.println("       " + constraint.getTitle());
+        }
+    }
+    
 	private boolean beforeMarker = false;
     private boolean onMarker = false;
     private boolean inTest = false;

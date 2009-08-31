@@ -178,9 +178,9 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     }
 
 	/**
-	 * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#getAvailableCustomReferences()
+	 * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#getCustomReferenceDefinitions()
 	 */
-    public Map<QName, AssociationDefinition> getAvailableCustomReferences()
+    public Map<QName, AssociationDefinition> getCustomReferenceDefinitions()
     {
 		QName relevantAspectQName = QName.createQName(RMC_CUSTOM_ASSOCS, namespaceService);
         AspectDefinition aspectDefn = dictionaryService.getAspect(relevantAspectQName);
@@ -190,22 +190,22 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     }
 
     /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#getAvailableCustomProperties()
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#getCustomPropertyDefinitions()
      */
-    public Map<QName, PropertyDefinition> getAvailableCustomProperties()
+    public Map<QName, PropertyDefinition> getCustomPropertyDefinitions()
     {
     	Map<QName, PropertyDefinition> result = new HashMap<QName, PropertyDefinition>();
     	for (CustomisableRmElement elem : CustomisableRmElement.values())
     	{
-    		result.putAll(getAvailableCustomProperties(elem));
+    		result.putAll(getCustomPropertyDefinitions(elem));
     	}
         return result;
     }
 
     /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#getAvailableCustomProperties(org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement)
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService#getCustomPropertyDefinitions(org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement)
      */
-    public Map<QName, PropertyDefinition> getAvailableCustomProperties(CustomisableRmElement rmElement)
+    public Map<QName, PropertyDefinition> getCustomPropertyDefinitions(CustomisableRmElement rmElement)
     {
 		QName relevantAspectQName = QName.createQName(rmElement.getCorrespondingAspect(), namespaceService);
         AspectDefinition aspectDefn = dictionaryService.getAspect(relevantAspectQName);
@@ -339,7 +339,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
      */
 	public void addCustomReference(NodeRef fromNode, NodeRef toNode, QName refId)
 	{
-		Map<QName, AssociationDefinition> availableAssocs = this.getAvailableCustomReferences();
+		Map<QName, AssociationDefinition> availableAssocs = this.getCustomReferenceDefinitions();
 
 		AssociationDefinition assocDef = availableAssocs.get(refId);
 		if (assocDef == null)
@@ -365,7 +365,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 
 	public void removeCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId) 
 	{
-		Map<QName, AssociationDefinition> availableAssocs = this.getAvailableCustomReferences();
+		Map<QName, AssociationDefinition> availableAssocs = this.getCustomReferenceDefinitions();
 
 		AssociationDefinition assocDef = availableAssocs.get(assocId);
 		if (assocDef == null)
