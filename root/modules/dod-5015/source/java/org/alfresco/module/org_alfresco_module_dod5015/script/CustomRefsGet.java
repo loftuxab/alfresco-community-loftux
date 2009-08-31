@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -80,8 +80,10 @@ public class CustomRefsGet extends AbstractRmWebScript
     		data.put("sourceRef", assRef.getSourceRef().toString());
     		data.put("targetRef", assRef.getTargetRef().toString());
 
-    		CustomReferenceId crId = new CustomReferenceId(typeQName.toPrefixString());
-			data.put("label", crId.getLabel());
+    		String clientId = rmAdminService.getClientIdForQName(typeQName);
+    		
+    		AssociationDefinition assDef = rmAdminService.getAvailableCustomReferences().get(typeQName);
+    		data.put("label", clientId);
 			data.put("referenceType", CustomReferenceType.BIDIRECTIONAL.toString());
     		
     		listOfReferenceData.add(data);
@@ -97,9 +99,11 @@ public class CustomRefsGet extends AbstractRmWebScript
     		data.put("childRef", childAssRef.getChildRef().toString());
     		data.put("parentRef", childAssRef.getParentRef().toString());
 
-    		CustomReferenceId crId = new CustomReferenceId(typeQName.toPrefixString());
-			data.put("source", crId.getSource());
-			data.put("target", crId.getTarget());
+            String clientId = rmAdminService.getClientIdForQName(typeQName);
+
+            String[] sourceAndTarget = rmAdminService.splitSourceTargetId(clientId);
+            data.put("source", sourceAndTarget[0]);
+            data.put("target", sourceAndTarget[1]);
 			data.put("referenceType", CustomReferenceType.PARENT_CHILD.toString());
     		
     		listOfReferenceData.add(data);

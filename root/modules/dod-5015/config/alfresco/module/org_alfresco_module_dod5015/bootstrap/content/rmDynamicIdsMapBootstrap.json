@@ -1,0 +1,40 @@
+{
+   "Comment1" : "This file defines the mappings from client-side ID to server-side QName",
+   "Comment2" : "The QNames must match those defined in recordsCustomModel.xml",
+   
+   "mappings" :
+   [
+      {
+         "qname" : "rmc:obsoletes",
+         "displayID" : "Obsoleted by__Obsoletes"
+      },
+      {
+         "qname" : "rmc:supersedes",
+         "displayID" : "Superseded by__Supersedes"
+      },
+      {
+         "qname" : "rmc:versions",
+         "displayID" : "Versioned by__Versions"
+      },
+      {
+         "qname" : "rmc:attachment",
+         "displayID" : "Attachment__TODO"
+      },
+      {
+         "qname" : "rmc:crossreference",
+         "displayID" : "Cross Reference"
+      },
+      {
+         "qname" : "rmc:redaction",
+         "displayID" : "Redaction__Redaction"
+      },
+      {
+         "qname" : "rmc:controlledcopy",
+         "displayID" : "Controlled Copy__Controlled Copy"
+      },
+      {
+         "qname" : "rmc:supports",
+         "displayID" : "Supports__Supported by"
+      }
+   ]
+}

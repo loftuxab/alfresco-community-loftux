@@ -10,7 +10,7 @@
   <br/>
   The body of the post should be in the form, e.g.<br/>
   {<br/>
-  &nbsp;&nbsp;&nbsp;"name" : "rmc:sampleCustomProperty",<br/>
+  &nbsp;&nbsp;&nbsp;"name" : "sampleCustomProperty",<br/>
   &nbsp;&nbsp;&nbsp;"dataType" : "d:boolean",<br/>
   &nbsp;&nbsp;&nbsp;etc.<br/>
   }<br/>

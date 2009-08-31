@@ -63,18 +63,18 @@ public interface RecordsManagementAdminService
      * Note: no default value, single valued, optional, not system protected, no constraints
      * 
      * @param aspectName - mandatory
-     * @param propQName - mandatory
+     * @param clientSideName - mandatory
      * @param dataType - mandatory
      * @param title - optional
      * @param description - optional
      */
-    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description);
+    public void addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description);
     
     /**
      * Add custom property definition with one optional constraint reference
      * 
      * @param aspectName - mandatory
-     * @param propQName - mandatory
+     * @param clientSideName - mandatory
      * @param dataType - mandatory
      * @param title - optional
      * @param description - optional
@@ -84,7 +84,7 @@ public interface RecordsManagementAdminService
      * @param isProtected - TRUE if protected property
      * @param lovConstraintQName - optional custom constraint
      */
-    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
+    public void addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
     
     /**
      * 
@@ -120,7 +120,7 @@ public interface RecordsManagementAdminService
      * 
      * @param fromNode
      * @param toNode
-     * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}supported__null__null
+     * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}abcd-12-efgh-4567
      */
     public void addCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId);
 
@@ -129,7 +129,7 @@ public interface RecordsManagementAdminService
      * 
      * @param fromNode
      * @param toNode
-     * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}supported__null__null
+     * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}abcd-12-efgh-4567
      */
     public void removeCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId);
     
@@ -188,4 +188,42 @@ public interface RecordsManagementAdminService
      * @param title
      */
     public void changeCustomConstraintTitle(QName constraintName, String title);
+    
+    /**
+     * This method returns the QName which corresponds to the given client-side ID.
+     * 
+     * @param clientId the client-side ID of a custom property, reference.
+     * @return the corresponding QName.
+     */
+    public QName getQNameForClientId(String clientId);
+
+    /**
+     * This method returns the client-side ID which corresponds to the given QName.
+     * 
+     * @param qname the QName of a custom property, reference.
+     * @return the corresponding client-side ID
+     */
+    public String getClientIdForQName(QName qname);
+
+    public QName generateAndRegisterQNameFor(String clientId);
+   
+    /**
+     * Given a compound id for source and target strings (as used with parent/child
+     * custom references), this method splits the String and returns an array containing
+     * the source and target IDs separately.
+     * 
+     * @param sourceTargetId the compound ID.
+     * @return a String array, where result[0] == sourceId and result[1] == targetId.
+     */
+    public String[] splitSourceTargetId(String sourceTargetId);
+
+    /**
+     * This method retrieves a compound ID (client-side) for the specified
+     * sourceId and targetId.
+     * 
+     * @param sourceId
+     * @param targetId
+     * @return
+     */
+    public String getCompoundIdFor(String sourceId, String targetId);
 }

@@ -30,7 +30,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
@@ -52,7 +51,7 @@ public class CustomRefDelete extends AbstractRmWebScript
     private static Log logger = LogFactory.getLog(CustomRefDelete.class);
     
     private RecordsManagementAdminService rmAdminService;
-    
+
     public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
     {
 		this.rmAdminService = rmAdminService;
@@ -95,16 +94,14 @@ public class CustomRefDelete extends AbstractRmWebScript
         
         Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
         String clientsRefId = templateVars.get("refId");
-        String serversRefId = CustomReferenceId.getReferenceIdFor(clientsRefId);
-        if (serversRefId == null)
+        QName qn = rmAdminService.getQNameForClientId(clientsRefId);
+        if (qn == null)
         {
             throw new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
             		"Unable to find reference type: " + clientsRefId);
         }
         
-        QName refQName = QName.createQName(serversRefId, namespaceService);
-        
-        rmAdminService.removeCustomReference(fromNodeRef, toNodeRef, refQName);
+        rmAdminService.removeCustomReference(fromNodeRef, toNodeRef, qn);
         
         result.put("success", true);
 

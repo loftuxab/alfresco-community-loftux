@@ -40,12 +40,12 @@ import javax.transaction.UserTransaction;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -86,7 +86,6 @@ import org.json.JSONTokener;
  */
 public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagementModel
 {
-    
     protected static final String GET_NODE_AUDITLOG_URL_FORMAT = "/api/node/{0}/rmauditlog";
     protected static final String GET_TRANSFER_URL_FORMAT = "/api/node/{0}/transfers/{1}";
     protected static final String REF_INSTANCES_URL_FORMAT = "/api/node/{0}/customreferences";
@@ -105,6 +104,11 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     protected ServiceRegistry services;
     protected RecordsManagementService rmService;
     protected RecordsManagementActionService rmActionService;
+    protected RecordsManagementAdminService rmAdminService;
+
+    private static final String BI_DI = "BiDi";
+    private static final String CHILD_SRC = "childSrc";
+    private static final String CHILD_TGT = "childTgt";
     
     @Override
     protected void setUp() throws Exception
@@ -122,6 +126,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         this.services = (ServiceRegistry)getServer().getApplicationContext().getBean("ServiceRegistry");
         this.rmService = (RecordsManagementService)getServer().getApplicationContext().getBean("RecordsManagementService");
         this.rmActionService = (RecordsManagementActionService)getServer().getApplicationContext().getBean("RecordsManagementActionService");
+        this.rmAdminService = (RecordsManagementAdminService)getServer().getApplicationContext().getBean("RecordsManagementAdminService");
         
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
 
@@ -334,8 +339,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 		// 1. Child association.
         String jsonString = new JSONStringer().object()
             .key("referenceType").value(CustomReferenceType.PARENT_CHILD)
-            .key("source").value("superseding" + now)
-            .key("target").value("superseded" + now)
+            .key("source").value(CHILD_SRC + now)
+            .key("target").value(CHILD_TGT + now)
         .endObject()
         .toString();
         
@@ -350,7 +355,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         // 2. Non-child or standard association.
         jsonString = new JSONStringer().object()
             .key("referenceType").value(CustomReferenceType.BIDIRECTIONAL)
-            .key("label").value("supported" + now)
+            .key("label").value(BI_DI + now)
         .endObject()
         .toString();
         
@@ -366,13 +371,13 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
             dictionaryService.getAspect(QName.createQName(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS, namespaceService));
         assertNotNull("Missing customAssocs aspect", customAssocsAspect);
         
-        String childRefName = CustomReferenceId.getReferenceIdFor("superseding" + now + CustomReferenceId.SEPARATOR + "superseded" + now);
-        QName newRefQname = QName.createQName(childRefName, namespaceService);
+        String clientId = rmAdminService.getCompoundIdFor(CHILD_SRC + now, CHILD_TGT + now);
+        QName newRefQname = rmAdminService.getQNameForClientId(clientId);
         Map<QName, AssociationDefinition> associations = customAssocsAspect.getAssociations();
 		assertTrue("Custom child assoc not returned by dataDictionary.", associations.containsKey(newRefQname));
 
-        String stdRefName = CustomReferenceId.getReferenceIdFor("supported" + now);
-        newRefQname = QName.createQName(stdRefName, namespaceService);
+        String clientId2 = BI_DI + now;
+        newRefQname = rmAdminService.getQNameForClientId(clientId2);
         assertTrue("Custom std assoc not returned by dataDictionary.", customAssocsAspect.getAssociations().containsKey(newRefQname));
         
         return now;
@@ -398,7 +403,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue("There should be at least two custom references. Found " + customRefsObj, customRefsObj.length() >= 2);
 
         // GET a specific custom reference definition
-        rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL + "/supported" + now), expectedStatus);
+        rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL + "/" + BI_DI + now), expectedStatus);
 
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
 
@@ -427,7 +432,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         // Add a standard ref
         String jsonString = new JSONStringer().object()
             .key("toNode").value(testRecord2.toString())
-            .key("refId").value("supported" + now)
+            .key("refId").value(BI_DI + now)
         .endObject()
         .toString();
     
@@ -437,7 +442,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 	    // Add a child ref
 	    jsonString = new JSONStringer().object()
 	    .key("toNode").value(testRecord2.toString())
-	    .key("refId").value("superseding" + now + "__" + "superseded" + now)
+	    .key("refId").value(rmAdminService.getCompoundIdFor(CHILD_SRC + now, CHILD_TGT + now))
 	    .endObject()
 	    .toString();
 	    
@@ -466,11 +471,11 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         final String queryFormat = "?st={0}&si={1}&id={2}";
         String urlQueryString = MessageFormat.format(queryFormat, protocol, identifier, recId);
 
-        rsp = sendRequest(new DeleteRequest(refInstancesUrl + "/" + "supported" + now + urlQueryString), 200);
+        rsp = sendRequest(new DeleteRequest(refInstancesUrl + "/" + BI_DI + now + urlQueryString), 200);
         assertTrue(rsp.getContentAsString().contains("success"));
 
         rsp = sendRequest(new DeleteRequest(refInstancesUrl + "/"
-        		+ "superseding" + now + "__" + "superseded" + now
+        		+ rmAdminService.getCompoundIdFor(CHILD_SRC + now, CHILD_TGT + now)
         		+ urlQueryString), 200);
         assertTrue(rsp.getContentAsString().contains("success"));
         
@@ -489,8 +494,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     
     public void testPostCustomProperty() throws Exception
     {
-    	//TODO Strip out the rmc prefix below
-        final String propertyName = "rmc:customProperty" + System.currentTimeMillis();
+        final String propertyName = "customProperty" + System.currentTimeMillis();
         
         String jsonString = new JSONStringer().object()
             .key("name").value(propertyName)
@@ -742,7 +746,6 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
     }
 
-    //TODO Extract these methods and those matching in CPRT into TestUtilities
     private NodeRef retrievePreexistingRecordFolder()
     {
         final List<NodeRef> resultNodeRefs = retrieveJanuaryAISVitalFolders();

@@ -41,7 +41,6 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementA
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -56,7 +55,6 @@ import org.alfresco.util.GUID;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.util.comparator.NullSafeComparator;
 
 /**
  * Records management service implementation
@@ -87,7 +85,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
 
     /** Well-known location of the scripts folder. */
     private NodeRef scriptsFolderNodeRef = new NodeRef("workspace", "SpacesStore", "rm_scripts");
-
+    
     /** Application context */
     private ApplicationContext applicationContext;
     

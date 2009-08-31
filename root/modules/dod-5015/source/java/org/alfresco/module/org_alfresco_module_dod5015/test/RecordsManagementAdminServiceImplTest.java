@@ -43,7 +43,6 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomPropertyAction;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint;
 import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
@@ -83,7 +82,7 @@ import org.alfresco.util.BaseSpringTest;
  * @author Neil McErlean, janv
  */
 public class RecordsManagementAdminServiceImplTest extends BaseSpringTest 
-                                         implements DOD5015Model,
+                                         implements DOD5015Model, RecordsManagementCustomModel,
                                                     BeforeCreateReference,
                                                     OnCreateReference
 {    
@@ -154,6 +153,27 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         }
     }
     
+    /**
+     * There are a number of custom reference definitions which are imported into the
+     * repository on bootup. This test ensures that a representative sample of those
+     * references have been correctly imported.
+     */
+    public void testGetPristineCustomReferenceDefinitions() throws Exception
+    {
+        Map<QName, AssociationDefinition> availableRefs = rmAdminService.getAvailableCustomReferences();
+        assertFalse("Expected some custom references.", availableRefs.isEmpty());
+        
+        AssociationDefinition assocDef = availableRefs.get(CUSTOM_REF_SUPERSEDES);
+        assertNotNull("assocDef was null.", assocDef);
+        final String expectedTitle = rmAdminService.getCompoundIdFor("Superseded by", "Supersedes");
+        assertEquals(expectedTitle, assocDef.getTitle());
+        
+        // These initial references should also be in the id-mapping bean.
+        String clientIdForQName = rmAdminService.getClientIdForQName(CUSTOM_REF_SUPERSEDES);
+        assertNotNull("Incorrect clientId for pristine custom reference: " + clientIdForQName,
+                clientIdForQName);
+    }
+
     public void testCreateSimpleCustomProperties() throws Exception
     {
         setComplete();
@@ -171,13 +191,11 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
             
             String propLocalName = "myProp-for-"+aspectName+"-"+testRunID;
             
-            QName propQName = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, propLocalName);
-            
             QName dataType = DataTypeDefinition.TEXT;
             String propTitle = "My property title";
             String description = "My property description";
             
-            rmAdminService.addCustomPropertyDefinition(aspectName, propQName, dataType, propTitle, description);
+            rmAdminService.addCustomPropertyDefinition(aspectName, propLocalName, dataType, propTitle, description);
         }
         
         txn1.commit();
@@ -200,10 +218,10 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         declareRecord(testRecord);
 
         // Define a custom property.
-        final String propName = "rmc:customProperty" + System.currentTimeMillis();
+        final String propClientSideName = "customProperty" + System.currentTimeMillis();
 
         Map <String, Serializable> params = new HashMap<String, Serializable>();
-        params.put("name", propName);
+        params.put("name", propClientSideName);
         params.put("dataType", DataTypeDefinition.BOOLEAN);
         params.put(DefineCustomPropertyAction.PARAM_ELEMENT, "recordFolder");
         rmActionService.executeRecordsManagementAction("defineCustomProperty", params);
@@ -215,20 +233,21 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         txn2.begin();
         
         // Confirm the custom property is included in the list from rmAdminService.
-        final QName propQName = QName.createQName(propName, namespaceService);
+        final QName propQName = this.rmAdminService.getQNameForClientId(propClientSideName);
 
         Map<QName, PropertyDefinition> customPropDefinitions = rmAdminService.getAvailableCustomProperties(CustomisableRmElement.RECORD_FOLDER);
         PropertyDefinition propDefn = customPropDefinitions.get(propQName);
         assertNotNull("Custom property definition from rmAdminService was null.", propDefn);
-        assertEquals(propName, propDefn.getName().toPrefixString(namespaceService));
+        assertEquals(propQName, propDefn.getName());
+        assertEquals(propClientSideName, propDefn.getTitle());
+
         assertEquals(DataTypeDefinition.BOOLEAN, propDefn.getDataType().getName());
         
         // Now we need to use the custom property.
         // So we apply the aspect containing it to our test record.
         Map<QName, Serializable> customPropValue = new HashMap<QName, Serializable>();
         customPropValue.put(propQName, true);
-        QName aspectQName = QName.createQName("rmc:customRecordFolderProperties", namespaceService);
-        nodeService.addAspect(testRecord, aspectQName, customPropValue);
+        nodeService.addAspect(testRecord, ASPECT_CUSTOM_RECORD_FOLDER_PROPERTIES, customPropValue);
         
         txn2.commit();
         
@@ -242,7 +261,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         assertEquals("The test property was not 'true'.", true, testPropertyValue);
         
         // Check that the property has appeared in the data dictionary
-        final AspectDefinition customPropertiesAspect = dictionaryService.getAspect(aspectQName);
+        final AspectDefinition customPropertiesAspect = dictionaryService.getAspect(ASPECT_CUSTOM_RECORD_FOLDER_PROPERTIES);
         assertNotNull(customPropertiesAspect);
         assertNotNull("The customProperty is not returned from the dictionaryService.",
                 customPropertiesAspect.getProperties().get(propQName));
@@ -290,37 +309,38 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         UserTransaction txn2 = transactionService.getUserTransaction(false);
         txn2.begin();
 
-        // Confirm the custom reference is included in the list from rmAdminService.
-        String uid;
+        QName backendQName;
         if (label != null)
         {
-        	uid = CustomReferenceId.getReferenceIdFor(label);
+            backendQName = rmAdminService.getQNameForClientId(label);
         }
         else
         {
-        	uid = CustomReferenceId.getReferenceIdFor(source + CustomReferenceId.SEPARATOR + target);
+            String compoundID = rmAdminService.getCompoundIdFor(source, target);
+            backendQName = rmAdminService.getQNameForClientId(compoundID);
         }
-        final QName refDefinitionQName = QName.createQName(uid, namespaceService);
         
+        // Confirm the custom reference is included in the list from rmAdminService.
         Map<QName, AssociationDefinition> customRefDefinitions = rmAdminService.getAvailableCustomReferences();
-        AssociationDefinition retrievedRefDefn = customRefDefinitions.get(refDefinitionQName);
+        AssociationDefinition retrievedRefDefn = customRefDefinitions.get(backendQName);
         assertNotNull("Custom reference definition from rmAdminService was null.", retrievedRefDefn);
-        assertEquals(refDefinitionQName, retrievedRefDefn.getName());
+        assertEquals(backendQName, retrievedRefDefn.getName());
         assertEquals(refType.equals(CustomReferenceType.PARENT_CHILD), retrievedRefDefn.isChild());
         
         // Now we need to use the custom reference.
         // So we apply the aspect containing it to our test records.
+        nodeService.addAspect(testRecord1, ASPECT_CUSTOM_ASSOCIATIONS, null);
         
         QName assocsAspectQName = QName.createQName("rmc:customAssocs", namespaceService);
         nodeService.addAspect(testRecord1, assocsAspectQName, null);
 
 		if (CustomReferenceType.PARENT_CHILD.equals(refType))
 		{
-			nodeService.addChild(testRecord1, testRecord2, refDefinitionQName, refDefinitionQName);
+            nodeService.addChild(testRecord1, testRecord2, backendQName, backendQName);
 		}
 		else
 		{
-			nodeService.createAssociation(testRecord1, testRecord2, refDefinitionQName);
+            nodeService.createAssociation(testRecord1, testRecord2, backendQName);
 		}
         
         txn2.commit();
@@ -336,7 +356,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
     		for (ChildAssociationRef caRef : childAssocs)
     		{
     			QName refInstanceQName = caRef.getQName();
-    			if (refDefinitionQName.equals(refInstanceQName)) newlyAddedRef = caRef;
+                if (backendQName.equals(refInstanceQName)) newlyAddedRef = caRef;
     		}
     	}
     	else
@@ -344,25 +364,41 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
     		for (AssociationRef aRef : retrievedAssocs)
     		{
     			QName refQName = aRef.getTypeQName();
-    			if (refDefinitionQName.equals(refQName)) newlyAddedRef = aRef;
+                if (backendQName.equals(refQName)) newlyAddedRef = aRef;
     		}
     	}
     	assertNotNull("newlyAddedRef was null.", newlyAddedRef);
         
         // Check that the reference has appeared in the data dictionary
-        AspectDefinition customAssocsAspect = dictionaryService.getAspect(assocsAspectQName);
+        AspectDefinition customAssocsAspect = dictionaryService.getAspect(ASPECT_CUSTOM_ASSOCIATIONS);
         assertNotNull(customAssocsAspect);
 		if (CustomReferenceType.PARENT_CHILD.equals(refType))
         {
         	assertNotNull("The customReference is not returned from the dictionaryService.",
-        			customAssocsAspect.getChildAssociations().get(refDefinitionQName));
+                    customAssocsAspect.getChildAssociations().get(backendQName));
         }
         else
         {
         	assertNotNull("The customReference is not returned from the dictionaryService.",
-        			customAssocsAspect.getAssociations().get(refDefinitionQName));
+        			customAssocsAspect.getAssociations().get(backendQName));
         }
 	}
+	
+    public void testGetAllProperties()
+    {
+        // Just dump them out for visual inspection
+        System.out.println("Available custom properties:");
+        Map<QName, PropertyDefinition> props = rmAdminService.getAvailableCustomProperties();
+        for (QName prop : props.keySet())
+        {
+            System.out.println("   - " + prop.toString());
+            
+            String clientIdForQName = rmAdminService.getClientIdForQName(prop);
+            assertNotNull("null client-id for " + prop, clientIdForQName);
+            
+            System.out.println("       " + clientIdForQName);
+        }     
+    }
 	
 	public void testGetAllReferences()
 	{
@@ -372,7 +408,12 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
 	    for (QName reference : references.keySet())
 	    {
             System.out.println("   - " + reference.toString());
-	    }	  
+
+            String clientIdForQName = rmAdminService.getClientIdForQName(reference);
+            assertNotNull("null client-id for " + reference, clientIdForQName);
+
+            System.out.println("       " + clientIdForQName);
+	    }
 	}
 	
 	private boolean beforeMarker = false;
@@ -410,8 +451,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
             assertFalse(beforeMarker);
             assertFalse(onMarker);
             
-            QName refName = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, "null__VersionedBy__Versions");
-            rmAdminService.addCustomReference(testRecord1, testRecord2, refName);
+            rmAdminService.addCustomReference(testRecord1, testRecord2, CUSTOM_REF_VERSIONS);
             
             assertTrue(beforeMarker);
             assertTrue(onMarker);
@@ -603,7 +643,6 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         String aspectName = CustomisableRmElement.RECORD.getCorrespondingAspect();
         
         String propLocalName = "myProp-"+testRunID;
-        QName propQName = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, propLocalName);
         
         QName dataType = DataTypeDefinition.TEXT;
         String propTitle = "My property title";
@@ -613,7 +652,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         boolean mandatory = false;
         boolean isProtected = false;
         
-        rmAdminService.addCustomPropertyDefinition(aspectName, propQName, dataType, propTitle, description, defaultValue, multiValued, mandatory, isProtected, testCon);
+        rmAdminService.addCustomPropertyDefinition(aspectName, propLocalName, dataType, propTitle, description, defaultValue, multiValued, mandatory, isProtected, testCon);
         
         txn6.commit();
     }

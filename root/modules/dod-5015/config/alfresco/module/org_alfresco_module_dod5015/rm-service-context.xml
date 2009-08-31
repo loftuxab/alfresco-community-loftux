@@ -343,6 +343,11 @@
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.addCustomConstraintDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.removeCustomConstraintDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.changeCustomConstraintValues=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getQNameForClientId=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getClientIdForQName=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.generateAndRegisterQNameFor=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.splitSourceTargetId=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCompoundIdFor=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.*=RM_DENY
                 ]]>
             </value>
