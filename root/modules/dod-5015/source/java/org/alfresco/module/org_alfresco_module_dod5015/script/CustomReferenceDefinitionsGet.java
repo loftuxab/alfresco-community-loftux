@@ -33,7 +33,6 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.ChildAssociationDefinition;
 import org.alfresco.service.namespace.NamespaceService;
@@ -58,7 +57,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
     
     private RecordsManagementAdminService rmAdminService;
     private NamespaceService namespaceService;
-    
+
     public void setNamespaceService(NamespaceService namespaceService)
     {
     	this.namespaceService = namespaceService;
@@ -88,8 +87,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
         // else it is a request for them all.
         if (refId != null)
         {
-        	String qname = CustomReferenceId.getReferenceIdFor(refId);
-        	QName qn = QName.createQName(qname, namespaceService);
+            QName qn = rmAdminService.getQNameForClientId(refId);
         	
         	AssociationDefinition assDef = currentCustomRefs.get(qn);
         	if (assDef == null)
@@ -114,23 +112,38 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
         {
     		Map<String, String> data = new HashMap<String, String>();
 
-    		QName serverSideQName = entry.getValue().getName();
+    		AssociationDefinition nextValue = entry.getValue();
+            QName serverSideQName = nextValue.getName();
     		
-    		CustomReferenceId crId = new CustomReferenceId(serverSideQName);
+    		String clientId = rmAdminService.getClientIdForQName(serverSideQName);
 
-    		CustomReferenceType referenceType = entry.getValue() instanceof ChildAssociationDefinition ?
+    		CustomReferenceType referenceType = nextValue instanceof ChildAssociationDefinition ?
     				CustomReferenceType.PARENT_CHILD : CustomReferenceType.BIDIRECTIONAL;
     		
 			data.put("referenceType", referenceType.toString());
 
-			String label = crId.getLabel();
-			if (!label.equals("null")) data.put("label", label);
-			
-			String source = crId.getSource();
-			if (!source.equals("null")) data.put("source", source);
-			
-			String target = crId.getTarget();
-			if (!target.equals("null")) data.put("target", target);
+			String nextTitle = nextValue.getTitle();
+            if (CustomReferenceType.PARENT_CHILD.equals(referenceType))
+            {
+                if (nextTitle != null)
+                {
+                    //TODO Can I actually use the title? It's not 'controlled'
+                    String[] sourceAndTarget = rmAdminService.splitSourceTargetId(nextTitle);
+                    data.put("source", sourceAndTarget[0]);
+                    data.put("target", sourceAndTarget[1]);
+                }
+            }
+            else if (CustomReferenceType.BIDIRECTIONAL.equals(referenceType))
+            {
+                if (nextTitle != null)
+                {
+                    data.put("label", nextTitle);
+                }
+            }
+            else
+            {
+                //TODO throw
+            }
         	
     		listOfReferenceData.add(data);
         }

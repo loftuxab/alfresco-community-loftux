@@ -7,7 +7,7 @@
   the request will not succeed. In cases where there are no instances of the specified<BR/>
   property in the system, the request will attempted.<BR/>
   <BR/>
-  The property_qname should be provided in the form "rmc_foo"
+  The property_qname should be provided in the form "foo" i.e. without namespace.
   ]]>
   </description>
   <url>/api/rma/admin/custompropertydefinitions/{property_qname}</url>

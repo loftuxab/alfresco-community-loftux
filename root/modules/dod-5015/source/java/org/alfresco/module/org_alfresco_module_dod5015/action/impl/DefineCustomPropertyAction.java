@@ -96,8 +96,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
             logger.debug(msg.toString());
         }
         
-        String qname = (String)params.get(PARAM_NAME);
-        QName propQName = QName.createQName(qname, namespaceService);
+        String clientSideName = (String)params.get(PARAM_NAME);
         
         //TODO According to the wireframes, type here can only be date|text|number
         Serializable serializableParam = params.get(PARAM_DATATYPE);
@@ -162,7 +161,7 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
             }
         }
         
-        rmAdminService.addCustomPropertyDefinition(aspectName, propQName, type, title, description, defaultValue, multiValued, mandatory, isProtected, constraintRef);
+        rmAdminService.addCustomPropertyDefinition(aspectName, clientSideName, type, title, description, defaultValue, multiValued, mandatory, isProtected, constraintRef);
     }
 
     @Override

@@ -31,7 +31,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.Cache;
@@ -102,16 +101,14 @@ public class CustomRefPost extends AbstractRmWebScript
         NodeRef toNode = new NodeRef(toNodeStg);
 
         String clientsRefId = json.getString("refId");
-        String serversRefId = CustomReferenceId.getReferenceIdFor(clientsRefId);
-        if (serversRefId == null)
+        QName qn = rmAdminService.getQNameForClientId(clientsRefId);
+        if (qn == null)
         {
             throw new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
             		"Unable to find reference type: " + clientsRefId);
         }
         
-        QName refQName = QName.createQName(serversRefId, namespaceService);
-        
-        rmAdminService.addCustomReference(fromNode, toNode, refQName);
+        rmAdminService.addCustomReference(fromNode, toNode, qn);
         
         result.put("success", true);
 

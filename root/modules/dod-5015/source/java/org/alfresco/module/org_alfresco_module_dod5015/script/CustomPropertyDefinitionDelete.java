@@ -96,8 +96,8 @@ public class CustomPropertyDefinitionDelete extends AbstractRmWebScript
     {
         Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
         String propIdString = templateVars.get("property_qname");
-        QName propQName = QName.createQName(propIdString.replaceFirst("_", ":"), namespaceService);
         
+        QName propQName = this.rmAdminService.getQNameForClientId(propIdString);
         Map<QName, PropertyDefinition> existingPropDefs = rmAdminService.getAvailableCustomProperties();
 
         if (existingPropDefs.containsKey(propQName) == false)

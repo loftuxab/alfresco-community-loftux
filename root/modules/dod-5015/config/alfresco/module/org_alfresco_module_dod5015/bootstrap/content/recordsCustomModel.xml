@@ -7,7 +7,7 @@
 
    <!-- Meta-data about the model -->
    <description>Records Management Custom Model</description>
-   <author>Neil McErlean</author>
+   <author>Alfresco</author>
    <version>1.0</version>
    
    <!-- Imports are required to allow references to definitions in other models -->
@@ -68,7 +68,8 @@
          
          <associations>
             
-            <child-association name="rmc:null__SupersedBy__Supersedes">
+            <child-association name="rmc:supersedes">
+                <title>Superseded by__Supersedes</title>
                 <source>
                     <mandatory>false</mandatory>
                     <many>false</many>
@@ -80,7 +81,8 @@
                 </target>
             </child-association>
             
-            <child-association name="rmc:null__ObsoletedBy__Obsoletes">
+            <child-association name="rmc:obsoletes">
+                <title>Obsoleted by__Obsoletes</title>
                 <source>
                     <mandatory>false</mandatory>
                     <many>false</many>
@@ -92,7 +94,8 @@
                 </target>
             </child-association>
             
-            <child-association name="rmc:null__VersionedBy__Versions">
+            <child-association name="rmc:versions">
+                <title>Versioned by__Versions</title>
                 <source>
                     <mandatory>false</mandatory>
                     <many>false</many>

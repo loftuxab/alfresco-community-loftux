@@ -49,8 +49,6 @@ public class DefineCustomAssociationAction extends DefineCustomElementAbstractAc
     private static final String PARAM_SOURCE = "source";
     private static final String PARAM_REFERENCE_TYPE = "referenceType";
     private static Log logger = LogFactory.getLog(DefineCustomAssociationAction.class);
-    public static final String RMA_RECORD = "rma:record";
-    
     private RecordsManagementAdminService rmAdminService;
     
     public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)

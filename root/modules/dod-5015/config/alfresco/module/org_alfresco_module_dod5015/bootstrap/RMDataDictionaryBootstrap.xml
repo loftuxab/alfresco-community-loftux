@@ -50,6 +50,21 @@
                </view:properties>
             </cm:content>
 
+            <cm:content view:childName="cm:rm_dynamic_ids_map.json">
+               <view:aspects>
+                  <cm:titled></cm:titled>
+               </view:aspects>
+               <view:properties>      
+                  <sys:store-protocol>workspace</sys:store-protocol>
+                  <sys:store-identifier>SpacesStore</sys:store-identifier>
+                  <sys:node-uuid>rm_dynamic_ids_map</sys:node-uuid>
+                  <cm:description>Records management Custom Objects.</cm:description>
+                  <cm:content>contentUrl=classpath:alfresco/module/org_alfresco_module_dod5015/bootstrap/content/rmDynamicIdsMapBootstrap.json|mimetype=text/plain|encoding=UTF-8</cm:content>
+                  <cm:title>rm_dynamic_ids_map.json</cm:title>
+                  <cm:name>rm_dynamic_ids_map.json</cm:name>
+               </view:properties>
+            </cm:content>
+
            <cm:dictionaryModel view:childName="cm:recordsCustomModel.xml">
                <view:aspects>
                   <cm:titled></cm:titled>
@@ -62,13 +77,9 @@
                   <cm:content>contentUrl=classpath:alfresco/module/org_alfresco_module_dod5015/bootstrap/content/recordsCustomModel.xml|mimetype=text/plain|encoding=UTF-8</cm:content>
                   <cm:title>recordsCustomModel.xml</cm:title>
                   <cm:name>recordsCustomModel.xml</cm:name>
-                  
 	              <cm:modelName>{http://www.alfresco.org/model/rmcustom/1.0}rmc</cm:modelName>
 	              <cm:modelDescription>Records Management Custom Model</cm:modelDescription>
 	              <cm:modelAuthor>Alfresco</cm:modelAuthor>
-	              <!--
-	              <cm:modelPublishedDate>d:Date</cm:modelPublishedDate>
-	              -->
 	              <cm:modelVersion>1.0</cm:modelVersion>
 	              <cm:modelActive>true</cm:modelActive>
             

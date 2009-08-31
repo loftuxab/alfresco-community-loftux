@@ -38,8 +38,6 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CustomReferenceId;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomAssociationAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint;
 import org.alfresco.repo.content.MimetypeMap;
@@ -52,6 +50,7 @@ import org.alfresco.repo.dictionary.M2Model;
 import org.alfresco.repo.dictionary.M2Property;
 import org.alfresco.repo.policy.ClassPolicyDelegate;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.Constraint;
@@ -69,16 +68,19 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.util.GUID;
 import org.alfresco.util.ParameterCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Records Management AdminService Implementation.
  * 
  * @author Neil McErlean, janv
  */
-public class RecordsManagementAdminServiceImpl implements RecordsManagementAdminService
+public class RecordsManagementAdminServiceImpl implements RecordsManagementAdminService, RecordsManagementCustomModel
 {
     /** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementAdminServiceImpl.class);
@@ -90,6 +92,14 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     private static final String PARAM_ALLOWED_VALUES = "allowedValues";
     private static final String PARAM_CASE_SENSITIVE = "caseSensitive";
     
+    public static final String RMA_RECORD = "rma:record";
+    
+    private Map<QName, String> qnamesToClientNames;
+    private static final String SOURCE_TARGET_ID_SEPARATOR = "__";
+    
+    /** Well-known node containing the dynamic ID mapping node. */
+    private NodeRef dynamicIdMappingsNode = new NodeRef("workspace", "SpacesStore", "rm_dynamic_ids_map");
+
     /** Services */
     private DictionaryService dictionaryService;
     private NamespaceService namespaceService;
@@ -204,38 +214,40 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return propDefns;
     }
     
-    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description)
+    public void addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description)
     {
-        addCustomPropertyDefinition(aspectName, propQName, dataType, title, description, null, false, false, false, null);
+        addCustomPropertyDefinition(aspectName, clientSideName, dataType, title, description, null, false, false, false, null);
     }
     
-    public void addCustomPropertyDefinition(String aspectName, QName propQName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraint)
+    public void addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraint)
     {
         ParameterCheck.mandatoryString("aspectName", aspectName);
-        ParameterCheck.mandatory("propQName", propQName);
+        ParameterCheck.mandatory("clientSideName", clientSideName);
         ParameterCheck.mandatory("dataType", dataType);
         
         M2Model deserializedModel = readCustomContentModel();
         M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
+
+        QName newQName = this.generateAndRegisterQNameFor(clientSideName);
+        String newQNameAsString = newQName.toPrefixString(namespaceService);
         
         if (customPropsAspect == null)
         {
-            throw new AlfrescoRuntimeException("Unknown aspect: "+aspectName);
+            throw new AlfrescoRuntimeException("Unknown aspect: " + aspectName);
         }
         
-        String propQNameAsString = propQName.toPrefixString(namespaceService);
-        
-        M2Property customProp = customPropsAspect.getProperty(propQNameAsString);
+        M2Property customProp = customPropsAspect.getProperty(newQNameAsString);
         if (customProp != null)
         {
-            throw new AlfrescoRuntimeException("Property already exists: "+propQNameAsString);
+            throw new AlfrescoRuntimeException("Property already exists: " + newQNameAsString);
         }
         
-        M2Property newProp = customPropsAspect.createProperty(propQNameAsString);
-        newProp.setName(propQNameAsString);
+        M2Property newProp = customPropsAspect.createProperty(newQNameAsString);
+        newProp.setName(newQNameAsString);
         newProp.setType(dataType.toPrefixString(namespaceService));
         
         newProp.setTitle(title);
+        newProp.setTitle(clientSideName);
         newProp.setDescription(description);
         newProp.setDefaultValue(defaultValue);
         
@@ -247,7 +259,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         {
             if (! dataType.equals(DataTypeDefinition.TEXT))
             {
-                throw new AlfrescoRuntimeException("Cannot apply constraint '"+lovConstraint+"' to property '"+propQNameAsString+"' with datatype '"+dataType+"' (expected: dataType = TEXT)");
+                throw new AlfrescoRuntimeException("Cannot apply constraint '"+lovConstraint+"' to property '"+newQNameAsString+"' with datatype '"+dataType+"' (expected: dataType = TEXT)");
             }
             
             String lovConstraintQNameAsString = lovConstraint.toPrefixString(namespaceService);
@@ -258,7 +270,8 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         
         if (logger.isInfoEnabled())
         {
-            logger.info("addCustomPropertyDefinition: "+propQNameAsString+" to aspect: "+aspectName);
+            logger.info("addCustomPropertyDefinition: "+clientSideName+
+                    "=" + newQNameAsString + " to aspect: "+aspectName);
         }
     }
     
@@ -403,21 +416,28 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
             throw new AlfrescoRuntimeException("Unknown aspect: "+aspectName);
         }
         
-        CustomReferenceId crId = new CustomReferenceId(label, null, null);
-        String assocName = crId.getReferenceId();
+        // If this label is already taken...
+        if (this.getQNameForClientId(label) != null)
+        {
+            throw new IllegalArgumentException("Reference label already in use: " + label);
+        }
+
+        QName generatedQName = this.generateAndRegisterQNameFor(label);
+        String generatedShortQName = generatedQName.toPrefixString(namespaceService);
         
-        M2ClassAssociation customAssoc = customAssocsAspect.getAssociation(assocName);
+        M2ClassAssociation customAssoc = customAssocsAspect.getAssociation(generatedShortQName);
         if (customAssoc != null)
         {
-            throw new AlfrescoRuntimeException("Assoc already exists: "+assocName);
+            throw new AlfrescoRuntimeException("Assoc already exists: "+generatedShortQName);
         }
         
-        M2Association newAssoc = customAssocsAspect.createAssociation(assocName);
+        M2Association newAssoc = customAssocsAspect.createAssociation(generatedShortQName);
         newAssoc.setSourceMandatory(false);
         newAssoc.setTargetMandatory(false);
+        newAssoc.setTitle(label);
         
         // TODO Could be the customAssocs aspect
-        newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
+        newAssoc.setTargetClassName(RecordsManagementAdminServiceImpl.RMA_RECORD);
         
         writeCustomContentModel(deserializedModel);
         
@@ -441,22 +461,27 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         {
             throw new AlfrescoRuntimeException("Unknown aspect: "+aspectName);
         }
-        
-        CustomReferenceId crId = new CustomReferenceId(null, source, target);
-        String assocName = crId.getReferenceId();
-        
-        M2ClassAssociation customAssoc = customAssocsAspect.getAssociation(assocName);
-        if (customAssoc != null)
+
+        String compoundID = this.getCompoundIdFor(source, target);
+        if (this.getQNameForClientId(compoundID) != null)
         {
-            throw new AlfrescoRuntimeException("ChildAssoc already exists: "+assocName);
+            throw new IllegalArgumentException("Reference label already in use: " + compoundID);
         }
         
-        M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(assocName);
+        M2ClassAssociation customAssoc = customAssocsAspect.getAssociation(compoundID);
+        if (customAssoc != null)
+        {
+            throw new AlfrescoRuntimeException("ChildAssoc already exists: "+compoundID);
+        }
+        QName generatedQName = this.generateAndRegisterQNameFor(compoundID);
+        
+        M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(generatedQName.toPrefixString(namespaceService));
         newAssoc.setSourceMandatory(false);
         newAssoc.setTargetMandatory(false);
+        newAssoc.setTitle(compoundID);
         
         // TODO Could be the custom assocs aspect
-        newAssoc.setTargetClassName(DefineCustomAssociationAction.RMA_RECORD);
+        newAssoc.setTargetClassName(RecordsManagementAdminServiceImpl.RMA_RECORD);
         
         writeCustomContentModel(deserializedModel);
         
@@ -661,5 +686,162 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         
         writer.putContent(updatedModelXml);
         // putContent closes all resources.
+    }
+
+    
+    // Dynamic ID handling. The following methods had been located in a dedicated
+    // spring bean, but got inlined. There may be a case to refactor these out into
+    // a bean again.
+    
+    //TODO After certification. This implementation currently does not support reference,
+    // property, constraints definitions with the same names, which is technically allowed by Alfresco.
+    public QName getQNameForClientId(String clientId)
+    {
+        Map<QName, String> mappings = this.getDynamicIdMappings();
+        for (Map.Entry<QName, String> entry : mappings.entrySet())
+        {
+            if (entry.getValue().equals(clientId))
+            {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    public String getClientIdForQName(QName qname)
+    {
+        Map<QName, String> mappings = this.getDynamicIdMappings();
+        return mappings.get(qname);
+    }
+    
+    public QName generateAndRegisterQNameFor(String clientId)
+    {
+        Map<QName, String> mappings = this.getDynamicIdMappings();
+        if (mappings.containsValue(clientId))
+        {
+            throw new IllegalArgumentException("clientId already in use: " + clientId);
+        }
+        
+        String newGUID = GUID.generate();
+        QName newQName = QName.createQName(RM_CUSTOM_PREFIX, newGUID, namespaceService);
+        
+        this.qnamesToClientNames.put(newQName, clientId);
+        this.saveMappings();
+        
+        return newQName;
+    }
+   
+    public String[] splitSourceTargetId(String sourceTargetId)
+    {
+        if (!sourceTargetId.contains(SOURCE_TARGET_ID_SEPARATOR))
+        {
+            throw new IllegalArgumentException("Illegal sourceTargetId: " + sourceTargetId);
+        }
+        return sourceTargetId.split(SOURCE_TARGET_ID_SEPARATOR);
+    }
+
+    public String getCompoundIdFor(String sourceId, String targetId)
+    {
+        StringBuilder result = new StringBuilder();
+        result.append(sourceId)
+            .append(SOURCE_TARGET_ID_SEPARATOR)
+            .append(targetId);
+        return result.toString();
+    }
+
+    /**
+     * Helper method which ensures lazy initialisation of the client-server ID mappings.
+     * @return
+     */
+    private synchronized Map<QName, String> getDynamicIdMappings()
+    {
+        if (qnamesToClientNames == null)
+        {
+            loadMappings();
+        }
+        return qnamesToClientNames;
+    }
+
+    /**
+     * Load the mappings from the persistent storage
+     */
+    private void loadMappings()
+    {
+        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+        {
+            public Object doWork() throws Exception
+            {
+                // Get the mappings node
+                if (nodeService.exists(dynamicIdMappingsNode) == false)
+                {
+                    throw new AlfrescoRuntimeException("Unable to find records management dynamicIdMappings node.");
+                }
+                
+                // Read content from config node
+                ContentReader reader = contentService.getReader(dynamicIdMappingsNode, ContentModel.PROP_CONTENT);
+                String jsonString = reader.getContentString();
+                
+                JSONObject configJSON = new JSONObject(jsonString);
+                JSONArray mappingsJSON = configJSON.getJSONArray("mappings");
+                
+                qnamesToClientNames = new HashMap<QName, String>(mappingsJSON.length());
+                
+                for (int i = 0; i < mappingsJSON.length(); i++)
+                {
+                    // Get the JSON object that represents the reference
+                    JSONObject mappingJSON = mappingsJSON.getJSONObject(i);
+                    
+                    // Get the details of the event
+                    String qnameString = mappingJSON.getString("qname");
+                    String displayID = mappingJSON.getString("displayID");
+                    
+                    QName qname = QName.createQName(qnameString, namespaceService);
+                    
+                    qnamesToClientNames.put(qname, displayID);                    
+                }
+                return null;
+            }
+            
+        }, AuthenticationUtil.getSystemUserName());
+    }
+
+    /**
+     * Save the mappings to the peristent storage
+     */
+    private void saveMappings()
+    {
+        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+        {
+            public Object doWork() throws Exception
+            {
+                // Get the mappings node
+                if (nodeService.exists(dynamicIdMappingsNode) == false)
+                {
+                    throw new AlfrescoRuntimeException("Unable to find records management dynamicIdMappings node.");
+                }
+                
+                JSONObject configJSON = new JSONObject();                        
+                JSONArray mappingsJSON = new JSONArray();
+                
+                int index = 0;
+                for (QName qn : qnamesToClientNames.keySet())
+                {
+                    JSONObject mappingJSON = new JSONObject();
+                    mappingJSON.put("qname", qn.toPrefixString(namespaceService));
+                    mappingJSON.put("displayID", qnamesToClientNames.get(qn));
+                    
+                    mappingsJSON.put(index, mappingJSON);
+                    index++;
+                }                        
+                configJSON.put("mappings", mappingsJSON);
+                
+                // Get content writer
+                ContentWriter contentWriter = contentService.getWriter(dynamicIdMappingsNode, ContentModel.PROP_CONTENT, true);
+                contentWriter.putContent(configJSON.toString());
+                
+                return null;
+            }
+            
+        }, AuthenticationUtil.getSystemUserName());
     }
 }
