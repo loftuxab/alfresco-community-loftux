@@ -49,13 +49,13 @@ public interface RecordsManagementAdminService
      * @param customisedElement
      * @return
      */
-    public Map<QName, PropertyDefinition> getAvailableCustomProperties(CustomisableRmElement customisedElement);
+    public Map<QName, PropertyDefinition> getCustomPropertyDefinitions(CustomisableRmElement customisedElement);
     
     /**
      * This method returns the custom properties that have been defined for all of
      * the specified customisable RM elements.
      */
-    public Map<QName, PropertyDefinition> getAvailableCustomProperties();
+    public Map<QName, PropertyDefinition> getCustomPropertyDefinitions();
     
     /**
      * Add custom property definition
@@ -99,7 +99,7 @@ public interface RecordsManagementAdminService
      * 
      * @return The Map of custom references (both parent-child and standard).
      */
-    public Map<QName, AssociationDefinition> getAvailableCustomReferences();
+    public Map<QName, AssociationDefinition> getCustomReferenceDefinitions();
     
     /**
      * 

@@ -68,7 +68,7 @@ public class CustomPropertyDefinitionsGet extends DeclarativeWebScript
     	}
         CustomisableRmElement elem = CustomisableRmElement.getEnumFor(elementName);
 
-        Map<QName, PropertyDefinition> currentCustomProps = rmAdminService.getAvailableCustomProperties(elem);
+        Map<QName, PropertyDefinition> currentCustomProps = rmAdminService.getCustomPropertyDefinitions(elem);
 
         List<PropertyDefinition> propData = new ArrayList<PropertyDefinition>(currentCustomProps.size());
         for (Entry<QName, PropertyDefinition> entry : currentCustomProps.entrySet())

@@ -82,7 +82,7 @@ public class CustomRefsGet extends AbstractRmWebScript
 
     		String clientId = rmAdminService.getClientIdForQName(typeQName);
     		
-    		AssociationDefinition assDef = rmAdminService.getAvailableCustomReferences().get(typeQName);
+    		AssociationDefinition assDef = rmAdminService.getCustomReferenceDefinitions().get(typeQName);
     		data.put("label", clientId);
 			data.put("referenceType", CustomReferenceType.BIDIRECTIONAL.toString());
     		

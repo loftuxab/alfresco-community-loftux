@@ -103,7 +103,7 @@ public abstract class RecordsManagementFormFilter extends AbstractFilter impleme
     {
         if (rmTypeCustomAspect != null)
         {
-            Map<QName, PropertyDefinition> customProps = this.rmAdminService.getAvailableCustomProperties(
+            Map<QName, PropertyDefinition> customProps = this.rmAdminService.getCustomPropertyDefinitions(
                         rmTypeCustomAspect);
         
             if (logger.isDebugEnabled())

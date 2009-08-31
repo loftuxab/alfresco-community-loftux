@@ -81,7 +81,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
     		logger.debug("Getting custom reference definitions with refId: " + String.valueOf(refId));
     	}
 
-    	Map<QName, AssociationDefinition> currentCustomRefs = rmAdminService.getAvailableCustomReferences();
+    	Map<QName, AssociationDefinition> currentCustomRefs = rmAdminService.getCustomReferenceDefinitions();
 
     	// If refId has been provided then this is a request for a single custom-ref-defn.
         // else it is a request for them all.
