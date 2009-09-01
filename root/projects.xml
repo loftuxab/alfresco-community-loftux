@@ -253,15 +253,21 @@
                classname="org.jibx.binding.ant.CompileTask"
                classpath="${dir.project.3rdparty.lib}/jibx/jibx-bind.jar;${dir.project.3rdparty.lib}/jibx/jibx-run.jar;${dir.project.3rdparty.lib}/bcel.jar;${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
 
-      <bind verbose="false" 
+      <bind verbose="true" 
             load="true" 
             binding="${file.jibx.binding.m2}">
-         <classpathset dir="${dir.project.repository.classes}"/>
+         <classpath>
+            <pathelement path="${dir.project.core.classes}"/>
+            <pathelement path="${dir.project.repository.classes}"/>
+         </classpath>
       </bind>
-      <bind verbose="false" 
+      <bind verbose="true" 
             load="true" 
             binding="${file.jibx.binding.systeminfo}">
-         <classpathset dir="${dir.project.repository.classes}"/>
+         <classpath>
+      	    <pathelement path="${dir.project.core.classes}"/>
+            <pathelement path="${dir.project.repository.classes}"/>
+      	 </classpath>
      </bind>
    </target>
    
