@@ -51,6 +51,9 @@ import org.json.JSONTokener;
  */
 public class CustomRefPost extends AbstractRmWebScript
 {
+    private static final String TO_NODE = "toNode";
+    private static final String REF_ID = "refId";
+
     private static Log logger = LogFactory.getLog(CustomRefPost.class);
     
     private RecordsManagementAdminService rmAdminService;
@@ -97,10 +100,10 @@ public class CustomRefPost extends AbstractRmWebScript
 
         Map<String, Object> result = new HashMap<String, Object>();
         
-        String toNodeStg = json.getString("toNode");
+        String toNodeStg = json.getString(TO_NODE);
         NodeRef toNode = new NodeRef(toNodeStg);
 
-        String clientsRefId = json.getString("refId");
+        String clientsRefId = json.getString(REF_ID);
         QName qn = rmAdminService.getQNameForClientId(clientsRefId);
         if (qn == null)
         {

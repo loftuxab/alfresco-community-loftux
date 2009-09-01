@@ -30,7 +30,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.util.ParameterCheck;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
@@ -49,13 +51,27 @@ import org.json.JSONTokener;
  */
 public class CustomReferenceDefinitionPost extends AbstractRmWebScript
 {
+    private static final String URL = "url";
+    private static final String REF_ID = "refId";
+    private static final String TARGET = "target";
+    private static final String SOURCE = "source";
+    private static final String LABEL = "label";
+    private static final String REFERENCE_TYPE = "referenceType";
+
     private static Log logger = LogFactory.getLog(CustomReferenceDefinitionPost.class);
     
     private RecordsManagementActionService rmActionService;
+    private RecordsManagementAdminService rmAdminService;
     
-    public void setRecordsManagementActionService(RecordsManagementActionService rmActionService) {
+    public void setRecordsManagementActionService(RecordsManagementActionService rmActionService)
+    {
 		this.rmActionService = rmActionService;
 	}
+
+    public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
+    {
+        this.rmAdminService = rmAdminService;
+    }
 
 	/*
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
@@ -92,7 +108,6 @@ public class CustomReferenceDefinitionPost extends AbstractRmWebScript
     protected Map<String, Object> addCustomReference(WebScriptRequest req, JSONObject json) throws JSONException
     {
         Map<String, Object> result = new HashMap<String, Object>();
-        
         Map<String, Serializable> params = new HashMap<String, Serializable>();
         
         for (Iterator iter = json.keys(); iter.hasNext(); )
@@ -106,6 +121,38 @@ public class CustomReferenceDefinitionPost extends AbstractRmWebScript
         
         result.put("success", true);
 
+        Serializable refTypeParam = params.get(REFERENCE_TYPE);
+        ParameterCheck.mandatory(REFERENCE_TYPE, refTypeParam);
+        
+        result.put(REFERENCE_TYPE, refTypeParam);
+
+        String clientId;
+        if (refTypeParam.equals(CustomReferenceType.BIDIRECTIONAL.toString()))
+        {
+            Serializable labelParam = params.get(LABEL);
+            // label is mandatory for bidirectional refs only
+            ParameterCheck.mandatory(LABEL, labelParam);
+
+            clientId = labelParam.toString();
+            result.put(REF_ID, clientId);
+        }
+        else if (refTypeParam.equals(CustomReferenceType.PARENT_CHILD.toString()))
+        {
+            Serializable sourceParam = params.get(SOURCE);
+            Serializable targetParam = params.get(TARGET);
+            // source,target mandatory for parent/child refs only
+            ParameterCheck.mandatory(SOURCE, sourceParam);
+            ParameterCheck.mandatory(TARGET, targetParam);
+
+            clientId = rmAdminService.getCompoundIdFor(sourceParam.toString(), targetParam.toString());
+            result.put(REF_ID, clientId);
+        }
+        else
+        {
+            throw new WebScriptException("Unsupported reference type: " + refTypeParam);
+        }
+        result.put(URL, req.getServicePath() + "/" + clientId);
+        
         return result;
     }
 }
