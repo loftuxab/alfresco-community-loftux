@@ -122,7 +122,15 @@ public class DispositionActionImpl implements DispositionAction,
         return (Date)this.services.getNodeService().getProperty(this.dispositionNodeRef, PROP_DISPOSITION_AS_OF);
     }
     
-    /*
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#isEventsEligible()
+     */
+    public boolean isEventsEligible()
+    {
+        return ((Boolean)this.services.getNodeService().getProperty(this.dispositionNodeRef, PROP_DISPOSITION_EVENTS_ELIGIBLE)).booleanValue();
+    }
+    
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getCompletedAt()
      */
     public Date getCompletedAt()
@@ -130,7 +138,7 @@ public class DispositionActionImpl implements DispositionAction,
         return (Date)this.services.getNodeService().getProperty(this.dispositionNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT);
     }
 
-    /*
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getCompletedBy()
      */
     public String getCompletedBy()

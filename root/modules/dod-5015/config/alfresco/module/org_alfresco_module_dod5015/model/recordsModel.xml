@@ -127,6 +127,12 @@
                 <mandatory>false</mandatory>
             </property>
             
+            <property name="rma:dispositionLocation">
+                <title>Disposition Location</title>
+                <type>d:text</type>
+                <mandatory>false</mandatory>
+            </property>
+            
             <property name="rma:dispositionPeriod">
                <title>Disposition Period</title>
                <type>d:period</type>
@@ -765,6 +771,10 @@
          <title>Ghosted Record</title>         
          <properties>                
          </properties>
+      </aspect> 
+      
+      <aspect name="rma:versionedRecord">
+         <title>Versioned Record</title>
       </aspect> 
 
    </aspects>

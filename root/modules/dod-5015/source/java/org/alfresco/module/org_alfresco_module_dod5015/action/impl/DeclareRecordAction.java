@@ -25,7 +25,9 @@
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,8 +64,9 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
         {
             if (recordsManagementService.isRecordDeclared(actionedUponNodeRef) == false)
             {
+                List<String> missingProperties = new ArrayList<String>(5);
                 // Aspect not already defined - check mandatory properties then add
-                if (mandatoryPropertiesSet(actionedUponNodeRef) == true)
+                if (mandatoryPropertiesSet(actionedUponNodeRef, missingProperties) == true)
                 {
                     // Add the declared aspect
                     this.nodeService.addAspect(actionedUponNodeRef, ASPECT_DECLARED_RECORD, null);
@@ -72,7 +75,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
                 }
                 else
                 {
-                    throw new AlfrescoRuntimeException("Can not declare record as not all mandatory properties have been set. (" + actionedUponNodeRef.toString() + ")");
+                    throw new AlfrescoRuntimeException(buildMissingPropertiesErrorString(missingProperties));
                 }
             }
         }
@@ -80,6 +83,18 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
         {
             throw new AlfrescoRuntimeException("Can only undeclare a record. (" + actionedUponNodeRef.toString() + ")");
         }
+    }
+    
+    private String buildMissingPropertiesErrorString(List<String> missingProperties)
+    {
+        StringBuilder builder = new StringBuilder(255);
+        builder.append("Can not declare record as not all mandatory properties have been set.  ");
+        for (String missingProperty : missingProperties)            
+        {
+            builder.append(missingProperty)
+                   .append(", ");
+        }
+        return builder.toString();
     }
 
     /**
@@ -89,7 +104,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
      *            node reference
      * @return boolean true if all mandatory properties are set, false otherwise
      */
-    private boolean mandatoryPropertiesSet(NodeRef nodeRef)
+    private boolean mandatoryPropertiesSet(NodeRef nodeRef, List<String> missingProperties)
     {
         boolean result = true;
 
@@ -104,7 +119,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
             {
                 if (nodeRefProps.get(propDef.getName()) == null)
                 {
-                    logMissingProperty(propDef);
+                    logMissingProperty(propDef, missingProperties);
 
                     result = false;
                     break;
@@ -124,7 +139,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
                     {
                         if (nodeRefProps.get(propDef.getName()) == null)
                         {
-                            logMissingProperty(propDef);
+                            logMissingProperty(propDef, missingProperties);
 
                             result = false;
                             break;
@@ -137,7 +152,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
         return result;
     }
 
-    private void logMissingProperty(PropertyDefinition propDef)
+    private void logMissingProperty(PropertyDefinition propDef, List<String> missingProperties)
     {
         if (logger.isWarnEnabled())
         {
@@ -145,6 +160,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
             msg.append("Mandatory property missing: ").append(propDef.getName());
             logger.warn(msg.toString());
         }
+        missingProperties.add(propDef.getName().toString());
     }
 
     @Override
@@ -163,7 +179,8 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
             if (recordsManagementService.isRecordDeclared(filePlanComponent) == false)
             {
                 // Aspect not already defined - check mandatory properties then add
-                if (mandatoryPropertiesSet(filePlanComponent) == true)
+                List<String> missingProperties = new ArrayList<String>(10);
+                if (mandatoryPropertiesSet(filePlanComponent, missingProperties) == true)
                 {
                     return true;
                 }
@@ -171,7 +188,7 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
                 {
                     if (throwException)
                     {
-                        throw new AlfrescoRuntimeException("Can not declare record as not all mandatory properties have been set. (" + filePlanComponent.toString() + ")");
+                        throw new AlfrescoRuntimeException(buildMissingPropertiesErrorString(missingProperties));
                     }
                     else
                     {

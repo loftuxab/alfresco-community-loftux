@@ -60,6 +60,12 @@ public interface DispositionAction
     Date getAsOfDate();
     
     /**
+     * @return  true if the events are complete (ie: enough events have been completed to make the disposition
+     *          action 
+     */
+    boolean isEventsEligible();
+    
+    /**
      * @return the user that started the action
      */
     String getStartedBy();
