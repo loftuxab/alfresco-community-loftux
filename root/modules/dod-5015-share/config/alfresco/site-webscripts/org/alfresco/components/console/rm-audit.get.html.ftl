@@ -1,40 +1,40 @@
 <script type="text/javascript" charset="utf-8">    
-    new Alfresco.RM_Audit('audit').setOptions({
+    new Alfresco.RM_Audit('${htmlid}-audit').setOptions({
        'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT,
        'enabled' : ${auditStatus.enabled?string},
        'startDate':"${auditStatus.started}",
        'stopDate':"${auditStatus.stopped}",
-       'pollInterval':5000
+       'pollInterval':20000
     }).setMessages(${messages});
   </script>
   
-  <div id="audit">
+  <div id="${htmlid}-audit" class="audit">
     <div class="yui-gc">
    	<div class="yui-u first">
-          <div id="audit-info">
+          <div id="${htmlid}-audit-info" class="audit-info">
              <h2>${msg("label.title")}</h2>
-             <p id="audit-status-date"></p>
+             <p id="${htmlid}-audit-status-date" class="audit-status-date"></p>
           </div>
    	</div>
 	   <div class="yui-u">
-		   <div id="auditActions">
-            <button id="audit-toggle" name="audit-toggle" value="${auditStatus.enabled?string}">
+		   <div id="${htmlid}-auditActions" class="auditActions">
+            <button id="${htmlid}-audit-toggle" name="audit-toggle" value="${auditStatus.enabled?string}" class="audit-toggle">
                <#if (auditStatus.enabled)>${msg("label.button-stop")}<#else>${msg("label.button-start")}</#if>
             </button>
-            <button id="audit-view" name="audit-view">${msg("label.button-view-log")}</button>
-            <button id="audit-clear" name="audit-clear">${msg("label.button-clear")}</button>
+            <button id="${htmlid}-audit-view" name="audit-view" class="audit-view">${msg("label.button-view-log")}</button>
+            <button id="${htmlid}-audit-clear" name="audit-clear" class="audit-clear">${msg("label.button-clear")}</button>
          </div>
 	   </div>
     </div>    
-    <div id="audit-log" class="yui-gc">
-   	<div class="yui-u first">
-         <div id="defaultActions" class="active">
-            <label for="audit-specifyfilter">${msg("label.show-log-for")}</label> <div id="personFilter"><span>${msg("label.all-users")}</span><a id="personFilterRemove"><img src="${page.url.context}/components/images/remove-icon-16.png"  alt="${msg('label.remove-filter')}"/></a></div>
-               <button id="audit-specifyfilter" name="audit-specifyfilter">${msg("label.button-specify")}</button>
+    <div id="${htmlid}-audit-log" class="yui-gc audit-log">
+   	<div class="yui-u">
+         <div id="${htmlid}-defaultActions" class="active defaultActions">
+            <label for="audit-specifyfilter">${msg("label.show-log-for")}</label> <div id="${htmlid}-audit-personFilter" class="personFilter"><span>${msg("label.all-users")}</span><a id="${htmlid}-personFilterRemove" class="personFilterRemove"><img src="${page.url.context}/components/images/remove-icon-16.png"  alt="${msg('label.remove-filter')}"/></a></div>
+               <button id="${htmlid}-audit-specifyfilter" name="audit-specifyfilter" class="audit-specifyfilter">${msg("label.button-specify")}</button>
          </div>
-         <div id="audit-peoplefinder">
+         <div id="${htmlid}-audit-peoplefinder" class="audit-peoplefinder">
          </div>
-         <div id="auditDT">
+         <div id="${htmlid}-audit-auditDT" class="auditDT">
          </div>    
       </div>
     </div>

@@ -27,6 +27,7 @@
    {
       Alfresco.RM_Audit.superclass.constructor.call(this, "Alfresco.RM_Audit", htmlId,["button", "container", "datasource", "datatable", "paginator", "json"]);
       Alfresco.util.ComponentManager.register(this);
+      this.showingFilter = false;
       return this;
    };
 
@@ -51,21 +52,21 @@
          {
             this.registerEventHandler('click',[
                {
-                  rule : 'button#audit-toggle-button',
+                  rule : 'button.audit-toggle',
                   o : {
                         handler:this.onToggleLog,
                         scope : this
                   }
                },
                {
-                  rule : 'button#audit-clear-button',
+                  rule : 'button.audit-clear',
                   o : {
                         handler:this.onClearLog,
                         scope : this
                   }
                },
                {
-                  rule : 'button#audit-view-button',
+                  rule : 'button.audit-view',
                   o : {
                         handler:this.onViewLog,
                         scope : this
@@ -77,14 +78,14 @@
          this.registerEventHandler('click',
          [
             {
-               rule : 'button#audit-specifyfilter-button',
+               rule : 'button.audit-specifyfilter',
                o : {
                      handler:this.onSpecifyFilterLog,
                      scope : this
                }
             },
             {
-               rule : 'a#personFilterRemove img',
+               rule : 'a.personFilterRemove img',
                o : {
                      handler:this.onRemoveFilter,
                      scope : this
@@ -148,7 +149,7 @@
             resultsList:'data.entries',
             fields: ["timestamp","user","role","event"]
          };
-         var DT = this.widgets['rolesDataTable'] = new YAHOO.widget.DataTable("auditDT",
+         var DT = this.widgets['rolesDataTable'] = new YAHOO.widget.DataTable(this.id+"-auditDT",
              [
                {key:"timestamp", label:this.msg('label.timestamp'), sortable:true, resizeable:true},
                {key:"user", label:this.msg('label.user'),  sortable:true, resizeable:true},
@@ -161,16 +162,17 @@
             }
          );
          
+         this.widgets['status-date'] = Dom.get(this.id+'-status-date');
+
          if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_COMPACT)
          {
-            Dom.get('audit-from-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.startDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);
-            Dom.get('audit-to-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.stopDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);  
+            Dom.get(this.id+'-from-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.startDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);
+            Dom.get(this.id+'-to-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.stopDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);  
          }
          else
          {
             this.toggleUI();            
          }
-
          this.pollData();
       },
       /**
@@ -179,15 +181,15 @@
        */
       pollData: function pollData()
       {
-        // Set up polling 
-        var pollCallback = { 
+         // Set up polling
+         var pollCallback = { 
             success: this.widgets['auditDataSource'].onDataReturnInitializeTable, 
             failure: function() { 
                 YAHOO.log("Polling failure", "error"); 
             }, 
             scope: this.widgets['auditDataSource'] 
-        };
-        this.widgets['auditDataSource'].setInterval(this.options.pollInterval, null, pollCallback); 
+         };
+         this.widgets['auditDataSource'].setInterval(this.options.pollInterval, null, pollCallback); 
       },
       /**
        * Updates the UI to show status of UI and start/stop buttons
@@ -198,7 +200,7 @@
          //get started/stopped (status) time
          var statusDate = (this.options.enabled) ? this.options.startDate : this.options.stopDate;
          var statusMessage = (this.options.enabled) ? 'label.started-at' : 'label.stopped-at';
-         Dom.get('audit-status-date').innerHTML = this.msg(statusMessage,formatDate(fromISO8601(statusDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime));         
+         this.widgets['status-date'].innerHTML = this.msg(statusMessage,formatDate(fromISO8601(statusDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime));         
          //update start/stop button
          if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
          {   
@@ -312,8 +314,19 @@
        */      
       onSpecifyFilterLog: function RM_Audit_onSpecifyFilterLog()
       {
-         Dom.addClass('audit-peoplefinder', 'active');
-         this.modules.peopleFinder.clearResults();                 
+         if (!this.showingFilter)
+         {
+            Dom.addClass(this.widgets['people-finder'], 'active');
+            this.modules.peopleFinder.clearResults();
+            this.widgets['specifyfilter'].set('label',Alfresco.util.message('label.button-cancel', 'Alfresco.RM_Audit'));
+            this.showingFilter = true;            
+         }
+         else
+         {
+            Dom.removeClass(this.widgets['people-finder'], 'active');
+            this.widgets['specifyfilter'].set('label',this.msg('label.button-specify'));
+            this.showingFilter = false;
+         }
       },
             
       /**
@@ -322,10 +335,12 @@
        */
       onPersonSelected: function RM_Audit_onPersonSelected(e, args)
       {
-         Dom.addClass('personFilter', 'active');
+         Dom.addClass(Sel.query('.personFilter',this.id)[0], 'active');
          var person = args[1];
          this._changeFilterText(person.firstName + ' ' + person.lastName);
-         Dom.removeClass('audit-peoplefinder','active'); 
+         this.widgets['specifyfilter'].set('label',this.msg('label.button-specify'));
+         Dom.removeClass(this.widgets['people-finder'],'active');
+         this.showingFilter = false;
          YAHOO.Bubbling.fire('PersonFilterActivated'); 
       },
       
@@ -336,7 +351,7 @@
        */
       _changeFilterText: function(text)
       {
-         var el = Sel.query('#personFilter span',this.id)[0];
+         var el = Sel.query('.personFilter span',this.id)[0];
          el.innerHTML = (text != "") ? text : this.msg('label.default-filter');
       },
       
@@ -350,6 +365,7 @@
       {
          // Inject the component from the XHR request into it's placeholder DIV element
          var finderDiv = Dom.get(this.id + "-peoplefinder");
+         this.widgets['people-finder'] = finderDiv;
          finderDiv.innerHTML = response.serverResponse.responseText;
          // Find the People Finder by container ID
          this.modules.peopleFinder = Alfresco.util.ComponentManager.get(this.id + "-peoplefinder");
@@ -372,7 +388,7 @@
        */
       onRemoveFilter: function RM_Audit_RemoveFilter(e, args)
       {
-         Dom.removeClass('personFilter', 'active');
+         Dom.removeClass(Sel.query('.personFilter',this.id)[0], 'active');
          this._changeFilterText('');
          YAHOO.Bubbling.fire('PersonFilterDeactivated');
       },
@@ -465,13 +481,15 @@
          });
          
       },
+
       personFilterActivated: function(e,args)
       {
-         console.log(arguments);
+
       },
+
       personFilterDeactivated: function(e,args)
       {
-         console.log(arguments);
+
       }
       
    });
