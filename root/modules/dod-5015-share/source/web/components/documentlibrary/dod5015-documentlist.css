@@ -25,6 +25,18 @@
 /**
  * Actions: Records
  */
+.doclist .record .onActionAccession a,
+.doclist .record-nonelec .onActionAccession a
+{
+   background-image: url(images/transfer-record-16.png);
+}
+
+.doclist .record .onActionAccessionComplete a,
+.doclist .record-nonelec .onActionAccessionComplete a
+{
+   background-image: url(images/transfer-complete-16.png);
+}
+
 .doclist .record .onActionAddReference a,
 .doclist .record-nonelec .onActionAddReference a
 {
@@ -281,7 +293,7 @@
    background-image: url(images/select-none-rm-16.png);
 }
 
-/* FilePlan Filter Styling */
+/* File Plan Filter Styling */
 .fileplan-filter span.holds
 {
    background-image: url(images/freeze-record-16.png);

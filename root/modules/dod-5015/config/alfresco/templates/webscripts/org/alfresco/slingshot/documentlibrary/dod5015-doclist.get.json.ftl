@@ -48,7 +48,7 @@
          "mimetype": "${d.mimetype!""}",
          "fileName": "${d.name}",
          "displayName": "${d.name?replace(workingCopyLabel, "")}",
-         "status": "<#list item.status?keys as s>${s}<#if s_has_next>,</#if></#list>",
+         "status": "<#list item.status?keys as s><#if item.status[s] == true>${s}<#if s_has_next>,</#if></#if></#list>",
          "title": "${d.properties.title!""}",
          "description": "${d.properties.description!""}",
          "author": "${d.properties.author!""}",

@@ -1503,8 +1503,8 @@
             }
             
             // Remove any actions the user doesn't have permission for
-            var actions = YAHOO.util.Selector.query("div", clone);
-            var actionPermissions, i, ii, j, jj;
+            var actions = YAHOO.util.Selector.query("div", clone),
+               actionPermissions, i, ii, j, jj;
             for (i = 0, ii = actions.length; i < ii; i++)
             {
                if (actions[i].firstChild.rel !== "")

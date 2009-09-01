@@ -756,14 +756,18 @@
                if (this.widgets.hasOwnProperty(index))
                {
                   widget = this.widgets[index];
+                  // Skip if this action specifies "no-access-check"
                   if (widget.get("srcelement").className != "no-access-check")
                   {
+                     // Default to disabled: must be enabled via permission
                      widget.set("disabled", false);
                      if (typeof widget.get("value") == "string")
                      {
+                        // Comma-separation indicates "AND"
                         widgetPermissions = widget.get("value").split(",");
                         for (var i = 0, ii = widgetPermissions.length; i < ii; i++)
                         {
+                           // Pipe-separation is a special case and indicates an "OR" match. The matched permission is stored in "activePermission" on the widget.
                            if (widgetPermissions[i].indexOf("|") !== -1)
                            {
                               orMatch = false;
@@ -811,8 +815,8 @@
             var files = this.modules.docList.getSelectedFiles(), fileTypes = [], file,
                userAccess = {}, fileAccess, index,
                menuItems = this.widgets.selectedItems.getMenu().getItems(), menuItem,
-               actionPermissions, typesSupported, disabled,
-               i, ii;
+               actionPermissions, typeGroups, typesSupported, disabled,
+               i, ii, j, jj;
             
             // Check each file for user permissions
             for (i = 0, ii = files.length; i < ii; i++)
@@ -842,17 +846,20 @@
             {
                if (menuItems.hasOwnProperty(index))
                {
+                  // Defaulting to enabled
                   menuItem = menuItems[index];
                   disabled = false;
 
                   if (menuItem.element.firstChild)
                   {
-                     // Check permissions required
+                     // Check permissions required - stored in "rel" attribute in the DOM
                      if (menuItem.element.firstChild.rel && menuItem.element.firstChild.rel !== "")
                      {
+                        // Comma-separated indicates and "AND" match
                         actionPermissions = menuItem.element.firstChild.rel.split(",");
                         for (i = 0, ii = actionPermissions.length; i < ii; i++)
                         {
+                           // Disable if the user doesn't have ALL the permissions
                            if (!userAccess[actionPermissions[i]])
                            {
                               disabled = true;
@@ -866,16 +873,24 @@
                         // Check filetypes supported
                         if (menuItem.element.firstChild.type && menuItem.element.firstChild.type !== "")
                         {
-                           typesSupported = Alfresco.util.arrayToObject(menuItem.element.firstChild.type.split(","));
-
-                           for (i = 0, ii = fileTypes.length; i < ii; i++)
+                           // Pipe-separation indicates grouping of allowed file types
+                           typeGroups = menuItem.element.firstChild.type.split("|");
+                           
+                           for (i = 0; i < typeGroups.length; i++) // Do not optimize - bounds updated within loop
                            {
-                              if (!(fileTypes[i] in typesSupported))
+                              typesSupported = Alfresco.util.arrayToObject(typeGroups[i].split(","));
+
+                              for (j = 0, jj = fileTypes.length; j < jj; j++)
                               {
-                                 disabled = true;
-                                 break;
+                                 if (!(fileTypes[j] in typesSupported))
+                                 {
+                                    typeGroups.splice(i, 1);
+                                    --i;
+                                    break;
+                                 }
                               }
                            }
+                           disabled = (typeGroups.length === 0);
                         }
                      }
                      menuItem.cfg.setProperty("disabled", disabled);
