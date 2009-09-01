@@ -8,7 +8,7 @@
 
 <@templateBody>
    <div id="bd">
-      <div id="audit-popup-log">
+      <div id="audit-popup-log" class="audit-popup-log">
          <div id="yui-main">
                <@region id="rmaudit" scope="template" protected=true />
          </div>
