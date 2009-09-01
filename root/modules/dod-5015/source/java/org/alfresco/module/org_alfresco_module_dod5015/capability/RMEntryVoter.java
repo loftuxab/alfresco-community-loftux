@@ -1014,6 +1014,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setCreateCapability(CreateCapability createCapability)
     {
         this.createCapability = createCapability;
+        capabilities.put(createCapability.getName(), createCapability);
     }
 
     public DeleteCapability getDeleteCapability()
@@ -1024,6 +1025,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDeleteCapability(DeleteCapability deleteCapability)
     {
         this.deleteCapability = deleteCapability;
+        capabilities.put(deleteCapability.getName(), deleteCapability);
+        
     }
 
     public UpdateCapability getUpdateCapability()
@@ -1034,6 +1037,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setUpdateCapability(UpdateCapability updateCapability)
     {
         this.updateCapability = updateCapability;
+        capabilities.put(updateCapability.getName(), updateCapability);
     }
 
     public UpdatePropertiesCapability getUpdatePropertiesCapability()
@@ -1044,6 +1048,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setUpdatePropertiesCapability(UpdatePropertiesCapability updatePropertiesCapability)
     {
         this.updatePropertiesCapability = updatePropertiesCapability;
+        capabilities.put(updatePropertiesCapability.getName(), updatePropertiesCapability);
     }
 
     public DeclareCapability getDeclareCapability()
@@ -1054,6 +1059,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public void setDeclareCapability(DeclareCapability declareCapability)
     {
         this.declareCapability = declareCapability;
+        capabilities.put(declareCapability.getName(), declareCapability);
     }
 
     public boolean supports(ConfigAttribute attribute)

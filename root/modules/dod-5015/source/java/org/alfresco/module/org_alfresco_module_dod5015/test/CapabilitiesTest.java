@@ -153,6 +153,12 @@ public class CapabilitiesTest extends TestCase
 
     private String testers;
 
+    private NodeRef recordCategory_3;
+
+    private NodeRef recordFolder_3;
+
+    private NodeRef record_3;
+
     /**
      * @param name
      */
@@ -199,10 +205,13 @@ public class CapabilitiesTest extends TestCase
         recordSeries = createRecordSeries(filePlan, "RS", "RS-1", "Record Series", "My record series");
         recordCategory_1 = createRecordCategory(recordSeries, "Docs", "101-1", "Docs", "Docs", "week|1", true, false);
         recordCategory_2 = createRecordCategory(recordSeries, "More Docs", "101-2", "More Docs", "More Docs", "week|1", true, true);
+        recordCategory_3 = createRecordCategory(recordSeries, "No disp schedule", "101-3", "No disp schedule", "No disp schedule", "week|1", true, null);
         recordFolder_1 = createRecordFolder(recordCategory_1, "F1", "101-3", "title", "description", "week|1", true);
         recordFolder_2 = createRecordFolder(recordCategory_2, "F2", "102-3", "title", "description", "week|1", true);
+        recordFolder_3 = createRecordFolder(recordCategory_3, "F3", "103-3", "title", "description", "week|1", true);
         record_1 = createRecord(recordFolder_1);
         record_2 = createRecord(recordFolder_2);
+        record_3 = createRecord(recordFolder_3);
 
         // create people ...
 
@@ -312,7 +321,7 @@ public class CapabilitiesTest extends TestCase
     }
 
     private NodeRef createRecordCategory(NodeRef recordSeries, String name, String identifier, String title, String description, String review, boolean vital,
-            boolean recordLevelDisposition)
+            Boolean recordLevelDisposition)
     {
         HashMap<QName, Serializable> properties = new HashMap<QName, Serializable>();
         properties.put(ContentModel.PROP_NAME, name);
@@ -321,20 +330,23 @@ public class CapabilitiesTest extends TestCase
         properties.put(ContentModel.PROP_DESCRIPTION, description);
         properties.put(DOD5015Model.PROP_REVIEW_PERIOD, review);
         properties.put(DOD5015Model.PROP_VITAL_RECORD_INDICATOR, vital);
-        NodeRef answer = nodeService.createNode(filePlan, ContentModel.ASSOC_CONTAINS, DOD5015Model.TYPE_RECORD_CATEGORY, DOD5015Model.TYPE_RECORD_CATEGORY, properties)
+        NodeRef answer = nodeService.createNode(recordSeries, ContentModel.ASSOC_CONTAINS, DOD5015Model.TYPE_RECORD_CATEGORY, DOD5015Model.TYPE_RECORD_CATEGORY, properties)
                 .getChildRef();
 
-        properties = new HashMap<QName, Serializable>();
-        properties.put(DOD5015Model.PROP_DISPOSITION_AUTHORITY, "N1-218-00-4 item 023");
-        properties.put(DOD5015Model.PROP_DISPOSITION_INSTRUCTIONS, "Cut off monthly, hold 1 month, then destroy.");
-        properties.put(DOD5015Model.PROP_RECORD_LEVEL_DISPOSITION, recordLevelDisposition);
-        NodeRef ds = nodeService.createNode(answer, DOD5015Model.ASSOC_DISPOSITION_SCHEDULE, DOD5015Model.TYPE_DISPOSITION_SCHEDULE, DOD5015Model.TYPE_DISPOSITION_SCHEDULE,
-                properties).getChildRef();
+        if (recordLevelDisposition != null)
+        {
+            properties = new HashMap<QName, Serializable>();
+            properties.put(DOD5015Model.PROP_DISPOSITION_AUTHORITY, "N1-218-00-4 item 023");
+            properties.put(DOD5015Model.PROP_DISPOSITION_INSTRUCTIONS, "Cut off monthly, hold 1 month, then destroy.");
+            properties.put(DOD5015Model.PROP_RECORD_LEVEL_DISPOSITION, recordLevelDisposition);
+            NodeRef ds = nodeService.createNode(answer, DOD5015Model.ASSOC_DISPOSITION_SCHEDULE, DOD5015Model.TYPE_DISPOSITION_SCHEDULE, DOD5015Model.TYPE_DISPOSITION_SCHEDULE,
+                    properties).getChildRef();
 
-        createDispoistionAction(ds, "cutoff", "monthend|1", null, "event");
-        createDispoistionAction(ds, "transfer", "month|1", null, null);
-        createDispoistionAction(ds, "accession", "month|1", null, null);
-        createDispoistionAction(ds, "destroy", "month|1", "{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate", null);
+            createDispoistionAction(ds, "cutoff", "monthend|1", null, "event");
+            createDispoistionAction(ds, "transfer", "month|1", null, null);
+            createDispoistionAction(ds, "accession", "month|1", null, null);
+            createDispoistionAction(ds, "destroy", "month|1", "{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate", null);
+        }
         return answer;
     }
 
@@ -572,7 +584,7 @@ public class CapabilitiesTest extends TestCase
     public void testFilePlanAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -638,7 +650,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -704,7 +716,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -775,7 +787,7 @@ public class CapabilitiesTest extends TestCase
 
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -841,7 +853,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -906,7 +918,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -971,7 +983,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1035,7 +1047,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1101,7 +1113,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1167,7 +1179,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1232,7 +1244,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1298,7 +1310,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1363,7 +1375,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1428,7 +1440,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1492,7 +1504,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1558,7 +1570,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1624,7 +1636,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1689,7 +1701,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1755,7 +1767,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1820,7 +1832,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1885,7 +1897,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1949,7 +1961,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2015,7 +2027,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2081,7 +2093,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2146,7 +2158,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2212,7 +2224,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2277,7 +2289,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2342,7 +2354,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2406,7 +2418,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2472,7 +2484,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2538,7 +2550,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(59, access.size());
+        assertEquals(64, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2603,7 +2615,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2669,7 +2681,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2734,7 +2746,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2799,7 +2811,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(59, access.size()); // 58 + File
+        assertEquals(64, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -7742,7 +7754,7 @@ public class CapabilitiesTest extends TestCase
         writer.putContent("There is some content in this record");
 
         recordsManagementActionService.executeRecordsManagementAction(newRecord_1, "file");
-        
+
         properties = new HashMap<QName, Serializable>(1);
         properties.put(ContentModel.PROP_NAME, "MyRecordCreate.txt");
         NodeRef newRecord_2 = this.nodeService.createNode(recordFolder_2, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),

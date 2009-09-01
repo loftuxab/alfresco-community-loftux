@@ -47,7 +47,7 @@ public class UpdatePropertiesCapability extends AbstractCapability
     @Override
     protected int hasPermissionImpl(NodeRef nodeRef)
     {
-        return AccessDecisionVoter.ACCESS_ABSTAIN;
+        return evaluate(nodeRef, null);
     }
 
     /* (non-Javadoc)

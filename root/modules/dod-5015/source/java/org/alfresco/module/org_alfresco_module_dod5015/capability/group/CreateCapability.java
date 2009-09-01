@@ -42,7 +42,7 @@ public class CreateCapability extends AbstractCapability
     @Override
     protected int hasPermissionImpl(NodeRef nodeRef)
     {
-        return AccessDecisionVoter.ACCESS_DENIED;
+        return evaluate(nodeRef, null, null);
     }
 
     public int evaluate(NodeRef destination, NodeRef linkee, QName type)
