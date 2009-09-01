@@ -165,7 +165,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         
         AssociationDefinition assocDef = availableRefs.get(CUSTOM_REF_SUPERSEDES);
         assertNotNull("assocDef was null.", assocDef);
-        final String expectedTitle = rmAdminService.getCompoundIdFor("Superseded by", "Supersedes");
+        final String expectedTitle = rmAdminService.getCompoundIdFor("SupersededBy", "Supersedes");
         assertEquals(expectedTitle, assocDef.getTitle());
         
         // These initial references should also be in the id-mapping bean.
@@ -407,12 +407,12 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         Map<QName, AssociationDefinition> references = rmAdminService.getCustomReferenceDefinitions();
         for (QName reference : references.keySet())
         {
-            System.out.println("   - " + reference.toString());
+            System.out.println("   QN - " + reference.toString());
 
             String clientIdForQName = rmAdminService.getClientIdForQName(reference);
             assertNotNull("null client-id for " + reference, clientIdForQName);
 
-            System.out.println("       " + clientIdForQName);
+            System.out.println("    ID " + clientIdForQName);
         }
     }
     

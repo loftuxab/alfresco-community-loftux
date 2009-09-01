@@ -42,6 +42,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -351,6 +352,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         String rspContent = rsp.getContentAsString();
         assertTrue(rspContent.contains("success"));
+        System.out.println(rspContent);
+
 
         // 2. Non-child or standard association.
         jsonString = new JSONStringer().object()
@@ -365,6 +368,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         rspContent = rsp.getContentAsString();
         assertTrue(rspContent.contains("success"));
+        System.out.println(rspContent);
+
 
         // Now assert that both have appeared in the data dictionary.
         AspectDefinition customAssocsAspect =
@@ -399,11 +404,18 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         JSONArray customRefsObj = (JSONArray)dataObj.get("customReferences");
         assertNotNull("JSON 'customReferences' object was null", customRefsObj);
+        
+        for (int i = 0; i < customRefsObj.length(); i++) {
+            System.out.println(customRefsObj.getString(i));
+        }
 
         assertTrue("There should be at least two custom references. Found " + customRefsObj, customRefsObj.length() >= 2);
 
-        // GET a specific custom reference definition
-        rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL + "/" + BI_DI + now), expectedStatus);
+        // GET a specific custom reference definition.
+        // Here, we're using one of the built-in references
+        // clientId = VersionedBy__Versions
+        // qname = rmc:versions
+        rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL + "/" + "VersionedBy__Versions"), expectedStatus);
 
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
 
@@ -438,6 +450,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     
         Response rsp = sendRequest(new PostRequest(refInstancesUrl,
 	                             jsonString, APPLICATION_JSON), 200);
+        System.out.println(rsp.getContentAsString());
 
 	    // Add a child ref
 	    jsonString = new JSONStringer().object()
@@ -448,6 +461,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 	    
 	    rsp = sendRequest(new PostRequest(refInstancesUrl,
 	    		jsonString, APPLICATION_JSON), 200);
+        System.out.println(rsp.getContentAsString());
 	    
 	    
         // Now retrieve the applied references from the REST API
@@ -461,6 +475,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONArray customRefsArray = (JSONArray)dataObj.get("customReferences");
         assertNotNull("JSON 'customReferences' object was null", customRefsArray);
 
+        for (int i = 0; i < customRefsArray.length(); i++) {
+            System.out.println(customRefsArray.get(i));
+        }
         final int customRefsCount = customRefsArray.length();
         assertTrue("There should be at least one custom reference. Found " + customRefsArray, customRefsCount > 0);
         
@@ -530,6 +547,10 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         JSONObject customPropsObj = (JSONObject)dataObj.get("customProperties");
         assertNotNull("JSON 'customProperties' object was null", customPropsObj);
+        
+        for (java.util.Iterator iter = customPropsObj.keys(); iter.hasNext();) {
+            System.out.println(customPropsObj.get((String)iter.next()));
+        }
 
         final int customPropsCount = customPropsObj.length();
         assertTrue("There should be at least one custom property. Found " + customPropsObj, customPropsCount > 0);
