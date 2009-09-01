@@ -34,6 +34,12 @@ import java.util.List;
  */
 public interface RecordsManagementAuditService
 {
+    public static final String RM_AUDIT_APPLICATION_NAME = "DOD5015";
+    public static final String RM_AUDIT_PATH_ROOT = "/DOD5015";
+    public static final String RM_AUDIT_PATH_ACTIONS = "/DOD5015/actions";
+    public static final String RM_AUDIT_PATH_ACTIONS_NODE = "/node";
+    public static final String RM_AUDIT_PATH_ACTIONS_PARAMS = "/parameters";
+    
     /**
      * Starts RM auditing.
      */

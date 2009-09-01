@@ -39,11 +39,20 @@ import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefiniti
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventType;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
+import org.alfresco.repo.audit.AuditComponent;
+import org.alfresco.repo.audit.AuditSession;
+import org.alfresco.repo.audit.model.AuditApplication;
+import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.TransactionListenerAdapter;
+import org.alfresco.repo.transaction.TransactionalResourceHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.action.ParameterDefinition;
@@ -57,6 +66,10 @@ import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.PropertyCheck;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.util.StringUtils;
 
@@ -70,8 +83,16 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
                                                                RecordsManagementModel,
                                                                BeanNameAware
 {
+    private static final String KEY_RM_ACTION_AUDIT_PARAMETERS = "RM.ACTION.AUDIT_PARAMETERS";
+    
     /** Action name */
     //protected String name;
+    
+    /** Namespace service */
+    protected NamespaceService namespaceService;
+    
+    /** Used to control transactional behaviour including post-commit auditing */
+    protected TransactionService transactionService;
     
     /** Node service */
     protected NodeService nodeService;
@@ -82,11 +103,11 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     /** Content service */
     protected ContentService contentService;
     
-    /** Namespace service */
-    protected NamespaceService namespaceService;
-    
     /** Action service */
     protected ActionService actionService;
+    
+    /** Audit component used for recording actions */
+    protected AuditComponent auditComponent;
     
     /** Records management action service */
     protected RecordsManagementActionService recordsManagementActionService;
@@ -103,9 +124,34 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     protected LinkedList<AbstractCapability> capabilities = new LinkedList<AbstractCapability>();;
     
     /**
+     * A <b>stateless</b> listener of transactional events.
+     */
+    private final RMActionExecuterTxnListener txnListener;
+    
+    /** Default constructor */
+    public RMActionExecuterAbstractBase()
+    {
+        txnListener = new RMActionExecuterTxnListener();
+    }
+    
+    /**
+     * Set the namespace service
+     */
+    public void setTransactionService(TransactionService transactionService)
+    {
+        this.transactionService = transactionService;
+    }
+    
+    /**
+     * Set the namespace service
+     */
+    public void setNamespaceService(NamespaceService namespaceService)
+    {
+        this.namespaceService = namespaceService;
+    }
+    
+    /**
      * Set node service
-     * 
-     * @param nodeService   node service
      */
     public void setNodeService(NodeService nodeService)
     {
@@ -114,8 +160,6 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     
     /**
      * Set the dictionary service
-     * 
-     * @param dictionaryService
      */
     public void setDictionaryService(DictionaryService dictionaryService)
     {
@@ -124,8 +168,6 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     
     /**
      * Set the content service
-     * 
-     * @param contentService
      */
     public void setContentService(ContentService contentService)
     {
@@ -133,29 +175,23 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     }
     
     /**
-     * Set the namespace service
-     * 
-     * @param namespaceService
-     */
-    public void setNamespaceService(NamespaceService namespaceService)
-    {
-        this.namespaceService = namespaceService;
-    }
-    
-    /**
      * Set action service 
-     * 
-     * @param actionService
      */
     public void setActionService(ActionService actionService)
     {
         this.actionService = actionService;
     }
-    
+
+    /**
+     * Set the audit component that will be used to record actions occuring
+     */
+    public void setAuditComponent(AuditComponent auditComponent)
+    {
+        this.auditComponent = auditComponent;
+    }
+
     /**
      * Set records management service
-     * 
-     * @param recordsManagementActionService
      */
     public void setRecordsManagementActionService(RecordsManagementActionService recordsManagementActionService)
     {
@@ -164,8 +200,6 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     
     /**
      * Set records management service
-     * 
-     * @param recordsManagementService      records management service
      */
     public void setRecordsManagementService(RecordsManagementService recordsManagementService)
     {
@@ -174,8 +208,6 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     
     /** 
      * Set records management event service
-     * 
-     * @param recordsManagementEventService records management event service
      */
     public void setRecordsManagementEventService(RecordsManagementEventService recordsManagementEventService)
     {
@@ -216,6 +248,17 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     @Override
     public void init()
     {
+        PropertyCheck.mandatory(this, "namespaceService", namespaceService);
+        PropertyCheck.mandatory(this, "transactionService", transactionService);
+        PropertyCheck.mandatory(this, "nodeService", nodeService);
+        PropertyCheck.mandatory(this, "dictionaryService", dictionaryService);
+        PropertyCheck.mandatory(this, "contentService", contentService);
+        PropertyCheck.mandatory(this, "actionService", actionService);
+        PropertyCheck.mandatory(this, "auditComponent", auditComponent);
+        PropertyCheck.mandatory(this, "transactionService", transactionService);
+        PropertyCheck.mandatory(this, "recordsManagementActionService", recordsManagementActionService);
+        PropertyCheck.mandatory(this, "recordsManagementService", recordsManagementService);
+        PropertyCheck.mandatory(this, "recordsManagementEventService", recordsManagementEventService);
         for(AbstractCapability capability : capabilities)
         {
             capability.registerAction(this);
@@ -292,8 +335,183 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
         Action action = this.actionService.createAction(name);
         action.setParameterValues(parameters);
         
+        // Audit: Bind a txn listener to the current transaction
+        AlfrescoTransactionSupport.bindListener(this.txnListener);
+        // Audit: Bind the audit parameters to the current transaction
+        List<RMActionExecutorAuditParameters> boundAuditParams = TransactionalResourceHelper.getList(
+                KEY_RM_ACTION_AUDIT_PARAMETERS);
+        RMActionExecutorAuditParameters auditParams = new RMActionExecutorAuditParameters(
+                this,
+                filePlanComponent,
+                parameters);
+        boundAuditParams.add(auditParams);
+        
         // Execute the action
         this.actionService.executeAction(action, filePlanComponent);          
+    }
+    
+    /**
+     * A class to carry audit information through the transaction.
+     * 
+     * @author Derek Hulley
+     * @since 3.2
+     */
+    private static class RMActionExecutorAuditParameters
+    {
+        /*
+         * No getters because they are final and the class is only used internally
+         */
+        
+        private final RMActionExecuterAbstractBase action;
+        private final NodeRef nodeRef;
+        private final Map<String, Serializable> parameters;
+        
+        private RMActionExecutorAuditParameters(
+                RMActionExecuterAbstractBase action,
+                NodeRef nodeRef,
+                Map<String, Serializable> parameters)
+        {
+            this.action = action;
+            this.nodeRef = nodeRef;
+            this.parameters = new HashMap<String, Serializable>(parameters);   // Deliberate copy
+        }
+
+        public RMActionExecuterAbstractBase getAction()
+        {
+            return action;
+        }
+        public NodeRef getNodeRef()
+        {
+            return nodeRef;
+        }
+        public Map<String, Serializable> getParameters()
+        {
+            return parameters;
+        }
+    }
+    
+    /**
+     * A <b>stateless</b> transaction listener for RM actions.  Amongst other things, auditing of actions
+     * is done by this component.
+     * <p/>
+     * This class is not static so that the instances will have access to the action's implementation.
+     * 
+     * @author Derek Hulley
+     * @since 3.2
+     */
+    private class RMActionExecuterTxnListener extends TransactionListenerAdapter
+    {
+        private final Log logger = LogFactory.getLog(RMActionExecuterAbstractBase.class);
+        
+        /*
+         * Equality and hashcode generation are left unimplemented; we expect to only have a single
+         * instance of this class per action.
+         */
+
+        /**
+         * Get the action parameters from the transaction and audit them.
+         */
+        @Override
+        public void afterCommit()
+        {
+            final List<RMActionExecutorAuditParameters> boundAuditParams = TransactionalResourceHelper.getList(
+                    KEY_RM_ACTION_AUDIT_PARAMETERS);
+            // Shortcut if there is nothing to audit
+            if (boundAuditParams.size() == 0)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("No audit parameters bound to transaction.");
+                }
+                return;
+            }
+            
+            // Start a *new* read-write transaction to audit in
+            RetryingTransactionCallback<Void> auditCallback = new RetryingTransactionCallback<Void>()
+            {
+                public Void execute() throws Throwable
+                {
+                    auditInTxn(boundAuditParams);
+                    return null;
+                }
+            };
+            transactionService.getRetryingTransactionHelper().doInTransaction(auditCallback, false, true);
+        }
+
+        /**
+         * Do the actual auditing, assuming the presence of a viable transaction
+         * 
+         * @param boundAuditParams          the parameters to audit
+         */
+        private void auditInTxn(List<RMActionExecutorAuditParameters> boundAuditParams) throws Throwable
+        {
+            // Start and audit session
+            AuditSession auditSession = auditComponent.startAuditSession(
+                    RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
+                    RecordsManagementAuditService.RM_AUDIT_PATH_ROOT);
+            if (auditSession == null)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("RM Audit: No session created for application.");
+                }
+                // There is nothing to do, and nothing to commit
+                RetryingTransactionHelper.getActiveUserTransaction().setRollbackOnly();
+                return;
+            }
+            // Go through all the audit information and audit it
+            boolean auditedSomething = false;                       // We rollback if nothing is audited
+            for (RMActionExecutorAuditParameters auditParams : boundAuditParams)
+            {
+                Map<String, Serializable> auditMap = new HashMap<String, Serializable>(13);
+                // The node
+                String actionName = auditParams.getAction().getName();
+                String actionPath = AuditApplication.buildPath(
+                                RecordsManagementAuditService.RM_AUDIT_PATH_ACTIONS,
+                                actionName);
+                auditMap.put(
+                        AuditApplication.buildPath(
+                                actionPath,
+                                RecordsManagementAuditService.RM_AUDIT_PATH_ACTIONS_NODE),
+                        auditParams.getNodeRef());
+                for (Map.Entry<String, Serializable> actionParam : auditParams.getParameters().entrySet())
+                {
+                    auditMap.put(
+                            AuditApplication.buildPath(
+                                    actionPath,
+                                    RecordsManagementAuditService.RM_AUDIT_PATH_ACTIONS_PARAMS,
+                                    actionParam.getKey()),
+                            actionParam.getValue());
+                }
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("RM Audit: Auditing values: \n" + auditMap);
+                }
+                auditMap = auditComponent.audit(auditSession, auditMap);
+                if (auditMap.isEmpty())
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("RM Audit: Nothing was audited.");
+                    }
+                }
+                else
+                {
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("RM Audit: Audited values: \n" + auditMap);
+                    }
+                    // We must commit the transaction to get the values in
+                    auditedSomething = true;
+                }
+            }
+            // Check if anything was audited
+            if (!auditedSomething)
+            {
+                // Nothing was audited, so do nothing
+                RetryingTransactionHelper.getActiveUserTransaction().setRollbackOnly();
+            }
+        }
     }
     
     /**

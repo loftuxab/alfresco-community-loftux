@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.TestCase;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies;
@@ -41,25 +43,37 @@ import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.BaseSpringTest;
+import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.ApplicationContextHelper;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Records management action service implementation test
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementActionServiceImplTest extends BaseSpringTest 
+public class RecordsManagementActionServiceImplTest extends TestCase 
                                                     implements RecordsManagementModel,
                                                                BeforeRMActionExecution,
                                                                OnRMActionExecution
-{    
-    protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+{
+    private static final String[] CONFIG_LOCATIONS = new String[] {
+        "classpath:alfresco/application-context.xml",
+        "classpath:org/alfresco/module/org_alfresco_module_dod5015/test/test-context.xml"};
     
+    private ApplicationContext ctx;
+    
+    private ServiceRegistry serviceRegistry;
+    private TransactionService transactionService;
+    private RetryingTransactionHelper txnHelper;
 	private NodeService nodeService;
 	private RecordsManagementActionService rmActionService;
 	private PolicyComponent policyComponent;
@@ -67,47 +81,79 @@ public class RecordsManagementActionServiceImplTest extends BaseSpringTest
 	private NodeRef nodeRef;
 	private List<NodeRef> nodeRefs;
 	
-	@Override
-    protected String[] getConfigLocations()
-    {
-        return new String[] { "classpath:alfresco/application-context.xml", "classpath:org/alfresco/module/org_alfresco_module_dod5015/test/test-context.xml" };
-    }
-	
-	@Override
-	protected void onSetUpInTransaction() throws Exception 
-	{
-		super.onSetUpInTransaction();
+    private boolean beforeMarker;
+    private boolean onMarker;
+    private boolean inTest;
 
-		// Get the service required in the tests
-		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); 
-		this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
-		this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
+	@Override
+	protected void setUp() throws Exception 
+	{
+	    ctx = ApplicationContextHelper.getApplicationContext(CONFIG_LOCATIONS);
+
+	    this.serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
+        this.transactionService = serviceRegistry.getTransactionService();
+        this.txnHelper = transactionService.getRetryingTransactionHelper();
+	    this.nodeService = serviceRegistry.getNodeService();
+	    
+		this.rmActionService = (RecordsManagementActionService)ctx.getBean("RecordsManagementActionService");
+		this.policyComponent = (PolicyComponent)ctx.getBean("policyComponent");
 
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
 		
-		// Create a node we can use for the tests
-		NodeRef rootNodeRef = this.nodeService.getRootNode(SPACES_STORE);
-		this.nodeRef = this.nodeService.createNode(
-		        rootNodeRef, 
-		        ContentModel.ASSOC_CHILDREN, 
-		        QName.createQName(NamespaceService.CONTENT_MODEL_PREFIX, "temp.txt"), 
-		        ContentModel.TYPE_CONTENT).getChildRef();
-		
-		// Create nodeRef list
-		this.nodeRefs = new ArrayList<NodeRef>(5);
-		for (int i = 0; i < 5; i++)
+		RetryingTransactionCallback<Void> setUpCallback = new RetryingTransactionCallback<Void>()
         {
-		    this.nodeRefs.add(
-		            this.nodeService.createNode(
-		                    rootNodeRef, 
-		                    ContentModel.ASSOC_CHILDREN, 
-		                    QName.createQName(NamespaceService.CONTENT_MODEL_PREFIX, "temp.txt"), 
-		                    ContentModel.TYPE_CONTENT).getChildRef());
-        }
+            public Void execute() throws Throwable
+            {
+                // Create a node we can use for the tests
+                NodeRef rootNodeRef = nodeService.getRootNode(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE);
+                nodeRef = nodeService.createNode(
+                        rootNodeRef, 
+                        ContentModel.ASSOC_CHILDREN, 
+                        QName.createQName(NamespaceService.CONTENT_MODEL_PREFIX, "temp.txt"), 
+                        ContentModel.TYPE_CONTENT).getChildRef();
+                
+                // Create nodeRef list
+                nodeRefs = new ArrayList<NodeRef>(5);
+                for (int i = 0; i < 5; i++)
+                {
+                    nodeRefs.add(
+                            nodeService.createNode(
+                                    rootNodeRef, 
+                                    ContentModel.ASSOC_CHILDREN, 
+                                    QName.createQName(NamespaceService.CONTENT_MODEL_PREFIX, "temp.txt"), 
+                                    ContentModel.TYPE_CONTENT).getChildRef());
+                }
+                return null;
+            }
+        };
+        txnHelper.doInTransaction(setUpCallback);
+        
+        beforeMarker = false;
+        onMarker = false;
+        inTest = false;
+	}
+	
+	@Override
+	protected void tearDown()
+	{
+        AuthenticationUtil.clearCurrentSecurityContext();
 	}
 	
 	public void testGetActions()
+	{
+	    RetryingTransactionCallback<Void> testCallback = new RetryingTransactionCallback<Void>()
+        {
+            public Void execute() throws Throwable
+            {
+                getActionsImpl();
+                return null;
+            }
+        };
+        txnHelper.doInTransaction(testCallback);
+	}
+	
+	private void getActionsImpl()
 	{
 	    List<RecordsManagementAction> result = this.rmActionService.getRecordsManagementActions();
 	    assertNotNull(result);
@@ -145,11 +191,46 @@ public class RecordsManagementActionServiceImplTest extends BaseSpringTest
         assertNull(this.rmActionService.getRecordsManagementAction("notThere"));
 	}
 	
-	private boolean beforeMarker = false;
-	private boolean onMarker = false;
-	private boolean inTest = false;
-	
-	public void testExecution()
+    public void testExecution()
+    {
+        RetryingTransactionCallback<Void> testCallback = new RetryingTransactionCallback<Void>()
+        {
+            public Void execute() throws Throwable
+            {
+                executionImpl();
+                return null;
+            }
+        };
+        txnHelper.doInTransaction(testCallback);
+    }
+    
+    public void beforeRMActionExecution(NodeRef nodeRef, String name, Map<String, Serializable> parameters)
+    {
+        if (inTest == true)
+        {
+            assertEquals(this.nodeRef, nodeRef);
+            assertEquals(TestAction.NAME, name);
+            assertEquals(1, parameters.size());
+            assertTrue(parameters.containsKey(TestAction.PARAM));
+            assertEquals(TestAction.PARAM_VALUE, parameters.get(TestAction.PARAM));
+            beforeMarker = true;
+        }
+    }
+
+    public void onRMActionExecution(NodeRef nodeRef, String name, Map<String, Serializable> parameters)
+    {
+        if (inTest == true)
+        {
+            assertEquals(this.nodeRef, nodeRef);
+            assertEquals(TestAction.NAME, name);
+            assertEquals(1, parameters.size());
+            assertTrue(parameters.containsKey(TestAction.PARAM));
+            assertEquals(TestAction.PARAM_VALUE, parameters.get(TestAction.PARAM));
+            onMarker = true;
+        }
+    }
+    
+	private void executionImpl()
 	{
 	    inTest = true;
 	    try
@@ -181,33 +262,20 @@ public class RecordsManagementActionServiceImplTest extends BaseSpringTest
 	    }
 	}
 	
-    public void beforeRMActionExecution(NodeRef nodeRef, String name, Map<String, Serializable> parameters)
+    public void testBulkExecution()
     {
-        if (inTest == true)
+        RetryingTransactionCallback<Void> testCallback = new RetryingTransactionCallback<Void>()
         {
-            assertEquals(this.nodeRef, nodeRef);
-            assertEquals(TestAction.NAME, name);
-            assertEquals(1, parameters.size());
-            assertTrue(parameters.containsKey(TestAction.PARAM));
-            assertEquals(TestAction.PARAM_VALUE, parameters.get(TestAction.PARAM));
-            beforeMarker = true;
-        }
+            public Void execute() throws Throwable
+            {
+                bulkExecutionImpl();
+                return null;
+            }
+        };
+        txnHelper.doInTransaction(testCallback);
     }
-
-    public void onRMActionExecution(NodeRef nodeRef, String name, Map<String, Serializable> parameters)
-    {
-        if (inTest == true)
-        {
-            assertEquals(this.nodeRef, nodeRef);
-            assertEquals(TestAction.NAME, name);
-            assertEquals(1, parameters.size());
-            assertTrue(parameters.containsKey(TestAction.PARAM));
-            assertEquals(TestAction.PARAM_VALUE, parameters.get(TestAction.PARAM));
-            onMarker = true;
-        }
-    }
-	
-	public void testBulkExecution()
+    
+	private void bulkExecutionImpl()
 	{
 	    for (NodeRef nodeRef : this.nodeRefs)
         {
