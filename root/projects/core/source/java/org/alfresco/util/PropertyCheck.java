@@ -49,7 +49,7 @@ public class PropertyCheck
         {
             throw new AlfrescoRuntimeException(
                     ERR_PROPERTY_NOT_SET,
-                    new Object[] {propertyName, target});
+                    new Object[] {propertyName, target, target.getClass()});
         }
     }
 
