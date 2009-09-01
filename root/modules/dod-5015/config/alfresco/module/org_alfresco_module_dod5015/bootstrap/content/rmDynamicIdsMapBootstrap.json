@@ -6,15 +6,15 @@
    [
       {
          "qname" : "rmc:obsoletes",
-         "displayID" : "Obsoleted by__Obsoletes"
+         "displayID" : "ObsoletedBy__Obsoletes"
       },
       {
          "qname" : "rmc:supersedes",
-         "displayID" : "Superseded by__Supersedes"
+         "displayID" : "SupersededBy__Supersedes"
       },
       {
          "qname" : "rmc:versions",
-         "displayID" : "Versioned by__Versions"
+         "displayID" : "VersionedBy__Versions"
       },
       {
          "qname" : "rmc:attachment",
@@ -22,7 +22,7 @@
       },
       {
          "qname" : "rmc:crossreference",
-         "displayID" : "Cross Reference"
+         "displayID" : "CrossReference"
       },
       {
          "qname" : "rmc:redaction",
@@ -30,11 +30,11 @@
       },
       {
          "qname" : "rmc:controlledcopy",
-         "displayID" : "Controlled Copy__Controlled Copy"
+         "displayID" : "ControlledCopy__ControlledCopy"
       },
       {
          "qname" : "rmc:supports",
-         "displayID" : "Supports__Supported by"
+         "displayID" : "Supports__SupportedBy"
       }
    ]
 }
