@@ -2,9 +2,6 @@
   <shortname>Removes specified Custom Reference Instance from the specified node</shortname>
   <description><![CDATA[
   The custom reference instance will be removed from the specified node.<BR/>
-  For bidirectional references the refId is simply the label. For parentchild references<BR/>
-  the refId is the source and target concatenated and separated by a slash<BR/>
-  e.g. "source__target".<BR/>
   The nodeRef encoded within the URL path is the 'fromNode' in the relationship.<BR/>
   The nodeRef encoded within the query string is the 'toNode' in the relationship.<BR/>
   ]]>
