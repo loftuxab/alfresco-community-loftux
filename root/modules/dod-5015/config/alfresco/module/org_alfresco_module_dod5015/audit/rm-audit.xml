@@ -18,7 +18,7 @@
                 <AuditPath key="node">
                     <RecordValue key="noderef" dataExtractor="simpleValue"/>
                 </AuditPath>
-                <AuditPath key="params">
+                <AuditPath key="parameters">
                     <AuditPath key="testActionParam">
                         <RecordValue key="value" dataExtractor="simpleValue"/>
                     </AuditPath>
