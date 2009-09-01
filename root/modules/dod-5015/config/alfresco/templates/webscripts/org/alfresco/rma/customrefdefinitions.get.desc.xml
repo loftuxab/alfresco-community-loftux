@@ -3,9 +3,7 @@
    <description><![CDATA[
    Gets the list of existing custom references.<br/>
    If a refId is specified, then only the reference definition corresponding to that<br/>
-   id will be returned. The ref Id should be either<br/>
-   bidirectional references: the label value<br/>
-   parentchild references: source + "__" + target<br/>
+   id will be returned.<br/>
    ]]>
    </description>
    <url>/api/rma/admin/customreferencedefinitions</url>
