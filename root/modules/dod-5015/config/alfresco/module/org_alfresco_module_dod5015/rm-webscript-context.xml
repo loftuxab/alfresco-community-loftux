@@ -40,6 +40,7 @@
     <!-- REST impl for POST Custom Reference Definitions -->
     <bean id="webscript.org.alfresco.rma.customrefdefinition.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceDefinitionPost" parent="rmBaseWebscript">
         <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
+        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
     
     <!-- REST impl for GET Custom Reference Instances -->

@@ -52,7 +52,12 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
 {
-	private final static String PARAM_REF_ID = "refId";
+	private static final String REFERENCE_TYPE = "referenceType";
+	private static final String REF_ID = "refId";
+    private static final String LABEL = "label";
+    private static final String SOURCE = "source";
+    private static final String TARGET = "target";
+    private static final String CUSTOM_REFS = "customRefs";
     private static Log logger = LogFactory.getLog(CustomReferenceDefinitionsGet.class);
     
     private RecordsManagementAdminService rmAdminService;
@@ -74,7 +79,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
         Map<String, Object> model = new HashMap<String, Object>();
         
         Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
-        String refId = templateVars.get(PARAM_REF_ID);
+        String refId = templateVars.get(REF_ID);
         
     	if (logger.isDebugEnabled())
     	{
@@ -120,29 +125,30 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
     		CustomReferenceType referenceType = nextValue instanceof ChildAssociationDefinition ?
     				CustomReferenceType.PARENT_CHILD : CustomReferenceType.BIDIRECTIONAL;
     		
-			data.put("referenceType", referenceType.toString());
+			data.put(REFERENCE_TYPE, referenceType.toString());
 
 			String nextTitle = nextValue.getTitle();
             if (CustomReferenceType.PARENT_CHILD.equals(referenceType))
             {
                 if (nextTitle != null)
                 {
-                    //TODO Can I actually use the title? It's not 'controlled'
                     String[] sourceAndTarget = rmAdminService.splitSourceTargetId(nextTitle);
-                    data.put("source", sourceAndTarget[0]);
-                    data.put("target", sourceAndTarget[1]);
+                    data.put(SOURCE, sourceAndTarget[0]);
+                    data.put(TARGET, sourceAndTarget[1]);
+                    data.put(REF_ID, clientId);
                 }
             }
             else if (CustomReferenceType.BIDIRECTIONAL.equals(referenceType))
             {
                 if (nextTitle != null)
                 {
-                    data.put("label", nextTitle);
+                    data.put(LABEL, nextTitle);
+                    data.put(REF_ID, clientId);
                 }
             }
             else
             {
-                //TODO throw
+                throw new WebScriptException("Unsupported custom reference type: " + referenceType);
             }
         	
     		listOfReferenceData.add(data);
@@ -153,7 +159,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
     		logger.debug("Retrieved custom reference definitions: " + listOfReferenceData.size());
     	}
 
-    	model.put("customRefs", listOfReferenceData);
+    	model.put(CUSTOM_REFS, listOfReferenceData);
 
         return model;
     }

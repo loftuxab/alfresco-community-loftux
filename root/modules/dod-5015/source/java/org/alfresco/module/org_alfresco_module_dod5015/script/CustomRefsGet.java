@@ -48,6 +48,15 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CustomRefsGet extends AbstractRmWebScript
 {
+    private static final String REFERENCE_TYPE = "referenceType";
+    private static final String REF_ID = "refId";
+    private static final String LABEL = "label";
+    private static final String SOURCE = "source";
+    private static final String TARGET = "target";
+    private static final String PARENT_REF = "parentRef";
+    private static final String CHILD_REF = "childRef";
+    private static final String CUSTOM_REFS = "customRefs";
+    
     private static Log logger = LogFactory.getLog(CustomRefsGet.class);
     private RecordsManagementAdminService rmAdminService;
     
@@ -77,14 +86,16 @@ public class CustomRefsGet extends AbstractRmWebScript
 
     		QName typeQName = assRef.getTypeQName();
     		
-    		data.put("sourceRef", assRef.getSourceRef().toString());
-    		data.put("targetRef", assRef.getTargetRef().toString());
-
     		String clientId = rmAdminService.getClientIdForQName(typeQName);
     		
     		AssociationDefinition assDef = rmAdminService.getCustomReferenceDefinitions().get(typeQName);
-    		data.put("label", clientId);
-			data.put("referenceType", CustomReferenceType.BIDIRECTIONAL.toString());
+    		data.put(LABEL, clientId);
+    		
+    		//TODO REF_ID and LABEL are intentionally duplicated here. It is anticipated
+    		// that we will change the value of the refId to the QName's unique part later.
+    		data.put(REF_ID, clientId);
+
+			data.put(REFERENCE_TYPE, CustomReferenceType.BIDIRECTIONAL.toString());
     		
     		listOfReferenceData.add(data);
     	}
@@ -96,15 +107,16 @@ public class CustomRefsGet extends AbstractRmWebScript
 
     		QName typeQName = childAssRef.getTypeQName();
     		
-    		data.put("childRef", childAssRef.getChildRef().toString());
-    		data.put("parentRef", childAssRef.getParentRef().toString());
+    		data.put(CHILD_REF, childAssRef.getChildRef().toString());
+    		data.put(PARENT_REF, childAssRef.getParentRef().toString());
 
             String clientId = rmAdminService.getClientIdForQName(typeQName);
+            data.put(REF_ID, clientId);
 
             String[] sourceAndTarget = rmAdminService.splitSourceTargetId(clientId);
-            data.put("source", sourceAndTarget[0]);
-            data.put("target", sourceAndTarget[1]);
-			data.put("referenceType", CustomReferenceType.PARENT_CHILD.toString());
+            data.put(SOURCE, sourceAndTarget[0]);
+            data.put(TARGET, sourceAndTarget[1]);
+			data.put(REFERENCE_TYPE, CustomReferenceType.PARENT_CHILD.toString());
     		
     		listOfReferenceData.add(data);
     	}
@@ -114,7 +126,7 @@ public class CustomRefsGet extends AbstractRmWebScript
     		logger.debug("Retrieved custom reference instances: " + assocs);
     	}
     	
-    	ftlModel.put("customRefs", listOfReferenceData);
+    	ftlModel.put(CUSTOM_REFS, listOfReferenceData);
 
         return ftlModel;
     }
