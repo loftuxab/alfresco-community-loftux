@@ -15,11 +15,13 @@
     <!-- Actions -->
     
     <bean id="rmAction" parent="action-executer" abstract="true">
+        <property name="namespaceService" ref="namespaceService"/>
+        <property name="transactionService" ref="transactionService"/>
         <property name="nodeService" ref="nodeService"/>
         <property name="contentService" ref="contentService"/>
         <property name="dictionaryService" ref="dictionaryService"/>
         <property name="actionService" ref="actionService"/>
-        <property name="namespaceService" ref="namespaceService"/>
+        <property name="auditComponent" ref="auditComponent"/>
         <property name="recordsManagementActionService" ref="recordsManagementActionService"/>
         <property name="recordsManagementService" ref="recordsManagementService"/>
         <property name="recordsManagementEventService" ref="recordsManagementEventService"/>
