@@ -140,6 +140,9 @@
 
     <bean id="destroy" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.DestroyAction" parent="rmAction"
         depends-on="rmDestroyRecordsScheduledForDestructionCapability">
+        <property name="policyComponent">
+            <ref bean="policyComponent"/>
+        </property>
         <property name="ghostingEnabled">
             <value>${rm.ghosting.enabled}</value>
         </property>
