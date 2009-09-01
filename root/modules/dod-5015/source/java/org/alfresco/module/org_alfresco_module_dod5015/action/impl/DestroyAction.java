@@ -28,23 +28,33 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
+import org.alfresco.repo.content.ContentServicePolicies;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
+import org.springframework.beans.factory.InitializingBean;
 
 /**
  * Destroy action
  * 
  * @author Roy Wetherall
  */
-public class DestroyAction extends RMDispositionActionExecuterAbstractBase
+public class DestroyAction extends RMDispositionActionExecuterAbstractBase implements
+        ContentServicePolicies.OnContentUpdatePolicy, InitializingBean
 {
-    private static final QName ASPECT_RM_GHOSTED = QName.createQName(RecordsManagementModel.RM_URI, "ghosted");
-
+    private PolicyComponent policyComponent;
     private boolean ghostingEnabled = true;
+
+    public void setPolicyComponent(PolicyComponent policyComponent)
+    {
+        this.policyComponent = policyComponent;
+    }
 
     public void setGhostingEnabled(boolean ghostingEnabled)
     {
@@ -72,12 +82,35 @@ public class DestroyAction extends RMDispositionActionExecuterAbstractBase
             }
 
             // Finally, add the ghosted aspect (TODO: Any properties?)
-            this.nodeService.addAspect(record, DestroyAction.ASPECT_RM_GHOSTED, Collections
+            this.nodeService.addAspect(record, DOD5015Model.ASPECT_GHOSTED, Collections
                     .<QName, Serializable> emptyMap());
         }
         else
         {
             this.nodeService.deleteNode(record);
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.alfresco.repo.content.ContentServicePolicies.OnContentUpdatePolicy#onContentUpdate(org.alfresco.service.cmr
+     * .repository.NodeRef, boolean)
+     */
+    public void onContentUpdate(NodeRef nodeRef, boolean newContent)
+    {
+        throw new AlfrescoRuntimeException("Update of content properties not allowed when node has "
+                + DOD5015Model.ASPECT_GHOSTED + " aspect.");
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
+    public void afterPropertiesSet() throws Exception
+    {
+        // Register interest in the onContentUpdate policy
+        policyComponent.bindClassBehaviour(ContentServicePolicies.ON_CONTENT_UPDATE,
+                DOD5015Model.ASPECT_GHOSTED, new JavaBehaviour(this, "onContentUpdate"));
     }
 }
