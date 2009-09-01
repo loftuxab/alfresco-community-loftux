@@ -234,6 +234,12 @@
             <aspect>rma:filePlanComponent</aspect>
         </mandatory-aspects>  
       </aspect>
+
+      <aspect name="dod:ghosted">
+         <title>Ghosted Record</title>         
+         <properties>                
+         </properties>
+      </aspect> 
       
    </aspects>
    

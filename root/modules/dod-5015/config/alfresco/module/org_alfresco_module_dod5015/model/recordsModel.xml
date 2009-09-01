@@ -767,12 +767,6 @@
          </properties>
       </aspect>
       
-      <aspect name="rma:ghosted">
-         <title>Ghosted Record</title>         
-         <properties>                
-         </properties>
-      </aspect> 
-      
       <aspect name="rma:versionedRecord">
          <title>Versioned Record</title>
       </aspect> 
