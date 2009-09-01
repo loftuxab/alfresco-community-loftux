@@ -5839,7 +5839,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testDeclareRecordsInClosedFoldersCapability()
     {
-     // Folder
+        // Folder
         checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.ALLOWED);
         checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.ALLOWED);
         checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.ALLOWED);
@@ -6062,7 +6062,7 @@ public class CapabilitiesTest extends TestCase
         checkCapability(test_user, record_2, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.ALLOWED);
 
         // try declare in closed
-        
+
         // Close
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
@@ -6109,7 +6109,13 @@ public class CapabilitiesTest extends TestCase
 
     public void testDeleteLinksCapability()
     {
-        // fail();
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.DELETE_LINKS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.DELETE_LINKS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.DELETE_LINKS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.DELETE_LINKS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.DELETE_LINKS, AccessStatus.DENIED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.DELETE_LINKS, AccessStatus.DENIED);
     }
 
     public void testDeleteRecordsCapability()
@@ -6674,17 +6680,669 @@ public class CapabilitiesTest extends TestCase
 
     public void testEditDeclaredRecordMetadataCapability()
     {
-        // fail();
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkPermission(rm_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        // Set appropriate state - declare records and make eligible
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_1, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_1, "declareRecord");
+
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_2, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "declareRecord");
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        // check frozen
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        // Check closed
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_DECLARED_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        // try to modify
+
+        publicNodeService.addAspect(record_1, ContentModel.ASPECT_OWNABLE, null);
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+        properties.put(ContentModel.PROP_OWNER, "me");
+        publicNodeService.addProperties(record_1, properties);
+        // move should fail ...
+        try
+        {
+            publicNodeService.moveNode(record_1, recordCategory_2, ContentModel.ASSOC_CONTAINS, DOD5015Model.TYPE_RECORD_FOLDER);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        publicNodeService.removeProperty(record_1, ContentModel.PROP_TITLE);
+        publicNodeService.setProperty(record_1, ContentModel.PROP_TITLE, "title");
+        publicNodeService.addAspect(record_1, ContentModel.ASPECT_TEMPORARY, null);
+        publicNodeService.removeAspect(record_1, ContentModel.ASPECT_TEMPORARY);
+        publicNodeService.setProperties(record_1, publicNodeService.getProperties(record_1));
+        try
+        {
+            // abstains
+            publicNodeService.setType(record_1, DOD5015Model.TYPE_RECORD_FOLDER);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
     }
 
     public void testEditNonRecordMetadataCapability()
     {
-        // fail();
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.EDIT_NON_RECORD_METADATA, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.EDIT_NON_RECORD_METADATA);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.EDIT_NON_RECORD_METADATA, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        // check frozen
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        // Check closed
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_NON_RECORD_METADATA, AccessStatus.DENIED);
+
+        // try to modify
+
+        publicNodeService.addAspect(recordFolder_1, ContentModel.ASPECT_OWNABLE, null);
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+        properties.put(ContentModel.PROP_OWNER, "me");
+        publicNodeService.addProperties(recordFolder_1, properties);
+        // move should fail ...
+        try
+        {
+            publicNodeService.moveNode(recordFolder_1, recordCategory_2, ContentModel.ASSOC_CONTAINS, DOD5015Model.TYPE_RECORD_FOLDER);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        publicNodeService.removeProperty(recordFolder_1, ContentModel.PROP_TITLE);
+        publicNodeService.setProperty(recordFolder_1, ContentModel.PROP_TITLE, "title");
+        publicNodeService.addAspect(recordFolder_1, ContentModel.ASPECT_TEMPORARY, null);
+        publicNodeService.removeAspect(recordFolder_1, ContentModel.ASPECT_TEMPORARY);
+        publicNodeService.setProperties(recordFolder_1, publicNodeService.getProperties(recordFolder_1));
+        try
+        {
+            // abstains
+            publicNodeService.setType(recordFolder_1, DOD5015Model.TYPE_RECORD_FOLDER);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
     }
 
     public void testEditRecordMetadataCapability()
     {
-        // fail();
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkPermission(rm_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(rm_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.EDIT_RECORD_METADATA, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.EDIT_RECORD_METADATA);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.EDIT_RECORD_METADATA, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        // check frozen
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        // Check closed
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EDIT_RECORD_METADATA, AccessStatus.ALLOWED);
+
+        // try to modify
+
+        publicNodeService.addAspect(record_1, ContentModel.ASPECT_OWNABLE, null);
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+        properties.put(ContentModel.PROP_OWNER, "me");
+        publicNodeService.addProperties(record_1, properties);
+        // move should fail ...
+        try
+        {
+            publicNodeService.moveNode(record_1, recordCategory_2, ContentModel.ASSOC_CONTAINS, DOD5015Model.TYPE_RECORD_FOLDER);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        publicNodeService.removeProperty(record_1, ContentModel.PROP_TITLE);
+        publicNodeService.setProperty(record_1, ContentModel.PROP_TITLE, "title");
+        publicNodeService.addAspect(record_1, ContentModel.ASPECT_TEMPORARY, null);
+        publicNodeService.removeAspect(record_1, ContentModel.ASPECT_TEMPORARY);
+        publicNodeService.setProperties(record_1, publicNodeService.getProperties(record_1));
+        try
+        {
+            // abstains
+            publicNodeService.setType(record_1, DOD5015Model.TYPE_RECORD_FOLDER);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
     }
 
     public void testEditSelectionListsCapability()
@@ -6722,12 +7380,381 @@ public class CapabilitiesTest extends TestCase
 
     public void testExtendRetentionPeriodOrFreezeCapability()
     {
-        // fail();
+        // freeze and unfreeze is part of most other tests - this jusr duplicates the basics ...
+
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkPermission(rm_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+
+        // check frozen - can be in mutiple holds/freezes ..
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+
+        // Check closed
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
+
     }
 
     public void testFileRecordsCapability()
     {
-        // fail();
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.FILE_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.FILE_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.FILE_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        // check frozen
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        // Check closed
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
+
+        // Do some filing ...
+
+        // create
+
+        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+        properties.put(ContentModel.PROP_NAME, "MyRecordCreate.txt");
+        NodeRef newRecord_1 = this.nodeService.createNode(recordFolder_1, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
+                ContentModel.TYPE_CONTENT, properties).getChildRef();
+
+        // Set the content
+        ContentWriter writer = this.contentService.getWriter(newRecord_1, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+
+        recordsManagementActionService.executeRecordsManagementAction(newRecord_1, "file");
+        
+        properties = new HashMap<QName, Serializable>(1);
+        properties.put(ContentModel.PROP_NAME, "MyRecordCreate.txt");
+        NodeRef newRecord_2 = this.nodeService.createNode(recordFolder_2, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
+                ContentModel.TYPE_CONTENT, properties).getChildRef();
+
+        // Set the content
+        writer = this.contentService.getWriter(newRecord_2, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
+
+        recordsManagementActionService.executeRecordsManagementAction(newRecord_2, "file");
     }
 
     public void testMakeOptionalPropertiesMandatoryCapability()

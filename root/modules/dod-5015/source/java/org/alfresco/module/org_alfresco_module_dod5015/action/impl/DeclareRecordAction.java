@@ -36,6 +36,7 @@ import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -66,6 +67,8 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
                 {
                     // Add the declared aspect
                     this.nodeService.addAspect(actionedUponNodeRef, ASPECT_DECLARED_RECORD, null);
+                    // remove all owner related rights 
+                    this.ownableService.setOwner(actionedUponNodeRef, OwnableService.NO_OWNER);
                 }
                 else
                 {

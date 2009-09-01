@@ -24,6 +24,7 @@
         <property name="recordsManagementService" ref="recordsManagementService"/>
         <property name="recordsManagementEventService" ref="recordsManagementEventService"/>
         <property name="publicAction" value="false"/>
+        <property name="ownableService" ref="ownableService"/>
     </bean>
     
     <bean id="rmProxyAction" parent="action-executer" abstract="true">

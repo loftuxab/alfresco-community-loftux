@@ -53,6 +53,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Period;
+import org.alfresco.service.cmr.security.OwnableService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -95,6 +96,9 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     
     /** Records management event service */
     protected RecordsManagementEventService recordsManagementEventService;
+    
+    /** Ownable service **/
+    protected OwnableService ownableService;
     
     protected LinkedList<AbstractCapability> capabilities = new LinkedList<AbstractCapability>();;
     
@@ -178,11 +182,29 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
         this.recordsManagementEventService = recordsManagementEventService;
     }
     
+    
+    /**
+     * Set the ownable service
+     * @param ownableSerice
+     */
+    public void setOwnableService(OwnableService ownableService)
+    {
+        this.ownableService = ownableService;
+    }
+
+    /**
+     * Register with a single capability
+     * @param capability
+     */
     public void setCapability(AbstractCapability capability)
     {
         capabilities.add(capability);
     }
     
+    /**
+     * Register with several capabilities
+     * @param capabilities
+     */
     public void setCapabilities(Collection<AbstractCapability> capabilities)
     {
         this.capabilities.addAll(capabilities);
