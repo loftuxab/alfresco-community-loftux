@@ -59,9 +59,6 @@
          </properties>
       </aspect>
       
-      <!-- These aspects are intentionally empty. New references and/or properties
-           will be defined at runtime. These new definitions will then be
-           programmatically added to these aspects. -->
       <aspect name="rmc:customAssocs">
          
          <title>Records Management Custom Associations</title>
@@ -110,6 +107,9 @@
          </associations>
       </aspect>
       
+      <!-- These aspects are intentionally empty. New references and/or properties
+           will be defined at runtime. These new definitions will then be
+           programmatically added to these aspects. -->
       <aspect name="rmc:customRecordSeriesProperties">
          <title>Properties for DOD5015 Custom Record Series</title>
       </aspect>

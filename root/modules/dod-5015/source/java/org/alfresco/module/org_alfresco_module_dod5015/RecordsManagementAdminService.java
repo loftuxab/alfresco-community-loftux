@@ -190,10 +190,11 @@ public interface RecordsManagementAdminService
     public void changeCustomConstraintTitle(QName constraintName, String title);
     
     /**
-     * This method returns the QName which corresponds to the given client-side ID.
+     * This method iterates over the custom properties, references looking for one whose title
+     * exactly matches that specified.
      * 
-     * @param clientId the client-side ID of a custom property, reference.
-     * @return the corresponding QName.
+     * @param titleValue the title value to look for
+     * @return the QName of the property, association definition which matches, or null.
      */
     public QName getQNameForClientId(String clientId);
 
@@ -205,7 +206,7 @@ public interface RecordsManagementAdminService
      */
     public String getClientIdForQName(QName qname);
 
-    public QName generateAndRegisterQNameFor(String clientId);
+    public QName generateQNameFor(String clientId);
    
     /**
      * Given a compound id for source and target strings (as used with parent/child

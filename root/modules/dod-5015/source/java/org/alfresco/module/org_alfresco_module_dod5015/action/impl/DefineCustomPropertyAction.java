@@ -117,6 +117,8 @@ public class DefineCustomPropertyAction extends DefineCustomElementAbstractActio
             }
         }
         
+        // The title is actually generated, so this parameter will be ignored
+        // by the RMAdminService
         String title = (String)params.get(PARAM_TITLE);
         String description = (String)params.get(PARAM_DESCRIPTION);
         String defaultValue = (String)params.get(PARAM_DEFAULT_VALUE);

@@ -53,7 +53,7 @@ import org.apache.commons.logging.LogFactory;
 public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
 {
 	private static final String REFERENCE_TYPE = "referenceType";
-	private static final String REF_ID = "refId";
+    private static final String REF_ID = "refId";
     private static final String LABEL = "label";
     private static final String SOURCE = "source";
     private static final String TARGET = "target";
@@ -80,6 +80,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
         
         Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
         String refId = templateVars.get(REF_ID);
+        
         
     	if (logger.isDebugEnabled())
     	{
@@ -127,6 +128,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
     		
 			data.put(REFERENCE_TYPE, referenceType.toString());
 
+			// It is the title which stores either the label, or the source and target.
 			String nextTitle = nextValue.getTitle();
             if (CustomReferenceType.PARENT_CHILD.equals(referenceType))
             {
