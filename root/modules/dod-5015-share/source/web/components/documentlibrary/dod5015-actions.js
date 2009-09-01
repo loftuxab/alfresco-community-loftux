@@ -40,6 +40,28 @@
    Alfresco.doclib.RecordsActions.prototype =
    {
       /**
+       * Accession action.
+       *
+       * @method onActionAccession
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionAccession: function RDLA_onActionAccession(assets)
+      {
+         this._dod5015Action("message.accession", assets, "accession");
+      },
+
+      /**
+       * Accession Complete action.
+       *
+       * @method onActionAccessionComplete
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionAccessionComplete: function RDLA_onActionAccessionComplete(assets)
+      {
+         this._dod5015Action("message.accession-complete", assets, "accessionComplete");
+      },
+
+      /**
        * Copy single document or folder.
        *
        * @method onActionCopyTo
@@ -324,7 +346,7 @@
       },
 
       /**
-       * Transfer Confirmation action.
+       * Transfer Complete action.
        *
        * @method onActionTransferComplete
        * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned

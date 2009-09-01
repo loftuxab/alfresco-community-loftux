@@ -95,18 +95,18 @@
             value: ""
          });
 
-         // File Upload button: user needs "file" access
+         // File Upload button: user needs (generated) "file" access
          this.widgets.fileUpload = Alfresco.util.createYUIButton(this, "fileUpload-button", this.onFileUpload,
          {
             disabled: true,
             value: "file"
          });
 
-         // Import button: user needs "import" access
+         // Import button: user needs "Create" access
          this.widgets.importButton = Alfresco.util.createYUIButton(this, "import-button", this.onImport,
          {
             disabled: true,
-            value: "import"
+            value: "Create"
          });
 
          // Selected Items menu button

@@ -232,8 +232,14 @@
    font-size: 123%;
    font-weight: normal;
    float: left;
-   padding-bottom: 0.1em;
-   padding-top: 0.1em;
+   padding-bottom: 0.2em;
+   padding-top: 0.2em;
+}
+.doclist .documents h3.filename span.filename
+{
+   color: #606060;
+   font-size: 82%;
+   padding-left: 0.7em;
 }
 .doclist .documents
 {
@@ -304,6 +310,14 @@
 .doclist .documents .detail span.item-simple
 {
    padding-right: 0.5em;
+}
+
+.doclist .documents .detail-first
+{
+}
+.doclist .documents .detail-last
+{
+   padding-bottom: 0.2em;
 }
 
 

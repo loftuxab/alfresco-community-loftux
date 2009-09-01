@@ -34,6 +34,9 @@ var Evaluator =
             }
             break;
          case "rma:transfer":
+            /**
+             * TODO: Determine whether this is a "transfer" or "accession" container (metadata?)
+             */
             assetType = "transfer-container";
             break;
          case "rma:hold":
@@ -122,6 +125,9 @@ var Evaluator =
    run: function Evaluator_run(asset)
    {
       var assetType = Evaluator.getAssetType(asset),
+         rmNode = rmService.getRecordsManagementNode(asset),
+         capabilities = {},
+         actions = {},
          actionSet = "empty",
          permissions = {},
          status = {};
@@ -129,28 +135,27 @@ var Evaluator =
       var now = new Date();
 
       /**
+       * Capabilities and Actions
+       */
+      var cap, act;
+      for each (cap in rmNode.capabilities)
+      {
+         capabilities[cap.name] = true;
+         for each (act in cap.actions)
+         {
+            actions[act] = true;
+         }
+      }
+
+      /**
        * COMMON FOR ALL TYPES
        */
 
       /**
-       * Basic permissions - replace these with RM equivalents
+       * Basic permissions - start from entire capabiltiies list
+       * TODO: Filter-out the ones non relevant to DocLib
        */
-      if (asset.hasPermission("CreateChildren"))
-      {
-         permissions["create"] = true;
-      }
-      if (asset.hasPermission("Write"))
-      {
-         permissions["edit"] = true;
-      }
-      if (asset.hasPermission("Delete") && people.isAdmin(person))
-      {
-         permissions["delete"] = true;
-      }
-      if (asset.hasPermission("ChangePermissions"))
-      {
-         permissions["permissions"] = true;
-      }
+      permissions = capabilities;
 
       /**
        * Multiple parent assocs
@@ -172,10 +177,10 @@ var Evaluator =
       switch (assetType)
       {
          /**
-          * SPECIFIC TO: FILEPLAN
+          * SPECIFIC TO: FILE PLAN
           */
          case "fileplan":
-            permissions["new-series"] = true;
+            permissions["new-series"] = capabilities["Create"];
             break;
 
 
@@ -184,7 +189,7 @@ var Evaluator =
           */
          case "record-series":
             actionSet = "recordSeries";
-            permissions["new-category"] = true;
+            permissions["new-category"] = capabilities["Create"];
             break;
 
 
@@ -193,7 +198,7 @@ var Evaluator =
           */
          case "record-category":
             actionSet = "recordCategory";
-            permissions["new-folder"] = true;
+            permissions["new-folder"] = capabilities["Create"];
             break;
 
 
@@ -203,40 +208,52 @@ var Evaluator =
          case "record-folder":
             actionSet = "recordFolder";
 
-            /**
-             * Open/Close
-             */
+            /* File new Records */
+            permissions["file"] = capabilities["Create"];
+
+            /* Open/Closed */
             if (asset.properties["rma:isClosed"])
             {
-               permissions["openRecordFolder"] = true;
                status["closed"] = true;
+               if (capabilities["ReOpenFolders"])
+               {
+                  permissions["openFolder"] = true;
+               }
             }
             else
             {
-               permissions["file"] = true;
-               permissions["closeRecordFolder"] = true;
                status["open"] = true;
+               if (capabilities["CloseFolders"])
+               {
+                  permissions["closeFolder"] = true;
+               }
             }
 
             /**
-             * Disposition Actions
+             * Disposition Actions.
+             *
+             * Note: Will be filtered later in Evaluator.filterDispositionActions()
              */
             permissions["accession"] = true;
             permissions["cutoff"] = true;
             permissions["destroy"] = true;
             permissions["transfer"] = true;
 
-            /**
-             * Freeze/Unfreeze
-             */
+            /* Frozen/Unfrozen */
             if (asset.hasAspect("rma:frozen"))
             {
-               permissions["Unfreeze"] = true;
                status["frozen"] = true;
+               if (capabilities["Unfreeze"])
+               {
+                  permissions["unfreeze"] = true;
+               }
             }
             else
             {
-               permissions["freeze"] = true;
+               if (capabilities["ExtendRetentionPeriodOrFreeze"])
+               {
+                  permissions["freeze"] = true;
+               }
             }
             break;
 
@@ -251,6 +268,7 @@ var Evaluator =
              * Reviewed
              * Rules: Has rma:vitalRecord aspect and rma:reviewAsOf date exists and is before now
              */
+            /*
             if (asset.hasAspect("rma:vitalRecord"))
             {
                if (asset.properties["rma:reviewAsOf"] != null && asset.properties["rma:reviewAsOf"] < now)
@@ -258,11 +276,12 @@ var Evaluator =
                   permissions["reviewed"] = true;
                }
             }
+            */
 
             /**
              * Disposition Actions
              *
-             * Note: Development values currently
+             * Note: Will be filtered later in Evaluator.filterDispositionActions()
              */
             if (!asset.hasAspect("rma:cutOff"))
             {
@@ -272,23 +291,24 @@ var Evaluator =
                permissions["transfer"] = true;
             }
 
-            /**
-             * Freeze/Unfreeze
-             */
+            /* Frozen/Unfrozen */
             if (asset.hasAspect("rma:frozen"))
             {
-               permissions["Unfreeze"] = true;
                status["frozen"] = true;
+               if (capabilities["Unfreeze"])
+               {
+                  permissions["unfreeze"] = true;
+               }
             }
             else
             {
-               permissions["freeze"] = true;
+               if (capabilities["ExtendRetentionPeriodOrFreeze"])
+               {
+                  permissions["freeze"] = true;
+               }
             }
-            permissions["undeclareRecord"] = true;
             
-            /**
-             * Electronic/Non-electronic documents
-             */
+            /* Electronic/Non-electronic documents */
             if (asset.typeShort == "rma:nonElectronicDocument")
             {
                assetType = "record-nonelec";
@@ -305,11 +325,8 @@ var Evaluator =
           */
          case "undeclared-record":
             actionSet = "undeclaredRecord";
-            permissions["declareRecord"] = true;
 
-            /**
-             * Electronic/Non-electronic documents
-             */
+            /* Electronic/Non-electronic documents */
             if (asset.typeShort == "rma:nonElectronicDocument")
             {
                assetType = "undeclared-record-nonelec";
@@ -326,9 +343,14 @@ var Evaluator =
           */
          case "transfer-container":
             actionSet = "transferContainer";
-            permissions["download-zip"] = true;
-            permissions["file-report"] = true;
-            permissions["transfer-complete"] = true;
+            break;
+
+
+         /**
+          * SPECIFIC TO: ACCESSION CONTAINERS
+          */
+         case "accession-container":
+            actionSet = "accessionContainer";
             break;
 
 
@@ -340,6 +362,7 @@ var Evaluator =
             permissions["Unfreeze"] = true;
             permissions["ViewUpdateReasonsForFreeze"] = true;
             break;
+
 
          /**
           * SPECIFIC TO: LEGACY TYPES
