@@ -89,5 +89,5 @@ public interface DOD5015Model extends RecordsManagementModel
     public static final QName PROP_CONTENT_MANAGEMENT_SYSTEM = QName.createQName(DOD_URI, "contentManagementSystem");
     
     // Ghosted record
-    public static QName ASPECT_GHOSTED = QName.createQName(RecordsManagementModel.RM_URI, "ghosted");    
+    public static QName ASPECT_GHOSTED = QName.createQName(DOD_URI, "ghosted");    
 }
