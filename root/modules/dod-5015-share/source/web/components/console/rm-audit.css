@@ -1,69 +1,69 @@
-#audit 
+.audit 
 {
    padding: 1em;
 }
-#audit .yui-u
+.audit .yui-u
 {
    text-align:right;
 }
 
-#audit .first
+.audit .first
 {
    text-align: left;
 }
-#audit h2
+.audit h2
 {
    font-size: 120%;       
 }
-#audit-log .yui-u
+.audit-log .yui-u
 {
    width: 100%;
 }
-#audit-log
+.audit-log
 {
    margin-top: 1em;
    position: relative;
 }
-#audit-log .yui-dt table
+.audit-log .yui-dt table
 {
    width:100%;
 }
-#audit-log .yui-dt caption
+.audit-log .yui-dt caption
 {
    text-align: left;
    font:100% normal Arial,sans-serif;
 }
-#audit-log .first
+.audit-log .first
 {
    text-align: right;
 }
-#audit-info p
+.audit-info p
 {
    margin-top:0.5em;
    padding:0;
 }
 
-#filterActions
+.filterActions
 {
    float: right;
 }
-#audit #filterActions,
-#audit #defaultActions
+.audit .filterActions,
+.audit .defaultActions
 {
    display: none;
    float: right;
 }
-#audit #filterActions .yui-button,
-#audit #defaultActions .yui-button
+.audit .filterActions .yui-button,
+.audit .defaultActions .yui-button
 {
    vertical-align: middle;
 }
-#audit #defaultActions.active,
-#audit #filterActions.active    
+.audit .defaultActions.active,
+.audit .filterActions.active    
 {
    display: inline;
 }
-#audit-peoplefinder
+.audit-peoplefinder
 {
    display: none;
    position: absolute;
@@ -71,69 +71,65 @@
    top: 1em;
    z-index: 100;
 }
-#audit-peoplefinder.active
+.audit-peoplefinder.active
 {
    display: block;
 }
-#personFilter
+.personFilter
 {
    display: inline;
 }
-#personFilterRemove
+.personFilterRemove
 {
    vertical-align: middle;
    margin: 0 5px;
    display: none;
 }
-#personFilter.active #personFilterRemove
+.personFilter.active .personFilterRemove
 {
    display: inline;
 }
-#personFilterRemove img
+.personFilterRemove img
 {
    vertical-align: middle;
 }
-#audit-peoplefinder
+.audit-peoplefinder
 {
    width: 30em;
 }
 
 /* audit log popup page */
-#doc3
-{
-   margin: 0;
-}
-#audit-popup-log #audit-info
+.audit-popup-log .audit-info
 {
    margin: 1em;
 }
-#audit-popup-log #auditDT
+.audit-popup-log .auditDT
 {
    margin:0 1em;
 }
-#audit-popup-log #auditDT table
+.audit-popup-log .auditDT table
 {
    width: 100%;
 }
-#audit-popup-log #auditDT caption
+.audit-popup-log .auditDT caption
 {
    visibility: hidden;
 }
-#audit-popup-log #audit
+.audit-popup-log .audit
 {
    padding: 0;
 }
-#audit-popup-log #audit-search
+.audit-popup-log .audit-search
 {
    width: 100%;
    text-align: center;
    padding: 0.5em;
 }
-#audit-popup-log #search
+.audit-popup-log .search
 {
    vertical-align: middle;
 }
-#audit-popup-log #audit #defaultActions.active
+.audit-popup-log .audit .defaultActions.active
 {
    margin-right:1em;
 }

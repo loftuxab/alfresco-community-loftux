@@ -1,33 +1,33 @@
 <script type="text/javascript" charset="utf-8">    
-    new Alfresco.RM_Audit('audit').setOptions(
+    new Alfresco.RM_Audit('${htmlid}-audit').setOptions(
        {
           'viewMode':Alfresco.RM_Audit.VIEW_MODE_COMPACT,
           'enabled' : ${auditStatus.enabled?string},
           'startDate':"${auditStatus.started}",
           'stopDate':"${auditStatus.stopped}",
-          'pollInterval':5000          
+          'pollInterval':20000          
        }
     ).setMessages(${messages});
   </script>
-<div id="audit">
+<div id="${htmlid}-audit" class="audit">
  <div class="yui-gc">
    	<div class="yui-u first">
-          <div id="audit-info">
+          <div id="${htmlid}-audit-info" class="audit-info">
             <h1>${msg("label.title")}</h1>
-            <p id="audit-from-date">${msg('label.from')}</p>
-            <p id="audit-to-date">${msg('label.to')}</p>
+            <p id="${htmlid}-audit-from-date" class="audit-from-date">${msg('label.from')}</p>
+            <p id="${htmlid}-audit-to-date" class="audit-to-date">${msg('label.to')}</p>
           </div>
    	</div>
     </div>    
-    <div id="audit-log" class="yui-gc">
-   	<div class="yui-u first">
-         <div id="defaultActions" class="active">
-            <label for="audit-specifyfilter">${msg("label.show-log-for")}</label> <div id="personFilter"><span>${msg("label.all-users")}</span><a id="personFilterRemove"><img src="${page.url.context}/components/images/remove-icon-16.png"  alt="${msg('label.remove-filter')}"/></a></div>
-               <button id="audit-specifyfilter" name="audit-specifyfilter">${msg("label.button-specify")}</button>
+    <div id="${htmlid}-audit-log" class="yui-gc audit-log">
+   	<div class="yui-u">
+         <div id="${htmlid}-defaultActions" class="active defaultActions">
+            <label for="audit-specifyfilter">${msg("label.show-log-for")}</label> <div id="${htmlid}-audit-personFilter" class="personFilter"><span>${msg("label.all-users")}</span><a id="${htmlid}-personFilterRemove" class="personFilterRemove"><img src="${page.url.context}/components/images/remove-icon-16.png"  alt="${msg('label.remove-filter')}"/></a></div>
+               <button id="${htmlid}-audit-specifyfilter" name="audit-specifyfilter" class="audit-specifyfilter">${msg("label.button-specify")}</button>
          </div>
-         <div id="audit-peoplefinder">
+         <div id="${htmlid}-audit-peoplefinder" class="audit-peoplefinder">
          </div>
-         <div id="auditDT">
+         <div id="${htmlid}-audit-auditDT" class="auditDT">
          </div>    
       </div>
     </div>
