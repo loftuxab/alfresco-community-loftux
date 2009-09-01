@@ -22,7 +22,7 @@
          "eventDisplayLabel" : "No longer needed"
       },
       {
-         "eventType" : "rmEventType.simple",
+         "eventType" : "rmEventType.superseded",
          "eventName" : "superseded",
          "eventDisplayLabel" : "Superseded"
       },
@@ -42,7 +42,7 @@
          "eventDisplayLabel" : "Related Record Transfered To Inactive Storage"
       },
       {
-         "eventType" : "rmEventType.simple",
+         "eventType" : "rmEventType.obsolete",
          "eventName" : "obsolete",
          "eventDisplayLabel" : "Obsolete"
       },

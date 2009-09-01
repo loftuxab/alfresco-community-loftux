@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -63,7 +62,9 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class RecordsManagementServiceImpl implements RecordsManagementService,
                                                      RecordsManagementModel,
-                                                     ApplicationContextAware
+                                                     ApplicationContextAware,
+                                                     RecordsManagementPolicies.OnCreateReference,
+                                                     RecordsManagementPolicies.OnRemoveReference
 {
     /** Service registry */
     private RecordsManagementServiceRegistry serviceRegistry;
@@ -79,9 +80,6 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     
     /** Records management action service */
     private RecordsManagementActionService rmActionService;
-    
-    /** Configured simple events */
-    private Properties configuredSimpleEvents;
 
     /** Well-known location of the scripts folder. */
     private NodeRef scriptsFolderNodeRef = new NodeRef("workspace", "SpacesStore", "rm_scripts");
@@ -160,6 +158,15 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"),
         		ASPECT_FILE_PLAN_COMPONENT,
                 new JavaBehaviour(this, "onChangeToAnyRmProperty", NotificationFrequency.TRANSACTION_COMMIT));
+        
+        // Reference behaviours
+        policyComponent.bindClassBehaviour(RecordsManagementPolicies.ON_CREATE_REFERENCE, 
+                                           ASPECT_RECORD, 
+                                           new JavaBehaviour(this, "onCreateReference", NotificationFrequency.TRANSACTION_COMMIT));
+
+        policyComponent.bindClassBehaviour(RecordsManagementPolicies.ON_REMOVE_REFERENCE, 
+                                           ASPECT_RECORD, 
+                                           new JavaBehaviour(this, "onRemoveReference", NotificationFrequency.TRANSACTION_COMMIT));
     }
     
     /**
@@ -227,6 +234,32 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                             QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("dispositionSchedule")),
                             TYPE_DISPOSITION_SCHEDULE);
             }
+        }
+    }
+
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference#onCreateReference(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+     */
+    public void onCreateReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference)
+    {
+        // Deal with versioned records
+        if (reference.equals(QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, "versions")) == true)
+        {
+            // Apply the versioned aspect to the from node
+            this.nodeService.addAspect(fromNodeRef, ASPECT_VERSIONED_RECORD, null);
+        }
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnRemoveReference#onRemoveReference(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+     */
+    public void onRemoveReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference)
+    {
+        // Deal with versioned records
+        if (reference.equals(QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, "versions")) == true)
+        {
+            // Apply the versioned aspect to the from node
+            this.nodeService.removeAspect(fromNodeRef, ASPECT_VERSIONED_RECORD);
         }
     }
     

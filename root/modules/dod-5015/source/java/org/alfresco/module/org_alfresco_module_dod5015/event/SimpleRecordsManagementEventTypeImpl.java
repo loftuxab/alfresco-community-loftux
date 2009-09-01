@@ -17,10 +17,10 @@ public class SimpleRecordsManagementEventTypeImpl implements RecordsManagementEv
     protected static final String LOOKUP_PREFIX = "rmeventservice.";
     
     /** Records management event service */
-    private RecordsManagementEventService recordsManagementEventService;
+    protected RecordsManagementEventService recordsManagementEventService;
     
     /** Name */
-    private String name;
+    protected String name;
     
     /**
      * Set the records management event service

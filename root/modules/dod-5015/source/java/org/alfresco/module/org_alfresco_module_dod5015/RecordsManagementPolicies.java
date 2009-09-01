@@ -44,6 +44,8 @@ public interface RecordsManagementPolicies
     public static final QName ON_RM_ACTION_EXECUTION = QName.createQName(NamespaceService.ALFRESCO_URI, "onRMActionExecution");
     public static final QName BEFORE_CREATE_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, "beforeCreateReference");
     public static final QName ON_CREATE_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateReference");
+    public static final QName BEFORE_REMOVE_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, "beforeRemoveReference");
+    public static final QName ON_REMOVE_REFERENCE = QName.createQName(NamespaceService.ALFRESCO_URI, "onRemoveReference");
     
     /** Before records management action execution */
     public interface BeforeRMActionExecution extends ClassPolicy
@@ -67,5 +69,17 @@ public interface RecordsManagementPolicies
     public interface OnCreateReference extends ClassPolicy
     {
         public void onCreateReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference);
+    }
+    
+    /** Before removal of reference */
+    public interface BeforeRemoveReference extends ClassPolicy
+    {
+        public void beforeRemoveReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference);
+    }
+    
+    /** On removal of reference */
+    public interface OnRemoveReference extends ClassPolicy
+    {
+        public void onRemoveReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference);
     }
 }

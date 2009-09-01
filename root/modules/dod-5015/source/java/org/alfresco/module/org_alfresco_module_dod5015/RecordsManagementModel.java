@@ -73,6 +73,7 @@ public interface RecordsManagementModel extends RecordsManagementCustomModel
     public static QName PROP_DISPOSITION_PERIOD_PROPERTY = QName.createQName(RM_URI, "dispositionPeriodProperty");
     public static QName PROP_DISPOSITION_EVENT = QName.createQName(RM_URI, "dispositionEvent");
     public static QName PROP_DISPOSITION_EVENT_COMBINATION = QName.createQName(RM_URI, "dispositionEventCombination");
+    
     // Records folder
     public static QName TYPE_RECORD_FOLDER = QName.createQName(RM_URI, "recordFolder");
     public static QName PROP_IS_CLOSED = QName.createQName(RM_URI, "isClosed");
@@ -167,4 +168,7 @@ public interface RecordsManagementModel extends RecordsManagementCustomModel
 	public static QName TYPE_TRANSFER = QName.createQName(RM_URI, "transfer");
 	public static QName PROP_TRANSFER_ACCESSION_INDICATOR = QName.createQName(RM_URI, "transferAccessionIndicator");
     public static QName ASSOC_TRANSFERRED = QName.createQName(RM_URI, "transferred");
+    
+    // Versioned record aspect
+    public static QName ASPECT_VERSIONED_RECORD = QName.createQName(RM_URI, "versionedRecord");
 }

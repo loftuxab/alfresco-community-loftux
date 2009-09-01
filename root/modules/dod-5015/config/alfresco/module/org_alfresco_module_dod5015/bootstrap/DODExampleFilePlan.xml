@@ -529,6 +529,7 @@
                                             <view:properties>
                                                 <rma:dispositionActionName>transfer</rma:dispositionActionName>
                                                 <rma:dispositionDescription>Retire to offline storage.</rma:dispositionDescription>
+                                                <rma:dispositionLocation>Offline Storage</rma:dispositionLocation>
                                                 <rma:dispositionPeriod>year|2</rma:dispositionPeriod>
                                                 <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                             </view:properties>                              
@@ -536,7 +537,8 @@
                                         <rma:dispositionActionDefinition view:childName="rma:dispositionActionDefinition">                              
                                             <view:properties>
                                                 <rma:dispositionActionName>transfer</rma:dispositionActionName>
-                                                <rma:dispositionDescription>Transfer to federal records holding area.</rma:dispositionDescription>
+                                                <rma:dispositionDescription>Transfer to federal records holding area.</rma:dispositionDescription>                   
+                                                <rma:dispositionLocation>Federal Records Holding</rma:dispositionLocation>
                                                 <rma:dispositionPeriod>year|5</rma:dispositionPeriod>
                                                 <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAsOf</rma:dispositionPeriodProperty>
                                             </view:properties>                              
@@ -545,6 +547,7 @@
                                             <view:properties>
                                                 <rma:dispositionActionName>accession</rma:dispositionActionName>
                                                 <rma:dispositionDescription>Transfer to NARA.</rma:dispositionDescription>
+                                                <rma:dispositionLocation>NARA</rma:dispositionLocation>
                                                 <rma:dispositionPeriod>year|25</rma:dispositionPeriod>
                                                 <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                             </view:properties>                              
@@ -938,6 +941,7 @@
                                             <view:properties>
                                                 <rma:dispositionActionName>transfer</rma:dispositionActionName>
                                                 <rma:dispositionDescription>Transfer to inactive storage.</rma:dispositionDescription>
+                                                <rma:dispositionLocation>Inactive Storage</rma:dispositionLocation>
                                                 <rma:dispositionPeriod>year|5</rma:dispositionPeriod>
                                                 <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                             </view:properties>                              
@@ -946,6 +950,7 @@
                                             <view:properties>
                                                 <rma:dispositionActionName>accession</rma:dispositionActionName>
                                                 <rma:dispositionDescription>Transfer to NARA.</rma:dispositionDescription>
+                                                <rma:dispositionLocation>NARA</rma:dispositionLocation>
                                                 <rma:dispositionPeriod>year|25</rma:dispositionPeriod>
                                                 <rma:dispositionPeriodProperty>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</rma:dispositionPeriodProperty>
                                             </view:properties>                              

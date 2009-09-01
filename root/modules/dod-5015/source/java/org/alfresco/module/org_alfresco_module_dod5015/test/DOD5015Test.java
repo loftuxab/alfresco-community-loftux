@@ -87,9 +87,10 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.PropertyMap;
+import org.bouncycastle.crypto.tls.RecordStream;
 
 /**
- * 
+ * DOD System Test
  * 
  * @author Roy Wetherall, Neil McErlean
  */
@@ -843,6 +844,173 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 return null;
             }          
         });                  
+    }
+    
+    public void testAutoSuperseded()
+    {
+        final NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Civilian Files", "Employee Performance File System Records");    
+        assertNotNull(recordCategory);
+        assertEquals("Employee Performance File System Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+        
+        final NodeRef recordFolder = createRecordFolder(recordCategory, "Test Record Folder");
+        
+        // Before we start just remove any outstanding transfers
+        final NodeRef rootNode = this.rmService.getRecordsManagementRoot(recordCategory);
+        List<ChildAssociationRef> tempAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
+        for (ChildAssociationRef tempAssoc : tempAssocs)
+        {
+            this.nodeService.deleteNode(tempAssoc.getChildRef());
+        }
+        
+        setComplete();
+        endTransaction();
+        
+        final NodeRef recordOne = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecord(recordFolder, "one.txt");
+            }          
+        });
+        final NodeRef recordTwo = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecord(recordFolder, "two.txt");
+            }          
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_RECORD));
+                
+                declareRecord(recordOne);
+                declareRecord(recordTwo);  
+                
+                return null;
+            }
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                
+                DispositionAction da = rmService.getNextDispositionAction(recordOne);
+                assertNotNull(da);
+                assertEquals("cutoff", da.getName());
+                assertFalse(da.isEventsEligible());
+                List<EventCompletionDetails> events = da.getEventCompletionDetails();
+                assertNotNull(events);
+                assertEquals(1, events.size());
+                EventCompletionDetails event = events.get(0);
+                assertEquals("superseded", event.getEventName());
+                assertFalse(event.isEventComplete());
+                assertNull(event.getEventCompletedAt());
+                assertNull(event.getEventCompletedBy());
+                
+                rmAdminService.addCustomReference(recordOne, recordTwo, QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, "supersedes"));
+                
+                return null;
+            }          
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                DispositionAction da = rmService.getNextDispositionAction(recordOne);
+                assertNotNull(da);
+                assertEquals("cutoff", da.getName());
+                assertTrue(da.isEventsEligible());
+                List<EventCompletionDetails> events = da.getEventCompletionDetails();
+                assertNotNull(events);
+                assertEquals(1, events.size());
+                EventCompletionDetails event = events.get(0);
+                assertEquals("superseded", event.getEventName());
+                assertTrue(event.isEventComplete());
+                assertNotNull(event.getEventCompletedAt());
+                assertNotNull(event.getEventCompletedBy());
+                
+                return null;
+            }          
+        });
+    }
+    
+    public void testVersioned()
+    {
+        final NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Civilian Files", "Employee Performance File System Records");    
+        assertNotNull(recordCategory);
+        assertEquals("Employee Performance File System Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+        
+        final NodeRef recordFolder = createRecordFolder(recordCategory, "Test Record Folder");
+        
+        // Before we start just remove any outstanding transfers
+        final NodeRef rootNode = this.rmService.getRecordsManagementRoot(recordCategory);
+        List<ChildAssociationRef> tempAssocs = this.nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
+        for (ChildAssociationRef tempAssoc : tempAssocs)
+        {
+            this.nodeService.deleteNode(tempAssoc.getChildRef());
+        }
+        
+        setComplete();
+        endTransaction();
+        
+        final NodeRef recordOne = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecord(recordFolder, "one.txt");
+            }          
+        });
+        final NodeRef recordTwo = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecord(recordFolder, "two.txt");
+            }          
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_RECORD));
+                
+                declareRecord(recordOne);
+                declareRecord(recordTwo);  
+                
+                assertFalse(nodeService.hasAspect(recordOne, ASPECT_VERSIONED_RECORD));
+                
+                rmAdminService.addCustomReference(recordOne, recordTwo, QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, "versions"));
+                
+                return null;
+            }
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_VERSIONED_RECORD));
+                
+                rmAdminService.removeCustomReference(recordOne, recordTwo, QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, "versions"));
+                
+                return null;
+            }
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertFalse(nodeService.hasAspect(recordOne, ASPECT_VERSIONED_RECORD));
+                
+                return null;
+            }
+        });
     }
     
     public void testDispositionLifecycle_0430_02_transfer() throws Exception
@@ -2313,7 +2481,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // This test formerly tested a single RecordCategory like so:
         // NodeRef recordCategory = this.getRecordCategory("Miscellaneous Files", "Civilian Employee Training Program Records");
-    }
+    }    
     
     /**
      * Gets all Record Categories under the SPACES_STORE.

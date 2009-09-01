@@ -101,6 +101,20 @@
     
     <bean id="rmEventType.simple" class="org.alfresco.module.org_alfresco_module_dod5015.event.SimpleRecordsManagementEventTypeImpl" parent="rmEventType"/>
     
+    <bean id="rmEventType.superseded" class="org.alfresco.module.org_alfresco_module_dod5015.event.OnReferenceCreateEventType" parent="rmEventType">        
+        <property name="referenceName" value="{http://www.alfresco.org/model/rmcustom/1.0}supersedes"/>
+        <property name="recordsManagementService" ref="recordsManagementService"/>
+        <property name="recordsManagementActionService" ref="recordsManagementActionService"/>  
+        <property name="policyComponent" ref="policyComponent"/>    
+    </bean>
+    
+    <bean id="rmEventType.obsolete" class="org.alfresco.module.org_alfresco_module_dod5015.event.OnReferenceCreateEventType" parent="rmEventType">
+        <property name="referenceName" value="{http://www.alfresco.org/model/rmcustom/1.0}obsoletes"/>
+        <property name="recordsManagementService" ref="recordsManagementService"/>
+        <property name="recordsManagementActionService" ref="recordsManagementActionService"/>
+        <property name="policyComponent" ref="policyComponent"/>    
+    </bean>
+    
     <!-- Scheduled actions -->
     
     <!-- NotifyOfRecordsDueForReview Job -->

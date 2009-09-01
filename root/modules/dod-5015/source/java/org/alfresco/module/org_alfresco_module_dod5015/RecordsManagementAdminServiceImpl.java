@@ -37,7 +37,9 @@ import java.util.Set;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeCreateReference;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeRemoveReference;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnRemoveReference;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint;
 import org.alfresco.repo.content.MimetypeMap;
@@ -110,8 +112,10 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     
     /** Policy delegates */
     private ClassPolicyDelegate<BeforeCreateReference> beforeCreateReferenceDelegate;
-    private ClassPolicyDelegate<OnCreateReference> onCreateReferenceDelegate;
-
+    private ClassPolicyDelegate<OnCreateReference> onCreateReferenceDelegate;    
+    private ClassPolicyDelegate<BeforeRemoveReference> beforeRemoveReferenceDelegate;
+    private ClassPolicyDelegate<OnRemoveReference> onRemoveReferenceDelegate;
+    
     /**
      * @param dictionaryService     the dictionary service
      */
@@ -157,6 +161,8 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         // Register the various policies
         beforeCreateReferenceDelegate = policyComponent.registerClassPolicy(BeforeCreateReference.class);
         onCreateReferenceDelegate = policyComponent.registerClassPolicy(OnCreateReference.class);
+        beforeRemoveReferenceDelegate = policyComponent.registerClassPolicy(BeforeRemoveReference.class);
+        onRemoveReferenceDelegate = policyComponent.registerClassPolicy(OnRemoveReference.class);
     }
 	
     protected void invokeBeforeCreateReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference)
@@ -175,6 +181,24 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         // execute policy for node type and aspects
         OnCreateReference policy = onCreateReferenceDelegate.get(qnames);
         policy.onCreateReference(fromNodeRef, toNodeRef, reference);
+    }
+    
+    protected void invokeBeforeRemoveReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference)
+    {
+        // get qnames to invoke against
+        Set<QName> qnames = RecordsManagementPoliciesUtil.getTypeAndAspectQNames(nodeService, fromNodeRef);
+        // execute policy for node type and aspects
+        BeforeRemoveReference policy = beforeRemoveReferenceDelegate.get(qnames);
+        policy.beforeRemoveReference(fromNodeRef, toNodeRef, reference);
+    }
+    
+    protected void invokeOnRemoveReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference)
+    {
+        // get qnames to invoke against
+        Set<QName> qnames = RecordsManagementPoliciesUtil.getTypeAndAspectQNames(nodeService, fromNodeRef);
+        // execute policy for node type and aspects
+        OnRemoveReference policy = onRemoveReferenceDelegate.get(qnames);
+        policy.onRemoveReference(fromNodeRef, toNodeRef, reference);
     }
 
 	/**
@@ -372,6 +396,8 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 		{
 			throw new IllegalArgumentException("No such custom reference: " + assocId);
 		}
+		
+		invokeBeforeRemoveReference(fromNode, toNode, assocId);
 
 		if (assocDef.isChild())
 		{
@@ -388,6 +414,8 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 		{
 			nodeService.removeAssociation(fromNode, toNode, assocId);
 		}
+		
+		invokeOnRemoveReference(fromNode, toNode, assocId);
 	}
 
 	public List<AssociationRef> getCustomReferencesFor(NodeRef node)
