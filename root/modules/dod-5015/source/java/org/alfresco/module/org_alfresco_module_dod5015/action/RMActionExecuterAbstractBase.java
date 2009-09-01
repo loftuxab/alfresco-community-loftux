@@ -85,9 +85,6 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
 {
     private static final String KEY_RM_ACTION_AUDIT_PARAMETERS = "RM.ACTION.AUDIT_PARAMETERS";
     
-    /** Action name */
-    //protected String name;
-    
     /** Namespace service */
     protected NamespaceService namespaceService;
     
@@ -373,7 +370,14 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
         {
             this.action = action;
             this.nodeRef = nodeRef;
-            this.parameters = new HashMap<String, Serializable>(parameters);   // Deliberate copy
+            if (this.parameters != null)
+            {
+                this.parameters = new HashMap<String, Serializable>(parameters);   // Deliberate copy
+            }
+            else
+            {
+                this.parameters = new HashMap<String, Serializable>(0);
+            }
         }
 
         public RMActionExecuterAbstractBase getAction()
