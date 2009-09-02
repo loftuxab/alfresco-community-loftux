@@ -37,9 +37,7 @@ function main()
          }
          constraint.updateAllowedValues(allowedValues);
       }
-      
-      var constraint = caveatConfig.getConstraint(shortName);
-      
+            
       // Pass the constraint detail to the template
       model.constraint = constraint;
 

@@ -570,7 +570,7 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
             allowedValues.add(value);
         }
         
-        QName listQName = QName.createQName(listName); 
+        QName listQName = QName.createQName(listName, namespaceService); 
         
         // TODO review - constraints cannot be deleted
         // TEMP review - if it already exists then change it for now
@@ -591,7 +591,12 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         caveatConfig.put(listName, emptyConstraint);
         updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));
         
-        return getRMConstraint(listName);
+        RMConstraintInfo info = new RMConstraintInfo();
+        info.setName(listQName.toPrefixString());
+        info.setTitle(title);
+        info.setAllowedValues(values);
+        info.setCaseSensitive(true);
+        return info;
     }
     
     /**
@@ -604,7 +609,7 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         caveatConfig.remove(listName);
         updateOrCreateCaveatConfig(convertToJSONString(caveatConfig));
         
-        QName listQName = QName.createQName(listName);
+        QName listQName = QName.createQName(listName, namespaceService);
         
         // TODO - incremental delete not currently supported, for now change title and set empty list
         
@@ -616,20 +621,19 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         recordsManagementAdminService.changeCustomConstraintTitle(listQName, RESERVED_TITLE);
     }
     
-    @SuppressWarnings("unused")
-    private ConstraintDefinition getCustomConstraintDefinition(QName constraintName)
-    {
-        //TODO
-        List<ConstraintDefinition> defs = recordsManagementAdminService.getCustomConstraintDefinitions();
-        for(ConstraintDefinition def : defs)
-        {
-            if(def.getName().equals(constraintName))
-            {
-                return def;
-            }
-        }
-        return null;
-    }
+//    @SuppressWarnings("unused")
+//    private ConstraintDefinition getCustomConstraintDefinition(QName constraintName)
+//    {
+//        List<ConstraintDefinition> defs = recordsManagementAdminService.getCustomConstraintDefinitions();
+//        for(ConstraintDefinition def : defs)
+//        {
+//            if(def.getName().equals(constraintName))
+//            {
+//                return def;
+//            }
+//        }
+//        return null;
+//    }
     
     /**
      * Add a single value to an authority in a list.   The existing values of the list remain.
@@ -800,45 +804,66 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
     public Set<RMConstraintInfo> getAllRMConstraints()
     {
         Set<RMConstraintInfo> info = new HashSet<RMConstraintInfo>();
-        for(String key : caveatConfig.keySet())
-        {            
-            RMConstraintInfo i = getRMConstraint(key);
-            info.add(i);
+          
+        List<ConstraintDefinition> defs = recordsManagementAdminService.getCustomConstraintDefinitions();
+        for(ConstraintDefinition dictionaryDef : defs)
+        {
+            Constraint con = dictionaryDef.getConstraint();
+            if (con instanceof RMListOfValuesConstraint)
+            {
+                RMListOfValuesConstraint def = (RMListOfValuesConstraint)con; 
+                RMConstraintInfo i = new RMConstraintInfo();
+                i.setName(def.getShortName());
+                i.setTitle(def.getTitle());
+                List<String> allowedValues = def.getAllowedValues();
+                i.setAllowedValues(allowedValues.toArray(new String[allowedValues.size()]));
+                i.setCaseSensitive(def.isCaseSensitive());
+                info.add(i);
+            }
+            
         }
+
         return info;
+    }
+    
+    /**
+     * Get an RMConstraintInfo
+     * @param listQName
+     * @return the constraint or null if it does not exist
+     */
+    public RMConstraintInfo getRMConstraint(QName listQName)
+    {
+        
+        ConstraintDefinition dictionaryDef = recordsManagementAdminService.getCustomConstraintDefinition(listQName);
+        if(dictionaryDef != null)
+        {
+            Constraint con = dictionaryDef.getConstraint();
+            if (con instanceof RMListOfValuesConstraint)
+            {
+                RMListOfValuesConstraint def = (RMListOfValuesConstraint)con; 
+
+                RMConstraintInfo info = new RMConstraintInfo();
+                info.setName(listQName.toPrefixString());
+                info.setTitle(con.getTitle());
+                List<String> allowedValues = def.getAllowedValues();
+                info.setAllowedValues(allowedValues.toArray(new String[allowedValues.size()]));
+                info.setCaseSensitive(def.isCaseSensitive());
+                return info;
+            }
+        }
+        return null;
     }
 
     /**
      * Get RM Constraint detail.
+     * 
+     * @return the constraintInfo or null
      */
     public RMConstraintInfo getRMConstraint(String listName)
     {
-        QName listQName = QName.createQName(listName); 
+        QName listQName = QName.createQName(listName, namespaceService); 
+        return getRMConstraint(listQName);
         
-        ConstraintDefinition dictionaryDef = getCustomConstraintDefinition(listQName);
-        
-        if(caveatConfig.keySet().contains(listName))
-        { 
-            // TODO Need to get data from data dictionary
-            //if (getCustomConstraintDefinition(new QName()) != null)
-      
-            RMConstraintInfo info = new RMConstraintInfo();
-            
-            info.setName(listName);
-            info.setTitle("Display title for " + listName);
-            String[] dummy = new String[3];
-            dummy[0]="Alpha";
-            dummy[1]="Beta";
-            dummy[2]="Gamma";
-            info.setAllowedValues(dummy);
-            info.setCaseSensitive(true);
-
-            return info;
-        }
-        else
-        {
-            return null;
-        }
     }
 
     /**
@@ -850,25 +875,54 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
      */
     public RMConstraintInfo updateRMConstraintAllowedValues(String listName, String[] allowedValues)
     {
-        QName listQName = QName.createQName(listName); 
+        QName listQName = QName.createQName(listName, namespaceService); 
         
         if(allowedValues != null)
         {
-            /**
-             * Deal with any additions
-             */
-            // TODO Not implemented
-            
-            /**
-             * Deal with any deletions
-             */
-            // TODO Not implemented
-                      
             List<String>allowedValueList = new ArrayList<String>();
             for(String value : allowedValues)
             {
                 allowedValueList.add(value);
             }
+            
+            ConstraintDefinition con = recordsManagementAdminService.getCustomConstraintDefinition(listQName);
+            if (con instanceof RMListOfValuesConstraint)
+            {
+                RMListOfValuesConstraint def = (RMListOfValuesConstraint)con; 
+                List<String> oldAllowedValues = def.getAllowedValues();
+                
+                /**
+                 * Deal with any additions
+                 */
+                for(String newValue : allowedValueList)
+                {
+                    if(!oldAllowedValues.contains(newValue))
+                    {
+                        // This is an addition
+                        if(logger.isDebugEnabled())
+                        {
+                            logger.debug("value added to list:" + listQName + ":" + newValue);
+                        }
+                    }
+                }
+                
+                /**
+                 * Deal with any deletions
+                 */
+                for(String oldValue : oldAllowedValues)
+                {
+                    if(!allowedValueList.contains(oldValue))
+                    {
+                        // This is a deletion
+                        if(logger.isDebugEnabled())
+                        {
+                            logger.debug("value removed from list:" + listQName + ":" + oldValue);
+                        }
+                        removeRMConstraintListValue(listName, oldValue);
+                    }
+                }
+            }
+
             recordsManagementAdminService.changeCustomConstraintValues(listQName, allowedValueList);
         }
         
@@ -920,6 +974,9 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
      */
     public RMConstraintInfo updateRMConstraintTitle(String listName, String newTitle)
     {
+        QName listQName = QName.createQName(listName, namespaceService); 
+        
+        recordsManagementAdminService.changeCustomConstraintTitle(listQName, newTitle);
         return getRMConstraint(listName);
     }
 }

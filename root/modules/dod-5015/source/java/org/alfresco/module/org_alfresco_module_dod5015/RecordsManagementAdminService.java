@@ -173,6 +173,11 @@ public interface RecordsManagementAdminService
      * in the results.
      */
     public List<ConstraintDefinition> getCustomConstraintDefinitions();
+    
+    /**
+     * Get a Constraint Definition object
+     */
+    public ConstraintDefinition getCustomConstraintDefinition(QName constraintName);
 
     /**
      * This method adds a Constraint definition to the custom model.
