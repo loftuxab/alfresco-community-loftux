@@ -447,7 +447,17 @@
       </aspect>
 	   
       <aspect name="rma:declaredRecord">
-         <title>Declared Record</title>  
+         <title>Declared Record</title>
+         <properties>
+            <property name="rma:declaredAt">
+               <title>Date Declared</title>
+               <type>d:date</type>
+            </property>
+            <property name="rma:declaredBy">
+               <title>Declared By</title>
+               <type>d:text</type>
+            </property>
+         </properties>
 		 <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>       

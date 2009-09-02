@@ -216,7 +216,7 @@
             </property> 
             <property name="dod:captureDate">
                 <title>Capture Date</title>
-                <type>d:text</type>
+                <type>d:date</type>
                 <mandatory>true</mandatory>
             </property> 
             <property name="dod:contact">

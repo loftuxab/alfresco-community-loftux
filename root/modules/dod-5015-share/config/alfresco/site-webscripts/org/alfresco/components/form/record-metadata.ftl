@@ -26,6 +26,12 @@
             <#if form.fields["prop_rmDeclared"]?? && form.mode == "view">
                <@formLib.renderField field=form.fields["prop_rmDeclared"] />
             </#if>
+            <#if form.fields["prop_rma_declaredAt"]?? && form.mode == "view">
+               <@formLib.renderField field=form.fields["prop_rma_declaredAt"] />
+            </#if>
+            <#if form.fields["prop_rma_declaredBy"]?? && form.mode == "view">
+               <@formLib.renderField field=form.fields["prop_rma_declaredBy"] />
+            </#if>
             <#if form.fields["prop_cm_author"]??>
                <@formLib.renderField field=form.fields["prop_cm_author"] />
             </#if>

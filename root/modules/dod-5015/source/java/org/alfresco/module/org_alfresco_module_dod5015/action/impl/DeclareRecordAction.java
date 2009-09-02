@@ -26,6 +26,8 @@ package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -69,7 +72,11 @@ public class DeclareRecordAction extends RMActionExecuterAbstractBase
                 if (mandatoryPropertiesSet(actionedUponNodeRef, missingProperties) == true)
                 {
                     // Add the declared aspect
-                    this.nodeService.addAspect(actionedUponNodeRef, ASPECT_DECLARED_RECORD, null);
+                    Map<QName, Serializable> declaredProps = new HashMap<QName, Serializable>(2);
+                    declaredProps.put(PROP_DECLARED_AT, new Date());
+                    declaredProps.put(PROP_DECLARED_BY, AuthenticationUtil.getRunAsUser());
+                    this.nodeService.addAspect(actionedUponNodeRef, ASPECT_DECLARED_RECORD, declaredProps);
+                    
                     // remove all owner related rights 
                     this.ownableService.setOwner(actionedUponNodeRef, OwnableService.NO_OWNER);
                 }

@@ -509,6 +509,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
         {
+            @SuppressWarnings("deprecation")
             public Object execute() throws Throwable
             {
                 assertTrue("Before test DECLARED aspect was set", 
@@ -521,6 +522,16 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 // Declare the record as we have set everything we should have
                 rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");
                 assertTrue(" the record is not declared", nodeService.hasAspect(recordOne, ASPECT_DECLARED_RECORD));
+                
+                // check that the declaredAt and declaredBy properties are set
+                assertNotNull(nodeService.getProperty(recordOne, PROP_DECLARED_BY));
+                assertEquals("admin", nodeService.getProperty(recordOne, PROP_DECLARED_BY));
+                assertNotNull(nodeService.getProperty(recordOne, PROP_DECLARED_AT));
+                Date dateNow = new Date();
+                Date declaredDate = (Date)nodeService.getProperty(recordOne, PROP_DECLARED_AT);
+                assertEquals(declaredDate.getDate(), dateNow.getDate());
+                assertEquals(declaredDate.getMonth(), dateNow.getMonth());
+                assertEquals(declaredDate.getYear(), dateNow.getYear());
                 
                 return null;
             }          
