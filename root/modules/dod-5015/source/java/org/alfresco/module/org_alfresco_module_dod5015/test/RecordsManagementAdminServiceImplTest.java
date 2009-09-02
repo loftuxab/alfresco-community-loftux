@@ -150,27 +150,6 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         }
     }
     
-    /**
-     * There are a number of custom reference definitions which are imported into the
-     * repository on bootup. This test ensures that a representative sample of those
-     * references have been correctly imported.
-     */
-    public void testGetPristineCustomReferenceDefinitions() throws Exception
-    {
-        Map<QName, AssociationDefinition> availableRefs = rmAdminService.getCustomReferenceDefinitions();
-        assertFalse("Expected some custom references.", availableRefs.isEmpty());
-        
-        AssociationDefinition assocDef = availableRefs.get(CUSTOM_REF_SUPERSEDES);
-        assertNotNull("assocDef was null.", assocDef);
-        final String expectedTitle = rmAdminService.getCompoundIdFor("SupersededBy", "Supersedes");
-        assertEquals(expectedTitle, assocDef.getTitle());
-        
-        // These initial references should also be in the id-mapping bean.
-        String clientIdForQName = rmAdminService.getClientIdForQName(CUSTOM_REF_SUPERSEDES);
-        assertNotNull("Incorrect clientId for pristine custom reference: " + clientIdForQName,
-                clientIdForQName);
-    }
-
     public void testCreateSimpleCustomProperties() throws Exception
     {
         setComplete();
@@ -304,7 +283,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
             generatedQName = rmAdminService.addCustomChildAssocDefinition(source, target);
         }
         System.out.println("Creating new " + refType + " reference definition: " + generatedQName);
-        System.out.println("  label: '" + label + "' source: '" + source + "' target: '" + target + "'");
+        System.out.println("  params- label: '" + label + "' source: '" + source + "' target: '" + target + "'");
         
         // We need to commit the transaction to trigger behaviour that should reload the data dictionary model.
         txn1.commit();
@@ -386,10 +365,10 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         {
             System.out.println("   - " + prop.toString());
             
-            String clientIdForQName = rmAdminService.getClientIdForQName(prop);
-            assertNotNull("null client-id for " + prop, clientIdForQName);
+            String propId = props.get(prop).getTitle();
+            assertNotNull("null client-id for " + prop, propId);
             
-            System.out.println("       " + clientIdForQName);
+            System.out.println("       " + propId);
         }     
     }
 	

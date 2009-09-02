@@ -87,10 +87,9 @@ public class CustomRefsGet extends AbstractRmWebScript
     		Map<String, String> data = new HashMap<String, String>();
 
     		QName typeQName = assRef.getTypeQName();
-    		
-    		String clientId = rmAdminService.getClientIdForQName(typeQName);
-    		
-    		data.put(LABEL, clientId);
+            AssociationDefinition assDef = rmAdminService.getCustomReferenceDefinitions().get(typeQName);
+            
+    		data.put(LABEL, assDef.getTitle());
     		data.put(REF_ID, typeQName.getLocalName());
 			data.put(REFERENCE_TYPE, CustomReferenceType.BIDIRECTIONAL.toString());
             data.put(SOURCE_REF, assRef.getSourceRef().toString());
@@ -109,10 +108,12 @@ public class CustomRefsGet extends AbstractRmWebScript
     		data.put(CHILD_REF, childAssRef.getChildRef().toString());
     		data.put(PARENT_REF, childAssRef.getParentRef().toString());
 
-            String clientId = rmAdminService.getClientIdForQName(typeQName);
+            AssociationDefinition assDef = rmAdminService.getCustomReferenceDefinitions().get(typeQName);
+            String compoundTitle = assDef.getTitle();
+
             data.put(REF_ID, typeQName.getLocalName());
 
-            String[] sourceAndTarget = rmAdminService.splitSourceTargetId(clientId);
+            String[] sourceAndTarget = rmAdminService.splitSourceTargetId(compoundTitle);
             data.put(SOURCE, sourceAndTarget[0]);
             data.put(TARGET, sourceAndTarget[1]);
 			data.put(REFERENCE_TYPE, CustomReferenceType.PARENT_CHILD.toString());

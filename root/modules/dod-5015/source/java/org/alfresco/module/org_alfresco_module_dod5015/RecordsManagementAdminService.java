@@ -230,18 +230,10 @@ public interface RecordsManagementAdminService
      * This method iterates over the custom properties, references looking for one whose id
      * exactly matches that specified.
      * 
-     * @param localName the localName part of the qname of the property or referene definition.
+     * @param localName the localName part of the qname of the property or reference definition.
      * @return the QName of the property, association definition which matches, or null.
      */
     public QName getQNameForClientId(String localName);
-
-    /**
-     * This method returns the client-side ID which corresponds to the given QName.
-     * 
-     * @param qname the QName of a custom property, reference.
-     * @return the corresponding client-side ID
-     */
-    public String getClientIdForQName(QName qname);
 
     /**
      * Given a compound id for source and target strings (as used with parent/child
