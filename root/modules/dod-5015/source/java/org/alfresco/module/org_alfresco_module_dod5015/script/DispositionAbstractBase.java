@@ -124,6 +124,11 @@ public class DispositionAbstractBase extends AbstractRmWebScript
             model.put("periodProperty", actionDef.getPeriodProperty().toPrefixString(this.namespaceService));
         }
         
+        if (actionDef.getLocation() != null)
+        {
+            model.put("location", actionDef.getLocation());
+        }
+        
         List<RecordsManagementEvent> events = actionDef.getEvents();
         if (events != null && events.size() > 0)
         {

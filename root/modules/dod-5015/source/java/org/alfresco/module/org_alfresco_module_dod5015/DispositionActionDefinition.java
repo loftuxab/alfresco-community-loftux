@@ -108,4 +108,11 @@ public interface DispositionActionDefinition
      * @return  boolean     true if eligible on first action complete, false otherwise
      */
     boolean eligibleOnFirstCompleteEvent();
+    
+    /**
+     * Get the location of the disposition (can be null)
+     * 
+     * @return  String  disposition location
+     */
+    String getLocation();
 }
