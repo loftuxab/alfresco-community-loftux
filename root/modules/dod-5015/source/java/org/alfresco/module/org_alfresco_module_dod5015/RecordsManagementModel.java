@@ -78,8 +78,10 @@ public interface RecordsManagementModel extends RecordsManagementCustomModel
     public static QName TYPE_RECORD_FOLDER = QName.createQName(RM_URI, "recordFolder");
     public static QName PROP_IS_CLOSED = QName.createQName(RM_URI, "isClosed");
     
-    // Undeclared record aspect
+    // Declared record aspect
     public static QName ASPECT_DECLARED_RECORD = QName.createQName(RM_URI, "declaredRecord");
+    public static QName PROP_DECLARED_AT = QName.createQName(RM_URI, "declaredAt");
+    public static QName PROP_DECLARED_BY = QName.createQName(RM_URI, "declaredBy");
     
     // Record aspect
     public static QName ASPECT_RECORD = QName.createQName(RM_URI, "record");
