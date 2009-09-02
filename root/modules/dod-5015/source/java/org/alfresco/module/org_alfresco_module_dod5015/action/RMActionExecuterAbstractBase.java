@@ -46,7 +46,6 @@ import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEv
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventType;
 import org.alfresco.repo.action.executer.ActionExecuterAbstractBase;
 import org.alfresco.repo.audit.AuditComponent;
-import org.alfresco.repo.audit.AuditSession;
 import org.alfresco.repo.audit.model.AuditApplication;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
@@ -449,41 +448,28 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
          */
         private void auditInTxn(List<RMActionExecutorAuditParameters> boundAuditParams) throws Throwable
         {
-            // Start and audit session
-            AuditSession auditSession = auditComponent.startAuditSession(
-                    RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
-                    RecordsManagementAuditService.RM_AUDIT_PATH_ROOT);
-            if (auditSession == null)
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("RM Audit: No session created for application.");
-                }
-                // There is nothing to do, and nothing to commit
-                RetryingTransactionHelper.getActiveUserTransaction().setRollbackOnly();
-                return;
-            }
             // Go through all the audit information and audit it
             boolean auditedSomething = false;                       // We rollback if nothing is audited
             for (RMActionExecutorAuditParameters auditParams : boundAuditParams)
             {
                 Map<String, Serializable> auditMap = new HashMap<String, Serializable>(13);
-                // The node
+                // Action node
+                auditMap.put(
+                        AuditApplication.buildPath(
+                                RecordsManagementAuditService.RM_AUDIT_PATH_ACTIONS,
+                                RecordsManagementAuditService.RM_AUDIT_PATH_NODE),
+                        auditParams.getNodeRef());
+                // Action parameters
                 String actionName = auditParams.getAction().getName();
                 String actionPath = AuditApplication.buildPath(
                                 RecordsManagementAuditService.RM_AUDIT_PATH_ACTIONS,
                                 actionName);
-                auditMap.put(
-                        AuditApplication.buildPath(
-                                actionPath,
-                                RecordsManagementAuditService.RM_AUDIT_PATH_ACTIONS_NODE),
-                        auditParams.getNodeRef());
                 for (Map.Entry<String, Serializable> actionParam : auditParams.getParameters().entrySet())
                 {
                     auditMap.put(
                             AuditApplication.buildPath(
                                     actionPath,
-                                    RecordsManagementAuditService.RM_AUDIT_PATH_ACTIONS_PARAMS,
+                                    RecordsManagementAuditService.RM_AUDIT_PATH_PARAMETERS,
                                     actionParam.getKey()),
                             actionParam.getValue());
                 }
@@ -491,7 +477,10 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
                 {
                     logger.debug("RM Audit: Auditing values: \n" + auditMap);
                 }
-                auditMap = auditComponent.audit(auditSession, auditMap);
+                auditMap = auditComponent.audit(
+                        RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
+                        RecordsManagementAuditService.RM_AUDIT_PATH_ROOT,
+                        auditMap);
                 if (auditMap.isEmpty())
                 {
                     if (logger.isDebugEnabled())
