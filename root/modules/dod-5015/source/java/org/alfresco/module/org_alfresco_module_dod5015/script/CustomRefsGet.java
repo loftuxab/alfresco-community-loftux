@@ -55,6 +55,8 @@ public class CustomRefsGet extends AbstractRmWebScript
     private static final String TARGET = "target";
     private static final String PARENT_REF = "parentRef";
     private static final String CHILD_REF = "childRef";
+    private static final String SOURCE_REF = "sourceRef";
+    private static final String TARGET_REF = "targetRef";
     private static final String CUSTOM_REFS = "customRefs";
     
     private static Log logger = LogFactory.getLog(CustomRefsGet.class);
@@ -88,12 +90,11 @@ public class CustomRefsGet extends AbstractRmWebScript
     		
     		String clientId = rmAdminService.getClientIdForQName(typeQName);
     		
-    		AssociationDefinition assDef = rmAdminService.getCustomReferenceDefinitions().get(typeQName);
     		data.put(LABEL, clientId);
-    		
     		data.put(REF_ID, typeQName.getLocalName());
-
 			data.put(REFERENCE_TYPE, CustomReferenceType.BIDIRECTIONAL.toString());
+            data.put(SOURCE_REF, assRef.getSourceRef().toString());
+            data.put(TARGET_REF, assRef.getTargetRef().toString());
     		
     		listOfReferenceData.add(data);
     	}

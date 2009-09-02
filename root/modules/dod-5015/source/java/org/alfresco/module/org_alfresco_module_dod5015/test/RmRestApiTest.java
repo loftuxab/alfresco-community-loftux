@@ -471,6 +471,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(refInstancesUrl), 200);
 
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        System.out.println(jsonRsp);
         
         JSONObject dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
