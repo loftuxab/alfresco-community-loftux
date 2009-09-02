@@ -13,7 +13,8 @@
 				"mandatory": ${prop.mandatory?string},
 				"multiValued": ${prop.multiValued?string},
 				"defaultValue": "${prop.defaultValue!""}",
-				"protected": ${prop.protected?string}
+				"protected": ${prop.protected?string},
+				"propId": "${prop.name.localName}"
 			}<#if prop_has_next>,</#if>
 			</#list>
 		}

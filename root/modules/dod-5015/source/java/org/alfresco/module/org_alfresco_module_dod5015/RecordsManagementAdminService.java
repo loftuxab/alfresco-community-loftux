@@ -68,7 +68,7 @@ public interface RecordsManagementAdminService
      * @param title - optional
      * @param description - optional
      */
-    public void addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description);
+    public QName addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description);
     
     /**
      * Add custom property definition with one optional constraint reference
@@ -84,7 +84,7 @@ public interface RecordsManagementAdminService
      * @param isProtected - TRUE if protected property
      * @param lovConstraintQName - optional custom constraint
      */
-    public void addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
+    public QName addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
     
     /**
      * 
@@ -133,9 +133,23 @@ public interface RecordsManagementAdminService
      */
     public void removeCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId);
     
-    public void addCustomAssocDefinition(String label);
+    /**
+     * This method creates a new custom association, using the given label as the title.
+     * 
+     * @param label the title of the association definition
+     * @return the QName of the newly-created association.
+     */
+    public QName addCustomAssocDefinition(String label);
     
-    public void addCustomChildAssocDefinition(String source, String target);
+    /**
+     * This method creates a new custom child association, combining the given source and
+     * target and using the combined String  as the title.
+     * 
+     * @param source
+     * @param target
+     * @return the QName of the newly-created association.
+     */
+    public QName addCustomChildAssocDefinition(String source, String target);
     
     /**
      * This method returns ConstraintDefinition objects defined in the rmc model (note: not property references or in-line defs)
@@ -190,13 +204,13 @@ public interface RecordsManagementAdminService
     public void changeCustomConstraintTitle(QName constraintName, String title);
     
     /**
-     * This method iterates over the custom properties, references looking for one whose title
+     * This method iterates over the custom properties, references looking for one whose id
      * exactly matches that specified.
      * 
-     * @param titleValue the title value to look for
+     * @param localName the localName part of the qname of the property or referene definition.
      * @return the QName of the property, association definition which matches, or null.
      */
-    public QName getQNameForClientId(String clientId);
+    public QName getQNameForClientId(String localName);
 
     /**
      * This method returns the client-side ID which corresponds to the given QName.
@@ -206,8 +220,6 @@ public interface RecordsManagementAdminService
      */
     public String getClientIdForQName(QName qname);
 
-    public QName generateQNameFor(String clientId);
-   
     /**
      * Given a compound id for source and target strings (as used with parent/child
      * custom references), this method splits the String and returns an array containing

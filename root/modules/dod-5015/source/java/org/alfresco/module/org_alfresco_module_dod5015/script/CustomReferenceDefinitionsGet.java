@@ -119,10 +119,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
     		Map<String, String> data = new HashMap<String, String>();
 
     		AssociationDefinition nextValue = entry.getValue();
-            QName serverSideQName = nextValue.getName();
     		
-    		String clientId = rmAdminService.getClientIdForQName(serverSideQName);
-
     		CustomReferenceType referenceType = nextValue instanceof ChildAssociationDefinition ?
     				CustomReferenceType.PARENT_CHILD : CustomReferenceType.BIDIRECTIONAL;
     		
@@ -137,7 +134,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
                     String[] sourceAndTarget = rmAdminService.splitSourceTargetId(nextTitle);
                     data.put(SOURCE, sourceAndTarget[0]);
                     data.put(TARGET, sourceAndTarget[1]);
-                    data.put(REF_ID, clientId);
+                    data.put(REF_ID, entry.getKey().getLocalName());
                 }
             }
             else if (CustomReferenceType.BIDIRECTIONAL.equals(referenceType))
@@ -145,7 +142,7 @@ public class CustomReferenceDefinitionsGet extends DeclarativeWebScript
                 if (nextTitle != null)
                 {
                     data.put(LABEL, nextTitle);
-                    data.put(REF_ID, clientId);
+                    data.put(REF_ID, entry.getKey().getLocalName());
                 }
             }
             else

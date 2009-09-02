@@ -31,7 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
@@ -60,14 +60,8 @@ public class CustomReferenceDefinitionPost extends AbstractRmWebScript
 
     private static Log logger = LogFactory.getLog(CustomReferenceDefinitionPost.class);
     
-    private RecordsManagementActionService rmActionService;
     private RecordsManagementAdminService rmAdminService;
     
-    public void setRecordsManagementActionService(RecordsManagementActionService rmActionService)
-    {
-		this.rmActionService = rmActionService;
-	}
-
     public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
     {
         this.rmAdminService = rmAdminService;
@@ -117,24 +111,50 @@ public class CustomReferenceDefinitionPost extends AbstractRmWebScript
             
             params.put(nextKeyString, nextValue);
         }
-        rmActionService.executeRecordsManagementAction("defineCustomAssociation", params);
-        
-        result.put("success", true);
-
-        Serializable refTypeParam = params.get(REFERENCE_TYPE);
+        String refTypeParam = (String)params.get(REFERENCE_TYPE);
         ParameterCheck.mandatory(REFERENCE_TYPE, refTypeParam);
+        CustomReferenceType refTypeEnum = CustomReferenceType.getEnumFromString(refTypeParam);
         
+        boolean isChildAssoc = refTypeEnum.equals(CustomReferenceType.PARENT_CHILD);
+        
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("Creating custom ");
+            if (isChildAssoc)
+            {
+                msg.append("child ");
+            }
+            msg.append("assoc");
+            logger.debug(msg.toString());
+        }
+
+        QName generatedQName;
+        if (isChildAssoc)
+        {
+            String source = (String)params.get(SOURCE);
+            String target = (String)params.get(TARGET);
+            
+            generatedQName = rmAdminService.addCustomChildAssocDefinition(source, target);
+        }
+        else
+        {
+            String label = (String)params.get(LABEL);
+            
+            generatedQName = rmAdminService.addCustomAssocDefinition(label);
+        }
+
         result.put(REFERENCE_TYPE, refTypeParam);
 
-        String clientId;
+        String qnameLocalName;
         if (refTypeParam.equals(CustomReferenceType.BIDIRECTIONAL.toString()))
         {
             Serializable labelParam = params.get(LABEL);
             // label is mandatory for bidirectional refs only
             ParameterCheck.mandatory(LABEL, labelParam);
 
-            clientId = labelParam.toString();
-            result.put(REF_ID, clientId);
+            qnameLocalName = generatedQName.getLocalName();
+            result.put(REF_ID, qnameLocalName);
         }
         else if (refTypeParam.equals(CustomReferenceType.PARENT_CHILD.toString()))
         {
@@ -144,14 +164,16 @@ public class CustomReferenceDefinitionPost extends AbstractRmWebScript
             ParameterCheck.mandatory(SOURCE, sourceParam);
             ParameterCheck.mandatory(TARGET, targetParam);
 
-            clientId = rmAdminService.getCompoundIdFor(sourceParam.toString(), targetParam.toString());
-            result.put(REF_ID, clientId);
+            qnameLocalName = generatedQName.getLocalName();
+            result.put(REF_ID, qnameLocalName);
         }
         else
         {
             throw new WebScriptException("Unsupported reference type: " + refTypeParam);
         }
-        result.put(URL, req.getServicePath() + "/" + clientId);
+        result.put(URL, req.getServicePath() + "/" + qnameLocalName);
+        
+        result.put("success", Boolean.TRUE);
         
         return result;
     }

@@ -40,7 +40,6 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeRemoveReference;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnRemoveReference;
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.DefineCustomElementAbstractAction;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.dictionary.M2Aspect;
@@ -87,6 +86,8 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     public static final String RMC_CUSTOM_ASSOCS = RecordsManagementCustomModel.RM_CUSTOM_PREFIX + ":customAssocs";
     
     private static final String CUSTOM_CONSTRAINT_TYPE = org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint.class.getName();
+    
+    private static final NodeRef RM_CUSTOM_MODEL_NODE_REF = new NodeRef("workspace://SpacesStore/records_management_custom_model");
     
     private static final String PARAM_ALLOWED_VALUES = "allowedValues";
     private static final String PARAM_CASE_SENSITIVE = "caseSensitive";
@@ -231,12 +232,12 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return propDefns;
     }
     
-    public void addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description)
+    public QName addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description)
     {
-        addCustomPropertyDefinition(aspectName, clientSideName, dataType, title, description, null, false, false, false, null);
+        return addCustomPropertyDefinition(aspectName, clientSideName, dataType, title, description, null, false, false, false, null);
     }
     
-    public void addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraint)
+    public QName addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraint)
     {
         //TODO title parameter is currently ignored. Intentionally.
         
@@ -291,6 +292,8 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
             logger.info("addCustomPropertyDefinition: "+clientSideName+
                     "=" + newQNameAsString + " to aspect: "+aspectName);
         }
+        
+        return newQName;
     }
     
     public void removeCustomPropertyDefinition(QName propQName)
@@ -424,7 +427,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     	return childAssocs;
 	}
 	
-    public void addCustomAssocDefinition(String label)
+    public QName addCustomAssocDefinition(String label)
     {
         ParameterCheck.mandatoryString("label", label);
         
@@ -468,9 +471,11 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         {
             logger.info("addCustomAssocDefinition: ("+label+")");
         }
+        
+        return generatedQName;
     }
 
-    public void addCustomChildAssocDefinition(String source, String target)
+    public QName addCustomChildAssocDefinition(String source, String target)
     {
         ParameterCheck.mandatoryString("source", source);
         ParameterCheck.mandatoryString("target", target);
@@ -513,6 +518,8 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         {
             logger.info("addCustomChildAssocDefinition: ("+source+","+target+")");
         }
+        
+        return generatedQName;
     }
     
     public void addCustomConstraintDefinition(QName constraintName, String title, boolean caseSensitive, List<String> allowedValues) 
@@ -670,7 +677,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     
     private M2Model readCustomContentModel()
     {
-        ContentReader reader = this.contentService.getReader(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF,
+        ContentReader reader = this.contentService.getReader(RM_CUSTOM_MODEL_NODE_REF,
                                                              ContentModel.TYPE_CONTENT);
         
         if (reader.exists() == false) {throw new AlfrescoRuntimeException("RM CustomModel has no content.");}
@@ -698,7 +705,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     
     private void writeCustomContentModel(M2Model deserializedModel)
     {
-        ContentWriter writer = this.contentService.getWriter(DefineCustomElementAbstractAction.RM_CUSTOM_MODEL_NODE_REF,
+        ContentWriter writer = this.contentService.getWriter(RM_CUSTOM_MODEL_NODE_REF,
                                                              ContentModel.TYPE_CONTENT, true);
         writer.setMimetype(MimetypeMap.MIMETYPE_XML);
         writer.setEncoding("UTF-8");
@@ -719,38 +726,31 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     
     //TODO After certification. This implementation currently does not support reference,
     // property, constraints definitions with the same names, which is technically allowed by Alfresco.
-    public QName getQNameForClientId(String titleValue)
+    public QName getQNameForClientId(String localName)
     {
         //TODO Note the implicit assumption here that all custom references will have
-        // unique titles. Can we guarantee this?
+        // unique titles. This is, in fact, not guaranteed.
         
         QName propertyResult = null;
-        for (Map.Entry<QName, PropertyDefinition> entry : getCustomPropertyDefinitions().entrySet())
+        for (QName qn : getCustomPropertyDefinitions().keySet())
         {
-            if (titleValue != null && titleValue.equals(entry.getValue().getTitle()))
+            if (localName != null && localName.equals(qn.getLocalName()))
             {
-                propertyResult = entry.getKey();
-            }
-            else if (titleValue == null && entry.getValue().getTitle() == null)
-            {
-                propertyResult = entry.getKey();
+                propertyResult = qn;
             }
         }
+        
         if (propertyResult != null)
         {
             return propertyResult;
         }
         
         QName referenceResult = null;
-        for (Map.Entry<QName, AssociationDefinition> entry : getCustomReferenceDefinitions().entrySet())
+        for (QName refQn : getCustomReferenceDefinitions().keySet())
         {
-            if (titleValue != null && titleValue.equals(entry.getValue().getTitle()))
+            if (localName != null && localName.equals(refQn.getLocalName()))
             {
-                referenceResult = entry.getKey();
-            }
-            else if (titleValue == null && entry.getValue().getTitle() == null)
-            {
-                referenceResult = entry.getKey();
+                referenceResult = refQn;
             }
         }
         
@@ -758,6 +758,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return referenceResult;
     }
 
+    //TODO Can I delete this now?
     public String getClientIdForQName(QName qname)
     {
         PropertyDefinition propDef = getCustomPropertyDefinitions().get(qname);
@@ -774,7 +775,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return null;
     }
     
-    public QName generateQNameFor(String clientId)
+    private QName generateQNameFor(String clientId)
     {
         if (getQNameForClientId(clientId) != null)
         {
