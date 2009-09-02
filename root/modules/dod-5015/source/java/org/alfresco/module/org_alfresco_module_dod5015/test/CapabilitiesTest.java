@@ -5300,7 +5300,7 @@ public class CapabilitiesTest extends TestCase
 
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
         properties.put(ContentModel.PROP_NAME, "MyRecordCreate.txt");
-        NodeRef newRecord = this.nodeService.createNode(recordFolder_1, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
+        NodeRef newRecord = this.publicNodeService.createNode(recordFolder_1, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
                 ContentModel.TYPE_CONTENT, properties).getChildRef();
 
         // Set the content
@@ -7633,9 +7633,9 @@ public class CapabilitiesTest extends TestCase
         permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
-        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
-        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
 
         permissionService.setPermission(filePlan, testers, RMPermissionModel.FILE_RECORDS, true);
 
@@ -7647,9 +7647,9 @@ public class CapabilitiesTest extends TestCase
         permissionService.deletePermission(filePlan, testers, RMPermissionModel.FILE_RECORDS);
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
-        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, recordFolder_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
-        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.FILE_RECORDS, AccessStatus.ALLOWED);
 
         permissionService.setPermission(filePlan, testers, RMPermissionModel.FILE_RECORDS, true);
 
@@ -7744,7 +7744,7 @@ public class CapabilitiesTest extends TestCase
 
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
         properties.put(ContentModel.PROP_NAME, "MyRecordCreate.txt");
-        NodeRef newRecord_1 = this.nodeService.createNode(recordFolder_1, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
+        NodeRef newRecord_1 = this.publicNodeService.createNode(recordFolder_1, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
                 ContentModel.TYPE_CONTENT, properties).getChildRef();
 
         // Set the content
@@ -7757,7 +7757,7 @@ public class CapabilitiesTest extends TestCase
 
         properties = new HashMap<QName, Serializable>(1);
         properties.put(ContentModel.PROP_NAME, "MyRecordCreate.txt");
-        NodeRef newRecord_2 = this.nodeService.createNode(recordFolder_2, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
+        NodeRef newRecord_2 = this.publicNodeService.createNode(recordFolder_2, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
                 ContentModel.TYPE_CONTENT, properties).getChildRef();
 
         // Set the content

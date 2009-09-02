@@ -27,8 +27,10 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability.group;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.namespace.QName;
 
 public class CreateCapability extends AbstractCapability
@@ -54,9 +56,18 @@ public class CreateCapability extends AbstractCapability
                 return AccessDecisionVoter.ACCESS_DENIED;
             }
         }
-        if (voter.getDeclareRecordsCapability().evaluate(destination) == AccessDecisionVoter.ACCESS_GRANTED)
+        if (isRm(destination))
         {
-            return AccessDecisionVoter.ACCESS_GRANTED;
+            if (checkFilingUnfrozenUncutoffOpen(destination) == AccessDecisionVoter.ACCESS_GRANTED)
+            {
+                if (isRecordFolder(voter.getNodeService().getType(destination)))
+                {
+                    if (voter.getPermissionService().hasPermission(destination, RMPermissionModel.FILE_RECORDS) == AccessStatus.ALLOWED)
+                    {
+                        return AccessDecisionVoter.ACCESS_GRANTED;
+                    }
+                }
+            }
         }
         if (voter.getCreateModifyDestroyFoldersCapability().evaluate(destination, type) == AccessDecisionVoter.ACCESS_GRANTED)
         {
