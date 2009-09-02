@@ -714,8 +714,17 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertFalse(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
                 
-                // Freeze a number of records
+                // Update the freeze reason
                 Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+                params.put(FreezeAction.PARAM_REASON, "changed");
+                rmActionService.executeRecordsManagementAction(holdNodeRef, "editHoldReason", params);
+                
+                // Check the hold has been updated
+                String updatedHoldReason = (String)nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON);
+                assertEquals("changed", updatedHoldReason);
+                
+                // Freeze a number of records
+                params = new HashMap<String, Serializable>(1);
                 params.put(FreezeAction.PARAM_REASON, "two");
                 List<NodeRef> records = new ArrayList<NodeRef>(2);
                 records.add(recordOne);

@@ -414,6 +414,32 @@
         <property name="capability" ref="rmUnfreezeCapability"/>
     </bean>      
     
+    <!-- Edit hold reason -->
+
+    <bean id="editHoldReason_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="editHoldReason"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="editHoldReason_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="editHoldReason_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
+        <property name="objectDefinitionSource">
+            <value>
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.ViewUpdateReasonsForFreeze
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
+                   org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="editHoldReason" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.EditHoldReasonAction" parent="rmAction" depends-on="rmViewUpdateReasonsForFreezeCapability">
+        <property name="capability" ref="rmViewUpdateReasonsForFreezeCapability"/>
+    </bean>  
     
     <!-- broadcast vital record definition -->
     <!-- bound to policy: allow -->
