@@ -186,4 +186,12 @@ public class DispositionActionDefinitionImpl implements DispositionActionDefinit
         }
         return result;
     }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition#getLocation()
+     */
+    public String getLocation()
+    {
+        return (String)this.services.getNodeService().getProperty(this.dispositionActionNodeRef, PROP_DISPOSITION_LOCATION);
+    }
 }

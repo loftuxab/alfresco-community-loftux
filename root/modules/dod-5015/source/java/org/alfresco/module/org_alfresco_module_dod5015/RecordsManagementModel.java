@@ -73,6 +73,7 @@ public interface RecordsManagementModel extends RecordsManagementCustomModel
     public static QName PROP_DISPOSITION_PERIOD_PROPERTY = QName.createQName(RM_URI, "dispositionPeriodProperty");
     public static QName PROP_DISPOSITION_EVENT = QName.createQName(RM_URI, "dispositionEvent");
     public static QName PROP_DISPOSITION_EVENT_COMBINATION = QName.createQName(RM_URI, "dispositionEventCombination");
+    public static QName PROP_DISPOSITION_LOCATION = QName.createQName(RM_URI, "dispositionLocation");
     
     // Records folder
     public static QName TYPE_RECORD_FOLDER = QName.createQName(RM_URI, "recordFolder");

@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.module.org_alfresco_module_dod5015.test;
+package org.alfresco.module.org_alfresco_module_dod5015.test.webscript;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -39,6 +39,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
+import org.alfresco.module.org_alfresco_module_dod5015.test.TestUtilities;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
@@ -289,6 +290,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         jsonPostData.put("name", name);
         jsonPostData.put("description", desc);
         jsonPostData.put("period", period);
+        jsonPostData.put("location", "my location");
         jsonPostData.put("periodProperty", periodProperty);
         jsonPostData.put("eligibleOnFirstCompleteEvent", eligibleOnFirstCompleteEvent);
         JSONArray events = new JSONArray();
@@ -311,6 +313,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertEquals("Destroy", rootDataObject.getString("label"));
         assertEquals(desc, rootDataObject.getString("description"));
         assertEquals(period, rootDataObject.getString("period"));
+        assertEquals("my location", rootDataObject.getString("location"));
         assertEquals(periodProperty, rootDataObject.getString("periodProperty"));
         assertTrue(rootDataObject.getBoolean("eligibleOnFirstCompleteEvent"));
         events = rootDataObject.getJSONArray("events");
@@ -380,6 +383,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         String name = "destroy";
         String desc = "Destroy this record after 5 years";
         String period = "year|5";
+        String location = "my location";
         String periodProperty = "rma:cutOffDate";
         boolean eligibleOnFirstCompleteEvent = false;
         
@@ -387,6 +391,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         jsonPostData.put("name", name);
         jsonPostData.put("description", desc);
         jsonPostData.put("period", period);
+        jsonPostData.put("location", location);
         jsonPostData.put("periodProperty", periodProperty);
         jsonPostData.put("eligibleOnFirstCompleteEvent", eligibleOnFirstCompleteEvent);
         JSONArray events = new JSONArray();
@@ -410,6 +415,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertEquals("Destroy", actionDef.getString("label"));
         assertEquals(desc, actionDef.getString("description"));
         assertEquals(period, actionDef.getString("period"));
+        assertEquals(location, actionDef.getString("location"));
         assertEquals(periodProperty, actionDef.getString("periodProperty"));
         assertFalse(actionDef.getBoolean("eligibleOnFirstCompleteEvent"));
         assertEquals(2, actionDef.getJSONArray("events").length());
@@ -523,7 +529,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertEquals("superseded", event1.get("name"));
         assertEquals("Superseded", event1.get("label"));
         assertFalse(event1.getBoolean("complete"));
-        assertFalse(event1.getBoolean("automatic"));
+        assertTrue(event1.getBoolean("automatic"));
         
         // check stuff expected to be missing is missing
         assertFalse(dataObj.has("asOf"));
