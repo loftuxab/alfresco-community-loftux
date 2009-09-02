@@ -580,7 +580,7 @@ public class CapabilitiesTest extends TestCase
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.VIEW_RECORDS).getActionNames().size());
-        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE).getActionNames().size());
 
     }
 
