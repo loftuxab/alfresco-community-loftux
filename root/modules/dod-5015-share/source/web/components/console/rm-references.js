@@ -121,7 +121,7 @@
             this.widgets.dataSource.responseSchema =
             {
                 resultsList: "data.customReferences",
-                fields: ["referenceType", "source", "target", "label"] // "name",
+                fields: ["refId", "referenceType", "source", "target", "label"]
             };
             this.widgets.dataSource.doBeforeParseData = function RecordsReferences_doBeforeParseData(oRequest , oFullResponse)
             {
@@ -129,10 +129,10 @@
                {
                   var items = oFullResponse.data.customReferences;
 
-                  // Sort the referecens by their title
+                  // Sort the referecens by their "title" (or refId)  which is either the label or the source and target
                   items.sort(function (reference1, reference2)
                   {
-                     return (reference1.source > reference2.source) ? 1 : (reference1.source < reference2.source) ? -1 : 0;
+                     return (reference1.refId > reference2.refId) ? 1 : (reference1.refId < reference2.refId) ? -1 : 0;
                   });
 
                   // we need to wrap the array inside a JSON object so the DataTable is happy
@@ -363,20 +363,9 @@
           */
          onEditReferenceClick: function ViewPanelHandler_onEditReferenceClick(e, oRecord)
          {
-            // update the current property context
-            var id;
-            if (oRecord.getData("referenceType") == "bidirectional")
-            {
-               id = oRecord.getData("label");
-            }
-            else if (oRecord.getData("referenceType") == "parentchild")
-            {
-               id = oRecord.getData("source") + "__" + oRecord.getData("target");
-            }
-
             YAHOO.Bubbling.fire('editReference',
             {
-               referenceName: id
+               refId: oRecord.getData("refId")
             });
          },
 
@@ -434,7 +423,7 @@
          {
             Alfresco.util.Ajax.jsonDelete(
             {
-               url: Alfresco.constants.PROXY_URI + "api/rma/" + oRecord.getData("name"),
+               url: Alfresco.constants.PROXY_URI + "api/rma/admin/customreferencedefinitions/" + oRecord.getData("refId"),
                successCallback:
                {
                   fn: function(o)
@@ -517,9 +506,16 @@
             form.setShowSubmitStateDynamically(true);
 
             // Form field validation
+            var doubleUnderscoresNotAllowed = {
+               pattern: /__/,
+               match: false
+            };
             form.addValidation(parent.id + "-bidirectional-label", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-bidirectional-label", Alfresco.forms.validation.regexMatch, doubleUnderscoresNotAllowed, "keyup");
             form.addValidation(parent.id + "-parentchild-source", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-parentchild-source", Alfresco.forms.validation.regexMatch, doubleUnderscoresNotAllowed, "keyup");
             form.addValidation(parent.id + "-parentchild-target", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-parentchild-target", Alfresco.forms.validation.regexMatch, doubleUnderscoresNotAllowed, "keyup");
 
             form.doBeforeFormSubmit =
             {
@@ -591,7 +587,7 @@
          onBeforeShow: function EditPanelHandler_onBeforeShow()
          {
             var editFormEl = Dom.get(parent.id + "-edit-form");
-            if (parent.referenceName && parent.referenceName != "")
+            if (parent.refId && parent.refId != "")
             {
                // Existing reference, prepare form
                this.widgets.editForm.setAjaxSubmitMethod(Alfresco.util.Ajax.POST);
@@ -602,7 +598,7 @@
                // Load reference data
                Alfresco.util.Ajax.jsonGet(
                {
-                  url: Alfresco.constants.PROXY_URI + "api/rma/admin/customreferencedefinitions/" + parent.referenceName,
+                  url: Alfresco.constants.PROXY_URI + "api/rma/admin/customreferencedefinitions/" + parent.refId,
                   successCallback:
                   {
                      fn: function(serverResponse)
@@ -612,7 +608,7 @@
                         {
                            var ref = serverResponse.json.data.customReferences[0];
                            Dom.get(parent.id + "-type-" + ref.referenceType).checked = true;
-                           //Dom.get(parent.id + "-name").value = (ref.name) ? ref.name : "";
+                           //Dom.get(parent.id + "-refId").value = (ref.refId) ? ref.refId : "";
                            Dom.get(parent.id + "-bidirectional-label").value = (ref.referenceType == "bidirectional" && ref.label) ? ref.label : "";
                            Dom.get(parent.id + "-parentchild-source").value = (ref.referenceType == "parentchild" && ref.source) ? ref.source: "";
                            Dom.get(parent.id + "-parentchild-target").value = (ref.referenceType == "parentchild" && ref.target) ? ref.target : "";
@@ -632,7 +628,7 @@
                Dom.removeClass(parent.id + "-create-title", "hidden");
                Dom.addClass(parent.id + "-edit-title", "hidden");
                Dom.get(parent.id + "-type-bidirectional").checked = true;
-               //Dom.get(parent.id + "-name").value = "";
+               //Dom.get(parent.id + "-refId").value = "";
                Dom.get(parent.id + "-bidirectional-label").value = "";
                Dom.get(parent.id + "-parentchild-source").value = "";
                Dom.get(parent.id + "-parentchild-target").value = "";
@@ -713,10 +709,10 @@
       /**
        * Currently selected reference
        *
-       * @property referenceName
+       * @property refId
        * @type string
        */
-      referenceName: null,
+      refId: null,
 
       /**
        * True if the data shall be refreshed on the page
@@ -784,7 +780,7 @@
          this.refreshUIState(
          {
             "panel": "edit",
-            "referenceName": ""
+            "refId": ""
          });
       },
 
@@ -800,7 +796,7 @@
          this.refreshUIState(
          {
             "panel": "edit",
-            "referenceName": args[1].referenceName
+            "refId": args[1].refId
          });
       },
 
@@ -814,13 +810,13 @@
       onStateChanged: function RecordsReferences_onStateChanged(e, args)
       {
          // Clear old states
-         this.referenceName = undefined;
+         this.refId = undefined;
          this.refresh = true;
 
          var state = this.decodeHistoryState(args[1].state);
-         if (state.referenceName)
+         if (state.refId)
          {
-            this.referenceName = state.referenceName ? state.referenceName : "";
+            this.refId = state.refId ? state.refId : "";
          }
          if (state.refresh)
          {
@@ -858,10 +854,10 @@
          {
             state += "panel=" + encodeURIComponent(obj.panel ? obj.panel : stateObj.panel);
          }
-         if (obj.referenceName)
+         if (obj.refId)
          {
             state += state.length > 0 ? "&" : "";
-            state += "referenceName=" + encodeURIComponent(obj.referenceName);
+            state += "refId=" + encodeURIComponent(obj.refId);
          }
          if (obj.refresh)
          {
