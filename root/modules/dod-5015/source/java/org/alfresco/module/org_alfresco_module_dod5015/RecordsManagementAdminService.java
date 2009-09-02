@@ -114,9 +114,10 @@ public interface RecordsManagementAdminService
     public Map<QName, AssociationDefinition> getCustomReferenceDefinitions();
     
     /**
+     * Returns a List of all associations <i>from</i> the given node.
      * 
-     * @param node
-     * @return
+     * @param node the node from which the associations start.
+     * @return a List of associations.
      */
     public List<AssociationRef> getCustomReferencesFor(NodeRef node);
     

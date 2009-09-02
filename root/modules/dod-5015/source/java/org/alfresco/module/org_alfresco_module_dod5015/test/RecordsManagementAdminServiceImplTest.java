@@ -303,6 +303,8 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
             // A parent/child reference
             generatedQName = rmAdminService.addCustomChildAssocDefinition(source, target);
         }
+        System.out.println("Creating new " + refType + " reference definition: " + generatedQName);
+        System.out.println("  label: '" + label + "' source: '" + source + "' target: '" + target + "'");
         
         // We need to commit the transaction to trigger behaviour that should reload the data dictionary model.
         txn1.commit();
