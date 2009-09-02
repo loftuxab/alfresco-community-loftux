@@ -93,6 +93,7 @@ public class ScriptConstraint implements Serializable
      */
     public void updateTitle(String newTitle)
     {
+        info.setTitle(newTitle);
         rmCaveatconfigService.updateRMConstraintTitle(info.getName(), newTitle)  ;
     }
     
@@ -101,6 +102,7 @@ public class ScriptConstraint implements Serializable
      */
     public void updateAllowedValues(String[] allowedValues)
     {
+        info.setAllowedValues(allowedValues);
         rmCaveatconfigService.updateRMConstraintAllowedValues(info.getName(), allowedValues);
     }
     
@@ -157,6 +159,7 @@ public class ScriptConstraint implements Serializable
                                      
     public ScriptConstraintValue[] getValues()
     {
+        // authority, values
         Map<String, List<String>> details = rmCaveatconfigService.getListDetails(info.getName());
         
         if (details == null)
@@ -164,6 +167,7 @@ public class ScriptConstraint implements Serializable
             return null;
         }
         
+        // values, authorities
         Map<String, List<String>> pivot = PivotUtil.getPivot(details);
         
         // Here with some data to return
@@ -197,6 +201,24 @@ public class ScriptConstraint implements Serializable
              constraint.setAuthorities(sauth);       
              constraints.add(constraint);             
         }
+        
+        /**
+         * Now go through and add any "empty" values
+         */
+        for(String value : info.getAllowedValues())
+        {
+            if(!values.contains(value))
+            {
+                ScriptConstraintValue constraint = new ScriptConstraintValue();
+                constraint.setValueName(value);
+                constraint.setValueTitle(value);
+                List<ScriptAuthority> sauth = new ArrayList<ScriptAuthority>();
+                constraint.setAuthorities(sauth);  
+                constraints.add(constraint);
+            }
+        }
+        
+        
         ScriptConstraintValue[] retVal = constraints.toArray(new ScriptConstraintValue[constraints.size()]);
         return retVal;
     }

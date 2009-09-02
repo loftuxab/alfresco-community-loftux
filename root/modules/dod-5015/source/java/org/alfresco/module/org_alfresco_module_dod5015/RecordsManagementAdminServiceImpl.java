@@ -806,4 +806,22 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
             .append(targetId);
         return result.toString();
     }
+
+    /**
+     * Get custom constraint definition or null if it does not exist.
+     */
+    public ConstraintDefinition getCustomConstraintDefinition(QName constraintName)
+    {
+        Collection<ConstraintDefinition> conDefs = dictionaryService.getConstraints(RecordsManagementCustomModel.RM_CUSTOM_MODEL);
+               
+        for (ConstraintDefinition conDef : conDefs)
+        {
+            if(conDef.getName().equals(constraintName))
+            {
+                return conDef;
+            }    
+        }
+        
+        return null;
+    }
 }
