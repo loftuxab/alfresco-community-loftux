@@ -91,9 +91,7 @@ public class CustomRefsGet extends AbstractRmWebScript
     		AssociationDefinition assDef = rmAdminService.getCustomReferenceDefinitions().get(typeQName);
     		data.put(LABEL, clientId);
     		
-    		//TODO REF_ID and LABEL are intentionally duplicated here. It is anticipated
-    		// that we will change the value of the refId to the QName's unique part later.
-    		data.put(REF_ID, clientId);
+    		data.put(REF_ID, typeQName.getLocalName());
 
 			data.put(REFERENCE_TYPE, CustomReferenceType.BIDIRECTIONAL.toString());
     		
@@ -111,7 +109,7 @@ public class CustomRefsGet extends AbstractRmWebScript
     		data.put(PARENT_REF, childAssRef.getParentRef().toString());
 
             String clientId = rmAdminService.getClientIdForQName(typeQName);
-            data.put(REF_ID, clientId);
+            data.put(REF_ID, typeQName.getLocalName());
 
             String[] sourceAndTarget = rmAdminService.splitSourceTargetId(clientId);
             data.put(SOURCE, sourceAndTarget[0]);
