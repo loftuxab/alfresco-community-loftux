@@ -75,6 +75,7 @@
     <bean id="rmUpdate" parent="rmBaseCapability" class="org.alfresco.module.org_alfresco_module_dod5015.capability.group.UpdateCapability" />
     <bean id="rmUpdateProperties" parent="rmBaseCapability" class="org.alfresco.module.org_alfresco_module_dod5015.capability.group.UpdatePropertiesCapability" />
     <bean id="rmDeclare" parent="rmBaseCapability" class="org.alfresco.module.org_alfresco_module_dod5015.capability.group.DeclareCapability" />
+    <bean id="rmWriteContent" parent="rmBaseCapability" class="org.alfresco.module.org_alfresco_module_dod5015.capability.group.WriteContentCapability" />
    
 
 </beans>

@@ -48,6 +48,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.capability.group.DeclareC
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.DeleteCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.UpdateCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.UpdatePropertiesCapability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.group.WriteContentCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AccessAuditCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AddModifyEventDatesCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ApproveRecordsScheduledForCutoffCapability;
@@ -294,6 +295,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     public UpdatePropertiesCapability updatePropertiesCapability;
 
     public DeclareCapability declareCapability;
+
+    public WriteContentCapability writeContentCapability;
 
     static
     {
@@ -1026,7 +1029,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     {
         this.deleteCapability = deleteCapability;
         capabilities.put(deleteCapability.getName(), deleteCapability);
-        
+
     }
 
     public UpdateCapability getUpdateCapability()
@@ -1060,6 +1063,17 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
     {
         this.declareCapability = declareCapability;
         capabilities.put(declareCapability.getName(), declareCapability);
+    }
+
+    public WriteContentCapability getWriteContentCapability()
+    {
+        return writeContentCapability;
+    }
+
+    public void setWriteContentCapability(WriteContentCapability writeContentCapability)
+    {
+        this.writeContentCapability = writeContentCapability;
+        capabilities.put(writeContentCapability.getName(), writeContentCapability);
     }
 
     public boolean supports(ConfigAttribute attribute)
@@ -1194,7 +1208,6 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         HashMap<Capability, AccessStatus> answer = new HashMap<Capability, AccessStatus>();
         for (Capability capability : capabilities.values())
         {
-            System.out.println(capability.getName());
             AccessStatus status = capability.hasPermission(nodeRef);
             if (answer.put(capability, status) != null)
             {
@@ -1729,15 +1742,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
         {
-            Policy policy = policies.get("Read");
-            if (policy == null)
-            {
-                return AccessDecisionVoter.ACCESS_DENIED;
-            }
-            else
-            {
-                return policy.evaluate(voter, invocation, params, cad);
-            }
+            NodeRef updatee = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(0), cad.parent);
+            return voter.getWriteContentCapability().evaluate(updatee);
         }
 
     }

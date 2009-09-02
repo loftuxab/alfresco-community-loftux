@@ -159,6 +159,8 @@ public class CapabilitiesTest extends TestCase
 
     private NodeRef record_3;
 
+    private ContentService publicContentService;
+
     /**
      * @param name
      */
@@ -181,6 +183,7 @@ public class CapabilitiesTest extends TestCase
         permissionService = (PermissionService) ctx.getBean("permissionService");
         permissionModel = (PermissionModel) ctx.getBean("permissionsModelDAO");
         contentService = (ContentService) ctx.getBean("contentService");
+        publicContentService = (ContentService) ctx.getBean("ContentService");
         authorityService = (AuthorityService) ctx.getBean("authorityService");
         personService = (PersonService) ctx.getBean("personService");
 
@@ -533,8 +536,8 @@ public class CapabilitiesTest extends TestCase
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS).getActionNames().size());
-        assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES).getActionNames().size());
-        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES).getActionNames().size());
+        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_REFERENCE_TYPES).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_ROLES).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS).getActionNames().size());
@@ -584,7 +587,7 @@ public class CapabilitiesTest extends TestCase
     public void testFilePlanAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -642,7 +645,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -650,7 +653,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -708,7 +711,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -716,7 +719,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -774,7 +777,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
     }
 
     public void testFilePlanAsRecordsManager()
@@ -787,7 +790,7 @@ public class CapabilitiesTest extends TestCase
 
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -845,7 +848,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -853,7 +856,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -918,7 +921,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -983,7 +986,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(filePlan);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1047,7 +1050,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1105,7 +1108,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -1113,7 +1116,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1171,7 +1174,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -1179,7 +1182,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1237,14 +1240,14 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
     }
 
     public void testRecordSeriesAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1302,7 +1305,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -1310,7 +1313,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1375,7 +1378,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1440,7 +1443,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1504,7 +1507,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1562,7 +1565,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -1570,7 +1573,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1628,7 +1631,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -1636,7 +1639,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1694,14 +1697,14 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
     }
 
     public void testRecordCategoryAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1759,7 +1762,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -1767,7 +1770,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1832,7 +1835,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1897,7 +1900,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -1961,7 +1964,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2019,7 +2022,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -2027,7 +2030,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2085,7 +2088,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -2093,7 +2096,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2151,14 +2154,14 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
     }
 
     public void testRecordFolderAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2216,7 +2219,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -2224,7 +2227,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2289,7 +2292,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2354,7 +2357,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2418,7 +2421,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordAsSystem()
     {
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2476,7 +2479,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -2484,7 +2487,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2542,7 +2545,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -2550,7 +2553,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_administrator);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(64, access.size());
+        assertEquals(65, access.size());
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2608,14 +2611,14 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
     }
 
     public void testRecordAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2673,7 +2676,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.UPGRADE_DOWNGRADE_AND_DECLASSIFY_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
 
     }
 
@@ -2681,7 +2684,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2746,7 +2749,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -2811,7 +2814,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
-        assertEquals(64, access.size()); // 58 + File
+        assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
         check(access, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
@@ -5300,11 +5303,11 @@ public class CapabilitiesTest extends TestCase
 
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
         properties.put(ContentModel.PROP_NAME, "MyRecordCreate.txt");
-        NodeRef newRecord = this.publicNodeService.createNode(recordFolder_1, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
-                ContentModel.TYPE_CONTENT, properties).getChildRef();
+        NodeRef newRecord = this.publicNodeService.createNode(recordFolder_1, ContentModel.ASSOC_CONTAINS,
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), ContentModel.TYPE_CONTENT, properties).getChildRef();
 
         // Set the content
-        ContentWriter writer = this.contentService.getWriter(newRecord, ContentModel.PROP_CONTENT, true);
+        ContentWriter writer = this.publicContentService.getWriter(newRecord, ContentModel.PROP_CONTENT, true);
         writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         writer.setEncoding("UTF-8");
         writer.putContent("There is some content in this record");
@@ -7516,7 +7519,6 @@ public class CapabilitiesTest extends TestCase
 
         // check frozen - can be in mutiple holds/freezes ..
 
-        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         Map<String, Serializable> params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "one");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
@@ -7526,7 +7528,6 @@ public class CapabilitiesTest extends TestCase
         checkCapability(test_user, recordFolder_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.EXTEND_RETENTION_PERIOD_OR_FREEZE, AccessStatus.ALLOWED);
 
-        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         params = new HashMap<String, Serializable>(1);
         params.put(FreezeAction.PARAM_REASON, "Two");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
@@ -7744,29 +7745,43 @@ public class CapabilitiesTest extends TestCase
 
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
         properties.put(ContentModel.PROP_NAME, "MyRecordCreate.txt");
-        NodeRef newRecord_1 = this.publicNodeService.createNode(recordFolder_1, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
-                ContentModel.TYPE_CONTENT, properties).getChildRef();
+        NodeRef newRecord_1 = this.publicNodeService.createNode(recordFolder_1, ContentModel.ASSOC_CONTAINS,
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), ContentModel.TYPE_CONTENT, properties).getChildRef();
 
-        // Set the content
-        ContentWriter writer = this.contentService.getWriter(newRecord_1, ContentModel.PROP_CONTENT, true);
+        // Set the content (relies on owner in the DM side until it becode RM ified ...)
+        ContentWriter writer = this.publicContentService.getWriter(newRecord_1, ContentModel.PROP_CONTENT, true);
         writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         writer.setEncoding("UTF-8");
         writer.putContent("There is some content in this record");
 
+        assertFalse(rmEntryVoter.getFileRecordsCapability().isRm(newRecord_1));
         recordsManagementActionService.executeRecordsManagementAction(newRecord_1, "file");
+        assertTrue(rmEntryVoter.getFileRecordsCapability().isRm(newRecord_1));
 
         properties = new HashMap<QName, Serializable>(1);
         properties.put(ContentModel.PROP_NAME, "MyRecordCreate.txt");
-        NodeRef newRecord_2 = this.publicNodeService.createNode(recordFolder_2, ContentModel.ASSOC_CONTAINS, QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"),
-                ContentModel.TYPE_CONTENT, properties).getChildRef();
+        NodeRef newRecord_2 = this.publicNodeService.createNode(recordFolder_2, ContentModel.ASSOC_CONTAINS,
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), ContentModel.TYPE_CONTENT, properties).getChildRef();
 
         // Set the content
-        writer = this.contentService.getWriter(newRecord_2, ContentModel.PROP_CONTENT, true);
+        writer = this.publicContentService.getWriter(newRecord_2, ContentModel.PROP_CONTENT, true);
         writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         writer.setEncoding("UTF-8");
         writer.putContent("There is some content in this record");
 
         recordsManagementActionService.executeRecordsManagementAction(newRecord_2, "file");
+        
+        // update with permissions in place ...
+        
+        writer = this.publicContentService.getWriter(newRecord_1, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some updated content in this record");
+        
+        writer = this.publicContentService.getWriter(newRecord_2, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer.setEncoding("UTF-8");
+        writer.putContent("There is some content in this record");
     }
 
     public void testMakeOptionalPropertiesMandatoryCapability()
@@ -7831,7 +7846,7 @@ public class CapabilitiesTest extends TestCase
 
     public void testMoveRecordsCapability()
     {
-     // capability is checked above - just check permission assignments
+        // capability is checked above - just check permission assignments
         checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.MOVE_RECORDS, AccessStatus.ALLOWED);
         checkPermission(rm_administrator, filePlan, RMPermissionModel.MOVE_RECORDS, AccessStatus.ALLOWED);
         checkPermission(rm_records_manager, filePlan, RMPermissionModel.MOVE_RECORDS, AccessStatus.ALLOWED);
@@ -7874,7 +7889,7 @@ public class CapabilitiesTest extends TestCase
         checkPermission(rm_power_user, record_1, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
         checkPermission(rm_user, record_1, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
 
-        // folder level 
+        // folder level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
         checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
@@ -7911,7 +7926,7 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
 
-        // folder level 
+        // folder level
 
         checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
         checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
@@ -7942,7 +7957,7 @@ public class CapabilitiesTest extends TestCase
         checkCapability(rm_security_officer, record_2, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
         checkCapability(rm_power_user, record_2, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
         checkCapability(rm_user, record_2, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
-        
+
         // check person with no access and add read and write
         // Filing
 
@@ -7999,7 +8014,6 @@ public class CapabilitiesTest extends TestCase
         checkCapability(test_user, recordFolder_2, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
 
-
         permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
         permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
 
@@ -8015,7 +8029,6 @@ public class CapabilitiesTest extends TestCase
         checkCapability(test_user, record_1, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
         checkCapability(test_user, recordFolder_2, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
-
 
         // check frozen
 
@@ -8071,17 +8084,441 @@ public class CapabilitiesTest extends TestCase
 
     public void testTriggerAnEventCapability()
     {
-        // fail();
+        // TODO: Waiting for action
     }
 
     public void testUndeclareRecordsCapability()
     {
-        // fail();
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkPermission(rm_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        // Set appropriate state - declare records and make eligible
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_1, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_1, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_1, "declareRecord");
+
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        nodeService.setProperty(record_2, RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+        nodeService.setProperty(record_2, ContentModel.PROP_TITLE, "titleValue");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "declareRecord");
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.UNDECLARE_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.UNDECLARE_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.UNDECLARE_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+
+        // check frozen
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+
+        // Check closed
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.ALLOWED);
+
+        // try undeclare
+
+        AuthenticationUtil.setFullyAuthenticatedUser(test_user);
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "undeclareRecord", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        recordsManagementActionService.executeRecordsManagementAction(record_1, "undeclareRecord");
+        try
+        {
+            recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "undeclareRecord", null);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "undeclareRecord");
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
     }
 
     public void testUnfreezeCapability()
     {
-        // fail();
+        // freeze and unfreeze is part of most other tests - this jusr duplicates the basics ...
+
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkPermission(rm_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+        
+     // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.UNFREEZE, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.UNFREEZE);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.UNFREEZE, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+
+        // check frozen - can be in mutiple holds/freezes ..
+
+       
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.UNFREEZE, AccessStatus.ALLOWED);
+
+     
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
+
+       
     }
 
     public void testUpdateClassificationDatesCapability()
@@ -8108,12 +8545,12 @@ public class CapabilitiesTest extends TestCase
 
     public void testUpdateTriggerDatesCapability()
     {
-        // fail();
+        // TODO: waiting for action
     }
 
     public void testUpdateVitalRecordCycleInformationCapability()
     {
-        // fail();
+        // TODO: ?
     }
 
     public void testUpgradeDowngradeAndDeclassifyRecordsCapability()
@@ -8129,12 +8566,198 @@ public class CapabilitiesTest extends TestCase
 
     public void testViewRecordsCapability()
     {
-        // fail();
+        // capability is checked above - just check permission assignments
+        checkPermission(AuthenticationUtil.getSystemUserName(), filePlan, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, filePlan, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, filePlan, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, filePlan, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_power_user, filePlan, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        checkPermission(rm_user, filePlan, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
+        // already tested in many places above
     }
 
     public void testViewUpdateReasonsForFreezeCapability()
     {
-        // fail();
+        // Folder
+        checkPermission(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkPermission(rm_power_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkPermission(rm_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        // Record
+        checkPermission(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_administrator, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_records_manager, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkPermission(rm_security_officer, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkPermission(rm_power_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkPermission(rm_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "one");
+        recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "freeze", params);
+        params = new HashMap<String, Serializable>(1);
+        params.put(FreezeAction.PARAM_REASON, "Two");
+        recordsManagementActionService.executeRecordsManagementAction(record_2, "freeze", params);
+        
+     // folder level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        // record level
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_power_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(rm_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        
+        // check person with no access and add read and write
+        // Filing
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+        permissionService.setInheritParentPermissions(recordCategory_1, false);
+        permissionService.setInheritParentPermissions(recordCategory_2, false);
+        permissionService.setPermission(recordCategory_1, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordCategory_2, testers, RMPermissionModel.READ_RECORDS, true);
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+
+        permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
+        permissionService.deletePermission(recordFolder_2, testers, RMPermissionModel.FILING);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+
+        permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
+        permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+
+        // check frozen - can be in multiple holds/freezes ..
+
+       
+
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, record_1, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.ALLOWED);
+
+        // TODO: property is not yet duplicated, waiting for action.
+        
+        // test filter - from the freeze object
+        
+        
+        
+        // test query
+        
+        //  update
+        
+        // 
     }
 
     private void check(Map<Capability, AccessStatus> access, String name, AccessStatus accessStatus)
