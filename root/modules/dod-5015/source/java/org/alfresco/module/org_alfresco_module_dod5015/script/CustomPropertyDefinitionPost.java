@@ -30,7 +30,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
@@ -51,11 +54,21 @@ public class CustomPropertyDefinitionPost extends AbstractRmWebScript
 {
     private static Log logger = LogFactory.getLog(CustomPropertyDefinitionPost.class);
     
-    private RecordsManagementActionService rmActionService;
+    public static final String PARAM_DATATYPE = "dataType";
+    public static final String PARAM_TITLE = "title";
+    public static final String PARAM_DESCRIPTION = "description";
+    public static final String PARAM_DEFAULT_VALUE = "defaultValue";
+    public static final String PARAM_MULTI_VALUED = "multiValued";
+    public static final String PARAM_MANDATORY = "mandatory";
+    public static final String PARAM_PROTECTED = "protected";
+    public static final String PARAM_CONSTRAINT_REF = "constraintRef";
+
+    private RecordsManagementAdminService rmAdminService;
     
-    public void setRecordsManagementActionService(RecordsManagementActionService rmActionService) {
-		this.rmActionService = rmActionService;
-	}
+    public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
+    {
+        this.rmAdminService = rmAdminService;
+    }
 
 	/*
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
@@ -103,8 +116,90 @@ public class CustomPropertyDefinitionPost extends AbstractRmWebScript
             
             params.put(nextKeyString, nextValueString);
         }
-        rmActionService.executeRecordsManagementAction("defineCustomProperty", params);
         
+        
+        
+        
+        
+        // Need to select the correct aspect in the customModel to which we'll add the property.
+        String customisableElement = (String)params.get("element");
+        CustomisableRmElement ce = CustomisableRmElement.getEnumFor(customisableElement);
+        String aspectName = ce.getCorrespondingAspect();
+        
+        String clientSideName = (String)params.get("name");
+        
+        //TODO According to the wireframes, type here can only be date|text|number
+        Serializable serializableParam = params.get(PARAM_DATATYPE);
+        QName type = null;
+        if (serializableParam != null)
+        {
+            if (serializableParam instanceof String)
+            {
+                type = QName.createQName((String)serializableParam);
+            }
+            else if (serializableParam instanceof QName)
+            {
+                type = (QName)serializableParam;
+            }
+            else
+            {
+                throw new AlfrescoRuntimeException("Unexpected type of dataType param: "+serializableParam+" (expected String or QName)");
+            }
+        }
+        
+        // The title is actually generated, so this parameter will be ignored
+        // by the RMAdminService
+        String title = (String)params.get(PARAM_TITLE);
+        String description = (String)params.get(PARAM_DESCRIPTION);
+        String defaultValue = (String)params.get(PARAM_DEFAULT_VALUE);
+        
+        // 'mandatory' should be an available parameter.
+        boolean mandatory = false;
+        serializableParam = params.get(PARAM_MANDATORY);
+        if (serializableParam != null)
+        {
+            mandatory = Boolean.valueOf(serializableParam.toString());
+        }
+        
+        boolean isProtected = false;
+        serializableParam = params.get(PARAM_PROTECTED);
+        if (serializableParam != null)
+        {
+            isProtected = Boolean.valueOf(serializableParam.toString());
+        }
+        
+        boolean multiValued = false;
+        serializableParam = params.get(PARAM_MULTI_VALUED);
+        if (serializableParam != null)
+        {
+            multiValued = Boolean.valueOf(serializableParam.toString());
+        }
+        
+        serializableParam = params.get(PARAM_CONSTRAINT_REF);
+        QName constraintRef = null;
+        if (serializableParam != null)
+        {
+            if (serializableParam instanceof String)
+            {
+                constraintRef = QName.createQName((String)serializableParam);
+            }
+            else if (serializableParam instanceof QName)
+            {
+                constraintRef = (QName)serializableParam;
+            }
+            else
+            {
+                throw new AlfrescoRuntimeException("Unexpected type of constraintRef param: "+serializableParam+" (expected String or QName)");
+            }
+        }
+        
+        QName generatedQName = rmAdminService.addCustomPropertyDefinition(aspectName, clientSideName, type,
+                title, description, defaultValue, multiValued, mandatory, isProtected, constraintRef);
+
+        
+        
+        
+        result.put("propId", generatedQName);
         result.put("success", true);
 
         return result;

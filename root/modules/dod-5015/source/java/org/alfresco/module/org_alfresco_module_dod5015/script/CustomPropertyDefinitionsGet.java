@@ -82,7 +82,7 @@ public class CustomPropertyDefinitionsGet extends DeclarativeWebScript
     	}
 
     	model.put("customProps", propData);
-
+    	
         return model;
     }
 }

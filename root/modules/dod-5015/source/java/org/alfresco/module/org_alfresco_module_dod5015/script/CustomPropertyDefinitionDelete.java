@@ -24,14 +24,12 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.Cache;
@@ -50,19 +48,15 @@ import org.json.JSONException;
  */
 public class CustomPropertyDefinitionDelete extends AbstractRmWebScript
 {
+    private static final String PROP_ID = "propId";
+
     private static Log logger = LogFactory.getLog(CustomPropertyDefinitionDelete.class);
     
     private RecordsManagementAdminService rmAdminService;
-    private RecordsManagementActionService rmActionService;
 
     public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
     {
 		this.rmAdminService = rmAdminService;
-	}
-
-    public void setRecordsManagementActionService(RecordsManagementActionService rmActionService)
-    {
-		this.rmActionService = rmActionService;
 	}
 
     /*
@@ -95,7 +89,7 @@ public class CustomPropertyDefinitionDelete extends AbstractRmWebScript
     private QName getPropertyFromReq(WebScriptRequest req)
     {
         Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
-        String propIdString = templateVars.get("property_qname");
+        String propIdString = templateVars.get(PROP_ID);
         
         QName propQName = this.rmAdminService.getQNameForClientId(propIdString);
         Map<QName, PropertyDefinition> existingPropDefs = rmAdminService.getCustomPropertyDefinitions();
@@ -116,10 +110,7 @@ public class CustomPropertyDefinitionDelete extends AbstractRmWebScript
     {
     	Map<String, Object> result = new HashMap<String, Object>();
     	
-    	// This work is being delegated to the rmActionService.
-    	Map<String, Serializable> parameters = new HashMap<String, Serializable>();
-    	parameters.put("name", propQName.toPrefixString(namespaceService));
-    	this.rmActionService.executeRecordsManagementAction("deleteCustomProperty", parameters);
+    	rmAdminService.removeCustomPropertyDefinition(propQName);
 
         result.put("propertyqname", propQName.toPrefixString(namespaceService));
 

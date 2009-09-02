@@ -42,7 +42,6 @@ import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -332,16 +331,17 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     /**
      * This method creates a child and a non-child reference and returns the system-time
      * used in creating unique labels, sources and targets.
+     * @return String[] with element 0 = refId of p/c ref, 1 = refId pf bidi.
      */
-	private long postCustomReferences() throws JSONException, IOException,
+	private String[] postCustomReferences() throws JSONException, IOException,
 			UnsupportedEncodingException {
-		long now = System.currentTimeMillis();
+	    String[] result = new String[2];
 		
 		// 1. Child association.
         String jsonString = new JSONStringer().object()
             .key("referenceType").value(CustomReferenceType.PARENT_CHILD)
-            .key("source").value(CHILD_SRC + now)
-            .key("target").value(CHILD_TGT + now)
+            .key("source").value(CHILD_SRC)
+            .key("target").value(CHILD_TGT)
         .endObject()
         .toString();
         
@@ -352,13 +352,15 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         String rspContent = rsp.getContentAsString();
         assertTrue(rspContent.contains("success"));
-        System.out.println(rspContent);
 
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        String generatedChildRefId = jsonRsp.getJSONObject("data").getString("refId");
+        result[0] = generatedChildRefId;
 
         // 2. Non-child or standard association.
         jsonString = new JSONStringer().object()
             .key("referenceType").value(CustomReferenceType.BIDIRECTIONAL)
-            .key("label").value(BI_DI + now)
+            .key("label").value(BI_DI)
         .endObject()
         .toString();
         
@@ -370,28 +372,30 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(rspContent.contains("success"));
         System.out.println(rspContent);
 
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        String generatedBidiRefId = jsonRsp.getJSONObject("data").getString("refId");
+        result[1] = generatedBidiRefId;
+
 
         // Now assert that both have appeared in the data dictionary.
         AspectDefinition customAssocsAspect =
             dictionaryService.getAspect(QName.createQName(RecordsManagementAdminServiceImpl.RMC_CUSTOM_ASSOCS, namespaceService));
         assertNotNull("Missing customAssocs aspect", customAssocsAspect);
         
-        String clientId = rmAdminService.getCompoundIdFor(CHILD_SRC + now, CHILD_TGT + now);
-        QName newRefQname = rmAdminService.getQNameForClientId(clientId);
+        QName newRefQname = rmAdminService.getQNameForClientId(generatedChildRefId);
         Map<QName, AssociationDefinition> associations = customAssocsAspect.getAssociations();
 		assertTrue("Custom child assoc not returned by dataDictionary.", associations.containsKey(newRefQname));
 
-        String clientId2 = BI_DI + now;
-        newRefQname = rmAdminService.getQNameForClientId(clientId2);
+        newRefQname = rmAdminService.getQNameForClientId(generatedBidiRefId);
         assertTrue("Custom std assoc not returned by dataDictionary.", customAssocsAspect.getAssociations().containsKey(newRefQname));
         
-        return now;
+        return result;
 	}
 
     public void testGetCustomReferences() throws IOException, JSONException
     {
         // Ensure that there is at least one custom reference.
-        final long now = postCustomReferences();
+        postCustomReferences();
 
         // GET all custom reference definitions
         final int expectedStatus = 200;
@@ -413,9 +417,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 
         // GET a specific custom reference definition.
         // Here, we're using one of the built-in references
-        // clientId = VersionedBy__Versions
         // qname = rmc:versions
-        rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL + "/" + "VersionedBy__Versions"), expectedStatus);
+        rsp = sendRequest(new GetRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL + "/" + "versions"), expectedStatus);
 
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
 
@@ -439,12 +442,12 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         String refInstancesUrl = MessageFormat.format(REF_INSTANCES_URL_FORMAT, node1Url);
 
         // Create reference types.
-        final long now = postCustomReferences();
+        String[] generatedRefIds = postCustomReferences();
 
         // Add a standard ref
         String jsonString = new JSONStringer().object()
             .key("toNode").value(testRecord2.toString())
-            .key("refId").value(BI_DI + now)
+            .key("refId").value(generatedRefIds[1])
         .endObject()
         .toString();
     
@@ -455,7 +458,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 	    // Add a child ref
 	    jsonString = new JSONStringer().object()
 	    .key("toNode").value(testRecord2.toString())
-	    .key("refId").value(rmAdminService.getCompoundIdFor(CHILD_SRC + now, CHILD_TGT + now))
+	    .key("refId").value(generatedRefIds[0])
 	    .endObject()
 	    .toString();
 	    
@@ -488,11 +491,11 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         final String queryFormat = "?st={0}&si={1}&id={2}";
         String urlQueryString = MessageFormat.format(queryFormat, protocol, identifier, recId);
 
-        rsp = sendRequest(new DeleteRequest(refInstancesUrl + "/" + BI_DI + now + urlQueryString), 200);
+        rsp = sendRequest(new DeleteRequest(refInstancesUrl + "/" + generatedRefIds[1] + urlQueryString), 200);
         assertTrue(rsp.getContentAsString().contains("success"));
 
         rsp = sendRequest(new DeleteRequest(refInstancesUrl + "/"
-        		+ rmAdminService.getCompoundIdFor(CHILD_SRC + now, CHILD_TGT + now)
+        		+ generatedRefIds[0]
         		+ urlQueryString), 200);
         assertTrue(rsp.getContentAsString().contains("success"));
         

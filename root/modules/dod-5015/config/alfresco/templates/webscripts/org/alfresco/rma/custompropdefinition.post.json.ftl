@@ -1,3 +1,4 @@
 {
-    "success": ${success?string}
+    "success": ${success?string},
+    "propId": "${propId}"
 }

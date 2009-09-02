@@ -7,10 +7,10 @@
   the request will not succeed. In cases where there are no instances of the specified<BR/>
   property in the system, the request will attempted.<BR/>
   <BR/>
-  The property_qname should be provided in the form "foo" i.e. without namespace.
+  The propId is that returned by custompropertydefinitions.get.
   ]]>
   </description>
-  <url>/api/rma/admin/custompropertydefinitions/{property_qname}</url>
+  <url>/api/rma/admin/custompropertydefinitions/{propId}</url>
   <format default="json">argument</format>
   <authentication>user</authentication>
   <transaction>required</transaction>
