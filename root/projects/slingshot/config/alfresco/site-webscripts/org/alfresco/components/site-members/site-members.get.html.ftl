@@ -19,7 +19,7 @@
 
 <div id="${args.htmlid}-body" class="site-members">
    
-   <div class="heading"><label for="${args.htmlid}-term">${msg("site-members.heading")}</label></div>
+   <div class="title"><label for="${args.htmlid}-term">${msg("site-members.heading")}</label></div>
 
    <div class="invite-people">
    <#if currentUserRole = "SiteManager">

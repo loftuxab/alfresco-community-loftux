@@ -19,7 +19,7 @@
 
 <div id="${args.htmlid}-body" class="site-groups">
    
-   <div class="heading"><label for="${args.htmlid}-term">${msg("site-groups.heading")}</label></div>
+   <div class="title"><label for="${args.htmlid}-term">${msg("site-groups.heading")}</label></div>
    
    <div class="add-groups">
    <#if currentUserRole = "SiteManager">
