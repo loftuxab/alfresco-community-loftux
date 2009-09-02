@@ -37,8 +37,8 @@ public interface RecordsManagementAuditService
     public static final String RM_AUDIT_APPLICATION_NAME = "DOD5015";
     public static final String RM_AUDIT_PATH_ROOT = "/DOD5015";
     public static final String RM_AUDIT_PATH_ACTIONS = "/actions";
-    public static final String RM_AUDIT_PATH_ACTIONS_NODE = "/node";
-    public static final String RM_AUDIT_PATH_ACTIONS_PARAMS = "/parameters";
+    public static final String RM_AUDIT_PATH_NODE = "/node";
+    public static final String RM_AUDIT_PATH_PARAMETERS = "/parameters";
     
     /**
      * Starts RM auditing.

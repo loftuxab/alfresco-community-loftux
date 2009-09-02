@@ -14,10 +14,10 @@
 
     <Application name="DOD5015" key="DOD5015">
         <AuditPath key="actions">
+            <AuditPath key="node">
+                <RecordValue key="noderef" dataExtractor="simpleValue"/>
+            </AuditPath>
             <AuditPath key="testAction">
-                <AuditPath key="node">
-                    <RecordValue key="noderef" dataExtractor="simpleValue"/>
-                </AuditPath>
                 <AuditPath key="parameters">
                     <AuditPath key="testActionParam">
                         <RecordValue key="value" dataExtractor="simpleValue"/>
