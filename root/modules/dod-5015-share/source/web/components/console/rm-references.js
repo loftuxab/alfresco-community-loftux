@@ -121,25 +121,41 @@
             this.widgets.dataSource.responseSchema =
             {
                 resultsList: "data.customReferences",
-                fields: ["refId", "referenceType", "source", "target", "label"]
+                fields: ["refId", "referenceType", "source", "target", "label", "title"]
             };
+
             this.widgets.dataSource.doBeforeParseData = function RecordsReferences_doBeforeParseData(oRequest , oFullResponse)
             {
                if (oFullResponse && oFullResponse.data && oFullResponse.data.customReferences)
                {
-                  var items = oFullResponse.data.customReferences;
+                  var references = oFullResponse.data.customReferences,
+                        reference;
 
-                  // Sort the referecens by their "title" (or refId)  which is either the label or the source and target
-                  items.sort(function (reference1, reference2)
+                  // Simplify display handling by creating a title field
+                  for (var i = 0; i < references.length; i++)
                   {
-                     return (reference1.refId > reference2.refId) ? 1 : (reference1.refId < reference2.refId) ? -1 : 0;
+                     reference = references[i];
+                     if (reference.referenceType == "parentchild")
+                     {
+                        reference.title = parent.msg("label.title.parentchild", reference.source, reference.target);
+                     }
+                     else
+                     {
+                        reference.title = reference.label;
+                     }
+                  }
+
+                  // Sort the references by their title
+                  references.sort(function (reference1, reference2)
+                  {
+                     return (reference1.title > reference2.title) ? 1 : (reference1.title < reference2.title) ? -1 : 0;
                   });
 
                   // we need to wrap the array inside a JSON object so the DataTable is happy
                   return {
                      data:
                      {
-                        customReferences: items
+                        customReferences: references
                      }
                   };
                }
@@ -183,6 +199,8 @@
             renderCellReference = function ViewPanelHandler__setupDataTable_renderCellReference(elCell, oRecord, oColumn, oData)
             {
                var title = document.createElement("h4");
+               title.appendChild(document.createTextNode(oRecord.getData("title")));
+
                var info = document.createElement("div");
 
                var typeLabel = document.createElement("span");
@@ -191,18 +209,9 @@
                info.appendChild(typeLabel);
 
                var typeValue = document.createElement("span");
+               typeValue.appendChild(document.createTextNode(parent.msg("label." + oRecord.getData("referenceType"))));
                info.appendChild(typeValue);
 
-               if (oRecord.getData("referenceType") == "parentchild")
-               {
-                  title.appendChild(document.createTextNode(parent.msg("label.title.parentchild", oRecord.getData("source"), oRecord.getData("target"))));
-                  typeValue.appendChild(document.createTextNode(parent.msg("label.parentchild")));
-               }
-               else if (oRecord.getData("referenceType") == "bidirectional")
-               {
-                  title.appendChild(document.createTextNode(oRecord.getData("label")));
-                  typeValue.appendChild(document.createTextNode(parent.msg("label.bidirectional")));
-               }
                elCell.appendChild(title);
                elCell.appendChild(info);
             };
@@ -380,19 +389,10 @@
          onDeleteReferenceClick: function ViewPanelHandler_onDeleteReferenceClick(e, oRecord)
          {
             var me = this;
-            var text;
-            if (oRecord.getData("referenceType") == "parentchild")
-            {
-               text = parent.msg("message.confirm.removereference.text.parentchild", oRecord.getData("source"), oRecord.getData("target"));
-            }
-            else
-            {
-               text = parent.msg("message.confirm.removereference.text", oRecord.getData("label"));
-            }
             Alfresco.util.PopupManager.displayPrompt(
             {
                title: parent.msg("message.confirm.removereference.title"),
-               text: text,
+               text: oRecord.getData("title"),
                buttons: [
                   {
                      text: parent.msg("button.yes"),
@@ -511,7 +511,6 @@
                match: false
             };
             form.addValidation(parent.id + "-bidirectional-label", Alfresco.forms.validation.mandatory, null, "keyup");
-            form.addValidation(parent.id + "-bidirectional-label", Alfresco.forms.validation.regexMatch, doubleUnderscoresNotAllowed, "keyup");
             form.addValidation(parent.id + "-parentchild-source", Alfresco.forms.validation.mandatory, null, "keyup");
             form.addValidation(parent.id + "-parentchild-source", Alfresco.forms.validation.regexMatch, doubleUnderscoresNotAllowed, "keyup");
             form.addValidation(parent.id + "-parentchild-target", Alfresco.forms.validation.mandatory, null, "keyup");
@@ -666,10 +665,11 @@
           * Disables/enables type input fields depending on what type checkbox that was checked
           *
           * @method _disableTextInputs
-          * @param e click event object
-          * @param obj callback object containg action info & HTMLElements
+          * @param e {object} click event object
+          * @param clearAndFocus {boolean} callback object set to true if disabled fields
+          *        shall be cleared and focus shall be set to appropriate field.
           */
-         _disableTextInputs: function EditPanelHandler__disableTextInputs(e, clearDisabledFields)
+         _disableTextInputs: function EditPanelHandler__disableTextInputs(e, clearAndFocus)
          {
             // Disable all type inputs
             var biDirectionalLabel = Dom.get(parent.id + "-bidirectional-label");
@@ -678,7 +678,7 @@
             biDirectionalLabel.disabled = true;
             parentChildSource.disabled = true;
             parentChildTarget.disabled = true;
-            if (clearDisabledFields)
+            if (clearAndFocus)
             {
                biDirectionalLabel.value = "";
                parentChildSource.value = "";
@@ -689,13 +689,19 @@
             if (Dom.get(parent.id + "-type-bidirectional").checked)
             {
                biDirectionalLabel.disabled = false;
-               biDirectionalLabel.focus();
+               if (clearAndFocus)
+               {
+                  Dom.get(parent.id + "-bidirectional-label").focus();
+               }
             }
             else if (Dom.get(parent.id + "-type-parentchild").checked)
             {
                parentChildSource.disabled = false;
                parentChildTarget.disabled = false;
-               parentChildSource.focus();
+               if (clearAndFocus)
+               {
+                  Dom.get(parent.id + "-parentchild-source").focus();
+               }               
             }
             this.widgets.editForm.updateSubmitElements();
          }
