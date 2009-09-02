@@ -24,8 +24,12 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.capability.group;
 
+import net.sf.acegisecurity.vote.AccessDecisionVoter;
+
+import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AccessStatus;
 
 /**
  * @author andyh
@@ -40,8 +44,7 @@ public class WriteContentCapability extends AbstractCapability
     @Override
     protected int hasPermissionImpl(NodeRef nodeRef)
     {
-        // TODO Auto-generated method stub
-        return 0;
+        return evaluate(nodeRef);
     }
 
     /* (non-Javadoc)
@@ -49,8 +52,30 @@ public class WriteContentCapability extends AbstractCapability
      */
     public String getName()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return "WriteContent";
     }
 
+    
+    public int evaluate(NodeRef nodeRef)
+    {
+        if (isRm(nodeRef))
+        {
+            if (checkFilingUnfrozenUncutoffOpenUndeclared(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+            {
+                if (isRecord(nodeRef))
+                {
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.FILE_RECORDS) == AccessStatus.ALLOWED)
+                    {
+                        return AccessDecisionVoter.ACCESS_GRANTED;
+                    }
+                }
+            }
+            return AccessDecisionVoter.ACCESS_DENIED;
+
+        }
+        else
+        {
+            return AccessDecisionVoter.ACCESS_ABSTAIN;
+        }
+    }
 }

@@ -147,6 +147,7 @@
         <property name="updateCapability" ref="rmUpdate"/>
         <property name="updatePropertiesCapability" ref="rmUpdateProperties"/>
         <property name="declareCapability" ref="rmDeclare"/>
+        <property name="writeContentCapability" ref="rmWriteContent"/>
         
     </bean>
     
