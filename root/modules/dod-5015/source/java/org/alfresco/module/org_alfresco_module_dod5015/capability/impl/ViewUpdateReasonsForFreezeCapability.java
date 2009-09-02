@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability.impl;
 
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessStatus;
@@ -48,7 +49,7 @@ public class ViewUpdateReasonsForFreezeCapability extends AbstractCapability
     {
         if (isRm(nodeRef))
         {
-            if (isFrozen(nodeRef))
+            if (isFrozen(nodeRef) || voter.getNodeService().getType(nodeRef).equals(RecordsManagementModel.TYPE_HOLD))
             {
                 if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE) == AccessStatus.ALLOWED)
                 {
