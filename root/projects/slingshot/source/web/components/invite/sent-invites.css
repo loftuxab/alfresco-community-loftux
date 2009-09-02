@@ -1,12 +1,12 @@
 .sent-invites {
-   margin: 10px;
+   margin: 1em 1em 1em;
 }
 
 /* general */
 .sent-invites .title {
-   color: #333;
-   font-size: 153.9%;
-   margin: 16px 0px;
+   color:#008000;
+   font-size:108%;
+   line-height:2.5em;
 }
 
 .sent-invites .sent-invites-wrapper

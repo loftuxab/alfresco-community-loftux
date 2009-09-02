@@ -61,9 +61,18 @@
    margin-right: 10px;
 }
 
+/* Bug fix for ubuntu that requires flash move  element to get resized to get displayed */
+
 .flash-upload .browse.button-fix
 {
    width: 39px;
+}
+
+/* Bug fix for mac gecko browsers where flash movie gets re-instantiated */
+
+.reinstantiated-fix .flash-upload span.yui-button
+{
+	overflow:visible;
 }
 
 .flash-upload .tip

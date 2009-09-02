@@ -386,6 +386,41 @@
             close: false
          });
 
+         /**
+          * Mac Gecko bugfix for javascript losing connection to the flash uploader movie.
+          * To avoid a mac gecko bug where scrollbars are displayed even if the "scrolled"
+          * content isn't visible, YUI toggled the "overflow" style property between "hidden"
+          * and "visible", this unfortnately also caused the flash movie (which is a child
+          * of the toggled element) to get re-instantiated.
+          *
+          * (https://bugzilla.mozilla.org/show_bug.cgi?id=187435)
+          */
+         if (this.panel.platform == "mac" && YAHOO.env.ua.gecko)
+         {
+            /**
+             * Remove the already added event listeners that toggles
+             * the "overflow" style property for the dialog wrapper.
+             */
+            var Config = YAHOO.util.Config,
+                  p = this.panel;
+
+            if (Config.alreadySubscribed(p.showEvent, p.showMacGeckoScrollbars, p))
+            {
+               p.showEvent.unsubscribe(p.showMacGeckoScrollbars, p);
+            }
+            if (Config.alreadySubscribed(p.showEvent, p.hideMacGeckoScrollbars, p))
+            {
+               p.showEvent.unsubscribe(p.hideMacGeckoScrollbars, p);
+            }
+
+            // Remove the toggling of the "overview" style property for the dialog itself.
+            p.showMacGeckoScrollbars = function(){};
+            p.hideMacGeckoScrollbars = function(){};
+
+            // Add a class for special bug fix css classes
+            Dom.addClass(p.element, "reinstantiated-fix");
+         }
+
          // Save a reference to the file row template that is hidden inside the markup
          this.fileItemTemplates.left = Dom.get(this.id + "-left-div");
          this.fileItemTemplates.center = Dom.get(this.id + "-center-div");
