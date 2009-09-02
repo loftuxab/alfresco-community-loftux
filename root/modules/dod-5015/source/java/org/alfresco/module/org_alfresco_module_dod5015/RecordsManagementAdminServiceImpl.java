@@ -720,15 +720,12 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     }
 
     
-    // Dynamic ID handling. The following methods had been located in a dedicated
-    // spring bean, but got inlined. There may be a case to refactor these out into
-    // a bean again.
-    
-    //TODO After certification. This implementation currently does not support reference,
-    // property, constraints definitions with the same names, which is technically allowed by Alfresco.
     public QName getQNameForClientId(String localName)
     {
-        //TODO Note the implicit assumption here that all custom references will have
+        //TODO 1. After certification. This implementation currently does not support reference,
+        // property, constraints definitions with the same names, which is technically allowed by Alfresco.
+
+        //TODO 2. Note the implicit assumption here that all custom references will have
         // unique titles. This is, in fact, not guaranteed.
         
         QName propertyResult = null;
@@ -758,23 +755,6 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return referenceResult;
     }
 
-    //TODO Can I delete this now?
-    public String getClientIdForQName(QName qname)
-    {
-        PropertyDefinition propDef = getCustomPropertyDefinitions().get(qname);
-        if (propDef != null)
-        {
-            return propDef.getTitle();
-        }
-        
-        AssociationDefinition assDef = getCustomReferenceDefinitions().get(qname);
-        if (assDef != null)
-        {
-            return assDef.getTitle();
-        }
-        return null;
-    }
-    
     private QName generateQNameFor(String clientId)
     {
         if (getQNameForClientId(clientId) != null)
