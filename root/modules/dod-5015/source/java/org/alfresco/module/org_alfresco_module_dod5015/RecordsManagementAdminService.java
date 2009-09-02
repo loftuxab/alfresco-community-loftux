@@ -45,6 +45,10 @@ public interface RecordsManagementAdminService
     /**
      * This method returns the custom properties that have been defined for the specified
      * customisable RM element.
+     * Note: the custom property definitions are retrieved from the dictionaryService
+     * which is notified of any newly created definitions on transaction commit.
+     * Therefore custom properties created in the current transaction will not appear
+     * in the results.
      * 
      * @param customisedElement
      * @return
@@ -54,6 +58,10 @@ public interface RecordsManagementAdminService
     /**
      * This method returns the custom properties that have been defined for all of
      * the specified customisable RM elements.
+     * Note: the custom property definitions are retrieved from the dictionaryService
+     * which is notified of any newly created definitions on transaction commit.
+     * Therefore custom properties created in the current transaction will not appear
+     * in the results.
      */
     public Map<QName, PropertyDefinition> getCustomPropertyDefinitions();
     
@@ -96,6 +104,10 @@ public interface RecordsManagementAdminService
     /**
      * This method returns the custom references that have been defined in the custom
      * model.
+     * Note: the custom reference definitions are retrieved from the dictionaryService
+     * which is notified of any newly created definitions on transaction commit.
+     * Therefore custom references created in the current transaction will not appear
+     * in the results.
      * 
      * @return The Map of custom references (both parent-child and standard).
      */
@@ -152,7 +164,12 @@ public interface RecordsManagementAdminService
     public QName addCustomChildAssocDefinition(String source, String target);
     
     /**
-     * This method returns ConstraintDefinition objects defined in the rmc model (note: not property references or in-line defs)
+     * This method returns ConstraintDefinition objects defined in the rmc model
+     * (note: not property references or in-line defs)
+     * The custom constraint definitions are retrieved from the dictionaryService
+     * which is notified of any newly created definitions on transaction commit.
+     * Therefore custom constraints created in the current transaction will not appear
+     * in the results.
      */
     public List<ConstraintDefinition> getCustomConstraintDefinitions();
 
