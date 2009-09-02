@@ -99,18 +99,17 @@ public class CustomEmailMappingServiceImpl implements CustomEmailMappingService
                    Map<String, Set<QName>> newMapping = new HashMap<String, Set<QName>>(17);
                    newMapping.putAll(currentMapping);
 
-// TODO MER - Commented out until RMC namespace is available here.                   
-//                   for(CustomMapping mapping : customMappings)
-//                   {
-//                       QName newQName = QName.createQName(mapping.getTo(), nspr);
-//                       Set<QName> values = newMapping.get(mapping.getFrom());
-//                       if(values == null)
-//                       {
-//                           values = new HashSet<QName>();
-//                           newMapping.put(mapping.getFrom(), values);
-//                       }
-//                       values.add(newQName);
-//                   }
+                   for(CustomMapping mapping : customMappings)
+                   {
+                       QName newQName = QName.createQName(mapping.getTo(), nspr);
+                       Set<QName> values = newMapping.get(mapping.getFrom());
+                       if(values == null)
+                       {
+                           values = new HashSet<QName>();
+                           newMapping.put(mapping.getFrom(), values);
+                       }
+                       values.add(newQName);
+                   }
                        
                    // Now update the metadata extracter
                    extracter.setMapping(newMapping);       
