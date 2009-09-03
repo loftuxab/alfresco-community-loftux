@@ -100,10 +100,17 @@ var Filters =
             break;
 
          case "transfers":
-            filterParams.variablePath = true;
-            filterQuery = "+PATH:\"" + parsedArgs.rootNode.qnamePath + "//*\"";
-            filterQuery += " +TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer\"";
-            filterParams.query = filterQuery;
+            if (filterData == null)
+            {
+               filterQuery = "+PATH:\"" + parsedArgs.rootNode.qnamePath + "//*\"";
+               filterQuery += " +TYPE:\"{http://www.alfresco.org/model/recordsmanagement/1.0}transfer\"";
+               filterParams.query = filterQuery;
+            }
+            else
+            {
+               filterParams.variablePath = true;
+               filterParams.query = "+PARENT:\"" + filterData + "\"";
+            }
             break;
 
          case "holds":

@@ -91,31 +91,29 @@ var Evaluator =
    /**
     * Disposition evaluator
     */
-   filterDispositionActions: function Evaluator_filterDispositionActions(asset, permissions, status)
+   nextDispositionAction: function Evaluator_nextDispositionAction(asset, permissions, status)
    {
-      var actionName = asset.properties["rma:recordSearchDispositionActionName"];
-
-      if (actionName !== null)
+      // Does the asset have a disposition lifecycle?
+      if (!asset.hasAspect("rma:dispositionLifecycle"))
       {
-         if (actionName !== "accession")
-         {
-            delete permissions["accession"];
-         }
-         
-         if (actionName !== "cutoff")
-         {
-            delete permissions["cutoff"];
-         }
-         
-         if (actionName !== "destroy")
-         {
-            delete permissions["destroy"];
-         }
-         
-         if (actionName !== "transfer")
-         {
-            delete permissions["transfer"];
-         }
+         return;
+      }
+      
+      var actionName = asset.properties["rma:recordSearchDispositionActionName"],
+         actionAsOf = asset.properties["rma:recordSearchDispositionActionAsOf"],
+         now = new Date();
+
+      // Check action asOf date
+      if (actionAsOf != null && actionAsOf < now)
+      {
+         permissions[actionName] = true;
+         return;
+      }
+
+      // Next action could become eligible based on event completion
+      if (asset.properties["rma:recordSearchDispositionEventsEligible"] == true)
+      {
+         permissions[actionName] = true;
       }
    },
 
@@ -208,13 +206,26 @@ var Evaluator =
          case "record-folder":
             actionSet = "recordFolder";
 
+            /* Disposition Actions */
+            Evaluator.nextDispositionAction(asset, permissions, status);
+
             /* File new Records */
             permissions["file"] = capabilities["Create"];
+
+            /* Cut Off status */
+            if (asset.hasAspect("rma:cutOff"))
+            {
+               status["cutoff-folder"] = true;
+            }
 
             /* Open/Closed */
             if (asset.properties["rma:isClosed"])
             {
-               status["closed"] = true;
+               // Cutoff implies closed, so no need to duplicate
+               if (!status["cutoff-folder"])
+               {
+                  status["closed"] = true;
+               }
                if (capabilities["ReOpenFolders"])
                {
                   permissions["openFolder"] = true;
@@ -228,16 +239,6 @@ var Evaluator =
                   permissions["closeFolder"] = true;
                }
             }
-
-            /**
-             * Disposition Actions.
-             *
-             * Note: Will be filtered later in Evaluator.filterDispositionActions()
-             */
-            permissions["accession"] = true;
-            permissions["cutoff"] = true;
-            permissions["destroy"] = true;
-            permissions["transfer"] = true;
 
             /* Frozen/Unfrozen */
             if (asset.hasAspect("rma:frozen"))
@@ -264,31 +265,13 @@ var Evaluator =
          case "record":
             actionSet = "record";
 
-            /**
-             * Reviewed
-             * Rules: Has rma:vitalRecord aspect and rma:reviewAsOf date exists and is before now
-             */
-            /*
-            if (asset.hasAspect("rma:vitalRecord"))
-            {
-               if (asset.properties["rma:reviewAsOf"] != null && asset.properties["rma:reviewAsOf"] < now)
-               {
-                  permissions["reviewed"] = true;
-               }
-            }
-            */
+            /* Disposition Actions */
+            Evaluator.nextDispositionAction(asset, permissions, status);
 
-            /**
-             * Disposition Actions
-             *
-             * Note: Will be filtered later in Evaluator.filterDispositionActions()
-             */
-            if (!asset.hasAspect("rma:cutOff"))
+            /* Cut Off status */
+            if (asset.hasAspect("rma:cutOff"))
             {
-               permissions["accession"] = true;
-               permissions["cutoff"] = true;
-               permissions["destroy"] = true;
-               permissions["transfer"] = true;
+               status["cutoff"] = true;
             }
 
             /* Frozen/Unfrozen */
@@ -371,9 +354,6 @@ var Evaluator =
             actionSet = assetType;
             break;
       }
-
-      // Filter by next Disposition action
-      Evaluator.filterDispositionActions(asset, permissions, status);
 
       return (
       {

@@ -3,23 +3,26 @@
    "totalResults": ${treenode.items?size?c},
    "items":
    [
-   <#list treenode.items as t>
+   <#list treenode.items as item>
+      <#assign t = item.node>
       <#assign hasChildren = false>
       <#list t.children as c>
          <#if c.isContainer><#assign hasChildren = true><#break></#if>
       </#list>
       {
+      <#if item.permissions??>
+         "userAccess":
+         {
+         <#list item.permissions?keys as perm>
+            "${perm?string}": true<#if perm_has_next>,</#if>
+         </#list>
+         },
+      </#if>
          "nodeRef": "${t.nodeRef}",
          "name": "${t.name}",
          "description": "${(t.properties.description!"{}")}",
-         "hasChildren": ${hasChildren?string},
-         "userAccess":
-         {
-            "create": ${t.hasPermission("CreateChildren")?string},
-            "edit": ${t.hasPermission("Write")?string},
-            "delete": ${t.hasPermission("Delete")?string}
-         }
-      }<#if t_has_next>,</#if>
+         "hasChildren": ${hasChildren?string}
+      }<#if item_has_next>,</#if>
    </#list>
    ]
 }

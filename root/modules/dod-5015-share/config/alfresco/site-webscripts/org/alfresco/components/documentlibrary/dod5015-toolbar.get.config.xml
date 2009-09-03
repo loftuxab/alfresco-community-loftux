@@ -2,6 +2,7 @@
    <actionSets>
       <actionSet id="default">
          <action type="action-link" id="onActionCutoff" permission="ApproveRecordsScheduledForCutoff" asset="record-folder,record,record-nonelec" label="menu.selected-items.cutoff" />
+         <action type="action-link" id="onActionUndoCutoff" permission="ApproveRecordsScheduledForCutoff" asset="record-folder,record,record-nonelec" label="menu.selected-items.undo-cutoff" />
          <action type="action-link" id="onActionDestroy" permission="DestroyRecordsScheduledForDestruction" asset="record-folder,record,record-nonelec" label="menu.selected-items.destroy" />
          <action type="action-link" id="onActionTransfer" permission="AuthorizeAllTransfers" asset="record-folder,record,record-nonelec" label="menu.selected-items.transfer" />
          <action type="action-link" id="onActionTransferComplete" permission="AuthorizeAllTransfers" asset="transfer" label="menu.selected-items.transfer-complete" />
@@ -12,6 +13,7 @@
          <action type="action-link" id="onActionCopyTo" permission="" asset="record-series|record-category|record-folder|record,record-nonelec|undeclared-record-nonelec" label="menu.selected-items.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="MoveRecords" asset="record-series|record-category|record-folder|record,record-nonelec|undeclared-record-nonelec" label="menu.selected-items.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" asset="record-series|record-category|record-folder|record,record-nonelec|undeclared-record-nonelec" label="menu.selected-items.file-to" />
+         <action type="action-link" id="onActionExportMetadata" permission="" asset="record-series,record-category,record-folder,record,record-nonelec,undeclared-record-nonelec" label="menu.selected-items.export-metadata" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="menu.selected-items.delete" />
       </actionSet>
    </actionSets>

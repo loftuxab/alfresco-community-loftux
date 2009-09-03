@@ -10,6 +10,16 @@
    background-image: url(images/import-disabled-16.png);
 }
 
+.toolbar .export-all button
+{
+   background: transparent url(images/export-16.png) no-repeat 12px 4px;
+   padding-left: 32px; 
+}
+.toolbar .export-all .yui-button-disabled button
+{
+   background-image: url(images/export-disabled-16.png);
+}
+
 .toolbar .selected-items
 {
    float: left;
@@ -25,6 +35,11 @@
 .toolbar .onActionDestroy
 {
    background-image: url(images/destroy-record-16.png);
+}
+
+.toolbar .onActionExportMetadata
+{
+   background-image: url(images/export-16.png);
 }
 
 .toolbar .onActionFileTo

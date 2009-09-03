@@ -109,6 +109,13 @@
             value: "Create"
          });
 
+         // Export All button: only "read" access required
+         /**
+          * Is this the correct place for the Export All button?
+          *
+         this.widgets.exportAllButton = Alfresco.util.createYUIButton(this, "exportAll-button", this.onExportAll);
+         */
+
          // Selected Items menu button
          this.widgets.selectedItems = Alfresco.util.createYUIButton(this, "selectedItems-button", this.onSelectedItems,
          {
@@ -136,8 +143,14 @@
             disabled: true
          });
 
+         // Transfers Folder Up Navigation button
+         this.widgets.transfersFolderUp =  Alfresco.util.createYUIButton(this, "transfersFolderUp-button", this.onFilterFolderUp,
+         {
+            disabled: true
+         });
+
          // Holds Folder Up Navigation button
-         this.widgets.holdsFolderUp =  Alfresco.util.createYUIButton(this, "holdsFolderUp-button", this.onHoldsFolderUp,
+         this.widgets.holdsFolderUp =  Alfresco.util.createYUIButton(this, "holdsFolderUp-button", this.onFilterFolderUp,
          {
             disabled: true
          });
@@ -307,7 +320,7 @@
                handler: function DLTB_onFileUpload_nonElectronic()
                {
                   this.destroy();
-                  me.onnonElectronicDocument.call(me);
+                  me.onNonElectronicDocument.call(me);
                }
             },
             {
@@ -353,9 +366,9 @@
       /**
        * Non-Electronic Record button click handler
        *
-       * @method onnonElectronicDocument
+       * @method onNonElectronicDocument
        */
-      onnonElectronicDocument: function DLTB_onnonElectronicDocument()
+      onNonElectronicDocument: function DLTB_onNonElectronicDocument()
       {
          var destination = this.modules.docList.doclistMetadata.parent,
             label = "label.new-rma_nonElectronicDocument",
@@ -363,7 +376,7 @@
             msgHeader = this.msg(label + ".header");
 
          // Intercept before dialog show
-         var doBeforeDialogShow = function DLTB_onnonElectronicDocument_doBeforeDialogShow(p_form, p_dialog)
+         var doBeforeDialogShow = function DLTB_onNonElectronicDocument_doBeforeDialogShow(p_form, p_dialog)
          {
             Dom.get(p_dialog.id + "-dialogTitle").innerHTML = msgTitle;
             Dom.get(p_dialog.id + "-dialogHeader").innerHTML = msgHeader;
@@ -393,7 +406,7 @@
             },
             onSuccess:
             {
-               fn: function DLTB_onnonElectronicDocument_success(response)
+               fn: function DLTB_onNonElectronicDocument_success(response)
                {
                   var fileName = response.config.dataObj["prop_cm_name"];
                   YAHOO.Bubbling.fire("metadataRefresh",
@@ -409,7 +422,7 @@
             },
             onFailure:
             {
-               fn: function DLTB_onnonElectronicDocument_failure(response)
+               fn: function DLTB_onNonElectronicDocument_failure(response)
                {
                   Alfresco.util.PopupManager.displayMessage(
                   {
@@ -433,17 +446,28 @@
       },
 
       /**
-       * Holds Folder Up Navigate button click handler
+       * Export All button click handler
        *
-       * @method onHoldsFolderUp
+       * @method onExportAll
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onHoldsFolderUp: function DLTB_onHoldsFolderUp(e, p_obj)
+      onExportAll: function DLTB_onExportAll(e, p_obj)
+      {
+      },
+
+      /**
+       * Transfers/Holds Folder Up Navigate button click handler
+       *
+       * @method onFilterFolderUp
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onFilterFolderUp: function DLTB_onFilterFolderUp(e, p_obj)
       {
          YAHOO.Bubbling.fire("filterChanged",
          {
-            filterId: "holds",
+            filterId: this.currentFilter.filterId,
             filterData: ""
          });
          Event.preventDefault(e);

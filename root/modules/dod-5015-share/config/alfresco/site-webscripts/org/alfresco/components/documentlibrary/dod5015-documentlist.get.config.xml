@@ -6,6 +6,8 @@
          <action type="simple-link" id="onActionViewDetails" href="{recordSeriesDetailsUrl}" label="actions.view-details" />
          <action type="simple-link" id="onActionEditDetails" permisson="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionManagePermissions" permission="ManageAccessControls" label="actions.manage-permissions" />
+         <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
+         <action type="action-link" id="onActionMoveTo" permission="MoveRecords" label="actions.move-to" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
       </actionSet>
 
@@ -13,15 +15,19 @@
          <action type="simple-link" id="onActionViewDetails" href="{recordCategoryDetailsUrl}" label="actions.view-details" />
          <action type="simple-link" id="onActionEditDetails" permisson="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionManagePermissions" permission="ManageAccessControls" label="actions.manage-permissions" />
+         <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
+         <action type="action-link" id="onActionMoveTo" permission="MoveRecords" label="actions.move-to" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
       </actionSet>
 
       <actionSet id="recordFolder">
          <action type="simple-link" id="onActionViewDetails" href="{recordFolderDetailsUrl}" label="actions.view-details" />
          <action type="simple-link" id="onActionEditDetails" permisson="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action type="action-link" id="onActionReviewed" permission="CycleVitalRecords" label="actions.reviewed" />
          <action type="action-link" id="onActionCloseFolder" permission="closeFolder" label="actions.close-folder" />
          <action type="action-link" id="onActionOpenFolder" permission="openFolder" label="actions.open-folder" />
-         <action type="action-link" id="onActionCutoff" permission="ApproveRecordsScheduledForCutoff" label="actions.cutoff" />
+         <action type="action-link" id="onActionCutoff" permission="ApproveRecordsScheduledForCutoff,cutoff" label="actions.cutoff" />
+         <action type="action-link" id="onActionUndoCutoff" permission="ApproveRecordsScheduledForCutoff,undoCutoff" label="actions.undo-cutoff" />
          <action type="action-link" id="onActionDestroy" permission="DestroyRecordsScheduledForDestruction" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="AuthorizeAllTransfers" label="actions.transfer" />
          <action type="action-link" id="onActionAccession" permission="AuthorizeNominatedTransfers" label="actions.accession" />
@@ -38,13 +44,14 @@
          <action type="simple-link" id="onActionDownload" permission="download" href="{downloadUrl}" label="actions.download" />
          <action type="simple-link" id="onActionEditDetails" permisson="EditDeclaredRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionReviewed" permission="CycleVitalRecords" label="actions.reviewed" />
-         <action type="action-link" id="onActionCutoff" permission="ApproveRecordsScheduledForCutoff" label="actions.cutoff" />
+         <action type="action-link" id="onActionUndeclare" permission="UndeclareRecords" label="actions.undeclare" />
+         <action type="action-link" id="onActionCutoff" permission="ApproveRecordsScheduledForCutoff,cutoff" label="actions.cutoff" />
+         <action type="action-link" id="onActionUndoCutoff" permission="ApproveRecordsScheduledForCutoff,undoCutoff" label="actions.undo-cutoff" />
          <action type="action-link" id="onActionDestroy" permission="DestroyRecordsScheduledForDestruction" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="AuthorizeAllTransfers" label="actions.transfer" />
          <action type="action-link" id="onActionAccession" permission="AuthorizeNominatedTransfers" label="actions.accession" />
          <action type="action-link" id="onActionFreeze" permission="freeze" label="actions.freeze" />
          <action type="action-link" id="onActionUnfreeze" permission="unfreeze" label="actions.unfreeze" />
-         <action type="action-link" id="onActionUndeclare" permission="UndeclareRecords" label="actions.undeclare" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="MoveRecords" label="actions.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
@@ -82,7 +89,7 @@
       </actionSet>
 
       <actionSet id="holdContainer">
-         <action type="action-link" id="onActionRelinquish" permission="unfreeze" label="actions.relinquish" />
+         <action type="action-link" id="onActionRelinquish" permission="Unfreeze" label="actions.relinquish" />
          <action type="action-link" id="onActionUnfreezeAll" permission="Unfreeze-HIDDEN" label="actions.unfreeze-all" />
          <action type="action-link" id="onActionEditHoldDetails" permission="ViewUpdateReasonsForFreeze" label="actions.edit-reason" />
       </actionSet>
@@ -90,7 +97,6 @@
       <actionSet id="folder">
          <action type="simple-link" id="onActionViewDetails" href="{folderDetailsUrl}" label="actions.view-details" />
          <action type="simple-link" id="onActionEditDetails" permisson="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
-         <action type="action-link" id="onActionManagePermissions" permission="ManageAccessControls" label="actions.manage-permissions" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
       </actionSet>
 

@@ -461,7 +461,14 @@
                case "transfer-container":
                   var transferTitle = me.msg("details.transfer-container.title", record.displayName);
                
-                  desc = '<h3 class="filename">' + $html(transferTitle) + '</h3>';
+                  var filterObj =
+                  {
+                     filterId: "transfers",
+                     filterData: nodeRef,
+                     filterDisplay: transferTitle
+                  };
+
+                  desc = '<h3 class="filename"><a class="filter-change" href="#" rel="' + Alfresco.DocumentList.generateFilterMarkup(filterObj) + '">' + $html(transferTitle) + '</a></h3>';
 
                   if (me.options.simpleView)
                   {
