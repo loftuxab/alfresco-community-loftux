@@ -211,8 +211,8 @@ test
 }
 FileGroup ::9C895371-373A-4923-840C-4F98632E4A99 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive MacOS-X} -name {Program Files} -parent FileGroups
 File ::A1B6D7E7-BFA9-49D2-9ECE-45C906A057EF -directory <%InstallDir%>/rm -name W:/HEAD/root/build/dist/alfresco-mmt.jar -location ../../build/dist -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::1B85819E-AF0D-4C69-8BEE-175641CD97CB -name W:/HEAD/root/build/dist/alfresco-dod5015-share-unsupported.amp -parent 9C895371-373A-4923-840C-4F98632E4A99
-File ::ADE58AE5-5DEC-4E2C-8604-7683990CF2B8 -name W:/HEAD/root/build/dist/alfresco-dod5015-unsupported.amp -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::1B85819E-AF0D-4C69-8BEE-175641CD97CB -name W:/HEAD/root/build/dist/alfresco-dod5015-share-unsupported.amp -location ../../build/dist -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::ADE58AE5-5DEC-4E2C-8604-7683990CF2B8 -name W:/HEAD/root/build/dist/alfresco-dod5015-unsupported.amp -location ../../build/dist -parent 9C895371-373A-4923-840C-4F98632E4A99
 Component ::A92DA43F-C102-49A4-89FB-F2A2B18949D1 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X} -name {Default Component} -parent Components
 SetupType ::F6005EED-F116-409B-82E7-662D4A7065E8 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X} -name Typical -parent SetupTypes
 SetupType ::840E153B-F29E-4184-8941-3C26F456EB0D -setup Install -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X} -name Custom -parent SetupTypes
