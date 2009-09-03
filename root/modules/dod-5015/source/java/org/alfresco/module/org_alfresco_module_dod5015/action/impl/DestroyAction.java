@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
 import org.alfresco.repo.content.ContentServicePolicies;
@@ -81,6 +82,12 @@ public class DestroyAction extends RMDispositionActionExecuterAbstractBase imple
                 this.nodeService.removeProperty(record, prop);
             }
 
+            // Remove the thumbnailed aspect (and its properties and associations) if it is present
+            if (this.nodeService.hasAspect(record, ContentModel.ASPECT_THUMBNAILED))
+            {
+                this.nodeService.removeAspect(record, ContentModel.ASPECT_THUMBNAILED);
+            }
+            
             // Finally, add the ghosted aspect (TODO: Any properties?)
             this.nodeService.addAspect(record, DOD5015Model.ASPECT_GHOSTED, Collections.<QName, Serializable> emptyMap());          
         }
