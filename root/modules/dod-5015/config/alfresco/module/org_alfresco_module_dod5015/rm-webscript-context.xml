@@ -101,7 +101,7 @@
     </bean>
     
     <!-- REST impl for POST export -->
-    <bean id="webscript.org.alfresco.rma.export.post" class="org.alfresco.repo.web.scripts.content.StreamArchive" parent="webscript">
+    <bean id="webscript.org.alfresco.rma.export.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.ExportPost" parent="webscript">
         <property name="nodeService" ref="NodeService"/>
         <property name="contentService" ref="ContentService"/>
         <property name="permissionService" ref="PermissionService"/>
