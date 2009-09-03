@@ -29,8 +29,6 @@
     "constraintName" : "${constraint.name}",
     "caseSensitive" :  "${constraint.caseSensitive?string("true", "false")}",
     "constraintTitle" : "${constraint.title}",
-    "allowedValues" : [ <#list constraint.allowedValues as allowedValue> "${allowedValue}" <#if allowedValue_has_next>,</#if> </#list> ],      
-        
     "values" : [ 
          <#list constraint.values as value>   
          {

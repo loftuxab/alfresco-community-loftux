@@ -298,7 +298,6 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                         
                         if (! found)
                         {
-                            // TODO MER Removed this temporarily to allow testing.
                             //throw new AlfrescoRuntimeException("Constraint does not exist (or is not used) in RM model: "+conStr);
                         }
                         
@@ -713,38 +712,39 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
         
         if(members == null)
         {
-            // list does not exist
+            // Members List does not exist
+            Map<String, List<String>> emptyConstraint =  new HashMap<String, List<String>>(0) ;
+            caveatConfig.put(listName, emptyConstraint);
+            members = emptyConstraint;
+            
         }
-        else
-        {
-            // authorities contains authority, values[]
-            // pivot contains value, members[]
-            Map<String, List<String>> pivot = PivotUtil.getPivot(members);
+        // authorities contains authority, values[]
+        // pivot contains value, members[]
+        Map<String, List<String>> pivot = PivotUtil.getPivot(members);
         
-            // remove all authorities which have this value
-            List<String> existingAuthorities = pivot.get(valueName);
-            if(existingAuthorities != null)
-            {
-                for(String authority : existingAuthorities)
-                {
-                    List<String> vals = members.get(authority);
-                    vals.remove(valueName);
-                }
-            }
-            // add the new authorities for this value
-            for(String authority : authorities)
+        // remove all authorities which have this value
+        List<String> existingAuthorities = pivot.get(valueName);
+        if(existingAuthorities != null)
+        {
+            for(String authority : existingAuthorities)
             {
                 List<String> vals = members.get(authority);
-                if(vals == null)
-                {
-                    vals= new ArrayList<String>();
-                    members.put(authority, vals);
-                }
-                vals.add(valueName);
+                vals.remove(valueName);
             }
-      
-            updateOrCreateCaveatConfig(convertToJSONString(caveatConfig)); 
         }
+        // add the new authorities for this value
+        for(String authority : authorities)
+        {
+            List<String> vals = members.get(authority);
+            if(vals == null)
+            {
+                vals= new ArrayList<String>();
+                members.put(authority, vals);
+            }
+            vals.add(valueName);
+        }
+      
+        updateOrCreateCaveatConfig(convertToJSONString(caveatConfig)); 
     }
     
     /**
@@ -811,11 +811,20 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
             Constraint con = dictionaryDef.getConstraint();
             if (con instanceof RMListOfValuesConstraint)
             {
-                RMListOfValuesConstraint def = (RMListOfValuesConstraint)con; 
+                final RMListOfValuesConstraint def = (RMListOfValuesConstraint)con; 
                 RMConstraintInfo i = new RMConstraintInfo();
                 i.setName(def.getShortName());
                 i.setTitle(def.getTitle());
-                List<String> allowedValues = def.getAllowedValues();
+                
+                // note: assumes only one caveat/LOV against a given property
+                List<String> allowedValues = AuthenticationUtil.runAs(new RunAsWork<List<String>>()
+                {
+                    public List<String> doWork()
+                    {
+                        return def.getAllowedValues();
+                    }
+                }, AuthenticationUtil.getSystemUserName());
+                
                 i.setAllowedValues(allowedValues.toArray(new String[allowedValues.size()]));
                 i.setCaseSensitive(def.isCaseSensitive());
                 info.add(i);
@@ -840,12 +849,19 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
             Constraint con = dictionaryDef.getConstraint();
             if (con instanceof RMListOfValuesConstraint)
             {
-                RMListOfValuesConstraint def = (RMListOfValuesConstraint)con; 
+                final RMListOfValuesConstraint def = (RMListOfValuesConstraint)con; 
 
                 RMConstraintInfo info = new RMConstraintInfo();
                 info.setName(listQName.toPrefixString());
                 info.setTitle(con.getTitle());
-                List<String> allowedValues = def.getAllowedValues();
+                List<String> allowedValues = AuthenticationUtil.runAs(new RunAsWork<List<String>>()
+                {
+                    public List<String> doWork()
+                    {
+                        return def.getAllowedValues();
+                    }
+                }, AuthenticationUtil.getSystemUserName());
+        
                 info.setAllowedValues(allowedValues.toArray(new String[allowedValues.size()]));
                 info.setCaseSensitive(def.isCaseSensitive());
                 return info;
@@ -888,8 +904,14 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
             ConstraintDefinition con = recordsManagementAdminService.getCustomConstraintDefinition(listQName);
             if (con instanceof RMListOfValuesConstraint)
             {
-                RMListOfValuesConstraint def = (RMListOfValuesConstraint)con; 
-                List<String> oldAllowedValues = def.getAllowedValues();
+                final RMListOfValuesConstraint def = (RMListOfValuesConstraint)con; 
+                List<String> oldAllowedValues = AuthenticationUtil.runAs(new RunAsWork<List<String>>()
+                {
+                    public List<String> doWork()
+                    {
+                       return def.getAllowedValues();
+                    }
+                }, AuthenticationUtil.getSystemUserName());
                 
                 /**
                  * Deal with any additions

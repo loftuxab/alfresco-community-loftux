@@ -220,8 +220,6 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
             assertTrue("values not correct", compare(array, allowedValues));
                    
         }
-
-
         
         /**
           * Now update both values and title - remove BANANA, PEACH, Add APPLE.
@@ -261,127 +259,125 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
             assertEquals(constraintName2, constraintName);
             assertNotNull(constraintTitle);
             assertEquals("title not as expected", constraintTitle, newTitle);
-
             
-// NEIL PLEASE LOOK AT THIS            
-//            // Check that data has been persisted.
-//            Response resp2 = sendRequest(new GetRequest(url), Status.STATUS_OK); 
-//            JSONObject top2 = new JSONObject(resp2.getContentAsString());
-//            System.out.println("Problem here");
-//            System.out.println(resp2.getContentAsString());
-//            JSONObject data2 = top2.getJSONObject("data");
-//            String constraintTitle2 = data2.getString("constraintTitle");
-//            JSONArray allowedValues2 = data2.getJSONArray("allowedValues");
-//            assertTrue("values not correct", compare(array, allowedValues2));
-//            assertTrue("allowedValues is not 2", allowedValues2.length() == 2); 
-//            assertEquals(constraintName2, constraintName);
-//            assertNotNull(constraintTitle2);
-//            assertEquals("title not as expected", constraintTitle2, newTitle);
-//            
+            // Check that data has been persisted.
+            Response resp2 = sendRequest(new GetRequest(url), Status.STATUS_OK); 
+            JSONObject top2 = new JSONObject(resp2.getContentAsString());
+            System.out.println("Problem here");
+            System.out.println(resp2.getContentAsString());
+            JSONObject data2 = top2.getJSONObject("data");
+            String constraintTitle2 = data2.getString("constraintTitle");
+            JSONArray allowedValues2 = data2.getJSONArray("allowedValues");
+            assertTrue("values not correct", compare(array, allowedValues2));
+            assertTrue("allowedValues is not 2", allowedValues2.length() == 2); 
+            assertEquals(constraintName2, constraintName);
+            assertNotNull(constraintTitle2);
+            assertEquals("title not as expected", constraintTitle2, newTitle);
+            
         }
-//        
-//        /**
-//         * Now put without allowed values
-//         */
-//        {
-//            String newTitle = "update with no values";
-//        
-//            JSONObject obj = new JSONObject();
-//
-//            obj.put("constraintName", RM_LIST);
-//            obj.put("constraintTitle", newTitle);
-//        
-//            /**
-//              * Now do a put to update a new list
-//              */
-//            
-//                Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + constraintName, obj.toString(), "application/json"), Status.STATUS_OK); 
-//                // Check the response
-//                JSONObject top = new JSONObject(response.getContentAsString());
-//                
-//                JSONObject data = top.getJSONObject("data");
-//                System.out.println(response.getContentAsString());
-//                
-//                String url = data.getString("url");
-//                String constraintName2 = data.getString("constraintName");
-//                String constraintTitle = data.getString("constraintTitle");
-//                JSONArray allowedValues = data.getJSONArray("allowedValues");
-//                
-//                assertTrue(allowedValues.length() == 2); 
-//               
-//                assertNotNull(url);
-//                assertEquals(constraintName2, constraintName);
-//                assertNotNull(constraintTitle);
-//                assertEquals("title not as expected", constraintTitle, newTitle);
-//        }
-//        
-//        /**
-//         * Now post without constraint Title
-//         */
-//        {
-//            JSONArray array = new JSONArray();
-//            array.put("LEMON");
-//            array.put("APPLE");
-//   
-//            JSONObject obj = new JSONObject();
-//            obj.put("allowedValues", array);
-//        
-//            System.out.println(obj.toString());
-//        
-//            /**
-//              * Now do a Put to update the list - title should remain
-//              */
-//            
-//                Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + constraintName, obj.toString(), "application/json"), Status.STATUS_OK); 
-//                // Check the response
-//                JSONObject top = new JSONObject(response.getContentAsString());
-//                
-//                JSONObject data = top.getJSONObject("data");
-//                System.out.println(response.getContentAsString());
-//        }
-//        
-//        /**
-//         * Add a new value (PEAR) to the list
-//         */
-//        {
-//            JSONArray array = new JSONArray();
-//            array.put("PEAR");
-//            array.put("LEMON");
-//            array.put("APPLE");
-//        
-//            JSONObject obj = new JSONObject();
-//            obj.put("allowedValues", array);
-//        
-//            System.out.println(obj.toString());
-//                    
-//            Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + constraintName, obj.toString(), "application/json"), Status.STATUS_OK); 
-//            // Check the response
-//            JSONObject top = new JSONObject(response.getContentAsString());
-//                
-//            JSONObject data = top.getJSONObject("data");
-//            System.out.println(response.getContentAsString());
-//        }
-//        
-//        /**
-//         * Remove a value (PEAR) from the list
-//         */
-//        {
-//            JSONArray array = new JSONArray();
-//            array.put("APPLE");
-//            array.put("LEMON");
-//        
-//            JSONObject obj = new JSONObject();
-//            obj.put("allowedValues", array);
-//        
-//            System.out.println(obj.toString());
-//                    
-//            Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + constraintName, obj.toString(), "application/json"), Status.STATUS_OK); 
-//            // Check the response
-//            JSONObject top = new JSONObject(response.getContentAsString());
-//                
-//            JSONObject data = top.getJSONObject("data");
-//            System.out.println(response.getContentAsString());
-//        }
+        
+        /**
+         * Now put without allowed values
+         */
+        {
+            String newTitle = "update with no values";
+        
+            JSONObject obj = new JSONObject();
+
+            obj.put("constraintName", RM_LIST);
+            obj.put("constraintTitle", newTitle);
+        
+            /**
+              * Now do a put to update a new list
+              */
+            
+                Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + constraintName, obj.toString(), "application/json"), Status.STATUS_OK); 
+                // Check the response
+                JSONObject top = new JSONObject(response.getContentAsString());
+                
+                JSONObject data = top.getJSONObject("data");
+                System.out.println(response.getContentAsString());
+                
+                String url = data.getString("url");
+                String constraintName2 = data.getString("constraintName");
+                String constraintTitle = data.getString("constraintTitle");
+                JSONArray allowedValues = data.getJSONArray("allowedValues");
+                
+                assertTrue(allowedValues.length() == 2); 
+               
+                assertNotNull(url);
+                assertEquals(constraintName2, constraintName);
+                assertNotNull(constraintTitle);
+                assertEquals("title not as expected", constraintTitle, newTitle);
+        }
+        
+        /**
+         * Now post without constraint Title
+         */
+        {
+            JSONArray array = new JSONArray();
+            array.put("LEMON");
+            array.put("APPLE");
+   
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+        
+            System.out.println(obj.toString());
+        
+            /**
+              * Now do a Put to update the list - title should remain
+              */
+            
+                Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + constraintName, obj.toString(), "application/json"), Status.STATUS_OK); 
+                // Check the response
+                JSONObject top = new JSONObject(response.getContentAsString());
+                
+                JSONObject data = top.getJSONObject("data");
+                System.out.println(response.getContentAsString());
+        }
+        
+        /**
+         * Add a new value (PEAR) to the list
+         */
+        {
+            JSONArray array = new JSONArray();
+            array.put("PEAR");
+            array.put("LEMON");
+            array.put("APPLE");
+        
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+        
+            System.out.println(obj.toString());
+                    
+            Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + constraintName, obj.toString(), "application/json"), Status.STATUS_OK); 
+            // Check the response
+            JSONObject top = new JSONObject(response.getContentAsString());
+                
+            JSONObject data = top.getJSONObject("data");
+            System.out.println(response.getContentAsString());
+        }
+        
+        /**
+         * Remove a value (PEAR) from the list
+         */
+        {
+            JSONArray array = new JSONArray();
+            array.put("APPLE");
+            array.put("LEMON");
+        
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+        
+            System.out.println(obj.toString());
+                    
+            Response response = sendRequest(new PutRequest(URL_RM_CONSTRAINTS + "/" + constraintName, obj.toString(), "application/json"), Status.STATUS_OK); 
+            // Check the response
+            JSONObject top = new JSONObject(response.getContentAsString());
+                
+            JSONObject data = top.getJSONObject("data");
+            System.out.println(response.getContentAsString());
+        }
               
     }
 
