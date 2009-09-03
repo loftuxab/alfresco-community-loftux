@@ -25,6 +25,7 @@
 package org.alfresco.web.scripts.servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -42,6 +43,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -53,6 +56,9 @@ public class FormData implements Serializable
 {
     private static final long serialVersionUID = 1832644544828452385L;
 
+    /** Logger */
+    private static Log logger = LogFactory.getLog(FormData.class);
+    
     private HttpServletRequest req;
     private String encoding = null;
     private ServletFileUpload upload;
@@ -237,6 +243,27 @@ public class FormData implements Serializable
             }
             catch (IOException e)
             {
+                if (logger.isWarnEnabled())
+                    logger.warn("Failed to get content: " + e.getMessage());
+                
+                return null;
+            }
+        }
+        
+        /**
+         * @return InputStream to contents of file
+         */
+        public InputStream getInputStream()
+        {
+            try
+            {
+                return file.getInputStream();
+            }
+            catch (IOException e)
+            {
+                if (logger.isWarnEnabled())
+                    logger.warn("Failed to get input stream: " + e.getMessage());
+                
                 return null;
             }
         }

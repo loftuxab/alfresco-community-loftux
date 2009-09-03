@@ -25,6 +25,7 @@
 package org.alfresco.web.scripts.servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequestImpl;
+import org.alfresco.web.scripts.servlet.FormData.FormField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -392,6 +394,36 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
             port = req.getServerPort();
         }
         return port;
+    }
+    
+    /**
+     * Returns the FormField bject representing a file uploaded via a multipart form.
+     * 
+     * @param name The name of the field containing the content
+     * @return FormField bject representing a file uploaded via a multipart form or null
+     *         if the field does not exist or is not a file field.
+     */
+    public FormField getFileField(String name)
+    {
+        FormField field = null;
+        
+        // attempt to find the requested field
+        FormField[] fields = this.formData.getFields();
+        for (FormField f : fields)
+        {
+            if (f.getName().equals(name))
+            {
+                // check the field is a file field
+                if (f.getIsFile())
+                {
+                    field = f;
+                }
+                
+                break;
+            }
+        }
+            
+        return field;
     }
 
     /* (non-Javadoc)
