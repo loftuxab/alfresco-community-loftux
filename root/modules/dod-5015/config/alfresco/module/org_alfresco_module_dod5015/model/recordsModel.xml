@@ -675,7 +675,7 @@
          </mandatory-aspects>
       </aspect>      
    
-      <!-- TODO rename to cutOffAs and add cutOffBy properties -->
+      <!-- TODO remove cutOffDate since it can be retrieved from action history -->
       <aspect name="rma:cutOff">
          <title>Cut Off</title>         
          <properties>                
@@ -685,9 +685,16 @@
                <mandatory>true</mandatory>
             </property>
          </properties>
-         <mandatory-aspects>
-            <aspect>rma:filePlanComponent</aspect>
-         </mandatory-aspects>
+      </aspect>
+      
+      <!-- Transfered marker aspect -->
+      <aspect name="rma:transferred">
+         <title>Transferred</title>         
+      </aspect>
+            
+      <!-- Ascended marker aspect -->
+      <aspect name="rma:ascended">
+         <title>Ascended</title>         
       </aspect>
       
       <aspect name="rma:frozen">

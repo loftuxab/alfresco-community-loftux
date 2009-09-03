@@ -75,10 +75,12 @@ public class TransferCompleteAction extends RMActionExecuterAbstractBase
         QName className = this.nodeService.getType(actionedUponNodeRef);
         if (this.dictionaryService.isSubClass(className, TYPE_TRANSFER) == true)
         {
+            boolean accessionIndicator = ((Boolean)nodeService.getProperty(actionedUponNodeRef, PROP_TRANSFER_ACCESSION_INDICATOR)).booleanValue();
+            
             List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionedUponNodeRef, ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
             for (ChildAssociationRef assoc : assocs)
             {
-                markComplete(assoc.getChildRef());
+                markComplete(assoc.getChildRef(), accessionIndicator);
             }
 
             // Delete the transfer object
@@ -105,11 +107,33 @@ public class TransferCompleteAction extends RMActionExecuterAbstractBase
      * @param nodeRef
      *            disposition lifecycle node reference
      */
-    private void markComplete(NodeRef nodeRef)
+    private void markComplete(NodeRef nodeRef, boolean accessionIndicator)
     {
         // Set the completed date
-        this.nodeService.setProperty(nodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT, new Date());
-        this.nodeService.setProperty(nodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY, AuthenticationUtil.getRunAsUser());
+        nodeService.setProperty(nodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT, new Date());
+        nodeService.setProperty(nodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY, AuthenticationUtil.getRunAsUser());
+        
+        // Determine which marker aspect to use
+        QName markerAspectQName = null;
+        if (accessionIndicator == true)
+        {
+            markerAspectQName = ASPECT_ASCENDED;
+        }
+        else
+        {
+            markerAspectQName = ASPECT_TRANSFERRED;
+        }
+        
+        // Mark the object and children accordingly
+        nodeService.addAspect(nodeRef, markerAspectQName, null);
+        if (recordsManagementService.isRecordFolder(nodeRef) == true)
+        {
+            List<NodeRef> records = recordsManagementService.getRecords(nodeRef);
+            for (NodeRef record : records)
+            {
+                nodeService.addAspect(record, markerAspectQName, null);
+            }
+        }
 
         // Update to the next disposition action
         updateNextDispositionAction(nodeRef);

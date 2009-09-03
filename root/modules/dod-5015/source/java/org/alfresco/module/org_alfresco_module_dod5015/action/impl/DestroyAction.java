@@ -82,8 +82,7 @@ public class DestroyAction extends RMDispositionActionExecuterAbstractBase imple
             }
 
             // Finally, add the ghosted aspect (TODO: Any properties?)
-            this.nodeService.addAspect(record, DOD5015Model.ASPECT_GHOSTED, Collections
-                    .<QName, Serializable> emptyMap());
+            this.nodeService.addAspect(record, DOD5015Model.ASPECT_GHOSTED, Collections.<QName, Serializable> emptyMap());          
         }
         else
         {
