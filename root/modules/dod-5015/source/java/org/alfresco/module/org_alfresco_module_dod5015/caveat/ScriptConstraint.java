@@ -68,7 +68,7 @@ public class ScriptConstraint implements Serializable
                   
          if (values == null)
          {
-             return null;
+             return new ScriptConstraintAuthority[0];
          }
          
          // Here with some data to return
@@ -164,7 +164,7 @@ public class ScriptConstraint implements Serializable
         
         if (details == null)
         {
-            return null;
+            details = new HashMap<String, List<String>>();
         }
         
         // values, authorities
