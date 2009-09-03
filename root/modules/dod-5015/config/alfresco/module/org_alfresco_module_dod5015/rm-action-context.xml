@@ -441,6 +441,60 @@
         <property name="capability" ref="rmViewUpdateReasonsForFreezeCapability"/>
     </bean>  
     
+    <!-- Edit review as of date -->
+
+    <bean id="editReviewAsOfDate_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="editReviewAsOfDate"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="editReviewAsOfDate_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="editReviewAsOfDate_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
+        <property name="objectDefinitionSource">
+            <value>
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.PlanningReviewCycles
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
+                   org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="editReviewAsOfDate" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.EditReviewAsOfDateAction" parent="rmAction" depends-on="rmPlanningReviewCyclesCapability">
+        <property name="capability" ref="rmPlanningReviewCyclesCapability"/>
+    </bean> 
+    
+    <!-- Edit disposition action as of date -->
+
+    <bean id="editDispositionActionAsOfDate_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="editDispositionActionAsOfDate"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="editDispositionActionAsOfDate_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="editDispositionActionAsOfDate_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
+        <property name="objectDefinitionSource">
+            <value>
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.ManuallyChangeDispositionDates
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
+                   org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="editDispositionActionAsOfDate" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.EditDispositionActionAsOfDateAction" parent="rmAction" depends-on="rmManuallyChangeDispositionDatesCapability">
+        <property name="capability" ref="rmManuallyChangeDispositionDatesCapability"/>
+    </bean> 
+    
     <!-- broadcast vital record definition -->
     <!-- bound to policy: allow -->
     
