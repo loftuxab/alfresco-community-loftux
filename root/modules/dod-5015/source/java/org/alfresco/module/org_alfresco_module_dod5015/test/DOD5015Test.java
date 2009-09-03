@@ -1314,6 +1314,30 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         events = da.getEventCompletionDetails();
         assertNotNull(events);
         assertEquals(0, events.size());
+
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        
+        // Clock the asOf date back to ensure eligibility for destruction
+        NodeRef ndNodeRef = nodeService.getChildAssocs(recordOne, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();     
+        Date nowDate = calendar.getTime();
+        assertFalse(nowDate.equals(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF)));
+        params.clear();
+        params.put(EditDispositionActionAsOfDateAction.PARAM_AS_OF_DATE, nowDate);                
+        rmActionService.executeRecordsManagementAction(recordOne, "editDispositionActionAsOfDate", params);
+        assertTrue(nowDate.equals(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF)));
+        
+
+        assertNotNull(nodeService.getProperty(recordOne, ContentModel.PROP_CONTENT));
+
+        rmActionService.executeRecordsManagementAction(recordOne, "destroy", null);
+        
+        // Check that the node has been ghosted
+        assertTrue(nodeService.exists(recordOne));
+        assertTrue(nodeService.hasAspect(recordOne, DOD5015Model.ASPECT_GHOSTED));
+        assertNull(nodeService.getProperty(recordOne, ContentModel.PROP_CONTENT));
         
         txn.commit();
     }
