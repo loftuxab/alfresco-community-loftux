@@ -109,6 +109,13 @@
         <property name="exporterService" ref="ExporterService"/>
     </bean>
     
+    <!-- REST impl for POST import -->
+    <bean id="webscript.org.alfresco.rma.import.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.ImportPost" parent="webscript">
+        <property name="nodeService" ref="NodeService"/>
+        <property name="dictionaryService" ref="DictionaryService"/>
+        <property name="importerService" ref="ImporterService"/>
+    </bean>
+    
     <!-- REST impl for GET transfer -->
     <bean id="webscript.org.alfresco.rma.transfer.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.TransferGet" parent="webscript">
         <property name="nodeService" ref="NodeService"/>
