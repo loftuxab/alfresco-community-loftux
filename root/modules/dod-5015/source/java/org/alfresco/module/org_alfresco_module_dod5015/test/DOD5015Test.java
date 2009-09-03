@@ -50,6 +50,8 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.EditDispositionActionAsOfDateAction;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.EditReviewAsOfDateAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService;
@@ -87,7 +89,6 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.PropertyMap;
-import org.bouncycastle.crypto.tls.RecordStream;
 
 /**
  * DOD System Test
@@ -452,6 +453,14 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertTrue(nodeService.hasAspect(recordOne, ASPECT_VITAL_RECORD));
                 assertNotNull(nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
                 System.out.println("Review as of: " + nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF));
+                
+                // Change the review asOf date
+                Date nowDate = new Date();
+                assertFalse(nowDate.equals(nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF)));
+                Map<String, Serializable> reviewAsOfParams = new HashMap<String, Serializable>(1);
+                reviewAsOfParams.put(EditReviewAsOfDateAction.PARAM_AS_OF_DATE, nowDate);
+                rmActionService.executeRecordsManagementAction(recordOne, "editReviewAsOfDate", reviewAsOfParams);
+                assertTrue(nowDate.equals(nodeService.getProperty(recordOne, PROP_REVIEW_AS_OF)));
 
                 // NOTE the disposition is being managed at a folder level ...
                 
@@ -577,8 +586,15 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             public Object execute() throws Throwable
             {
                 // Clock the asOf date back to ensure eligibility
-                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
-                nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());        
+                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();     
+                Date nowDate = calendar.getTime();
+                assertFalse(nowDate.equals(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF)));
+                Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+                params.put(EditDispositionActionAsOfDateAction.PARAM_AS_OF_DATE, nowDate);                
+                rmActionService.executeRecordsManagementAction(recordFolder, "editDispositionActionAsOfDate", params);
+                assertTrue(nowDate.equals(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF)));
+                
+                // Cut off
                 rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
                 
                 return null;
@@ -620,9 +636,15 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 // Check for the search properties having been populated
                 checkSearchAspect(recordFolder);
                 
-                // Execute the destroy action
-                ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
-                nodeService.setProperty(ndNodeRef, PROP_DISPOSITION_AS_OF, calendar.getTime());
+                // Clock the asOf date back to ensure eligibility
+                ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();     
+                Date nowDate = calendar.getTime();
+                assertFalse(nowDate.equals(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF)));
+                Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+                params.put(EditDispositionActionAsOfDateAction.PARAM_AS_OF_DATE, nowDate);                
+                rmActionService.executeRecordsManagementAction(recordFolder, "editDispositionActionAsOfDate", params);
+                assertTrue(nowDate.equals(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF)));
+                
                 rmActionService.executeRecordsManagementAction(recordFolder, "destroy", null);
                 
                 // Check that the node has been destroyed
@@ -1110,7 +1132,13 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             public Object execute() throws Throwable
             {        
                 // Clock the asOf date back to ensure eligibility
-                nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_AS_OF, calendar.getTime());        
+                Date nowDate = calendar.getTime();
+                assertFalse(nowDate.equals(nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_AS_OF)));
+                Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+                params.put(EditDispositionActionAsOfDateAction.PARAM_AS_OF_DATE, nowDate);                
+                rmActionService.executeRecordsManagementAction(recordFolder, "editDispositionActionAsOfDate", params);
+                assertTrue(nowDate.equals(nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_AS_OF)));    
+                
                 rmActionService.executeRecordsManagementAction(recordFolder, "transfer", null);
                 
                 return null;
