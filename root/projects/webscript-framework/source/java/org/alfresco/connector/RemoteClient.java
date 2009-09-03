@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
@@ -77,13 +77,14 @@ import org.apache.commons.logging.LogFactory;
 public class RemoteClient extends AbstractClient
 {
     private static Log logger = LogFactory.getLog(RemoteClient.class);
-    
+
     private static final String CHARSETEQUALS = "charset=";
     private static final int BUFFERSIZE = 4096;
     
     private static final int CONNECT_TIMEOUT = 5000;  // 5 seconds
     private static final int READ_TIMEOUT = 90000;    // 90 seconds 
     
+    private Map<String, String> cookies;
     private String defaultEncoding;
     private String ticket;
     private String ticketName = "alf_ticket";
@@ -98,6 +99,15 @@ public class RemoteClient extends AbstractClient
     // special http error codes used internally to detect specific error
     public static final int SC_REMOTE_CONN_TIMEOUT = 499;
     public static final int SC_REMOTE_CONN_NOHOST  = 498;
+
+    // Redirect status codes
+    public static final int SC_MOVED_TEMPORARILY = 302;
+    public static final int SC_MOVED_PERMANENTLY = 301;
+    public static final int SC_SEE_OTHER = 303;
+    public static final int SC_TEMPORARY_REDIRECT = 307;
+
+    private static final int MAX_REDIRECTS = 10;
+    
 
 
     /**
@@ -214,6 +224,31 @@ public class RemoteClient extends AbstractClient
     {
         this.requestProperties = requestProperties;
     }    
+
+    
+    /**
+     * Provides a set of cookies for state transfer. This set of cookies is maintained through any redirects followed by
+     * the client (e.g. redirect through SSO host).
+     * 
+     * @param cookies the cookies
+     */
+    public void setCookies(Map<String, String> cookies)
+    {
+        this.cookies = cookies;
+    }
+    
+    
+    /**
+     * Gets the current set of cookies for state transfer. This set of cookies is maintained through any redirects
+     * followed by the client (e.g. redirect through SSO host).
+     * 
+     * @return the cookies
+     */
+
+    public Map<String, String> getCookies()
+    {
+        return this.cookies;
+    }
 
     /**
      * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
@@ -428,6 +463,58 @@ public class RemoteClient extends AbstractClient
         
         return result;
     }
+
+
+    /**
+     * Pre-processes the response, propagating cookies and deciding whether a redirect is required
+     * 
+     * @param method
+     *            the executed method
+     * @throws MalformedURLException
+     */
+    protected URL processResponse(URL url, org.apache.commons.httpclient.HttpMethod method)
+            throws MalformedURLException
+    {
+        String redirectLocation = null;
+        for (Header header : method.getResponseHeaders())
+        {
+            String headerName = header.getName();            
+            if (this.cookies != null && headerName.equalsIgnoreCase("set-cookie"))
+            {
+                String headerValue = header.getValue();
+
+                int z = headerValue.indexOf('=');
+                if (z != -1)
+                {
+                    String cookieName = headerValue.substring(0, z);
+                    String cookieValue = headerValue.substring(z + 1, headerValue.length());
+                    int y = cookieValue.indexOf(';');
+                    if (y != -1)
+                    {
+                        cookieValue = cookieValue.substring(0, y);
+                    }
+
+                    // store cookie back
+                    if (logger.isDebugEnabled())
+                        logger.debug("RemoteClient found set-cookie: " + cookieName + " = " + cookieValue);
+
+                    this.cookies.put(cookieName, cookieValue);
+                }
+            }
+            if (headerName.equalsIgnoreCase("Location"))
+            {
+                switch (method.getStatusCode())
+                {
+                case RemoteClient.SC_MOVED_TEMPORARILY:
+                case RemoteClient.SC_MOVED_PERMANENTLY:
+                case RemoteClient.SC_SEE_OTHER:
+                case RemoteClient.SC_TEMPORARY_REDIRECT:
+                    redirectLocation = header.getValue();
+                }
+            }
+        }
+        return redirectLocation == null ? null : new URL(url, redirectLocation);
+    }
     
     /**
      * Build the URL object based on the supplied uri and configured endpoint. Ticket
@@ -516,102 +603,154 @@ public class RemoteClient extends AbstractClient
             params.setIntParameter("http.socket.timeout", READ_TIMEOUT);
         }
         
-        final org.apache.commons.httpclient.HttpMethod method;
-        switch (this.requestMethod)
-        {
-            default:
-            case GET:
-                method = new GetMethod(url.toString());
-                break;
-            case PUT:
-                method = new PutMethod(url.toString());
-                break;
-            case POST:
-                method = new PostMethod(url.toString());
-                break;
-            case DELETE:
-                method = new DeleteMethod(url.toString());
-                break;
-            case HEAD:
-                method = new HeadMethod(url.toString());
-                break;
-        }
-        
+        URL redirectURL = url;
+        int responseCode;
+        org.apache.commons.httpclient.HttpMethod method = null;
+        int retries = 0;
+        // Only process redirects if we are not processing a 'push'
+        int maxRetries = in == null ? MAX_REDIRECTS : 1;
         try
         {
-            // proxy over any headers from the request stream to proxied request
-            if (req != null)
+            do
             {
-                Enumeration<String> headers = req.getHeaderNames();
-                while (headers.hasMoreElements())
+                // Release a previous method that we processed due to a redirect
+                if (method != null)
                 {
-                    String key = headers.nextElement();
-                    if (key != null)
-                    {
-                        method.setRequestHeader(key, req.getHeader(key));
-                        if (trace) logger.trace("Proxy request header: " + key + "=" + req.getHeader(key));
-                    }
+                    method.releaseConnection();
+                    method = null;
                 }
-            }
-            
-            // apply request properties, allows for the assignment and override of specific header properties
-            if (this.requestProperties != null && this.requestProperties.size() != 0)
-            {
-                for (Map.Entry<String, String> entry : requestProperties.entrySet())
+
+                switch (this.requestMethod)
                 {
-                    String headerName = entry.getKey();
-                    String headerValue = this.requestProperties.get(headerName);
-                    method.setRequestHeader(headerName, headerValue);
-                    if (trace) logger.trace("Set request header: " + headerName + "=" + headerValue);
+                default:
+                case GET:
+                    method = new GetMethod(redirectURL.toString());
+                    break;
+                case PUT:
+                    method = new PutMethod(redirectURL.toString());
+                    break;
+                case POST:
+                    method = new PostMethod(redirectURL.toString());
+                    break;
+                case DELETE:
+                    method = new DeleteMethod(redirectURL.toString());
+                    break;
+                case HEAD:
+                    method = new HeadMethod(redirectURL.toString());
+                    break;
                 }
-            }
-            
-            // HTTP basic auth support
-            if (this.username != null && this.password != null)
-            {
-                String auth = this.username + ':' + this.password;
-                method.addRequestHeader("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
-                if (debug) logger.debug("Applied HTTP Basic Authorization");
-            }
-            
-            // prepare the POST/PUT entity data if input supplied
-            if (in != null)
-            {
-                method.setRequestHeader("Content-Type", this.requestContentType);
                 
-                // apply content-length here if known (i.e. from proxied req)
-                // if this is not set, then the content will be buffered in memory
-                int contentLength = InputStreamRequestEntity.CONTENT_LENGTH_AUTO;
+                // Switch off automatic redirect handling as we want to process them ourselves and maintain cookies
+                method.setFollowRedirects(false);
+
+                // proxy over any headers from the request stream to proxied request
                 if (req != null)
                 {
-                    contentLength = req.getContentLength();
-                }
-                
-                if (debug) logger.debug("Setting content-type=" + this.requestContentType + " content-length=" + contentLength);
-                
-                ((EntityEnclosingMethod)method).setRequestEntity(new InputStreamRequestEntity(in, contentLength));
-                
-                // apply any supplied POST request parameters
-                if (req != null && contentLength == 0 && method instanceof PostMethod)
-                {
-                    Map<String, String[]> postParams = req.getParameterMap();
-                    
-                    if (postParams != null)
+                    Enumeration<String> headers = req.getHeaderNames();
+                    while (headers.hasMoreElements())
                     {
-                        for (String key : postParams.keySet())
+                        String key = headers.nextElement();
+                        if (key != null)
                         {
-                            String[] values = postParams.get(key);
-                            for (int i=0; i<values.length; i++)
+                            method.setRequestHeader(key, req.getHeader(key));
+                            if (trace)
+                                logger.trace("Proxy request header: " + key + "=" + req.getHeader(key));
+                        }
+                    }
+                }
+
+                // apply request properties, allows for the assignment and override of specific header properties
+                if (this.requestProperties != null && this.requestProperties.size() != 0)
+                {
+                    for (Map.Entry<String, String> entry : requestProperties.entrySet())
+                    {
+                        String headerName = entry.getKey();
+                        String headerValue = this.requestProperties.get(headerName);
+                        method.setRequestHeader(headerName, headerValue);
+                        if (trace)
+                            logger.trace("Set request header: " + headerName + "=" + headerValue);
+                    }
+                }
+
+                // Apply cookies
+                if (this.cookies != null && !this.cookies.isEmpty())
+                {
+                    StringBuilder builder = new StringBuilder(128);
+                    for (Map.Entry<String, String> entry : this.cookies.entrySet())
+                    {
+                        if (builder.length() != 0)
+                        {
+                            builder.append(';');
+                        }
+                        builder.append(entry.getKey());
+                        builder.append('=');
+                        builder.append(entry.getValue());
+                    }
+
+                    String cookieString = builder.toString();
+
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Setting cookie header: " + cookieString);
+                    }
+                    method.setRequestHeader("Cookie", cookieString);
+                }
+
+                // HTTP basic auth support
+                if (this.username != null && this.password != null)
+                {
+                    String auth = this.username + ':' + this.password;
+                    method.addRequestHeader("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
+                    if (debug)
+                        logger.debug("Applied HTTP Basic Authorization");
+                }
+
+                // prepare the POST/PUT entity data if input supplied
+                if (in != null)
+                {
+                    method.setRequestHeader("Content-Type", this.requestContentType);
+
+                    // apply content-length here if known (i.e. from proxied req)
+                    // if this is not set, then the content will be buffered in memory
+                    int contentLength = InputStreamRequestEntity.CONTENT_LENGTH_AUTO;
+                    if (req != null)
+                    {
+                        contentLength = req.getContentLength();
+                    }
+
+                    if (debug)
+                        logger.debug("Setting content-type=" + this.requestContentType + " content-length="
+                                + contentLength);
+
+                    ((EntityEnclosingMethod) method).setRequestEntity(new InputStreamRequestEntity(in, contentLength));
+
+                    // apply any supplied POST request parameters
+                    if (req != null && contentLength == 0 && method instanceof PostMethod)
+                    {
+                        Map<String, String[]> postParams = req.getParameterMap();
+
+                        if (postParams != null)
+                        {
+                            for (String key : postParams.keySet())
                             {
-                                ((PostMethod)method).addParameter(key, values[i]);
+                                String[] values = postParams.get(key);
+                                for (int i = 0; i < values.length; i++)
+                                {
+                                    ((PostMethod) method).addParameter(key, values[i]);
+                                }
                             }
                         }
                     }
                 }
+
+                // execute the method to get the response code
+                responseCode = client.executeMethod(method);
+                redirectURL = processResponse(redirectURL, method);
             }
+            while (redirectURL != null && ++retries < maxRetries);
             
-            // execute the method to get the response code and proxy over if required
-            final int responseCode = client.executeMethod(method);
+
+            // proxy over if required
             if (res != null)
             {
                 res.setStatus(responseCode);
@@ -832,7 +971,10 @@ public class RemoteClient extends AbstractClient
         finally
         {
             // reset state values
-            method.releaseConnection();
+            if (method != null)
+            {
+                method.releaseConnection();
+            }
             this.requestContentType = "application/octet-stream";
             this.requestMethod = HttpMethod.GET;
         }
