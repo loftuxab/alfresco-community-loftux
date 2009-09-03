@@ -125,15 +125,17 @@ Alfresco.RM = Alfresco.RM || {};
        */
       onDeleteReference : function RM_References_onDeleteReference(e, args)
       {
-         var refId = this.widgets[Event.getTarget(e).id.replace('-button','')].get('value');         
+         var refId = this.widgets[Event.getTarget(e).id.replace('-button','')].get('value');
+         var nodeRef = Dom.getAncestorByTagName(Event.getTarget(e),'li').getElementsByTagName('a')[0].href.split('/').pop();
 
+         var queryString = '?st=workspace&si=SpacesStore&id='+nodeRef;
          Alfresco.util.Ajax.jsonRequest(
          {
             method: Alfresco.util.Ajax.DELETE,
-            url: Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.replace(':/','')+'/customreferences'+'/'+refId,
+            url: Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.replace(':/','')+'/customreferences'+'/'+refId+queryString,
             successCallback:
             {
-               fn: this.onDeleteSuccess,
+               fn: function(e) { this.onDeleteSuccess(nodeRef) },
                scope: this
             },
             successMessage: Alfresco.util.message("message.delete.success", 'Alfresco.RM.References'),
@@ -146,7 +148,7 @@ Alfresco.RM = Alfresco.RM || {};
        */
       onNewReference : function RM_References_onNewReference(e, args)
       {
-        var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/new-rmreference?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}';
+         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/new-rmreference?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}';
          var url = YAHOO.lang.substitute(uriTemplate,
          {
             site: encodeURIComponent(this.options.siteId),
@@ -162,16 +164,16 @@ Alfresco.RM = Alfresco.RM || {};
        * Handler for deletion success 
        *  
        */
-       onDeleteSuccess : function RM_References_onDeleteSuccess(e)
+       onDeleteSuccess : function RM_References_onDeleteSuccess(nodeRef)
        {
+          var el = Dom.get('ref-'+nodeRef);
+          var ul = el.parentNode;
           //remove list item
-          var parent = Dom.getAncestorByTagName(Event.getTarget(e),'li');
-          parent.parentNode.removeChild(parent);
+          ul.removeChild(el);
           //if no more references, remove list and display msg
-          if (Sel.query('li', this.id).length==0)
+          if (ul.getElementsByTagName('li').length==0)
           {
-             var ol  = (Sel.query('ol', this.id)[0]);
-             ol.parentNode.removeChild(ol);
+             ul.parentNode.removeChild(ul);
              Dom.addClass("no-refs",'active');
           }
        },

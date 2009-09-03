@@ -41,9 +41,9 @@
             <select name="record-rel" id="record-rel">
               <#list reference_types as ref>
                <#if (ref.label?exists)>
-                  <option value="${ref.label}">${ref.label}</option>
+                  <option value="${ref.refId}">${ref.label}</option>
                <#else>
-                  <option value="${ref.source}__${ref.target}">${ref.source}/${ref.target}</option>                  
+                  <option value="${ref.refId}">${ref.source}/${ref.target}</option>                  
                </#if>
               </#list>
             </select>   

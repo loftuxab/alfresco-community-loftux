@@ -81,10 +81,12 @@
     * DocumentPicker constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
+    * @param {String} (optional) objectRendererClass Class Reference of ObjectRenderer subclass to use as picker's object renderer
+    * 
     * @return {Alfresco.DocumentPicker} The new DocumentPicker instance
     * @constructor
     */
-   Alfresco.module.DocumentPicker = function(htmlId)
+   Alfresco.module.DocumentPicker = function(htmlId, objectRendererClass)
    {
       
       // Mandatory properties
@@ -111,8 +113,12 @@
       this.columns = [];
       this.currentValueMeta = [];
       this.selectedItems = [];
-      
-      this.options.objectRenderer = new Alfresco.module.ObjectRenderer(this);
+
+      //use specifed object renderer or default to default object renderer
+      var objectRendererClass =  objectRendererClass || Alfresco.module.ObjectRenderer
+
+      this.options.objectRenderer = new objectRendererClass(this);
+
       return this;
    };
    
@@ -149,6 +155,11 @@
           * @type string
           */
          itemType: "cm:content",
+         
+         /**
+          * types
+          *  
+          */
 
          /**
           * Compact mode flag
@@ -238,7 +249,36 @@
           * @type boolean
           * @default false
           */
-         mandatory: false
+         mandatory: false,
+         
+         /**
+          * Flag to indicate whether to restrict picker to doclib and its children
+          *  
+          * @property restrictParentNavigationToDocLib
+          * @type boolean
+          * @default false
+          */
+         restrictParentNavigationToDocLib: true,
+
+         /**
+          * Alias to use in UI for documentLibrary
+          *  
+          * @property docLibNameAlias
+          * @type string
+          * @default null
+          */
+         docLibNameAlias: null,
+                  
+         /**
+          * Reference to class to use as the object renderer. Allows
+          * specification of different renderers that have different
+          * functionality.
+          * 
+          * @property objectRendererClass
+          * @type Object (Class not an instance) Must be a subclass of Alfresco.module.ObjectRenderer
+          * @default Alfresco.module.ObjectRenderer
+          */
+          objectRendererClass : null
       },
 
       /**
@@ -320,7 +360,6 @@
        */
       onComponentsLoaded: function DocumentPicker_onComponentsLoaded()
       {
-         // Event.onContentReady(this.id, this.onReady, this, true);
          /**
           * Load the gui from the server and let the templateLoaded() method
           * handle the rest.
@@ -409,11 +448,9 @@
             Dom.get(this.id + "-showPicker-button-button").name = "-";
             Dom.get(this.id + "-cntrl-ok-button").name = "-";
             Dom.get(this.id + "-cntrl-cancel-button").name = "-";
-         }          
-         // 
-         // // Show the panel
-         // this._showPanel();
-      },      
+         }
+      },  
+          
       /**
        * Show picker button click handler
        *
@@ -424,10 +461,12 @@
       onShowPicker: function DocumentPicker_onShowPicker(e, p_obj)
       {
          p_obj.set("disabled", true);
+
          this.widgets.panel.show();
-         // this._createResizer();
+         this._createResizer();
          this._populateSelectedItems();
          this.options.objectRenderer.onPickerShow();
+         this.widgets.ok.set('disabled',true);
 
          YAHOO.Bubbling.fire("refreshItemList",
          {
@@ -658,6 +697,7 @@
                this.widgets.dataTable.addRow(obj.item);
                this.selectedItems[obj.item.nodeRef] = obj.item;
                this.singleSelectedItem = obj.item;
+               this.widgets.ok.set('disabled',false);
             }
          }
       },
@@ -679,6 +719,10 @@
             {
                delete this.selectedItems[obj.item.nodeRef];
                this.singleSelectedItem = null;
+            }
+            if (this.selectedItems.length==0)
+            {
+               this.widgets.ok.set('disabled',true);               
             }
          }
       },
@@ -729,6 +773,20 @@
                while (item)
                {
                   arrItems = [item].concat(arrItems);
+
+                  if (item.name == 'documentLibrary')
+                  {
+                     //use alias for doc lib if supplied
+                     if (this.options.docLibNameAlias)
+                     {
+                        item.name = this.options.docLibNameAlias;                                                
+                     }
+                     //restrict to doc lib if configured to
+                     if (this.options.restrictParentNavigationToDocLib)
+                     {
+                        break;
+                     }
+                  }
                   item = item.parent;
                }
 
@@ -1171,7 +1229,16 @@
           * @type int
           * @default 100
           */
-         maxSearchResults: 100
+         maxSearchResults: 100,
+         
+         /**
+          * Flag to indicate whether to display small icon for add button
+          * 
+          * @property displaySmallAddButtonIcon
+          * @type boolean
+          * @default false
+          */
+          displaySmallAddButtonIcon: false
       },
 
       /**
@@ -1262,7 +1329,49 @@
        */
       getIconURL: function ObjectRenderer_getIconURL(item, size)
       {
-         return Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(item.name, item.type, size);
+         // var types = item.type.split(':');
+         //          if (types[0] !== 'rma' && types[0] !== 'dod')
+         //          {
+            return Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(item.name, item.type, size);            
+         // }
+         //       else
+         //       {
+         //          var type = "";
+         //          switch (types[1])
+         //          {
+         //             case "recordSeries":
+         //             {
+         //                type = 'record-series';
+         //                break;
+         //             }
+         //             case "recordCategory":
+         //             {
+         //                type = 'record-category';
+         //                break;
+         //             }
+         //             case "recordFolder":
+         //             {
+         //                type = 'record-folder';
+         //                break;
+         //             }
+         //             case "nonElectronicDocument":
+         //             {
+         //                type = 'non-electronic';
+         //                break;
+         //             }
+         //             case "metadataStub":
+         //             {
+         //                type = 'meta-stub';
+         //                break;
+         //             }
+         //             default:
+         //             {
+         //                return Alfresco.constants.URL_CONTEXT + 'components/images/filetypes/' + Alfresco.util.getFileIcon(item.name, item.type, size); 
+         //             }
+         //          }
+         //          return Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + type + '-'+size+'.png';
+         //       }
+
       },
       
       /**
@@ -1499,15 +1608,14 @@
             {
                var nodeRef = oRecord.getData("nodeRef"),
                   containerId = Alfresco.util.generateDomId();
-
-               if (me.options.compactMode)
+               if (me.options.compactMode || me.options.displaySmallAddButtonIcon)
                {
                   var style = "";
                   if (!me.DocumentPicker.canItemBeSelected(nodeRef))
                   {
                      style = 'style="display: none"';
                   }
-                  elCell.innerHTML = '<a id="' + containerId + '" href="#" ' + style + ' class="add-item add-' + me.eventGroup + '" title="' + me._msg("label.document-picker-add-item") + '"><span class="addIcon">&nbsp;</span></a>';
+                  elCell.innerHTML = '<a id="' + containerId + '" href="#" ' + style + ' class="add-item add-' + me.eventGroup + '" title="' + Alfresco.util.message("label.document-picker-add-item", "Alfresco.module.DocumentPicker") + '"><span class="addIcon">&nbsp;</span></a>';
                   me.addItemButtons[nodeRef] = containerId;
                }
                else
@@ -1556,7 +1664,7 @@
             key: "name", label: "Item", sortable: false, formatter: renderItemName
          },
          {
-            key: "add", label: "Add", sortable: false, formatter: renderCellAdd, width: this.options.compactMode ? 16 : 80
+            key: "add", label: "Add", sortable: false, formatter: renderCellAdd, width: (this.options.compactMode || this.options.displaySmallAddButtonIcon) ? 16 : 80
          }];
 
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-results", columnDefinitions, this.widgets.dataSource,
@@ -1632,7 +1740,7 @@
          var successHandler = function ObjectRenderer__uI_successHandler(sRequest, oResponse, oPayload)
          {
             this.options.parentNodeRef = nodeRef;
-            this.widgets.dataTable.set("MSG_EMPTY", this._msg("label.document-picker-items-list-empty"));
+            this.widgets.dataTable.set("MSG_EMPTY", Alfresco.util.message("label.document-picker-items-list-empty",'Alfresco.module.DocumentPicker'));
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          };
          

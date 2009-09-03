@@ -30,7 +30,7 @@
          </div>
       </div>
       <div class="bdft">
-         <button id="${controlId}-ok" tabindex="4">${msg("button.ok")}</button>
+         <button id="${controlId}-ok" tabindex="4" disabled>${msg("button.ok")}</button>
          <button id="${controlId}-cancel" tabindex="5">${msg("button.cancel")}</button>
       </div>
    </div>
