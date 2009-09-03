@@ -199,15 +199,29 @@
          // Description
          Dom.getElementsByClassName("description", "textarea", actionEl)[0].value = action.description ? action.description : "";
 
-         // Action
+         // Action type & location
          var actionType = action.name,
-            actionTypeEl = Dom.getElementsByClassName("action-type", "select", actionEl)[0];
+               actionTypeEl = Dom.getElementsByClassName("action-type", "select", actionEl)[0],
+               actionLocationEl = Dom.getElementsByClassName("action-location", "select", actionEl)[0],
+               actionLocationSpan = Dom.getElementsByClassName("action-location-section", "span", actionEl)[0];
+         if(actionType == "transfer")
+         {
+            Alfresco.util.setSelectedIndex(actionLocationEl, action.location);
+            Dom.removeClass(actionLocationSpan, "hidden");
+         }
+         else
+         {
+            Alfresco.util.setSelectedIndex(actionLocationEl, "");
+            Dom.addClass(actionLocationSpan, "hidden");
+         }
          Event.addListener(actionTypeEl, "change", this.onActionTypeSelectChange,
          {
-            actionEl: actionEl
+            actionEl: actionEl,
+            actionLocationSpan: actionLocationSpan,
+            actionLocationEl: actionLocationEl
          }, this);
          var actionTitle = Alfresco.util.setSelectedIndex(actionTypeEl, actionType);
-         actionTitle = actionTitle ? actionTitle : actionType; 
+         actionTitle = actionTitle ? actionTitle : actionType;
 
          // Period Amount
          var periodAmount = (period && period.length > 1) ? period[1] : null,
@@ -692,6 +706,16 @@
        */
       onActionTypeSelectChange: function DispositionEdit_onActionTypeSelectChange(e, obj)
       {
+         var actionTypeEl = e.currentTarget;
+         if(actionTypeEl.options[actionTypeEl.selectedIndex].value == "transfer")
+         {
+            Dom.removeClass(obj.actionLocationSpan, "hidden");
+         }
+         else
+         {
+            Alfresco.util.setSelectedIndex(obj.actionLocationEl, "");
+            Dom.addClass(obj.actionLocationSpan, "hidden");
+         }
          this._refreshTitle(obj.actionEl);
       },
 

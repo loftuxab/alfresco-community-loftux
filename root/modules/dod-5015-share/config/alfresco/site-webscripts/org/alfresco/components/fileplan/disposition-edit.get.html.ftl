@@ -81,6 +81,14 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                         <option value="${action.value}">${action.label}</option>
                         </#list>
                      </select>
+                     <span class="action-location-section">
+                        ${msg("label.to")}
+                        <select name="location" class="action-location">
+                           <#list locations as location>
+                           <option value="${location.value}">${location.label}</option>
+                           </#list>
+                        </select>
+                     </span>
                   </div>
                   <div class="section">
                      <input type="checkbox" class="period-enabled" checked="true" />

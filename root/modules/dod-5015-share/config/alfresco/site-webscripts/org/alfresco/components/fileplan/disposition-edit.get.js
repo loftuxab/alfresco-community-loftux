@@ -54,6 +54,17 @@ function main()
             periodProperties.sort(sortByLabel);
             model.periodProperties = periodProperties;
          }
+         // Hard coded for now
+         model.locations = [
+            {
+               value: "",
+               label: msg.get("label.select.location")
+            },
+            {
+               value: "NARA",
+               label: "NARA"
+            }
+         ];
       }
       else if (repoJSON.status.code)
       {
