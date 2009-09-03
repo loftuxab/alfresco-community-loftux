@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,18 +18,28 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.config;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.net.ssl.KeyManagerFactory;
+
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.element.ConfigElementAdapter;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.apache.abdera.protocol.client.util.ClientAuthSSLProtocolSocketFactory;
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.dom4j.Element;
 
 /**
@@ -41,11 +51,13 @@ import org.dom4j.Element;
  */
 public class RemoteConfigElement extends ConfigElementAdapter implements RemoteConfigProperties
 {
+    private static final String REMOTE_KEYSTORE = "keystore";  
     private static final String REMOTE_ENDPOINT = "endpoint";
     private static final String REMOTE_AUTHENTICATOR = "authenticator";
     private static final String REMOTE_CONNECTOR = "connector";
     private static final String CONFIG_ELEMENT_ID = "remote";
 
+    protected KeyStoreDescriptor keyStoreDescriptor;
     protected HashMap<String, ConnectorDescriptor> connectors = null;
     protected HashMap<String, AuthenticatorDescriptor> authenticators = null;
     protected HashMap<String, EndpointDescriptor> endpoints = null;
@@ -84,6 +96,13 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         combinedElement.connectors.putAll(configElement.connectors);
         combinedElement.authenticators.putAll(configElement.authenticators);
         combinedElement.endpoints.putAll(configElement.endpoints);
+
+        // SSL KeyStore configuration
+        combinedElement.keyStoreDescriptor = this.keyStoreDescriptor;
+        if(configElement.keyStoreDescriptor != null)
+        {
+           combinedElement.keyStoreDescriptor = configElement.keyStoreDescriptor;
+        }
 
         // default endpoint id
         combinedElement.defaultEndpointId = this.defaultEndpointId;
@@ -213,6 +232,50 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         }
     }
 
+    /**
+     * The Class KeyStoreDescriptor.
+     */
+    public static class KeyStoreDescriptor extends Descriptor
+    {
+        private static final String PATH = "path";
+        private static final String TYPE = "type";
+        private static final String PASSWORD = "password";
+
+        /**
+         * Initializes SSL client certificate configuration, if appropriate
+         * 
+         * @param elem the element
+         */
+        KeyStoreDescriptor(Element el)
+        {
+            super(el);
+            String keyStorePath = getStringProperty(PATH);
+            InputStream keyStoreIn;
+            if (keyStorePath != null && (keyStoreIn = getClass().getResourceAsStream("/" + keyStorePath)) != null)
+            {
+
+                try
+                {
+                    KeyStore keyStore = KeyStore.getInstance(getStringProperty(TYPE));
+                    String password = getStringProperty(PASSWORD);
+                    keyStore.load(keyStoreIn, password.toCharArray());
+                    Protocol authHttps = new Protocol("https",
+                            (ProtocolSocketFactory) new ClientAuthSSLProtocolSocketFactory(keyStore, password,
+                                    "TLS", KeyManagerFactory.getDefaultAlgorithm(), null), 443);
+                    Protocol.registerProtocol("https", authHttps);
+                }
+                catch (GeneralSecurityException e)
+                {
+                    throw new AlfrescoRuntimeException("Error loading keyStore: " + keyStorePath, e);
+                }
+                catch (IOException e)
+                {
+                    throw new AlfrescoRuntimeException("Error loading keyStore: " + keyStorePath, e);
+                }
+            }            
+        }
+    }
+    
 
     /**
      * The Class ConnectorDescriptor.
@@ -427,6 +490,12 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
             configElement.endpoints.put(descriptor.getId(), descriptor);
         }
 
+        Element el = elem.element(REMOTE_KEYSTORE);
+        if (el != null)
+        {
+            configElement.keyStoreDescriptor = new KeyStoreDescriptor(el);
+        }
+        
         String _defaultEndpointId = elem.elementTextTrim("default-endpoint-id");
         if(_defaultEndpointId != null && _defaultEndpointId.length() > 0)
         {

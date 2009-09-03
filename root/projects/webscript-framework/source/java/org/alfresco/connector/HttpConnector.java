@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -71,7 +71,7 @@ public class HttpConnector extends AbstractConnector
             
             // call client and process response
             response = remoteClient.call(uri);
-            processResponse(response);
+            processResponse(remoteClient, response);
         }
         else
         {
@@ -91,7 +91,7 @@ public class HttpConnector extends AbstractConnector
             
             // call client and process response
             response = remoteClient.call(uri, in);
-            processResponse(response);
+            processResponse(remoteClient, response);
         }
         else
         {
@@ -111,7 +111,7 @@ public class HttpConnector extends AbstractConnector
             
             // call client and process response
             response = remoteClient.call(uri, in, out);
-            processResponse(response);
+            processResponse(remoteClient, response);
         }
         else
         {
@@ -132,7 +132,7 @@ public class HttpConnector extends AbstractConnector
                     
             // call client and process response
             response = remoteClient.call(uri, req, res);
-            processResponse(response);
+            processResponse(remoteClient, response);
         }
         else
         {
@@ -152,43 +152,36 @@ public class HttpConnector extends AbstractConnector
      */
     private void applyRequestHeaders(RemoteClient remoteClient, ConnectorContext context)
     {
+        // copy in cookies that have been stored back as part of the connector session
+        ConnectorSession connectorSession = getConnectorSession();
+        if (connectorSession != null)
+        {
+            Map<String, String> cookies = new HashMap<String, String>(8);
+            for (String cookieName : connectorSession.getCookieNames())
+            {
+                cookies.put(cookieName, connectorSession.getCookie(cookieName));
+            }
+            remoteClient.setCookies(cookies);
+        }
+        
         // get the headers
-        Map<String, String> headers = new HashMap<String, String>(8, 1.0f);
+        Map<String, String> headers = new HashMap<String, String>(8);
         if (context != null)
         {
             headers.putAll(context.getHeaders());
         }
 
-        // copy in cookies that have been stored back as part of the connector session
-        if (getConnectorSession() != null)
+        // Proxy the authenticated user name if we have password-less credentials (indicates SSO auth over a secure
+        // connection)
+        if (getCredentials() != null)
         {
-            String[] keys = getConnectorSession().getCookieNames();
-            if (keys.length != 0)
+            String user = (String) getCredentials().getProperty(Credentials.CREDENTIAL_USERNAME);
+            String pass = (String) getCredentials().getProperty(Credentials.CREDENTIAL_PASSWORD);
+            if (pass == null)
             {
-                StringBuilder builder = new StringBuilder(128);
-                
-                for (int i = 0; i < keys.length; i++)
-                {
-                    String cookieName = keys[i];
-                    String cookieValue = getConnectorSession().getCookie(cookieName);
-                    
-                    if (builder.length() != 0)
-                    {
-                        builder.append(';');
-                    }
-                    builder.append(cookieName);
-                    builder.append('=');
-                    builder.append(cookieValue);
-                }
-                
-                String cookieString = builder.toString();
-                
-                if (logger.isDebugEnabled())
-                    logger.debug("HttpConnector setting cookie header: " + cookieString);
-                
-                headers.put("Cookie", cookieString);
+                headers.put("X-Alfresco-Remote-User", user);
             }
-        }
+        }        
         
         // stamp all headers onto the remote client
         if (headers.size() != 0)
@@ -209,7 +202,10 @@ public class HttpConnector extends AbstractConnector
         {
             String user = (String) getCredentials().getProperty(Credentials.CREDENTIAL_USERNAME);
             String pass = (String) getCredentials().getProperty(Credentials.CREDENTIAL_PASSWORD);
-            remoteClient.setUsernamePassword(user, pass);
+            if (pass != null)
+            {
+                remoteClient.setUsernamePassword(user, pass);
+            }
         }        
     }
     
@@ -218,39 +214,24 @@ public class HttpConnector extends AbstractConnector
      * 
      * @param response
      */
-    protected void processResponse(Response response)
+    protected void processResponse(RemoteClient remoteClient, Response response)
     {
-        if (EndpointManager.processResponseCode(this.endpoint, response.getStatus().getCode()) &&
-            getConnectorSession() != null)
+        ConnectorSession connectorSession = getConnectorSession();
+        if (EndpointManager.processResponseCode(this.endpoint, response.getStatus().getCode())
+                && connectorSession != null)
         {
-            Map<String, String> headers = response.getStatus().getHeaders();
-            for (String headerName : headers.keySet())
+            Map<String, String> cookies = remoteClient.getCookies();
+            for (Map.Entry<String, String> cookie : cookies.entrySet())
             {
-                if (headerName.equalsIgnoreCase("set-cookie"))
-                {
-                    String headerValue = headers.get(headerName);
-                    
-                    int z = headerValue.indexOf('=');
-                    if (z != -1)
-                    {
-                        String cookieName = headerValue.substring(0, z);
-                        String cookieValue = headerValue.substring(z + 1, headerValue.length());
-                        int y = cookieValue.indexOf(';');
-                        if (y != -1)
-                        {
-                            cookieValue = cookieValue.substring(0, y);
-                        }
-                        
-                        // store cookie back
-                        if (logger.isDebugEnabled())
-                            logger.debug("Connector found set-cookie: " + cookieName + " = " + cookieValue);
-                        
-                        getConnectorSession().setCookie(cookieName, cookieValue);
-                    }
-                }
+                // store cookie back
+                if (logger.isDebugEnabled())
+                    logger.debug("Connector found set-cookie: " + cookie.getKey() + " = " + cookie.getValue());
+
+                connectorSession.setCookie(cookie.getKey(), cookie.getValue());
             }
         }
     }
+    
     
     /**
      * Init the RemoteClient object based on the Connector Context.
