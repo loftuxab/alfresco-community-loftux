@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability;
 
 import java.util.List;
 
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessStatus;
 
@@ -54,4 +55,6 @@ public interface Capability
     public List<String> getActionNames();
     
     public int hasPermissionRaw(NodeRef nodeRef);
+    
+    public List<RecordsManagementAction> getActions();
 }

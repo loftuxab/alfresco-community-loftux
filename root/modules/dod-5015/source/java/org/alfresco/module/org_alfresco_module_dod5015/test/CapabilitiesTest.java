@@ -3079,7 +3079,7 @@ public class CapabilitiesTest extends TestCase
         checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
 
-        // try and complete some events
+        // try and complete some events        
 
         AuthenticationUtil.setFullyAuthenticatedUser(test_user);
         Map<String, Serializable> eventDetails = new HashMap<String, Serializable>(3);
@@ -3105,6 +3105,7 @@ public class CapabilitiesTest extends TestCase
         {
 
         }
+
         recordsManagementActionService.executeRecordsManagementAction(record_2, "completeEvent", eventDetails);
 
         // check protected properties
@@ -8746,9 +8747,43 @@ public class CapabilitiesTest extends TestCase
 
         // test filter - from the freeze object
 
+        Map<QName, Serializable> returned = publicNodeService.getProperties(getHold(recordFolder_1));
+        assertTrue(returned.containsKey(RecordsManagementModel.PROP_HOLD_REASON));
+        assertNotNull(publicNodeService.getProperty(getHold(recordFolder_1), RecordsManagementModel.PROP_HOLD_REASON));
+
+        permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE);
+
+        returned = publicNodeService.getProperties(getHold(recordFolder_1));
+        assertFalse(returned.containsKey(RecordsManagementModel.PROP_HOLD_REASON));
+        try
+        {
+            publicNodeService.getProperty(getHold(recordFolder_1), RecordsManagementModel.PROP_HOLD_REASON);
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+
         // test query
 
         // update
+
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.FILING, true);
+        try
+        {
+            publicNodeService.setProperty(getHold(recordFolder_1), RecordsManagementModel.PROP_HOLD_REASON, "meep");
+            fail();
+        }
+        catch (AccessDeniedException ade)
+        {
+
+        }
+        permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, true);
+        // TODO: fix reject by updateProperties - no capabilty lets it through even though not protected
+        publicNodeService.setProperty(getHold(recordFolder_1), RecordsManagementModel.PROP_HOLD_REASON, "meep");
+
+        // update by action
 
         // 
     }
@@ -8768,7 +8803,7 @@ public class CapabilitiesTest extends TestCase
                 List<ChildAssociationRef> heldFolderChildren = nodeService.getChildAssocs(inHold.getChildRef());
                 for (ChildAssociationRef car : heldFolderChildren)
                 {
-                    if(car.getChildRef().equals(held))
+                    if (car.getChildRef().equals(held))
                     {
                         return holdAssoc.getChildRef();
                     }

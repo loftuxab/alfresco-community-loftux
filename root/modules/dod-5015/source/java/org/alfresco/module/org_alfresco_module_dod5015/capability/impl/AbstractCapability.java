@@ -139,6 +139,11 @@ public abstract class AbstractCapability implements Capability
         return actionNames;
     }
 
+    public List<RecordsManagementAction> getActions()
+    {
+        return actions;
+    }
+
     public NodeRef getFilePlan(NodeRef nodeRef)
     {
         if (nodeRef == null)
