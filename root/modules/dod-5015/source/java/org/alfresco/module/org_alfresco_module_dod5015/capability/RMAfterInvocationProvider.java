@@ -42,7 +42,9 @@ import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.afterinvocation.AfterInvocationProvider;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.ViewUpdateReasonsForFreezeCapability;
 import org.alfresco.repo.search.SimpleResultSetMetaData;
 import org.alfresco.repo.search.impl.lucene.PagingLuceneResultSet;
 import org.alfresco.repo.search.impl.querymodel.QueryEngineResults;
@@ -50,15 +52,18 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.permissions.impl.acegi.ACLEntryAfterInvocationProvider;
 import org.alfresco.repo.security.permissions.impl.acegi.ACLEntryVoterException;
 import org.alfresco.repo.security.permissions.impl.acegi.FilteringResultSet;
+import org.alfresco.repo.webservice.repository.UpdateResult;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.search.LimitBy;
 import org.alfresco.service.cmr.search.PermissionEvaluationMode;
 import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespacePrefixResolver;
@@ -919,8 +924,26 @@ public class RMAfterInvocationProvider implements AfterInvocationProvider, Initi
     private Map decide(Authentication authentication, Object object, ConfigAttributeDefinition config, Map returnedObject) throws AccessDeniedException
 
     {
-        // ToDO: filter for flattened frozen information.
-        return returnedObject;
+        if (returnedObject.containsKey(RecordsManagementModel.PROP_HOLD_REASON))
+        {
+            HashMap filtered = new HashMap();
+            filtered.putAll(returnedObject);
+            // get the node ref from the properties or delete
+            String protocol = DefaultTypeConverter.INSTANCE.convert(String.class, filtered.get(ContentModel.PROP_STORE_PROTOCOL));
+            String identifier = DefaultTypeConverter.INSTANCE.convert(String.class, filtered.get(ContentModel.PROP_STORE_IDENTIFIER));
+            String uuid = DefaultTypeConverter.INSTANCE.convert(String.class, filtered.get(ContentModel.PROP_NODE_UUID));
+            StoreRef storeRef = new StoreRef(protocol, identifier);
+            NodeRef nodeRef = new NodeRef(storeRef, uuid);
+            if ((nodeRef == null) || (permissionService.hasPermission(entryVoter.getViewUpdateReasonsForFreezeCapability().getFilePlan(nodeRef), RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE) != AccessStatus.ALLOWED))
+            {
+                filtered.remove(RecordsManagementModel.PROP_HOLD_REASON);
+            }
+            return filtered;
+        }
+        else
+        {
+            return returnedObject;
+        }
     }
 
     private class ConfigAttributeDefintion

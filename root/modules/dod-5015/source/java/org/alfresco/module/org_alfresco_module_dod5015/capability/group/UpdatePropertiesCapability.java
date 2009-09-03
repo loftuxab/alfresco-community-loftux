@@ -30,18 +30,21 @@ import java.util.Set;
 
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
 /**
  * @author andyh
- *
  */
 public class UpdatePropertiesCapability extends AbstractCapability
 {
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability#hasPermissionImpl(org.alfresco.service.cmr.repository.NodeRef)
      */
     @Override
@@ -50,14 +53,16 @@ public class UpdatePropertiesCapability extends AbstractCapability
         return evaluate(nodeRef, null);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.alfresco.module.org_alfresco_module_dod5015.capability.Capability#getName()
      */
     public String getName()
     {
         return "UpdateProperties";
     }
-    
+
     public int evaluate(NodeRef nodeRef, Map<QName, Serializable> properties)
     {
         if ((properties != null) && (voter.includesProtectedPropertyChange(nodeRef, properties)))
@@ -88,11 +93,10 @@ public class UpdatePropertiesCapability extends AbstractCapability
         {
             return AccessDecisionVoter.ACCESS_GRANTED;
         }
-        if(voter.getCreateModifyRecordsInCuttoffFoldersCapability().evaluate(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+        if (voter.getCreateModifyRecordsInCuttoffFoldersCapability().evaluate(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
         {
             return AccessDecisionVoter.ACCESS_GRANTED;
         }
         return AccessDecisionVoter.ACCESS_DENIED;
     }
-
 }

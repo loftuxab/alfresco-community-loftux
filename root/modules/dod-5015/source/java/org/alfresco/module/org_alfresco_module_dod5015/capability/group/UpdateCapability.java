@@ -63,7 +63,7 @@ public class UpdateCapability extends AbstractCapability
 
     public int evaluate(NodeRef nodeRef, QName aspectQName, Map<QName, Serializable> properties)
     {
-        if ((aspectQName != null) && (voter.isProtectedAspect(aspectQName)))
+        if ((aspectQName != null) && (voter.isProtectedAspect(nodeRef, aspectQName)))
         {
             return AccessDecisionVoter.ACCESS_DENIED;
         }

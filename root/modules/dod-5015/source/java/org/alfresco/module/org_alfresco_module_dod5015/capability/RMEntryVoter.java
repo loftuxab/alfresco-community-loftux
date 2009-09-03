@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +43,9 @@ import net.sf.acegisecurity.ConfigAttribute;
 import net.sf.acegisecurity.ConfigAttributeDefinition;
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.CreateCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.DeclareCapability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.group.DeleteCapability;
@@ -310,6 +313,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         policies.put("WriteContent", new WriteContentPolicy());
         policies.put("Capability", new CapabilityPolicy());
         policies.put("Declare", new DeclarePolicy());
+        policies.put("ReadProperty", new ReadPropertyPolicy());
 
         // restrictedProperties.put(RecordsManagementModel.PROP_IS_CLOSED, value)
 
@@ -1488,14 +1492,54 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         return dictionaryService;
     }
 
-    public boolean isProtectedAspect(QName aspectQName)
+    public boolean isProtectedAspect(NodeRef nodeRef, QName aspectQName)
     {
-        return protectedAspects.contains(aspectQName);
+        if(protectedAspects.contains(aspectQName))
+        {
+            for(Capability capability : capabilities.values())
+            {
+                for(RecordsManagementAction action : capability.getActions())
+                {
+                    if(action.getProtectedAspects().contains(aspectQName))
+                    {
+                        if(action.isExecutable(nodeRef, null))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
-    public boolean isProtectedProperty(QName propertyQName)
+    public boolean isProtectedProperty(NodeRef nodeRef, QName propertyQName)
     {
-        return protectedProperties.contains(propertyQName);
+        if(protectedProperties.contains(propertyQName))
+        {
+            for(Capability capability : capabilities.values())
+            {
+                for(RecordsManagementAction action : capability.getActions())
+                {
+                    if(action.getProtectedProperties().contains(propertyQName))
+                    {
+                        if(action.isExecutable(nodeRef, null))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean includesProtectedPropertyChange(NodeRef nodeRef, Map<QName, Serializable> properties)
@@ -1503,7 +1547,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         Map<QName, Serializable> originals = nodeService.getProperties(nodeRef);
         for (QName test : properties.keySet())
         {
-            if (isProtectedProperty(test))
+            if (isProtectedProperty(nodeRef, test))
             {
                 if (!EqualsHelper.nullSafeEquals(originals.get(test), properties.get(test)))
                 {
@@ -1753,15 +1797,8 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
 
         public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
         {
-            Policy policy = policies.get("Read");
-            if (policy == null)
-            {
-                return AccessDecisionVoter.ACCESS_DENIED;
-            }
-            else
-            {
-                return policy.evaluate(voter, invocation, params, cad);
-            }
+            NodeRef assignee = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(0), cad.parent);
+            return voter.getManageAccessControlsCapability().evaluate(assignee);
         }
 
     }
@@ -1776,4 +1813,24 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
         }
 
     }
+    
+    private static class ReadPropertyPolicy implements Policy
+    {
+
+        public int evaluate(RMEntryVoter voter, MethodInvocation invocation, Class[] params, ConfigAttributeDefintion cad)
+        {
+            NodeRef nodeRef = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(0), cad.parent);
+            QName propertyQName = getQName(invocation, params, cad.parameters.get(1));
+            if(propertyQName.equals(RecordsManagementModel.PROP_HOLD_REASON))
+            {
+                return voter.getViewUpdateReasonsForFreezeCapability().evaluate(nodeRef);
+            }
+            else
+            {
+                return AccessDecisionVoter.ACCESS_GRANTED;
+            }
+        }
+
+    }
+    
 }
