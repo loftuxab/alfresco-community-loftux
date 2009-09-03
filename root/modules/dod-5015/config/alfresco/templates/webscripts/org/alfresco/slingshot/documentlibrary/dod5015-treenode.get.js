@@ -10,21 +10,53 @@ function getTreenode(siteId, path)
 {
    try
    {
-      var items = new Array();
+      var items = [],
+         parsedArgs = ParseArgs.getParsedArgs(),
+         skipPermissionCheck = args["perms"] == "false",
+         item, node, rmNode, capabilities, cap;
    
       // Use helper function to get the arguments
-      var parsedArgs = ParseArgs.getParsedArgs();
       if (parsedArgs === null)
       {
          return;
       }
 
-      // Look for folders in the parentNode
-      for each(item in parsedArgs.parentNode.children)
+      // Quick version if "skipPermissionCheck" flag set
+      if (skipPermissionCheck)
       {
-         if (itemIsAllowed(item))
+         for each(node in parsedArgs.parentNode.children)
          {
-            items.push(item);
+            if (itemIsAllowed(node))
+            {
+               items.push(
+               {
+                  node: node
+               });
+            }
+         }
+      }
+      else
+      {
+         for each(node in parsedArgs.parentNode.children)
+         {
+            if (itemIsAllowed(node))
+            {
+               capabilities = {};
+               rmNode = rmService.getRecordsManagementNode(node);
+               for each (cap in rmNode.capabilities)
+               {
+                  capabilities[cap.name] = true;
+               }
+
+               items.push(
+               {
+                  node: node,
+                  permissions:
+                  {
+                     create: capabilities["Create"]
+                  }
+               });
+            }
          }
       }
    
@@ -46,7 +78,7 @@ function getTreenode(siteId, path)
 /* Sort the results by case-insensitive name */
 function sortByName(a, b)
 {
-   return (b.name.toLowerCase() > a.name.toLowerCase() ? -1 : 1);
+   return (b.node.name.toLowerCase() > a.node.name.toLowerCase() ? -1 : 1);
 }
 
 /* Filter allowed types, etc. */

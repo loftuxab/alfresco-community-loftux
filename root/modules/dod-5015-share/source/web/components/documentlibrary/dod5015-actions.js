@@ -368,12 +368,34 @@
       },
 
       /**
+       * Undo Cut Off action.
+       *
+       * @method onActionUndoCutoff
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionUndoCutoff: function RDLA_onActionUndoCutoff(assets)
+      {
+         this._dod5015Action("message.undo-cutoff", assets, "undoCutoff");
+      },
+
+      /**
        * Unfreeze record.
        *
        * @method onActionUnfreeze
        * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
       onActionUnfreeze: function RDLA_onActionUnfreeze(assets)
+      {
+         this._dod5015Action("message.unfreeze", assets, "unfreeze");
+      },
+
+      /**
+       * Unfreeze All records within Hold.
+       *
+       * @method onActionUnfreezeAll
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionUnfreezeAll: function RDLA_onActionUnfreezeAll(assets)
       {
          this._dod5015Action("message.unfreeze", assets, "unfreeze");
       },

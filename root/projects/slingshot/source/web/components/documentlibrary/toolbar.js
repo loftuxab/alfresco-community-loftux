@@ -1037,18 +1037,22 @@
          });
          eDescMsg.addClass("message");
 
-         // Don't display a "more" message that contains the "{0}" placeholder unless filterData is populated
-         if (this.msg("description." + this.currentFilter.filterId + ".more").indexOf("{0}") == -1 || filterDisplay !== "")
+         // If filterData is populated and a ".more.filterData" i18n message exists, then use that
+         var i18n = "description." + this.currentFilter.filterId + ".more",
+            i18nAlt = i18n + ".filterDisplay";
+         
+         if (filterDisplay !== "" && this.msg(i18nAlt) !== i18nAlt)
          {
-            eDescMore = new Element(document.createElement("span"),
-            {
-               innerHTML: this.msg("description." + this.currentFilter.filterId + ".more", $html(filterDisplay))
-            });
-            eDescMore.addClass("more");
-
-            eDescMsg.appendChild(eDescMore);
+            i18n = i18nAlt;
          }
 
+         eDescMore = new Element(document.createElement("span"),
+         {
+            innerHTML: this.msg(i18n, $html(filterDisplay))
+         });
+         eDescMore.addClass("more");
+
+         eDescMsg.appendChild(eDescMore);
          eDivDesc = new Element(divDesc);
          eDivDesc.appendChild(eDescMsg);
       },
