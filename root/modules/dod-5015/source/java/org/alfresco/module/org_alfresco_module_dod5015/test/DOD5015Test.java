@@ -1117,6 +1117,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertNotNull(da);
                 assertEquals("transfer", da.getName());
                 
+                assertFalse(nodeService.hasAspect(recordFolder, ASPECT_TRANSFERRED));
+                
                 return da;
             }          
         });
@@ -1149,6 +1151,11 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         {
             public Object execute() throws Throwable
             {
+                assertFalse(nodeService.hasAspect(recordFolder, ASPECT_TRANSFERRED));
+                assertFalse(nodeService.hasAspect(recordOne, ASPECT_TRANSFERRED));
+                assertFalse(nodeService.hasAspect(recordTwo, ASPECT_TRANSFERRED));
+                assertFalse(nodeService.hasAspect(recordThree, ASPECT_TRANSFERRED));
+                
                 // Check that the next disposition action is stil in the correct state
                 DispositionAction da = rmService.getNextDispositionAction(recordFolder);
                 assertNotNull(da);
@@ -1171,6 +1178,12 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 
                 // Complete the transfer
                 rmActionService.executeRecordsManagementAction(assocs.get(0).getChildRef(), "transferComplete");
+                
+                // Check nodes have been marked correctly
+                assertTrue(nodeService.hasAspect(recordFolder, ASPECT_TRANSFERRED));
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_TRANSFERRED));
+                assertTrue(nodeService.hasAspect(recordTwo, ASPECT_TRANSFERRED));
+                assertTrue(nodeService.hasAspect(recordThree, ASPECT_TRANSFERRED));
                 
                 // Check the transfer object is deleted
                 assocs = nodeService.getChildAssocs(rootNode, ASSOC_TRANSFERS, RegexQNamePattern.MATCH_ALL);
