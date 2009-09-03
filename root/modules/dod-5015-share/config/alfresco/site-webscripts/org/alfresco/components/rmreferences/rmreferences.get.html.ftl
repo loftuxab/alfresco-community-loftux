@@ -12,8 +12,8 @@
        <#if (references?size > 0)>
        <ol>
            <#list references as ref>
-           <li><span>${ref.displayName?html}</span><button id="deleteReference-but-${ref_index}" class="deleteRef refAction" value="${ref.id}">${msg('label.delete')}</button></li>
-           </#list>
+           <li id="ref-${ref.domId}"><span>${ref.label?html} <a href="${url.context}/page/site/${page.url.templateArgs.site}/document-details?nodeRef=${ref.targetRef}" title="${ref.targetRefDocName}">${ref.targetRefDocName}</a></span><button id="deleteReference-but-${ref_index}" class="deleteRef refAction" value="${ref.refId}">${msg('label.delete')}</button></li>
+            </#list>
        </ol>
        </#if>
        <p id="no-refs" <#if (references?size == 0)>class="active"</#if>">${msg('label.no-references')}<p>

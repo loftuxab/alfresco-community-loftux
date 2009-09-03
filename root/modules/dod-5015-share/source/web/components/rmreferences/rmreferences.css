@@ -25,7 +25,7 @@
 {
   clear:both;
   padding: 1em 0.5em 1em 3em;
-  background: transparent url(../../components/images/generic-file-32.png) no-repeat scroll 4px 7px;
+  background: transparent url(../documentlibrary/images/record-32.png) no-repeat scroll 4px 7px;
   text-align: right;
   border-bottom: 1px solid #999;
 }

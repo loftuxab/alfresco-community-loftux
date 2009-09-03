@@ -53,7 +53,7 @@ Alfresco.RM = Alfresco.RM || {};
 
 
    /**
-    * RM References componentconstructor.
+    * RM References component constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
     * @return {Alfresco.dashlet.MyDocuments} The new component instance
@@ -67,7 +67,7 @@ Alfresco.RM = Alfresco.RM || {};
       return this;
    };
     
-    YAHOO.extend(Alfresco.RM.NewReference, Alfresco.component.Base,
+   YAHOO.extend(Alfresco.RM.NewReference, Alfresco.component.Base,
    {
       
       /**
@@ -108,22 +108,25 @@ Alfresco.RM = Alfresco.RM || {};
        */
       initEvents : function RM_NewReference_initEvents()
       {
-         Event.on(this.id,'click',this.onInteractionEvent, null, this);
+         Event.on(this.id, 'click', this.onInteractionEvent, null, this);
          Event.on('new-ref-name','keyup',function(e) { this.checkRequiredFields(); }, null, this);
          this.registerEventHandler('click',[
             {
                rule : 'button.cancelCreate',
-               o : {
-                     handler:this._navigateForward,
-                     scope : this
+               o : 
+               {
+                  handler:this._navigateForward,
+                  scope : this
                }
             },                       
             {
                rule : 'button.submitCreate',
-               o : {
-                      handler:this.onCreate,
-                      scope:this
-                   }
+               o : 
+               {
+                  
+                  handler:this.onCreate,
+                  scope:this
+               }
             }
          ]);
          
@@ -147,13 +150,15 @@ Alfresco.RM = Alfresco.RM || {};
             this.widgets[id] = new YAHOO.widget.Button(id);
             this.widgets[id]._button.className=button.className;
          }
+         
+         this.widgets['documentPicker'] = new Alfresco.module.DocumentPicker(this.id+'-docPicker', Alfresco.module.RM_ObjectRenderer);
 
-         this.widgets['documentPicker'] = new Alfresco.module.DocumentPicker(this.id+'-docPicker');
          this.widgets['documentPicker'].setOptions({
                controlId: this.options.controlId,
                pickerId: this.options.pickerId,
                disabled:false,
                compactMode: false,
+               displaySmallAddButtonIcon:true,
                currentValue: this.options.currentValue,
                minSearchTermLength: "3",
                maxSearchResults: "100",
@@ -162,11 +167,16 @@ Alfresco.RM = Alfresco.RM || {};
                itemFamily: "node",
                showLinkToTarget: false,
                maintainAddedRemovedItems:false,
-               mandatory:true
+               mandatory:true,
+               docLibNameAlias:this.msg('label.fileplan'),
+               restrictParentNavigationToDocLib: true,     
+               params:'filterType=rma:dispositionSchedule,rma:dispositionActionDefinition,rma:dispositionAction,rma:hold,rma:transfer'
+                // params:'filterType='+encodeURIComponent('{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule,{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionActionDefinition,{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAction,{http://www.alfresco.org/model/recordsmanagement/1.0}hold','{http://www.alfresco.org/model/recordsmanagement/1.0}transfer')
             }
-         );
+         );         
          YAHOO.Bubbling.on('onDocumentsSelected',this.updateSelectionField, this);
       },
+      
       /**
        * Updates UI with details about the selected documents
        * 
@@ -176,19 +186,30 @@ Alfresco.RM = Alfresco.RM || {};
        */
       updateSelectionField: function RM_NewReference_updateSelectionField(e, args)
       {
-
-         var selectedItems = args[1];
-         //we only need one
-         var selectedItem = selectedItems[0];
-
-         var docUrl = Alfresco.constants.URL_CONTEXT + 'page/site/rm/document-details?nodeRef='+selectedItem.nodeRef;
-         //we only want to display the path relative to the doc lib
-         var docLibPath = selectedItem.displayPath.split('documentLibrary')[1];
          var selectedEl = Dom.get(this.options.pickerId);
-         selectedEl.innerHTML = '<a href="'+ docUrl+ '" title="' + selectedItem.description + '">'+ docLibPath + '/' + selectedItem.name +'</a>';
-         Dom.addClass(selectedEl,'active');
-         //note: if more than one than we must store as comma separated
-         this.options.currentValue = selectedItem.nodeRef;
+         var selectedItems = args[1];
+         
+
+         if (selectedItems.length>0)
+         {
+            //we only need one
+            var selectedItem = selectedItems[0];
+
+            var docUrl = Alfresco.constants.URL_CONTEXT + 'page/site/rm/document-details?nodeRef='+selectedItem.nodeRef;
+            //we only want to display the path relative to the doc lib
+            var docLibPath = selectedItem.displayPath.split('documentLibrary')[1];
+         
+            selectedEl.innerHTML = '<a href="'+ docUrl+ '" title="' + selectedItem.description + '">'+ docLibPath + '/' + selectedItem.name +'</a>';
+            Dom.addClass(selectedEl,'active');
+            //note: if more than one than we must store as comma separated
+            this.options.currentValue = selectedItem.nodeRef;
+         }
+         else
+         {
+            selectedEl.innerHTML = "";
+            Dom.removeClass(selectedEl,'active');
+            this.options.currentValue = "";
+         }
          this.checkRequiredFields();
       },
       
@@ -203,6 +224,7 @@ Alfresco.RM = Alfresco.RM || {};
             this.widgets['submitCreate'].set('disabled',true);
          }
       },
+      
       /**
        * Displays the corresponding details page for the current node
        *
@@ -223,6 +245,7 @@ Alfresco.RM = Alfresco.RM || {};
 
          window.location.href = pageUrl;
       },
+      
       onCreate: function RM_NewReference__onCreate(e)
       {
          var refTypeEl = document.getElementById('record-rel');
@@ -232,7 +255,7 @@ Alfresco.RM = Alfresco.RM || {};
          {
             method: Alfresco.util.Ajax.POST,
             url: Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.replace(':/','')+'/customreferences',
-            dataObj: {refId:referenceType,toNode:this.options.nodeRef},
+            dataObj: {refId:referenceType,toNode:this.options.currentValue},
             successCallback:
             {
                fn: this._navigateForward,
@@ -244,5 +267,3 @@ Alfresco.RM = Alfresco.RM || {};
       }
    });
 })();
-
-

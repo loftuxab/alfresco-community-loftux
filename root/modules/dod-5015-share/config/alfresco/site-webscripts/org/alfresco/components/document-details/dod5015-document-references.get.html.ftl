@@ -17,7 +17,7 @@
       <#if (references?size > 0)>
       <ul>
 <#list references as ref>
-         <li><a href="${ref.id}" title="${ref.displayName}"><span>${ref.displayName}</span></a></li>
+         <li>${ref.label?html} <a href="${url.context}/page/site/${page.url.templateArgs.site}/document-details?nodeRef=${ref.targetRef}" title="${ref.targetRefDocName}"><span>${ref.targetRefDocName}</span></a></li>
 </#list>
       </ul>
       <#else>

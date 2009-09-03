@@ -146,6 +146,10 @@
 {
    border: medium none;
 }
+.document-picker .picker-items.yui-dt .yui-dt-data td.yui-dt-col-nodeRef
+{
+   vertical-align:top;
+}
 
 .document-picker .picker-items.yui-dt .yui-dt-data td
 {
