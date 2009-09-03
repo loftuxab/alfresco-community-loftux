@@ -464,9 +464,9 @@
                }
                
                // About section fields
-               var firstName = person.firstName;
-               var lastName = person.lastName;
-               var fullName = firstName + ' ' + (lastName ? lastName : "");
+               var firstName = person.firstName,
+                  lastName = person.lastName,
+                  fullName = firstName + ' ' + (lastName ? lastName : "");
                fnSetter("-view-title", fullName);
                fnSetter("-view-name", fullName);
                fnSetter("-view-jobtitle", person.jobtitle);
@@ -501,6 +501,11 @@
                fnSetter("-view-enabled", person.enabled ? parent._msg("label.enabled") : parent._msg("label.disabled"));
                fnSetter("-view-quota", (person.quota > 0 ? Alfresco.util.formatFileSize(person.quota) : ""));
                fnSetter("-view-usage", Alfresco.util.formatFileSize(person.sizeCurrent));
+               var fnGroupToString = function()
+               {
+                  return this.displayName;
+               }
+               for (var i = 0, j = person.groups.length; i < j; person.groups[i++].toString = fnGroupToString) {}
                fnSetter("-view-groups", person.groups.join(", "));
                
                // Make main panel area visible
@@ -856,10 +861,11 @@
           */
          addGroup: function addGroup(group)
          {
-            var found = false;
-            for (var i=0, j=this._groups.length; i<j; i++)
+            var found = false,
+               i, j;
+            for (i = 0, j = this._groups.length; i < j; i++)
             {
-               if (this._groups[i] != null && this._groups[i].itemName === group.itemName)
+               if (this._groups[i] !== null && this._groups[i].itemName === group.itemName)
                {
                   found = true;
                   break;
@@ -870,16 +876,17 @@
             {
                this._groups.push(group);
                
-               var groupDiv = Dom.get(parent.id + "-update-groups");
-               var html = groupDiv.innerHTML;
-               var idx = (this._groups.length-1);
+               var groupDiv = Dom.get(parent.id + "-update-groups"),
+                  html = groupDiv.innerHTML,
+                  idx = (this._groups.length-1);
+               
                html += " <span id='" + parent.id + "_group" + idx + "' onclick=\"YAHOO.Bubbling.fire('removeGroupUpdate', {id: " +
                      idx + "});\" class='group-item' title='" + $html(parent._msg("label.removegroup")) + "'>" + $html(group.displayName) + "</span>";
                groupDiv.innerHTML = html;
                
                // if this group wasn't one of the original list, then add it to the addition list
                found = false;
-               for (var i=0, j=this._originalGroups.length; i<j; i++)
+               for (i = 0, j = this._originalGroups.length; i < j; i++)
                {
                   if (this._originalGroups[i] === group.itemName)
                   {
@@ -998,9 +1005,9 @@
                }
                
                // About section fields
-               var firstName = person.firstName;
-               var lastName = person.lastName;
-               var fullName = firstName + ' ' + (lastName ? lastName : "");
+               var firstName = person.firstName,
+                  lastName = person.lastName,
+                  fullName = firstName + ' ' + (lastName ? lastName : "");
                Dom.get(parent.id + "-update-title").innerHTML = $html(fullName);
                fnSetter("-update-firstname", firstName);
                fnSetter("-update-lastname", lastName);
@@ -1011,7 +1018,7 @@
                
                // convert quota to closest value type
                var quota = person.quota;
-               if (quota != -1)
+               if (quota !== -1)
                {
                   if (quota < Alfresco.util.BYTES_MB)
                   {
@@ -1046,7 +1053,11 @@
                me._originalGroups = person.groups;
                for (var i=0, j=person.groups.length; i<j; i++)
                {
-                  me.addGroup({"itemName": person.groups[i], "displayName": person.groups[i].substring(6)});
+                  me.addGroup(
+                  {
+                     "itemName": person.groups[i].itemName,
+                     "displayName": person.groups[i].displayName
+                  });
                }
                
                // Hide or show the old password field - only required if user changing own password
