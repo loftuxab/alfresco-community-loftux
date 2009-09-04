@@ -453,7 +453,7 @@
           */
          _deleteList: function ViewPanelHandler__deleteList(oRecord)
          {
-            Alfresco.util.Ajax.jsonDelete(
+            Alfresco.util.Ajax.jsonPost(
             {
                url: Alfresco.constants.PROXY_URI + "api/rma/admin/rmconstraints/" + oRecord.getData("constraintName"),
                successCallback:
@@ -1075,18 +1075,22 @@
                      authorities = [];
                for (var i = 0; i < authorityRecords.length; i++)
                {
-                  authorities.push(authorityRecords[i].getData("referenceType"));
+                  authorities.push(authorityRecords[i].getData("authorityName"));
                }
                authorities.push(args[1].shortName);
 
                // Submit new access authorities to server and add it to the ui after a successful response
-               Alfresco.util.Ajax.jsonPut(
+               Alfresco.util.Ajax.jsonPost(
                {
-                  url: Alfresco.constants.PROXY_URI + "api/rma/constraint/" + parent.constraintName + "/values",
+                  url: Alfresco.constants.PROXY_URI + "api/rma/admin/rmconstraints/" + parent.constraintName + "/values",
                   dataObj:
                   {
-                     value: this._getSelectedValueName(),
-                     authorities: authorities
+                     values: [
+                        {
+                           value: this._getSelectedValueName(),
+                           authorities: authorities
+                        }
+                     ]
                   },
                   successCallback:
                   {
@@ -1112,32 +1116,35 @@
          _setupAccessDataSource: function ViewPanelHandler__setupAccessDataSource()
          {
             // DataSource definition
-            var uriSearchResults = Alfresco.constants.PROXY_URI + "api/rma/admin/customreferencedefinitions?bapp=true";
+            var uriSearchResults = Alfresco.constants.PROXY_URI + "api/rma/admin/rmconstraints/";
             this.widgets.accessDataSource = new YAHOO.util.DataSource(uriSearchResults);
             this.widgets.accessDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
             this.widgets.accessDataSource.connXhrMode = "queueRequests";
             this.widgets.accessDataSource.responseSchema =
             {
-                resultsList: "data.customReferences",
-                fields: ["referenceType", "source", "target", "label"]
+                resultsList: "data.value.authorities",
+                fields: ["authorityName", "authorityTitle"]
             };
             this.widgets.accessDataSource.doBeforeParseData = function RecordsListOfAccess_doBeforeParseData(oRequest , oFullResponse)
             {
-               if (oFullResponse && oFullResponse.data && oFullResponse.data.customReferences)
+               if (oFullResponse && oFullResponse.data && oFullResponse.data.value.authorities)
                {
-                  var items = oFullResponse.data.customReferences;
+                  var authorities = oFullResponse.data.value.authorities;
 
                   // Sort the access authorities by their title
-                  items.sort(function (list1, list2)
+                  authorities.sort(function (authority1, authority2)
                   {
-                     return (list1.source > list2.source) ? 1 : (list1.source < list2.source) ? -1 : 0;
+                     return (authority1.authorityTitle > authority2.authorityTitle) ? 1 : (authority1.authorityTitle < authority2.authorityTitle) ? -1 : 0;
                   });
 
                   // we need to wrap the array inside a JSON object so the DataTable is happy
                   return {
                      data:
                      {
-                        customReferences: items
+                        value:
+                        {
+                           authorities: authorities
+                        }
                      }
                   };
                }
@@ -1180,7 +1187,7 @@
              */
             renderCellDescription = function ViewPanelHandler__setupAccessDataTable_renderCellDescription(elCell, oRecord, oColumn, oData)
             {
-               elCell.appendChild(document.createTextNode(oRecord.getData("referenceType")));
+               elCell.appendChild(document.createTextNode(oRecord.getData("authorityTitle")));
             };
 
             /**
@@ -1297,7 +1304,7 @@
             var selectedValueName = this._getSelectedValueName();
             if (selectedValueName)
             {
-               this.widgets.accessDataSource.sendRequest("valueKey=" + selectedValueName,
+               this.widgets.accessDataSource.sendRequest("/" + parent.constraintName + "/values/" + selectedValueName,
                {
                   success: successHandler,
                   failure: failureHandler,
@@ -1331,7 +1338,7 @@
          onRemoveAccessClick: function ViewPanelHandler_onRemoveAccessClick(e, oRecord)
          {
             var me = this;
-            var text = parent.msg("message.confirm.removeaccess.text", oRecord.getData("referenceType"));
+            var text = parent.msg("message.confirm.removeaccess.text", oRecord.getData("authorityTitle"));
             Alfresco.util.PopupManager.displayPrompt(
             {
                title: parent.msg("message.confirm.removeaccess.title"),
@@ -1373,18 +1380,22 @@
                authority = authorityRecords[i];
                if (oRecord.getId() != authority.getId())
                {
-                  authorities.push(authorityRecords[i].getData("referenceType"));                  
+                  authorities.push(authorityRecords[i].getData("authorityName"));
                }
             }
 
             // Send new list of authorities to server and update ui after
-            Alfresco.util.Ajax.jsonPut(
+            Alfresco.util.Ajax.jsonPost(
             {
-               url: Alfresco.constants.PROXY_URI + "api/rma/" + parent.constraintName + "/values",
+               url: Alfresco.constants.PROXY_URI + "api/rma/admin/rmconstraints/" + parent.constraintName + "/values",
                dataObj:
                {
-                  value: this._getSelectedValueName(),
-                  authorities: authorities
+                  values: [
+                     {
+                        value: this._getSelectedValueName(),
+                        authorities: authorities
+                     }
+                  ]
                },
                successCallback:
                {
@@ -1392,12 +1403,6 @@
                   {
                      // Reload the accesss authorities
                      this._loadAccess();
-
-                     // Display success message
-                     Alfresco.util.PopupManager.displayMessage(
-                     {
-                        text: parent.msg("message.removeaccess.success")
-                     });
                   },
                   scope: this
                },
