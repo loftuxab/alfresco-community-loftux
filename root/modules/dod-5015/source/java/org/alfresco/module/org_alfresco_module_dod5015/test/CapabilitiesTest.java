@@ -519,12 +519,12 @@ public class CapabilitiesTest extends TestCase
     public void testConfig()
     {
         assertEquals(6, recordsManagementSecurityService.getProtectedAspects().size());
-        assertEquals(12, recordsManagementSecurityService.getProtectedProperties().size());
+        assertEquals(13, recordsManagementSecurityService.getProtectedProperties().size());
 
         // Test action wire up
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.ACCESS_AUDIT).getActionNames().size());
         assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.ADD_MODIFY_EVENT_DATES).getActionNames().size());
-        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF).getActionNames().size());
+        assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES).getActionNames().size());
         assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.AUTHORIZE_ALL_TRANSFERS).getActionNames().size());
         assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS).getActionNames().size());
@@ -563,12 +563,12 @@ public class CapabilitiesTest extends TestCase
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MANAGE_ACCESS_CONTROLS).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MANAGE_ACCESS_RIGHTS).getActionNames().size());
-        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MAP_EMAIL_METADATA).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.MOVE_RECORDS).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.PASSWORD_CONTROL).getActionNames().size());
-        assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.PLANNING_REVIEW_CYCLES).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.PLANNING_REVIEW_CYCLES).getActionNames().size());
         assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.RE_OPEN_FOLDERS).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.SELECT_AUDIT_METADATA).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.TRIGGER_AN_EVENT).getActionNames().size());
@@ -628,7 +628,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -694,7 +694,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -760,7 +760,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -831,7 +831,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -1091,7 +1091,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -1157,7 +1157,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -1223,7 +1223,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -1288,7 +1288,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -1548,7 +1548,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -1614,7 +1614,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -1680,7 +1680,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -1745,7 +1745,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -2462,7 +2462,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -2528,7 +2528,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -2594,7 +2594,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
@@ -2659,7 +2659,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.MAKE_OPTIONAL_PARAMETERS_MANDATORY, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MANAGE_ACCESS_CONTROLS, AccessStatus.DENIED);
         check(access, RMPermissionModel.MANAGE_ACCESS_RIGHTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.MANUALLY_CHANGE_DISPOSITION_DATES, AccessStatus.DENIED);
         check(access, RMPermissionModel.MAP_CLASSIFICATION_GUIDE_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MAP_EMAIL_METADATA, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.MOVE_RECORDS, AccessStatus.UNDETERMINED);
