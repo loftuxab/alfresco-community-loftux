@@ -156,6 +156,26 @@ public class ScriptConstraint implements Serializable
     {
         
     }
+    
+
+    /**
+     * Get a single value
+     * @param value
+     * @return
+     */
+    public ScriptConstraintValue getValue(String value)
+    {
+        ScriptConstraintValue[] values = getValues();
+        
+        for(ScriptConstraintValue val : values)
+        {
+            if(val.getValueName().equalsIgnoreCase(value))
+            {
+                return val;
+            }
+        }
+        return null;
+    }
                                      
     public ScriptConstraintValue[] getValues()
     {
