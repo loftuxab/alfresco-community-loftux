@@ -633,6 +633,9 @@
          onUpdate: function ViewPanelHandler_onUpdate()
          {
             this._loadValues();
+
+            // empty access table
+            this.widgets.accessDataTable.deleteRows(0, this.widgets.accessDataTable.getRecordSet().getLength());            
          },
 
          /**
@@ -1077,7 +1080,7 @@
                {
                   authorities.push(authorityRecords[i].getData("authorityName"));
                }
-               authorities.push(args[1].shortName);
+               authorities.push(args[1].itemName);
 
                // Submit new access authorities to server and add it to the ui after a successful response
                Alfresco.util.Ajax.jsonPost(
@@ -1173,6 +1176,7 @@
              */
             renderCellAccessIcon = function ViewPanelHandler__setupListDataTable_renderCellAccessIcon(elCell, oRecord, oColumn, oData)
             {
+               Dom.addClass(elCell, oRecord.getData("authorityName").indexOf("GROUP_") == 0 ? "authority-group":"authority-user");               
                elCell.innerHTML = "&nbsp;";
             };
 

@@ -154,12 +154,21 @@
 
 .listofvalues .yui-dt table .yui-dt-col-accessicon div
 {
-   background-image: url(../images/user-16.png);
    background-position: center center;
    background-repeat: no-repeat;
    margin-bottom: 0.25em;
    margin-top: 0.25em;
    margin-left: 1em;
+}
+
+.listofvalues .yui-dt table .yui-dt-col-accessicon div.authority-user
+{
+   background-image: url(../images/user-16.png);
+}
+
+.listofvalues .yui-dt table .yui-dt-col-accessicon div.authority-group
+{
+   background-image: url(../images/group-16.png);
 }
 
 .listofvalues .yui-dt table .yui-dt-col-actions
@@ -198,7 +207,7 @@
 
 .listofvalues.authority-picker
 {
-   width: 31em;
+   width: 41em;
 }
 
 .listofvalues.authority-picker .authority-finder.list
