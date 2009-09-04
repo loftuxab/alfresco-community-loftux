@@ -27,6 +27,16 @@
 
 /* Multi-Select Actions */
 
+.toolbar .onActionAccession
+{
+   background-image: url(images/accession-16.png);
+}
+
+.toolbar .onActionAccessionComplete
+{
+   background-image: url(images/accession-complete-16.png);
+}
+
 .toolbar .onActionCutoff
 {
    background-image: url(images/cutoff-record-16.png);

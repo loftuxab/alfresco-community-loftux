@@ -475,7 +475,7 @@
                      /**
                       * Simple View
                       */
-                     desc += '<div class="detail"><span class="item-simple"><em>' + me.msg("details.created.on") + '</em> ' + Alfresco.util.formatDate(record.createdOn, "longDate") + '</span>';
+                     desc += '<div class="detail"><span class="item-simple"><em>' + me.msg("details.created.on") + '</em> ' + Alfresco.util.formatDate(record.createdOn) + '</span>';
                      desc += '<span class="item-simple"><em>' + me.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
                   }
                   else
@@ -483,7 +483,7 @@
                      /**
                       * Detailed View
                       */
-                     desc += '<div class="detail detail-first"><span class="item"><em>' + me.msg("details.created.on") + '</em> ' + Alfresco.util.formatDate(record.createdOn, "longDate") + '</span>';
+                     desc += '<div class="detail detail-first"><span class="item"><em>' + me.msg("details.created.on") + '</em> ' + Alfresco.util.formatDate(record.createdOn) + '</span>';
                      desc += '<span class="item"><em>' + me.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
                      desc += '<div class="detail">&nbsp;</div>';
                      desc += '<div class="detail detail-last">&nbsp;</div>';
@@ -559,9 +559,6 @@
                 * Metadata Stub
                 */
                case "metadata-stub":
-                  /**
-                   * TODO: How do we handle the details page for this "metadata stub" record?
-                   */
                   docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
 
                   desc += '<h3 class="filename"><a href="' + docDetailsUrl + '" title="' + $html(fileName) + '">' + $html(record.displayName) + '</a><span class="filename">(' + $html(fileName) + ')</span></h3>';
@@ -578,12 +575,12 @@
                       * Detailed View
                       */
                      desc += '<div class="detail detail-first"><span class="item"><em>' + me.msg("details.record.identifier") + '</em> ' + rmaIdentifier + '</span></div>';
-                     description = record.description;
-                     if (description === "")
-                     {
-                        description = me.msg("details.description.none");
-                     }
-                     desc += '<div class="detail detail-last"><span class="item"><em>' + me.msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
+                     desc += '<div class="detail"><span class="item"><em>' + me.msg("details.record.date-filed") + '</em> ' + Alfresco.util.formatDate($jsonDate(dod5015["rma:dateFiled"])) + '</span>';
+                     desc += '<span class="item"><em>' + me.msg("details.record.publication-date") + '</em> ' + Alfresco.util.formatDate($jsonDate(dod5015["rma:publicationDate"]), "defaultDateOnly") + '</span></div>';
+                     desc += '<div class="detail detail-last">';
+                     desc +=    '<span class="item"><em>' + me.msg("details.record.originator") + '</em> ' + $html(dod5015["rma:originator"]) + '</span>';
+                     desc +=    '<span class="item"><em>' + me.msg("details.record.originating-organization") + '</em> ' + $html(dod5015["rma:originatingOrganization"]) + '</span>';
+                     desc += '</div>';
                   }
                   break;
 

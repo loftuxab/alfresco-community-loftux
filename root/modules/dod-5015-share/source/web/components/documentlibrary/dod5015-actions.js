@@ -36,6 +36,11 @@
     */
    Alfresco.doclib = Alfresco.doclib || {};
    Alfresco.doclib.RecordsActions = {};
+
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $combine = Alfresco.util.combinePaths;
    
    Alfresco.doclib.RecordsActions.prototype =
    {
@@ -397,7 +402,7 @@
        */
       onActionUnfreezeAll: function RDLA_onActionUnfreezeAll(assets)
       {
-         this._dod5015Action("message.unfreeze", assets, "unfreeze");
+         this._dod5015Action("message.unfreeze-all", assets, "unfreezeAll");
       },
       
       /**

@@ -30,6 +30,10 @@ var Evaluator =
                if (asset.hasAspect("rma:declaredRecord"))
                {
                   assetType = "record";
+                  if (asset.hasAspect("dod:ghosted"))
+                  {
+                     assetType = "metadata-stub";
+                  }
                }
             }
             break;
@@ -61,11 +65,11 @@ var Evaluator =
       {
          for (var index in p_asset.properties)
          {
-            if (index.indexOf("{http://www.alfresco.org/model/recordsmanagement/1.0}") == 0)
+            if (index.indexOf("{http://www.alfresco.org/model/recordsmanagement/1.0}") === 0)
             {
                metadata[index.replace("{http://www.alfresco.org/model/recordsmanagement/1.0}", "rma:")] = p_asset.properties[index];
             }
-            else if (index.indexOf("{http://www.alfresco.org/model/dod5015/1.0}") == 0)
+            else if (index.indexOf("{http://www.alfresco.org/model/dod5015/1.0}") === 0)
             {
                metadata[index.replace("{http://www.alfresco.org/model/dod5015/1.0}", "dod:")] = p_asset.properties[index];
             }
@@ -86,6 +90,48 @@ var Evaluator =
       }
 
       return metadata;
+   },
+
+   /**
+    * Record and Record Folder common evaluators
+    */
+   recordAndRecordFolder: function Evaluator_recordAndRecordFolder(asset, permissions, status)
+   {
+      /* Frozen/Unfrozen */
+      if (asset.hasAspect("rma:frozen"))
+      {
+         status["frozen"] = true;
+         if (permissions["Unfreeze"])
+         {
+            permissions["unfreeze"] = true;
+         }
+      }
+      else
+      {
+         if (permissions["ExtendRetentionPeriodOrFreeze"])
+         {
+            permissions["freeze"] = true;
+         }
+      }
+
+      /* Cut Off status */
+      if (asset.hasAspect("rma:cutOff"))
+      {
+         status["cutoff"] = true;
+         permissions["undoCutoff"] = true;
+      }
+
+      /* Transferred status */
+      if (asset.hasAspect("rma:transferred"))
+      {
+         status["transferred"] = true;
+      }
+      
+      /* Accessioned status */
+      if (asset.hasAspect("rma:ascended"))
+      {
+         status["accessioned"] = true;
+      }
    },
 
    /**
@@ -209,14 +255,18 @@ var Evaluator =
             /* Disposition Actions */
             Evaluator.nextDispositionAction(asset, permissions, status);
 
-            /* File new Records */
-            permissions["file"] = capabilities["Create"];
+            /* Record and Record Folder common evaluator */
+            Evaluator.recordAndRecordFolder(asset, permissions, status);
 
-            /* Cut Off status */
-            if (asset.hasAspect("rma:cutOff"))
+            /* Update Cut Off status to folder-specific status */
+            if (status["cutoff"] == true)
             {
+               delete status["cutoff"];
                status["cutoff-folder"] = true;
             }
+            
+            /* File new Records */
+            permissions["file"] = capabilities["Create"];
 
             /* Open/Closed */
             if (asset.properties["rma:isClosed"])
@@ -240,22 +290,6 @@ var Evaluator =
                }
             }
 
-            /* Frozen/Unfrozen */
-            if (asset.hasAspect("rma:frozen"))
-            {
-               status["frozen"] = true;
-               if (capabilities["Unfreeze"])
-               {
-                  permissions["unfreeze"] = true;
-               }
-            }
-            else
-            {
-               if (capabilities["ExtendRetentionPeriodOrFreeze"])
-               {
-                  permissions["freeze"] = true;
-               }
-            }
             break;
 
 
@@ -268,29 +302,9 @@ var Evaluator =
             /* Disposition Actions */
             Evaluator.nextDispositionAction(asset, permissions, status);
 
-            /* Cut Off status */
-            if (asset.hasAspect("rma:cutOff"))
-            {
-               status["cutoff"] = true;
-            }
+            /* Record and Record Folder common evaluator */
+            Evaluator.recordAndRecordFolder(asset, permissions, status);
 
-            /* Frozen/Unfrozen */
-            if (asset.hasAspect("rma:frozen"))
-            {
-               status["frozen"] = true;
-               if (capabilities["Unfreeze"])
-               {
-                  permissions["unfreeze"] = true;
-               }
-            }
-            else
-            {
-               if (capabilities["ExtendRetentionPeriodOrFreeze"])
-               {
-                  permissions["freeze"] = true;
-               }
-            }
-            
             /* Electronic/Non-electronic documents */
             if (asset.typeShort == "rma:nonElectronicDocument")
             {
@@ -300,6 +314,17 @@ var Evaluator =
             {
                permissions["download"] = true;
             }
+            break;
+
+
+         /**
+          * SPECIFIC TO: GHOSTED RECORD (Metadata Stub)
+          */
+         case "metadata-stub":
+            actionSet = "metadataStub";
+
+            /* Record and Record Folder common evaluator */
+            Evaluator.recordAndRecordFolder(asset, permissions, status);
             break;
 
 
