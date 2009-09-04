@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour;
 import org.alfresco.repo.exporter.ACPExportPackageHandler;
 import org.alfresco.repo.web.scripts.content.StreamACP;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -105,15 +106,15 @@ public class ExportPost extends StreamACP
                 // restrict specific aspects from being returned
                 QName[] excludedAspects = new QName[] { 
                             ContentModel.ASPECT_THUMBNAILED, 
-                            RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE};
+                            RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE,
+                            RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH};
                 params.setExcludeAspects(excludedAspects);
             }
             
             // create an ACP of the nodes
             tempACPFile = createACP(params, 
                         transferFormat ? ZIP_EXTENSION : ACPExportPackageHandler.ACP_EXTENSION, 
-                        // TODO: change keepFolderStructure parameter to true once auth issues are sorted
-                        false);
+                        transferFormat);
                 
             // stream the ACP back to the client as an attachment (forcing save as)
             streamContent(req, res, tempACPFile, true, tempACPFile.getName());

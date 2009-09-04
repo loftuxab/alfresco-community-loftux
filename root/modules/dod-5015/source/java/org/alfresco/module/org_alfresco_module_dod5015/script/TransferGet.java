@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour;
 import org.alfresco.repo.web.scripts.content.StreamACP;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -152,12 +153,12 @@ public class TransferGet extends StreamACP
             params.setExportFrom(new Location(itemsToTransfer));
             QName[] excludedAspects = new QName[] { 
                         ContentModel.ASPECT_THUMBNAILED, 
-                        RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE};
+                        RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE,
+                        RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH};
             params.setExcludeAspects(excludedAspects);
             
             // create an archive of all the nodes to transfer
-            // TODO: change keepFolderStructure parameter to true once auth issues are sorted
-            tempArchiveFile = createACP(params, ZIP_EXTENSION, false);
+            tempArchiveFile = createACP(params, ZIP_EXTENSION, true);
             
             // stream the archive back to the client as an attachment (forcing save as)
             streamContent(req, res, tempArchiveFile, true, tempArchiveFile.getName());
