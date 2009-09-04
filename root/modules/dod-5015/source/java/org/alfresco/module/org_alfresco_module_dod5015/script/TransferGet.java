@@ -32,12 +32,16 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
-import org.alfresco.repo.web.scripts.content.StreamArchive;
+import org.alfresco.repo.web.scripts.content.StreamACP;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
+import org.alfresco.service.cmr.view.Location;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
@@ -52,7 +56,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Gavin Cornwell
  */
-public class TransferGet extends StreamArchive
+public class TransferGet extends StreamACP
 {
     /** Logger */
     private static Log logger = LogFactory.getLog(TransferGet.class);
@@ -141,8 +145,19 @@ public class TransferGet extends StreamArchive
                 itemsToTransfer[idx] = assocs.get(idx).getChildRef();
             }
             
+            // setup the ACP parameters
+            ExporterCrawlerParameters params = new ExporterCrawlerParameters();
+            params.setCrawlSelf(true);
+            params.setCrawlChildNodes(true);
+            params.setExportFrom(new Location(itemsToTransfer));
+            QName[] excludedAspects = new QName[] { 
+                        ContentModel.ASPECT_THUMBNAILED, 
+                        RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE};
+            params.setExcludeAspects(excludedAspects);
+            
             // create an archive of all the nodes to transfer
-            tempArchiveFile = createArchive(itemsToTransfer);
+            // TODO: change keepFolderStructure parameter to true once auth issues are sorted
+            tempArchiveFile = createACP(params, ZIP_EXTENSION, false);
             
             // stream the archive back to the client as an attachment (forcing save as)
             streamContent(req, res, tempArchiveFile, true, tempArchiveFile.getName());
