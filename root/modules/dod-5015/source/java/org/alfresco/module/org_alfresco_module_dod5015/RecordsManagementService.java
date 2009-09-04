@@ -157,14 +157,30 @@ public interface RecordsManagementService
     boolean isNextDispositionActionEligible(NodeRef nodeRef);
     
     /**
-     * 
+     * Gets the next dispositoin action for a given node
+     *  
      * @param nodeRef
      * @return
      */
     DispositionAction getNextDispositionAction(NodeRef nodeRef);
+     
     
-    // TODO List<DispositionAction> getDispositionActionHistory(NodeRef nodeRef);
-    // TODO boolean isDispositionActionEligible(DispositionAction nodeRef); ???  (move to disposition action object?)  
+    /**
+     * Gets a list of all the completed disposition action in the order they occured.
+     * 
+     * @param nodeRef                       record/record folder 
+     * @return List<DispositionAction>      list of completed disposition actions
+     */
+    List<DispositionAction> getCompletedDispositionActions(NodeRef nodeRef);
+    
+    /**
+     * Helper method to get the last completed disposition action.  Returns null 
+     * if there is none.
+     * 
+     * @param nodeRef               record/record folder
+     * @return DispositionAction    last completed disposition action, null if none
+     */
+    DispositionAction getLastCompletedDispostionAction(NodeRef nodeRef);
     
     /**
      * Get the vital record definition for a given node reference within the file plan

@@ -542,6 +542,11 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertEquals(declaredDate.getMonth(), dateNow.getMonth());
                 assertEquals(declaredDate.getYear(), dateNow.getYear());
                 
+                // Check that the history is empty
+                List<DispositionAction> history = rmService.getCompletedDispositionActions(recordFolder);
+                assertNotNull(history);
+                assertEquals(0, history.size());
+                
                 return null;
             }          
         });     
@@ -600,14 +605,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 return null;
             }          
         });
-        
-//        System.out.println("Completed at :"  + this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT )); 
-//        assertNotNull("PROP_DISPOSITION_ACTION_COMPLETED_AT", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT));
-//        assertNotNull("PROP_DISPOSITION_ACTION_COMPLETED_BY", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY));
-//        assertNotNull("PROP_DISPOSITION_ACTION_STARTED_AT", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_STARTED_AT));
-//        assertNotNull("PROP_DISPOSITION_ACTION_STARTED_BY", this.nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_STARTED_BY));              
-//        
-        
+      
         transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
         {
             public Object execute() throws Throwable
@@ -628,11 +626,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertNull(nodeService.getProperty(recordFolder, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS));
                                  
                 // Check the previous action details
-                // TODO check the history association
-                //assertEquals("cutoff", this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_ACTION));
-                //assertNotNull(this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE));
-                //System.out.println("Previous aciont date: " + this.nodeService.getProperty(recordFolder, PROP_PREVIOUS_DISPOSITION_DISPOSITION_DATE).toString());
-
+                checkLastDispositionAction(recordFolder, "cutoff", 1);
+         
                 // Check for the search properties having been populated
                 checkSearchAspect(recordFolder);
                 
@@ -651,9 +646,32 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertFalse(nodeService.exists(recordFolder));
                 assertFalse(nodeService.exists(recordOne));
                 
+                // Check the history
+                if (nodeService.exists(recordFolder) == true)
+                {
+                    checkLastDispositionAction(recordFolder, "destroy", 2);
+                }
+                
                 return null;
             }          
         });
+    }
+    
+    private void checkLastDispositionAction(NodeRef nodeRef, String daName, int expectedCount)
+    {
+        // Check the previous action details
+        List<DispositionAction> history = rmService.getCompletedDispositionActions(nodeRef);
+        assertNotNull(history);
+        assertEquals(expectedCount, history.size());
+        DispositionAction lastDA = history.get(history.size()-1);
+        assertEquals(daName, lastDA.getName());
+        assertNotNull(lastDA.getStartedAt());
+        assertNotNull(lastDA.getStartedBy());
+        assertNotNull(lastDA.getCompletedAt());
+        assertNotNull(lastDA.getCompletedBy());
+        // Check the "get last" method
+        lastDA = rmService.getLastCompletedDispostionAction(nodeRef);
+        assertEquals(daName, lastDA.getName());        
     }
     
     public void testFreeze() throws Exception
@@ -1113,6 +1131,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 rmActionService.executeRecordsManagementAction(recordFolder, "completeEvent", params);
                 rmActionService.executeRecordsManagementAction(recordFolder, "cutoff");
                 
+                checkLastDispositionAction(recordFolder, "cutoff", 1);
+                
                 DispositionAction da = rmService.getNextDispositionAction(recordFolder);
                 assertNotNull(da);
                 assertEquals("transfer", da.getName());
@@ -1163,7 +1183,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertNotNull(da.getStartedAt());
                 assertNotNull(da.getStartedBy());
                 assertNull(da.getCompletedAt());
-                assertNull(da.getCompletedBy());        
+                assertNull(da.getCompletedBy());
+                
+                checkLastDispositionAction(recordFolder, "cutoff", 1);
                 
                 // Check that the transfer object is created
                 assertNotNull(rootNode);
@@ -1199,6 +1221,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertNull(da.getCompletedAt());
                 assertNull(da.getCompletedBy());    
                 assertFalse(rmService.isNextDispositionActionEligible(recordFolder));
+                
+                checkLastDispositionAction(recordFolder, "transfer", 2);
                 
                 return null;
             }          
