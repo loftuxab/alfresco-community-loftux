@@ -585,6 +585,32 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertEquals("application/acp", rsp.getContentType());
     }
     
+    public void testExportInTransferFormat() throws Exception
+    {
+        NodeRef recordFolder1 = TestUtilities.getRecordFolder(searchService, "Reports", 
+                    "AIS Audit Records", "January AIS Audit Records");
+        assertNotNull(recordFolder1);
+        
+        NodeRef recordFolder2 = TestUtilities.getRecordFolder(searchService, "Reports", 
+                    "Unit Manning Documents", "1st Quarter Unit Manning Documents");
+        assertNotNull(recordFolder2);
+        
+        String exportUrl = "/api/rma/admin/export";
+        
+        // define JSON POST body
+        JSONObject jsonPostData = new JSONObject();
+        JSONArray nodeRefs = new JSONArray();
+        nodeRefs.put(recordFolder1.toString());
+        nodeRefs.put(recordFolder2.toString());
+        jsonPostData.put("nodeRefs", nodeRefs);
+        jsonPostData.put("transferFormat", true);
+        String jsonPostString = jsonPostData.toString();
+        
+        // make the export request
+        Response rsp = sendRequest(new PostRequest(exportUrl, jsonPostString, APPLICATION_JSON), 200);
+        assertEquals("application/zip", rsp.getContentType());
+    }
+    
     public void testTransfer() throws Exception
     {
         // Test 404 status for non existent node
@@ -683,7 +709,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         transferId = transferNodeRef.getId();
         transferUrl = MessageFormat.format(GET_TRANSFER_URL_FORMAT, rootNodeUrl, transferId);
         rsp = sendRequest(new GetRequest(transferUrl), 200);
-        assertEquals("application/acp", rsp.getContentType());
+        assertEquals("application/zip", rsp.getContentType());
     }
     
     public void testAudit() throws IOException, JSONException
