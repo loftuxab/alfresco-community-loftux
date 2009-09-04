@@ -884,5 +884,55 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
         
         return true;
     }
+    
+    
+    /**
+     * Create an RM Constraint value
+     * @throws Exception
+     */
+    public void testGetRMConstraintValue() throws Exception
+    {
+       
+        String constraintName = null;
+        
+        /*
+         * Create a new list
+         */
+        {
+            String title = "Get Constraint Value";
+            JSONArray array = new JSONArray();
+            array.put("POTATO");
+            array.put("CARROT");
+            array.put("TURNIP");
+    
+            JSONObject obj = new JSONObject();
+            obj.put("allowedValues", array);
+            obj.put("constraintTitle", title);
+            /**
+             * Now do a post to create a new list
+             */  
+            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
+            JSONObject top = new JSONObject(response.getContentAsString());
+        
+            JSONObject data = top.getJSONObject("data");       
+            constraintName = data.getString("constraintName");   
+            JSONArray allowedValues = data.getJSONArray("allowedValues");
+            assertTrue("values not correct", compare(array, allowedValues));
+        }
+        
+        /**
+         * Get the CARROT value
+         */
+        {
+            String url = URL_RM_CONSTRAINTS + "/" + constraintName + "/values/" + "CARROT";
+            Response response = sendRequest(new GetRequest(url), Status.STATUS_OK);
+            JSONObject top = new JSONObject(response.getContentAsString());
+        }
+        
+        {
+            String url = URL_RM_CONSTRAINTS + "/" + constraintName + "/values/" + "ONION";
+            sendRequest(new GetRequest(url), Status.STATUS_NOT_FOUND);
+        }
+    }
 }
 
