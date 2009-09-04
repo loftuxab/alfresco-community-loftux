@@ -703,39 +703,30 @@
             this.widgets.valuesDataSource.connXhrMode = "queueRequests";
             this.widgets.valuesDataSource.responseSchema =
             {
-                resultsList: "data.allowedValues",
-                fields: ["valueKey", "valueTitle"]
+                resultsList: "data.values",
+                fields: ["valueName", "valueTitle"]
             };
             this.widgets.valuesDataSource.doBeforeParseData = function RecordsListOfValues_doBeforeParseData(oRequest , oFullResponse)
             {
-               if (oFullResponse && oFullResponse.data && oFullResponse.data.allowedValues)
+               if (oFullResponse && oFullResponse.data && oFullResponse.data.values)
                {
                   // Display the title of the list in the "edit title"
                   Dom.get(parent.id + "-edittitle").innerHTML = parent.msg("label.edit-listofvalue-title", oFullResponse.data.constraintTitle);
 
                   // Get the values from the response
-                  var values = oFullResponse.data.allowedValues;
+                  var values = oFullResponse.data.values;
 
                   // Sort the values by their title
                   values.sort(function (value1, value2)
                   {
-                     return (value1 > value2) ? 1 : (value1 < value2) ? -1 : 0;
+                     return (value1.valueTitle > value2.valueTitle) ? 1 : (value1.valueTitle < value2.valueTitle) ? -1 : 0;
                   });
 
-                  // Put the string inside objects so we can use the "fields" hint in the responseSchema
-                  for (var i = 0; i < values.length; i++)
-                  {
-                     values[i] = {
-                        valueKey: "key_" + values[i],
-                        valueTitle: values[i]
-                     };
-                  }
-                  
                   // we need to wrap the array inside a JSON object so the DataTable is happy
                   return {
                      data:
                      {
-                        allowedValues: values
+                        values: values
                      }
                   };
                }
@@ -977,16 +968,10 @@
                   {
                      // Reload the values
                      this._loadValues();
-
-                     // Display success message
-                     Alfresco.util.PopupManager.displayMessage(
-                     {
-                        text: parent.msg("message.removevalue.success")
-                     });
                   },
                   scope: this
                },
-               failureMessage: parent.msg("message.removevalue.failure")
+               failureMessage: parent.msg("message.deletevalue.failure")
             });
          },
 
@@ -1332,7 +1317,7 @@
             var selectedRows = this.widgets.valuesDataTable.getSelectedRows(),
                   selectedRow = selectedRows && selectedRows.length > 0 ? selectedRows[0] : null,
                   selectedRecord = this.widgets.valuesDataTable.getRecord(selectedRow);
-            return selectedRecord ? selectedRecord.getData("valueKey") : null;
+            return selectedRecord ? selectedRecord.getData("valueName") : null;
          },
 
          /**
