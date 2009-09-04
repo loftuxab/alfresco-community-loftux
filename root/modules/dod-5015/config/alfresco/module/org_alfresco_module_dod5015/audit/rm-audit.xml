@@ -9,14 +9,37 @@
     >
 
     <DataExtractors>
-       <DataExtractor name="simpleValue" class="org.alfresco.repo.audit.extractor.SimpleValueDataExtractor"/>
+       <DataExtractor name="simpleValue" registeredName="auditModel.extractor.simpleValue"/>
+       <DataExtractor name="nodeName" registeredName="auditModel.extractor.nodeName"/>
     </DataExtractors>
+    
+    <DataGenerators>
+       <DataGenerator name="personFullName" registeredName="auditModel.generator.personFullName"/>
+    </DataGenerators>
 
     <Application name="DOD5015" key="DOD5015">
         <AuditPath key="actions">
+            <!-- Record user details -->
+            <AuditPath key="person">
+                <GenerateValue key="fullName" dataGenerator="personFullName"/>
+            </AuditPath>
+            <!-- Record the name and description of the action as well as the actioned-upon node -->
+            <AuditPath key="actionName">
+                <RecordValue key="value" dataExtractor="simpleValue"/>
+            </AuditPath>
+            <AuditPath key="actionDescription">
+                <RecordValue key="value" dataExtractor="simpleValue"/>
+            </AuditPath>
             <AuditPath key="node">
                 <RecordValue key="noderef" dataExtractor="simpleValue"/>
+                <RecordValue key="name" dataExtractor="nodeName"/>
             </AuditPath>
+            <!--
+                RM action parameters
+                * Keyed by action name to be more selective
+                * Only record the parameters if they are of interest
+            -->
+            <!-- A test action -->
             <AuditPath key="testAction">
                 <AuditPath key="parameters">
                     <AuditPath key="testActionParam">

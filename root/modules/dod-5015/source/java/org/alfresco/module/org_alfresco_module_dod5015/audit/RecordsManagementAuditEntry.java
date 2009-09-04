@@ -37,13 +37,13 @@ import org.alfresco.util.ParameterCheck;
  */
 public final class RecordsManagementAuditEntry
 {
-    private Date timestamp;
-    private String userName;
-    private String fullName;
-    private String userRole;
-    private NodeRef nodeRef;
-    private String nodeName;
-    private String event;
+    private final Date timestamp;
+    private final String userName;
+    private final String fullName;
+    private final String userRole;
+    private final NodeRef nodeRef;
+    private final String nodeName;
+    private final String event;
  
     /**
      * Default constructor
@@ -54,11 +54,6 @@ public final class RecordsManagementAuditEntry
     {
         ParameterCheck.mandatory("timestamp", timestamp);
         ParameterCheck.mandatory("userName", userName);
-        ParameterCheck.mandatory("fullName", fullName);
-        ParameterCheck.mandatory("userRole", userRole);
-        ParameterCheck.mandatory("nodeRef", nodeRef);
-        ParameterCheck.mandatory("nodeName", nodeName);
-        ParameterCheck.mandatory("event", event);
         
         this.timestamp = timestamp;
         this.userName = userName;
@@ -67,6 +62,22 @@ public final class RecordsManagementAuditEntry
         this.nodeRef = nodeRef;
         this.nodeName = nodeName;
         this.event = event;
+    }
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append("(")
+          .append("timestamp=").append(timestamp)
+          .append(", userName=").append(userName)
+          .append(", userRole=").append(userRole)
+          .append(", fullName=").append(fullName)
+          .append(", nodeRef=").append(nodeRef)
+          .append(", nodeName=").append(nodeName)
+          .append(", event=").append(event)
+          .append(")");
+        return sb.toString();
     }
 
     /**

@@ -24,16 +24,16 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.audit;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-import org.alfresco.model.ContentModel;
-import org.alfresco.service.cmr.audit.AuditInfo;
 import org.alfresco.service.cmr.audit.AuditService;
+import org.alfresco.service.cmr.audit.AuditService.AuditQueryCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.util.ParameterCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,54 +47,30 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
 	/** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementAuditServiceImpl.class);
 
-    protected NodeService nodeService;
-    protected AuditService auditService;
-    protected PersonService personService;
+    private AuditService auditService;
 
     // temporary field to hold imaginary enabled flag
     private boolean enabled = false;
     
     /**
      * Sets the AuditService instance
-     * 
-     * @param auditService AuditService instance
      */
 	public void setAuditService(AuditService auditService)
 	{
 		this.auditService = auditService;
 	}
 	
-	/**
-     * Sets the NodeService instance
-     * 
-     * @param nodeService NodeService instance
+    /**
+     * {@inheritDoc}
      */
-	public void setNodeService(NodeService nodeService)
-    {
-        this.nodeService = nodeService;
-    }
-	
-	/**
-     * Sets the PersonService instance
-     * 
-     * @param personService PersonService instance
-     */
-    public void setPersonService(PersonService personService)
-    {
-        this.personService = personService;
-    }
-	
-	/*
-	 * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#isEnabled()
-	 */
 	public boolean isEnabled()
     {
         return this.enabled;
     }
 	
-	/*
-	 * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#start()
-	 */
+    /**
+     * {@inheritDoc}
+     */
     public void start()
     {
         // TODO: Start RM auditing properly!
@@ -104,8 +80,8 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
             logger.info("Started Records Management auditing");
     }
 
-    /*
-     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#stop()
+    /**
+     * {@inheritDoc}
      */
     public void stop()
     {
@@ -116,8 +92,8 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
             logger.info("Stopped Records Management auditing");
     }
     
-    /*
-     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#clear()
+    /**
+     * {@inheritDoc}
      */
     public void clear()
     {
@@ -127,8 +103,8 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
             logger.debug("Records Management audit log has been cleared");
     }
     
-    /*
-     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#getDateLastStarted()
+    /**
+     * {@inheritDoc}
      */
     public Date getDateLastStarted()
     {
@@ -136,8 +112,8 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
         return new Date();
     }
     
-    /*
-     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#getDateLastStopped()
+    /**
+     * {@inheritDoc}
      */
     public Date getDateLastStopped()
     {
@@ -145,134 +121,112 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
         return new Date();
     }
     
-    /*
-     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#getAuditTrail()
-     */
-    public List<RecordsManagementAuditEntry> getAuditTrail()
-    {
-        return getAuditTrail(null);
-    }
-    
-    /*
-     * @see org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService#getAuditTrail(org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters)
+    /**
+     * {@inheritDoc}
      */
     public List<RecordsManagementAuditEntry> getAuditTrail(
                 RecordsManagementAuditQueryParameters params)
     {
+        ParameterCheck.mandatory("params", params);
+        
         if (logger.isDebugEnabled())
             logger.debug("Retrieving audit trail using parameters: " + params);
         
-        List<RecordsManagementAuditEntry> entries = new ArrayList<RecordsManagementAuditEntry>();
-        
-        if (params != null)
+        // TODO: Add node-based filtering
+        if (params.getNodeRef() != null)
         {
-            // TODO: examine parameters and build up query or call relevant service methods,
-            //       for now mimic user filter and max entries in here!
-            
-            if (params.getNodeRef() != null)
+            logger.error("TODO: Node-based filtering is not enabled, yet.");
+        }
+        
+        // The callback will populate this
+        final List<RecordsManagementAuditEntry> entries = new ArrayList<RecordsManagementAuditEntry>(50);
+        
+        AuditQueryCallback callback = new AuditQueryCallback()
+        {
+            public boolean handleAuditEntry(
+                    Long entryId,
+                    String applicationName,
+                    String user,
+                    long time,
+                    Map<String, Serializable> values)
             {
-                // get audit trail for provided node
-                List<AuditInfo> auditLog = this.auditService.getAuditTrail(params.getNodeRef());
-                
-                if (logger.isDebugEnabled())
-                    logger.debug("Found " + auditLog.size() + " audit log entries");
-                
-                for (AuditInfo entry: auditLog)
+                Date timestamp = new Date(time);
+                String fullName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_FULLNAME);
+                if (fullName == null)
                 {
-                    RecordsManagementAuditEntry rmEntry = createRMAuditEntry(entry, params.getNodeRef());
-                    if (rmEntry != null)
-                    {
-                        // NOTE: temporary user filtering
-                        if (params.getUser() == null || params.getUser().equals(entry.getUserIdentifier()))
-                        {
-                            entries.add(rmEntry);
-                        }
-                        
-                        // NOTE: temporary way to mimic maximum number of results
-                        if (params.getMaxEntries() != -1 && (entries.size() == params.getMaxEntries()))
-                        {
-                            break;
-                        }
-                    }
+                    logger.warn(
+                            "RM Audit: No value for '" +
+                            RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_FULLNAME + "': " + entryId);
                 }
-                
+                String userRole = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLE);
+                if (userRole == null)
+                {
+                    logger.warn(
+                            "RM Audit: No value for '" +
+                            RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLE + "': " + entryId);
+                }
+                NodeRef nodeRef = (NodeRef) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF);
+                if (nodeRef == null)
+                {
+                    logger.warn(
+                            "RM Audit: No value for '" +
+                            RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF + "': " + entryId);
+                }
+                String nodeName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME);
+                if (nodeName == null)
+                {
+                    logger.warn(
+                            "RM Audit: No value for '" +
+                            RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME + "': " + entryId);
+                }
+                String description = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_ACTIONDESCRIPTION_VALUE);
+                if (description == null)
+                {
+                    logger.warn(
+                            "RM Audit: No value for '" +
+                            RecordsManagementAuditService.RM_AUDIT_DATA_ACTIONDESCRIPTION_VALUE + "': " + entryId);
+                }
+                RecordsManagementAuditEntry entry = new RecordsManagementAuditEntry(
+                        timestamp,
+                        user,
+                        fullName,
+                        userRole,
+                        nodeRef,
+                        nodeName,
+                        description);
+                // Add it to the output
+                entries.add(entry);
                 if (logger.isDebugEnabled())
-                    logger.debug("Returning " + entries.size() + " relevant audit log entries");
+                {
+                    logger.debug("   " + entry);
+                }
+                // Keep going
+                return true;
             }
-        }
-        else
+        };
+        
+        String user = params.getUser();
+        Long fromTime = (params.getDateFrom() == null ? null : new Long(params.getDateFrom().getTime()));
+        Long toTime = (params.getDateTo() == null ? null : new Long(params.getDateTo().getTime()));
+        int maxEntries = params.getMaxEntries();
+        
+        if (logger.isDebugEnabled())
         {
-            // TODO: return whole RM audit trail, for now just let the empty list go back
+            logger.debug("RM Audit: Issuing query: " + params);
         }
         
+        auditService.auditQuery(
+                callback,
+                RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
+                user,
+                fromTime,
+                toTime,
+                maxEntries);
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("RM Audit: Got " + entries.size() + " query results for params: " + params);
+        }
         return entries;
-    }
-    
-    /**
-     * Creates a RecordsManagementAuditEntry instance for the given AuditInfo.
-     * 
-     * @param entry The AuditInfo instance holding audit log entry to generate
-     * @param nodeRef The node the audit log entry is for
-     * @return RecordsManagementAuditEntry instance
-     */
-    protected RecordsManagementAuditEntry createRMAuditEntry(AuditInfo entry, NodeRef nodeRef)
-    {
-        RecordsManagementAuditEntry rmEntry = null;
-        
-        String service = entry.getAuditService();
-        String method = entry.getAuditMethod();
-        if (service != null && method != null)
-        {
-            // construct the event from the service and method
-            String event = service + "." + method;
-            String userName = entry.getUserIdentifier();
-            String fullName = getFullName(userName);
-            // TODO: Call the [yet to be implemented] RM security service to get user's role
-            String userRole = "Records Manager";
-            String nodeName = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
-            
-            // create the entry instance
-            rmEntry = new RecordsManagementAuditEntry(entry.getDate(), userName, fullName, 
-                        userRole, nodeRef, nodeName, event);
-        }
-        
-        return rmEntry;
-    }
-    
-    /**
-     * Returns the full name of the given username.
-     * 
-     * @param userName User name to get full name for
-     * @return User's full name
-     */
-    protected String getFullName(String userName)
-    {
-        // TODO: Add caching in here as the same username is going to be potentially
-        //       looked up multiple times for the same request and the processing below
-        //       won't be that cheap!
-        
-        String fullName = null;
-        
-        NodeRef person = personService.getPerson(userName);
-        if (person != null)
-        {
-            String firstName = (String)nodeService.getProperty(person, ContentModel.PROP_FIRSTNAME);
-            String lastName = (String)nodeService.getProperty(person, ContentModel.PROP_LASTNAME);
-            
-            fullName = ((firstName != null && firstName.length() > 0) ? firstName : "");
-            if (lastName != null && lastName.length() > 0)
-            {
-                fullName += (fullName.length() > 0 ? " " : "");
-                fullName += lastName;
-            }
-        }
-        
-        // make sure something is returned
-        if (fullName == null || fullName.length() == 0)
-        {
-            fullName = userName;
-        }
-        
-        return fullName;
     }
 }
