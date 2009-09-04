@@ -489,6 +489,26 @@ Alfresco.util.fromISO8601 = function(date)
 };
 
 /**
+ * Convert a JavaScript native Date object into an ISO8601 date string
+ *
+ * @method Alfresco.util.toISO8601
+ * @param date {Date} JavaScript native Date object
+ * @return {string} ISO8601 formatted date string
+ * @static
+ */
+Alfresco.util.toISO8601 = function(date)
+{
+   try
+   {
+      return Alfresco.thirdparty.toISO8601.apply(this, arguments);
+   }
+   catch(e)
+   {
+      return "";
+   }
+};
+
+/**
  * Convert an JSON date exploded into an object literal into a JavaScript native Date object.
  * NOTE: Passed-in date will have month as zero-based.
  *
@@ -536,23 +556,39 @@ Alfresco.util.fromExplodedJSONDate = function(date)
 };
 
 /**
- * Convert a JavaScript native Date object into an ISO8601 date string
+ * Convert an object literal into a JavaScript native Date object into an JSON date exploded.
+ * NOTE: Passed-in date will have month as zero-based.
  *
- * @method Alfresco.util.toISO8601
- * @param date {Date} JavaScript native Date object
- * @return {string} ISO8601 formatted date string
+ * @method Alfresco.util.toExplodedJSONDate
+ * @param date {Date} JavaScript Date object
+ * @return {object}
+ * <pre>
+ *    date = 
+ *    {
+ *       year: 2009
+ *       month: 4 // NOTE: zero-based
+ *       date: 22
+ *       hours: 14
+ *       minutes: 27
+ *       seconds: 42
+ *       milliseconds: 390
+ *    }
+ * </pre>
  * @static
  */
-Alfresco.util.toISO8601 = function(date)
+Alfresco.util.toExplodedJSONDate = function(date)
 {
-   try
+   return (
    {
-      return Alfresco.thirdparty.toISO8601.apply(this, arguments);
-   }
-   catch(e)
-   {
-      return "";
-   }
+      zone: "UTC",
+      year: date.getFullYear(),
+      month: date.getMonth(),
+      date: date.getDate(),
+      hours: date.getHours(),
+      minutes: date.getMinutes(),
+      seconds: date.getSeconds(),
+      milliseconds: date.getMilliseconds()
+   });
 };
 
 /**
@@ -2216,6 +2252,7 @@ Alfresco.util.PopupManager = function()
          effectDuration: 0.5,
          modal: true,
          visible: false,
+         initialShow: true,
          noEscape: true,
          html: null,
          callback: null,
@@ -2250,6 +2287,7 @@ Alfresco.util.PopupManager = function()
        *    effect: {YAHOO.widget.ContainerEffect}, // the effect to use when showing and hiding the prompt, default is null
        *    effectDuration: {int}, // the time in seconds that the effect should run, default is 0.5
        *    modal: {boolean},      // if a grey transparent overlay should be displayed in the background
+       *    initialShow {boolean}  // whether to call show() automatically on the panel
        *    close: {boolean},      // if a close icon should be displayed in the right upper corner, default is true
        *    buttons: []            // an array of button configs as described by YUI:s SimpleDialog, default is a single OK button
        *    okButtonText: {string} // Allows just the label of the OK button to be overridden
@@ -2257,6 +2295,7 @@ Alfresco.util.PopupManager = function()
        *    html: {string},        // optional override for function-generated HTML <input> field. Note however that you must supply your own
        *                           //    button handlers in this case in order to get the user's input from the Dom.
        * }
+       * @return {YAHOO.widget.SimpleDialog} The dialog widget
        */
       getUserInput: function(config)
       {
@@ -2353,10 +2392,13 @@ Alfresco.util.PopupManager = function()
             prompt.cfg.queueProperty("buttons", c.buttons);
          }
 
-         // Add the dialog to the dom, center it and show it.
+         // Add the dialog to the dom, center it and show it (unless flagged not to).
          prompt.render(document.body);
          prompt.center();
-         prompt.show();
+         if (c.initialShow)
+         {
+            prompt.show();
+         }
          
          // If a default value was given, set the selectionStart and selectionEnd properties
          if (c.value !== "")
@@ -2384,6 +2426,8 @@ Alfresco.util.PopupManager = function()
          {
             YUIDom.get(id).focus();
          }
+         
+         return prompt;
       }
    });
 }();

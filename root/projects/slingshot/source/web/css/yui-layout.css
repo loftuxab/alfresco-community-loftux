@@ -86,6 +86,12 @@
    text-align: center;
 }
 
+#Share #prompt .bd form,
+#Share #userInput .bd form
+{
+   clear: both;
+}
+
 #Share #userInput .bd label
 {
    padding-right: 0.5em;

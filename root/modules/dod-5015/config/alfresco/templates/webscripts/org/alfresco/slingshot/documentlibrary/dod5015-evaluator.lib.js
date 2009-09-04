@@ -132,6 +132,15 @@ var Evaluator =
       {
          status["accessioned"] = true;
       }
+      
+      /* Review As Of Date */
+      if (asset.hasAspect("rma:vitalRecord"))
+      {
+         if (asset.properties["rma:reviewAsOf"] != null)
+         {
+            permissions["reviewAsOf"] = true;
+         }
+      }
    },
 
    /**
@@ -149,11 +158,16 @@ var Evaluator =
          actionAsOf = asset.properties["rma:recordSearchDispositionActionAsOf"],
          now = new Date();
 
-      // Check action asOf date
-      if (actionAsOf != null && actionAsOf < now)
+      if (actionAsOf != null)
       {
-         permissions[actionName] = true;
-         return;
+         permissions["dispositionAsOf"] = true;
+         
+         // Check if action asOf date has passed
+         if (actionAsOf < now)
+         {
+            permissions[actionName] = true;
+            return;
+         }
       }
 
       // Next action could become eligible based on event completion
@@ -164,7 +178,7 @@ var Evaluator =
    },
 
    /**
-    * Asset Evaluator
+    * Asset Evaluator - main entrypoint
     */
    run: function Evaluator_run(asset)
    {

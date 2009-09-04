@@ -485,7 +485,14 @@
                       */
                      desc += '<div class="detail detail-first"><span class="item"><em>' + me.msg("details.created.on") + '</em> ' + Alfresco.util.formatDate(record.createdOn) + '</span>';
                      desc += '<span class="item"><em>' + me.msg("details.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
-                     desc += '<div class="detail">&nbsp;</div>';
+                     if (dod5015["rma:transferAccessionIndicator"])
+                     {
+                        desc += '<div class="detail">' + me.msg("details.transfer-container.is-accession") + '</div';
+                     }
+                     else
+                     {
+                        desc += '<div class="detail">&nbsp;</div>';
+                     }
                      desc += '<div class="detail detail-last">&nbsp;</div>';
                   }
                   break;

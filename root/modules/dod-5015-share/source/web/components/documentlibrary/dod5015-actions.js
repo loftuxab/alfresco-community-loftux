@@ -219,6 +219,56 @@
       },
 
       /**
+       * Edit Disposition As Of Date action.
+       *
+       * @method onActionEditDispositionAsOf
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionEditDispositionAsOf: function RDLA_onActionEditDispositionAsOf(assets)
+      {
+         var calendarId = Alfresco.util.generateDomId(),
+            asOfDate = Alfresco.util.fromExplodedJSONDate(assets.dod5015["rma:recordSearchDispositionActionAsOf"]),
+            panel,
+            calendar;
+         
+         panel = Alfresco.util.PopupManager.getUserInput(
+         {
+            title: this.msg("message.edit-disposition-as-of-date.title"),
+            html: '<div id="' + calendarId + '"></div>',
+            initialShow: false,
+            okButtonText: this.msg("button.update"),
+            callback:
+            {
+               fn: function RDLA_onActionEditDispositionAsOf_callback(unused, cal)
+               {
+                  this._dod5015Action("message.edit-disposition-as-of-date", assets, "editDispositionActionAsOfDate",
+                  {
+                     "asOfDate": Alfresco.util.toExplodedJSONDate(cal.getSelectedDates()[0])
+                  });
+               },
+               scope: this
+            }
+         });
+
+         var page = (asOfDate.getMonth() + 1) + "/" + asOfDate.getFullYear(),
+            selected = (asOfDate.getMonth() + 1) + "/" + asOfDate.getDate() + "/" + asOfDate.getFullYear();   
+         calendar = new YAHOO.widget.Calendar(calendarId,
+         {
+            iframe: false
+         });
+         calendar.cfg.setProperty("pagedate", page);
+         calendar.cfg.setProperty("selected", selected);
+         calendar.render();
+         calendar.show();
+         // Center the calendar
+         YAHOO.util.Dom.setStyle(calendarId, "margin-left", "2em");
+         // Only now can we set the panel button's callback reference to the calendar, as it was undefined on panel creation
+         panel.cfg.getProperty("buttons")[0].handler.obj.callback.obj = calendar;
+         panel.center();
+         panel.show();
+      },
+
+      /**
        * Edit Hold Details action.
        *
        * @method onActionEditHoldDetails
@@ -244,6 +294,56 @@
                scope: this
             }
          });
+      },
+
+      /**
+       * Edit Review As Of Date action.
+       *
+       * @method onActionEditReviewAsOf
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionEditReviewAsOf: function RDLA_onActionEditReviewAsOf(assets)
+      {
+         var calendarId = Alfresco.util.generateDomId(),
+            asOfDate = Alfresco.util.fromExplodedJSONDate(assets.dod5015["rma:reviewAsOf"]),
+            panel,
+            calendar;
+         
+         panel = Alfresco.util.PopupManager.getUserInput(
+         {
+            title: this.msg("message.edit-review-as-of-date.title"),
+            html: '<div id="' + calendarId + '"></div>',
+            initialShow: false,
+            okButtonText: this.msg("button.update"),
+            callback:
+            {
+               fn: function RDLA_onActionEditReviewAsOf_callback(unused, cal)
+               {
+                  this._dod5015Action("message.edit-review-as-of-date", assets, "editReviewAsOfDate",
+                  {
+                     "asOfDate": Alfresco.util.toExplodedJSONDate(cal.getSelectedDates()[0])
+                  });
+               },
+               scope: this
+            }
+         });
+
+         var page = (asOfDate.getMonth() + 1) + "/" + asOfDate.getFullYear(),
+            selected = (asOfDate.getMonth() + 1) + "/" + asOfDate.getDate() + "/" + asOfDate.getFullYear();   
+         calendar = new YAHOO.widget.Calendar(calendarId,
+         {
+            iframe: false
+         });
+         calendar.cfg.setProperty("pagedate", page);
+         calendar.cfg.setProperty("selected", selected);
+         calendar.render();
+         calendar.show();
+         // Center the calendar
+         YAHOO.util.Dom.setStyle(calendarId, "margin-left", "2em");
+         // Only now can we set the panel button's callback reference to the calendar, as it was undefined on panel creation
+         panel.cfg.getProperty("buttons")[0].handler.obj.callback.obj = calendar;
+         panel.center();
+         panel.show();
       },
 
       /**
