@@ -36,9 +36,19 @@ public interface RecordsManagementAuditService
 {
     public static final String RM_AUDIT_APPLICATION_NAME = "DOD5015";
     public static final String RM_AUDIT_PATH_ROOT = "/DOD5015";
-    public static final String RM_AUDIT_PATH_ACTIONS = "/actions";
-    public static final String RM_AUDIT_PATH_NODE = "/node";
-    public static final String RM_AUDIT_PATH_PARAMETERS = "/parameters";
+    public static final String RM_AUDIT_SNIPPET_ACTIONS = "/actions";
+    public static final String RM_AUDIT_SNIPPET_PERSON = "/person";
+    public static final String RM_AUDIT_SNIPPET_ACTIONNAME = "/actionName";
+    public static final String RM_AUDIT_SNIPPET_ACTIONDESCRIPTION = "/actionDescription";
+    public static final String RM_AUDIT_SNIPPET_NODE = "/node";
+    public static final String RM_AUDIT_SNIPPET_PARAMETERS = "/parameters";
+
+    public static final String RM_AUDIT_DATA_PERSON_FULLNAME = "/DOD5015/actions/person/fullName";
+    public static final String RM_AUDIT_DATA_PERSON_ROLE = "/DOD5015/actions/person/role";
+    public static final String RM_AUDIT_DATA_ACTIONNAME_VALUE = "/DOD5015/actions/actionName/value";
+    public static final String RM_AUDIT_DATA_ACTIONDESCRIPTION_VALUE = "/DOD5015/actions/actionDescription/value";
+    public static final String RM_AUDIT_DATA_NODE_NODEREF = "/DOD5015/actions/node/noderef";
+    public static final String RM_AUDIT_DATA_NODE_NAME = "/DOD5015/actions/node/name";
     
     /**
      * Starts RM auditing.
@@ -77,13 +87,6 @@ public interface RecordsManagementAuditService
     Date getDateLastStopped();
     
     /**
-     * Retrieves a list of ALL audit log entries for the RM system.
-     * 
-     * @return List of RecordsManagementAuditEntry objects
-     */
-    List<RecordsManagementAuditEntry> getAuditTrail();
-    
-    /**
      * Retrieves a list of audit log entries using the provided parameters
      * represented by the RecordsManagementAuditQueryParameters instance.
      * <p>
@@ -92,8 +95,8 @@ public interface RecordsManagementAuditService
      * returned. Setting the various parameters effectively filters the full
      * audit trail.
      * 
-     * @param params Parameters to use to retrieve audit trail
-     * @return List of RecordsManagementAuditEntry objects
+     * @param params        Parameters to use to retrieve audit trail (never <tt>null</tt>)
+     * @return              List of RecordsManagementAuditEntry objects
      */
     List<RecordsManagementAuditEntry> getAuditTrail(RecordsManagementAuditQueryParameters params);
 }

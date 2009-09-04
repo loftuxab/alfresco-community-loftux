@@ -27,7 +27,6 @@
         <property name="interceptorNames">
             <list>
                 <idref local="RecordsManagementService_transaction"/>
-                <idref bean="AuditMethodInterceptor"/>
                 <idref bean="exceptionTranslator"/>
                 <idref local="RecordsManagementService_security"/>
             </list>
@@ -99,7 +98,6 @@
         <property name="interceptorNames">
             <list>
                 <idref local="RecordsManagementSecurityService_transaction"/>
-                <idref bean="AuditMethodInterceptor"/>
                 <idref bean="exceptionTranslator"/>
                 <idref local="RecordsManagementSecurityService_security"/>
             </list>
@@ -156,7 +154,6 @@
         <property name="interceptorNames">
             <list>
                 <idref local="RecordsManagementActionService_transaction"/>
-                <idref bean="AuditMethodInterceptor"/>
                 <idref bean="exceptionTranslator"/>
                 <idref local="RecordsManagementActionService_security"/>
             </list>
@@ -221,7 +218,6 @@
         <property name="interceptorNames">
             <list>
                 <idref local="RecordsManagementEventService_transaction"/>
-                <idref bean="AuditMethodInterceptor"/>
                 <idref bean="exceptionTranslator"/>
                 <idref local="RecordsManagementEventService_security"/>
             </list>
@@ -297,7 +293,6 @@
         <property name="interceptorNames">
             <list>
                 <idref local="RecordsManagementAdminService_transaction"/>
-                <idref bean="AuditMethodInterceptor"/>
                 <idref bean="exceptionTranslator"/>
                 <idref local="RecordsManagementAdminService_security"/>
             </list>
@@ -358,12 +353,6 @@
         <property name="auditService">
             <ref bean="AuditService" />
         </property>
-        <property name="nodeService">
-            <ref bean="NodeService" />
-        </property>
-        <property name="personService">
-            <ref bean="PersonService" />
-        </property>
     </bean>
     
     <bean id="RecordsManagementAuditService" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -376,7 +365,6 @@
         <property name="interceptorNames">
             <list>
                 <idref local="RecordsManagementAuditService_transaction"/>
-                <idref bean="AuditMethodInterceptor"/>
                 <idref bean="exceptionTranslator"/>
                 <idref local="RecordsManagementAuditService_security"/>
             </list>

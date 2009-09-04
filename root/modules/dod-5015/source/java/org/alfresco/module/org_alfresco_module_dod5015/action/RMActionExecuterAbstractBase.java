@@ -453,23 +453,42 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
             for (RMActionExecutorAuditParameters auditParams : boundAuditParams)
             {
                 Map<String, Serializable> auditMap = new HashMap<String, Serializable>(13);
+                // Person (we just hint that we want generated data)
+                auditMap.put(
+                        AuditApplication.buildPath(
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_ACTIONS,
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_PERSON),
+                        null);
+                // Action name
+                String actionName = auditParams.getAction().getName();
+                auditMap.put(
+                        AuditApplication.buildPath(
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_ACTIONS,
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_ACTIONNAME),
+                        actionName);
+                // Action description
+                String actionDescription = auditParams.getAction().getDescription();
+                auditMap.put(
+                        AuditApplication.buildPath(
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_ACTIONS,
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_ACTIONDESCRIPTION),
+                        actionDescription);
                 // Action node
                 auditMap.put(
                         AuditApplication.buildPath(
-                                RecordsManagementAuditService.RM_AUDIT_PATH_ACTIONS,
-                                RecordsManagementAuditService.RM_AUDIT_PATH_NODE),
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_ACTIONS,
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_NODE),
                         auditParams.getNodeRef());
                 // Action parameters
-                String actionName = auditParams.getAction().getName();
                 String actionPath = AuditApplication.buildPath(
-                                RecordsManagementAuditService.RM_AUDIT_PATH_ACTIONS,
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_ACTIONS,
                                 actionName);
                 for (Map.Entry<String, Serializable> actionParam : auditParams.getParameters().entrySet())
                 {
                     auditMap.put(
                             AuditApplication.buildPath(
                                     actionPath,
-                                    RecordsManagementAuditService.RM_AUDIT_PATH_PARAMETERS,
+                                    RecordsManagementAuditService.RM_AUDIT_SNIPPET_PARAMETERS,
                                     actionParam.getKey()),
                             actionParam.getValue());
                 }
