@@ -243,7 +243,10 @@
                {
                   this._dod5015Action("message.edit-disposition-as-of-date", assets, "editDispositionActionAsOfDate",
                   {
-                     "asOfDate": Alfresco.util.toExplodedJSONDate(cal.getSelectedDates()[0])
+                     asOfDate:
+                     {
+                        iso8601: Alfresco.util.toISO8601(cal.getSelectedDates()[0])
+                     }
                   });
                },
                scope: this
@@ -261,7 +264,7 @@
          calendar.render();
          calendar.show();
          // Center the calendar
-         YAHOO.util.Dom.setStyle(calendarId, "margin-left", "2em");
+         YAHOO.util.Dom.setStyle(calendarId, "margin", "0 2em");
          // Only now can we set the panel button's callback reference to the calendar, as it was undefined on panel creation
          panel.cfg.getProperty("buttons")[0].handler.obj.callback.obj = calendar;
          panel.center();
@@ -321,7 +324,10 @@
                {
                   this._dod5015Action("message.edit-review-as-of-date", assets, "editReviewAsOfDate",
                   {
-                     "asOfDate": Alfresco.util.toExplodedJSONDate(cal.getSelectedDates()[0])
+                     asOfDate:
+                     {
+                        iso8601: Alfresco.util.toISO8601(cal.getSelectedDates()[0])
+                     }
                   });
                },
                scope: this
@@ -339,7 +345,7 @@
          calendar.render();
          calendar.show();
          // Center the calendar
-         YAHOO.util.Dom.setStyle(calendarId, "margin-left", "2em");
+         YAHOO.util.Dom.setStyle(calendarId, "margin", "0 2em");
          // Only now can we set the panel button's callback reference to the calendar, as it was undefined on panel creation
          panel.cfg.getProperty("buttons")[0].handler.obj.callback.obj = calendar;
          panel.center();
