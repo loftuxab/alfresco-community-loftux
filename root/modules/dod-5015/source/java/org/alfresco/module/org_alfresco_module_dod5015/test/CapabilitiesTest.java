@@ -524,7 +524,7 @@ public class CapabilitiesTest extends TestCase
         // Test action wire up
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.ACCESS_AUDIT).getActionNames().size());
         assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.ADD_MODIFY_EVENT_DATES).getActionNames().size());
-        assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF).getActionNames().size());
+        assertEquals(1, recordsManagementSecurityService.getCapability(RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF).getActionNames().size());
         assertEquals(0, recordsManagementSecurityService.getCapability(RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES).getActionNames().size());
         assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.AUTHORIZE_ALL_TRANSFERS).getActionNames().size());
         assertEquals(2, recordsManagementSecurityService.getCapability(RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS).getActionNames().size());
