@@ -40,7 +40,17 @@
             </parameter>
          <parameter name="caseSensitive"><value>true</value></parameter>
       </constraint>
-      
+
+      <!-- Note: intentionally empty list of values - allowed values can be added/updated dynamically -->
+      <constraint name="rmc:tlList" type="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
+         <title>Transfer Locations</title>
+         <parameter name="allowedValues">
+            <list>
+            </list>
+            </parameter>
+         <parameter name="caseSensitive"><value>true</value></parameter>
+      </constraint>
+
    </constraints>
    
    <aspects>
