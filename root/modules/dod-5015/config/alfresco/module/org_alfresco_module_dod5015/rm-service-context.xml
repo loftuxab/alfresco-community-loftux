@@ -72,6 +72,8 @@
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.updateDispositionActionDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isNextDispositionActionEligible=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getNextDispositionAction=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getCompletedDispositionActions=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getLastCompletedDispostionAction=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getVitalRecordDefinition=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getNextRecordIdentifier=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.*=RM_DENY

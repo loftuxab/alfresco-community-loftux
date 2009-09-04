@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
@@ -110,8 +111,12 @@ public class TransferCompleteAction extends RMActionExecuterAbstractBase
     private void markComplete(NodeRef nodeRef, boolean accessionIndicator)
     {
         // Set the completed date
-        nodeService.setProperty(nodeRef, PROP_DISPOSITION_ACTION_COMPLETED_AT, new Date());
-        nodeService.setProperty(nodeRef, PROP_DISPOSITION_ACTION_COMPLETED_BY, AuthenticationUtil.getRunAsUser());
+        DispositionAction da = recordsManagementService.getNextDispositionAction(nodeRef);
+        if (da != null)
+        {
+            nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_ACTION_COMPLETED_AT, new Date());
+            nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_ACTION_COMPLETED_BY, AuthenticationUtil.getRunAsUser());
+        }
         
         // Determine which marker aspect to use
         QName markerAspectQName = null;

@@ -540,7 +540,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         
         // Get the disposition instructions
         DispositionSchedule di = getDispositionSchedule(nodeRef);
-        NodeRef nextDa = getNextDispostionAction(nodeRef);
+        NodeRef nextDa = getNextDispositionActionNodeRef(nodeRef);
         if (di != null &&
             this.nodeService.hasAspect(nodeRef, ASPECT_DISPOSITION_LIFECYCLE) == true &&
             nextDa != null)
@@ -586,7 +586,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     public DispositionAction getNextDispositionAction(NodeRef nodeRef)
     {
         DispositionAction result = null;
-        NodeRef dispositionActionNodeRef = getNextDispostionAction(nodeRef);
+        NodeRef dispositionActionNodeRef = getNextDispositionActionNodeRef(nodeRef);
         if (dispositionActionNodeRef != null)
         {
             result = new DispositionActionImpl(this.serviceRegistry, dispositionActionNodeRef);
@@ -595,12 +595,42 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     }
     
     /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getCompletedDispositionActions(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public List<DispositionAction> getCompletedDispositionActions(NodeRef nodeRef)
+    {
+        List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_DISPOSITION_ACTION_HISTORY, RegexQNamePattern.MATCH_ALL);
+        List<DispositionAction> result = new ArrayList<DispositionAction>(assocs.size());        
+        for (ChildAssociationRef assoc : assocs)
+        {
+            NodeRef dispositionActionNodeRef = assoc.getChildRef();
+            result.add(new DispositionActionImpl(serviceRegistry, dispositionActionNodeRef));
+        }        
+        return result;
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getLastCompletedDispostionAction(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public DispositionAction getLastCompletedDispostionAction(NodeRef nodeRef)
+    {
+       DispositionAction result = null;
+       List<DispositionAction> list = getCompletedDispositionActions(nodeRef);
+       if (list.isEmpty() == false)
+       {
+           // Get the last dispostion action in the list
+           result = list.get(list.size()-1);
+       }       
+       return result;
+    }
+    
+    /**
      * Get the next disposition action node.  Null if none present.
      * 
      * @param nodeRef       the disposable node reference
      * @return NodeRef      the next disposition action, null if none
      */
-    private NodeRef getNextDispostionAction(NodeRef nodeRef)
+    private NodeRef getNextDispositionActionNodeRef(NodeRef nodeRef)
     {
         NodeRef result = null;
         List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL);
