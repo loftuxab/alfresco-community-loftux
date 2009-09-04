@@ -67,6 +67,18 @@
    background-image: url(images/destroy-record-16.png);
 }
 
+.doclist .record .onActionEditDispositionAsOf a,
+.doclist .record-nonelec .onActionEditDispositionAsOf a
+{
+   background-image: url(images/edit-disposition-date-16.png);
+}
+
+.doclist .record .onActionEditReviewAsOf a,
+.doclist .record-nonelec .onActionEditReviewAsOf a
+{
+   background-image: url(images/edit-review-date-16.png);
+}
+
 .doclist .record .onActionFileTo a,
 .doclist .record-nonelec .onActionFileTo a
 {
@@ -187,6 +199,11 @@
 .doclist .record-folder .onActionDestroy a
 {
    background-image: url(images/destroy-record-16.png);
+}
+
+.doclist .record-folder .onActionEditDispositionAsOf a
+{
+   background-image: url(images/edit-disposition-date-16.png);
 }
 
 .doclist .record-folder .onActionFileTo a
