@@ -107,9 +107,12 @@ public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionEx
                 NodeRef nextActionNode = nextActions.get(0).getChildRef();
                 // This is a dispositionAction, with dispositionAsOf property
 
-                Date now = new Date();
-                Date newAsOfDate = dispositionPeriod.getNextDate(now);
-                nodeService.setProperty(nextActionNode, PROP_DISPOSITION_AS_OF, newAsOfDate);
+                if (dispositionPeriod != null)
+                {
+                    Date now = new Date();
+                    Date newAsOfDate = dispositionPeriod.getNextDate(now);
+                    nodeService.setProperty(nextActionNode, PROP_DISPOSITION_AS_OF, newAsOfDate);
+                }
             }
         }
     }
