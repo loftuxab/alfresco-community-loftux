@@ -42,7 +42,7 @@ CleanupCancelledInstall
 Yes
 
 Codeline
-Enterprise
+Community
 
 CommandLineFailureAction
 {Continue without including missing files}
@@ -560,6 +560,8 @@ File ::4E613007-2F5C-4DAB-AFC1-EEDEB866913B -type dir -name web-extension -paren
 File ::677C4666-AE68-4D82-9480-02F7D98648D4 -name custom-slingshot-application-context.xml.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
 File ::84D3AF6F-A1C0-4AC3-84F8-B89EAB693A82 -name webscript-framework-config-custom.xml.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
 File ::7E4B2E0F-52DD-4866-9FC4-8DB025FEDC55 -name web-framework-config-custom.xml.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
+File ::1202534C-BEC4-412F-A97B-0B736E4F08EC -name 2-column-edit-form.ftl.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
+File ::554D1B9F-4A48-44B8-8FB2-4EC041913BE6 -name custom-set-dublincore.ftl.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
 File ::A91DCDC8-C1F2-472A-A899-0B7C3D8BD03D -name alfresco-global.properties -parent 464CC019-6E39-4D10-A983-02C03DFFDC70
 File ::08847D6B-1753-4C9B-8109-8345E86AA827 -type dir -name bootstrap -parent 464CC019-6E39-4D10-A983-02C03DFFDC70
 File ::11DB2BB3-936F-4991-B346-532290B76162 -type dir -name temp -parent B9703F34-1F9E-4A75-808C-352C234CA924
@@ -3852,7 +3854,7 @@ InstallComponent 5CB7C2FB-65D4-4ED6-88F0-7C8EA397B37D -setup Install -type actio
 Condition B612D657-48C1-421E-A810-D1FF82C768E2 -active Yes -parent 5CB7C2FB-65D4-4ED6-88F0-7C8EA397B37D -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id B612D657-48C1-421E-A810-D1FF82C768E2
 InstallComponent 0F270676-694A-4607-A2AE-9BEEC3C2B264 -setup Install -type action -conditions 5A7AF50A-C33F-47B4-BAAD-0869D47D5901 -title {Locate Java Runtime} -component LocateJavaRuntime -command insert -active Yes -parent 991553B3-06E2-412E-89E5-1829C782E086
 Condition 5A7AF50A-C33F-47B4-BAAD-0869D47D5901 -active Yes -parent 0F270676-694A-4607-A2AE-9BEEC3C2B264 -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id 5A7AF50A-C33F-47B4-BAAD-0869D47D5901
-InstallComponent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -setup Install -type pane -conditions {A1AF4F54-A600-430D-AA51-39C5EA26D457 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86} -title {Check JDK} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
+InstallComponent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -setup Install -type pane -conditions {A1AF4F54-A600-430D-AA51-39C5EA26D457 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86} -title {Check JDK} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition A1AF4F54-A600-430D-AA51-39C5EA26D457 -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -title {Object Test Condition} -component ObjectTestCondition -TreeObject::id A1AF4F54-A600-430D-AA51-39C5EA26D457
 Condition 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86 -active Yes -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9 -title {String Is Condition} -component StringIsCondition -TreeObject::id 76D08EBF-1C4F-44C8-A8DD-0F48CF606B86
 InstallComponent B8BC4D70-2048-4DD5-B15B-76050F07566F -setup Install -type action -conditions 9C516685-6F30-4420-A108-8F51B16D3AB8 -title {Move Forward} -component MoveForward -command insert -active No -parent F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9
@@ -3875,11 +3877,15 @@ InstallComponent 26AB25DD-F99D-443E-885E-E83824C414CB -setup Install -type pane 
 InstallComponent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A -setup Install -type pane -title {Copying Files} -component CopyFiles -active Yes -parent StandardInstall
 InstallComponent 3C792AD2-7426-4EB0-B6EB-BBE13E8C56F1 -setup Install -type action -title {Disable Buttons} -component ModifyWidget -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
 InstallComponent 95BB0407-03A2-493A-B74A-133E8F7F111A -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
-InstallComponent 9103325D-9719-4A25-87AE-B14FE9E12609 -setup Install -type action -conditions {78477F30-E4C0-40BC-BA73-3F7526414A57 FAA84B20-649B-4DAC-96F0-7AA44B3D78E8} -title {Write Setpaths} -component WriteTextToFile -command reorder -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
+InstallComponent 9103325D-9719-4A25-87AE-B14FE9E12609 -setup Install -type action -conditions {78477F30-E4C0-40BC-BA73-3F7526414A57 FAA84B20-649B-4DAC-96F0-7AA44B3D78E8} -title {Write Setpaths} -component WriteTextToFile -command insert -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
 Condition 78477F30-E4C0-40BC-BA73-3F7526414A57 -active Yes -parent 9103325D-9719-4A25-87AE-B14FE9E12609 -title {String Is Condition} -component StringIsCondition -TreeObject::id 78477F30-E4C0-40BC-BA73-3F7526414A57
 Condition FAA84B20-649B-4DAC-96F0-7AA44B3D78E8 -active Yes -parent 9103325D-9719-4A25-87AE-B14FE9E12609 -title {Platform Condition} -component PlatformCondition -TreeObject::id FAA84B20-649B-4DAC-96F0-7AA44B3D78E8
 InstallComponent A7A67250-725D-453B-94A7-3384D68498D3 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 6F0C5322-0C62-435D-BDAC-8EA457CE3E8A
-InstallComponent A679983A-9E44-4848-AE89-1571B8FD6229 -setup Install -type pane -conditions {6AD46333-4FF3-48A6-A054-61D16F32A431 D4D47D94-3A94-47CD-AD89-6101CC515BE4} -title {Installing Java} -component CustomBlankPane1 -command reorder -active Yes -parent StandardInstall
+InstallComponent 1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0 -setup Install -type pane -conditions F1DF85DD-15F4-4C37-810B-5E9F42980735 -title {Admin Password} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+Condition F1DF85DD-15F4-4C37-810B-5E9F42980735 -active Yes -parent 1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0 -title {String Equal Condition} -component StringEqualCondition -TreeObject::id F1DF85DD-15F4-4C37-810B-5E9F42980735
+InstallComponent 28C345CE-D8E8-4D6D-8E5F-D9AEED7C2417 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent 1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0
+InstallComponent 17D6CB12-636E-4E2F-B926-0B9209A9D0ED -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent 1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0
+InstallComponent A679983A-9E44-4848-AE89-1571B8FD6229 -setup Install -type pane -conditions {6AD46333-4FF3-48A6-A054-61D16F32A431 D4D47D94-3A94-47CD-AD89-6101CC515BE4} -title {Installing Java} -component CustomBlankPane1 -command insert -active Yes -parent StandardInstall
 Condition 6AD46333-4FF3-48A6-A054-61D16F32A431 -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 6AD46333-4FF3-48A6-A054-61D16F32A431
 Condition D4D47D94-3A94-47CD-AD89-6101CC515BE4 -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229 -title {String Is Condition} -component StringIsCondition -TreeObject::id D4D47D94-3A94-47CD-AD89-6101CC515BE4
 InstallComponent C106AE81-88CA-44E9-8B7C-37C6579863FF -setup Install -type action -title {Execute JDK Install} -component ExecuteExternalProgram -command reorder -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
@@ -3887,7 +3893,7 @@ InstallComponent 7BB3FB0F-E84F-458C-9526-B41A8243BEBF -setup Install -type actio
 InstallComponent 6C162E90-45F2-4940-A5BE-3A94EDD0854B -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 InstallComponent AEAE5E8C-0579-43E4-B67B-F17BC82DB74B -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 InstallComponent 5CBA0C33-0A87-4F2E-B4B8-F90F0B975A43 -setup Install -type action -title {Message Box-n} -component MessageBox -active No -parent A679983A-9E44-4848-AE89-1571B8FD6229
-InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -conditions 8E1EFCAF-14C0-4649-999A-AEACDA8E4203 -title {Write Setpaths} -component WriteTextToFile -command reorder -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
+InstallComponent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -setup Install -type action -conditions 8E1EFCAF-14C0-4649-999A-AEACDA8E4203 -title {Write Setpaths} -component WriteTextToFile -command insert -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 Condition 8E1EFCAF-14C0-4649-999A-AEACDA8E4203 -active No -parent 3C654D54-8DFB-4E6F-B40C-E58D4C76BBAE -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 8E1EFCAF-14C0-4649-999A-AEACDA8E4203
 InstallComponent BFE9EF55-8DDE-4A48-A848-02EB9F58FE38 -setup Install -type action -conditions 408A2212-FC97-4BCD-9A91-9AFBDB442052 -title {Message Box} -component MessageBox -command insert -active Yes -parent A679983A-9E44-4848-AE89-1571B8FD6229
 Condition 408A2212-FC97-4BCD-9A91-9AFBDB442052 -active Yes -parent BFE9EF55-8DDE-4A48-A848-02EB9F58FE38 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 408A2212-FC97-4BCD-9A91-9AFBDB442052
@@ -4102,7 +4108,7 @@ No
 <%InstallDir%>
 
 07D6DE98-FC0F-4F51-AE10-75314D0B4651,FileSize
-890579
+890599
 
 07D6DE98-FC0F-4F51-AE10-75314D0B4651,Name
 SPP
@@ -4174,6 +4180,18 @@ CreateDesktopShortcut
 11D931E9-F589-4F10-AEFF-734DE33E8488,Y
 180
 
+17D6CB12-636E-4E2F-B926-0B9209A9D0ED,Conditions
+{0 conditions}
+
+17D6CB12-636E-4E2F-B926-0B9209A9D0ED,ExecuteAction
+{Before Next Pane is Displayed}
+
+17D6CB12-636E-4E2F-B926-0B9209A9D0ED,ResultVirtualText
+ADMIN_HASH
+
+17D6CB12-636E-4E2F-B926-0B9209A9D0ED,TclScript
+{return [string tolower [::md4::md4 -hex [encoding convertto unicode <%ADMIN_PWD%>]]];}
+
 196847CE-9E6C-4473-AD16-69782D16EB3B,Alias
 {Uninstall Actions}
 
@@ -4210,6 +4228,33 @@ No
 
 1ACD65CD-7FED-4D7F-A23D-E1CA0A766E81,Alias
 {Startup Actions}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Active
+Yes
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton,subst
+1
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton,subst
+1
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption,subst
+1
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Conditions
+{1 condition}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message,subst
+1
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton,subst
+1
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle,subst
+1
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title,subst
+1
 
 1F0C1F8D-58E2-406A-874C-DD64E6DC0099,Background
 white
@@ -4325,6 +4370,15 @@ disabled
 289DDD79-2080-47F9-98B6-9F30493AA1F0,Conditions
 {0 conditions}
 
+28C345CE-D8E8-4D6D-8E5F-D9AEED7C2417,Conditions
+{0 conditions}
+
+28C345CE-D8E8-4D6D-8E5F-D9AEED7C2417,ResultVirtualText
+ScriptLoad
+
+28C345CE-D8E8-4D6D-8E5F-D9AEED7C2417,TclScript
+#\ md4.tcl\ -\ Copyright\ (C)\ 2003\ Pat\ Thoyts\ <patthoyts@users.sourceforge.net>\n#\n#\ This\ is\ a\ Tcl-only\ implementation\ of\ the\ MD4\ hash\ algorithm\ as\ described\ in\ \n#\ RFC\ 1320\ (\ http://www.ietf.org/rfc/rfc1320.txt\ )\n#\n#\ -------------------------------------------------------------------------\n#\ See\ the\ file\ \"license.terms\"\ for\ information\ on\ usage\ and\ redistribution\n#\ of\ this\ file,\ and\ for\ a\ DISCLAIMER\ OF\ ALL\ WARRANTIES.\n#\ -------------------------------------------------------------------------\n#\n#\ \$Id:\ md4.tcl,v\ 1.19\ 2006/09/19\ 23:36:17\ andreas_kupries\ Exp\ \$\n\npackage\ require\ Tcl\ 8.2\;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #\ tcl\ minimum\ version\ncatch\ \{package\ require\ md4c\ 1.0\}\;\ \ \ \ \ \ \ #\ tcllib\ critcl\ alternative\n\n#\ @mdgen\ EXCLUDE:\ md4c.tcl\n\nnamespace\ eval\ ::md4\ \{\n\ \ \ \ variable\ version\ 1.0.4\n\ \ \ \ variable\ rcsid\ \{\$Id:\ md4.tcl,v\ 1.19\ 2006/09/19\ 23:36:17\ andreas_kupries\ Exp\ \$\}\n\ \ \ \ variable\ accel\n\ \ \ \ array\ set\ accel\ \{critcl\ 0\ cryptkit\ 0\}\n\n\ \ \ \ namespace\ export\ md4\ hmac\ MD4Init\ MD4Update\ MD4Final\n\n\ \ \ \ variable\ uid\n\ \ \ \ if\ \{!\[info\ exists\ uid\]\}\ \{\n\ \ \ \ \ \ \ \ set\ uid\ 0\n\ \ \ \ \}\n\}\n\n#\ -------------------------------------------------------------------------\n\n#\ MD4Init\ -\ create\ and\ initialize\ an\ MD4\ state\ variable.\ This\ will\ be\n#\ cleaned\ up\ when\ we\ call\ MD4Final\n#\nproc\ ::md4::MD4Init\ \{\}\ \{\n\ \ \ \ variable\ uid\n\ \ \ \ variable\ accel\n\ \ \ \ set\ token\ \[namespace\ current\]::\[incr\ uid\]\n\ \ \ \ upvar\ #0\ \$token\ state\n\n\ \ \ \ #\ RFC1320:3.3\ -\ Initialize\ MD4\ state\ structure\n\ \ \ \ array\ set\ state\ \\\n\ \ \ \ \ \ \ \ \[list\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \ A\ \[expr\ \{0x67452301\}\]\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \ B\ \[expr\ \{0xefcdab89\}\]\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \ C\ \[expr\ \{0x98badcfe\}\]\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \ D\ \[expr\ \{0x10325476\}\]\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \ n\ 0\ i\ \"\"\ \]\n\ \ \ \ if\ \{\$accel(cryptkit)\}\ \{\n\ \ \ \ \ \ \ \ cryptkit::cryptCreateContext\ state(ckctx)\ CRYPT_UNUSED\ CRYPT_ALGO_MD4\n\ \ \ \ \}\n\ \ \ \ return\ \$token\n\}\n\nproc\ ::md4::MD4Update\ \{token\ data\}\ \{\n\ \ \ \ variable\ accel\n\ \ \ \ upvar\ #0\ \$token\ state\n\n\ \ \ \ if\ \{\$accel(critcl)\}\ \{\n\ \ \ \ \ \ \ \ if\ \{\[info\ exists\ state(md4c)\]\}\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ set\ state(md4c)\ \[md4c\ \$data\ \$state(md4c)\]\n\ \ \ \ \ \ \ \ \}\ else\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ set\ state(md4c)\ \[md4c\ \$data\]\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ return\n\ \ \ \ \}\ elseif\ \{\[info\ exists\ state(ckctx)\]\}\ \{\n\ \ \ \ \ \ \ \ if\ \{\[string\ length\ \$data\]\ >\ 0\}\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ cryptkit::cryptEncrypt\ \$state(ckctx)\ \$data\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ return\n\ \ \ \ \}\n\n\ \ \ \ #\ Update\ the\ state\ values\n\ \ \ \ incr\ state(n)\ \[string\ length\ \$data\]\n\ \ \ \ append\ state(i)\ \$data\n\n\ \ \ \ #\ Calculate\ the\ hash\ for\ any\ complete\ blocks\n\ \ \ \ set\ len\ \[string\ length\ \$state(i)\]\n\ \ \ \ for\ \{set\ n\ 0\}\ \{(\$n\ +\ 64)\ <=\ \$len\}\ \{\}\ \{\n\ \ \ \ \ \ \ \ MD4Hash\ \$token\ \[string\ range\ \$state(i)\ \$n\ \[incr\ n\ 64\]\]\n\ \ \ \ \}\n\n\ \ \ \ #\ Adjust\ the\ state\ for\ the\ blocks\ completed.\n\ \ \ \ set\ state(i)\ \[string\ range\ \$state(i)\ \$n\ end\]\n\ \ \ \ return\n\}\n\nproc\ ::md4::MD4Final\ \{token\}\ \{\n\ \ \ \ upvar\ #0\ \$token\ state\n\n\ \ \ \ if\ \{\[info\ exists\ state(md4c)\]\}\ \{\n\ \ \ \ \ \ \ \ set\ r\ \$state(md4c)\n\ \ \ \ \ \ \ \ unset\ state\n\ \ \ \ \ \ \ \ return\ \$r\n\ \ \ \ \}\ elseif\ \{\[info\ exists\ state(ckctx)\]\}\ \{\n\ \ \ \ \ \ \ \ cryptkit::cryptEncrypt\ \$state(ckctx)\ \"\"\n\ \ \ \ \ \ \ \ cryptkit::cryptGetAttributeString\ \$state(ckctx)\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ CRYPT_CTXINFO_HASHVALUE\ r\ 16\n\ \ \ \ \ \ \ \ cryptkit::cryptDestroyContext\ \$state(ckctx)\n\ \ \ \ \ \ \ \ #\ If\ nothing\ was\ hashed,\ we\ get\ no\ r\ variable\ set!\n\ \ \ \ \ \ \ \ if\ \{\[info\ exists\ r\]\}\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ unset\ state\n\ \ \ \ \ \ \ \ \ \ \ \ return\ \$r\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \}\n\n\ \ \ \ #\ RFC1320:3.1\ -\ Padding\n\ \ \ \ #\n\ \ \ \ set\ len\ \[string\ length\ \$state(i)\]\n\ \ \ \ set\ pad\ \[expr\ \{56\ -\ (\$len\ %\ 64)\}\]\n\ \ \ \ if\ \{\$len\ %\ 64\ >\ 56\}\ \{\n\ \ \ \ \ \ \ \ incr\ pad\ 64\n\ \ \ \ \}\n\ \ \ \ if\ \{\$pad\ ==\ 0\}\ \{\n\ \ \ \ \ \ \ \ incr\ pad\ 64\n\ \ \ \ \}\n\ \ \ \ append\ state(i)\ \[binary\ format\ a\$pad\ \\x80\]\n\n\ \ \ \ #\ RFC1320:3.2\ -\ Append\ length\ in\ bits\ as\ little-endian\ wide\ int.\n\ \ \ \ append\ state(i)\ \[binary\ format\ ii\ \[expr\ \{8\ *\ \$state(n)\}\]\ 0\]\n\n\ \ \ \ #\ Calculate\ the\ hash\ for\ the\ remaining\ block.\n\ \ \ \ set\ len\ \[string\ length\ \$state(i)\]\n\ \ \ \ for\ \{set\ n\ 0\}\ \{(\$n\ +\ 64)\ <=\ \$len\}\ \{\}\ \{\n\ \ \ \ \ \ \ \ MD4Hash\ \$token\ \[string\ range\ \$state(i)\ \$n\ \[incr\ n\ 64\]\]\n\ \ \ \ \}\n\n\ \ \ \ #\ RFC1320:3.5\ -\ Output\n\ \ \ \ set\ r\ \[bytes\ \$state(A)\]\[bytes\ \$state(B)\]\[bytes\ \$state(C)\]\[bytes\ \$state(D)\]\n\ \ \ \ unset\ state\n\ \ \ \ return\ \$r\n\}\n\n#\ -------------------------------------------------------------------------\n#\ HMAC\ Hashed\ Message\ Authentication\ (RFC\ 2104)\n#\n#\ hmac\ =\ H(K\ xor\ opad,\ H(K\ xor\ ipad,\ text))\n#\nproc\ ::md4::HMACInit\ \{K\}\ \{\n\n\ \ \ \ #\ Key\ K\ is\ adjusted\ to\ be\ 64\ bytes\ long.\ If\ K\ is\ larger,\ then\ use\n\ \ \ \ #\ the\ MD4\ digest\ of\ K\ and\ pad\ this\ instead.\n\ \ \ \ set\ len\ \[string\ length\ \$K\]\n\ \ \ \ if\ \{\$len\ >\ 64\}\ \{\n\ \ \ \ \ \ \ \ set\ tok\ \[MD4Init\]\n\ \ \ \ \ \ \ \ MD4Update\ \$tok\ \$K\n\ \ \ \ \ \ \ \ set\ K\ \[MD4Final\ \$tok\]\n\ \ \ \ \ \ \ \ set\ len\ \[string\ length\ \$K\]\n\ \ \ \ \}\n\ \ \ \ set\ pad\ \[expr\ \{64\ -\ \$len\}\]\n\ \ \ \ append\ K\ \[string\ repeat\ \\0\ \$pad\]\n\n\ \ \ \ #\ Cacluate\ the\ padding\ buffers.\n\ \ \ \ set\ Ki\ \{\}\n\ \ \ \ set\ Ko\ \{\}\n\ \ \ \ binary\ scan\ \$K\ i16\ Ks\n\ \ \ \ foreach\ k\ \$Ks\ \{\n\ \ \ \ \ \ \ \ append\ Ki\ \[binary\ format\ i\ \[expr\ \{\$k\ ^\ 0x36363636\}\]\]\n\ \ \ \ \ \ \ \ append\ Ko\ \[binary\ format\ i\ \[expr\ \{\$k\ ^\ 0x5c5c5c5c\}\]\]\n\ \ \ \ \}\n\n\ \ \ \ set\ tok\ \[MD4Init\]\n\ \ \ \ MD4Update\ \$tok\ \$Ki\;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #\ initialize\ with\ the\ inner\ pad\n\ \ \ \ \n\ \ \ \ #\ preserve\ the\ Ko\ value\ for\ the\ final\ stage.\n\ \ \ \ #\ FRINK:\ nocheck\n\ \ \ \ set\ \[subst\ \$tok\](Ko)\ \$Ko\n\n\ \ \ \ return\ \$tok\n\}\n\nproc\ ::md4::HMACUpdate\ \{token\ data\}\ \{\n\ \ \ \ MD4Update\ \$token\ \$data\n\ \ \ \ return\n\}\n\nproc\ ::md4::HMACFinal\ \{token\}\ \{\n\ \ \ \ #\ FRINK:\ nocheck\n\ \ \ \ variable\ \$token\n\ \ \ \ upvar\ 0\ \$token\ state\n\n\ \ \ \ set\ tok\ \[MD4Init\]\;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ #\ init\ the\ outer\ hashing\ function\n\ \ \ \ MD4Update\ \$tok\ \$state(Ko)\;\ \ \ \ \ \ \ \ \ \ #\ prepare\ with\ the\ outer\ pad.\n\ \ \ \ MD4Update\ \$tok\ \[MD4Final\ \$token\]\;\ \ \ #\ hash\ the\ inner\ result\n\ \ \ \ return\ \[MD4Final\ \$tok\]\n\}\n\n#\ -------------------------------------------------------------------------\n\nset\ ::md4::MD4Hash_body\ \{\n\ \ \ \ variable\ \$token\n\ \ \ \ upvar\ 0\ \$token\ state\n\n\ \ \ \ #\ RFC1320:3.4\ -\ Process\ Message\ in\ 16-Word\ Blocks\n\ \ \ \ binary\ scan\ \$msg\ i*\ blocks\n\ \ \ \ foreach\ \{X0\ X1\ X2\ X3\ X4\ X5\ X6\ X7\ X8\ X9\ X10\ X11\ X12\ X13\ X14\ X15\}\ \$blocks\ \{\n\ \ \ \ \ \ \ \ set\ A\ \$state(A)\n\ \ \ \ \ \ \ \ set\ B\ \$state(B)\n\ \ \ \ \ \ \ \ set\ C\ \$state(C)\n\ \ \ \ \ \ \ \ set\ D\ \$state(D)\n\n\ \ \ \ \ \ \ \ #\ Round\ 1\n\ \ \ \ \ \ \ \ #\ Let\ \[abcd\ k\ s\]\ denote\ the\ operation\n\ \ \ \ \ \ \ \ #\ \ \ a\ =\ (a\ +\ F(b,c,d)\ +\ X\[k\])\ <<<\ s.\n\ \ \ \ \ \ \ \ #\ Do\ the\ following\ 16\ operations.\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 0\ \ 3\]\ \ \[DABC\ \ 1\ \ 7\]\ \ \[CDAB\ \ 2\ 11\]\ \ \[BCDA\ \ 3\ 19\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[F\ \$B\ \$C\ \$D\]\ +\ \$X0)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[F\ \$A\ \$B\ \$C\]\ +\ \$X1)\ <<<\ 7\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[F\ \$D\ \$A\ \$B\]\ +\ \$X2)\ <<<\ 11\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[F\ \$C\ \$D\ \$A\]\ +\ \$X3)\ <<<\ 19\}\]\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 4\ \ 3\]\ \ \[DABC\ \ 5\ \ 7\]\ \ \[CDAB\ \ 6\ 11\]\ \ \[BCDA\ \ 7\ 19\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[F\ \$B\ \$C\ \$D\]\ +\ \$X4)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[F\ \$A\ \$B\ \$C\]\ +\ \$X5)\ <<<\ 7\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[F\ \$D\ \$A\ \$B\]\ +\ \$X6)\ <<<\ 11\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[F\ \$C\ \$D\ \$A\]\ +\ \$X7)\ <<<\ 19\}\]\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 8\ \ 3\]\ \ \[DABC\ \ 9\ \ 7\]\ \ \[CDAB\ 10\ 11\]\ \ \[BCDA\ 11\ 19\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[F\ \$B\ \$C\ \$D\]\ +\ \$X8)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[F\ \$A\ \$B\ \$C\]\ +\ \$X9)\ <<<\ 7\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[F\ \$D\ \$A\ \$B\]\ +\ \$X10)\ <<<\ 11\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[F\ \$C\ \$D\ \$A\]\ +\ \$X11)\ <<<\ 19\}\]\n\ \ \ \ \ \ \ \ #\ \[ABCD\ 12\ \ 3\]\ \ \[DABC\ 13\ \ 7\]\ \ \[CDAB\ 14\ 11\]\ \ \[BCDA\ 15\ 19\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[F\ \$B\ \$C\ \$D\]\ +\ \$X12)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[F\ \$A\ \$B\ \$C\]\ +\ \$X13)\ <<<\ 7\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[F\ \$D\ \$A\ \$B\]\ +\ \$X14)\ <<<\ 11\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[F\ \$C\ \$D\ \$A\]\ +\ \$X15)\ <<<\ 19\}\]\n\n\ \ \ \ \ \ \ \ #\ Round\ 2.\n\ \ \ \ \ \ \ \ #\ Let\ \[abcd\ k\ s\]\ denote\ the\ operation\n\ \ \ \ \ \ \ \ #\ \ \ a\ =\ (a\ +\ G(b,c,d)\ +\ X\[k\]\ +\ 5A827999)\ <<<\ s\n\ \ \ \ \ \ \ \ #\ Do\ the\ following\ 16\ operations.\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 0\ \ 3\]\ \ \[DABC\ \ 4\ \ 5\]\ \ \[CDAB\ \ 8\ \ 9\]\ \ \[BCDA\ 12\ 13\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[G\ \$B\ \$C\ \$D\]\ +\ \$X0\ \ +\ 0x5a827999)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[G\ \$A\ \$B\ \$C\]\ +\ \$X4\ \ +\ 0x5a827999)\ <<<\ 5\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[G\ \$D\ \$A\ \$B\]\ +\ \$X8\ \ +\ 0x5a827999)\ <<<\ 9\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[G\ \$C\ \$D\ \$A\]\ +\ \$X12\ +\ 0x5a827999)\ <<<\ 13\}\]\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 1\ \ 3\]\ \ \[DABC\ \ 5\ \ 5\]\ \ \[CDAB\ \ 9\ \ 9\]\ \ \[BCDA\ 13\ 13\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[G\ \$B\ \$C\ \$D\]\ +\ \$X1\ \ +\ 0x5a827999)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[G\ \$A\ \$B\ \$C\]\ +\ \$X5\ \ +\ 0x5a827999)\ <<<\ 5\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[G\ \$D\ \$A\ \$B\]\ +\ \$X9\ \ +\ 0x5a827999)\ <<<\ 9\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[G\ \$C\ \$D\ \$A\]\ +\ \$X13\ +\ 0x5a827999)\ <<<\ 13\}\]\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 2\ \ 3\]\ \ \[DABC\ \ 6\ \ 5\]\ \ \[CDAB\ 10\ \ 9\]\ \ \[BCDA\ 14\ 13\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[G\ \$B\ \$C\ \$D\]\ +\ \$X2\ \ +\ 0x5a827999)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[G\ \$A\ \$B\ \$C\]\ +\ \$X6\ \ +\ 0x5a827999)\ <<<\ 5\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[G\ \$D\ \$A\ \$B\]\ +\ \$X10\ +\ 0x5a827999)\ <<<\ 9\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[G\ \$C\ \$D\ \$A\]\ +\ \$X14\ +\ 0x5a827999)\ <<<\ 13\}\]\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 3\ \ 3\]\ \ \[DABC\ \ 7\ \ 5\]\ \ \[CDAB\ 11\ \ 9\]\ \ \[BCDA\ 15\ 13\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[G\ \$B\ \$C\ \$D\]\ +\ \$X3\ \ +\ 0x5a827999)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[G\ \$A\ \$B\ \$C\]\ +\ \$X7\ \ +\ 0x5a827999)\ <<<\ 5\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[G\ \$D\ \$A\ \$B\]\ +\ \$X11\ +\ 0x5a827999)\ <<<\ 9\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[G\ \$C\ \$D\ \$A\]\ +\ \$X15\ +\ 0x5a827999)\ <<<\ 13\}\]\n\ \ \ \ \ \ \ \ \n\ \ \ \ \ \ \ \ #\ Round\ 3.\n\ \ \ \ \ \ \ \ #\ Let\ \[abcd\ k\ s\]\ denote\ the\ operation\n\ \ \ \ \ \ \ \ #\ \ \ a\ =\ (a\ +\ H(b,c,d)\ +\ X\[k\]\ +\ 6ED9EBA1)\ <<<\ s.\n\ \ \ \ \ \ \ \ #\ Do\ the\ following\ 16\ operations.\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 0\ \ 3\]\ \ \[DABC\ \ 8\ \ 9\]\ \ \[CDAB\ \ 4\ 11\]\ \ \[BCDA\ 12\ 15\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[H\ \$B\ \$C\ \$D\]\ +\ \$X0\ \ +\ 0x6ed9eba1)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[H\ \$A\ \$B\ \$C\]\ +\ \$X8\ \ +\ 0x6ed9eba1)\ <<<\ 9\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[H\ \$D\ \$A\ \$B\]\ +\ \$X4\ \ +\ 0x6ed9eba1)\ <<<\ 11\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[H\ \$C\ \$D\ \$A\]\ +\ \$X12\ +\ 0x6ed9eba1)\ <<<\ 15\}\]\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 2\ \ 3\]\ \ \[DABC\ 10\ \ 9\]\ \ \[CDAB\ \ 6\ 11\]\ \ \[BCDA\ 14\ 15\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[H\ \$B\ \$C\ \$D\]\ +\ \$X2\ \ +\ 0x6ed9eba1)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[H\ \$A\ \$B\ \$C\]\ +\ \$X10\ +\ 0x6ed9eba1)\ <<<\ 9\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[H\ \$D\ \$A\ \$B\]\ +\ \$X6\ \ +\ 0x6ed9eba1)\ <<<\ 11\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[H\ \$C\ \$D\ \$A\]\ +\ \$X14\ +\ 0x6ed9eba1)\ <<<\ 15\}\]\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 1\ \ 3\]\ \ \[DABC\ \ 9\ \ 9\]\ \ \[CDAB\ \ 5\ 11\]\ \ \[BCDA\ 13\ 15\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[H\ \$B\ \$C\ \$D\]\ +\ \$X1\ \ +\ 0x6ed9eba1)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[H\ \$A\ \$B\ \$C\]\ +\ \$X9\ \ +\ 0x6ed9eba1)\ <<<\ 9\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[H\ \$D\ \$A\ \$B\]\ +\ \$X5\ \ +\ 0x6ed9eba1)\ <<<\ 11\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[H\ \$C\ \$D\ \$A\]\ +\ \$X13\ +\ 0x6ed9eba1)\ <<<\ 15\}\]\n\ \ \ \ \ \ \ \ #\ \[ABCD\ \ 3\ \ 3\]\ \ \[DABC\ 11\ \ 9\]\ \ \[CDAB\ \ 7\ 11\]\ \ \[BCDA\ 15\ 15\]\n\ \ \ \ \ \ \ \ set\ A\ \[expr\ \{(\$A\ +\ \[H\ \$B\ \$C\ \$D\]\ +\ \$X3\ \ +\ 0x6ed9eba1)\ <<<\ 3\}\]\n\ \ \ \ \ \ \ \ set\ D\ \[expr\ \{(\$D\ +\ \[H\ \$A\ \$B\ \$C\]\ +\ \$X11\ +\ 0x6ed9eba1)\ <<<\ 9\}\]\n\ \ \ \ \ \ \ \ set\ C\ \[expr\ \{(\$C\ +\ \[H\ \$D\ \$A\ \$B\]\ +\ \$X7\ \ +\ 0x6ed9eba1)\ <<<\ 11\}\]\n\ \ \ \ \ \ \ \ set\ B\ \[expr\ \{(\$B\ +\ \[H\ \$C\ \$D\ \$A\]\ +\ \$X15\ +\ 0x6ed9eba1)\ <<<\ 15\}\]\n\n\ \ \ \ \ \ \ \ #\ Then\ perform\ the\ following\ additions.\ (That\ is,\ increment\ each\n\ \ \ \ \ \ \ \ #\ of\ the\ four\ registers\ by\ the\ value\ it\ had\ before\ this\ block\n\ \ \ \ \ \ \ \ #\ was\ started.)\n\ \ \ \ \ \ \ \ incr\ state(A)\ \$A\n\ \ \ \ \ \ \ \ incr\ state(B)\ \$B\n\ \ \ \ \ \ \ \ incr\ state(C)\ \$C\n\ \ \ \ \ \ \ \ incr\ state(D)\ \$D\n\ \ \ \ \}\n\n\ \ \ \ return\n\}\n\nproc\ ::md4::byte\ \{n\ v\}\ \{expr\ \{((0xFF\ <<\ (8\ *\ \$n))\ &\ \$v)\ >>\ (8\ *\ \$n)\}\}\nproc\ ::md4::bytes\ \{v\}\ \{\ \n\ \ \ \ #format\ %c%c%c%c\ \[byte\ 0\ \$v\]\ \[byte\ 1\ \$v\]\ \[byte\ 2\ \$v\]\ \[byte\ 3\ \$v\]\n\ \ \ \ format\ %c%c%c%c\ \\\n\ \ \ \ \ \ \ \ \[expr\ \{0xFF\ &\ \$v\}\]\ \\\n\ \ \ \ \ \ \ \ \[expr\ \{(0xFF00\ &\ \$v)\ >>\ 8\}\]\ \\\n\ \ \ \ \ \ \ \ \[expr\ \{(0xFF0000\ &\ \$v)\ >>\ 16\}\]\ \\\n\ \ \ \ \ \ \ \ \[expr\ \{((0xFF000000\ &\ \$v)\ >>\ 24)\ &\ 0xFF\}\]\n\}\n\n#\ 32bit\ rotate-left\nproc\ ::md4::<<<\ \{v\ n\}\ \{\n\ \ \ \ return\ \[expr\ \{(((\$v\ <<\ \$n)\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ |\ ((\$v\ >>\ (32\ -\ \$n))\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ &\ (0x7FFFFFFF\ >>\ (31\ -\ \$n)))))\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ &\ 0xFFFFFFFF\}\]\n\}\n\n#\ Convert\ our\ <<<\ pseudo-operator\ into\ a\ procedure\ call.\nregsub\ -all\ -line\ \\\n\ \ \ \ \{\\\[expr\ \{(.*)\ <<<\ (\\d+)\}\\\]\}\ \\\n\ \ \ \ \$::md4::MD4Hash_body\ \\\n\ \ \ \ \{\[<<<\ \[expr\ \{\\1\}\]\ \\2\]\}\ \\\n\ \ \ \ ::md4::MD4Hash_body\n\n#\ RFC1320:3.4\ -\ function\ F\nproc\ ::md4::F\ \{X\ Y\ Z\}\ \{\n\ \ \ \ return\ \[expr\ \{(\$X\ &\ \$Y)\ |\ ((~\$X)\ &\ \$Z)\}\]\n\}\n\n#\ Inline\ the\ F\ function\nregsub\ -all\ -line\ \\\n\ \ \ \ \{\\\[F\ (\\\$\[ABCD\])\ (\\\$\[ABCD\])\ (\\\$\[ABCD\])\\\]\}\ \\\n\ \ \ \ \$::md4::MD4Hash_body\ \\\n\ \ \ \ \{(\ (\\1\ \\&\ \\2)\ |\ ((~\\1)\ \\&\ \\3)\ )\}\ \\\n\ \ \ \ ::md4::MD4Hash_body\n\ \ \ \ \n#\ RFC1320:3.4\ -\ function\ G\nproc\ ::md4::G\ \{X\ Y\ Z\}\ \{\n\ \ \ \ return\ \[expr\ \{(\$X\ &\ \$Y)\ |\ (\$X\ &\ \$Z)\ |\ (\$Y\ &\ \$Z)\}\]\n\}\n\n#\ Inline\ the\ G\ function\nregsub\ -all\ -line\ \\\n\ \ \ \ \{\\\[G\ (\\\$\[ABCD\])\ (\\\$\[ABCD\])\ (\\\$\[ABCD\])\\\]\}\ \\\n\ \ \ \ \$::md4::MD4Hash_body\ \\\n\ \ \ \ \{((\\1\ \\&\ \\2)\ |\ (\\1\ \\&\ \\3)\ |\ (\\2\ \\&\ \\3))\}\ \\\n\ \ \ \ ::md4::MD4Hash_body\n\n#\ RFC1320:3.4\ -\ function\ H\nproc\ ::md4::H\ \{X\ Y\ Z\}\ \{\n\ \ \ \ return\ \[expr\ \{\$X\ ^\ \$Y\ ^\ \$Z\}\]\n\}\n\n#\ Inline\ the\ H\ function\nregsub\ -all\ -line\ \\\n\ \ \ \ \{\\\[H\ (\\\$\[ABCD\])\ (\\\$\[ABCD\])\ (\\\$\[ABCD\])\\\]\}\ \\\n\ \ \ \ \$::md4::MD4Hash_body\ \\\n\ \ \ \ \{(\\1\ ^\ \\2\ ^\ \\3)\}\ \\\n\ \ \ \ ::md4::MD4Hash_body\n\n#\ Define\ the\ MD4\ hashing\ procedure\ with\ inline\ functions.\nproc\ ::md4::MD4Hash\ \{token\ msg\}\ \$::md4::MD4Hash_body\n\n#\ -------------------------------------------------------------------------\n\nif\ \{\[package\ provide\ Trf\]\ !=\ \{\}\}\ \{\n\ \ \ \ interp\ alias\ \{\}\ ::md4::Hex\ \{\}\ ::hex\ -mode\ encode\ --\n\}\ else\ \{\n\ \ \ \ proc\ ::md4::Hex\ \{data\}\ \{\n\ \ \ \ \ \ \ \ binary\ scan\ \$data\ H*\ result\n\ \ \ \ \ \ \ \ return\ \[string\ toupper\ \$result\]\n\ \ \ \ \}\n\}\n\n#\ -------------------------------------------------------------------------\n\n#\ LoadAccelerator\ --\n#\n#\tThis\ package\ can\ make\ use\ of\ a\ number\ of\ compiled\ extensions\ to\n#\taccelerate\ the\ digest\ computation.\ This\ procedure\ manages\ the\n#\tuse\ of\ these\ extensions\ within\ the\ package.\ During\ normal\ usage\n#\tthis\ should\ not\ be\ called,\ but\ the\ test\ package\ manipulates\ the\n#\tlist\ of\ enabled\ accelerators.\n#\nproc\ ::md4::LoadAccelerator\ \{name\}\ \{\n\ \ \ \ variable\ accel\n\ \ \ \ set\ r\ 0\n\ \ \ \ switch\ -exact\ --\ \$name\ \{\n\ \ \ \ \ \ \ \ critcl\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ if\ \{!\[catch\ \{package\ require\ tcllibc\}\]\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ||\ !\[catch\ \{package\ require\ md4c\}\]\}\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ set\ r\ \[expr\ \{\[info\ command\ ::md4::md4c\]\ !=\ \{\}\}\]\n\ \ \ \ \ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ cryptkit\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ if\ \{!\[catch\ \{package\ require\ cryptkit\}\]\}\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ set\ r\ \[expr\ \{!\[catch\ \{cryptkit::cryptInit\}\]\}\]\n\ \ \ \ \ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ #trf\ \{\n\ \ \ \ \ \ \ \ #\ \ \ \ if\ \{!\[catch\ \{package\ require\ Trf\}\]\}\ \{\n\ \ \ \ \ \ \ \ #\ \ \ \ \ \ \ \ set\ r\ \[expr\ \{!\[catch\ \{::md4\ aa\}\ msg\]\}\]\n\ \ \ \ \ \ \ \ #\ \ \ \ \}\n\ \ \ \ \ \ \ \ #\}\n\ \ \ \ \ \ \ \ default\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ return\ -code\ error\ \"invalid\ accelerator\ package:\\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ must\ be\ one\ of\ \[join\ \[array\ names\ accel\]\ \{,\ \}\]\"\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \}\n\ \ \ \ set\ accel(\$name)\ \$r\n\}\n\n#\ -------------------------------------------------------------------------\n\n#\ Description:\n#\ \ Pop\ the\ nth\ element\ off\ a\ list.\ Used\ in\ options\ processing.\n#\nproc\ ::md4::Pop\ \{varname\ \{nth\ 0\}\}\ \{\n\ \ \ \ upvar\ \$varname\ args\n\ \ \ \ set\ r\ \[lindex\ \$args\ \$nth\]\n\ \ \ \ set\ args\ \[lreplace\ \$args\ \$nth\ \$nth\]\n\ \ \ \ return\ \$r\n\}\n\n#\ -------------------------------------------------------------------------\n\n#\ fileevent\ handler\ for\ chunked\ file\ hashing.\n#\nproc\ ::md4::Chunk\ \{token\ channel\ \{chunksize\ 4096\}\}\ \{\n\ \ \ \ #\ FRINK:\ nocheck\n\ \ \ \ variable\ \$token\n\ \ \ \ upvar\ 0\ \$token\ state\n\ \ \ \ \n\ \ \ \ if\ \{\[eof\ \$channel\]\}\ \{\n\ \ \ \ \ \ \ \ fileevent\ \$channel\ readable\ \{\}\n\ \ \ \ \ \ \ \ set\ state(reading)\ 0\n\ \ \ \ \}\n\ \ \ \ \ \ \ \ \n\ \ \ \ MD4Update\ \$token\ \[read\ \$channel\ \$chunksize\]\n\}\n\n#\ -------------------------------------------------------------------------\n\nproc\ ::md4::md4\ \{args\}\ \{\n\ \ \ \ array\ set\ opts\ \{-hex\ 0\ -filename\ \{\}\ -channel\ \{\}\ -chunksize\ 4096\}\n\ \ \ \ while\ \{\[string\ match\ -*\ \[set\ option\ \[lindex\ \$args\ 0\]\]\]\}\ \{\n\ \ \ \ \ \ \ \ switch\ -glob\ --\ \$option\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ -hex\ \ \ \ \ \ \ \{\ set\ opts(-hex)\ 1\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ -file*\ \ \ \ \ \{\ set\ opts(-filename)\ \[Pop\ args\ 1\]\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ -channel\ \ \ \{\ set\ opts(-channel)\ \[Pop\ args\ 1\]\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ -chunksize\ \{\ set\ opts(-chunksize)\ \[Pop\ args\ 1\]\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ default\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ \{\[llength\ \$args\]\ ==\ 1\}\ \{\ break\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ \{\[string\ compare\ \$option\ \"--\"\]\ ==\ 0\ \}\ \{\ Pop\ args\;\ break\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ set\ err\ \[join\ \[lsort\ \[array\ names\ opts\]\]\ \",\ \"\]\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ -code\ error\ \"bad\ option\ \$option:\\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ must\ be\ one\ of\ \$err\"\n\ \ \ \ \ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ Pop\ args\n\ \ \ \ \}\n\n\ \ \ \ if\ \{\$opts(-filename)\ !=\ \{\}\}\ \{\n\ \ \ \ \ \ \ \ set\ opts(-channel)\ \[open\ \$opts(-filename)\ r\]\n\ \ \ \ \ \ \ \ fconfigure\ \$opts(-channel)\ -translation\ binary\n\ \ \ \ \}\n\n\ \ \ \ if\ \{\$opts(-channel)\ ==\ \{\}\}\ \{\n\n\ \ \ \ \ \ \ \ if\ \{\[llength\ \$args\]\ !=\ 1\}\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ return\ -code\ error\ \"wrong\ #\ args:\\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ should\ be\ \\\"md4\ ?-hex?\ -filename\ file\ |\ string\\\"\"\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ set\ tok\ \[MD4Init\]\n\ \ \ \ \ \ \ \ MD4Update\ \$tok\ \[lindex\ \$args\ 0\]\n\ \ \ \ \ \ \ \ set\ r\ \[MD4Final\ \$tok\]\n\n\ \ \ \ \}\ else\ \{\n\n\ \ \ \ \ \ \ \ set\ tok\ \[MD4Init\]\n\ \ \ \ \ \ \ \ #\ FRINK:\ nocheck\n\ \ \ \ \ \ \ \ set\ \[subst\ \$tok\](reading)\ 1\n\ \ \ \ \ \ \ \ fileevent\ \$opts(-channel)\ readable\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \[list\ \[namespace\ origin\ Chunk\]\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tok\ \$opts(-channel)\ \$opts(-chunksize)\]\n\ \ \ \ \ \ \ \ vwait\ \[subst\ \$tok\](reading)\n\ \ \ \ \ \ \ \ set\ r\ \[MD4Final\ \$tok\]\n\n\ \ \ \ \ \ \ \ #\ If\ we\ opened\ the\ channel\ -\ we\ should\ close\ it\ too.\n\ \ \ \ \ \ \ \ if\ \{\$opts(-filename)\ !=\ \{\}\}\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ close\ \$opts(-channel)\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \}\n\ \ \ \ \n\ \ \ \ if\ \{\$opts(-hex)\}\ \{\n\ \ \ \ \ \ \ \ set\ r\ \[Hex\ \$r\]\n\ \ \ \ \}\n\ \ \ \ return\ \$r\n\}\n\n#\ -------------------------------------------------------------------------\n\nproc\ ::md4::hmac\ \{args\}\ \{\n\ \ \ \ array\ set\ opts\ \{-hex\ 0\ -filename\ \{\}\ -channel\ \{\}\ -chunksize\ 4096\}\n\ \ \ \ while\ \{\[string\ match\ -*\ \[set\ option\ \[lindex\ \$args\ 0\]\]\]\}\ \{\n\ \ \ \ \ \ \ \ switch\ -glob\ --\ \$option\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ -key\ \ \ \ \ \ \ \{\ set\ opts(-key)\ \[Pop\ args\ 1\]\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ -hex\ \ \ \ \ \ \ \{\ set\ opts(-hex)\ 1\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ -file*\ \ \ \ \ \{\ set\ opts(-filename)\ \[Pop\ args\ 1\]\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ -channel\ \ \ \{\ set\ opts(-channel)\ \[Pop\ args\ 1\]\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ -chunksize\ \{\ set\ opts(-chunksize)\ \[Pop\ args\ 1\]\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ default\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ \{\[llength\ \$args\]\ ==\ 1\}\ \{\ break\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ \{\[string\ compare\ \$option\ \"--\"\]\ ==\ 0\ \}\ \{\ Pop\ args\;\ break\ \}\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ set\ err\ \[join\ \[lsort\ \[array\ names\ opts\]\]\ \",\ \"\]\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ return\ -code\ error\ \"bad\ option\ \$option:\\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ must\ be\ one\ of\ \$err\"\n\ \ \ \ \ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ Pop\ args\n\ \ \ \ \}\n\n\ \ \ \ if\ \{!\[info\ exists\ opts(-key)\]\}\ \{\n\ \ \ \ \ \ \ \ return\ -code\ error\ \"wrong\ #\ args:\\\n\ \ \ \ \ \ \ \ \ \ \ \ should\ be\ \\\"hmac\ ?-hex?\ -key\ key\ -filename\ file\ |\ string\\\"\"\n\ \ \ \ \}\n\n\ \ \ \ if\ \{\$opts(-filename)\ !=\ \{\}\}\ \{\n\ \ \ \ \ \ \ \ set\ opts(-channel)\ \[open\ \$opts(-filename)\ r\]\n\ \ \ \ \ \ \ \ fconfigure\ \$opts(-channel)\ -translation\ binary\n\ \ \ \ \}\n\n\ \ \ \ if\ \{\$opts(-channel)\ ==\ \{\}\}\ \{\n\n\ \ \ \ \ \ \ \ if\ \{\[llength\ \$args\]\ !=\ 1\}\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ return\ -code\ error\ \"wrong\ #\ args:\\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ should\ be\ \\\"hmac\ ?-hex?\ -key\ key\ -filename\ file\ |\ string\\\"\"\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \ \ \ \ set\ tok\ \[HMACInit\ \$opts(-key)\]\n\ \ \ \ \ \ \ \ HMACUpdate\ \$tok\ \[lindex\ \$args\ 0\]\n\ \ \ \ \ \ \ \ set\ r\ \[HMACFinal\ \$tok\]\n\n\ \ \ \ \}\ else\ \{\n\n\ \ \ \ \ \ \ \ set\ tok\ \[HMACInit\ \$opts(-key)\]\n\ \ \ \ \ \ \ \ #\ FRINK:\ nocheck\n\ \ \ \ \ \ \ \ set\ \[subst\ \$tok\](reading)\ 1\n\ \ \ \ \ \ \ \ fileevent\ \$opts(-channel)\ readable\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \[list\ \[namespace\ origin\ Chunk\]\ \\\n\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \$tok\ \$opts(-channel)\ \$opts(-chunksize)\]\n\ \ \ \ \ \ \ \ vwait\ \[subst\ \$tok\](reading)\n\ \ \ \ \ \ \ \ set\ r\ \[HMACFinal\ \$tok\]\n\n\ \ \ \ \ \ \ \ #\ If\ we\ opened\ the\ channel\ -\ we\ should\ close\ it\ too.\n\ \ \ \ \ \ \ \ if\ \{\$opts(-filename)\ !=\ \{\}\}\ \{\n\ \ \ \ \ \ \ \ \ \ \ \ close\ \$opts(-channel)\n\ \ \ \ \ \ \ \ \}\n\ \ \ \ \}\n\ \ \ \ \n\ \ \ \ if\ \{\$opts(-hex)\}\ \{\n\ \ \ \ \ \ \ \ set\ r\ \[Hex\ \$r\]\n\ \ \ \ \}\n\ \ \ \ return\ \$r\n\}\n\n#\ -------------------------------------------------------------------------\n\n#\ Try\ and\ load\ a\ compiled\ extension\ to\ help.\nnamespace\ eval\ ::md4\ \{\n\ \ \ \ foreach\ e\ \{critcl\ cryptkit\}\ \{\ if\ \{\[LoadAccelerator\ \$e\]\}\ \{\ break\ \}\ \}\n\}\n\npackage\ provide\ md4\ \$::md4::version\n\n#\ -------------------------------------------------------------------------\n#\ Local\ Variables:\n#\ \ \ mode:\ tcl\n#\ \ \ indent-tabs-mode:\ nil\n#\ End:\n\n\n
+
 2A57E08F-A0AB-41E2-8A2A-67B4B40B539F,Conditions
 {0 conditions}
 
@@ -4365,7 +4419,7 @@ false
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-25615718
+25898366
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -4666,7 +4720,7 @@ Yes
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-115518079
+117107251
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
@@ -5479,7 +5533,7 @@ No
 <%InstallDir%>
 
 8F9CD740-BE57-45DF-B176-5C11E746846B,FileSize
-2326
+2365
 
 8F9CD740-BE57-45DF-B176-5C11E746846B,Name
 {Program Files Linux}
@@ -6294,10 +6348,23 @@ F03F1387-C847-400B-A135-9A967D979941,StringMap
 "@@DB_HOST@@" "<%DB_HOST%>"
 "@@DB_PORT@@" "<%DB_PORT%>"
 "@@ALFRESCO_DIR@@" "<%InstallDir%>"
-"@@JAVA_HOME@@" "<%JavaHome%>"}
+"@@JAVA_HOME@@" "<%JavaHome%>"
+"@@ADMIN_PWD@@" "<%ADMIN_HASH%>"}
 
 F097BC02-D279-4A43-9F8B-1DC3958FDB4A,Alias
 {Cancel Actions}
+
+F1DF85DD-15F4-4C37-810B-5E9F42980735,CheckCondition
+{Before Next Pane is Displayed}
+
+F1DF85DD-15F4-4C37-810B-5E9F42980735,FailureMessage
+{The passwords do not match or are empty.  Please re-enter them.}
+
+F1DF85DD-15F4-4C37-810B-5E9F42980735,String1
+<%ADMIN_PWD%>
+
+F1DF85DD-15F4-4C37-810B-5E9F42980735,String2
+<%ADMIN_PWD2%>
 
 F2338184-37AF-4756-B940-BD88DEEF2C1E,Default
 Yes
@@ -6836,6 +6903,27 @@ ZipArchive,VirtualTextMap
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
 
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton
+{< <%Back%>}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton
+<%Cancel%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption
+Überschrift
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message
+Meldung
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton
+{<%Next%> >}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle
+Untertitel
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title
+Titel
+
 2D04FDC4-66C1-442D-A280-66CAC3EBF543,Message
 <%InstallationCompleteText%>
 
@@ -6897,6 +6985,27 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 
 19F5E6E0-ED74-42E9-8A17-93EF7879CF50,Title
 <%InstallApplicationText%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton
+{< <%Back%>}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton
+<%Cancel%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption
+{Please give a password to use for the Alfresco administrator account. }
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message
+{This password will be used for the administrator account for Alfresco.  You will need this password to access and configure Alfresco.}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton
+{<%Next%> >}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle
+{Enter a password for the Alfresco administrator account}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title
+{Alfresco Administrator Account}
 
 1F0C1F8D-58E2-406A-874C-DD64E6DC0099,Text
 <%CreateQuickLaunchShortcutText%>
@@ -6996,7 +7105,7 @@ If you do not wish to use OpenOffice for Office document conversions, just selec
 {OpenOffice Folder}
 
 73EBD608-2E51-4D77-A456-569367970EA1,Subtitle
-{Enter the location of OpenOffice on your ccomputer}
+{Enter the location of OpenOffice on your computer}
 
 73EBD608-2E51-4D77-A456-569367970EA1,Title
 {OpenOffice Location}
@@ -7149,6 +7258,27 @@ TypicalInstallDescription
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
 
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton
+{< <%Back%>}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton
+<%Cancel%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption
+Leyenda
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message
+Mensaje
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton
+{<%Next%> >}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle
+Subtítulo
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title
+Título
+
 2D04FDC4-66C1-442D-A280-66CAC3EBF543,Message
 <%InstallationCompleteText%>
 
@@ -7195,6 +7325,27 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 ::msgcat::mcmset fr {
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton
+{< <%Back%>}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton
+<%Cancel%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption
+Légende
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message
+Message
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton
+{<%Next%> >}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle
+Sous-titre
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title
+Titre
 
 2D04FDC4-66C1-442D-A280-66CAC3EBF543,Message
 <%InstallationCompleteText%>
@@ -7243,6 +7394,27 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
 
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton
+{< <%Back%>}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton
+<%Cancel%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption
+Leírás
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message
+Üzenet
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton
+{<%Next%> >}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle
+Alcím
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title
+Cím
+
 2D04FDC4-66C1-442D-A280-66CAC3EBF543,Message
 <%InstallationCompleteText%>
 
@@ -7289,6 +7461,27 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 ::msgcat::mcmset it {
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton
+{< <%Back%>}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton
+<%Cancel%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption
+Didascalia
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message
+Messaggio
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton
+{<%Next%> >}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle
+Sottotitolo
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title
+Titolo
 
 2D04FDC4-66C1-442D-A280-66CAC3EBF543,Message
 <%InstallationCompleteText%>
@@ -7337,6 +7530,27 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
 
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton
+{< <%Back%>}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton
+<%Cancel%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption
+Bijschrift
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message
+Bericht
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton
+{<%Next%> >}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle
+Ondertitel
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title
+Titel
+
 2D04FDC4-66C1-442D-A280-66CAC3EBF543,Message
 <%InstallationCompleteText%>
 
@@ -7383,6 +7597,27 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 ::msgcat::mcmset pl {
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton
+{< <%Back%>}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton
+<%Cancel%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption
+NagÅ‚Ã³wek
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message
+WiadomoÅ›Ä‡
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton
+{<%Next%> >}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle
+PodtytuÅ‚
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title
+TytuÅ‚
 
 2D04FDC4-66C1-442D-A280-66CAC3EBF543,Message
 <%InstallationCompleteText%>
@@ -7431,6 +7666,27 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
 
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton
+{< <%Back%>}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton
+<%Cancel%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption
+Caption
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message
+Mensagem
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton
+{<%Next%> >}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle
+Subtítulo
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title
+Título
+
 2D04FDC4-66C1-442D-A280-66CAC3EBF543,Message
 <%InstallationCompleteText%>
 
@@ -7477,6 +7733,27 @@ FC8462E9-E8F1-463F-9546-592F985CE2B9,Message
 ::msgcat::mcmset ru {
 034E5A8A-AF8B-4B0F-96CD-80647D6B539E,Message
 <%UninstallingApplicationText%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,BackButton
+{< <%Back%>}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,CancelButton
+<%Cancel%>
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Caption
+Ïîäïèñü
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Message
+Ñîîáùåíèå
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,NextButton
+{<%Next%> >}
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Subtitle
+Ïîäçàãîëîâîê
+
+1B6FF77A-26AA-4D1B-A2B7-F5A25D1004D0,Title
+Çàãîëîâîê
 
 2D04FDC4-66C1-442D-A280-66CAC3EBF543,Message
 <%InstallationCompleteText%>
