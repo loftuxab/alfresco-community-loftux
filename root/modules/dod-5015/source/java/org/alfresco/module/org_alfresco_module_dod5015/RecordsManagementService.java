@@ -157,7 +157,7 @@ public interface RecordsManagementService
     boolean isNextDispositionActionEligible(NodeRef nodeRef);
     
     /**
-     * Gets the next dispositoin action for a given node
+     * Gets the next disposition action for a given node
      *  
      * @param nodeRef
      * @return

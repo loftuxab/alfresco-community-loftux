@@ -159,6 +159,11 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         		ASPECT_FILE_PLAN_COMPONENT,
                 new JavaBehaviour(this, "onChangeToAnyRmProperty", NotificationFrequency.TRANSACTION_COMMIT));
         
+        // Disposition behaviours
+        this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"),
+                TYPE_DISPOSITION_ACTION_DEFINITION,
+                new JavaBehaviour(this, "onChangeToDispositionActionDefinition", NotificationFrequency.TRANSACTION_COMMIT));
+
         // Reference behaviours
         policyComponent.bindClassBehaviour(RecordsManagementPolicies.ON_CREATE_REFERENCE, 
                                            ASPECT_RECORD, 
@@ -204,6 +209,17 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     }
     
     /**
+     * Called after a DispositionActionDefinition property has been updated.
+     */
+    public void onChangeToDispositionActionDefinition(NodeRef node, Map<QName, Serializable> oldProps, Map<QName, Serializable> newProps)
+    {
+        if (nodeService.exists(node) == true)
+        {
+            rmActionService.executeRecordsManagementAction(node, "broadcastDispositionActionDefinitionUpdate");
+        }
+    }
+    
+    /**
      * Called after any Records Management property has been updated.
      */
     public void onChangeToAnyRmProperty(NodeRef node, Map<QName, Serializable> oldProps, Map<QName, Serializable> newProps)
@@ -229,7 +245,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
             List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_DISPOSITION_SCHEDULE, RegexQNamePattern.MATCH_ALL);            
             if (assocs.size() == 0)
             {
-                // Create the disposition scedule object
+                // Create the disposition schedule object
                 this.nodeService.createNode(nodeRef, ASSOC_DISPOSITION_SCHEDULE, 
                             QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("dispositionSchedule")),
                             TYPE_DISPOSITION_SCHEDULE);
@@ -423,19 +439,18 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
             List<NodeRef> diNodeRefs = new ArrayList<NodeRef>(recordFolders.size());
             for (NodeRef recordFolder : recordFolders)
             {
-                // Get all the disposition instructions
-                NodeRef temp = getDispositionInstructionsImpl(recordFolder);
-                if (temp != null)
+                // Get the disposition instructions for each folder
+                NodeRef folderDispInstruc = getDispositionInstructionsImpl(recordFolder);
+                if (folderDispInstruc != null)
                 {
-                    diNodeRefs.add(temp);
+                    diNodeRefs.add(folderDispInstruc);
                 }
-                
-                if (diNodeRefs.size() != 0)
-                {
+            }
+            if (diNodeRefs.size() != 0)
+            {
                     // TODO figure out which disposition instruction object is most relevant
                     //      for now just take the first!
-                    diNodeRef = diNodeRefs.get(0);
-                }
+                diNodeRef = diNodeRefs.get(0);
             }
         }
         else
@@ -462,7 +477,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         String name = (String)actionDefinitionParams.get(PROP_DISPOSITION_ACTION_NAME);
         if (name == null || name.length() == 0)
         {
-            throw new IllegalArgumentException("'name' parameter is manatory when creating a disposition action definition");
+            throw new IllegalArgumentException("'name' parameter is mandatory when creating a disposition action definition");
         }
         
         // TODO: also check the action name is valid?
@@ -506,7 +521,8 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     }
 
     /**
-     * Get disposition instructions implementation
+     * This method returns a NodeRef
+     * Gets the disposition instructions 
      * 
      * @param nodeRef
      * @return
@@ -517,7 +533,9 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         
         if (this.nodeService.hasAspect(nodeRef, ASPECT_SCHEDULED) == true)
         {
-            result = this.nodeService.getChildAssocs(nodeRef, ASSOC_DISPOSITION_SCHEDULE, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+            List<ChildAssociationRef> childAssocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_DISPOSITION_SCHEDULE, RegexQNamePattern.MATCH_ALL);
+            ChildAssociationRef firstChildAssocRef = childAssocs.get(0);
+            result = firstChildAssocRef.getChildRef();
         }
         else
         {
@@ -587,6 +605,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     {
         DispositionAction result = null;
         NodeRef dispositionActionNodeRef = getNextDispositionActionNodeRef(nodeRef);
+
         if (dispositionActionNodeRef != null)
         {
             result = new DispositionActionImpl(this.serviceRegistry, dispositionActionNodeRef);
