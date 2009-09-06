@@ -34,15 +34,19 @@ import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FileAction;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
@@ -64,15 +68,15 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
 	
 	private NodeRef filePlan;
 	
-	private NodeService nodeService;
 	private ImporterService importService;
-	private TransactionService transactionService;
-	private RecordsManagementService rmService;
+	private NodeService nodeService;
+	private NodeService unprotectedNodeService;
+	private PermissionService permissionService;
+    private RecordsManagementActionService rmActionService;
+    private RecordsManagementService rmService;
 	private SearchService searchService;
-
-    private PermissionService permissionService;
-
-    private NodeService unprotectedNodeService;
+	private TransactionService transactionService;
+	private RetryingTransactionHelper transactionHelper;
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -85,8 +89,10 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
 		this.importService = (ImporterService)this.applicationContext.getBean("importerComponent");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		this.searchService = (SearchService)this.applicationContext.getBean("searchService");
-		this.rmService = (RecordsManagementService)this.applicationContext.getBean("recordsManagementService");
+        this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("recordsManagementActionService");
+        this.rmService = (RecordsManagementService)this.applicationContext.getBean("recordsManagementService");
 		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
+		this.transactionHelper = (RetryingTransactionHelper)this.applicationContext.getBean("retryingTransactionHelper");
 
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -146,6 +152,110 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
         assertNotNull(schedule);
         
         txn.commit();
+    }
+    
+    /**
+     * This test method contains a subset of the tests in TC 7-2 of the DoD doc.
+     * @throws Exception
+     */
+    public void testRescheduleRecord_IsNotCutOff() throws Exception
+    {
+         final NodeRef recCat = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");
+        // This RC has disposition instructions "Cut off monthly, hold 1 month, then destroy."
+        
+        setComplete();
+        endTransaction();
+
+        // Create a suitable folder for this test.
+        final NodeRef testFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
+                        String folderName = "testFolder" + System.currentTimeMillis();
+                        folderProps.put(ContentModel.PROP_NAME, folderName);
+                        NodeRef recordFolder = nodeService.createNode(recCat,
+                                                                      ContentModel.ASSOC_CONTAINS, 
+                                                                      QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, folderName), 
+                                                                      TYPE_RECORD_FOLDER).getChildRef();
+                        return recordFolder;
+                    }          
+                });
+        
+        // Create a record in the test folder. File it and declare it.
+        final NodeRef testRecord = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        final NodeRef result = nodeService.createNode(testFolder, ContentModel.ASSOC_CONTAINS,
+                                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI,
+                                        "Record" + System.currentTimeMillis() + ".txt"),
+                                ContentModel.TYPE_CONTENT).getChildRef();
+                        
+                        rmActionService.executeRecordsManagementAction(result, "file");
+                        TestUtilities.declareRecord(result, unprotectedNodeService, rmActionService);
+                        return result;
+                    }          
+                });        
+
+        assertTrue("recCat missing scheduled aspect", nodeService.hasAspect(recCat, RecordsManagementModel.ASPECT_SCHEDULED));
+        assertFalse("folder should not have scheduled aspect", nodeService.hasAspect(testFolder, RecordsManagementModel.ASPECT_SCHEDULED));
+        assertFalse("record should not have scheduled aspect", nodeService.hasAspect(testRecord, RecordsManagementModel.ASPECT_SCHEDULED));
+
+        assertFalse("recCat should not have dispositionLifecycle aspect", nodeService.hasAspect(recCat, RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE));
+        assertTrue("testFolder missing dispositionLifecycle aspect", nodeService.hasAspect(testFolder, RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE));
+        assertFalse("testRecord should not have dispositionLifecycle aspect", nodeService.hasAspect(testRecord, RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE));
+
+        // Change the cutoff conditions for the associated record category
+        final Date dateBeforeChange = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Date>()
+                {
+                    public Date execute() throws Throwable
+                    {
+                        Date asOfDate = rmService.getNextDispositionAction(testFolder).getAsOfDate();
+                        System.out.println("Going to change the disposition asOf Date.");
+                        System.out.println(" - Original value: " + asOfDate);
+
+                        // Now change "Cut off monthly, hold 1 month, then destroy."
+                        //    to "Cut off yearly, hold 1 month, then destroy."
+                        List<DispositionActionDefinition> dads = rmService.getDispositionSchedule(testFolder).getDispositionActionDefinitions();
+                        DispositionActionDefinition firstDAD = dads.get(0);
+                        assertEquals("cutoff", firstDAD.getName());
+                        NodeRef dadNode = firstDAD.getNodeRef();
+                        
+                        nodeService.setProperty(dadNode, PROP_DISPOSITION_PERIOD, new Period("year|1"));
+
+                        return asOfDate;
+                    }          
+                });
+
+        // view the record metadata to verify that the record has been rescheduled.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        DispositionAction nextDispositionAction = rmService.getNextDispositionAction(testFolder);
+                        
+                        assertEquals("cutoff", nextDispositionAction.getName());
+                        Date asOfDateAfterChange = nextDispositionAction.getAsOfDate();
+                        System.out.println(" - Updated  value: " + asOfDateAfterChange);
+                        
+                        assertFalse("Expected disposition asOf date to change.", dateBeforeChange.equals(asOfDateAfterChange));
+                        return null;
+                    }          
+                });
+
+        // Tidy up
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        nodeService.deleteNode(testRecord);
+                        nodeService.deleteNode(testFolder);
+                        return null;
+                    }          
+                });
+        // TODO Change the disposition type (e.g. event-based to time-based)
+        // TODO View the record metadata to verify that the record has been rescheduled.
     }
     
 	public void testGetDispositionInstructions() throws Exception

@@ -105,6 +105,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	
 	private NodeRef filePlan;
 	
+	private NodeService unprotectedNodeService;
 	private NodeService nodeService;
 	private SearchService searchService;
 	private ImporterService importService;
@@ -144,7 +145,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 		super.onSetUpInTransaction();
 
 		// Get the service required in the tests
-		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); // use upper 'N'odeService (to test access config interceptor)		
+		this.unprotectedNodeService = (NodeService)applicationContext.getBean("nodeService");
+		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); // use upper 'N'odeService (to test access config interceptor)		                NodeService unprotectedNodeService = (NodeService)applicationContext.getBean("nodeService");
 		this.authenticationService = (AuthenticationService)this.applicationContext.getBean("AuthenticationService");
 		this.personService = (PersonService)this.applicationContext.getBean("PersonService");
 		this.authorityService = (AuthorityService)this.applicationContext.getBean("AuthorityService");
@@ -243,7 +245,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 NodeRef recordUnderTest = createRecordNode(nonVitalFolder);
 
                 rmActionService.executeRecordsManagementAction(recordUnderTest, "file");
-                declareRecord(recordUnderTest);
+
+                TestUtilities.declareRecord(recordUnderTest, unprotectedNodeService, rmActionService);
                 
                 return recordUnderTest;
             }          
@@ -946,8 +949,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             {
                 assertTrue(nodeService.hasAspect(recordOne, ASPECT_RECORD));
                 
-                declareRecord(recordOne);
-                declareRecord(recordTwo);  
+                TestUtilities.declareRecord(recordOne, unprotectedNodeService, rmActionService);
+                TestUtilities.declareRecord(recordTwo, unprotectedNodeService, rmActionService);  
                 
                 return null;
             }
@@ -1039,8 +1042,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             {
                 assertTrue(nodeService.hasAspect(recordOne, ASPECT_RECORD));
                 
-                declareRecord(recordOne);
-                declareRecord(recordTwo);  
+                TestUtilities.declareRecord(recordOne, unprotectedNodeService, rmActionService);
+                TestUtilities.declareRecord(recordTwo, unprotectedNodeService, rmActionService);  
                 
                 assertFalse(nodeService.hasAspect(recordOne, ASPECT_VERSIONED_RECORD));
                 
@@ -1119,9 +1122,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             public DispositionAction execute() throws Throwable
             {
                 // Declare the records
-                declareRecord(recordOne);
-                declareRecord(recordTwo);
-                declareRecord(recordThree);
+                TestUtilities.declareRecord(recordOne, unprotectedNodeService, rmActionService);
+                TestUtilities.declareRecord(recordTwo, unprotectedNodeService, rmActionService);
+                TestUtilities.declareRecord(recordThree, unprotectedNodeService, rmActionService);
                 
                 // Cutoff
                 Map<String, Serializable> params = new HashMap<String, Serializable>(3);
@@ -1290,7 +1293,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         txn = transactionService.getUserTransaction(false);
         txn.begin();
         
-        declareRecord(recordOne);
+        TestUtilities.declareRecord(recordOne, unprotectedNodeService, rmActionService);
         
         // Check the disposition action
         assertTrue(this.nodeService.hasAspect(recordOne, ASPECT_DISPOSITION_LIFECYCLE));
@@ -1390,7 +1393,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         txn = transactionService.getUserTransaction(false);
         txn.begin();
         
-        declareRecord(recordOne);
+        TestUtilities.declareRecord(recordOne, unprotectedNodeService, rmActionService);
         
         // NOTE the disposition is being managed at a folder level ...
         
@@ -1559,26 +1562,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         return recordOne;
 	}   
       
-    private void declareRecord(NodeRef recordOne)
-    {
-        NodeService unprotectedNodeService = (NodeService)applicationContext.getBean("nodeService");
-        // Declare record
-        Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
-        propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
-        List<String> smList = new ArrayList<String>(2);
-        smList.add(FOUO);
-        smList.add(NOFORN);
-        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
-        propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
-        propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
-        propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());       
-        propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
-        propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
-        propValues.put(ContentModel.PROP_TITLE, "titleValue");
-        unprotectedNodeService.setProperties(recordOne, propValues);
-        this.rmActionService.executeRecordsManagementAction(recordOne, "declareRecord");        
-	}
-    
     /**
      * This method tests the filing of a custom type, as defined in DOD 5015.
      */

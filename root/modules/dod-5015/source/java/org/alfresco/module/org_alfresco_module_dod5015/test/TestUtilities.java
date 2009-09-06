@@ -27,11 +27,18 @@ package org.alfresco.module.org_alfresco_module_dod5015.test;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -165,4 +172,24 @@ public class TestUtilities implements DOD5015Model
         }
 
     };
+
+    public static void declareRecord(NodeRef recordToDeclare, NodeService nodeService,
+            RecordsManagementActionService rmActionService)
+    {
+        // Declare record
+        Map<QName, Serializable> propValues = nodeService.getProperties(recordToDeclare);        
+        propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
+        List<String> smList = new ArrayList<String>(2);
+//        smList.add(DOD5015Test.FOUO);
+//        smList.add(DOD5015Test.NOFORN);
+        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
+        propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
+        propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
+        propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());       
+        propValues.put(RecordsManagementModel.PROP_ORIGINATOR, "origValue");
+        propValues.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "origOrgValue");
+        propValues.put(ContentModel.PROP_TITLE, "titleValue");
+        nodeService.setProperties(recordToDeclare, propValues);
+        rmActionService.executeRecordsManagementAction(recordToDeclare, "declareRecord");        
+    }
 }

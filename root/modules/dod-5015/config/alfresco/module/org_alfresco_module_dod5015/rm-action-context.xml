@@ -522,6 +522,34 @@
     <bean id="broadcastVitalRecordDefinition" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.BroadcastVitalRecordDefinitionAction"
                                             parent="rmAction" />
     
+    <!-- broadcast disposition action definition update -->
+    <!-- bound to policy: allow -->
+    
+    <bean id="broadcastDispositionActionDefinitionUpdate_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="broadcastDispositionActionDefinitionUpdate"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="broadcastDispositionActionDefinitionUpdate_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="broadcastDispositionActionDefinitionUpdate_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
+        <property name="objectDefinitionSource">
+            <value>
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
+                   org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="broadcastDispositionActionDefinitionUpdate" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.BroadcastDispositionActionDefinitionUpdateAction"
+                                            parent="rmAction" />
+    
+    
     <!-- complete event -->
     
     <bean id="completeEvent_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
