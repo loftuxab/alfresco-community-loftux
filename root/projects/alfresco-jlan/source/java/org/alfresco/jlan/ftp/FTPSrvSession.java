@@ -1817,7 +1817,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 			// Create the file open parameters
 
-			FileOpenParams params = new FileOpenParams(ftpPath.getSharePath(), FileAction.OpenIfExists, AccessMode.ReadOnly, 0);
+			FileOpenParams params = new FileOpenParams(ftpPath.getSharePath(), FileAction.OpenIfExists, AccessMode.ReadOnly, 0, 0);
 
 			// Check if the file exists and it is a file
 
@@ -2036,7 +2036,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 			if ( sts == FileStatus.FileExists)
 				openAction = append == false ? FileAction.TruncateExisting : FileAction.OpenIfExists;
 
-			FileOpenParams params = new FileOpenParams(ftpPath.getSharePath(), openAction, AccessMode.ReadWrite, 0);
+			FileOpenParams params = new FileOpenParams(ftpPath.getSharePath(), openAction, AccessMode.ReadWrite, 0, 0);
 
 			// Create a new file to receive the data
 
@@ -2593,7 +2593,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 				// Create the new directory
 
 				FileOpenParams params = new FileOpenParams(ftpPath.getSharePath(), FileAction.CreateNotExist,
-						AccessMode.ReadWrite, FileAttribute.NTDirectory);
+						AccessMode.ReadWrite, FileAttribute.NTDirectory, 0);
 
 				disk.createDirectory(this, tree, params);
 

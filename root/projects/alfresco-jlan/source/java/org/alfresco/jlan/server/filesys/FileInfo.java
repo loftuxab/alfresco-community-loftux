@@ -127,6 +127,10 @@ public class FileInfo {
   
   private int m_setFlags;
   
+  // Network file object, used when a set information call uses the file id/handle
+  
+  private NetworkFile m_netFile;
+  
   /**
    * Default constructor
    */
@@ -858,6 +862,33 @@ public class FileInfo {
 	 */
 	public final int getSetFileInformationFlags() {
 	  return m_setFlags;
+	}
+	
+	/**
+	 * Check if the associated network file is valid
+	 * 
+	 * @return boolean
+	 */
+	public final boolean hasNetworkFile() {
+		return m_netFile != null ? true : false;
+	}
+	
+	/**
+	 * Return the associated network file
+	 * 
+	 * @return NetworkFile
+	 */
+	public final NetworkFile getNetworkFile() {
+		return m_netFile;
+	}
+	
+	/**
+	 * Set the associated network file
+	 * 
+	 * @param netFile NetworkFile
+	 */
+	public final void setNetworkFile(NetworkFile netFile) {
+		m_netFile = netFile;
 	}
 	
   /**

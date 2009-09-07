@@ -45,11 +45,11 @@ public class FileOpenParams {
 	//	Conversion array for Core/LanMan open actions to NT open action codes
 	
 	private static int[] _NTToLMOpenCode = { FileAction.TruncateExisting + FileAction.CreateNotExist,
-																					 FileAction.OpenIfExists,
-																					 FileAction.CreateNotExist,
-																					 FileAction.OpenIfExists + FileAction.CreateNotExist,
-																					 FileAction.TruncateExisting,
-																					 FileAction.TruncateExisting + FileAction.CreateNotExist
+											 FileAction.OpenIfExists,
+											 FileAction.CreateNotExist,
+											 FileAction.OpenIfExists + FileAction.CreateNotExist,
+											 FileAction.TruncateExisting,
+											 FileAction.TruncateExisting + FileAction.CreateNotExist
 	};
 	
 	//	File open mode strings
@@ -113,14 +113,22 @@ public class FileOpenParams {
 	
 	private int m_mode = -1;
 	
-  //  File type and symbolic name
+    //  File type and symbolic name
   
-  private int m_fileType;
-  private String m_symName;
+    private int m_fileType;
+    private String m_symName;
   
-  //  Session making the open/create request
+    // Process id
+    
+    private int m_pid;
+    
+    // 	NTCreateAndX createFlags field (extended response and oplock flags)
+    
+    private int m_createFlags;
+    
+    //  Session making the open/create request
   
-  private SrvSession m_sess;
+    private SrvSession m_sess;
   
 	/**
 	 * Class constructor for Core SMB dialect Open SMB requests
@@ -129,8 +137,9 @@ public class FileOpenParams {
 	 * @param openAction int
 	 * @param accessMode int
 	 * @param fileAttr int
+	 * @param pid int
 	 */
-	public FileOpenParams(String path, int openAction, int accessMode, int fileAttr) {
+	public FileOpenParams(String path, int openAction, int accessMode, int fileAttr, int pid) {
 		
 		//	Parse the file path, split into file name and stream if specified
 		
@@ -139,6 +148,7 @@ public class FileOpenParams {
 		m_openAction = convertToNTOpenAction(openAction);
 		m_accessMode = convertToNTAccessMode(accessMode);
 		m_attr       = fileAttr;
+		m_pid        = pid;
 		
 		//	Check if the diectory attribute is set
 		
@@ -160,8 +170,9 @@ public class FileOpenParams {
 	 * @param gid int
 	 * @param uid int
 	 * @param mode int
+	 * @param pid int
 	 */
-	public FileOpenParams(String path, int openAction, int accessMode, int fileAttr, int gid, int uid, int mode) {
+	public FileOpenParams(String path, int openAction, int accessMode, int fileAttr, int gid, int uid, int mode, int pid) {
 		
 		//	Parse the file path, split into file name and stream if specified
 		
@@ -170,6 +181,7 @@ public class FileOpenParams {
 		m_openAction = convertToNTOpenAction(openAction);
 		m_accessMode = convertToNTAccessMode(accessMode);
 		m_attr       = fileAttr;
+		m_pid        = pid;
 		
 		//	Check if the diectory attribute is set
 		
@@ -195,20 +207,22 @@ public class FileOpenParams {
 	 * @param fileAttr int
 	 * @param allocSize int
 	 * @param createDate long
+	 * @param pid int
 	 */
 	public FileOpenParams(String path, int openAction, int accessMode, int searchAttr, int fileAttr,
-											  int allocSize, long createDate) {
+											  int allocSize, long createDate, int pid) {
 		
 		//	Parse the file path, split into file name and stream if specified
 		
 		parseFileName(path);
 		
 		m_openAction   = convertToNTOpenAction(openAction);
-		m_accessMode	 = convertToNTAccessMode(accessMode);
-		m_attr 		 		 = fileAttr;
+		m_accessMode   = convertToNTAccessMode(accessMode);
+		m_attr 		   = fileAttr;
 		m_sharedAccess = convertToNTSharedMode(accessMode);
-		m_allocSize 	 = allocSize;
+		m_allocSize    = allocSize;
 		m_createDate   = createDate;
+		m_pid          = pid;
 
 		//	Check if the diectory attribute is set
 		
@@ -233,23 +247,25 @@ public class FileOpenParams {
 	 * @param rootFID int
 	 * @param secLevel int
 	 * @param secFlags int
+	 * @param pid int
 	 */
 	public FileOpenParams(String path, int openAction, int accessMode, int attr, int sharedAccess, long allocSize,
-												int createOption, int rootFID, int secLevel, int secFlags) {
+												int createOption, int rootFID, int secLevel, int secFlags, int pid) {
 
 		//	Parse the file path, split into file name and stream if specified
 
 		parseFileName(path);
 		
 		m_openAction    = openAction;
-		m_accessMode	  = accessMode;
-		m_attr 		 		  = attr;
+		m_accessMode	= accessMode;
+		m_attr 		 	= attr;
 		m_sharedAccess  = sharedAccess;
-		m_allocSize 	  = allocSize;
+		m_allocSize 	= allocSize;
 		m_createOptions = createOption;
 		m_rootFID       = rootFID;
 		m_secLevel      = secLevel;
 		m_secFlags      = secFlags;
+		m_pid           = pid;
 		
 		//	Make sure the directory attribute is set if the create directory option is set
 		
@@ -325,6 +341,15 @@ public class FileOpenParams {
 	public final int getOpenAction() {
 		return m_openAction;
 	}
+
+	/**
+	 * Return the process id
+	 * 
+	 * @return int
+	 */
+	public final int getProcessId() {
+		return m_pid;
+	}
 	
 	/**
 	 * Return the root directory file id, or zero if not specified
@@ -369,7 +394,11 @@ public class FileOpenParams {
 	 * @return boolean
 	 */
 	public final boolean isReadOnlyAccess() {
-		return (m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTRead ? true : false;
+		if (( m_accessMode & AccessMode.NTFileWriteCheck) == 0 &&
+			( m_accessMode & AccessMode.NTFileReadCheck)  != 0)
+			return true;
+		return false;
+//		return (m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTRead ? true : false;
 	}
 	
 	/**
@@ -378,7 +407,11 @@ public class FileOpenParams {
 	 * @return boolean
 	 */
 	public final boolean isWriteOnlyAccess() {
-		return (m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTWrite ? true : false;
+		if (( m_accessMode & AccessMode.NTFileWriteCheck) != 0 &&
+			( m_accessMode & AccessMode.NTFileReadCheck) == 0)
+				return true;
+			return false;
+//		return (m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTWrite ? true : false;
 	}
 	
 	/**
@@ -387,7 +420,11 @@ public class FileOpenParams {
 	 * @return boolean
 	 */
 	public final boolean isReadWriteAccess() {
-		return (m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTReadWrite ? true : false;
+		if (( m_accessMode & AccessMode.NTFileWriteCheck) != 0 &&
+			( m_accessMode & AccessMode.NTFileReadCheck)  != 0)
+				return true;
+			return false;
+//		return (m_accessMode & AccessMode.NTReadWrite) == AccessMode.NTReadWrite ? true : false;
 	}
 	
   /**
@@ -574,6 +611,33 @@ public class FileOpenParams {
 		return m_mode;
 	}
 
+	/**
+	 * Check if a batch oplock was requested
+	 * 
+	 * @return boolean
+	 */
+	public final boolean requestBatchOpLock() {
+		return (m_createFlags & WinNT.RequestBatchOplock) != 0 ? true : false;
+	}
+	
+	/**
+	 * Check if an exclusive oplock was requested
+	 * 
+	 * @return boolean
+	 */
+	public final boolean requestExclusiveOpLock() {
+		return (m_createFlags & WinNT.RequestOplock) != 0 ? true : false;
+	}
+	
+	/**
+	 * Check if an extended response was requested
+	 * 
+	 * @return boolean
+	 */
+	public final boolean requestExtendedResponse() {
+		return (m_createFlags & WinNT.ExtendedResponse) != 0 ? true : false;
+	}
+	
   /**
    * Determine if the session has been set
    * 
@@ -622,6 +686,15 @@ public class FileOpenParams {
 	  m_createOptions = m_createOptions | flag;
 	}
 
+	/**
+	 * Set the NTCreateAndX createFlags
+	 * 
+	 * @param createFlags int
+	 */
+	public final void setNTCreateFlags(int createFlags) {
+		m_createFlags = createFlags;
+	}
+	
   /**
    * Set the session that is making the open/create request
    * 
@@ -765,6 +838,8 @@ public class FileOpenParams {
 		str.append(getAllocationSize());
 		str.append(",share=0x");
 		str.append(Integer.toHexString(getSharedAccess()));
+		str.append(",pid=");
+		str.append(getProcessId());
 		
 		if ( getRootDirectoryFID() != 0) {
 			str.append(",fid=");
@@ -795,11 +870,20 @@ public class FileOpenParams {
 			str.append(getUid());
 		}
     
-    if ( getMode() != -1) {
-      str.append(",mode=0");
-      str.append(Integer.toOctalString(getMode()));       
-    }
-    str.append("]");
+	    if ( getMode() != -1) {
+	      str.append(",mode=0");
+	      str.append(Integer.toOctalString(getMode()));       
+	    }
+	    
+	    if ( m_createFlags != 0) {
+	    	if ( requestBatchOpLock())
+	    		str.append(",BatchOpLck");
+	    	if ( requestExclusiveOpLock())
+	    		str.append(",ExOpLck");
+	    	if ( requestExtendedResponse())
+	    		str.append(",ExtResp");
+	    }
+	    str.append("]");
     
 		return str.toString();
 	}

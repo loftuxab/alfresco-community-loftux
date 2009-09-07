@@ -643,7 +643,7 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
       //	causes an exception to be thrown.
 
       if (hasShutdown() == false) {
-        Debug.println("[FTP] FTP Socket error : " + ex.toString());
+        Debug.println("[FTP] FTP Socket error : " + ex.toString(), Debug.Error);
       	Debug.println(ex);
       	
       	//	Inform listeners of the error, store the exception
@@ -658,7 +658,7 @@ public class FTPServer extends NetworkFileServer implements Runnable, Configurat
       //	causes an exception to be thrown.
 
 			if ( hasShutdown() == false) {
-        Debug.println("[FTP] FTP Server error : " + ex.toString());
+        Debug.println("[FTP] FTP Server error : " + ex.toString(), Debug.Error);
         Debug.println(ex);
 			}
       	

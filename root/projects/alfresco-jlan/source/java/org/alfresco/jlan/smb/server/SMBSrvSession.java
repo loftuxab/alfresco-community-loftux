@@ -311,6 +311,15 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 	}
 
 	/**
+	 * Return the active virtual circuit count
+	 * 
+	 * @return int
+	 */
+	public final int numberOfVirtualCircuits() {
+		return (m_vcircuits != null ? m_vcircuits.getCircuitCount() : 0);
+	}
+	
+	/**
 	 * Cleanup any resources owned by this session, close virtual circuits and change notification
 	 * requests.
 	 */
@@ -367,7 +376,8 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 				// list
 
 				NotifyRequest curReq = m_notifyList.getRequest(i);
-				curReq.getDiskContext().getChangeHandler().removeNotifyRequests(this);
+				if ( curReq.getDiskContext().hasChangeHandler())
+					curReq.getDiskContext().getChangeHandler().removeNotifyRequests(this);
 			}
 		}
 
@@ -405,20 +415,23 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 	 */
 	public final void closeSession() {
 
+		// Cleanup the session (open files/virtual circuits/searches)
+		
+		cleanupSession();
+		
 		// Call the base class
 
 		super.closeSession();
 
 		try {
 
-			// Set the session into a hangup state and indicate that we have shutdown the session
+			// Set the session into a hangup state
 
 			setState(SMBSrvSessionState.NBHANGUP);
-			setShutdown(true);
 
-			// Close the packet handler
-
-			m_pktHandler.closeHandler();
+			// Close the socket
+			
+			closeSocket();
 		}
 		catch (Exception ex) {
 		}
@@ -624,7 +637,7 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 
 		// Debug
 
-		if ( Debug.EnableInfo && hasDebug(DBG_NETBIOS)) {
+		if ( Debug.EnableInfo && hasDebug(DBG_STATE)) {
 			debugPrint("## Session closing. ");
 			debugPrintln(reason);
 		}
@@ -782,8 +795,17 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 
 		// Check if the received packet contains enough data for a NetBIOS session request packet.
 
-		if ( smbPkt.getReceivedLength() < RFCNetBIOSProtocol.SESSREQ_LEN || smbPkt.getHeaderType() != RFCNetBIOSProtocol.SESSION_REQUEST)
-			throw new NetBIOSException("NBREQ Invalid packet");
+		if ( smbPkt.getReceivedLength() < RFCNetBIOSProtocol.SESSREQ_LEN || smbPkt.getHeaderType() != RFCNetBIOSProtocol.SESSION_REQUEST) {
+			
+			// Debug
+			
+			if ( Debug.EnableInfo && hasDebug(DBG_NETBIOS)) {
+				Debug.println("NBREQ invalid packet len=" + smbPkt.getReceivedLength() + ", header=0x" + Integer.toHexString(smbPkt.getHeaderType()));
+				HexDump.Dump( smbPkt.getBuffer(), smbPkt.getReceivedLength(), 0, Debug.getDebugInterface());
+			}
+		
+			throw new NetBIOSException("NBREQ Invalid packet len=" + smbPkt.getReceivedLength());
+		}
 
 		// Do a few sanity checks on the received packet
 
@@ -868,6 +890,10 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 		m_callerNBName = fromName;
 		m_targetNBName = toName;
 
+		// Move the session to the SMB negotiate state
+
+		setState(SMBSrvSessionState.SMBNEGOTIATE);
+		
 		// Set the remote client name
 
 		setRemoteName(fromName);
@@ -881,10 +907,6 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 		// Output the NetBIOS session accept packet
 
 		m_pktHandler.writePacket( smbPkt, 4, true);
-
-		// Move the session to the SMB negotiate state
-
-		setState(SMBSrvSessionState.SMBNEGOTIATE);
 	}
 
 	/**
@@ -1309,7 +1331,6 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 			
 			// Cleanup the session, then close the session/socket
 			
-			cleanupSession();
 			closeSession();
 		}
 		catch (Exception ex) {
@@ -1452,7 +1473,7 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 								long duration = endTime - startTime;
 								if ( duration > 20)
 									debugPrintln("Processed packet " + PacketType.getCommandName( smbPkt.getCommand()) + " (0x"
-											+ Integer.toHexString( smbPkt.getCommand()) + ") in " + duration + "ms");
+											+ Integer.toHexString( smbPkt.getCommand()) + ") in " + duration + "ms, MID=" + smbPkt.getMultiplexId());
 							}
 							break;
 					}
@@ -1535,6 +1556,11 @@ public class SMBSrvSession extends SrvSession implements Runnable {
 	
 			getSMBServer().sessionClosed(this);
 		}
+		
+		// Clear any user context
+		
+		if ( hasClientInformation())
+			getSMBServer().getCifsAuthenticator().setCurrentUser( null);
 	}
 	
 	/**
