@@ -1,9 +1,7 @@
 <webscript>
   <shortname>Add a Custom Property Definition to the custom model</shortname>
   <description><![CDATA[
-  Adds a custom property definition to the custom model. If the property definition is<br/>
-  for an already existing property, it may not be possible to apply the changes. If there<br/>
-  are already instances of the property, it may not be possible to change the model.<br/>
+  Adds a custom property definition to the custom model.<br/>
   <br/>
   The URL query parameter 'element' should have one of the following values:</br>
   'recordSeries', 'recordCategory', 'recordFolder' or 'record'.<br/>
@@ -12,8 +10,9 @@
   {<br/>
   &nbsp;&nbsp;&nbsp;"name" : "sampleCustomProperty",<br/>
   &nbsp;&nbsp;&nbsp;"dataType" : "d:boolean",<br/>
-  &nbsp;&nbsp;&nbsp;etc.<br/>
+  &nbsp;&nbsp;&nbsp;"mandatory" : false<br/>
   }<br/>
+  A value for "title" should not be provided.
   ]]>
   </description>
   <url>/api/rma/admin/custompropertydefinitions?element={element}</url>

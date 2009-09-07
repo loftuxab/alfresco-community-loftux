@@ -519,7 +519,6 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         String jsonString = new JSONStringer().object()
             .key("name").value(propertyName)
-            .key("title").value("Custom test property")
             .key("description").value("Dynamically defined test property")
             .key("mandatory").value(false)
             .key("dataType").value(DataTypeDefinition.BOOLEAN)
