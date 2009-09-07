@@ -107,7 +107,6 @@ public class RemoteClient extends AbstractClient
     public static final int SC_TEMPORARY_REDIRECT = 307;
 
     private static final int MAX_REDIRECTS = 10;
-    
 
 
     /**
@@ -225,7 +224,6 @@ public class RemoteClient extends AbstractClient
         this.requestProperties = requestProperties;
     }    
 
-    
     /**
      * Provides a set of cookies for state transfer. This set of cookies is maintained through any redirects followed by
      * the client (e.g. redirect through SSO host).
@@ -237,14 +235,12 @@ public class RemoteClient extends AbstractClient
         this.cookies = cookies;
     }
     
-    
     /**
      * Gets the current set of cookies for state transfer. This set of cookies is maintained through any redirects
      * followed by the client (e.g. redirect through SSO host).
      * 
      * @return the cookies
      */
-
     public Map<String, String> getCookies()
     {
         return this.cookies;
@@ -464,7 +460,6 @@ public class RemoteClient extends AbstractClient
         return result;
     }
 
-
     /**
      * Pre-processes the response, propagating cookies and deciding whether a redirect is required
      * 
@@ -505,11 +500,11 @@ public class RemoteClient extends AbstractClient
             {
                 switch (method.getStatusCode())
                 {
-                case RemoteClient.SC_MOVED_TEMPORARILY:
-                case RemoteClient.SC_MOVED_PERMANENTLY:
-                case RemoteClient.SC_SEE_OTHER:
-                case RemoteClient.SC_TEMPORARY_REDIRECT:
-                    redirectLocation = header.getValue();
+                    case RemoteClient.SC_MOVED_TEMPORARILY:
+                    case RemoteClient.SC_MOVED_PERMANENTLY:
+                    case RemoteClient.SC_SEE_OTHER:
+                    case RemoteClient.SC_TEMPORARY_REDIRECT:
+                        redirectLocation = header.getValue();
                 }
             }
         }
@@ -622,22 +617,22 @@ public class RemoteClient extends AbstractClient
 
                 switch (this.requestMethod)
                 {
-                default:
-                case GET:
-                    method = new GetMethod(redirectURL.toString());
-                    break;
-                case PUT:
-                    method = new PutMethod(redirectURL.toString());
-                    break;
-                case POST:
-                    method = new PostMethod(redirectURL.toString());
-                    break;
-                case DELETE:
-                    method = new DeleteMethod(redirectURL.toString());
-                    break;
-                case HEAD:
-                    method = new HeadMethod(redirectURL.toString());
-                    break;
+                    default:
+                    case GET:
+                        method = new GetMethod(redirectURL.toString());
+                        break;
+                    case PUT:
+                        method = new PutMethod(redirectURL.toString());
+                        break;
+                    case POST:
+                        method = new PostMethod(redirectURL.toString());
+                        break;
+                    case DELETE:
+                        method = new DeleteMethod(redirectURL.toString());
+                        break;
+                    case HEAD:
+                        method = new HeadMethod(redirectURL.toString());
+                        break;
                 }
                 
                 // Switch off automatic redirect handling as we want to process them ourselves and maintain cookies
@@ -749,7 +744,6 @@ public class RemoteClient extends AbstractClient
             }
             while (redirectURL != null && ++retries < maxRetries);
             
-
             // proxy over if required
             if (res != null)
             {
