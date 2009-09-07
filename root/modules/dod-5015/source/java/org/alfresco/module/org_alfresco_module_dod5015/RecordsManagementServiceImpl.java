@@ -89,6 +89,9 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     /** Application context */
     private ApplicationContext applicationContext;
     
+    /** Disposition selection strategy */
+    private DispositionSelectionStrategy dispositionSelectionStrategy;
+    
     /**
      * Set the service registry service
      * 
@@ -129,6 +132,16 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     public void setRmActionService(RecordsManagementActionService rmActionService)
     {
         this.rmActionService = rmActionService;
+    }
+
+    /**
+     * Set the dispositionSelectionStrategy bean.
+     * @param dispositionSelectionStrategy
+     */
+    public void setDispositionSelectionStrategy(
+            DispositionSelectionStrategy dispositionSelectionStrategy)
+    {
+        this.dispositionSelectionStrategy = dispositionSelectionStrategy;
     }
 
     /**
@@ -441,21 +454,21 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         {
             // Get the record folders for the record
             List<NodeRef> recordFolders = getRecordFolders(nodeRef);
-            List<NodeRef> diNodeRefs = new ArrayList<NodeRef>(recordFolders.size());
+            List<NodeRef> folderDispInstrucs = new ArrayList<NodeRef>(recordFolders.size());
             for (NodeRef recordFolder : recordFolders)
             {
                 // Get the disposition instructions for each folder
                 NodeRef folderDispInstruc = getDispositionInstructionsImpl(recordFolder);
                 if (folderDispInstruc != null)
                 {
-                    diNodeRefs.add(folderDispInstruc);
+                    folderDispInstrucs.add(folderDispInstruc);
                 }
             }
-            if (diNodeRefs.size() != 0)
+            if (folderDispInstrucs.size() != 0)
             {
-                    // TODO figure out which disposition instruction object is most relevant
-                    //      for now just take the first!
-                diNodeRef = diNodeRefs.get(0);
+                // At this point, we may have disposition instruction objects from some
+                // or all of the folders.
+                diNodeRef = dispositionSelectionStrategy.selectDispositionScheduleFrom(folderDispInstrucs);
             }
         }
         else

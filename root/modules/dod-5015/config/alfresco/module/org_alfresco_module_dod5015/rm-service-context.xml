@@ -7,6 +7,13 @@
 
     <bean id="RecordsManagementServiceRegistry" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistryImpl" />    
     
+    <!-- Disposition selection strategy -->
+    <bean id="org_alfresco_module_dod5015_dispositionSelectionStrategy"
+          class="org.alfresco.module.org_alfresco_module_dod5015.DispositionSelectionStrategy" >        
+        <property name="recordsManagementServiceRegistry" ref="RecordsManagementServiceRegistry"/>
+        <property name="nodeService" ref="nodeService"/>
+    </bean>
+
     <!-- Records Management Service -->
     
     <bean id="recordsManagementService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceImpl"
@@ -15,6 +22,9 @@
         <property name="rmActionService" ref="recordsManagementActionService"/>
         <property name="nodeService" ref="nodeService"/>
         <property name="policyComponent" ref="policyComponent"/>
+        <property name="dispositionSelectionStrategy">
+           <ref local="org_alfresco_module_dod5015_dispositionSelectionStrategy" />
+        </property>
     </bean>
     
     <bean id="RecordsManagementService" class="org.springframework.aop.framework.ProxyFactoryBean">
