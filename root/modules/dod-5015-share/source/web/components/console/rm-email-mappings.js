@@ -547,7 +547,7 @@ Alfresco.RM = Alfresco.RM || {};
                },
                scope: this
             },
-            failureMessage: Alfresco.util.message("message.loadFailure", this.name)
+            failureMessage: Alfresco.util.message("message.loadFailure", "Alfresco.RM.EmailMappings")
          });
       },
       /**
@@ -608,7 +608,7 @@ Alfresco.RM = Alfresco.RM || {};
               },
               scope: this
            },
-           failureMessage: Alfresco.util.message("message.saveFailure", this.name)
+           failureMessage: Alfresco.util.message("message.saveFailure", "Alfresco.RM.EmailMappings")
          });
         
       },
