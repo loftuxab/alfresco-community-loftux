@@ -109,6 +109,18 @@ public class NotifyOfRecordsDueForReviewJob implements Job
                         {
                             //TODO Send notification for these nodes and set rma:notificationIssued to true
                             
+                            // Here's what I need to do.
+                            // I need to call actionService.createAction("mail") which will give me
+                            // a MailActionExecutor object. Then I may need to configure that object?
+                            // Then actionService.execute?
+                            // Also: to test, I'll need to configure custom-repository.properties
+                            // to have the following:
+//                            mail.host=zimbra.alfresco.com
+//                            mail.port=25
+//                            mail.username=rwetherall
+//                            mail.password=pwd
+                            // in it.
+                            
                             //TODO Perhaps we should roll up the notification message to list
                             // all parent folders.
                             return Boolean.TRUE;
