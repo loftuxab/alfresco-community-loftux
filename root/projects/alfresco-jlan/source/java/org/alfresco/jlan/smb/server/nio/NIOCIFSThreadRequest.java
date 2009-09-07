@@ -80,9 +80,14 @@ public class NIOCIFSThreadRequest implements ThreadRequest {
 				PacketHandler pktHandler = m_sess.getPacketHandler();
 				smbPkt = pktHandler.readPacket();
 				
-				// If the request paket is not valid then close the session
+				// If the request packet is not valid then close the session
 				
 				if ( smbPkt == null) {
+					
+					// DEBUG
+					
+					if ( Debug.EnableInfo && m_sess.hasDebug( SMBSrvSession.DBG_SOCKET))
+						Debug.println("Received null packet, closing session sess=" + m_sess.getUniqueId() + ", addr=" + m_sess.getRemoteAddress().getHostAddress());
 					
 					// Close the session
 					
@@ -100,7 +105,7 @@ public class NIOCIFSThreadRequest implements ThreadRequest {
 					
 					m_selectionKey.interestOps( m_selectionKey.interestOps() | SelectionKey.OP_READ);
 					m_selectionKey.selector().wakeup();
-				
+					
 					// Process the CIFS request
 					
 					m_sess.processPacket( smbPkt);

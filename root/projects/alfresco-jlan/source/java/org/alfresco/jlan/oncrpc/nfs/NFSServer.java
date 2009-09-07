@@ -1818,7 +1818,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
         //	Create a new file
 
-        FileOpenParams params = new FileOpenParams(filePath, FileAction.CreateNotExist, AccessMode.ReadWrite, 0, gid, uid, mode);
+        FileOpenParams params = new FileOpenParams(filePath, FileAction.CreateNotExist, AccessMode.ReadWrite, 0, gid, uid, mode, 0);
         NetworkFile netFile = disk.createFile(sess, conn, params);
 
         //  DEBUG
@@ -2006,7 +2006,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 				//	Directory creation parameters
 			
 				FileOpenParams params = new FileOpenParams(dirPath, FileAction.CreateNotExist, AccessMode.ReadWrite,
-																									 FileAttribute.NTDirectory, gid, uid, mode);
+																									 FileAttribute.NTDirectory, gid, uid, mode, 0);
 
 				//	Create a new directory
 				
@@ -2275,7 +2275,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
         //  Create a new symbolic
 
-        FileOpenParams params = new FileOpenParams(filePath, FileAction.CreateNotExist, AccessMode.ReadWrite, 0, gid, uid, mode);
+        FileOpenParams params = new FileOpenParams(filePath, FileAction.CreateNotExist, AccessMode.ReadWrite, 0, gid, uid, mode, 0);
         params.setSymbolicLink( linkName);
         
         NetworkFile netFile = disk.createFile(sess, conn, params);
@@ -4576,7 +4576,7 @@ public class NFSServer extends RpcNetworkServer implements RpcProcessor {
 
           //	Open the network file
 
-          FileOpenParams params = new FileOpenParams(path, FileAction.OpenIfExists, AccessMode.ReadWrite, 0);
+          FileOpenParams params = new FileOpenParams(path, FileAction.OpenIfExists, AccessMode.ReadWrite, 0, 0);
           file = disk.openFile(sess, conn, params);
 
           //	Add the file to the active file cache

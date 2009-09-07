@@ -95,6 +95,16 @@ public final class Debug {
 	}
 
 	/**
+	 * Output a debug string.
+	 *
+	 * @param str String
+	 * @param level int
+	 */
+	public static final void print(String str, int level) {
+		m_debug.debugPrint(str, level);
+	}
+
+	/**
 	 * Output a debug string, and a newline.
 	 *
 	 * @param str java.lang.String
@@ -104,11 +114,31 @@ public final class Debug {
 	}
 	
 	/**
+	 * Output a debug string, and a newline.
+	 *
+	 * @param str String
+	 * @param level int
+	 */
+	public static final void println(String str, int level) {
+		m_debug.debugPrintln(str, level);
+	}
+	
+	/**
 	 * Output an exception trace to the debug device
 	 *
 	 * @param ex Exception
 	 */
-	public static final void println(Exception ex) {			
+	public static final void println(Exception ex) {
+		println(ex, Error);
+	}
+	
+	/**
+	 * Output an exception trace to the debug device
+	 *
+	 * @param ex Exception
+	 * @param level int
+	 */
+	public static final void println(Exception ex, int level) {			
 
 		//	Write the exception stack trace records to an in-memory stream
 				
@@ -120,7 +150,7 @@ public final class Debug {
 		StringTokenizer strTok = new StringTokenizer(strWrt.toString(), LineSeperator);
 				
 		while ( strTok.hasMoreTokens())
-			m_debug.debugPrintln(strTok.nextToken());
+			m_debug.debugPrintln(strTok.nextToken(), level);
 	}
 
 	/**
@@ -128,7 +158,17 @@ public final class Debug {
 	 *
 	 * @param ex Throwable
 	 */
-	public static final void println(Throwable ex) {			
+	public static final void println(Throwable ex) {
+		println(ex, Error);
+	}
+	
+	/**
+	 * Output an exception trace to the debug device
+	 *
+	 * @param ex Throwable
+	 * @param level int
+	 */
+	public static final void println(Throwable ex, int level) {			
 
 		//	Write the exception stack trace records to an in-memory stream
 				
@@ -140,6 +180,6 @@ public final class Debug {
 		StringTokenizer strTok = new StringTokenizer(strWrt.toString(), LineSeperator);
 				
 		while ( strTok.hasMoreTokens())
-			m_debug.debugPrintln(strTok.nextToken());
+			m_debug.debugPrintln(strTok.nextToken(), level);
 	}
 }

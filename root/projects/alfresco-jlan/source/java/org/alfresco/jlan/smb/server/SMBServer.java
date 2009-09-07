@@ -546,7 +546,7 @@ public class SMBServer extends NetworkFileServer implements Runnable, Configurat
 			// causes an exception to be thrown.
 
 			if ( hasShutdown() == false) {
-				Debug.println("[SMB] Server error : " + ex.toString());
+				Debug.println("[SMB] Server error : " + ex.toString(), Debug.Error);
 				Debug.println(ex);
 
 				// Store the error, fire a server error event
@@ -597,6 +597,21 @@ public class SMBServer extends NetworkFileServer implements Runnable, Configurat
 
 		m_sessions.removeSession(sess);
 
+		// DEBUG
+		
+		if ( hasDebug()) {
+			Debug.println("[SMB] Closed session " + sess.getSessionId() + ", sessions=" + m_sessions.numberOfSessions());
+			if ( m_sessions.numberOfSessions() > 0 && m_sessions.numberOfSessions() <= 10) {
+				Enumeration<Integer> sessIds = m_sessions.enumerate();
+				Debug.print("      Active sessions [");
+				while ( sessIds.hasMoreElements()) {
+					SMBSrvSession curSess = (SMBSrvSession) m_sessions.findSession( sessIds.nextElement());
+					Debug.print("" + curSess.getSessionId() + "=" + curSess.getRemoteAddress().getHostAddress() + ",");
+				}
+				Debug.println("]");
+			}
+		}
+		
 		// Notify session listeners that a session has been closed
 
 		fireSessionClosedEvent(sess);
@@ -762,6 +777,10 @@ public class SMBServer extends NetworkFileServer implements Runnable, Configurat
 
 			case ConfigId.SMBSessionDebug:
 				sts = ConfigurationListener.StsNewSessionsOnly;
+				if ( newVal instanceof Integer) {
+					Integer dbgVal = (Integer) newVal;
+					setDebug( dbgVal.intValue() != 0 ? true : false);
+				}
 				break;
 
 			// Changes that require a restart

@@ -101,6 +101,10 @@ public class NIOCifsConnectionsHandler implements CifsConnectionsHandler, Reques
 	
 	private boolean m_debug;
 	
+	// Thread pool debug
+	
+	private boolean m_threadDebug;
+	
 	/**
 	 * Idle Session Reaper Thread Class
 	 * 
@@ -236,6 +240,11 @@ public class NIOCifsConnectionsHandler implements CifsConnectionsHandler, Reques
 		if ( (config.getSessionDebugFlags() & SMBSrvSession.DBG_SOCKET) != 0)
 			m_debug = true;
 
+		// Check if thread pool debug is enabled
+		
+		if ( (config.getSessionDebugFlags() & SMBSrvSession.DBG_THREADPOOL) != 0)
+			m_threadDebug = true;
+		
 		// Create the native SMB/port 445 session handler, if enabled
 		
 		if ( config.hasTcpipSMB()) {
@@ -291,6 +300,7 @@ public class NIOCifsConnectionsHandler implements CifsConnectionsHandler, Reques
 
 		m_requestHandlers = new Vector<CIFSRequestHandler>();
 		CIFSRequestHandler reqHandler = new CIFSRequestHandler( m_server.getThreadPool(), SessionSocketsPerHandler, m_clientSocketTimeout, hasDebug());
+		reqHandler.setThreadDebug( m_threadDebug);
 		reqHandler.setListener( this);
 		
 		m_requestHandlers.add( reqHandler); 
@@ -540,6 +550,7 @@ public class NIOCifsConnectionsHandler implements CifsConnectionsHandler, Reques
 				// Create a new session request handler and add to the head of the list
 				
 				reqHandler = new CIFSRequestHandler( m_server.getThreadPool(), SessionSocketsPerHandler, m_clientSocketTimeout, hasDebug());
+				reqHandler.setThreadDebug( m_threadDebug);
 				reqHandler.setListener( this);
 				
 				m_requestHandlers.add( 0, reqHandler);

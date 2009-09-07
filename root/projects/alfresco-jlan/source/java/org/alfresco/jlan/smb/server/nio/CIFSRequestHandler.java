@@ -186,6 +186,15 @@ public class CIFSRequestHandler extends RequestHandler implements Runnable {
 	}
 	
 	/**
+	 * Enable/disable thread pool debugging
+	 * 
+	 * @param dbg boolean
+	 */
+	public final void setThreadDebug( boolean dbg) {
+		m_threadPool.setDebug( dbg);
+	}
+	
+	/**
 	 * Run the main processing in a seperate thread
 	 */
 	public void run() {
@@ -281,7 +290,7 @@ public class CIFSRequestHandler extends RequestHandler implements Runnable {
 			
 				// DEBUG
 				
-//				if ( Debug.EnableInfo && hasDebug() && sessCnt > 1)
+//				if ( Debug.EnableInfo && hasDebug()) // && sessCnt > 1)
 //					Debug.println( "[SMB] Request handler " + m_thread.getName() + " session events, sessCnt=" + sessCnt + "/" + m_selector.keys().size());
 
 				// Clear the thread request list
@@ -313,6 +322,11 @@ public class CIFSRequestHandler extends RequestHandler implements Runnable {
 							Debug.println( "[SMB] NIO Selection key not valid, sess=" + selKey.attachment());
 					}
 					else if ( selKey.isReadable()) {
+						
+						// DEBUG
+						
+//						if ( Debug.EnableInfo && hasDebug())
+//							Debug.println("[SMB] Socket read event");
 						
 						// Switch off read events for this channel until the current processing is complete
 						
@@ -535,7 +549,7 @@ public class CIFSRequestHandler extends RequestHandler implements Runnable {
 					// DEBUG
 					
 					if ( Debug.EnableInfo && hasDebug())
-						Debug.println( "[SMB] Closing idle session, " + sess.getUniqueId());
+						Debug.println( "[SMB] Closing idle session, " + sess.getUniqueId() + ", addr=" + sess.getRemoteAddress().getHostAddress());
 					
 					// Close the session
 					

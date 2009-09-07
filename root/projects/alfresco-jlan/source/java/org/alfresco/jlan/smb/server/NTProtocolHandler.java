@@ -43,6 +43,7 @@ import org.alfresco.jlan.server.core.InvalidDeviceInterfaceException;
 import org.alfresco.jlan.server.core.ShareType;
 import org.alfresco.jlan.server.core.SharedDevice;
 import org.alfresco.jlan.server.filesys.AccessDeniedException;
+import org.alfresco.jlan.server.filesys.AccessMode;
 import org.alfresco.jlan.server.filesys.DirectoryNotEmptyException;
 import org.alfresco.jlan.server.filesys.DiskDeviceContext;
 import org.alfresco.jlan.server.filesys.DiskFullException;
@@ -124,7 +125,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 	// Flag to enable faking of oplock requests when opening files
 
-	public static final boolean FakeOpLocks = true;
+	public static final boolean FakeOpLocks = false;
 
 	// Number of write requests per file to report file size change notifications
 
@@ -2095,7 +2096,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// DEBUG
 
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_NEGOTIATE))
-			Debug.println("[SMB] Logoff vc=" + vc);
+			Debug.println("[SMB] LogoffAndX vc=" + vc);
 
 		// Mark the virtual circuit as logged off
 
@@ -2118,6 +2119,20 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Return a success status SMB
 
 		m_sess.sendSuccessResponseSMB( smbPkt);
+		
+		// If there are no active virtual circuits then close the session/socket
+		
+		if ( m_sess.numberOfVirtualCircuits() == 0) {
+			
+			// DEBUG
+			
+			if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_NEGOTIATE))
+				Debug.println("  Closing session, no more virtual circuits");
+			
+			// Close the session/socket
+			
+			m_sess.hangupSession( "Client logoff");
+		}
 	}
 
 	/**
@@ -2209,13 +2224,20 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		if ( crTime > 0 && crDate > 0)
 			crDateTime = new SMBDate(crDate, crTime).getTime();
 
-		FileOpenParams params = new FileOpenParams(fileName, openFunc, access, srchAttr, fileAttr, allocSiz, crDateTime);
+		FileOpenParams params = new FileOpenParams(fileName, openFunc, access, srchAttr, fileAttr, allocSiz, crDateTime, smbPkt.getProcessIdFull());
 
 		// Debug
 
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE))
 			m_sess.debugPrintln("File Open AndX [" + treeId + "] params=" + params);
 
+        // Check if the file name is valid
+        
+        if ( isValidPath( params.getPath()) == false) {
+            m_sess.sendErrorResponseSMB(smbPkt, SMBStatus.NTObjectNameInvalid, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
+            return;
+        }
+        
 		// Access the disk interface and open the requested file
 
 		int fid;
@@ -2693,6 +2715,18 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE))
 			m_sess.debugPrintln("File Rename [" + treeId + "] old name=" + oldName + ", new name=" + newName);
 
+        // Check if the from/to paths are valid
+        
+        if ( isValidPath( oldName) == false) {
+            m_sess.sendErrorResponseSMB(smbPkt, SMBStatus.NTObjectNameInvalid, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
+            return;
+        }
+        
+        if ( isValidPath( newName) == false) {
+            m_sess.sendErrorResponseSMB(smbPkt, SMBStatus.NTObjectNameInvalid, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
+            return;
+        }
+
 		// Access the disk interface and rename the requested file
 
 		int fid;
@@ -3118,6 +3152,13 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 				m_sess.debugPrintln("Converted Unicode wildcards to:" + srchPath);
 		}
 
+        // Check if the search path is valid
+        
+        if ( isValidSearchPath( srchPath) == false) {
+            m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTObjectNameInvalid, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
+            return;
+        }
+        
 		// Check if the search path is valid
 
 		if ( srchPath == null || srchPath.length() == 0) {
@@ -3199,8 +3240,8 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 				// Deallocate the search
 
-//				if ( searchId != -1)
-//					vc.deallocateSearchSlot(searchId);
+				if ( searchId != -1)
+					vc.deallocateSearchSlot(searchId);
 
 				// Failed to start the search, return a no more files error
 
@@ -4540,6 +4581,10 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 					setFlags += FileInfo.SetAttributes;
 				}
 
+				// Store the associated network file in the file information object
+				
+				finfo.setNetworkFile(netFile);
+				
 				// Set the file information for the specified file/directory
 
 				finfo.setFileInformationFlags(setFlags);
@@ -4839,6 +4884,13 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_INFO))
 			m_sess.debugPrintln("Set Path - path=" + path + ", level=0x" + Integer.toHexString(infoLevl));
 
+        // Check if the file name is valid
+        
+        if ( isValidPath( path) == false) {
+            m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTObjectNameInvalid, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
+            return;
+        }
+        
 		// Access the shared device disk interface
 
 		try {
@@ -5452,13 +5504,24 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Create the file open parameters to be passed to the disk interface
 
 		FileOpenParams params = new FileOpenParams(fileName, createDisp, accessMask, attrib, shrAccess, allocSize, createOptn,
-				rootFID, impersonLev, secFlags);
+				rootFID, impersonLev, secFlags, smbPkt.getProcessIdFull());
+		
+		// Set the create flags, with oplock requests
+		
+		params.setNTCreateFlags( flags);
 
 		// Debug
 
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE))
 			m_sess.debugPrintln("NT Create AndX [" + treeId + "] params=" + params);
 
+        // Check if the file name is valid
+        
+        if ( isValidPath( params.getPath()) == false) {
+            m_sess.sendErrorResponseSMB(smbPkt, SMBStatus.NTObjectNameInvalid, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
+            return;
+        }
+        
 		// Access the disk interface and open the requested file
 
 		int fid;
@@ -5685,7 +5748,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		// Build the NT create andX response
 
-		boolean extendedResponse = ( flags & WinNT.ExtendedResponse) != 0;
+		boolean extendedResponse = params.requestExtendedResponse();
 		smbPkt.setParameterCount( extendedResponse ? 42 : 34);
 
 		smbPkt.setAndXCommand(0xFF);
@@ -5693,33 +5756,9 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 		prms.reset(smbPkt.getBuffer(), SMBSrvPacket.PARAMWORDS + 4);
 
-		// Check if oplocks should be faked
+		// No oplocks granted
 
-		if ( FakeOpLocks) {
-
-			// If an oplock was requested indicate it was granted, for now
-
-			if ( (flags & WinNT.RequestBatchOplock) != 0) {
-
-				// Batch oplock granted
-
-				prms.packByte(2);
-			}
-			else if ( (flags & WinNT.RequestOplock) != 0) {
-
-				// Exclusive oplock granted
-
-				prms.packByte(1);
-			}
-			else {
-
-				// No oplock granted
-
-				prms.packByte(0);
-			}
-		}
-		else
-			prms.packByte(0);
+		prms.packByte(0);
 
 		// Pack the file id
 
@@ -5771,7 +5810,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		prms.packLong(fileSize); 	// Allocation size
 		prms.packLong(netFile.getFileSize()); // End of file
 		prms.packWord(0); 			// File type - disk file
-		prms.packWord((flags & WinNT.ExtendedResponse) != 0 ? 7 : 0); // Device state
+		prms.packWord( extendedResponse ? 7 : 0); // Device state
 		prms.packByte(netFile.isDirectory() ? 1 : 0);
 
 		prms.packWord(0); // byte count = 0
@@ -5789,7 +5828,10 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 			
 			// Pack the permissions
 			
-			prms.packInt( 0x1F01FF);
+			if ( netFile.isDirectory() || netFile.getGrantedAccess() == NetworkFile.READWRITE)
+				prms.packInt( AccessMode.NTFileGenericAll);
+			else
+				prms.packInt( AccessMode.NTFileGenericRead);
 			
 			// 6 byte block of zeroes
 			
@@ -6417,7 +6459,8 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 		// Create the file open parameters to be passed to the disk interface
 
 		FileOpenParams params = new FileOpenParams(fileName, createDisp, accessMask, attrib, shrAccess, allocSize, createOptn,
-				rootFID, impersonLev, secFlags);
+				rootFID, impersonLev, secFlags, smbPkt.getProcessIdFull());
+		
 		// Debug
 
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE)) {

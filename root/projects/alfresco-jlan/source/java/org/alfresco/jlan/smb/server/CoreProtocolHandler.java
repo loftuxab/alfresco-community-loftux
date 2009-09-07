@@ -90,6 +90,11 @@ class CoreProtocolHandler extends ProtocolHandler {
 	
 	protected static final int SearchInfoLen	= 43;
 	
+    // Invalid file name characters
+    
+    private static final String InvalidFileNameChars 		= "\"/:|<>*?";
+    private static final String InvalidFileNameCharsSearch	= "\"/:|<>";
+    
 	/**
 	 * Create a new core SMB protocol handler.
 	 */
@@ -123,6 +128,46 @@ class CoreProtocolHandler extends ProtocolHandler {
 
 	}
 
+    /**
+     * Check if a path contains any illegal characters, for file/create open/create/rename/get info
+     * 
+     * @param path String
+     * @return boolean
+     */
+    protected boolean isValidPath(String path) {
+    	
+    	// Scan the path for invalid path characters
+    	
+    	for ( int i = 0; i < InvalidFileNameChars.length(); i++) {
+    		if ( path.indexOf( InvalidFileNameChars.charAt( i)) != -1)
+    			return false;
+    	}
+    	
+    	// Path looks valid
+    	
+    	return true;
+    }
+    
+    /**
+     * Check if a path contains any illegal characters, for a folder search
+     * 
+     * @param path String
+     * @return boolean
+     */
+    protected boolean isValidSearchPath(String path) {
+    	
+    	// Scan the path for invalid path characters
+    	
+    	for ( int i = 0; i < InvalidFileNameCharsSearch.length(); i++) {
+    		if ( path.indexOf( InvalidFileNameCharsSearch.charAt( i)) != -1)
+    			return false;
+    	}
+    	
+    	// Path looks valid
+    	
+    	return true;
+    }
+    
 	/**
 	 * Pack file information for a search into the specified buffer.
 	 * 
@@ -456,6 +501,13 @@ class CoreProtocolHandler extends ProtocolHandler {
 			return;
 		}
 
+        // Check if the file name is valid
+        
+        if ( isValidPath( dirName) == false) {
+            m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTObjectNameInvalid, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
+            return;
+        }
+        
 		// Debug
 
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE))
@@ -472,7 +524,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 			// Directory creation parameters
 
 			FileOpenParams params = new FileOpenParams(dirName, FileAction.CreateNotExist, AccessMode.ReadWrite,
-					FileAttribute.NTDirectory);
+					FileAttribute.NTDirectory, smbPkt.getProcessIdFull());
 
 			// Create the new directory
 
@@ -577,13 +629,20 @@ class CoreProtocolHandler extends ProtocolHandler {
 			return;
 		}
 
+        // Check if the file name is valid
+        
+        if ( isValidPath( fileName) == false) {
+            m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTObjectNameInvalid, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
+            return;
+        }
+        
 		// Get the required file attributes for the new file
 
 		int attr = smbPkt.getParameter(0);
 
 		// Create the file parameters to be passed to the disk interface
 
-		FileOpenParams params = new FileOpenParams(fileName, FileAction.CreateNotExist, AccessMode.ReadWrite, attr);
+		FileOpenParams params = new FileOpenParams(fileName, FileAction.CreateNotExist, AccessMode.ReadWrite, attr, smbPkt.getProcessIdFull());
 
 		// Debug
 
@@ -722,6 +781,13 @@ class CoreProtocolHandler extends ProtocolHandler {
 			return;
 		}
 
+        // Check if the file name is valid
+        
+        if ( isValidPath( dirName) == false) {
+            m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTObjectNameInvalid, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
+            return;
+        }
+        
 		// Debug
 
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE))
@@ -838,6 +904,13 @@ class CoreProtocolHandler extends ProtocolHandler {
 			return;
 		}
 
+        // Check if the file name is valid
+        
+        if ( isValidPath( fileName) == false) {
+            m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTObjectNameInvalid, SMBStatus.DOSInvalidData, SMBStatus.ErrDos);
+            return;
+        }
+        
 		// Debug
 
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE))
@@ -1603,7 +1676,7 @@ class CoreProtocolHandler extends ProtocolHandler {
 
 		// Create the file open parameters to be passed to the disk interface
 
-		FileOpenParams params = new FileOpenParams(fileName, mode, AccessMode.ReadWrite, attr);
+		FileOpenParams params = new FileOpenParams(fileName, mode, AccessMode.ReadWrite, attr, smbPkt.getProcessIdFull());
 		// Debug
 
 		if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_FILE))
@@ -3214,6 +3287,20 @@ class CoreProtocolHandler extends ProtocolHandler {
 		smbPkt.setByteCount(0);
 
 		m_sess.sendResponseSMB(smbPkt);
+
+		// If there are no active virtual circuits then close the session/socket
+		
+		if ( m_sess.numberOfVirtualCircuits() == 0) {
+			
+			// DEBUG
+			
+			if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_NEGOTIATE))
+				Debug.println("  Closing session, no more virtual circuits");
+			
+			// Close the session/socket
+			
+			m_sess.hangupSession( "Tree disconnect");
+		}
 
 		// Inform the driver that a connection has been closed
 

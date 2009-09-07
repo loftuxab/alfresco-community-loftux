@@ -853,7 +853,7 @@ public class SMBSrvPacket {
 	}
 
 	/**
-	 * Get the process indentifier (PID)
+	 * Get the process identifier (PID)
 	 * 
 	 * @return Process identifier value.
 	 */
@@ -861,6 +861,30 @@ public class SMBSrvPacket {
 		return DataPacker.getIntelShort(m_smbbuf, PID);
 	}
 
+	/**
+	 * Get the process identifier (PID) high bytes, or zero if not used
+	 * 
+	 * @return Process identifier value.
+	 */
+	public final int getProcessIdHigh() {
+		return DataPacker.getIntelShort(m_smbbuf, PIDHIGH);
+	}
+
+	/**
+	 * Return the 32bit process id value
+	 * 
+	 * @return int
+	 */
+	public final int getProcessIdFull() {
+		int pid = getProcessId();
+		int pidHigh = getProcessIdHigh();
+		
+		if ( pidHigh != 0)
+			pid += pidHigh << 16;
+		
+		return pid;
+	}
+	
 	/**
 	 * Get the actual received data length.
 	 * 

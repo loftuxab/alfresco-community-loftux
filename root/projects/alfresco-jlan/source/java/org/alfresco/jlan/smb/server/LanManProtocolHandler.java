@@ -870,7 +870,7 @@ class LanManProtocolHandler extends CoreProtocolHandler {
 			crDateTime = new SMBDate(crDate, crTime);
 
 		FileOpenParams params = new FileOpenParams(fileName, openFunc, access, srchAttr, fileAttr, allocSiz,
-				crDateTime != null ? crDateTime.getTime() : 0L);
+				crDateTime != null ? crDateTime.getTime() : 0L, smbPkt.getProcessIdFull());
 
 		// Debug
 
