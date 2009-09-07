@@ -454,22 +454,8 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         {
             // Get the record folders for the record
             List<NodeRef> recordFolders = getRecordFolders(nodeRef);
-            List<NodeRef> folderDispInstrucs = new ArrayList<NodeRef>(recordFolders.size());
-            for (NodeRef recordFolder : recordFolders)
-            {
-                // Get the disposition instructions for each folder
-                NodeRef folderDispInstruc = getDispositionInstructionsImpl(recordFolder);
-                if (folderDispInstruc != null)
-                {
-                    folderDispInstrucs.add(folderDispInstruc);
-                }
-            }
-            if (folderDispInstrucs.size() != 0)
-            {
-                // At this point, we may have disposition instruction objects from some
-                // or all of the folders.
-                diNodeRef = dispositionSelectionStrategy.selectDispositionScheduleFrom(folderDispInstrucs);
-            }
+            // At this point, we may have disposition instruction objects from 1..n folders.
+            diNodeRef = dispositionSelectionStrategy.selectDispositionScheduleFrom(recordFolders);
         }
         else
         {
@@ -535,6 +521,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         // get the updated disposition schedule and retrieve the updated action definition
         NodeRef scheduleParent = this.nodeService.getPrimaryParent(schedule.getNodeRef()).getParentRef();
         DispositionSchedule updatedSchedule = this.getDispositionSchedule(scheduleParent);
+        
         return updatedSchedule.getDispositionActionDefinition(actionDefinition.getId());
     }
 
