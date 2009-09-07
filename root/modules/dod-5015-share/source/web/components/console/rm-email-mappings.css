@@ -1,0 +1,43 @@
+.emailMappings
+{
+   margin:1em;
+}
+
+.emailMappings h2
+{
+   margin:1em 0;
+}
+
+.emailMappings .emailMappings-list 
+{
+   background-color:#fff;
+   border:1px solid #D7D7D7;
+   margin-top:1em;
+}
+
+.emailMappings .emailMappings-list li
+{
+   padding:0.5em 1em 1em;
+   display:block;
+   text-align:right;
+   clear:both;
+   border-bottom:1px dashed #D7D7D7;
+}
+
+.emailMappings .emailMappings-list li p
+{
+   float:left;
+   display:inline;
+}
+
+.emailMappings .emailMappings-actions
+{
+   text-align:center;
+   padding:1em;
+}
+
+.emailMappings .yuimenubaritemlabel, 
+.emailMappings .yuimenuitemlabel
+{
+   font-size:100%;
+}
