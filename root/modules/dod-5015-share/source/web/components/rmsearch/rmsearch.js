@@ -467,7 +467,7 @@
          
          if (query.length !== 0)
          {
-            query = '(' + query + ') AND (' + userQuery + ')';
+            query = '(' + query + ') AND (' + userQuery + ') AND NOT ASPECT:"rma:versionedRecord"';
          }
          else
          {
