@@ -37,12 +37,19 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.exporter.ACPExportPackageHandler;
 import org.alfresco.repo.importer.ACPImportPackageHandler;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
+import org.alfresco.repo.tenant.TenantService;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.util.TempFileProvider;
+import org.alfresco.web.app.Application;
+import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
@@ -53,6 +60,7 @@ import org.alfresco.web.scripts.servlet.FormData.FormField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Imports an ACP file into a records management container.
@@ -117,7 +125,7 @@ public class ImportPost extends DeclarativeWebScript
             }
             
             // create and check noderef
-            NodeRef destination = new NodeRef(nodeRef);
+            final NodeRef destination = new NodeRef(nodeRef);
             if (nodeService.exists(destination))
             {
                 // check the destination is an RM container
@@ -154,9 +162,18 @@ public class ImportPost extends DeclarativeWebScript
                 if (logger.isDebugEnabled())
                     logger.debug("Importing uploaded ACP (" + acpFile.getAbsolutePath() + ") into " + nodeRef);
                 
-                // import the ACP file
-                ACPImportPackageHandler importHandler = new ACPImportPackageHandler(acpFile, "UTF-8");
-                this.importerService.importView(importHandler, new Location(destination), null, null);
+                // setup the import handler
+                final ACPImportPackageHandler importHandler = new ACPImportPackageHandler(acpFile, "UTF-8");
+                
+                // import the ACP file as the system user
+                AuthenticationUtil.runAs(new RunAsWork<NodeRef>()
+                {
+                     public NodeRef doWork() throws Exception
+                     {
+                         importerService.importView(importHandler, new Location(destination), null, null);
+                         return null;
+                     }
+                }, AuthenticationUtil.getSystemUserName());
                 
                 // create and return model
                 Map<String, Object> model = new HashMap<String, Object>(1);
