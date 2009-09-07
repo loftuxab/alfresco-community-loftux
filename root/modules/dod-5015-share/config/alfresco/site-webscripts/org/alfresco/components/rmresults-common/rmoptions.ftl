@@ -130,7 +130,7 @@
                         <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
                         <option value="rma:location">${msg("label.location")}</option>
                         <option value="rma:address">${msg("label.address")}</option>
-                        <option value="rma:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                        <option value="rmc:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
                         <#list meta as d>
                         <option value="${d.name}">${d.title}</option>
                         </#list>
