@@ -80,7 +80,7 @@ public class CompleteEventAction extends RMActionExecuterAbstractBase
                     this.nodeService.setProperties(eventNodeRef, props);
                     
                     // Check to see if the events eligible property needs to be updated
-                    updateEventEigible(da);
+                    updateEventEligible(da);
                     
                 }
                 else
@@ -118,7 +118,7 @@ public class CompleteEventAction extends RMActionExecuterAbstractBase
      * @param da
      * @param nodeRef
      */
-    private void updateEventEigible(DispositionAction da)
+    private void updateEventEligible(DispositionAction da)
     {
         List<EventCompletionDetails> events = da.getEventCompletionDetails();
         
