@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,8 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FileAction;
+import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
+import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -73,6 +76,7 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
 	private NodeService unprotectedNodeService;
 	private PermissionService permissionService;
     private RecordsManagementActionService rmActionService;
+    private RecordsManagementEventService rmEventService;
     private RecordsManagementService rmService;
 	private SearchService searchService;
 	private TransactionService transactionService;
@@ -90,6 +94,7 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
 		this.searchService = (SearchService)this.applicationContext.getBean("searchService");
         this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("recordsManagementActionService");
+        this.rmEventService = (RecordsManagementEventService)this.applicationContext.getBean("recordsManagementEventService");
         this.rmService = (RecordsManagementService)this.applicationContext.getBean("recordsManagementService");
 		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
 		this.transactionHelper = (RetryingTransactionHelper)this.applicationContext.getBean("retryingTransactionHelper");
@@ -239,12 +244,81 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
                         Date asOfDateAfterChange = nextDispositionAction.getAsOfDate();
                         System.out.println(" - Updated  value: " + asOfDateAfterChange);
                         
-                        assertFalse("Expected disposition asOf date to change.", dateBeforeChange.equals(asOfDateAfterChange));
+                        assertFalse("Expected disposition asOf date to change.", asOfDateAfterChange.equals(dateBeforeChange));
                         return null;
                     }          
                 });
 
-        // Tidy up
+        // Change the disposition type (e.g. time-based to event-based)
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        List<RecordsManagementEvent> rmes = rmService.getNextDispositionAction(testFolder).getDispositionActionDefinition().getEvents();
+                        System.out.println("Going to change the RMEs.");
+                        System.out.println(" - Original value: " + rmes);
+
+                        List<DispositionActionDefinition> dads = rmService.getDispositionSchedule(testFolder).getDispositionActionDefinitions();
+                        DispositionActionDefinition firstDAD = dads.get(0);
+                        assertEquals("cutoff", firstDAD.getName());
+                        NodeRef dadNode = firstDAD.getNodeRef();
+                        
+//                        nodeService.setProperty(dadNode, PROP_DISPOSITION_PERIOD, null);
+                        List<String> eventNames= new ArrayList<String>();
+                        eventNames.add("study_complete");
+                        nodeService.setProperty(dadNode, PROP_DISPOSITION_EVENT, (Serializable)eventNames);
+
+                        return null;
+                    }          
+                });
+        // Now add a second event to the same 
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        DispositionAction nextDispositionAction = rmService.getNextDispositionAction(testFolder);
+                        StringBuilder buf = new StringBuilder();
+                        for (RecordsManagementEvent e : nextDispositionAction.getDispositionActionDefinition().getEvents()) {
+                            buf.append(e.getName()).append(',');
+                        }
+
+                        System.out.println("Going to change the RMEs again.");
+                        System.out.println(" - Original value: " + buf.toString());
+
+                        List<DispositionActionDefinition> dads = rmService.getDispositionSchedule(testFolder).getDispositionActionDefinitions();
+                        DispositionActionDefinition firstDAD = dads.get(0);
+                        assertEquals("cutoff", firstDAD.getName());
+                        NodeRef dadNode = firstDAD.getNodeRef();
+                        
+                        List<String> eventNames= new ArrayList<String>();
+                        eventNames.add("study_complete");
+                        eventNames.add("case_complete");
+                        nodeService.setProperty(dadNode, PROP_DISPOSITION_EVENT, (Serializable)eventNames);
+
+                        return null;
+                    }          
+                });
+
+        // View the record metadata to verify that the record has been rescheduled.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        DispositionAction nextDispositionAction = rmService.getNextDispositionAction(testFolder);
+                        
+                        assertEquals("cutoff", nextDispositionAction.getName());
+                        StringBuilder buf = new StringBuilder();
+                        for (RecordsManagementEvent e : nextDispositionAction.getDispositionActionDefinition().getEvents()) {
+                            buf.append(e.getName()).append(',');
+                        }
+                        System.out.println(" - Updated  value: " + buf.toString());
+                        
+                        assertFalse("Disposition should not be eligible.", nextDispositionAction.isEventsEligible());
+                        return null;
+                    }          
+                });
+
+        // Tidy up test nodes.
         transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
                 {
                     public Void execute() throws Throwable
@@ -254,8 +328,6 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
                         return null;
                     }          
                 });
-        // TODO Change the disposition type (e.g. event-based to time-based)
-        // TODO View the record metadata to verify that the record has been rescheduled.
     }
     
 	public void testGetDispositionInstructions() throws Exception

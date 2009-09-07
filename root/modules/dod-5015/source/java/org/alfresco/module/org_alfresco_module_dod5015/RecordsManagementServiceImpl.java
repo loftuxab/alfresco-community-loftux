@@ -66,6 +66,8 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                                                      RecordsManagementPolicies.OnCreateReference,
                                                      RecordsManagementPolicies.OnRemoveReference
 {
+    private static final String CHANGED_PROPERTIES = "changedProperties";
+
     /** Service registry */
     private RecordsManagementServiceRegistry serviceRegistry;
     
@@ -215,7 +217,10 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     {
         if (nodeService.exists(node) == true)
         {
-            rmActionService.executeRecordsManagementAction(node, "broadcastDispositionActionDefinitionUpdate");
+            Set<QName> changedProps = this.determineChangedProps(oldProps, newProps);
+            Map<String, Serializable> params = new HashMap<String, Serializable>();
+            params.put(CHANGED_PROPERTIES, (Serializable)changedProps);
+            rmActionService.executeRecordsManagementAction(node, "broadcastDispositionActionDefinitionUpdate", params);
         }
     }
     

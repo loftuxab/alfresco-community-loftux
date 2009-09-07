@@ -25,6 +25,8 @@
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +34,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
+import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
@@ -51,6 +55,8 @@ import org.alfresco.service.namespace.RegexQNamePattern;
  */
 public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionExecuterAbstractBase
 {
+    private static final String CHANGED_PROPERTIES = "changedProperties";
+
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
      *      org.alfresco.service.cmr.repository.NodeRef)
@@ -63,41 +69,99 @@ public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionEx
             return;
         }
         
+        Set<QName> changedProps = (Set<QName>)action.getParameterValue(CHANGED_PROPERTIES);
+
         // Navigate up the containment hierarchy to get the RecordCategory grandparent.
         NodeRef dispositionScheduleNode = nodeService.getPrimaryParent(actionedUponNodeRef).getParentRef();
         NodeRef recordCategoryNode = nodeService.getPrimaryParent(dispositionScheduleNode).getParentRef();
-        
-        Period dispositionPeriod = (Period)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_PERIOD);
         boolean isRecordLevelDisposition = (Boolean)nodeService.getProperty(dispositionScheduleNode, PROP_RECORD_LEVEL_DISPOSITION);
-
-        // This recordCategory could contain 0..n RecordFolder children.
-        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(recordCategoryNode, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
-        for (ChildAssociationRef nextAssoc : childAssocs)
+        
+        List<NodeRef> recordFolders = getRecordFoldersBeneath(recordCategoryNode);
+        for (NodeRef recordFolder : recordFolders)
         {
-            NodeRef nextChild = nextAssoc.getChildRef();
-            if (recordsManagementService.isRecordFolder(nextChild) && isRecordLevelDisposition == false)
+            if (isRecordLevelDisposition == false)
             {
-                persistLifecycleUpdates(nextChild, dispositionPeriod);
-            }
-            if (recordsManagementService.isRecordFolder(nextChild) && isRecordLevelDisposition == true)
-            {
-                // Each record Folder can contain 0..n Record children. TODO Consider multiple filing.
-                List<ChildAssociationRef> childOfFolderAssocs = nodeService.getChildAssocs(nextChild, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
-                for (ChildAssociationRef nextFolderAssoc : childOfFolderAssocs)
+                if (changedProps.contains(PROP_DISPOSITION_PERIOD))
                 {
-                    NodeRef nextPotentialRecord = nextFolderAssoc.getChildRef();
-                    if (recordsManagementService.isRecord(nextPotentialRecord))
+                    Period dispositionPeriod = (Period)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_PERIOD);
+                    persistDispositionPeriod(recordFolder, dispositionPeriod);
+                }
+                if (changedProps.contains(PROP_DISPOSITION_EVENT) || changedProps.contains(PROP_DISPOSITION_EVENT_COMBINATION))
+                {
+                    List<String> dispositionEvents = (List<String>)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_EVENT);
+                    String dispositionEventCombination = (String)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_EVENT_COMBINATION);
+                    persistEvents(recordFolder, dispositionEvents, dispositionEventCombination);
+                }
+            }
+            else
+            {
+                List<NodeRef> records = getRecordsBeneath(recordFolder);
+                for (NodeRef nextRecord : records)
+                {
+                    if (changedProps.contains(PROP_DISPOSITION_PERIOD))
                     {
-                        persistLifecycleUpdates(nextPotentialRecord, dispositionPeriod);
+                        Period dispositionPeriod = (Period)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_PERIOD);
+                        persistDispositionPeriod(nextRecord, dispositionPeriod);
+                    }
+                    if (changedProps.contains(PROP_DISPOSITION_EVENT) || changedProps.contains(PROP_DISPOSITION_EVENT_COMBINATION))
+                    {
+                        List<String> dispositionEvents = (List<String>)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_EVENT);
+                        String dispositionEventCombination = (String)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_EVENT_COMBINATION);
+                        persistEvents(nextRecord, dispositionEvents, dispositionEventCombination);
                     }
                 }
             }
         }
     }
 
-    private void persistLifecycleUpdates(NodeRef nextChild, Period dispositionPeriod)
+    /**
+     * This method finds all the children contained under the specified recordCategoryNode
+     * which are record folders.
+     * 
+     * @param recordCategoryNode
+     * @return
+     */
+    private List<NodeRef> getRecordFoldersBeneath(NodeRef recordCategoryNode)
     {
-        //TODO What about the other possible changes to the schedule?
+        List<NodeRef> result = new ArrayList<NodeRef>();
+        // This recordCategory could contain 0..n RecordFolder children.
+        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(recordCategoryNode, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+        for (ChildAssociationRef nextAssoc : childAssocs)
+        {
+            NodeRef nextChild = nextAssoc.getChildRef();
+            if (recordsManagementService.isRecordFolder(nextChild))
+            {
+                result.add(nextChild);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * This method finds all the children contained under the specified recordFolderNode
+     * which are record.
+     * 
+     * @param recordFolderNode
+     * @return
+     */
+    private List<NodeRef> getRecordsBeneath(NodeRef recordFolderNode)
+    {
+        List<NodeRef> result = new ArrayList<NodeRef>();
+        // This recordFolder could contain 0..n Record children.
+        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(recordFolderNode, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+        for (ChildAssociationRef nextAssoc : childAssocs)
+        {
+            NodeRef nextChild = nextAssoc.getChildRef();
+            if (recordsManagementService.isRecord(nextChild))
+            {
+                result.add(nextChild);
+            }
+        }
+        return result;
+    }
+    
+    private void persistDispositionPeriod(NodeRef nextChild, Period dispositionPeriod)
+    {
         if (nodeService.hasAspect(nextChild, ASPECT_DISPOSITION_LIFECYCLE))
         {
             List<ChildAssociationRef> nextActions = nodeService.getChildAssocs(nextChild, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL);
@@ -113,10 +177,62 @@ public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionEx
                     Date newAsOfDate = dispositionPeriod.getNextDate(now);
                     nodeService.setProperty(nextActionNode, PROP_DISPOSITION_AS_OF, newAsOfDate);
                 }
+                else
+                {
+                    //TODO Is this null if there are no timers?
+//                    nodeService.setProperty(nextActionNode, PROP_DISPOSITION_AS_OF, null);
+                }
             }
         }
     }
 
+    private void persistEvents(NodeRef recordOrFolderNode, List<String> events, String combinator)
+    {
+        if (nodeService.hasAspect(recordOrFolderNode, ASPECT_DISPOSITION_LIFECYCLE))
+        {
+            List<ChildAssociationRef> nextActions = nodeService.getChildAssocs(recordOrFolderNode, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL);
+            // There should be 0 or 1 elements
+            if (nextActions.isEmpty() == false)
+            {
+                NodeRef nextActionNode = nextActions.get(0).getChildRef();
+
+                nodeService.setProperty(nextActionNode, PROP_DISPOSITION_EVENT, (Serializable)events);
+                nodeService.setProperty(nextActionNode, PROP_DISPOSITION_EVENT_COMBINATION, combinator);
+                
+                // Now need to recalculate PROP_DISPOSITION_EVENTS_ELIGIBLE
+                DispositionAction da = recordsManagementService.getNextDispositionAction(recordOrFolderNode);
+                List<EventCompletionDetails> eventCompletionDetails = da.getEventCompletionDetails();
+                
+                boolean eligible = false;
+                if (da.getDispositionActionDefinition().eligibleOnFirstCompleteEvent() == false)
+                {
+                    eligible = true;
+                    for (EventCompletionDetails ecd : eventCompletionDetails)
+                    {
+                        if (ecd.isEventComplete() == false)
+                        {
+                            eligible = false;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    for (EventCompletionDetails ecd : eventCompletionDetails)
+                    {
+                        if (ecd.isEventComplete() == true)
+                        {
+                            eligible = true;
+                            break;
+                        }
+                    }
+                }
+
+                this.nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE, eligible);
+            }
+        }
+    }
+    
     /**
      * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefinitions(java.util.List)
      */
@@ -137,15 +253,16 @@ public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionEx
     {
         HashSet<QName> qnames = new HashSet<QName>();
         qnames.add(PROP_DISPOSITION_AS_OF);
+        qnames.add(PROP_DISPOSITION_EVENT);
+        qnames.add(PROP_DISPOSITION_EVENT_COMBINATION);
+        qnames.add(PROP_DISPOSITION_EVENTS_ELIGIBLE);
         return qnames;
     }
 
     @Override
     public Set<QName> getProtectedAspects()
     {
-        HashSet<QName> qnames = new HashSet<QName>();
-        // Intentionally empty Set.
-        return qnames;
+        return Collections.emptySet();
     }
 
 }
