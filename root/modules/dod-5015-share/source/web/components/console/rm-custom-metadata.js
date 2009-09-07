@@ -212,7 +212,10 @@
                   elPropList.appendChild(div);
                   
                   // generate buttons (NOTE: must occur after DOM insertion)
-                  var editBtn = new YAHOO.widget.Button(
+                  //
+                  // TODO: disabled until Edit/Delete is resolved in the repository
+                  //
+                  /*var editBtn = new YAHOO.widget.Button(
                   {
                      type: "button",
                      label: parent._msg("button.edit"),
@@ -239,7 +242,7 @@
                         scope: this
                      }
                   });
-                  this.propDeleteButtons[index] = deleteBtn;
+                  this.propDeleteButtons[index] = deleteBtn;*/
                }
             }
             else
@@ -405,11 +408,10 @@
             
             // TODO: add mandatory field support
             // TODO: add list of values selection (constraint)
-            // TODO: how to generate the model property name?
             
             var obj =
             {
-               name: "rmc:" + label.replace(/\s/g, "").toLowerCase(),
+               name: label.replace(/\s/g, "").toLowerCase(),
                dataType: dataType,
                title: label
             };
@@ -559,6 +561,10 @@
          onClickSaveProperty: function onClickSaveProperty(e, obj)
          {
             var label = Dom.get(parent.id + "-edit-label").value;
+            
+            //
+            // TODO: OUT OF DATE - need PUT REST API in place to update label!
+            //
             
             // TODO: add mandatory field support
             // TODO: add list of values selection (constraint)
