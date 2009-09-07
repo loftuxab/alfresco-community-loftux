@@ -24,27 +24,44 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.Part;
+import javax.mail.internet.ContentType;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.ImapModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.FileCopyUtils;
 
 /**
  * Split Email Action
  * 
- * Splits the attachments for an email message to be independent records.
+ * Splits the attachments for an email message out to independent records.
  * 
  * @author Mark Rogers
  */
@@ -68,30 +85,45 @@ public class SplitEmailAction extends RMActionExecuterAbstractBase
             if (recordsManagementService.isRecordDeclared(actionedUponNodeRef) == false)
             {
                 ChildAssociationRef parent = nodeService.getPrimaryParent(actionedUponNodeRef);
-
-                List<AssociationRef> refs = nodeService.getTargetAssocs(actionedUponNodeRef, ImapModel.ASSOC_IMAP_ATTACHMENT);
-
-                for(AssociationRef ref : refs)
-                {
-                    /**
-                     * Move the attachments up one level, to the parent folder of the record
-                     */
-                    logger.debug("split attachment:" + actionedUponNodeRef);
-                    String parentName = (String)nodeService.getProperty(actionedUponNodeRef, ContentModel.PROP_NAME);
-                    String bareName = (String)nodeService.getProperty(ref.getTargetRef(), ContentModel.PROP_NAME);
-                    QName assocName = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName(parentName + "-" + bareName));
-                    nodeService.moveNode(ref.getTargetRef(), parent.getParentRef(), parent.getTypeQName(), assocName);
-                }
-
-                /**
-                 * Now get rid of the old attatchment folder
+                
+                /** 
+                 * Check whether the email message has already been split - do nothing if it has already been split
                  */
-                List<AssociationRef> folderRefs = nodeService.getTargetAssocs(actionedUponNodeRef, ImapModel.ASSOC_IMAP_ATTACHMENTS_FOLDER);
-                for(AssociationRef ref : folderRefs)
+                List<AssociationRef> refs = nodeService.getTargetAssocs(actionedUponNodeRef, ImapModel.ASSOC_IMAP_ATTACHMENT);
+                if(refs.size() > 0)
                 {
-                    nodeService.removeChild(parent.getParentRef(), ref.getTargetRef());
+                    logger.debug("mail message has already been split - do nothing");
+                    return;
                 }
-            }
+                
+                /**
+                 * Get the content and if its a mime message then create atachments for each part
+                 */
+                try
+                {
+                    ContentReader reader = contentService.getReader(actionedUponNodeRef, ContentModel.PROP_CONTENT);
+                    InputStream is = reader.getContentInputStream();
+                    MimeMessage mimeMessage = new MimeMessage(null, is);
+                    Object content = mimeMessage.getContent();
+                    if (content instanceof Multipart)
+                    {
+                        Multipart multipart = (Multipart)content;
+
+                        for (int i = 0, n = multipart.getCount(); i < n; i++)
+                        {
+                            Part part = multipart.getBodyPart(i);
+                            if ("attachment".equalsIgnoreCase(part.getDisposition()))
+                            {
+                                createAttachment(actionedUponNodeRef, parent.getParentRef(), part);
+                            }
+                        }
+                    } 
+                } 
+                catch (Exception e)
+                {
+                    throw new AlfrescoRuntimeException("Unable to read mime message "+ e.toString(), e);
+                }                
+           }
             else
             {
                 throw new AlfrescoRuntimeException("Record has already been declared - can't split it. (" + actionedUponNodeRef.toString() + ")");
@@ -132,5 +164,71 @@ public class SplitEmailAction extends RMActionExecuterAbstractBase
             }
         }
         return true;
+    }
+    
+    /**
+     * Create attachment from Mime Message Part
+     * @param messageNodeRef - the node ref of the mime message
+     * @param parentNodeRef - the node ref of the parent folder
+     * @param part
+     * @throws MessagingException
+     * @throws IOException
+     */
+    private void createAttachment(NodeRef messageNodeRef, NodeRef parentNodeRef, Part part) throws MessagingException, IOException
+    {
+        String fileName = part.getFileName();
+        try
+        {
+            fileName = MimeUtility.decodeText(fileName);
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            if (logger.isWarnEnabled())
+            {
+                logger.warn("Cannot decode file name '" + fileName + "'", e);
+            }
+        }
+        
+        Map<QName, Serializable> messageProperties = nodeService.getProperties(messageNodeRef);
+        String messageTitle = (String)messageProperties.get(ContentModel.PROP_NAME);
+        if(messageTitle == null)
+        {
+            messageTitle = fileName;
+        }
+        else
+        {
+            messageTitle = messageTitle + " - " + fileName; 
+        }
+
+        ContentType contentType = new ContentType(part.getContentType());
+  
+        Map<QName, Serializable> docProps = new HashMap<QName, Serializable>(1);
+        docProps.put(ContentModel.PROP_NAME, messageTitle + " - " + fileName);
+        docProps.put(ContentModel.PROP_TITLE, fileName);
+        
+        /**
+         * Create an attachment node in the same folder as the message
+         */
+        ChildAssociationRef attachmentRef = nodeService.createNode(parentNodeRef, 
+                        ContentModel.ASSOC_CONTAINS, 
+                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, fileName), 
+                        ContentModel.TYPE_CONTENT,
+                        docProps);
+        
+        /**
+         * Write the content into the new attachment node
+         */
+        ContentWriter writer = contentService.getWriter(attachmentRef.getChildRef(), ContentModel.PROP_CONTENT, true);
+        writer.setMimetype(contentType.getBaseType());
+        OutputStream os = writer.getContentOutputStream();
+        FileCopyUtils.copy(part.getInputStream(), os);
+        
+        /**
+         * Create a link from the message to the attachment
+         */
+        nodeService.createAssociation(
+                    messageNodeRef,
+                    attachmentRef.getChildRef(),
+                    ImapModel.ASSOC_IMAP_ATTACHMENT);
     }
 }
