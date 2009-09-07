@@ -143,5 +143,4 @@ public class TransferCompleteAction extends RMActionExecuterAbstractBase
         // Update to the next disposition action
         updateNextDispositionAction(nodeRef);
     }
-
 }

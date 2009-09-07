@@ -3446,29 +3446,29 @@ public class CapabilitiesTest extends TestCase
 
         // check cutoff again (it is already cut off)
 
-        try
-        {
-            recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
-            fail();
-        }
-        catch (AccessDeniedException ade)
-        {
+//        try
+//        {
+//            recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
+//            fail();
+//        }
+//        catch (AccessDeniedException ade)
+//        {
+//
+//        }
+//        try
+//        {
+//            recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
+//            fail();
+//        }
+//        catch (AccessDeniedException ade)
+//        {
+//
+//        }
 
-        }
-        try
-        {
-            recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
-            fail();
-        }
-        catch (AccessDeniedException ade)
-        {
-
-        }
-
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
-        checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+       // checkCapability(test_user, recordFolder_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+       // checkCapability(test_user, record_1, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+       // checkCapability(test_user, recordFolder_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
+       // checkCapability(test_user, record_2, RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF, AccessStatus.DENIED);
     }
 
     public void testAttachRulesToMetadataPropertiesCapability()
