@@ -173,7 +173,9 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
     
     public void dispositionActionCreate(ChildAssociationRef childAssocRef)
     {
-        if (childAssocRef.getTypeQName().equals(ASSOC_NEXT_DISPOSITION_ACTION) == true)
+        NodeRef child = childAssocRef.getChildRef();
+        if (nodeService.exists(child) == true &&
+            childAssocRef.getTypeQName().equals(ASSOC_NEXT_DISPOSITION_ACTION) == true)
         {
             // Get the record (or record folder)
             NodeRef record = childAssocRef.getParentRef();

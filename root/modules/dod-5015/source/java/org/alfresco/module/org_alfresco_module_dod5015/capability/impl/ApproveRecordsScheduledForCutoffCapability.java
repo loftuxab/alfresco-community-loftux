@@ -53,17 +53,18 @@ public class ApproveRecordsScheduledForCutoffCapability extends AbstractCapabili
     {
         if (isRm(nodeRef))
         {
-            if (checkFilingUnfrozenUncutoff(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+            if (checkFilingUnfrozen(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
                 if (hasDispositionSchedule(nodeRef))
                 {
-                    if (isScheduledForCutoff(nodeRef))
-                    {
+                   // Commented out because this capability is doubled up with uncutoff
+                   // if (isScheduledForCutoff(nodeRef))
+                   // {
                         if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.APPROVE_RECORDS_SCHEDULED_FOR_CUTOFF) == AccessStatus.ALLOWED)
                         {
                             return AccessDecisionVoter.ACCESS_GRANTED;
                         }
-                    }
+                   // }
                 }
                 else
                 {

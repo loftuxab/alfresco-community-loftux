@@ -120,7 +120,8 @@ public class CutOffAction extends RMDispositionActionExecuterAbstractBase
         }
         
         // duplicates code from close .. it should get the closed action somehow?
-        if (this.recordsManagementService.isRecordFolder(filePlanComponent) || this.recordsManagementService.isRecord(filePlanComponent))
+        if (this.recordsManagementService.isRecordFolder(filePlanComponent) 
+            || this.recordsManagementService.isRecord(filePlanComponent))
         {
             return true;
         }

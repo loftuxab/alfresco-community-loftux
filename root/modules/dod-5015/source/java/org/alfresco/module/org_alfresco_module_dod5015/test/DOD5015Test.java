@@ -660,6 +660,94 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         });
     }
     
+    public void testUnCutoff()
+    {      
+        final NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records"); 
+        setComplete();
+        endTransaction();
+                
+        final NodeRef recordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                   
+                assertNotNull(recordCategory);
+                assertEquals("AIS Audit Records", nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
+                        
+                return createRecordFolder(recordCategory, "March AIS Audit Records");                        
+            }          
+        });
+        
+        final NodeRef recordOne = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecord(recordFolder);
+            }          
+        }); 
+        
+        final Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                declareRecord(recordOne);
+                
+                // Clock the asOf date back to ensure eligibility
+                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();     
+                Date nowDate = calendar.getTime();
+                assertFalse(nowDate.equals(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF)));
+                Map<String, Serializable> params = new HashMap<String, Serializable>(1);
+                params.put(EditDispositionActionAsOfDateAction.PARAM_AS_OF_DATE, nowDate);                
+                rmActionService.executeRecordsManagementAction(recordFolder, "editDispositionActionAsOfDate", params);
+                assertTrue(nowDate.equals(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF)));
+                
+                // Cut off
+                rmActionService.executeRecordsManagementAction(recordFolder, "cutoff", null);
+                
+                // Check that everything appears to be cutoff
+                assertTrue(nodeService.hasAspect(recordFolder, ASPECT_CUT_OFF));
+                List<NodeRef> records = rmService.getRecords(recordFolder);
+                for (NodeRef record : records)
+                {
+                    assertTrue(nodeService.hasAspect(record, ASPECT_CUT_OFF));
+                }
+                DispositionAction da = rmService.getNextDispositionAction(recordFolder);
+                assertNotNull(da);
+                assertFalse("cutoff".equals(da.getName()));
+                checkLastDispositionAction(recordFolder, "cutoff", 1);
+                                
+                // Revert the cutoff
+                rmActionService.executeRecordsManagementAction(recordFolder, "unCutoff", null);
+                
+                // Check that everything has been reverted
+                assertFalse(nodeService.hasAspect(recordFolder, ASPECT_CUT_OFF));
+                records = rmService.getRecords(recordFolder);
+                for (NodeRef record : records)
+                {
+                    assertFalse(nodeService.hasAspect(record, ASPECT_CUT_OFF));
+                }
+                da = rmService.getNextDispositionAction(recordFolder);
+                assertNotNull(da);
+                assertTrue("cutoff".equals(da.getName()));
+                assertNull(da.getStartedAt());
+                assertNull(da.getStartedBy());
+                assertNull(da.getCompletedAt());
+                assertNull(da.getCompletedBy());
+                List<DispositionAction> history = rmService.getCompletedDispositionActions(recordFolder);
+                assertNotNull(history);
+                assertEquals(0, history.size());
+                
+                return null;
+            }          
+        });
+
+    }
+    
     private void checkLastDispositionAction(NodeRef nodeRef, String daName, int expectedCount)
     {
         // Check the previous action details

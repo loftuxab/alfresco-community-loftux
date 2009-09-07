@@ -113,7 +113,34 @@
     
     <bean id="cutoff" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.CutOffAction" parent="rmAction" depends-on="rmApproveRecordsScheduledForCutoffCapability">
         <property name="capability" ref="rmApproveRecordsScheduledForCutoffCapability"/>
-    </bean>    
+    </bean>   
+    
+    <!-- UnCutoff action -->    
+    
+    <bean id="unCutoff_proxy" class="org.alfresco.module.org_alfresco_module_dod5015.capability.RMActionProxyFactoryBean" parent="rmProxyAction" init-method="registerAction">
+        <property name="target">
+            <ref bean="unCutoff"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref bean="unCutoff_security"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="unCutoff_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor" parent="actionSecurity">
+        <property name="objectDefinitionSource">
+            <value>
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.execute=RM_CAP.0.rma:filePlanComponent.ApproveRecordsScheduledForCutoff
+                   org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction.*=RM_ALLOW
+                   org.alfresco.repo.action.executer.ActionExecuter.*=RM_ALLOW
+            </value>
+        </property>
+    </bean>
+    
+    <bean id="unCutoff" class="org.alfresco.module.org_alfresco_module_dod5015.action.impl.UnCutoffAction" parent="rmAction" depends-on="rmApproveRecordsScheduledForCutoffCapability">
+        <property name="capability" ref="rmApproveRecordsScheduledForCutoffCapability"/>
+    </bean> 
     
     <!-- Destroy -->
     
