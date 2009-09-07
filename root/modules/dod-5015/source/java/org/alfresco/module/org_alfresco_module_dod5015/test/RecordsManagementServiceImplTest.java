@@ -324,7 +324,16 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
                     public Void execute() throws Throwable
                     {
                         nodeService.deleteNode(testRecord);
+
+                        // Change the disposition Period back to what it was.
+                        List<DispositionActionDefinition> dads = rmService.getDispositionSchedule(testFolder).getDispositionActionDefinitions();
+                        DispositionActionDefinition firstDAD = dads.get(0);
+                        assertEquals("cutoff", firstDAD.getName());
+                        NodeRef dadNode = firstDAD.getNodeRef();
+                        nodeService.setProperty(dadNode, PROP_DISPOSITION_PERIOD, new Period("month|1"));
+
                         nodeService.deleteNode(testFolder);
+
                         return null;
                     }          
                 });

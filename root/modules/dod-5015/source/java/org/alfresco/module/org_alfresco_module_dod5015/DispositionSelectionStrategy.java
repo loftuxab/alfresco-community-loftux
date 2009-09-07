@@ -24,7 +24,11 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015;
 
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -70,30 +74,89 @@ public class DispositionSelectionStrategy implements RecordsManagementModel
         this.nodeService = nodeService;
     }
     
-    public NodeRef selectDispositionScheduleFrom(List<NodeRef> dispositionScheduleNodeRefs)
+    public NodeRef selectDispositionScheduleFrom(List<NodeRef> recordFolders)
     {
-        if (dispositionScheduleNodeRefs == null || dispositionScheduleNodeRefs.isEmpty())
+        if (recordFolders == null || recordFolders.isEmpty())
         {
             return null;
         }
         else
         {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Selecting disposition schedule from 1 of " + dispositionScheduleNodeRefs.size());
-            }
-
             //      46 CHAPTER 2 
             //      Records assigned more than 1 disposition must be retained and linked to the record folder (category) with the longest 
             //      retention period.
+
+            // Assumption: an event-based disposition action has a longer retention
+            // period than a time-based one - as we cannot know when an event will occur
+            // TODO Automatic events?
             
-            //TODO Implement a proper strategy here. For now, we're just returning the first.
-            NodeRef firstDispSchedule = dispositionScheduleNodeRefs.get(0);
+            SortedSet<NodeRef> sortedFolders = new TreeSet<NodeRef>(new DispositionableNodeRefComparator());
+            for (NodeRef f : recordFolders)
+            {
+                sortedFolders.add(f);
+            }
+            DispositionSchedule dispSchedule = serviceRegistry.getRecordsManagementService().getDispositionSchedule(sortedFolders.first());
+            
             if (logger.isDebugEnabled())
             {
-                logger.debug("Selected disposition schedule: " + firstDispSchedule);
+                logger.debug("Selected disposition schedule: " + dispSchedule);
             }
-            return firstDispSchedule;
+            return dispSchedule.getNodeRef();
+        }
+    }
+
+    /**
+     * This class defines a natural comparison order between NodeRefs that have
+     * the dispositionLifecycle aspect applied.
+     * This order has the following meaning: NodeRefs with a 'lesser' value are considered
+     * to have a shorter retention period, although the actual retention period may
+     * not be straightforwardly determined in all cases.
+     */
+    class DispositionableNodeRefComparator implements Comparator<NodeRef>
+    {
+        public int compare(NodeRef f1, NodeRef f2)
+        {
+            //TODO Check the nodeRefs have the correct aspect
+            
+            DispositionAction da1 = serviceRegistry.getRecordsManagementService().getNextDispositionAction(f1);
+            DispositionAction da2 = serviceRegistry.getRecordsManagementService().getNextDispositionAction(f2);
+            
+            if (da1 != null && da2 != null)
+            {
+                Date asOfDate1 = da1.getAsOfDate();
+                Date asOfDate2 = da2.getAsOfDate();
+                // If both record(Folder)s have asOfDates, then use these to compare
+                if (asOfDate1 != null && asOfDate2 != null)
+                {
+                    return asOfDate1.compareTo(asOfDate2);
+                }
+                // If one has a date and the other doesn't, the one with the date is "less".
+                // (Defined date is 'shorter' than undefined date as an undefined date means it may be retained forever - theoretically)
+                else if (asOfDate1 != null || asOfDate2 != null)
+                {
+                    return asOfDate1 == null ? +1 : -1;
+                }
+                else
+                {
+                    // Neither has an asOfDate. (Somewhat arbitrarily) we'll use the number of events to compare now.
+                    DispositionActionDefinition dad1 = da1.getDispositionActionDefinition();
+                    DispositionActionDefinition dad2 = da2.getDispositionActionDefinition();
+                    int eventsCount1 = 0;
+                    int eventsCount2 = 0;
+                    
+                    if (dad1 != null)
+                    {
+                        eventsCount1 = dad1.getEvents().size();
+                    }
+                    if (dad2 != null)
+                    {
+                        eventsCount2 = dad2.getEvents().size();
+                    }
+                    return new Integer(eventsCount1).compareTo(eventsCount2);
+                }
+            }
+
+            return 0;
         }
     }
 }
