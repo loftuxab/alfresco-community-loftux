@@ -1,4 +1,4 @@
-package org.alfresco.module.org_alfresco_module_dod5015.script;
+package org.alfresco.module.org_alfresco_module_dod5015.email;
 
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
@@ -50,7 +50,7 @@ public class EmailMapScriptTest extends BaseWebScriptTest
     public void testUpdateEmailMap() throws Exception
     {
         /**
-         * Update the list  
+         * Update the list by adding two values  
          */
         {
            JSONObject obj = new JSONObject();
@@ -68,16 +68,63 @@ public class EmailMapScriptTest extends BaseWebScriptTest
            obj.put("add", add);
            
            System.out.println(obj.toString());
+           
            /**
-             * Now do a post to delete a value
+             * Now do a post to add a couple of values
              */
            Response response = sendRequest(new PostRequest(URL_RM_EMAILMAP, obj.toString(), "application/json"), Status.STATUS_OK); 
            System.out.println(response.getContentAsString());
            // Check the response
            
+           
            JSONArray delete = new JSONArray(); 
            delete.put(val2);
            
+        }
+        
+        /**
+         * Update the list by deleting a value
+         * 
+         * "whatever" has two mappings, delete one of them
+         */
+        {
+            JSONObject obj = new JSONObject();
+            JSONObject val2 = new JSONObject();
+            JSONArray delete = new JSONArray();  
+            val2.put("from", "whatever");
+            val2.put("to", "rmc:wobble");
+            delete.put(val2);
+            obj.put("delete", delete);
+            
+            /**
+             * Now do a post to delete a couple of values
+             */
+           Response response = sendRequest(new PostRequest(URL_RM_EMAILMAP, obj.toString(), "application/json"), Status.STATUS_OK); 
+           System.out.println(response.getContentAsString());
+
+           JSONObject top = new JSONObject(response.getContentAsString());
+           JSONObject data = top.getJSONObject("data");
+           JSONArray mappings = data.getJSONArray("mappings");
+           
+           boolean wibbleFound = false; 
+           for(int i = 0; i < mappings.length(); i++)
+           {
+               JSONObject mapping = mappings.getJSONObject(i);
+               
+        
+               if(mapping.get("from").equals("whatever"))
+               {
+                   if(mapping.get("to").equals("rmc:Wibble"))
+                   {
+                       wibbleFound = true;
+                   }
+                   else
+                   {
+                       fail("custom mapping for field not deleted");
+                   }
+               }
+           }
+           assertTrue(wibbleFound);
         }
     }
 }
