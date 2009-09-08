@@ -18,6 +18,9 @@
          <div class="set-panel-body">
             <@formLib.renderField field=form.fields["prop_cm_name"] />
             <@formLib.renderField field=form.fields["prop_rma_identifier"] />
+            <#if form.mode == "view">
+               <@formLib.renderField field=form.fields["prop_rmCategoryIdentifier"] />
+            </#if>
             <@formLib.renderField field=form.fields["prop_cm_title"] />
             <@formLib.renderField field=form.fields["prop_cm_description"] />
             <#if form.fields["prop_cm_owner"]?? && form.mode == "view">
@@ -121,15 +124,12 @@
             <@formLib.renderField field=form.fields["prop_rma_otherAddress"] />
          </div>
       </div>
-      <#-- mjh 28-aug-09: Removed due to r15971
       <div class="set-panel">
          <div class="set-panel-heading">${msg("label.set.security")}</div>
          <div class="set-panel-body">
-            <@formLib.renderField field=form.fields["prop_rma_supplementalMarkingList"] />
+            <@formLib.renderField field=form.fields["prop_rmc_supplementalMarkingList"] />
          </div>
       </div>
-      -->
-      
       <#if form.fields["prop_rma_vitalRecordIndicator"]?? || form.fields["prop_rma_reviewPeriod"]?? ||
            (form.fields["prop_rma_reviewAsOf"]?? && form.mode == "view")>
          <div class="set-panel">
@@ -148,11 +148,14 @@
          </div>
       </#if>
       
-      <#if form.fields["prop_rma_cutOffDate"]?? && form.mode == "view">
+      <#if form.mode == "view">
          <div class="set-panel">
             <div class="set-panel-heading">${msg("label.set.disposition")}</div>
             <div class="set-panel-body">
-               <@formLib.renderField field=form.fields["prop_rma_cutOffDate"] />
+               <@formLib.renderField field=form.fields["prop_rmDispositionInstructions"] />
+               <#if form.fields["prop_rma_cutOffDate"]??>
+                  <@formLib.renderField field=form.fields["prop_rma_cutOffDate"] />
+               </#if>
             </div>
          </div>
       </#if>

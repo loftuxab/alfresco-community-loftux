@@ -46,25 +46,9 @@ public class RecordsManagementTypeFormFilter extends RecordsManagementFormFilter
     {
         QName typeName = type.getName();
 
-        /*
-         * if (TYPE_RECORD_SERIES.equals(typeName) ||
-         * TYPE_RECORD_CATEGORY.equals(typeName) ||
-         * TYPE_RECORD_FOLDER.equals(typeName)) { if (logger.isDebugEnabled())
-         * logger.debug("Generating unique identifier for " +
-         * typeName.toPrefixString(this.namespaceService)); // find the field
-         * definition for the rma:identifier property List<FieldDefinition>
-         * fieldDefs = form.getFieldDefinitions(); String identifierPropName =
-         * PROP_IDENTIFIER.toPrefixString(this.namespaceService); for
-         * (FieldDefinition fieldDef : fieldDefs) { if
-         * (fieldDef.getName().equals(identifierPropName)) {
-         * fieldDef.setDefaultValue(GUID.generate()); break; } }
-         */
-
         // add any custom properties for the type being created (we don't need
-        // to deal with
-        // the record type in here as records are typically uploaded and then
-        // their metadata
-        // edited after the fact)
+        // to deal with the record type in here as records are typically uploaded 
+        // and then their metadata edited after the fact)
         if (TYPE_RECORD_SERIES.equals(typeName))
         {
             addCustomRMProperties(CustomisableRmElement.RECORD_SERIES, form);
@@ -77,7 +61,6 @@ public class RecordsManagementTypeFormFilter extends RecordsManagementFormFilter
         {
             addCustomRMProperties(CustomisableRmElement.RECORD_FOLDER, form);
         }
-        // }
     }
 
     /*
@@ -85,7 +68,6 @@ public class RecordsManagementTypeFormFilter extends RecordsManagementFormFilter
      */
     public void afterPersist(TypeDefinition item, FormData data, NodeRef nodeRef)
     {
-
         // Once an RM container type has been persisted generate a default
         // identifer for it.
         if (this.nodeService.hasAspect(nodeRef, ASPECT_FILE_PLAN_COMPONENT))

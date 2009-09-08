@@ -46,6 +46,9 @@ public interface RecordsManagementCustomModel
     // Custom property for for Supplemental Marking List
     public static QName PROP_SUPPLEMENTAL_MARKING_LIST = QName.createQName(RM_CUSTOM_URI, "supplementalMarkingList");
     
+    // Supplemental Marking List aspect
+    public static QName ASPECT_SUPPLEMENTAL_MARKING_LIST = QName.createQName(RM_CUSTOM_URI, "customSupplementalMarkingList");
+    
     // Custom associations aspect
     public static QName ASPECT_CUSTOM_ASSOCIATIONS = QName.createQName(RM_CUSTOM_URI, "customAssocs");
     

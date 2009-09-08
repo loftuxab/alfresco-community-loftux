@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.repo.forms.FieldDefinition;
 import org.alfresco.repo.forms.Form;
@@ -12,6 +13,7 @@ import org.alfresco.repo.forms.PropertyFieldDefinition;
 import org.alfresco.repo.forms.processor.node.ContentModelFormProcessor;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -34,8 +36,9 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
     private static Log logger = LogFactory.getLog(RecordsManagementNodeFormFilter.class);
 
     protected static final String TRANSIENT_DECLARED = "rmDeclared";
-
     protected static final String TRANSIENT_RECORD_TYPE = "rmRecordType";
+    protected static final String TRANSIENT_CATEGORY_ID = "rmCategoryIdentifier";
+    protected static final String TRANSIENT_DISPOSITION_INSTRUCTIONS = "rmDispositionInstructions";
 
     protected DictionaryService dictionaryService;
 
@@ -73,9 +76,14 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
                     addCustomRMProperties(CustomisableRmElement.RECORD, form);
                 }
 
+                // force the "supplementalMarkingList" property to be present
+                forceSupplementalMarkingListProperty(form, nodeRef);
+                
                 // generate property definitions for the 'transient' properties
                 generateDeclaredPropertyField(form, nodeRef);
                 generateRecordTypePropertyField(form, nodeRef);
+                generateCategoryIdentifierPropertyField(form, nodeRef);
+                generateDispositionInstructionsPropertyField(form, nodeRef);
             }
             else
             {
@@ -124,6 +132,9 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
                         // add field defintions for all the custom properties
                         addCustomRMProperties(CustomisableRmElement.RECORD_FOLDER, form);
                     }
+                    
+                    // force the "supplementalMarkingList" property to be present
+                    forceSupplementalMarkingListProperty(form, nodeRef);
                 }
             }
         }
@@ -142,7 +153,8 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
         List<FieldDefinition> fieldDefs = form.getFieldDefinitions();
         for (FieldDefinition fieldDef : fieldDefs)
         {
-            if (fieldDef.getName().startsWith(RecordsManagementCustomModel.RM_CUSTOM_PREFIX))
+            if (fieldDef.getName().startsWith(RM_CUSTOM_PREFIX) &&
+                !fieldDef.getName().equals(PROP_SUPPLEMENTAL_MARKING_LIST.toPrefixString(this.namespaceService)))
             {
                 fieldDef.setGroup(CUSTOM_RM_FIELD_GROUP);
 
@@ -153,8 +165,38 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
     }
 
     /**
+     * Forces the "rmc:supplementalMarkingList" property to be present, if it is
+     * already on the given node this method does nothing, otherwise a property
+     * field definition is generated for the property.
+     * 
+     * @param form The Form instance to add the property to
+     * @param nodeRef The node the form is being generated for
+     */
+    protected void forceSupplementalMarkingListProperty(Form form, NodeRef nodeRef)
+    {
+        if (!this.nodeService.hasAspect(nodeRef, 
+                    RecordsManagementCustomModel.ASPECT_SUPPLEMENTAL_MARKING_LIST))
+        {
+            PropertyDefinition propDef = this.dictionaryService.getProperty(
+                        RecordsManagementCustomModel.PROP_SUPPLEMENTAL_MARKING_LIST);
+            
+            if (propDef != null)
+            {
+                ContentModelFormProcessor.generatePropertyField(propDef, form, 
+                            null, this.namespaceService);
+            }
+            else if (logger.isWarnEnabled())
+            {
+                logger.warn("Could not add " + 
+                            RecordsManagementCustomModel.PROP_SUPPLEMENTAL_MARKING_LIST.getLocalName() +
+                            " property as it's definition could not be found");
+            }
+        }
+    }
+    
+    /**
      * Generates the field definition for the transient <code>rmDeclared</code>
-     * property
+     * property.
      * 
      * @param form The Form instance to add the property to
      * @param nodeRef The node the form is being generated for
@@ -226,5 +268,93 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
         }
 
         form.addData(dataKeyName, recordType);
+    }
+    
+    /**
+     * Generates the field definition for the transient <code>rmCategoryIdentifier</code>
+     * property
+     * 
+     * @param form The Form instance to add the property to
+     * @param nodeRef The node the form is being generated for
+     */
+    protected void generateDispositionInstructionsPropertyField(Form form, NodeRef nodeRef)
+    {
+        String dataKeyName = ContentModelFormProcessor.PROP_DATA_PREFIX + TRANSIENT_DISPOSITION_INSTRUCTIONS;
+        PropertyFieldDefinition dispInstructionsField = new PropertyFieldDefinition(TRANSIENT_DISPOSITION_INSTRUCTIONS,
+                    DataTypeDefinition.TEXT.getLocalName());
+        dispInstructionsField.setLabel(TRANSIENT_DISPOSITION_INSTRUCTIONS);
+        dispInstructionsField.setDescription(TRANSIENT_DISPOSITION_INSTRUCTIONS);
+        dispInstructionsField.setProtectedField(true);
+        dispInstructionsField.setDataKeyName(dataKeyName);
+        form.addFieldDefinition(dispInstructionsField);
+        
+        // use RMService to get disposition instructions
+        DispositionSchedule ds = this.rmService.getDispositionSchedule(nodeRef);
+        if (ds != null)
+        {
+            String instructions = ds.getDispositionInstructions();
+            if (instructions != null)
+            {
+                form.addData(dataKeyName, instructions);
+            }
+        }
+    }
+    
+    /**
+     * Generates the field definition for the transient <code>rmCategoryIdentifier</code>
+     * property
+     * 
+     * @param form The Form instance to add the property to
+     * @param nodeRef The node the form is being generated for
+     */
+    protected void generateCategoryIdentifierPropertyField(Form form, NodeRef nodeRef)
+    {
+        String dataKeyName = ContentModelFormProcessor.PROP_DATA_PREFIX + TRANSIENT_CATEGORY_ID;
+        PropertyFieldDefinition categoryIdField = new PropertyFieldDefinition(TRANSIENT_CATEGORY_ID,
+                    DataTypeDefinition.TEXT.getLocalName());
+        categoryIdField.setLabel(TRANSIENT_CATEGORY_ID);
+        categoryIdField.setDescription(TRANSIENT_CATEGORY_ID);
+        categoryIdField.setProtectedField(true);
+        categoryIdField.setDataKeyName(dataKeyName);
+        form.addFieldDefinition(categoryIdField);
+        
+        // get the category id from the appropriate parent node
+        NodeRef category = getRecordCategory(nodeRef);
+        if (category != null)
+        {
+            String categoryId = (String)nodeService.getProperty(category, PROP_IDENTIFIER);
+            if (categoryId != null)
+            {
+                form.addData(dataKeyName, categoryId);
+            }
+        }
+    }
+    
+    /**
+     * Retrieves the record category the given record belongs to or
+     * null if the record category can not be found
+     * 
+     * @param record NodeRef representing the record
+     * @return NodeRef of the record's category
+     */
+    protected NodeRef getRecordCategory(NodeRef record)
+    {
+        NodeRef result = null;
+        
+        NodeRef parent = this.nodeService.getPrimaryParent(record).getParentRef();
+        if (parent != null)
+        {
+            QName nodeType = this.nodeService.getType(parent);
+            if (this.dictionaryService.isSubClass(nodeType, TYPE_RECORD_CATEGORY))
+            {
+                result = parent;
+            }
+            else
+            {
+                result = getRecordCategory(parent);
+            }
+        }
+        
+        return result;
     }
 }
