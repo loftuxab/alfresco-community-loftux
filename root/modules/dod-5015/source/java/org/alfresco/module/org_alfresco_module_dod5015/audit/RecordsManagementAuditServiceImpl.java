@@ -24,16 +24,22 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.audit;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.io.Writer;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.service.cmr.audit.AuditService;
 import org.alfresco.service.cmr.audit.AuditService.AuditQueryCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.util.ParameterCheck;
+import org.alfresco.util.TempFileProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,10 +53,22 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
 	/** Logger */
     private static Log logger = LogFactory.getLog(RecordsManagementAuditServiceImpl.class);
 
+    protected static final String AUDIT_TRAIL_FILE_PREFIX = "audit_";
+    protected static final String AUDIT_TRAIL_FILE_SUFFIX = ".json";
+        
+    private NodeService nodeService;
     private AuditService auditService;
 
     // temporary field to hold imaginary enabled flag
     private boolean enabled = false;
+    
+    /**
+     * Sets the NodeService instance
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
     
     /**
      * Sets the AuditService instance
@@ -124,8 +142,7 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
     /**
      * {@inheritDoc}
      */
-    public List<RecordsManagementAuditEntry> getAuditTrail(
-                RecordsManagementAuditQueryParameters params)
+    public File getAuditTrail(RecordsManagementAuditQueryParameters params)
     {
         ParameterCheck.mandatory("params", params);
         
@@ -138,95 +155,188 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
             logger.error("TODO: Node-based filtering is not enabled, yet.");
         }
         
-        // The callback will populate this
-        final List<RecordsManagementAuditEntry> entries = new ArrayList<RecordsManagementAuditEntry>(50);
-        
-        AuditQueryCallback callback = new AuditQueryCallback()
+        File auditTrailFile = null;
+        try
         {
-            public boolean handleAuditEntry(
-                    Long entryId,
-                    String applicationName,
-                    String user,
-                    long time,
-                    Map<String, Serializable> values)
+            // The callback will populate this temp file
+            auditTrailFile = TempFileProvider.createTempFile(AUDIT_TRAIL_FILE_PREFIX, AUDIT_TRAIL_FILE_SUFFIX);
+            final FileWriter fileWriter = new FileWriter(auditTrailFile);
+            
+            // define the callback
+            AuditQueryCallback callback = new AuditQueryCallback()
             {
-                Date timestamp = new Date(time);
-                String fullName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_FULLNAME);
-                if (fullName == null)
+                private boolean firstEntry = true;
+                
+                public boolean handleAuditEntry(
+                        Long entryId,
+                        String applicationName,
+                        String user,
+                        long time,
+                        Map<String, Serializable> values)
                 {
-                    logger.warn(
-                            "RM Audit: No value for '" +
-                            RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_FULLNAME + "': " + entryId);
+                    Date timestamp = new Date(time);
+                    String fullName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_FULLNAME);
+                    if (fullName == null)
+                    {
+                        logger.warn(
+                                "RM Audit: No value for '" +
+                                RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_FULLNAME + "': " + entryId);
+                    }
+                    String userRole = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLE);
+                    if (userRole == null)
+                    {
+                        logger.warn(
+                                "RM Audit: No value for '" +
+                                RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLE + "': " + entryId);
+                    }
+                    NodeRef nodeRef = (NodeRef) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF);
+                    if (nodeRef == null)
+                    {
+                        logger.warn(
+                                "RM Audit: No value for '" +
+                                RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF + "': " + entryId);
+                    }
+                    String nodeName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME);
+                    if (nodeName == null)
+                    {
+                        logger.warn(
+                                "RM Audit: No value for '" +
+                                RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME + "': " + entryId);
+                    }
+                    String description = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_ACTIONDESCRIPTION_VALUE);
+                    if (description == null)
+                    {
+                        logger.warn(
+                                "RM Audit: No value for '" +
+                                RecordsManagementAuditService.RM_AUDIT_DATA_ACTIONDESCRIPTION_VALUE + "': " + entryId);
+                    }
+                    
+                    RecordsManagementAuditEntry entry = new RecordsManagementAuditEntry(
+                            timestamp,
+                            user,
+                            fullName,
+                            userRole,
+                            nodeRef,
+                            nodeName,
+                            description);
+                    
+                    // write out the entry to the file in JSON format
+                    writeEntryToFile(entry);
+                    
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("   " + entry);
+                    }
+                    
+                    // Keep going
+                    return true;
                 }
-                String userRole = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLE);
-                if (userRole == null)
+                
+                private void writeEntryToFile(RecordsManagementAuditEntry entry)
                 {
-                    logger.warn(
-                            "RM Audit: No value for '" +
-                            RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLE + "': " + entryId);
+                    try
+                    {
+                        if (!firstEntry)
+                        {
+                            fileWriter.write(",");
+                        }
+                        else
+                        {
+                            firstEntry = false;
+                        }
+                        
+                        // write the entry to the file
+                        fileWriter.write("\n\t\t");
+                        fileWriter.write(entry.toJSONString());
+                    }
+                    catch (IOException ioe)
+                    {
+                        throw new AlfrescoRuntimeException("Failed to generate audit trail file", ioe);
+                    }
                 }
-                NodeRef nodeRef = (NodeRef) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF);
-                if (nodeRef == null)
-                {
-                    logger.warn(
-                            "RM Audit: No value for '" +
-                            RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF + "': " + entryId);
-                }
-                String nodeName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME);
-                if (nodeName == null)
-                {
-                    logger.warn(
-                            "RM Audit: No value for '" +
-                            RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME + "': " + entryId);
-                }
-                String description = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_ACTIONDESCRIPTION_VALUE);
-                if (description == null)
-                {
-                    logger.warn(
-                            "RM Audit: No value for '" +
-                            RecordsManagementAuditService.RM_AUDIT_DATA_ACTIONDESCRIPTION_VALUE + "': " + entryId);
-                }
-                RecordsManagementAuditEntry entry = new RecordsManagementAuditEntry(
-                        timestamp,
-                        user,
-                        fullName,
-                        userRole,
-                        nodeRef,
-                        nodeName,
-                        description);
-                // Add it to the output
-                entries.add(entry);
+            };
+            
+            String user = params.getUser();
+            Long fromTime = (params.getDateFrom() == null ? null : new Long(params.getDateFrom().getTime()));
+            Long toTime = (params.getDateTo() == null ? null : new Long(params.getDateTo().getTime()));
+            int maxEntries = params.getMaxEntries();
+            
+            try
+            {
+                // start the audit trail JSON
+                writeAuditTrailHeader(fileWriter);
+                
                 if (logger.isDebugEnabled())
                 {
-                    logger.debug("   " + entry);
+                    logger.debug("RM Audit: Issuing query: " + params);
                 }
-                // Keep going
-                return true;
+                
+                auditService.auditQuery(
+                        callback,
+                        RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
+                        user,
+                        fromTime,
+                        toTime,
+                        maxEntries);
+                
+                // finish off the audit trail JSON
+                writeAuditTrailFooter(fileWriter);
             }
-        };
-        
-        String user = params.getUser();
-        Long fromTime = (params.getDateFrom() == null ? null : new Long(params.getDateFrom().getTime()));
-        Long toTime = (params.getDateTo() == null ? null : new Long(params.getDateTo().getTime()));
-        int maxEntries = params.getMaxEntries();
-        
-        if (logger.isDebugEnabled())
+            finally
+            {
+                // close the writer
+                try { fileWriter.close(); } catch (IOException closeEx) {}
+            }
+        }
+        catch (IOException ioe)
         {
-            logger.debug("RM Audit: Issuing query: " + params);
+            throw new AlfrescoRuntimeException("Failed to generate audit trail file", ioe);
         }
         
-        auditService.auditQuery(
-                callback,
-                RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
-                user,
-                fromTime,
-                toTime,
-                maxEntries);
+        return auditTrailFile;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public NodeRef fileAuditTrailAsRecord(RecordsManagementAuditQueryParameters params,
+                NodeRef destination)
+    {
+        // NOTE: the underlying RM services checks the pre-conditions
         
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("RM Audit: Got " + entries.size() + " query results for params: " + params);
-        }
-        return entries;
+        // get the audit trail for the provided parameters
+        
+        // file the audit log as an undeclared record
+        
+        return null;
+    }
+    
+    /**
+     * Writes the start of the audit JSON stream to the given writer
+     * 
+     * @param writer The writer to write to
+     * @throws IOException
+     */
+    private void writeAuditTrailHeader(Writer writer) throws IOException
+    {
+        writer.write("{\n\t\"data\":\n\t{");
+        writer.write("\n\t\t\"started\": \"");
+        writer.write(ISO8601DateFormat.format(getDateLastStarted()));
+        writer.write("\",\n\t\t\"stopped\": \"");
+        writer.write(ISO8601DateFormat.format(getDateLastStopped()));
+        writer.write("\",\n\t\t\"enabled\": ");
+        writer.write(Boolean.toString(isEnabled()));
+        writer.write(",\n\t\t\"entries\":[");
+    }
+    
+    /**
+     * Writes the end of the audit JSON stream to the given writer
+     * 
+     * @param writer The writer to write to
+     * @throws IOException
+     */
+    private void writeAuditTrailFooter(Writer writer) throws IOException
+    {
+        writer.write("\n\t\t]\n\t}\n}");
     }
 }

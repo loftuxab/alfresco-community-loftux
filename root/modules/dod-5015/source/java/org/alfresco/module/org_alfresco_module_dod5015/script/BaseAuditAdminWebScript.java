@@ -32,12 +32,11 @@ import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 
 /**
- * Base class for all Java backed webscript implementations
- * for audit related operations.
+ * Base class for all audit administration webscripts.
  * 
  * @author Gavin Cornwell
  */
-public class BaseAuditLogWebScript extends DeclarativeWebScript
+public class BaseAuditAdminWebScript extends DeclarativeWebScript
 {
     protected RecordsManagementAuditService rmAuditService;
     

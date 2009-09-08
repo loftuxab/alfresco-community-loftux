@@ -24,8 +24,10 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.audit;
 
+import java.io.File;
 import java.util.Date;
-import java.util.List;
+
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * Records management audit service.
@@ -90,13 +92,31 @@ public interface RecordsManagementAuditService
      * Retrieves a list of audit log entries using the provided parameters
      * represented by the RecordsManagementAuditQueryParameters instance.
      * <p>
-     * The parameters are all optional, null or an empty RecordsManagementAuditQueryParameters
+     * The parameters are all optional so an empty RecordsManagementAuditQueryParameters
      * object will result in ALL audit log entries for the RM system being
      * returned. Setting the various parameters effectively filters the full
      * audit trail.
      * 
      * @param params        Parameters to use to retrieve audit trail (never <tt>null</tt>)
-     * @return              List of RecordsManagementAuditEntry objects
+     * @return              File containing JSON representation of audit trail
      */
-    List<RecordsManagementAuditEntry> getAuditTrail(RecordsManagementAuditQueryParameters params);
+    File getAuditTrail(RecordsManagementAuditQueryParameters params);
+    
+    /**
+     * Retrieves a list of audit log entries using the provided parameters
+     * represented by the RecordsManagementAuditQueryParameters instance and
+     * then files the resulting log as an undeclared record in the record folder 
+     * represented by the given NodeRef.
+     * <p>
+     * The parameters are all optional so an empty RecordsManagementAuditQueryParameters
+     * object will result in ALL audit log entries for the RM system being
+     * returned. Setting the various parameters effectively filters the full
+     * audit trail.
+     * 
+     * @param params        Parameters to use to retrieve audit trail (never <tt>null</tt>)
+     * @param destination   NodeRef representing a record folder in which to file the audit log
+     * @return              NodeRef of the undeclared record filed
+     */
+    NodeRef fileAuditTrailAsRecord(RecordsManagementAuditQueryParameters params, 
+                NodeRef destination);
 }

@@ -24,17 +24,11 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
 
-import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.web.scripts.Cache;
-import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
+import org.alfresco.web.scripts.WebScriptResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,113 +38,50 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Gavin Cornwell
  */
-public class AuditLogGet extends BaseAuditLogWebScript
+public class AuditLogGet extends BaseAuditRetrievalWebScript
 {
     /** Logger */
     private static Log logger = LogFactory.getLog(AuditLogGet.class);
     
-    protected final static String PARAM_USER = "user";
-    protected final static String PARAM_SIZE = "size";
-    protected final static String PARAM_FROM = "from";
-    protected final static String PARAM_TO = "to";
-    protected final static String DATE_PATTERN = "yyyy-MM-dd";
-    
-    /*
-     * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
-     */
-    @Override
-    protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
-    {
-        // this webscript has a couple of different forms of url, work out
-        // whether a nodeRef has been supplied or whether the whole audit
-        // log should be displayed
-        NodeRef nodeRef = null;
-        
-        Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
-        String storeType = templateVars.get("store_type");
-        if (storeType != null && storeType.length() > 0)
-        {
-            // there is a store_type so all other params are likely to be present
-            String storeId = templateVars.get("store_id");
-            String nodeId = templateVars.get("id");
-            
-            // create the nodeRef
-            nodeRef = new NodeRef(new StoreRef(storeType, storeId), nodeId);
-        }
-        
-        // create model object with the audit model
-        Map<String, Object> model = new HashMap<String, Object>(1);
-        model.put("auditlog", generateAuditModel(req, nodeRef));
-        return model;
-    }
-    
-    /**
-     * Generates the audit log model for the optional node. If a node
-     * is not supplied the audit log for the whole system is returned.
-     * 
-     * @param req The request
-     * @param nodeRef The NodeRef to get audit log for
-     * @return Map representing the audit log model
-     */
-    protected Map<String, Object> generateAuditModel(WebScriptRequest req, NodeRef nodeRef)
-    {
-        Map<String, Object> model = createAuditStatusModel();
-        
-        // gather all the common filtering parameters
-        String size = req.getParameter(PARAM_SIZE);
-        String user = req.getParameter(PARAM_USER);
-        String from = req.getParameter(PARAM_FROM);
-        String to = req.getParameter(PARAM_TO);
+    protected final static String PARAM_EXPORT = "export";
 
-        // create parameters for audit trail retrieval
-        RecordsManagementAuditQueryParameters params = new RecordsManagementAuditQueryParameters();
-        params.setNodeRef(nodeRef);
-        params.setUser(user);
+    @Override
+    public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException
+    {
+        File auditTrail = null;
         
-        if (size != null && size.length() > 0)
+        try
         {
-            try
+            // parse the parameters and get a file containing the audit trail
+            auditTrail = this.rmAuditService.getAuditTrail(parseQueryParameters(req));
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Streaming audit trail from file: " + auditTrail.getAbsolutePath());
+            
+            boolean attach = false;
+            String attachFileName = null;
+            String export = req.getParameter(PARAM_EXPORT);
+            if (export != null && Boolean.parseBoolean(export))
             {
-                params.setMaxEntries(Integer.parseInt(size));
+                attach = true;
+                attachFileName = auditTrail.getName();
+                
+                if (logger.isDebugEnabled())
+                    logger.debug("Exporting audit trail using file name: " + attachFileName);
             }
-            catch (NumberFormatException nfe)
+            
+            // stream the file back to the client
+            streamContent(req, res, auditTrail, attach, attachFileName);
+        }
+        finally
+        {
+            if (auditTrail != null)
             {
-                if (logger.isWarnEnabled())
-                    logger.warn("Ignoring size parameter as '" + size + "' is not a number!");
+                auditTrail.delete();
+                
+                if (logger.isDebugEnabled())
+                    logger.debug("Deleted temporary file: " + auditTrail.getAbsolutePath());
             }
         }
-        
-        if (from != null && from.length() > 0)
-        {
-            try
-            {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
-                params.setDateFrom(dateFormat.parse(from));
-            }
-            catch (ParseException pe)
-            {
-                if (logger.isWarnEnabled())
-                    logger.warn("Ignoring from parameter as '" + from + "' does not conform to the date pattern: " + DATE_PATTERN);
-            }
-        }
-        
-        if (to != null && to.length() > 0)
-        {
-            try
-            {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
-                params.setDateTo(dateFormat.parse(to));
-            }
-            catch (ParseException pe)
-            {
-                if (logger.isWarnEnabled())
-                    logger.warn("Ignoring to parameter as '" + to + "' does not conform to the date pattern: " + DATE_PATTERN);
-            }
-        }
-        
-        // get the audit trail
-        model.put("entries", this.rmAuditService.getAuditTrail(params));
-        
-        return model;
     }
 }
