@@ -103,6 +103,7 @@
       onReady: function RM_Audit_onReady()
       {
          this.initEvents();
+         
          // Load the People Finder component from the server
          Alfresco.util.Ajax.request(
          {
@@ -119,13 +120,14 @@
             failureMessage: "Could not load People Finder component",
             execScripts: true
          });
+         
          // Decoupled event listeners
          YAHOO.Bubbling.on("personSelected", this.onPersonSelected, this);
          YAHOO.Bubbling.on('PersonFilterActivated',this.personFilterActivated);
          YAHOO.Bubbling.on('PersonFilterDeactivated',this.personFilterDeactivated);
-
          
          var buttons = Sel.query('button',this.id).concat(Sel.query('input[type=submit]',this.id));
+
          // Create widget button while reassigning classname to src element (since YUI removes classes). 
          // We need the classname so we can identify what action to take when it is interacted with (event  delegation).
          for (var i=0, len = buttons.length; i<len; i++)
@@ -138,8 +140,7 @@
               this.widgets[id]._button.className=button.className;
           }
          }       
-         //Sets up datatable. Could do with a generic helper
-         //Might need a cell formatter for timestamp
+         //Sets up datatable.
          var DS = this.widgets['auditDataSource'] = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI+'api/rma/admin/rmauditlog');
          
 
@@ -164,33 +165,21 @@
          
          this.widgets['status-date'] = Dom.get(this.id+'-status-date');
 
-         if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_COMPACT)
+         this.validAuditDates = (this.options.startDate!=="");
+         if (this.validAuditDates)
          {
-            Dom.get(this.id+'-from-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.startDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);
-            Dom.get(this.id+'-to-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.stopDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);  
+            if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_COMPACT)
+            {
+               Dom.get(this.id+'-from-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.startDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);
+               Dom.get(this.id+'-to-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.stopDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);  
+            }
+            else
+            {
+               this.toggleUI();            
+            }  
          }
-         else
-         {
-            this.toggleUI();            
-         }
-         this.pollData();
       },
-      /**
-       * Poll data every x seconds based on options configuration
-       *  
-       */
-      pollData: function pollData()
-      {
-         // Set up polling
-         var pollCallback = { 
-            success: this.widgets['auditDataSource'].onDataReturnInitializeTable, 
-            failure: function() { 
-                YAHOO.log("Polling failure", "error"); 
-            }, 
-            scope: this.widgets['auditDataSource'] 
-         };
-         this.widgets['auditDataSource'].setInterval(this.options.pollInterval, null, pollCallback); 
-      },
+      
       /**
        * Updates the UI to show status of UI and start/stop buttons
        *  

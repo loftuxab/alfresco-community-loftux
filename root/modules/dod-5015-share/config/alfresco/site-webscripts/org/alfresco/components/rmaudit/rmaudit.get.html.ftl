@@ -4,8 +4,7 @@
           'viewMode':Alfresco.RM_Audit.VIEW_MODE_COMPACT,
           'enabled' : ${auditStatus.enabled?string},
           'startDate':"${auditStatus.started}",
-          'stopDate':"${auditStatus.stopped}",
-          'pollInterval':20000          
+          'stopDate':"${auditStatus.stopped}"
        }
     ).setMessages(${messages});
   </script>
