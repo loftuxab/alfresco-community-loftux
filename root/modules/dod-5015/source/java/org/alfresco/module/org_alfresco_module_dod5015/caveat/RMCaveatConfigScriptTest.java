@@ -211,7 +211,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
             /**
              * Now do a post to create a new list
              */  
-            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
+            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_OK); 
             JSONObject top = new JSONObject(response.getContentAsString());
         
             JSONObject data = top.getJSONObject("data");       
@@ -412,7 +412,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
              * Now do a post to create a new list
              */
             
-            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
+            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_OK); 
                 // Check the response 
        }
         
@@ -458,7 +458,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
             /**
              * Now do a post to create a new list
              */  
-            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
+            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_OK); 
             JSONObject top = new JSONObject(response.getContentAsString());
             
             JSONObject data = top.getJSONObject("data");
@@ -499,7 +499,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
              * Now do a post to create a new list
              */
             
-            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
+            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_OK); 
             JSONObject top = new JSONObject(response.getContentAsString());
             
             JSONObject data = top.getJSONObject("data");
@@ -911,7 +911,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
             /**
              * Now do a post to create a new list
              */  
-            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_CREATED); 
+            Response response = sendRequest(new PostRequest(URL_RM_CONSTRAINTS, obj.toString(), "application/json"), Status.STATUS_OK); 
             JSONObject top = new JSONObject(response.getContentAsString());
         
             JSONObject data = top.getJSONObject("data");       
