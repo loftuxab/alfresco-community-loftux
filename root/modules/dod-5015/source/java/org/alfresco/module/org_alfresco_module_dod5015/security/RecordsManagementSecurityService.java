@@ -75,17 +75,67 @@ public interface RecordsManagementSecurityService
      */
     Set<QName> getProtectedProperties();
     
+    /**
+     * Get all the available roles for the given records management root node
+     * 
+     * @param rmRootNode
+     * @return
+     */
     Set<Role> getRoles(NodeRef rmRootNode);
     
-    Role getRole(NodeRef rmRootNode, String role);
+    /**
+     * Gets the roles for a given user
+     * 
+     * @param rmRootNode
+     * @param user
+     * @return
+     */
+    Set<Role> getRolesByUser(NodeRef rmRootNode, String user);
     
+    /**
+     * Get a role by name
+     * 
+     * @param rmRootNode
+     * @param role
+     * @return
+     */
+    Role getRole(NodeRef rmRootNode, String role);    
+    
+    /**
+     * Indicate whether a role exists for a given records management root node
+     * @param rmRootNode
+     * @param role
+     * @return
+     */
     boolean existsRole(NodeRef rmRootNode, String role);
     
+    /**
+     * Create a new role
+     * 
+     * @param rmRootNode
+     * @param role
+     * @param roleDisplayLabel
+     * @param capabilities
+     * @return
+     */
     Role createRole(NodeRef rmRootNode, String role, String roleDisplayLabel, Set<Capability> capabilities);
     
-
+    /**
+     * Update an existing role
+     * 
+     * @param rmRootNode
+     * @param role
+     * @param roleDisplayLabel
+     * @param capabilities
+     * @return
+     */
     Role updateRole(NodeRef rmRootNode, String role, String roleDisplayLabel, Set<Capability> capabilities);
     
-  
+    /**
+     * Delete a role
+     * 
+     * @param rmRootNode
+     * @param role
+     */
     void deleteRole(NodeRef rmRootNode, String role);
 }

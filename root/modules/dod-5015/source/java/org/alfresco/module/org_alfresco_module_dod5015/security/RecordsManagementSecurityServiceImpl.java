@@ -69,11 +69,21 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         this.voter = voter;       
     }
     
+    /**
+     * Set the authortiy service
+     * 
+     * @param authorityService
+     */
     public void setAuthorityService(AuthorityService authorityService)
     {
         this.authorityService = authorityService;
     }
     
+    /**
+     * Set the permission service
+     * 
+     * @param permissionService
+     */
     public void setPermissionService(PermissionService permissionService)
     {
         this.permissionService = permissionService;
@@ -137,8 +147,39 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                     String displayLabel = authorityService.getAuthorityDisplayName(roleAuthority);
                     Set<String> capabilities = getCapabilities(rmRootNode, roleAuthority);
                     
-                    Role role = new Role(name, displayLabel, capabilities);
+                    Role role = new Role(name, displayLabel, capabilities, roleAuthority);
                     result.add(role);            
+                }
+                
+                return result;
+            }
+        }, AuthenticationUtil.getAdminUserName());
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#getRolesByUser(org.alfresco.service.cmr.repository.NodeRef, java.lang.String)
+     */
+    public Set<Role> getRolesByUser(final NodeRef rmRootNode, final String user)
+    {
+        return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Set<Role>>()
+        {
+            public Set<Role> doWork() throws Exception
+            {
+                Set<Role> result = new HashSet<Role>(13);
+                
+                Set<String> roleAuthorities = authorityService.getAllAuthoritiesInZone(getZoneName(rmRootNode), AuthorityType.GROUP);        
+                for (String roleAuthority : roleAuthorities)
+                {
+                    Set<String> users = authorityService.getContainedAuthorities(AuthorityType.USER, roleAuthority, false);
+                    if (users.contains(user) == true)
+                    {                    
+                        String name = getShortRoleName(authorityService.getShortName(roleAuthority), rmRootNode);
+                        String displayLabel = authorityService.getAuthorityDisplayName(roleAuthority);
+                        Set<String> capabilities = getCapabilities(rmRootNode, roleAuthority);
+                        
+                        Role role = new Role(name, displayLabel, capabilities, roleAuthority);
+                        result.add(role);  
+                    }
                 }
                 
                 return result;
@@ -156,11 +197,25 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         return RM_ROLE_ZONE_PREFIX + rmRootNode.getId();
     }
     
+    /**
+     * Get the full role name
+     * 
+     * @param role
+     * @param rmRootNode
+     * @return
+     */
     private String getFullRoleName(String role, NodeRef rmRootNode)
     {
         return role + rmRootNode.getId();
     }
     
+    /**
+     * Get the short role name
+     * 
+     * @param fullRoleName
+     * @param rmRootNode
+     * @return
+     */
     private String getShortRoleName(String fullRoleName, NodeRef rmRootNode)
     {
         return fullRoleName.replaceAll(rmRootNode.getId(), "");
@@ -181,7 +236,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 String displayLabel = authorityService.getAuthorityDisplayName(roleAuthority);                
                 Set<String> capabilities = getCapabilities(rmRootNode, roleAuthority);
                 
-                return new Role(name, displayLabel, capabilities);
+                return new Role(name, displayLabel, capabilities, getFullRoleName(role, rmRootNode));
             }
         }, AuthenticationUtil.getAdminUserName());
     }
@@ -260,7 +315,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 {
                     capStrings.add(capability.getName());
                 }
-                return new Role(role, roleDisplayLabel, capStrings);
+                return new Role(role, roleDisplayLabel, capStrings, fullRoleName);
             }
         }, AuthenticationUtil.getAdminUserName());
     }
@@ -292,7 +347,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 {
                     capStrings.add(capability.getName());
                 }
-                return new Role(role, roleDisplayLabel, capStrings);
+                return new Role(role, roleDisplayLabel, capStrings, getFullRoleName(role, rmRootNode));
                 
             }
         }, AuthenticationUtil.getAdminUserName());
