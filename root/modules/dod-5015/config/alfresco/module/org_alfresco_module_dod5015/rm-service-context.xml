@@ -420,6 +420,155 @@
         </property>
     </bean>
     
+    <bean id="customEmailMappingService" 
+      class="org.alfresco.module.org_alfresco_module_dod5015.email.CustomEmailMappingServiceImpl" >
+      <property name="extracter" ref="extracter.RFC822" />
+      <property name="nodeService" ref="nodeService" />
+      <property name="contentService" ref="contentService"/>
+      <property name="namespacePrefixResolver">
+            <ref bean="namespaceService"></ref>
+      </property>
+      <property name="policyComponent"><ref bean="policyComponent" /></property>
+      <property name="transactionService"><ref bean="transactionService" /></property>
+   
+    </bean>
+    
+    
+    <bean id="CustomEmailMappingService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+    
+        <bean id="CustomEmailMappingService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref bean="accessDecisionManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref bean="afterInvocationManager"/>
+        </property>
+        <property name="objectDefinitionSource">
+            <value>
+                <![CDATA[ 
+                    org.alfresco.module.org_alfresco_module_dod5015.email.CustomEmailMappingService.getCustomMappings=RM_ALLOW
+                    org.alfresco.module.org_alfresco_module_dod5015.email.CustomEmailMappingService.addCustomMapping=RM_ALLOW
+                    org.alfresco.module.org_alfresco_module_dod5015.email.CustomEmailMappingService.deleteCustomMapping=RM_ALLOW
+                    org.alfresco.module.org_alfresco_module_dod5015.email.CustomEmailMappingService.*=RM_DENY
+                ]]>
+            </value>
+        </property>
+    </bean>
+
+        
+    <bean id="CustomEmailMappingService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.module.org_alfresco_module_dod5015.email.CustomEmailMappingService</value>
+            </list>
+        </property>
+        <property name="targetName">
+            <value>customEmailMappingService</value>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="CustomEmailMappingService_transaction"/>
+                <idref local="CustomEmailMappingService_security"/>
+                <idref bean="exceptionTranslator"/>
+            </list>
+        </property>
+    </bean>
+    
+    
+        <!-- RM caveats -->
+    <!-- Caveat read veto is now enforced via the security wrappers for RM -->
+    
+    <bean id="caveatConfigService" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigServiceImpl">
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="contentService" ref="contentService"/>
+        <property name="dictionaryService" ref="dictionaryService"/>
+        <property name="namespaceService" ref="namespaceService"/>
+        <property name="authorityService" ref="authorityService"/>
+        <property name="personService" ref="personService"/>
+        <property name="nodeService" ref="nodeService"/>
+        <property name="recordsManagementAdminService" ref = "recordsManagementAdminService" />
+        
+    </bean>
+    
+    <bean id="rmListOfValuesContraintInit" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint">
+        <property name="caveatConfigService" ref="caveatConfigService"/>
+    </bean>
+    
+    <bean id="CaveatConfigService_security" class="org.alfresco.repo.security.permissions.impl.acegi.MethodSecurityInterceptor">
+        <property name="authenticationManager">
+            <ref bean="authenticationManager"/>
+        </property>
+        <property name="accessDecisionManager">
+            <ref bean="accessDecisionManager"/>
+        </property>
+        <property name="afterInvocationManager">
+            <ref bean="afterInvocationManager"/>
+        </property>
+        <property name="objectDefinitionSource">
+            <value>
+                <![CDATA[ 
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.getRMAllowedValues=RM_ALLOW  
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.hasAccess=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.getRMConstraint=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.getAllRMConstraints=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.getListDetails=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.updateOrCreateCaveatConfig=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.addRMConstraint=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.updateRMConstraintAllowedValues=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.updateRMConstraintTitle=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.deleteRMConstraint=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.addRMConstraintListValue=RM_ALLOW 
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.updateRMConstraintListAuthority=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.removeRMConstraintListAuthority=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.updateRMConstraintListValue=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.removeRMConstraintListValue=RM_ALLOW
+                   org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService.*=RM_DENY
+                ]]>
+            </value>
+        </property>
+    </bean>         
+
+    <bean id="CaveatConfigService_transaction" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+        <property name="transactionManager">
+            <ref bean="transactionManager"/>
+        </property>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">${server.transaction.mode.default}</prop>
+            </props>
+        </property>
+    </bean>
+    
+    <bean id="CaveatConfigService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService</value>
+            </list>
+        </property>
+        <property name="targetName">
+            <value>caveatConfigService</value>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <idref local="CaveatConfigService_transaction"/>
+                <idref local="CaveatConfigService_security"/>
+                <idref bean="exceptionTranslator"/>
+            </list>
+        </property>
+    </bean>
+    
     <!-- Search Behaviour -->
     
     <bean id="recordsManagementSearchBehaviour" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour" init-method="init">        

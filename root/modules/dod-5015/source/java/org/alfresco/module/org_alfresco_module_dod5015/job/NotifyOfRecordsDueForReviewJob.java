@@ -25,20 +25,33 @@
 
 package org.alfresco.module.org_alfresco_module_dod5015.job;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.repo.action.executer.MailActionExecuter;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.repository.TemplateService;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -52,7 +65,7 @@ import org.quartz.JobExecutionException;
 public class NotifyOfRecordsDueForReviewJob implements Job
 {
     private static Log logger = LogFactory.getLog(NotifyOfRecordsDueForReviewJob.class);
-
+    
     /**
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      */
@@ -60,11 +73,22 @@ public class NotifyOfRecordsDueForReviewJob implements Job
     {
         final NodeService nodeService = (NodeService) context.getJobDetail().getJobDataMap().get(
                     "nodeService");
-        final SearchService search = (SearchService) context.getJobDetail().getJobDataMap().get(
+        final SearchService searchService = (SearchService) context.getJobDetail().getJobDataMap().get(
                     "searchService");
         final TransactionService trxService = (TransactionService) context.getJobDetail()
                     .getJobDataMap().get("transactionService");
-
+        final ActionService actionService = (ActionService) context.getJobDetail()
+                    .getJobDataMap().get("actionService");
+        final TemplateService templateService = (TemplateService) context.getJobDetail()
+                    .getJobDataMap().get("templateService");
+        final String to = (String)context.getJobDetail()
+                    .getJobDataMap().get("to");
+        final String from = (String)context.getJobDetail()
+                    .getJobDataMap().get("from");
+        final String subject = (String)context.getJobDetail()
+                    .getJobDataMap().get("subject");
+        final String template = "PATH:\"/app:company_home/app:dictionary/cm:records_management/cm:records_management_email_templates/cm:notify-records-due-for-review-email.ftl\"";
+        
         if (logger.isDebugEnabled())
         {
             logger.debug("Job " + this.getClass().getSimpleName() + " starting.");
@@ -78,8 +102,6 @@ public class NotifyOfRecordsDueForReviewJob implements Job
                 // a notification has not been sent.
                 StringBuilder queryBuffer = new StringBuilder();
                 queryBuffer.append("+ASPECT:\"rma:vitalRecord\" ");
-//                sb.append("+TYPE:\"rma:recordFolder\" ");
-//                sb.append("+(@rma\\:dispositionAction:(\"cutOff\" OR \"retain\"))");
                 
                 queryBuffer.append("+(@rma\\:reviewAsOf:[MIN TO NOW] ) ");
                 queryBuffer.append("+( ");
@@ -88,44 +110,61 @@ public class NotifyOfRecordsDueForReviewJob implements Job
                 queryBuffer.append(") ");
                 String query = queryBuffer.toString();
 
-                ResultSet results = search.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
+                ResultSet results = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
                             SearchService.LANGUAGE_LUCENE, query);
 
-                List<NodeRef> resultNodes = results.getNodeRefs();
+                final List<NodeRef> resultNodes = results.getNodeRefs();
                 
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Found " + resultNodes.size() + " nodes due for review and without notification.");
                 }
-
-                RetryingTransactionHelper trn = trxService.getRetryingTransactionHelper();
-
-                for (NodeRef node : resultNodes)
+                               
+                if(resultNodes.size() > 0)
                 {
-                    final NodeRef currentNode = node;
+                    List<Record> arrayList = new ArrayList<Record>();
+                    Map<String, Object> model = new HashMap<String, Object>(8, 1.0f);
+                    
+                    for (NodeRef currentNode : resultNodes)
+                    {
+                        Map<QName, Serializable> props = nodeService.getProperties(currentNode);
+                        Record record = new Record();
+                        record.setName((String)props.get(ContentModel.PROP_NAME));
+                        arrayList.add(record);
+                    }
+                    
+                    model.put("records", arrayList);
+
+                    String emailText = templateService.processTemplate(template, model);        
+                    
+                    /**
+                     * Send an email for the records management notification
+                     */
+                    Action emailAction = actionService.createAction("mail");
+                    emailAction.setParameterValue(MailActionExecuter.PARAM_TO, to);
+                    emailAction.setParameterValue(MailActionExecuter.PARAM_FROM, from);
+                    emailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, subject);
+                    emailAction.setParameterValue(MailActionExecuter.PARAM_TEXT, emailText);
+                    emailAction.setExecuteAsynchronously(false);
+                    actionService.executeAction(emailAction, null);
+
+                    /**
+                     * Set the notification issued property
+                     */
+                    RetryingTransactionHelper trn = trxService.getRetryingTransactionHelper();
                     RetryingTransactionCallback<Boolean> txCallback = new RetryingTransactionCallback<Boolean>()
                     {
+                        // Set the notification issued property.
                         public Boolean execute() throws Throwable
                         {
-                            //TODO Send notification for these nodes and set rma:notificationIssued to true
-                            
-                            // Here's what I need to do.
-                            // I need to call actionService.createAction("mail") which will give me
-                            // a MailActionExecutor object. Then I may need to configure that object?
-                            // Then actionService.execute?
-                            // Also: to test, I'll need to configure custom-repository.properties
-                            // to have the following:
-//                            mail.host=zimbra.alfresco.com
-//                            mail.port=25
-//                            mail.username=rwetherall
-//                            mail.password=pwd
-                            // in it.
-                            
-                            //TODO Perhaps we should roll up the notification message to list
-                            // all parent folders.
+                            for (NodeRef node : resultNodes)
+                            {
+                                nodeService.setProperty(node, RecordsManagementModel.PROP_NOTIFICATION_ISSUED, "true");
+                            }
                             return Boolean.TRUE;
                         }
                     };
+                    
                     /**
                      * Now do the work, one action in each transaction
                      */
@@ -133,11 +172,30 @@ public class NotifyOfRecordsDueForReviewJob implements Job
                 }
                 return null;
             }
+            
         }, AuthenticationUtil.getSystemUserName());
 
         if (logger.isDebugEnabled())
         {
             logger.debug("Job " + this.getClass().getSimpleName() + " finished");
+        }     
+    }  // end of execute method
+    
+    class Record
+    {
+        private String name;
+
+        private void setName(String name)
+        {
+            this.name = name;
+        }
+
+        private String getName()
+        {
+            return name;
         }
     }
+    
 }
+
+
