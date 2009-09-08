@@ -110,11 +110,7 @@
          });
 
          // Export All button: only "read" access required
-         /**
-          * Is this the correct place for the Export All button?
-          *
          this.widgets.exportAllButton = Alfresco.util.createYUIButton(this, "exportAll-button", this.onExportAll);
-         */
 
          // Selected Items menu button
          this.widgets.selectedItems = Alfresco.util.createYUIButton(this, "selectedItems-button", this.onSelectedItems,
@@ -454,6 +450,25 @@
        */
       onExportAll: function DLTB_onExportAll(e, p_obj)
       {
+         // Load all series so they (and all their child objects) can be exported
+         Alfresco.util.Ajax.jsonGet(
+         {
+            url: Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/treenode/site/rmsite/documentLibrary?perms=false",
+            successCallback:
+            {
+               fn: function(serverResponse)
+               {
+                  if (serverResponse.json && serverResponse.json.items)
+                  {
+                     // Display the export dialog and do the export
+                     var items = serverResponse.json.items;
+                     this.onActionExport(items);
+                  }
+               },
+               scope: this
+            },
+            failureMessage: this.msg("message.load-tolevel-passets.failure")
+         });
       },
 
       /**

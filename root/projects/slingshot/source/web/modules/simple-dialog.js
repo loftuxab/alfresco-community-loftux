@@ -322,7 +322,7 @@
                   this.widgets.cancelButton.set("disabled", true);
                },
                scope: this
-            }
+            };
          }
 
          // Custom ajax before-request interest registered?
@@ -339,11 +339,16 @@
          
          if (this.options.clearForm)
          {
-            var inputs = Selector.query("input", form);
+            var inputs = Selector.query("input", form),
+                  input;
             inputs = inputs.concat(Selector.query("textarea", form));
             for (var i = 0, j = inputs.length; i < j; i++)
             {
-               inputs[i].value = "";
+               input = inputs[i];
+               if(input.getAttribute("type") != "radio" && input.getAttribute("type") != "checkbox")
+               {
+                  input.value = "";                  
+               }
             }
          }
          // Custom before show event interest registered?
@@ -387,6 +392,17 @@
             Dom.get(this.options.firstFocus).focus();
          }
       },
+
+      /**
+       * Hide the dialog
+       *
+       * @method hide
+       */
+      hide: function AmSD_hide()
+      {
+         this._hideDialog();
+      },
+
 
       /**
        * Hide the dialog, removing the caret-fix patch
@@ -500,7 +516,7 @@
          if (!response)
          {
             // Invoke the callback if one was supplied
-            if (typeof this.options.onFailure.fn == "function")
+            if (this.options.onFailure && typeof this.options.onFailure.fn == "function")
             {
                this.options.onFailure.fn.call(this.options.onFailure.scope, this.options.onFailure.obj);
             }
@@ -515,7 +531,7 @@
          else
          {
             // Invoke the callback if one was supplied
-            if (typeof this.options.onSuccess.fn == "function")
+            if (this.options.onSuccess && typeof this.options.onSuccess.fn == "function")
             {
                this.options.onSuccess.fn.call(this.options.onSuccess.scope, response, this.options.onSuccess.obj);
             }

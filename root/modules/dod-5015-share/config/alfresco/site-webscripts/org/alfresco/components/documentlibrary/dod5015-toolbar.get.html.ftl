@@ -23,12 +23,10 @@
             <div class="import"><button id="${args.htmlid}-import-button" name="import">${msg("button.import")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
-         <#-- TODO: Determine if this is the best place for "Export All"
          <div class="hideable toolbar-hidden DocListTree">
             <div class="export-all"><button id="${args.htmlid}-exportAll-button" name="exportAll">${msg("button.export-all")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
-         -->
          <div class="selected-items">
             <button class="no-access-check" id="${args.htmlid}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}</button>
             <div id="${args.htmlid}-selectedItems-menu" class="yuimenu">
