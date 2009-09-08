@@ -577,9 +577,12 @@
          {
             var me = this;
 
-            // widgets
+            // Buttons
             this.widgets.newValueButton = Alfresco.util.createYUIButton(this, "newvalue-button", this.onNewValueClick, {}, parent.id + "-newvalue-button");
             this.widgets.addAccessButton = Alfresco.util.createYUIButton(this, "addaccess-button", this.onAddAccessClick, {}, parent.id + "-addaccess-button");
+            this.widgets.newDoneButton = Alfresco.util.createYUIButton(this, "done-button", this.onDoneButtonClick, {}, parent.id + "-done-button");
+
+            // Make enter key strokes in new value text input add values
             var newValueInput = Dom.get(parent.id + "-newvalue-input"),
                   keyListener = new KeyListener(newValueInput,
                   {
@@ -588,17 +591,21 @@
                   {
                      fn: function()
                      {
-                        me.onNewValueClick(newValueInput);
+                        if (!this.widgets.newValueButton.get("disabled"))
+                        {
+                           me.onNewValueClick(newValueInput);
+                        }
                      },
                      scope:this,
                      correctScope:true
                   }, "keydown").enable();
+
+            // Make sure the "Add" value button is is enabled when characters are entered in the textinput
             Event.addListener(newValueInput, "keyup", function()
             {
-               this.widgets.newValueButton.set("disabled", !this._validateValueTitle(newValueInput));
+               this._enableNewValueButton(newValueInput);
             }, null, this);
-
-            this.widgets.newDoneButton = Alfresco.util.createYUIButton(this, "done-button", this.onDoneButtonClick, {}, parent.id + "-done-button");
+            this._enableNewValueButton(newValueInput);
 
             // Setup data table and data sources
             this._setupValuesDataSource();
@@ -635,7 +642,9 @@
             this._loadValues();
 
             // empty access table
-            this.widgets.accessDataTable.deleteRows(0, this.widgets.accessDataTable.getRecordSet().getLength());            
+            this.widgets.accessDataTable.deleteRows(0, this.widgets.accessDataTable.getRecordSet().getLength());
+            this.widgets.accessDataTable.set("MSG_EMPTY", "");
+            
          },
 
          /**
@@ -679,16 +688,16 @@
           */
 
          /**
-          * Validates the user input for a values title
+          * Validates the user input for a values title and enables/disables the new value button afterwards
           *
-          * @method _validateValueTitle
+          * @method _enableNewValueButton
           * @param newValueInputEl
           * @private
           * @return true if the user input is valid
           */
-         _validateValueTitle: function ViewPanelHandler__validateValueTitle(newValueInputEl)
+         _enableNewValueButton: function ViewPanelHandler__enableNewValueButton(newValueInputEl)
          {
-            return Alfresco.forms.validation.mandatory(newValueInputEl);
+            this.widgets.newValueButton.set("disabled", !Alfresco.forms.validation.mandatory(newValueInputEl));
          },
 
          /**
@@ -867,6 +876,7 @@
                }
                else
                {
+                  this.widgets.accessDataTable.set("MSG_EMPTY", "");                                 
                   this.widgets.addAccessButton.set("disabled", true);
                }
             };
@@ -1014,6 +1024,7 @@
                      // Reload the values and clear the textinput
                      this._loadValues();
                      Dom.get(parent.id + "-newvalue-input").value = "";
+                     this.widgets.newValueButton.set("disabled", true);
                   },
                   scope: this
                },
@@ -1232,7 +1243,7 @@
             {
                renderLoopSize: 32,
                initialLoad: false,
-               MSG_EMPTY: parent.msg("message.loading.access")
+               MSG_EMPTY: ""
             });
 
             // Override abstract function within AccessDataTable to set custom error message
@@ -1314,6 +1325,10 @@
                   failure: failureHandler,
                   scope: this
                });
+            }
+            else
+            {
+               this.widgets.accessDataTable.set("MSG_EMPTY", "");               
             }
          },
 

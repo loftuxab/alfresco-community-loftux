@@ -183,6 +183,11 @@
    border-bottom: 1px dashed #D7D7D7;   
 }
 
+.listofvalues .yui-dt table td.yui-dt-empty
+{
+   border: none;
+}
+
 .listofvalues .listofvalues-list.yui-dt table .yui-dt-last td
 {
    border-bottom: medium none;
