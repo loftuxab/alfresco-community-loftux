@@ -695,7 +695,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         {
             public Object execute() throws Throwable
             {
-                declareRecord(recordOne);
+                TestUtilities.declareRecord(recordOne, unprotectedNodeService, rmActionService);
                 
                 // Clock the asOf date back to ensure eligibility
                 NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL).get(0).getChildRef();     
