@@ -1,5 +1,6 @@
 <script type="text/javascript" charset="utf-8">    
     new Alfresco.RM_Audit('${htmlid}-audit').setOptions({
+       'siteId': "${page.url.templateArgs.site!""}",
        'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT,
        'enabled' : ${auditStatus.enabled?string},
        'startDate':"${auditStatus.started}",

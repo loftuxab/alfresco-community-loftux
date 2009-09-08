@@ -28,6 +28,7 @@
       Alfresco.RM_Audit.superclass.constructor.call(this, "Alfresco.RM_Audit", htmlId,["button", "container", "datasource", "datatable", "paginator", "json"]);
       Alfresco.util.ComponentManager.register(this);
       this.showingFilter = false;
+
       return this;
    };
 
@@ -132,18 +133,24 @@
          // We need the classname so we can identify what action to take when it is interacted with (event  delegation).
          for (var i=0, len = buttons.length; i<len; i++)
          {
-          var button= buttons[i];
-          if (button.id.indexOf('-button')==-1)
-          {
+            var button= buttons[i];
+            if (button.id.indexOf('-button')==-1)
+            {
               var id = button.id.replace(this.id+'-','');
               this.widgets[id] = new YAHOO.widget.Button(button.id);
               this.widgets[id]._button.className=button.className;
-          }
-         }       
+            }
+         }
+         if (this.options.nodeRef)
+         {
+            var nodeRef = this.options.nodeRef.split('/');
+            this.dataUri = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/node/{store_type}/{store_id}/{id}/rmauditlog", { store_type: nodeRef[0], store_id: nodeRef[1], id: nodeRef[2] });
+         }
+         else {
+            this.dataUri = Alfresco.constants.PROXY_URI+'api/rma/admin/rmauditlog';
+         }
          //Sets up datatable.
-         var DS = this.widgets['auditDataSource'] = new YAHOO.util.DataSource(Alfresco.constants.PROXY_URI+'api/rma/admin/rmauditlog');
-         
-
+         var DS = this.widgets['auditDataSource'] = new YAHOO.util.DataSource(this.dataUri);
          
          DS.responseType = YAHOO.util.DataSource.TYPE_JSON;
          DS.responseSchema = {
@@ -177,7 +184,7 @@
             {
                this.toggleUI();            
             }  
-         }
+         }         
       },
       
       /**
@@ -271,14 +278,15 @@
        */      
       onViewLog: function RM_Audit_onViewLog()
       {
+         
          var openAuditLogWindow = function openAuditLogWindow()
          {
-            return window.open(Alfresco.constants.URL_CONTEXT+'page/site/rm/rmaudit', 'Audit_Log', 'resizable=yes,location=no,menubar=no,scrollbars=yes,status=yes,width=400,height=400');
+            return window.open(Alfresco.constants.URL_CONTEXT+'page/site/' + this.options.siteId + '/rmaudit', 'Audit_Log', 'resizable=yes,location=no,menubar=no,scrollbars=yes,status=yes,width=400,height=400');
          };
          // haven't yet opened window yet
          if (!this.fullLogWindowReference)
          {
-            this.fullLogWindowReference = openAuditLogWindow();
+            this.fullLogWindowReference = openAuditLogWindow.call(this);
          }
          else
          {
@@ -291,7 +299,7 @@
             //had been closed so reopen window
             else
             {
-               this.fullLogWindowReference = openAuditLogWindow();
+               this.fullLogWindowReference = openAuditLogWindow.call(this);
             }
          }
       },
@@ -341,7 +349,7 @@
       _changeFilterText: function(text)
       {
          var el = Sel.query('.personFilter span',this.id)[0];
-         el.innerHTML = (text != "") ? text : this.msg('label.default-filter');
+         el.innerHTML = (text !== "") ? text : this.msg('label.default-filter');
       },
       
       

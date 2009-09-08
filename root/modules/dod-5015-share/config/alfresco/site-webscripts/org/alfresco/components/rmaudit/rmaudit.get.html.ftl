@@ -1,10 +1,14 @@
 <script type="text/javascript" charset="utf-8">    
     new Alfresco.RM_Audit('${htmlid}-audit').setOptions(
        {
+          'siteId': "${page.url.templateArgs.site!""}",
           'viewMode':Alfresco.RM_Audit.VIEW_MODE_COMPACT,
           'enabled' : ${auditStatus.enabled?string},
           'startDate':"${auditStatus.started}",
           'stopDate':"${auditStatus.stopped}"
+          <#if (nodeRef?exists)>
+            ,'nodeRef' : '${nodeRef}'
+          </#if>          
        }
     ).setMessages(${messages});
   </script>

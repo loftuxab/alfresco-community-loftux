@@ -570,6 +570,51 @@
       {
          this._dod5015Action("message.unfreeze-all", assets, "unfreezeAll");
       },
+
+      /**
+       * View Audit log
+       *
+       * @method onActionViewAuditLog
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionViewAuditLog: function RDLA_onActionViewAuditLog(assets)
+      {
+         this._viewAuditLog(assets);
+      },
+      
+      /**
+       * View audit log for a noderef
+       *
+       * @method _ViewAuditLog
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       * @private
+       */
+      _viewAuditLog: function RDLA__viewAuditLog(assets)
+      {
+         var openAuditLogWindow = function openAuditLogWindow()
+         {
+            return window.open(Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + '/rmaudit?nodeRef=' + assets.nodeRef.replace(':/',''), 'Audit_Log', 'resizable=yes,location=no,menubar=no,scrollbars=yes,status=yes,width=400,height=400');
+         };
+         // haven't yet opened window yet
+         if (!this.fullLogWindowReference)
+         {
+            this.fullLogWindowReference = openAuditLogWindow.call(this);
+         }
+         else
+         {
+            // window has been opened already and is still open, so focus and reload it.
+            if (!this.fullLogWindowReference.closed)
+            {
+               this.fullLogWindowReference.focus();
+               this.fullLogWindowReference.location.reload();
+            }
+            //had been closed so reopen window
+            else
+            {
+               this.fullLogWindowReference = openAuditLogWindow.call(this);
+            }
+         }
+      },
       
       /**
        * DOD5015 action.
@@ -644,5 +689,6 @@
 
          this.modules.actions.genericAction(config);
       }
+            
    };
 })();
