@@ -8,7 +8,7 @@ function main()
    
    var values = null;
    
-   if(json.has("values"))
+   if (json.has("values"))
    {
       values = json.getJSONArray("values");
    }
@@ -24,9 +24,9 @@ function main()
    
    if (constraint != null)
    {
-     constraint.updateValues(values); 
-     model.constraint = caveatConfig.getConstraint(shortName);
-     model.constraintName = shortName; 
+      constraint.updateValues(values); 
+      model.constraint = caveatConfig.getConstraint(shortName);
+      model.constraintName = shortName; 
    }
    else
    {
