@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,9 +26,6 @@
 package org.alfresco.deployment.impl.asr;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -694,7 +691,7 @@ public class AVMDeploymentTargetTest extends TestCase
     	/**
     	 * Now do a smaller update and check that just a few files update
     	 */
-    	avmService.removeNode(storeName + ":/avm/hibernate");
+    	avmService.removeNode(storeName + ":/avm/ibatis");
     	avmService.getFileOutputStream(storeName + ":/avm/AVMServiceTest.java").close();
     	report = new DeploymentReport();
     	callbacks = new ArrayList<DeploymentCallback>();
@@ -710,7 +707,7 @@ public class AVMDeploymentTargetTest extends TestCase
     	assertEquals(4, smallUpdate.size());
     	
     	assertTrue("Start missing", smallUpdate.contains(new DeploymentEvent(DeploymentEvent.Type.START, null, TEST_TARGET)));
-    	assertTrue("End missing", smallUpdate.contains(new DeploymentEvent(DeploymentEvent.Type.DELETED, null, "/avm/hibernate")));
+    	assertTrue("End missing", smallUpdate.contains(new DeploymentEvent(DeploymentEvent.Type.DELETED, null, "/avm/ibatis")));
     	assertTrue("Update missing", smallUpdate.contains(new DeploymentEvent(DeploymentEvent.Type.UPDATED, null, "/avm/AVMServiceTest.java")));
     	assertTrue("Delete Missing", smallUpdate.contains(new DeploymentEvent(DeploymentEvent.Type.END, null, TEST_TARGET)));	
     }
