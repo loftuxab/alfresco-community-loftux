@@ -212,9 +212,10 @@
                      <control-param name="activateLinks">true</control-param>
                   </control>
                </field>
+               <field id="rma:identifier" set="rm" label-id="label.folderIdentifier" />
+               <field id="rmc:supplementalMarkingList" set="rm" />
                <field id="rma:vitalRecordIndicator" set="rm" />
                <field id="rma:reviewPeriod" set="rm" />
-               <field id="rma:identifier" set="rm" label-id="label.folderIdentifier" />
                <field id="rma:location" set="rm" />
             </appearance>
          </form>
@@ -239,8 +240,10 @@
                <set id="rm-custom" label-id="label.set.customMetadata" appearance="panel" />
                
                <field id="rma:identifier" label-id="label.recordIdentifier" />
+               <field id="rmCategoryIdentifier" label-id="label.categoryIdentifier" />
                <field id="rmDeclared" label-id="label.declared" />
                <field id="rmRecordType" label-id="label.recordType" />
+               <field id="rmDispositionInstructions" label-id="label.dispositionInstructions" />
                <field id="cm:title">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
