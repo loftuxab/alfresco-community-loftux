@@ -299,6 +299,66 @@
          });
       },
 
+
+      /**
+       * Export action.
+       *
+       * @method onActionExport
+       * @param assets {array} Array representing one or more file(s) or folder(s) to be exported
+       */
+      onActionExport: function RDLA_onActionExport(assets)
+      {
+         // Save the nodeRef ids
+         var nodeRefs = [];
+         for(var i = 0; i < assets.length; i++)
+         {
+            nodeRefs.push(assets[i].nodeRef);
+         }
+         this.actionExportNodeRefs = nodeRefs;
+
+         // Open the export dialog
+         var exportWebscriptUrl = Alfresco.constants.PROXY_URI + "api/rma/admin/export";
+         if (!this.modules.exportDialog)
+         {
+            // Load if for the first time
+            this.modules.exportDialog = new Alfresco.module.SimpleDialog(this.id + "-exportDialog").setOptions(
+            {
+               width: "30em",
+               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/export",
+               actionUrl: exportWebscriptUrl,
+               doBeforeDialogShow:
+               {
+                  fn: function ViewPanelHandler_onNewListOfValueClick_SimpleDialog_doBeforeDialogShow(p_config, p_simpleDialog, p_obj)
+                  {
+                     // Set the hidden nodeRefs field to a comma-separated list of nodeRef:s
+                     YAHOO.util.Dom.get(this.id + "-exportDialog-nodeRefs").value = this.actionExportNodeRefs.join(",");
+                  },
+                  scope: this
+               },
+               firstFocus: this.id + "-exportDialog-acp",
+               doBeforeFormSubmit:
+               {
+                  fn: function ViewPanelHandler_onNewListOfValueClick_SimpleDialog_doBeforeFormSubmit()
+                  {
+                     // Close dialog now since no callback is provided since we are submitting in a hidden iframe.
+                     this.modules.exportDialog.hide();
+                  },
+                  scope: this
+               }
+            });
+         }
+         else
+         {
+            // Open the export dialog again
+            this.modules.exportDialog.setOptions(
+            {
+               actionUrl: exportWebscriptUrl,
+               clearForm: true
+            });
+         }
+         this.modules.exportDialog.show();
+      },
+
       /**
        * Edit Review As Of Date action.
        *
