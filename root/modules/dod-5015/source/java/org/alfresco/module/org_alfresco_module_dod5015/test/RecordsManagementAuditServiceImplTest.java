@@ -24,12 +24,11 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
-import java.util.List;
+import java.io.File;
 
 import junit.framework.TestCase;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditEntry;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -106,7 +105,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
             {
                 RecordsManagementAuditQueryParameters params = new RecordsManagementAuditQueryParameters();
                 @SuppressWarnings("unused")
-                List<RecordsManagementAuditEntry> entries = rmAuditService.getAuditTrail(params);
+                File auditTrail = rmAuditService.getAuditTrail(params);
                 return null;
             }
         };

@@ -29,6 +29,8 @@ import java.util.Date;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.util.ParameterCheck;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Class to represent a Records Management audit entry.
@@ -78,6 +80,32 @@ public final class RecordsManagementAuditEntry
           .append(", event=").append(event)
           .append(")");
         return sb.toString();
+    }
+    
+    /**
+     * 
+     * @return The state of this audit entry as a JSON string
+     */
+    public String toJSONString()
+    {
+        try
+        {
+            JSONObject entry = new JSONObject();
+            
+            entry.put("timestamp", getTimestampString());
+            entry.put("userName", this.userName);
+            entry.put("userRole", this.userRole == null ? "": this.userRole);
+            entry.put("fullName", this.fullName == null ? "": this.fullName);
+            entry.put("nodeRef", this.nodeRef == null ? "": this.nodeRef);
+            entry.put("nodeName", this.nodeName == null ? "": this.nodeName);
+            entry.put("event", this.event == null ? "": this.event);
+        
+            return entry.toString();
+        }
+        catch (JSONException je)
+        {
+            return "{}";
+        }
     }
 
     /**

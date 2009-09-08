@@ -37,7 +37,7 @@ import org.alfresco.web.scripts.WebScriptRequest;
  * 
  * @author Gavin Cornwell
  */
-public class AuditLogDelete extends BaseAuditLogWebScript
+public class AuditLogDelete extends BaseAuditAdminWebScript
 {
     /*
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)

@@ -715,7 +715,10 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     {
         // get the full RM audit log 
         Response rsp = sendRequest(new GetRequest(RMA_AUDITLOG_URL), 200);
-        System.out.println(rsp.getContentAsString());
+        // check response
+        assertEquals("application/json", rsp.getContentType());
+        //System.out.println(rsp.getContentAsString());
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         // get category
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Civilian Files", "Foreign Employee Award Files");
@@ -728,17 +731,25 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         // send request
         rsp = sendRequest(new GetRequest(auditUrl), 200);
-        System.out.println(rsp.getContentAsString());
+        // check response
+        assertEquals("application/json", rsp.getContentType());
+        //System.out.println(rsp.getContentAsString());
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         // get the audit log with all restrictions in place
         String filteredAuditUrl = auditUrl + "?user=gavinc&size=5&from=2009-01-01&to=2009-12-31";
         rsp = sendRequest(new GetRequest(filteredAuditUrl), 200);
-        System.out.println(rsp.getContentAsString());
+        // check response
+        assertEquals("application/json", rsp.getContentType());
+        //System.out.println(rsp.getContentAsString());
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         // attempt to get the audit log with invalid restrictions in place
         filteredAuditUrl = auditUrl + "?user=fred&size=abc&from=2009&to=2010";
         rsp = sendRequest(new GetRequest(filteredAuditUrl), 200);
-        System.out.println(rsp.getContentAsString());
+        assertEquals("application/json", rsp.getContentType());
+        //System.out.println(rsp.getContentAsString());
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         // start the RM audit log
         JSONObject jsonPostData = new JSONObject();
@@ -748,7 +759,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         // check the response
         System.out.println(rsp.getContentAsString());
-        JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         JSONObject dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
         assertTrue(dataObj.getBoolean("enabled"));

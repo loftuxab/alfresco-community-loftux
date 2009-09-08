@@ -9,13 +9,14 @@
   <li>user: Only return log entries by the specified user</li>
   <li>from: Only return log entries after the specified date, date should be in yyyy-MM-dd format</li>
   <li>to: Only return log entries before the specified date, date should be in yyyy-MM-dd format</li>
+  <li>export: Set this to 'true' to force the browser to display the Save As dialog</li>
   </ul>
   ]]>
   </description>
   <url>/api/rma/admin/rmauditlog</url>
   <url>/api/node/{store_type}/{store_id}/{id}/rmauditlog</url>
   <format default="json">argument</format>
-  <authentication>user</authentication>
+  <authentication>admin</authentication>
   <transaction allow="readonly">required</transaction>
   <lifecycle>internal</lifecycle>
 </webscript>

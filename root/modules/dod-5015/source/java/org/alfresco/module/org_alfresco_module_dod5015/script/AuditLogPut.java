@@ -42,7 +42,7 @@ import org.json.JSONTokener;
  * 
  * @author Gavin Cornwell
  */
-public class AuditLogPut extends BaseAuditLogWebScript
+public class AuditLogPut extends BaseAuditAdminWebScript
 {
     protected static final String PARAM_ENABLED = "enabled";
     
