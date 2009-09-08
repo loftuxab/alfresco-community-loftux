@@ -5,7 +5,6 @@ function main()
 {
    var urlElements = url.extension.split("/");
    var shortName = urlElements[0];
-   //var authorityName = urlElements[1];
    
    // Get the constraint
    var constraint = caveatConfig.getConstraint(shortName);

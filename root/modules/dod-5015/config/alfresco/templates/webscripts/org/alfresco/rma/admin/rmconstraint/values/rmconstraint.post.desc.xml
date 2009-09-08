@@ -2,23 +2,22 @@
   <shortname>Updates values in an an RM Constraint List</shortname>
   <description><![CDATA[
   Updates values in an an RM Constraint List
-  
-  If the authority is missing from the list then the value is deleted. 
+  <br />
+  If the authority is missing from the list then the value is deleted.
+  <br />
   If an authority does not exist in a list then the authority is added.
-  
   <br />
-  
-  Only the authorities for the specified values are updated.   
+  Only the authorities for the specified values are updated.
+  <br />
   If a value is missing it will not be affected.
-  
   <br />
-  JSON Parameter format
+  JSON Parameter format:
+  <br />
   "values" : [ ValueName, [ authorityName1, authorityName2 ]]
-  
-  The input format for values is different to the output format.
-  
   <br />
-  Data Return format. 
+  The input format for values is different to the output format.
+  <br />
+  Data Return format.
   ]]>
   </description>
   <url>/api/rma/admin/rmconstraints/{listName}/values</url>
