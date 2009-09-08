@@ -405,6 +405,7 @@
          {
             var label = Dom.get(parent.id + "-create-label").value;
             var dataType = Dom.get(parent.id + "-create-type").value;
+            var mandatory = Dom.get(parent.id + "-create-mandatory").checked;
             
             // TODO: add mandatory field support
             // TODO: add list of values selection (constraint)
@@ -413,6 +414,7 @@
             {
                name: label.replace(/\s/g, "").toLowerCase(),
                dataType: dataType,
+               mandatory: mandatory,
                title: label
             };
             
