@@ -28,7 +28,6 @@ import java.util.Set;
 
 /**
  * Records management role class 
- *  
  *
  * @author Roy Wetherall
  */
@@ -37,17 +36,19 @@ public class Role
     private String name;
     private String displayLabel;
     private Set<String> capabilities;
+    private String roleGroupName;
     
     /**
      * @param name
      * @param displayLabel
      * @param capabilities
      */
-    public Role(String name, String displayLabel, Set<String> capabilities)
+    public Role(String name, String displayLabel, Set<String> capabilities, String roleGroupName)
     {
         this.name = name;
         this.displayLabel = displayLabel;
         this.capabilities = capabilities;
+        this.roleGroupName = roleGroupName;
     }
 
     /**
@@ -74,5 +75,11 @@ public class Role
         return capabilities;
     }
 
-    
+    /**
+     * @return the roleGroupName
+     */
+    public String getRoleGroupName()
+    {
+        return roleGroupName;
+    }
 }

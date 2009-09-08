@@ -39,7 +39,12 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.GUID;
+import org.alfresco.util.PropertyMap;
 
 /**
  * Event service implementation unit test
@@ -51,6 +56,9 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     
 	private NodeService nodeService;
+	private AuthenticationService authenticationService;
+	private AuthorityService authorityService;
+	private PersonService personService;
 	private RecordsManagementSecurityService rmSecurityService;
 	
 	@Override
@@ -60,6 +68,9 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
 
 		// Get the service required in the tests
 		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); 
+		this.authenticationService = (AuthenticationService)this.applicationContext.getBean("AuthenticationService");
+		this.personService = (PersonService)this.applicationContext.getBean("PersonService");
+		this.authorityService = (AuthorityService)this.applicationContext.getBean("authorityService");
 		this.rmSecurityService = (RecordsManagementSecurityService)this.applicationContext.getBean("RecordsManagementSecurityService");
 
 		// Set the current security context as admin
@@ -86,6 +97,17 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
         assertEquals("My Role", role.getDisplayLabel());
         assertNotNull(role.getCapabilities());
         assertEquals(5, role.getCapabilities().size());
+        assertNotNull(role.getRoleGroupName());
+        
+        // Add a user to the role
+        String userName = createAndAddUserToRole(role.getRoleGroupName());
+        
+        // Check that we can retrieve the users roles
+        Set<Role> userRoles = rmSecurityService.getRolesByUser(rmRootNode, userName);
+        assertNotNull(userRoles);
+        assertEquals(1, userRoles.size());
+        Role userRole  = userRoles.iterator().next();
+        assertEquals("MyRole", userRole.getName());
         
         try
         {
@@ -113,7 +135,7 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
         assertEquals("SomethingDifferent", result.getDisplayLabel());
         assertNotNull(result.getCapabilities());
         assertEquals(3, result.getCapabilities().size());
-        
+        assertNotNull(result.getRoleGroupName());
 	 
         roles = rmSecurityService.getRoles(rmRootNode);
         assertNotNull(roles);
@@ -128,6 +150,7 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
                 assertEquals("SomethingDifferent", role2.getDisplayLabel());
                 assertNotNull(role2.getCapabilities());
                 assertEquals(3, role2.getCapabilities().size());
+                assertNotNull(role2.getRoleGroupName());
             }
         }
         
@@ -170,5 +193,26 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
 	{
 	    NodeRef root = this.nodeService.getRootNode(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore"));
 	    return this.nodeService.createNode(root, ContentModel.ASSOC_CHILDREN, ContentModel.ASSOC_CHILDREN, DOD5015Model.TYPE_FILE_PLAN).getChildRef();
+	}
+	
+	private String createAndAddUserToRole(String role)
+	{
+	    // Create an athentication
+	    String userName = GUID.generate();
+	    authenticationService.createAuthentication(userName, "PWD".toCharArray());
+	            
+	    // Create a person
+        PropertyMap ppOne = new PropertyMap(4);
+        ppOne.put(ContentModel.PROP_USERNAME, userName);
+        ppOne.put(ContentModel.PROP_FIRSTNAME, "firstName");
+        ppOne.put(ContentModel.PROP_LASTNAME, "lastName");
+        ppOne.put(ContentModel.PROP_EMAIL, "email@email.com");
+        ppOne.put(ContentModel.PROP_JOBTITLE, "jobTitle");        
+        personService.createPerson(ppOne);
+        
+        // Assign the new user to the role passed
+        authorityService.addAuthority(role, userName);
+	    
+        return userName;
 	}
 }
