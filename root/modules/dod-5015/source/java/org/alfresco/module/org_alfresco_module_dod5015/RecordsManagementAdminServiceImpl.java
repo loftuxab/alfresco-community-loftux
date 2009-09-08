@@ -232,14 +232,20 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return propDefns;
     }
     
-    public QName addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description)
+    public QName addCustomPropertyDefinition(QName propId, String aspectName, String clientSideName, QName dataType, String title, String description)
     {
-        return addCustomPropertyDefinition(aspectName, clientSideName, dataType, title, description, null, false, false, false, null);
+        return addCustomPropertyDefinition(propId, aspectName, clientSideName, dataType, title, description, null, false, false, false, null);
     }
     
-    public QName addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraint)
+    public QName addCustomPropertyDefinition(QName propId, String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraint)
     {
-        //TODO title parameter is currently ignored. Intentionally.
+        // title parameter is currently ignored. Intentionally.
+        
+        if (propId == null)
+        {
+            // Generate a propId
+            propId = this.generateQNameFor(clientSideName);
+        }
         
         ParameterCheck.mandatoryString("aspectName", aspectName);
         ParameterCheck.mandatory("clientSideName", clientSideName);
@@ -248,22 +254,22 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         M2Model deserializedModel = readCustomContentModel();
         M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
 
-        QName newQName = this.generateQNameFor(clientSideName);
-        String newQNameAsString = newQName.toPrefixString(namespaceService);
         
         if (customPropsAspect == null)
         {
             throw new AlfrescoRuntimeException("Unknown aspect: " + aspectName);
         }
         
-        M2Property customProp = customPropsAspect.getProperty(newQNameAsString);
+        String propIdAsString = propId.toPrefixString(namespaceService);
+
+        M2Property customProp = customPropsAspect.getProperty(propIdAsString);
         if (customProp != null)
         {
-            throw new AlfrescoRuntimeException("Property already exists: " + newQNameAsString);
+            throw new AlfrescoRuntimeException("Property already exists: " + propIdAsString);
         }
         
-        M2Property newProp = customPropsAspect.createProperty(newQNameAsString);
-        newProp.setName(newQNameAsString);
+        M2Property newProp = customPropsAspect.createProperty(propIdAsString);
+        newProp.setName(propIdAsString);
         newProp.setType(dataType.toPrefixString(namespaceService));
         
         newProp.setTitle(clientSideName);
@@ -278,7 +284,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         {
             if (! dataType.equals(DataTypeDefinition.TEXT))
             {
-                throw new AlfrescoRuntimeException("Cannot apply constraint '"+lovConstraint+"' to property '"+newQNameAsString+"' with datatype '"+dataType+"' (expected: dataType = TEXT)");
+                throw new AlfrescoRuntimeException("Cannot apply constraint '"+lovConstraint+"' to property '"+propIdAsString+"' with datatype '"+dataType+"' (expected: dataType = TEXT)");
             }
             
             String lovConstraintQNameAsString = lovConstraint.toPrefixString(namespaceService);
@@ -290,12 +296,52 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         if (logger.isInfoEnabled())
         {
             logger.info("addCustomPropertyDefinition: "+clientSideName+
-                    "=" + newQNameAsString + " to aspect: "+aspectName);
+                    "=" + propIdAsString + " to aspect: "+aspectName);
         }
         
-        return newQName;
+        return propId;
     }
-    
+
+    public QName updateCustomPropertyDefinition(QName propQName, String newLabel)
+    {
+        ParameterCheck.mandatory("propQName", propQName);
+        ParameterCheck.mandatoryString("newLabel", newLabel);
+        
+        PropertyDefinition propDefn = dictionaryService.getProperty(propQName);
+        if (propDefn == null)
+        {
+            //TODO throw?
+        }
+        
+        M2Model deserializedModel = readCustomContentModel();
+        List<M2Aspect> aspects = deserializedModel.getAspects();
+        // Search through the aspects looking for the custom property
+        M2Aspect targetAspect = null;
+        for (M2Aspect aspect : aspects)
+        {
+            for (M2Property prop : aspect.getProperties())
+            {
+                if (propQName.toPrefixString(namespaceService).equals(prop.getName()))
+                {
+                    targetAspect = aspect;
+                    //Update the title with the new label. - non-incremental change!
+                    prop.setTitle(newLabel);
+                }
+            }
+        }
+        //TODO Handle not found.
+        
+        writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("updateCustomPropertyDefinition: "+propQName+
+                    "=" + newLabel + " to aspect: "+targetAspect);
+        }
+        
+        return propQName;
+    }
+
     public void removeCustomPropertyDefinition(QName propQName)
     {
         // data dictionary does not currently support incremental deletes

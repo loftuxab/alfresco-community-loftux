@@ -70,17 +70,27 @@ public interface RecordsManagementAdminService
      * 
      * Note: no default value, single valued, optional, not system protected, no constraints
      * 
+     * @param propId - If a value for propId is provided it will be used to identify property definitions
+     *                 within URLs and in QNames. Therefore it must contain URL/QName-valid characters
+     *                 only. It must also be unique.
+     *                 If a null value is passed, an id will be generated.
      * @param aspectName - mandatory
      * @param clientSideName - mandatory
      * @param dataType - mandatory
      * @param title - optional
      * @param description - optional
+     * 
+     * @return the propId, whether supplied as a parameter or generated.
      */
-    public QName addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description);
+    public QName addCustomPropertyDefinition(QName propId, String aspectName, String clientSideName, QName dataType, String title, String description);
     
     /**
      * Add custom property definition with one optional constraint reference
      * 
+     * @param propId - If a value for propId is provided it will be used to identify property definitions
+     *                 within URLs and in QNames. Therefore it must contain URL/QName-valid characters
+     *                 only. It must also be unique.
+     *                 If a null value is passed, an id will be generated.
      * @param aspectName - mandatory
      * @param clientSideName - mandatory
      * @param dataType - mandatory
@@ -91,9 +101,19 @@ public interface RecordsManagementAdminService
      * @param mandatory - TRUE if mandatory property
      * @param isProtected - TRUE if protected property
      * @param lovConstraintQName - optional custom constraint
+     * 
+     * @return the propId, whether supplied as a parameter or generated.
      */
-    public QName addCustomPropertyDefinition(String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
+    public QName addCustomPropertyDefinition(QName propId, String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
     
+    /**
+     * Update the value of the 'label' (title) for a custom property definition.
+     * @param propQName the qname of the property definition
+     * @param newLabel the new value for the label.
+     * @return the propId.
+     */
+    public QName updateCustomPropertyDefinition(QName propQName, String newLabel);
+
     /**
      * 
      * @param propQName

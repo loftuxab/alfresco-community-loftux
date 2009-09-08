@@ -8,7 +8,7 @@
 			"${prop.name.toPrefixString()}":
 			{
 				"dataType": "<#if prop.dataType??>${prop.dataType.name.toPrefixString()}</#if>",
-				"title": "${prop.title!""}",
+				"label": "${prop.title!""}",
 				"description": "${prop.description!""}",
 				"mandatory": ${prop.mandatory?string},
 				"multiValued": ${prop.multiValued?string},

@@ -2304,7 +2304,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 try
                 {
                     // Define a custom "project list" property (for records) - note: multi-valued
-                    rmAdminService.addCustomPropertyDefinition(CustomisableRmElement.RECORD.getCorrespondingAspect(),
+                    rmAdminService.addCustomPropertyDefinition(null, CustomisableRmElement.RECORD.getCorrespondingAspect(),
                             PROP_CUSTOM_PRJLIST.getLocalName(), DataTypeDefinition.TEXT, "Projects",
                             null, null, true, false, false, CONSTRAINT_CUSTOM_PRJLIST);
                 } 

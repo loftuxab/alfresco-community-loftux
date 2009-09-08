@@ -171,7 +171,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
             String propTitle = "My property title";
             String description = "My property description";
             
-            rmAdminService.addCustomPropertyDefinition(aspectName, propLocalName, dataType, propTitle, description);
+            rmAdminService.addCustomPropertyDefinition(null, aspectName, propLocalName, dataType, propTitle, description);
         }
         
         txn1.commit();
@@ -194,7 +194,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         declareRecord(testRecord);
 
         // Define a custom property.
-        QName generatedQName = rmAdminService.addCustomPropertyDefinition(ASPECT_CUSTOM_RECORD_FOLDER_PROPERTIES.toPrefixString(namespaceService),
+        QName generatedQName = rmAdminService.addCustomPropertyDefinition(null, ASPECT_CUSTOM_RECORD_FOLDER_PROPERTIES.toPrefixString(namespaceService),
                 "foo", DataTypeDefinition.BOOLEAN, "custom prop title", "custom prop description");
         
         // We need to commit the transaction to trigger behaviour that should reload the data dictionary model.
@@ -632,7 +632,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         boolean mandatory = false;
         boolean isProtected = false;
         
-        rmAdminService.addCustomPropertyDefinition(aspectName, propLocalName, dataType, propTitle, description, defaultValue, multiValued, mandatory, isProtected, testCon);
+        rmAdminService.addCustomPropertyDefinition(null, aspectName, propLocalName, dataType, propTitle, description, defaultValue, multiValued, mandatory, isProtected, testCon);
         
         txn6.commit();
     }
