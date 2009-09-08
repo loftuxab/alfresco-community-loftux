@@ -365,9 +365,6 @@
         <property name="auditService">
             <ref bean="AuditService" />
         </property>
-        <property name="nodeService">
-            <ref bean="NodeService" />
-        </property>
     </bean>
     
     <bean id="RecordsManagementAuditService" class="org.springframework.aop.framework.ProxyFactoryBean">

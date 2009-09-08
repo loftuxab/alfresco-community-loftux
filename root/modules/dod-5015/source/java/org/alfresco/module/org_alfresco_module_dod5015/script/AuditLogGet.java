@@ -53,7 +53,7 @@ public class AuditLogGet extends BaseAuditRetrievalWebScript
         try
         {
             // parse the parameters and get a file containing the audit trail
-            auditTrail = this.rmAuditService.getAuditTrail(parseQueryParameters(req));
+            auditTrail = this.rmAuditService.getAuditTrailFile(parseQueryParameters(req));
             
             if (logger.isDebugEnabled())
                 logger.debug("Streaming audit trail from file: " + auditTrail.getAbsolutePath());

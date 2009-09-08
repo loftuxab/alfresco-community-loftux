@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.audit;
 
 import java.io.File;
 import java.util.Date;
+import java.util.List;
 
 import org.alfresco.service.cmr.repository.NodeRef;
 
@@ -100,7 +101,21 @@ public interface RecordsManagementAuditService
      * @param params        Parameters to use to retrieve audit trail (never <tt>null</tt>)
      * @return              File containing JSON representation of audit trail
      */
-    File getAuditTrail(RecordsManagementAuditQueryParameters params);
+    File getAuditTrailFile(RecordsManagementAuditQueryParameters params);
+    
+    /**
+     * Retrieves a list of audit log entries using the provided parameters
+     * represented by the RecordsManagementAuditQueryParameters instance.
+     * <p>
+     * The parameters are all optional so an empty RecordsManagementAuditQueryParameters
+     * object will result in ALL audit log entries for the RM system being
+     * returned. Setting the various parameters effectively filters the full
+     * audit trail.
+     * 
+     * @param params        Parameters to use to retrieve audit trail (never <tt>null</tt>)
+     * @return              All entries for the audit trail
+     */
+    List<RecordsManagementAuditEntry> getAuditTrail(RecordsManagementAuditQueryParameters params);
     
     /**
      * Retrieves a list of audit log entries using the provided parameters
@@ -117,6 +132,5 @@ public interface RecordsManagementAuditService
      * @param destination   NodeRef representing a record folder in which to file the audit log
      * @return              NodeRef of the undeclared record filed
      */
-    NodeRef fileAuditTrailAsRecord(RecordsManagementAuditQueryParameters params, 
-                NodeRef destination);
+    NodeRef fileAuditTrailAsRecord(RecordsManagementAuditQueryParameters params, NodeRef destination);
 }
