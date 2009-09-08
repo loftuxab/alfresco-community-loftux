@@ -21,6 +21,7 @@
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
          <action type="action-link" id="onActionManagePermissions" permission="ManageAccessControls" label="actions.manage-permissions" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
+         <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />         
       </actionSet>
 
       <actionSet id="undeclaredRecord">
@@ -34,6 +35,7 @@
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
          <action type="action-link" id="onActionManagePermissions" permission="ManageAccessControls" label="actions.manage-permissions" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
+         <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />         
       </actionSet>
    </actionSets>
 </documentList>

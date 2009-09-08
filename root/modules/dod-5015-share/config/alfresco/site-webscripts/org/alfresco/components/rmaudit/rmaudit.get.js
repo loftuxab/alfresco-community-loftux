@@ -14,4 +14,8 @@ function getAuditLogStatus()
    }
 }
 
-model.auditStatus = getAuditLogStatus()
+model.auditStatus = getAuditLogStatus();
+if (page.url.args.nodeRef)
+{
+   model.nodeRef = page.url.args.nodeRef;
+}
