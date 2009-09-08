@@ -31,22 +31,21 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.WebScriptRequest;
 
 /**
- * Implementation for Java backed webscript to add RM custom property definitions
+ * Implementation for Java backed webscript to add/update RM custom property definitions
  * to the custom model.
  * 
  * @author Neil McErlean
  */
-public class CustomPropertyDefinitionPost extends AbstractCustomPropertyDefnWrite
+public class CustomPropertyDefinitionPut extends AbstractCustomPropertyDefnWrite
 {
     protected boolean isRequestToCreateNewProp(Map<String, Serializable> params)
     {
-        // A POST request always tries to create a new property definition
-        return true;
+        // If the URL includes an 'element', then it is a create, else an update
+        return params.get(PARAM_ELEMENT) != null;
     }
     
     protected String getUrlResult(WebScriptRequest req, QName propQName)
     {
-        return req.getServicePath() + "/" + propQName.getLocalName();
+        return req.getServicePath();
     }
-
 }

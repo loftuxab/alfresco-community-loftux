@@ -92,7 +92,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     protected static final String RMA_AUDITLOG_URL = "/api/rma/admin/rmauditlog";
     protected static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
     protected static final String APPLICATION_JSON = "application/json";
-    protected static final String RMA_CUSTOM_PROPS_URL = "/api/rma/admin/custompropertydefinitions";
+    protected static final String RMA_CUSTOM_PROPS_DEFINITIONS_URL = "/api/rma/admin/custompropertydefinitions";
     protected static final String RMA_CUSTOM_REFS_DEFINITIONS_URL = "/api/rma/admin/customreferencedefinitions";
     protected NamespaceService namespaceService;
     protected NodeService nodeService;
@@ -513,12 +513,12 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue("customRefsArray was unexpectedly not empty.", customRefsArray.length() == 0);
     }
     
-    public void testPostCustomProperty() throws Exception
+    public void testPostCustomPropertyDefinition() throws Exception
     {
-        final String propertyName = "customProperty" + System.currentTimeMillis();
+        final String propertyLabel = "customProperty" + System.currentTimeMillis();
         
         String jsonString = new JSONStringer().object()
-            .key("name").value(propertyName)
+            .key("name").value(propertyLabel)
             .key("description").value("Dynamically defined test property")
             .key("mandatory").value(false)
             .key("dataType").value(DataTypeDefinition.BOOLEAN)
@@ -532,13 +532,124 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
                                  jsonString, APPLICATION_JSON), expectedStatus);
         
         String rspContent = rsp.getContentAsString();
-        assertTrue(rspContent.contains("success"));
+        assertTrue(rspContent.contains("propId"));
+
+        System.out.println(rspContent);
+        
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        String urlOfNewPropDef = jsonRsp.getString("url");
+
+        assertNotNull("urlOfNewPropDef was null.", urlOfNewPropDef);
+        
+        // GET from the URL we're given to ensure it's valid
+        rsp = sendRequest(new GetRequest(urlOfNewPropDef), 200);
+        rspContent = rsp.getContentAsString();
+        
+        System.out.println(rspContent);
+        
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        JSONObject dataObject = jsonRsp.getJSONObject("data");
+        assertNotNull("JSON data object was null", dataObject);
+        JSONObject customPropsObject = dataObject.getJSONObject("customProperties");
+        assertNotNull("JSON customProperties object was null", customPropsObject);
+        assertEquals("Wrong customProperties length.", 1, customPropsObject.length());
+        
+        Object keyToSoleProp = customPropsObject.keys().next();
+        
+        System.out.println("New property defn: " + keyToSoleProp);
+        
+        JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
+        assertEquals("Wrong property label.", propertyLabel, newPropObject.getString("label"));
+    }
+
+    public void testPutAndRePutCustomPropertyDefinition() throws Exception
+    {
+        final String propertyLabel = "Original name åçîéøü";
+        final String propId = "propId" + System.currentTimeMillis();
+        
+        String jsonString = new JSONStringer().object()
+            .key("name").value(propertyLabel)
+            .key("mandatory").value(false)
+            .key("dataType").value(DataTypeDefinition.TEXT)
+            .key("element").value("record")
+        .endObject()
+        .toString();
+        
+        // Submit the JSON request.
+        final int expectedStatus = 200;
+        String propDefnUrl = "/api/rma/admin/custompropertydefinitions/" + propId;
+        String propDefnWithElementUrl = propDefnUrl + "?element=record";
+        
+        System.out.println("PUT " + propDefnWithElementUrl);
+        
+        Response rsp = sendRequest(new PutRequest(propDefnWithElementUrl,
+                                 jsonString, APPLICATION_JSON), expectedStatus);
+        
+        String rspContent = rsp.getContentAsString();
+
+        System.out.println(rspContent);
+        
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        String urlOfNewPropDef = jsonRsp.getString("url");
+        assertNotNull("urlOfNewPropDef was null.", urlOfNewPropDef);
+        
+        // GET from the URL to ensure it's valid
+        System.out.println("GET " + propDefnUrl);
+        rsp = sendRequest(new GetRequest(propDefnUrl), 200);
+        rspContent = rsp.getContentAsString();
+        
+        System.out.println(rspContent);
+        
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        
+        JSONObject dataObject = jsonRsp.getJSONObject("data");
+        assertNotNull("JSON data object was null", dataObject);
+        JSONObject customPropsObject = dataObject.getJSONObject("customProperties");
+        assertNotNull("JSON customProperties object was null", customPropsObject);
+        assertEquals("Wrong customProperties length.", 1, customPropsObject.length());
+        
+        // Now PUT again to the same URL this time specifying only an updated name (aka label).
+        final String updatedLabel = "Updated label";
+        jsonString = new JSONStringer().object()
+            .key("name").value(updatedLabel)
+        .endObject()
+        .toString();
+    
+        rsp = sendRequest(new PutRequest(propDefnUrl,
+                                 jsonString, APPLICATION_JSON), expectedStatus);
+    
+        rspContent = rsp.getContentAsString();
+        System.out.println(rspContent);
+    
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        urlOfNewPropDef = jsonRsp.getString("url");
+        assertNotNull("urlOfNewPropDef was null.", urlOfNewPropDef);
+    
+        // GET from the URL again to ensure it's valid
+        rsp = sendRequest(new GetRequest(propDefnUrl), 200);
+        rspContent = rsp.getContentAsString();
+        
+        System.out.println(rspContent);
+        
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        dataObject = jsonRsp.getJSONObject("data");
+        assertNotNull("JSON data object was null", dataObject);
+        customPropsObject = dataObject.getJSONObject("customProperties");
+        assertNotNull("JSON customProperties object was null", customPropsObject);
+        assertEquals("Wrong customProperties length.", 1, customPropsObject.length());
+        
+        Object keyToSoleProp = customPropsObject.keys().next();
+        
+        System.out.println("Updated property defn: " + keyToSoleProp);
+        
+        JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
+        assertEquals("Wrong property label.", updatedLabel, newPropObject.getString("label"));
     }
 
     public void testGetCustomProperties() throws Exception
     {
         // Ensure that there is at least one custom property.
-        this.testPostCustomProperty();
+        this.testPostCustomPropertyDefinition();
 
         final int expectedStatus = 200;
         Response rsp = sendRequest(new GetRequest("/api/rma/admin/custompropertydefinitions?element=record"), expectedStatus);
