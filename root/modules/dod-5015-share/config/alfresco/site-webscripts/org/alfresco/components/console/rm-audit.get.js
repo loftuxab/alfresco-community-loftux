@@ -6,6 +6,12 @@ function getAuditLogStatus()
       var data = eval('(' + result + ')');
       return data.data;
    }
+   else return {
+      enabled:false,
+      started:"",
+      stopped:"",
+      entries:[]
+   }
 }
 
 model.auditStatus = getAuditLogStatus()
