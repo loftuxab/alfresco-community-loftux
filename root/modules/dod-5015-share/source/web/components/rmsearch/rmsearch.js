@@ -61,7 +61,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json", "menu", "tabview"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "calendar", "container", "datasource", "datatable", "json", "menu", "tabview"], this.onComponentsLoaded, this);
       
       YAHOO.Bubbling.on("savedSearchAdded", this.onSavedSearchAdded, this);
       YAHOO.Bubbling.on("searchComplete", this.onSearchComplete, this);
@@ -97,9 +97,7 @@
          
          // Buttons
          this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
-         this.widgets.searchButton.set("disabled", true);
          this.widgets.saveButton = Alfresco.util.createYUIButton(this, "savesearch-button", this.onSaveSearch);
-         this.widgets.saveButton.set("disabled", true);
          this.widgets.newButton = Alfresco.util.createYUIButton(this, "newsearch-button", this.onNewSearch);
          this.widgets.printButton = Alfresco.util.createYUIButton(this, "print-button", this.onPrint);
          this.widgets.printButton.set("disabled", true);
@@ -136,8 +134,22 @@
             }
          });
          
+         // construct the date picker calendar
+         var theDate = new Date();
+         var page = (theDate.getMonth() + 1) + "/" + theDate.getFullYear();
+         var selected = (theDate.getMonth() + 1) + "/" + theDate.getDate() + "/" + theDate.getFullYear();   
+         this.widgets.calendar = new YAHOO.widget.Calendar(null, this.id + "-date", { title: this._msg("message.selectdate"), close: true });
+         this.widgets.calendar.cfg.setProperty("pagedate", page);
+         this.widgets.calendar.cfg.setProperty("selected", selected);
+         
+         // setup date picker events
+         this.widgets.calendar.selectEvent.subscribe(this.onDatePickerSelection, this, true);
+         Event.addListener(this.id + "-date-icon", "click", function () { this.widgets.calendar.show(); }, this, true);
+         
+         // render the calendar control
+         this.widgets.calendar.render();
+         
          // wire up misc events
-         Event.on(me.id + "-terms", "keyup", this.onQueryKeyup, this, true);
          Event.on(me.id + "-records", "change", this.onRecordsCheckChanged, this, true);
          
          // Call super class onReady() method
@@ -148,6 +160,31 @@
        * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
        * Disconnected event handlers for inter-component event notification
        */
+       
+      /**
+       * Handles the date being changed in the date picker YUI control.
+       * 
+       * @method onDatePickerSelection
+       * @param type
+       * @param args
+       * @param obj
+       * @private
+       */
+      onDatePickerSelection: function RecordsSearch_onDatePickerSelection(type, args, obj)
+      {
+         // update the date field - contains an array of [year, month, day]
+         var selected = args[0][0];
+         this.widgets.calendar.hide();
+         
+         // convert to query date format and insert
+         var date = YAHOO.lang.substitute("{year}\\-{month}\\-{day}T00\\:00\\:00",
+         {
+            year: selected[0],
+            month: Alfresco.util.pad(selected[1], 2),
+            day: Alfresco.util.pad(selected[2], 2)
+         });
+         Alfresco.util.insertAtCursor(Dom.get(this.id + "-terms"), date);
+      },
       
       /**
        * Saved Searches AJAX success callback
@@ -181,19 +218,6 @@
          }
          
          this._initSavedSearchMenu();
-      },
-      
-      /**
-       * Query field keydown event handler
-       * 
-       * @method onQueryKeyup
-       * @param e {object} DomEvent
-       */
-      onQueryKeyup: function RecordsSearch_onQueryKeyup(e)
-      {
-         var disable = (YAHOO.lang.trim(Dom.get(this.id + "-terms").value).length == 0);
-         this.widgets.saveButton.set("disabled", disable);
-         this.widgets.searchButton.set("disabled", disable);
       },
       
       /**
@@ -255,6 +279,7 @@
             params += "&categories=" + (Dom.get(this.id + "-categories").checked);
             params += "&series=" + (Dom.get(this.id + "-series").checked);
             params += "&frozen=" + (Dom.get(this.id + "-frozen").checked);
+            params += "&cutoff=" + (Dom.get(this.id + "-cutoff").checked);
             
             // TODO: prepopulate dialog with current saved search name if any selected
             
@@ -294,6 +319,7 @@
          Dom.get(this.id + "-categories").checked = false;
          Dom.get(this.id + "-series").checked = false;
          Dom.get(this.id + "-frozen").checked = false;
+         Dom.get(this.id + "-cutoff").checked = false;
          Dom.get(this.id + "-terms").value = "";
          
          // reset sorting options
@@ -309,10 +335,6 @@
             orderMenu.set("label", orderMenuItems[0].cfg.getProperty("text"));
             this.sortby[i].order = orderMenuItems[0].value;
          }
-         
-         // reset buttons
-         this.widgets.saveButton.set("disabled", true);
-         this.widgets.searchButton.set("disabled", true);
          
          // switch to query builder tab
          this.widgets.tabs.selectTab(0);
@@ -337,6 +359,8 @@
                var search = this.options.savedSearches[i];
                if (search.label === searchObj.label)
                {
+                  // replace existing value
+                  this.options.savedSearches[i] = searchObj;
                   found = true;
                   break;
                }
@@ -442,6 +466,7 @@
          
          var query = "";
          
+         // record components
          var selectRecords = Dom.get(this.id + "-records").checked;
          if (selectRecords)
          {
@@ -456,11 +481,7 @@
             query += (query.length != 0 ? ' AND ' : '') + 'ASPECT:"rma:vitalRecord"';
          }
          
-         if (Dom.get(this.id + "-frozen").checked)
-         {
-            query += (query.length != 0 ? ' AND ' : '') + 'ASPECT:"rma:frozen"';
-         }
-         
+         // container components
          var containerQuery = "";
          if (Dom.get(this.id + "-folders").checked)
          {
@@ -486,8 +507,26 @@
             }
          }
          
+         // default to all nodes if no search term is entered
+         if (userQuery.length === 0)
+         {
+            userQuery = "ISNODE:T";
+         }
+         
+         // must have selected at least some components or container types to search against
          if (query.length !== 0)
          {
+            // constrain by optional component markers
+            if (Dom.get(this.id + "-frozen").checked)
+            {
+               query = '(' + query + ') AND ASPECT:"rma:frozen"';
+            }
+            if (Dom.get(this.id + "-cutoff").checked)
+            {
+              query = '(' + query + ') AND ASPECT:"rma:cutOff"';
+            }
+            
+            // construct final query elements
             query = '(' + query + ') AND (' + userQuery + ') AND NOT ASPECT:"rma:versionedRecord"';
          }
          else
@@ -606,6 +645,12 @@
                         break;
                      }
                      
+                     case "cutoff":
+                     {
+                        Dom.get(me.id + "-cutoff").checked = (pair[1] === "true");
+                        break;
+                     }
+                     
                      case "terms":
                      {
                         Dom.get(me.id + "-terms").value = decodeURIComponent(pair[1]);
@@ -613,9 +658,6 @@
                      }
                   }
                }
-               
-               me.widgets.saveButton.set("disabled", false);
-               me.widgets.searchButton.set("disabled", false);
                
                // switch to query builder tab
                me.widgets.tabs.selectTab(0);

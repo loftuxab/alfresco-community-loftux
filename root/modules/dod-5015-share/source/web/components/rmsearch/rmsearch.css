@@ -84,9 +84,28 @@
    vertical-align: 15%;
 }
 
+.search .insertDate
+{
+   vertical-align: 15%;
+   padding-left: 2em;
+}
+
 .search .execute-search
 {
    border-top: 1px solid #AAAAAA;
    margin-top: 8px;
    padding-top: 12px;
+}
+
+.search .datepicker
+{
+   display: none; 
+   position: absolute; 
+   z-index: 1;
+   margin: -5em 0 0 20em;
+}
+
+.search .datepicker-icon
+{
+   cursor: pointer;
 }

@@ -29,7 +29,7 @@ function retrieveMetadataForElement(conn, meta, el)
          meta.push(
          {
             name: id,
-            title: prop.title,
+            title: prop.label,
             dataType: prop.dataType
          });
       }
