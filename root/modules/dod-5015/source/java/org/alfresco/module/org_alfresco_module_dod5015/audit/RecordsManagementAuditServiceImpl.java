@@ -156,7 +156,10 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
         finally
         {
             // close the writer
-            try { fileWriter.close(); } catch (IOException closeEx) {}
+            if (fileWriter != null)
+            {
+                try { fileWriter.close(); } catch (IOException closeEx) {}
+            }
         }
     }
     

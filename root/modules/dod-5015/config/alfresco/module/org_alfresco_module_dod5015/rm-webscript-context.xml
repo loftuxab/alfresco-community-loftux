@@ -100,6 +100,15 @@
         <property name="recordsManagementAuditService" ref="RecordsManagementAuditService"/>
     </bean>
     
+    <!-- REST impl for POST Audit Log -->
+    <bean id="webscript.org.alfresco.rma.rmauditlog.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.AuditLogPost" parent="webscript">
+        <property name="nodeService" ref="nodeService"/>
+        <property name="contentService" ref="ContentService"/>
+        <property name="permissionService" ref="PermissionService"/>
+        <property name="mimetypeService" ref="mimetypeService"/>
+        <property name="recordsManagementAuditService" ref="RecordsManagementAuditService"/>
+    </bean>
+    
     <!-- REST impl for PUT Audit Log (starting and stopping auditing) -->
     <bean id="webscript.org.alfresco.rma.rmauditlog.put" class="org.alfresco.module.org_alfresco_module_dod5015.script.AuditLogPut" parent="webscript">
         <property name="recordsManagementAuditService" ref="RecordsManagementAuditService"/>

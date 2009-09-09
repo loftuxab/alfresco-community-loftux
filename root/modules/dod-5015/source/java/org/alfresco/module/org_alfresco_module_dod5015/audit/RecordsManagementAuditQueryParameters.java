@@ -41,6 +41,7 @@ public final class RecordsManagementAuditQueryParameters
     private NodeRef nodeRef;
     private Date dateFrom;
     private Date dateTo;
+    private String event;
 
     /**
      * Default constructor.
@@ -148,6 +149,26 @@ public final class RecordsManagementAuditQueryParameters
     {
         this.dateTo = dateTo;
     }
+    
+    /**
+     * 
+     * @return The event to retrive entries for
+     */
+    public String getEvent()
+    {
+        return this.event;
+    }
+
+    /**
+     * Restricts the retrieved audit trail to only those entries
+     * that match the given event string.
+     * 
+     * @param event Event to retrieve entries for
+     */
+    public void setEvent(String event)
+    {
+        this.event = event;
+    }
 
     /*
      * @see java.lang.Object#toString()
@@ -160,7 +181,7 @@ public final class RecordsManagementAuditQueryParameters
         builder.append(" (nodeRef='").append(nodeRef).append("', user='")
         .append(user).append("', dateFrom='").append(dateFrom)
         .append("', dateTo='").append(dateTo).append("', maxEntries='")
-        .append(maxEntries).append("')");
+        .append(maxEntries).append("', event='").append(event).append("')");
         
         return builder.toString();
     }

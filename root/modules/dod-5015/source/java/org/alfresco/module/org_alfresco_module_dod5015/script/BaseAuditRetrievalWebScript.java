@@ -49,6 +49,7 @@ public class BaseAuditRetrievalWebScript extends StreamContent
     
     protected final static String PARAM_USER = "user";
     protected final static String PARAM_SIZE = "size";
+    protected final static String PARAM_EVENT = "event";
     protected final static String PARAM_FROM = "from";
     protected final static String PARAM_TO = "to";
     protected final static String DATE_PATTERN = "yyyy-MM-dd";
@@ -96,12 +97,14 @@ public class BaseAuditRetrievalWebScript extends StreamContent
         // gather all the common filtering parameters
         String size = req.getParameter(PARAM_SIZE);
         String user = req.getParameter(PARAM_USER);
+        String event = req.getParameter(PARAM_EVENT);
         String from = req.getParameter(PARAM_FROM);
         String to = req.getParameter(PARAM_TO);
 
         // setup the audit query parameters object
         params.setNodeRef(nodeRef);
         params.setUser(user);
+        params.setEvent(event);
         
         if (size != null && size.length() > 0)
         {

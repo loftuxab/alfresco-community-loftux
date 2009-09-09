@@ -7,6 +7,7 @@
   <ul>
   <li>size: Maximum number of log entries to return</li>
   <li>user: Only return log entries by the specified user</li>
+  <li>event: Only return log entries matching this event</li>
   <li>from: Only return log entries after the specified date, date should be in yyyy-MM-dd format</li>
   <li>to: Only return log entries before the specified date, date should be in yyyy-MM-dd format</li>
   <li>export: Set this to 'true' to force the browser to display the Save As dialog</li>
