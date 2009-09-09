@@ -446,7 +446,6 @@ Alfresco.util.getFileIcon.types =
    "st:site": "site"
 };
 
-
 /**
  * Formats a Freemarker datetime into more UI-friendly format
  *
@@ -589,6 +588,26 @@ Alfresco.util.toExplodedJSONDate = function(date)
       seconds: date.getSeconds(),
       milliseconds: date.getMilliseconds()
    });
+};
+
+/**
+ * Pad a value with leading zeros to the specified length.
+ * 
+ * @method Alfresco.util.pad
+ * @param value {string|number} non null value to pad
+ * @param value {number} length to pad out with leading zeros
+ * @return {string} padded value as a string
+ * @static
+ */
+Alfresco.util.pad = function(value, length)
+{
+	value = String(value);
+	length = parseInt(length, 10) || 2;
+	while (value.length < length)
+	{
+		value = "0" + value;
+	}
+	return value;
 };
 
 /**

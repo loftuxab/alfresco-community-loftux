@@ -176,7 +176,11 @@
                </div>
                <div>
                   <input type="checkbox" id="${el}-frozen" />
-                  <label for="${el}-frozen">${msg("label.frozenItems")}</label>
+                  <label for="${el}-frozen">${msg("label.frozen")}</label>
+               </div>
+               <div>
+                  <input type="checkbox" id="${el}-cutoff" />
+                  <label for="${el}-cutoff">${msg("label.cutoff")}</label>
                </div>
             </div>
          </div>
