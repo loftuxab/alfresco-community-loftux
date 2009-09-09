@@ -67,6 +67,7 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.GUID;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.scripts.TestWebScriptServer.DeleteRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
@@ -901,7 +902,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertFalse(dataObj.getBoolean("enabled"));
     }
     
-    public void testFileAuditLogAsRecord() throws IOException, JSONException
+    public void testFileAuditLogAsRecord() throws Exception
     {
         // Attempt to store audit log at non existent destination, make sure we get 404
         JSONObject jsonPostData = new JSONObject();
@@ -910,15 +911,18 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         Response rsp = sendRequest(new PostRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 404);
         
         // Attempt to store audit log at wrong type of destination, make sure we get 400
-        NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Civilian Files", "Foreign Employee Award Files");
+        NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Civilian Files", 
+                    "Foreign Employee Award Files");
         assertNotNull(recordCategory);
         jsonPostData = new JSONObject();
         jsonPostData.put("destination", recordCategory.toString());
         jsonPostString = jsonPostData.toString();
         rsp = sendRequest(new PostRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 400);
         
-        // TODO: create a record folder to store the audit log in 
-        /*NodeRef destination = null;
+        // get record folder to file into
+        NodeRef destination = TestUtilities.getRecordFolder(searchService, "Civilian Files", 
+                    "Foreign Employee Award Files", "Christian Bohr");
+        assertNotNull(destination);
         
         // Store the full audit log as a record
         jsonPostData = new JSONObject();
@@ -931,8 +935,27 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         assertTrue(jsonRsp.has("success"));
         assertTrue(jsonRsp.getBoolean("success"));
-        */
-        // TODO: Store a filtered audit log as a record
+        assertTrue(jsonRsp.has("record"));
+        assertNotNull(jsonRsp.get("record"));
+        assertTrue(nodeService.exists(new NodeRef(jsonRsp.getString("record"))));
+        
+        // Store a filtered audit log as a record
+        jsonPostData = new JSONObject();
+        jsonPostData.put("destination", destination);
+        jsonPostData.put("size", "50");
+        jsonPostData.put("user", "gavinc");
+        jsonPostData.put("event", "Update Metadata");
+        jsonPostString = jsonPostData.toString();
+        rsp = sendRequest(new PostRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 200);
+        
+        // check the response
+        System.out.println(rsp.getContentAsString());
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        assertTrue(jsonRsp.has("success"));
+        assertTrue(jsonRsp.getBoolean("success"));
+        assertTrue(jsonRsp.has("record"));
+        assertNotNull(jsonRsp.get("record"));
+        assertTrue(nodeService.exists(new NodeRef(jsonRsp.getString("record"))));
     }
     
     private void declareRecord(NodeRef recordOne)
