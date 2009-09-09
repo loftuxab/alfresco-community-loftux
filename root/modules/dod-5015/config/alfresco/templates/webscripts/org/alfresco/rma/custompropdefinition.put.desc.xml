@@ -12,17 +12,16 @@
   <br/>
   The body of the PUT should be in the form, e.g.<br/>
   {<br/>
-  &nbsp;&nbsp;&nbsp;"name" : "original label",<br/>
+  &nbsp;&nbsp;&nbsp;"label" : "original label",<br/>
   &nbsp;&nbsp;&nbsp;"dataType" : "d:boolean",<br/>
   &nbsp;&nbsp;&nbsp;"mandatory" : false<br/>
   }<br/>
-  A value for "title" should not be provided.<br/>
   <br/>
   In the case of an update to an existing property definition, there is currently support for<br/>
-  updating the 'name' (a.k.a. the label) only. In this case there is no need to specify
+  updating the 'label' only. In this case there is no need to specify
   an 'element' query param.<br/>
   {<br/>
-  &nbsp;&nbsp;&nbsp;"name" : "updated label",<br/>
+  &nbsp;&nbsp;&nbsp;"label" : "updated label",<br/>
   }<br/>
   ]]>
   </description>

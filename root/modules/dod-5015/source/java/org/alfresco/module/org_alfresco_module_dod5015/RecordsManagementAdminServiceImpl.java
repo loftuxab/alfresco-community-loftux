@@ -232,23 +232,23 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return propDefns;
     }
     
-    public QName addCustomPropertyDefinition(QName propId, String aspectName, String clientSideName, QName dataType, String title, String description)
+    public QName addCustomPropertyDefinition(QName propId, String aspectName, String label, QName dataType, String title, String description)
     {
-        return addCustomPropertyDefinition(propId, aspectName, clientSideName, dataType, title, description, null, false, false, false, null);
+        return addCustomPropertyDefinition(propId, aspectName, label, dataType, title, description, null, false, false, false, null);
     }
     
-    public QName addCustomPropertyDefinition(QName propId, String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraint)
+    public QName addCustomPropertyDefinition(QName propId, String aspectName, String label, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraint)
     {
         // title parameter is currently ignored. Intentionally.
         
         if (propId == null)
         {
             // Generate a propId
-            propId = this.generateQNameFor(clientSideName);
+            propId = this.generateQNameFor(label);
         }
         
         ParameterCheck.mandatoryString("aspectName", aspectName);
-        ParameterCheck.mandatory("clientSideName", clientSideName);
+        ParameterCheck.mandatory("label", label);
         ParameterCheck.mandatory("dataType", dataType);
         
         M2Model deserializedModel = readCustomContentModel();
@@ -272,7 +272,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         newProp.setName(propIdAsString);
         newProp.setType(dataType.toPrefixString(namespaceService));
         
-        newProp.setTitle(clientSideName);
+        newProp.setTitle(label);
         newProp.setDescription(description);
         newProp.setDefaultValue(defaultValue);
         
@@ -295,7 +295,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         
         if (logger.isInfoEnabled())
         {
-            logger.info("addCustomPropertyDefinition: "+clientSideName+
+            logger.info("addCustomPropertyDefinition: "+label+
                     "=" + propIdAsString + " to aspect: "+aspectName);
         }
         
@@ -310,7 +310,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         PropertyDefinition propDefn = dictionaryService.getProperty(propQName);
         if (propDefn == null)
         {
-            //TODO throw?
+            throw new AlfrescoRuntimeException("DictionaryService does not contain property definition " + propQName);
         }
         
         M2Model deserializedModel = readCustomContentModel();
@@ -324,12 +324,15 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
                 if (propQName.toPrefixString(namespaceService).equals(prop.getName()))
                 {
                     targetAspect = aspect;
-                    //Update the title with the new label. - non-incremental change!
                     prop.setTitle(newLabel);
                 }
             }
         }
-        //TODO Handle not found.
+        // Handle case where the property definition was not found
+        if (targetAspect == null)
+        {
+            throw new AlfrescoRuntimeException("Custom model does not contain property definition " + propQName);
+        }
         
         writeCustomContentModel(deserializedModel);
         
