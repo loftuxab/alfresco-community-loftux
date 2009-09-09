@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -745,6 +746,24 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         else
         {
             return GUID.generate();
+        }
+    }
+    
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getDispositionPeriodProperties()
+     */
+    public List<QName> getDispositionPeriodProperties()
+    {
+        DispositionPeriodProperties dpp = (DispositionPeriodProperties)this.applicationContext.getBean(
+                    DispositionPeriodProperties.BEAN_NAME);
+
+        if (dpp == null)
+        {
+            return Collections.emptyList();
+        }
+        else
+        {
+            return dpp.getPeriodProperties();
         }
     }
     
