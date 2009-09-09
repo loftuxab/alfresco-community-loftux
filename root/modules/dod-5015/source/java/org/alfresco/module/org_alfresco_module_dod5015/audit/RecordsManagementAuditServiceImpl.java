@@ -35,9 +35,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.audit.AuditService;
 import org.alfresco.service.cmr.audit.AuditService.AuditQueryCallback;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.util.TempFileProvider;
@@ -58,17 +66,52 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
     protected static final String AUDIT_TRAIL_FILE_PREFIX = "audit_";
     protected static final String AUDIT_TRAIL_FILE_SUFFIX = ".json";
         
+    private NodeService nodeService;
+    private ContentService contentService;
     private AuditService auditService;
+    private RecordsManagementActionService rmActionService;
 
     // temporary field to hold imaginary enabled flag
     private boolean enabled = false;
     
     /**
+     * Sets the NodeService instance
+     * 
+     * @param nodeService NodeService instance
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService; 
+    }
+    
+    /**
+     * Sets the ContentService instance
+     * 
+     * @param contentService ContentService instance
+     */
+    public void setContentService(ContentService contentService)
+    {
+        this.contentService = contentService; 
+    }
+    
+    /**
      * Sets the AuditService instance
+     * 
+     * @param auditService AuditService instance
      */
 	public void setAuditService(AuditService auditService)
 	{
 		this.auditService = auditService;
+	}
+	
+	/**
+	 * Sets the RecordsManagementActionService instance
+	 * 
+	 * @param rmActionService RecordsManagementActionService instance
+	 */
+	public void setRecordsManagementActionService(RecordsManagementActionService rmActionService)
+	{
+	    this.rmActionService = rmActionService;
 	}
 	
     /**
@@ -348,13 +391,52 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
      */
     public NodeRef fileAuditTrailAsRecord(RecordsManagementAuditQueryParameters params, NodeRef destination)
     {
-        // NOTE: the underlying RM services checks the pre-conditions
+        ParameterCheck.mandatory("params", params);
+        ParameterCheck.mandatory("destination", destination);
+        
+        // NOTE: the underlying RM services will check all the remaining pre-conditions
+        
+        NodeRef record = null;
         
         // get the audit trail for the provided parameters
+        File auditTrail = this.getAuditTrailFile(params);
         
-        // file the audit log as an undeclared record
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Filing audit trail in file " + auditTrail.getAbsolutePath() + 
+                        " as a record in record folder: " + destination);
+        }
         
-        return null;
+        try
+        {
+            // file the audit log as an undeclared record
+            record = this.nodeService.createNode(destination, 
+                        ContentModel.ASSOC_CONTAINS, 
+                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, 
+                                    QName.createValidLocalName(auditTrail.getName())), 
+                        ContentModel.TYPE_CONTENT).getChildRef();
+
+            // Set the content
+            ContentWriter writer = this.contentService.getWriter(record, ContentModel.PROP_CONTENT, true);
+            writer.setMimetype(MimetypeMap.MIMETYPE_JSON);
+            writer.setEncoding("UTF-8");
+            writer.putContent(auditTrail);
+            
+            // file the node as a record
+            this.rmActionService.executeRecordsManagementAction(record, "file");
+        }
+        finally
+        {
+            auditTrail.delete();
+            
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Deleted temporary file holding audit trail: " + 
+                            auditTrail.getAbsolutePath());
+            }
+        } 
+        
+        return record;
     }
     
     /**

@@ -364,9 +364,10 @@
     <!-- Records Management Audit Service -->
     
     <bean id="recordsManagementAuditService" class="org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditServiceImpl">
-        <property name="auditService">
-            <ref bean="AuditService" />
-        </property>
+        <property name="auditService" ref="AuditService" />
+        <property name="nodeService" ref="NodeService" />
+        <property name="contentService" ref="ContentService" />
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService" />
     </bean>
     
     <bean id="RecordsManagementAuditService" class="org.springframework.aop.framework.ProxyFactoryBean">

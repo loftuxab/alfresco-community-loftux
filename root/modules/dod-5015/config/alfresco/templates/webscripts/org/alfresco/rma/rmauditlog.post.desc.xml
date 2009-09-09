@@ -18,6 +18,6 @@
   <url>/api/node/{store_type}/{store_id}/{id}/rmauditlog</url>
   <format default="json">argument</format>
   <authentication>admin</authentication>
-  <transaction allow="readonly">required</transaction>
+  <transaction>required</transaction>
   <lifecycle>internal</lifecycle>
 </webscript>

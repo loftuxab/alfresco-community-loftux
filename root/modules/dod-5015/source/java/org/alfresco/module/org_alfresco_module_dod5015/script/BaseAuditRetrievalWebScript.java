@@ -24,18 +24,23 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.web.scripts.content.StreamContent;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  * Base class for all audit retrieval webscripts.
@@ -94,12 +99,61 @@ public class BaseAuditRetrievalWebScript extends StreamContent
             nodeRef = new NodeRef(new StoreRef(storeType, storeId), nodeId);
         }
         
-        // gather all the common filtering parameters
-        String size = req.getParameter(PARAM_SIZE);
-        String user = req.getParameter(PARAM_USER);
-        String event = req.getParameter(PARAM_EVENT);
-        String from = req.getParameter(PARAM_FROM);
-        String to = req.getParameter(PARAM_TO);
+        // gather all the common filtering parameters, these could be on the
+        // query string, in a multipart/form-data request or in a JSON body
+        String size = null;
+        String user = null;
+        String event = null;
+        String from = null;
+        String to = null;
+        
+        if (MimetypeMap.MIMETYPE_JSON.equals(req.getContentType()))
+        {
+            try
+            {
+                JSONObject json = new JSONObject(new JSONTokener(req.getContent().getContent()));
+                if (json.has(PARAM_SIZE))
+                {
+                    size = json.getString(PARAM_SIZE);
+                }
+                if (json.has(PARAM_USER))
+                {
+                    user = json.getString(PARAM_USER);
+                }
+                if (json.has(PARAM_EVENT))
+                {
+                    event = json.getString(PARAM_EVENT);
+                }
+                if (json.has(PARAM_FROM))
+                {
+                    from = json.getString(PARAM_FROM);
+                }
+                if (json.has(PARAM_TO))
+                {
+                    to = json.getString(PARAM_TO);
+                }
+            }
+            catch (IOException ioe)
+            {
+                // log a warning
+                if (logger.isWarnEnabled())
+                    logger.warn("Failed to parse JSON parameters for audit query: " + ioe.getMessage());
+            }
+            catch (JSONException je)
+            {
+                // log a warning
+                if (logger.isWarnEnabled())
+                    logger.warn("Failed to parse JSON parameters for audit query: " + je.getMessage());
+            }
+        }
+        else
+        {
+            size = req.getParameter(PARAM_SIZE);
+            user = req.getParameter(PARAM_USER);
+            event = req.getParameter(PARAM_EVENT);
+            from = req.getParameter(PARAM_FROM);
+            to = req.getParameter(PARAM_TO);
+        }
 
         // setup the audit query parameters object
         params.setNodeRef(nodeRef);
