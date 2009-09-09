@@ -174,6 +174,10 @@
                   <input type="checkbox" id="${el}-series" />
                   <label for="${el}-series">${msg("label.recordSeries")}</label>
                </div>
+               <div>
+                  <input type="checkbox" id="${el}-frozen" />
+                  <label for="${el}-frozen">${msg("label.frozenItems")}</label>
+               </div>
             </div>
          </div>
       </div>
