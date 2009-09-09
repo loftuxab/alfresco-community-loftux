@@ -45,6 +45,8 @@ import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.PropertyMap;
 
 /**
+ * Test of RM Caveat (Admin facing scripts)
+ *  
  * @author Mark Rogers
  */
 public class RMCaveatConfigServiceImplTest extends BaseSpringTest implements DOD5015Model
