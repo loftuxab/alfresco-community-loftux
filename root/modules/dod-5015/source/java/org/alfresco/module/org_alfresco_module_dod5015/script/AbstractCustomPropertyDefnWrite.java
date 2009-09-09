@@ -194,7 +194,7 @@ public abstract class AbstractCustomPropertyDefnWrite extends AbstractRmWebScrip
         {
             if (serializableParam instanceof String)
             {
-                constraintRef = QName.createQName((String)serializableParam);
+                constraintRef = QName.createQName((String)serializableParam, namespaceService);
             }
             else if (serializableParam instanceof QName)
             {

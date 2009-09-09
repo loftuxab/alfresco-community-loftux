@@ -521,8 +521,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
             .key("label").value(propertyLabel)
             .key("description").value("Dynamically defined test property")
             .key("mandatory").value(false)
-            .key("dataType").value(DataTypeDefinition.BOOLEAN)
+            .key("dataType").value(DataTypeDefinition.TEXT)
             .key("element").value("record")
+            .key("constraintRef").value("rmc:smList")
         .endObject()
         .toString();
         
