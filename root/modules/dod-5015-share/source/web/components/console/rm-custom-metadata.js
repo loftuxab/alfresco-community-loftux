@@ -165,7 +165,7 @@
                // add to array for sorting
                customProperties.push(prop);
             }
-            customProperties.sort(parent._sortByTitle);
+            customProperties.sort(parent._sortByLabel);
             
             // update the current custom properties list context
             parent.currentProperties = customProperties;
@@ -201,7 +201,7 @@
                   Dom.addClass(div, "theme-bg-color-2");
                   Dom.addClass(div, "property-item");
                   var html = '<div class="property-actions"><span id="' + editBtnContainerId + '"></span><span id="' + deleteBtnContainerId + '"></span>';
-                  html += '</div><div><p class="property-title">' + $html(prop.title) + '</p>';
+                  html += '</div><div><p class="property-title">' + $html(prop.label) + '</p>';
                   html += '<p>' + parent._msg('label.type') + ': ' + parent._dataTypeLabel(prop.dataType) + '</p>';
                   // TODO: display selection list constraint
                   //html += '<p>' + this._msg('label.selection-list') + ': ' + prop.xx + '</p>';
@@ -407,16 +407,24 @@
             var dataType = Dom.get(parent.id + "-create-type").value;
             var mandatory = Dom.get(parent.id + "-create-mandatory").checked;
             
-            // TODO: add mandatory field support
-            // TODO: add list of values selection (constraint)
-            
             var obj =
             {
-               name: label.replace(/\s/g, "").toLowerCase(),
+               //name: label.replace(/\s/g, "").toLowerCase(),
                dataType: dataType,
                mandatory: mandatory,
-               title: label
+               label: label
             };
+            
+            var constraint = null;
+            var useConstraint = Dom.get(parent.id + "-create-use-list").checked;
+            if (dataType === "d:text" && useConstraint)
+            {
+               constraint = Dom.get(parent.id + "-create-list").value;
+               if (constraint !== null)
+               {
+                  obj.constraintRef = constraint.replace("_", ":");
+               }
+            }
             
             Alfresco.util.Ajax.request(
             {
@@ -529,10 +537,10 @@
             var prop = parent.currentProperty;
             
             // title message
-            Dom.get(parent.id + "-edit-metadata-item").innerHTML = prop.title;
+            Dom.get(parent.id + "-edit-metadata-item").innerHTML = prop.label;
             
             // apply current property values to form
-            Dom.get(parent.id + "-edit-label").value = prop.title;
+            Dom.get(parent.id + "-edit-label").value = prop.label;
             Dom.get(parent.id + "-edit-type").innerHTML = parent._dataTypeLabel(prop.dataType);
             // TODO: apply LOV constraints etc.
             Dom.get(parent.id + "-edit-use-list").checked = false;
@@ -684,15 +692,15 @@
        */
       
       /**
-       * Helper to Array.sort() by the 'title' field of an object.
+       * Helper to Array.sort() by the 'label' field of an object.
        *
-       * @method _sortByTitle
+       * @method _sortByLabel
        * @return {Number}
        * @private
        */
-      _sortByTitle: function RecordsMetaData__sortByTitle(s1, s2)
+      _sortByLabel: function RecordsMetaData__sortByLabel(s1, s2)
       {
-         var ss1 = s1.title.toLowerCase(), ss2 = s2.title.toLowerCase();
+         var ss1 = s1.label.toLowerCase(), ss2 = s2.label.toLowerCase();
          return (ss1 > ss2) ? 1 : (ss1 < ss2) ? -1 : 0;
       },
       
