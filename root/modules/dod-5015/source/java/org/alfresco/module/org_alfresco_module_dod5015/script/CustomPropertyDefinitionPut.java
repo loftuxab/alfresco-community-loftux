@@ -52,6 +52,7 @@ public class CustomPropertyDefinitionPut extends AbstractRmWebScript
     private RecordsManagementAdminService rmAdminService;
 
     private static final String PARAM_LABEL = "label";
+    private static final String PARAM_CONSTRAINT_REF = "constraintRef";
     private static final String PROP_ID = "propId";
     private static final String URL = "url";
 
@@ -99,7 +100,6 @@ public class CustomPropertyDefinitionPut extends AbstractRmWebScript
         propertyQName = updatePropertyDefinition(params);
         String localName = propertyQName.getLocalName();
         
-        result.put("success", true);
         result.put(PROP_ID, localName);
     
         String urlResult = req.getServicePath();
@@ -111,6 +111,8 @@ public class CustomPropertyDefinitionPut extends AbstractRmWebScript
     protected QName updatePropertyDefinition(Map<String, Serializable> params)
     {
         String label = (String)params.get(PARAM_LABEL);
+        String constraintRef = (String)params.get(PARAM_CONSTRAINT_REF);
+        QName constraintRefQName = QName.createQName(constraintRef, namespaceService);
         String propId = (String)params.get(PROP_ID);
         ParameterCheck.mandatoryString("propId", propId);
         
@@ -122,7 +124,7 @@ public class CustomPropertyDefinitionPut extends AbstractRmWebScript
                     "Could not find property definition for: " + propId);
         }
     
-        return rmAdminService.updateCustomPropertyDefinition(propQName, label);
+        return rmAdminService.updateCustomPropertyDefinition(propQName, label, constraintRefQName);
     }
 
     @SuppressWarnings("unchecked")

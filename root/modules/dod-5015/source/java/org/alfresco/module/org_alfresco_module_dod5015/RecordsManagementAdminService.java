@@ -107,12 +107,15 @@ public interface RecordsManagementAdminService
     public QName addCustomPropertyDefinition(QName propId, String aspectName, String label, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
     
     /**
-     * Update the value of the 'label' (title) for a custom property definition.
+     * Update the custom property definition.
+     * Currently a new value of the 'label' (title) or a lov constraint can be updated on a custom property definition.
+     * 
      * @param propQName the qname of the property definition
      * @param newLabel the new value for the label.
+     * @param lovConstraint the new value for the List-Of-Values constraintRef.
      * @return the propId.
      */
-    public QName updateCustomPropertyDefinition(QName propQName, String newLabel);
+    public QName updateCustomPropertyDefinition(QName propQName, String newLabel, QName lovConstraint);
 
     /**
      * 

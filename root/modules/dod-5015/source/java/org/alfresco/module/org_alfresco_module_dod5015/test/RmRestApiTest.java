@@ -545,7 +545,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
                 .key("mandatory").value(false)
                 .key("dataType").value("d:text")
                 .key("element").value("record")
-                .key("constraintRef").value("rmc:smList")
+//                .key("constraintRef").value("rmc:smList")
                 // Note no propId
             .endObject()
             .toString();
@@ -558,7 +558,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
             .key("mandatory").value(false)
             .key("dataType").value("d:text")
             .key("element").value("record")
-            .key("constraintRef").value("rmc:smList")
+//            .key("constraintRef").value("rmc:smList")
             .key("propId").value(propId)
         .endObject()
         .toString();
@@ -607,10 +607,12 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         final String propertyLabel = "Original label åçîéøü";
         String propId = postCustomPropertyDefinition(propertyLabel, null);
         
-        // PUT specifies only an updated label.
+        // PUT specifies only an updated label or a new constraint ref.
         final String updatedLabel = "Updated label";
+        final String updatedConstraint = "rmc:tlList";
         String jsonString = new JSONStringer().object()
             .key("label").value(updatedLabel)
+            .key("constraintRef").value(updatedConstraint)
         .endObject()
         .toString();
     
@@ -642,6 +644,10 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
         assertEquals("Wrong property label.", updatedLabel, newPropObject.getString("label"));
+        JSONArray constraintRefsArray = newPropObject.getJSONArray("constraintRefs");
+        assertEquals("ConstraintRefsArray wrong length.", 1, constraintRefsArray.length());
+        String recoveredConstraintTitle = constraintRefsArray.getJSONObject(0).getString("title");
+        assertEquals("Wrong constraint.", "Transfer Locations", recoveredConstraintTitle);
     }
 
     @SuppressWarnings("unchecked")
