@@ -108,7 +108,6 @@ public class CustomPropertyDefinitionPost extends AbstractRmWebScript
         QName propertyQName = createNewPropertyDefinition(params);
         String localName = propertyQName.getLocalName();
         
-        result.put("success", true);
         result.put(PROP_ID, localName);
     
         String urlResult = req.getServicePath() + "/" + propertyQName.getLocalName();

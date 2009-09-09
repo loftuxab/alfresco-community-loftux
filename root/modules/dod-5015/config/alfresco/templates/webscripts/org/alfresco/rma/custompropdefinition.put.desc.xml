@@ -3,10 +3,15 @@
   <description><![CDATA[
   This webscript can be used to update an existing property definition.<br/>
   <br/>
-  There is currently support only for updating the 'label'.<br/>
+  There is currently support only for updating the label and/or for adding a constraint.<br/>
+  Also, the current implementation supports only a single constraint on a property definition.<br/>
+  With this in mind, if a call is made to put a constraint on a property definition that already<br/>
+  contains one, the existing constraint will be replaced.<br/>
+  <br/>
   The body of the PUT should be in the form, e.g.<br/>
   {<br/>
-  &nbsp;&nbsp;&nbsp;"label" : "updated label value",<br/>
+  &nbsp;&nbsp;&nbsp;"label": "updated label value",<br/>
+  &nbsp;&nbsp;&nbsp;"constraintRef": "rmc:constraintName",<br/>
   }<br/>
   ]]>
   </description>

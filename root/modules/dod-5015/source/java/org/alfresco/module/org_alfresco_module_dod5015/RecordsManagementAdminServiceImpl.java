@@ -302,10 +302,9 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return propId;
     }
 
-    public QName updateCustomPropertyDefinition(QName propQName, String newLabel)
+    public QName updateCustomPropertyDefinition(QName propQName, String newLabel, QName lovConstraint)
     {
         ParameterCheck.mandatory("propQName", propQName);
-        ParameterCheck.mandatoryString("newLabel", newLabel);
         
         PropertyDefinition propDefn = dictionaryService.getProperty(propQName);
         if (propDefn == null)
@@ -324,7 +323,26 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
                 if (propQName.toPrefixString(namespaceService).equals(prop.getName()))
                 {
                     targetAspect = aspect;
-                    prop.setTitle(newLabel);
+                    String dataType = prop.getType();
+                    if (newLabel != null)
+                    {
+                        prop.setTitle(newLabel);
+                    }
+                    if (lovConstraint != null)
+                    {
+                        if (! dataType.equals(DataTypeDefinition.TEXT.toPrefixString(namespaceService)))
+                        {
+                            throw new AlfrescoRuntimeException("Cannot apply constraint '"+lovConstraint+
+                                    "' to property '" + prop.getName() + "' with datatype '" + dataType + "' (expected: dataType = TEXT)");
+                        }
+                        String lovConstraintQNameAsString = lovConstraint.toPrefixString(namespaceService);
+                        if (!prop.getConstraints().isEmpty())
+                        {
+                            prop.removeConstraintRef(lovConstraintQNameAsString);
+                        }
+                        
+                        prop.addConstraintRef(lovConstraintQNameAsString);
+                    }
                 }
             }
         }
