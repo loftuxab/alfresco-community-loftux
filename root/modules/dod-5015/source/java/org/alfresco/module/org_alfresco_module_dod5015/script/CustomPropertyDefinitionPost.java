@@ -27,9 +27,13 @@ package org.alfresco.module.org_alfresco_module_dod5015.script;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
@@ -45,22 +49,26 @@ import org.json.JSONTokener;
  * 
  * @author Neil McErlean
  */
-public class CustomPropertyDefinitionPost extends AbstractCustomPropertyDefnWrite
+public class CustomPropertyDefinitionPost extends AbstractRmWebScript
 {
+    protected RecordsManagementAdminService rmAdminService;
+
+    private static final String PARAM_DATATYPE = "dataType";
+    private static final String PARAM_TITLE = "title";
+    private static final String PARAM_DESCRIPTION = "description";
+    private static final String PARAM_DEFAULT_VALUE = "defaultValue";
+    private static final String PARAM_MULTI_VALUED = "multiValued";
+    private static final String PARAM_MANDATORY = "mandatory";
+    private static final String PARAM_PROTECTED = "protected";
+    private static final String PARAM_CONSTRAINT_REF = "constraintRef";
+    private static final String PARAM_ELEMENT = "element";
+    private static final String PARAM_LABEL = "label";
+    private static final String PROP_ID = "propId";
+    private static final String URL = "url";
+
     public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
     {
         this.rmAdminService = rmAdminService;
-    }
-
-    protected boolean isRequestToCreateNewProp(Map<String, Serializable> params)
-    {
-        // A POST request always tries to create a new property definition
-        return true;
-    }
-    
-    protected String getUrlResult(WebScriptRequest req, QName propQName)
-    {
-        return req.getServicePath() + "/" + propQName.getLocalName();
     }
 
     @Override
@@ -72,7 +80,7 @@ public class CustomPropertyDefinitionPost extends AbstractCustomPropertyDefnWrit
         {
             json = new JSONObject(new JSONTokener(req.getContent().getContent()));
             
-            ftlModel = handlePropertyRequest(req, json);
+            ftlModel = createPropertyDefinition(req, json);
         }
         catch (IOException iox)
         {
@@ -91,30 +99,124 @@ public class CustomPropertyDefinitionPost extends AbstractCustomPropertyDefnWrit
     /**
      * Applies custom properties.
      */
-    protected Map<String, Object> handlePropertyRequest(WebScriptRequest req, JSONObject json)
+    protected Map<String, Object> createPropertyDefinition(WebScriptRequest req, JSONObject json)
             throws JSONException
     {
         Map<String, Object> result = new HashMap<String, Object>();
-        
         Map<String, Serializable> params = getParamsFromUrlAndJson(req, json);
         
-        QName propertyQName;
-        if (isRequestToCreateNewProp(params))
-        {
-            propertyQName = createNewPropertyDefinition(params);
-        }
-        else
-        {
-            propertyQName = updatePropertyDefinition(params);
-        }
+        QName propertyQName = createNewPropertyDefinition(params);
         String localName = propertyQName.getLocalName();
         
         result.put("success", true);
         result.put(PROP_ID, localName);
     
-        String urlResult = getUrlResult(req, propertyQName);
+        String urlResult = req.getServicePath() + "/" + propertyQName.getLocalName();
         result.put(URL, urlResult);
     
         return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Serializable> getParamsFromUrlAndJson(WebScriptRequest req, JSONObject json)
+            throws JSONException
+    {
+        Map<String, Serializable> params;
+        params = new HashMap<String, Serializable>();
+        params.put(PARAM_ELEMENT, req.getParameter(PARAM_ELEMENT));
+        
+        for (Iterator iter = json.keys(); iter.hasNext(); )
+        {
+            String nextKeyString = (String)iter.next();
+            String nextValueString = json.getString(nextKeyString);
+            
+            params.put(nextKeyString, nextValueString);
+        }
+        
+        return params;
+    }
+
+    protected QName createNewPropertyDefinition(Map<String, Serializable> params)
+    {
+        // Need to select the correct aspect in the customModel to which we'll add the property.
+        String customisableElement = (String)params.get(PARAM_ELEMENT);
+        CustomisableRmElement ce = CustomisableRmElement.getEnumFor(customisableElement);
+        String aspectName = ce.getCorrespondingAspect();
+        
+        String label = (String)params.get(PARAM_LABEL);
+        
+        //According to the wireframes, type here can only be date|text|number
+        Serializable serializableParam = params.get(PARAM_DATATYPE);
+        QName type = null;
+        if (serializableParam != null)
+        {
+            if (serializableParam instanceof String)
+            {
+                type = QName.createQName((String)serializableParam, namespaceService);
+            }
+            else if (serializableParam instanceof QName)
+            {
+                type = (QName)serializableParam;
+            }
+            else
+            {
+                throw new AlfrescoRuntimeException("Unexpected type of dataType param: "+serializableParam+" (expected String or QName)");
+            }
+        }
+        
+        // The title is actually generated, so this parameter will be ignored
+        // by the RMAdminService
+        String title = (String)params.get(PARAM_TITLE);
+        String description = (String)params.get(PARAM_DESCRIPTION);
+        String defaultValue = (String)params.get(PARAM_DEFAULT_VALUE);
+        
+        boolean mandatory = false;
+        serializableParam = params.get(PARAM_MANDATORY);
+        if (serializableParam != null)
+        {
+            mandatory = Boolean.valueOf(serializableParam.toString());
+        }
+        
+        boolean isProtected = false;
+        serializableParam = params.get(PARAM_PROTECTED);
+        if (serializableParam != null)
+        {
+            isProtected = Boolean.valueOf(serializableParam.toString());
+        }
+        
+        boolean multiValued = false;
+        serializableParam = params.get(PARAM_MULTI_VALUED);
+        if (serializableParam != null)
+        {
+            multiValued = Boolean.valueOf(serializableParam.toString());
+        }
+        
+        serializableParam = params.get(PARAM_CONSTRAINT_REF);
+        QName constraintRef = null;
+        if (serializableParam != null)
+        {
+            if (serializableParam instanceof String)
+            {
+                constraintRef = QName.createQName((String)serializableParam, namespaceService);
+            }
+            else if (serializableParam instanceof QName)
+            {
+                constraintRef = (QName)serializableParam;
+            }
+            else
+            {
+                throw new AlfrescoRuntimeException("Unexpected type of constraintRef param: "+serializableParam+" (expected String or QName)");
+            }
+        }
+        
+        // if propId is specified, use it.
+        QName proposedQName = null;
+        String propId = (String)params.get(PROP_ID);
+        if (propId != null)
+        {
+            proposedQName = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_PREFIX, propId, namespaceService);
+        }
+        return rmAdminService.addCustomPropertyDefinition(proposedQName, aspectName, label, type,
+            title, description, defaultValue, multiValued, mandatory, isProtected, constraintRef);
     }
 }
