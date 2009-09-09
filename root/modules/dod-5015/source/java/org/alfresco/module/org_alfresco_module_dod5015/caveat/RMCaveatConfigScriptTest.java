@@ -3,8 +3,6 @@ package org.alfresco.module.org_alfresco_module_dod5015.caveat;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.event.ListSelectionEvent;
-
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
@@ -71,6 +69,9 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
      
     public void testGetRMConstraints() throws Exception
     {
+        // Set the current security context as admin
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+
         {
             Response response = sendRequest(new GetRequest(URL_RM_CONSTRAINTS), Status.STATUS_OK);    
         
@@ -118,14 +119,15 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
      */
     public void testGetRMConstraint() throws Exception
     {
+        // Set the current security context as admin
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+
         /**
          * Delete the list to remove any junk then recreate it.
          */
         caveatConfigService.deleteRMConstraint(RM_LIST);
         caveatConfigService.addRMConstraint(RM_LIST, "my title", new String[0]);
         
-        // Set the current security context as admin
-        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         
         createUser("fbloggs");
         createUser("jrogers");
@@ -391,7 +393,7 @@ public class RMCaveatConfigScriptTest extends BaseWebScriptTest
         /**
          * Delete the list to remove any junk then recreate it.
          */
-        caveatConfigService.deleteRMConstraint(RM_LIST);
+        //caveatConfigService.deleteRMConstraint(RM_LIST);
 
         /**
          * create a new list 
