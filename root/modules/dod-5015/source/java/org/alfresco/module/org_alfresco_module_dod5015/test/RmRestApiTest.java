@@ -518,7 +518,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         final String propertyLabel = "customProperty" + System.currentTimeMillis();
         
         String jsonString = new JSONStringer().object()
-            .key("name").value(propertyLabel)
+            .key("label").value(propertyLabel)
             .key("description").value("Dynamically defined test property")
             .key("mandatory").value(false)
             .key("dataType").value(DataTypeDefinition.BOOLEAN)
@@ -568,7 +568,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         final String propId = "propId" + System.currentTimeMillis();
         
         String jsonString = new JSONStringer().object()
-            .key("name").value(propertyLabel)
+            .key("label").value(propertyLabel)
             .key("mandatory").value(false)
             .key("dataType").value(DataTypeDefinition.TEXT)
             .key("element").value("record")
@@ -611,7 +611,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         // Now PUT again to the same URL this time specifying only an updated name (aka label).
         final String updatedLabel = "Updated label";
         jsonString = new JSONStringer().object()
-            .key("name").value(updatedLabel)
+            .key("label").value(updatedLabel)
         .endObject()
         .toString();
     

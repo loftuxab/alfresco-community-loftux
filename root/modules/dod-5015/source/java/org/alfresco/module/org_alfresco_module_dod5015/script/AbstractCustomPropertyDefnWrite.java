@@ -50,8 +50,6 @@ import org.json.JSONTokener;
  */
 public abstract class AbstractCustomPropertyDefnWrite extends AbstractRmWebScript
 {
-    private static final String NAME = "name";
-
     protected RecordsManagementAdminService rmAdminService;
 
     public static final String PARAM_DATATYPE = "dataType";
@@ -64,6 +62,7 @@ public abstract class AbstractCustomPropertyDefnWrite extends AbstractRmWebScrip
     public static final String PARAM_CONSTRAINT_REF = "constraintRef";
 
     protected static final String PARAM_ELEMENT = "element";
+    protected static final String PARAM_LABEL = "label";
     
     protected static final String PROP_ID = "propId";
     protected static final String URL = "url";
@@ -141,7 +140,7 @@ public abstract class AbstractCustomPropertyDefnWrite extends AbstractRmWebScrip
         CustomisableRmElement ce = CustomisableRmElement.getEnumFor(customisableElement);
         String aspectName = ce.getCorrespondingAspect();
         
-        String label = (String)params.get(NAME);
+        String label = (String)params.get(PARAM_LABEL);
         
         //According to the wireframes, type here can only be date|text|number
         Serializable serializableParam = params.get(PARAM_DATATYPE);
@@ -220,7 +219,7 @@ public abstract class AbstractCustomPropertyDefnWrite extends AbstractRmWebScrip
 
     protected QName updatePropertyDefinition(Map<String, Serializable> params)
     {
-        String label = (String)params.get(NAME);
+        String label = (String)params.get(PARAM_LABEL);
         String propId = (String)params.get(PROP_ID);
         QName propQName = rmAdminService.getQNameForClientId(propId);
         

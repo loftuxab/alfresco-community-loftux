@@ -75,14 +75,14 @@ public interface RecordsManagementAdminService
      *                 only. It must also be unique.
      *                 If a null value is passed, an id will be generated.
      * @param aspectName - mandatory
-     * @param clientSideName - mandatory
+     * @param label - mandatory
      * @param dataType - mandatory
      * @param title - optional
      * @param description - optional
      * 
      * @return the propId, whether supplied as a parameter or generated.
      */
-    public QName addCustomPropertyDefinition(QName propId, String aspectName, String clientSideName, QName dataType, String title, String description);
+    public QName addCustomPropertyDefinition(QName propId, String aspectName, String label, QName dataType, String title, String description);
     
     /**
      * Add custom property definition with one optional constraint reference
@@ -92,7 +92,7 @@ public interface RecordsManagementAdminService
      *                 only. It must also be unique.
      *                 If a null value is passed, an id will be generated.
      * @param aspectName - mandatory
-     * @param clientSideName - mandatory
+     * @param label - mandatory
      * @param dataType - mandatory
      * @param title - optional
      * @param description - optional
@@ -104,7 +104,7 @@ public interface RecordsManagementAdminService
      * 
      * @return the propId, whether supplied as a parameter or generated.
      */
-    public QName addCustomPropertyDefinition(QName propId, String aspectName, String clientSideName, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
+    public QName addCustomPropertyDefinition(QName propId, String aspectName, String label, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
     
     /**
      * Update the value of the 'label' (title) for a custom property definition.

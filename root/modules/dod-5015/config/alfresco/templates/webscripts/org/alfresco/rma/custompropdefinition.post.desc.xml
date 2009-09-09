@@ -8,11 +8,10 @@
   <br/>
   The body of the post should be in the form, e.g.<br/>
   {<br/>
-  &nbsp;&nbsp;&nbsp;"name" : "sampleCustomProperty",<br/>
+  &nbsp;&nbsp;&nbsp;"label" : "sample Custom Property",<br/>
   &nbsp;&nbsp;&nbsp;"dataType" : "d:boolean",<br/>
   &nbsp;&nbsp;&nbsp;"mandatory" : false<br/>
   }<br/>
-  A value for "title" should not be provided.
   ]]>
   </description>
   <url>/api/rma/admin/custompropertydefinitions?element={element}</url>
