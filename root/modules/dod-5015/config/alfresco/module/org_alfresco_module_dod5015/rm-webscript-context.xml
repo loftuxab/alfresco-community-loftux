@@ -212,4 +212,9 @@
         <property name="customEmailMappingService" ref="CustomEmailMappingService" />
     </bean>
     
+    <!-- REST impl for GET RM Constraint  -->
+    <bean id="webscript.org.alfresco.rma.rmconstraints.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.RMConstraintGet" parent="webscript">
+        <property name="caveatConfigService" ref="CaveatConfigService" />
+    </bean>
+    
 </beans>

@@ -13,7 +13,7 @@
    <dt>constraintName</dt> <dd>the name of the constraint. The underscore character is used instead of the colon</dd>
    <dt>caseSensitive</dt> <dd>is the constraint case sensitive</dd>
    <dt>constraintTitle</dt> <dd>the display name of the constraint</dd>
-   <dt>allowedValues</dt> <dd>array of the allowed values</dd>
+   <dt>allowedValues</dt> <dd>array of the allowed values, this is the complete unrestricted list of all values</dd>
    <dt>values</dt> <dd>array of constraint values</dd>
    </dl>
    Constraint values object
