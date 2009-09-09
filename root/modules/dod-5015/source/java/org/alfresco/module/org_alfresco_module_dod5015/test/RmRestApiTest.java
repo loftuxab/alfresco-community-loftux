@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -515,17 +516,53 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     
     public void testPostCustomPropertyDefinition() throws Exception
     {
-        final String propertyLabel = "customProperty" + System.currentTimeMillis();
-        
-        String jsonString = new JSONStringer().object()
+        long currentTimeMillis = System.currentTimeMillis();
+
+        // Create one with no propId - it'll get generated.
+        postCustomPropertyDefinition("customProperty" + currentTimeMillis, null);
+
+        // Create another with an explicit propId.
+        postCustomPropertyDefinition("customProperty" + currentTimeMillis, "prop" + currentTimeMillis);
+    }
+
+    /**
+     * Creates a new property definition using a POST call.
+     * GETs the resultant property definition.
+     * 
+     * @param propertyLabel the label to use
+     * @param propId the propId to use - null to have one generated.
+     * @return the propId of the new property definition
+     */
+    private String postCustomPropertyDefinition(String propertyLabel, String propId) throws JSONException,
+            IOException, UnsupportedEncodingException
+    {
+        String jsonString;
+        if (propId == null)
+        {
+            jsonString = new JSONStringer().object()
+                .key("label").value(propertyLabel)
+                .key("description").value("Dynamically defined test property")
+                .key("mandatory").value(false)
+                .key("dataType").value("d:text")
+                .key("element").value("record")
+                .key("constraintRef").value("rmc:smList")
+                // Note no propId
+            .endObject()
+            .toString();
+        }
+        else
+        {
+            jsonString = new JSONStringer().object()
             .key("label").value(propertyLabel)
             .key("description").value("Dynamically defined test property")
             .key("mandatory").value(false)
             .key("dataType").value("d:text")
             .key("element").value("record")
             .key("constraintRef").value("rmc:smList")
+            .key("propId").value(propId)
         .endObject()
         .toString();
+        }
         
         // Submit the JSON request.
         final int expectedStatus = 200;
@@ -533,12 +570,12 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
                                  jsonString, APPLICATION_JSON), expectedStatus);
         
         String rspContent = rsp.getContentAsString();
-        assertTrue(rspContent.contains("propId"));
 
         System.out.println(rspContent);
         
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
         String urlOfNewPropDef = jsonRsp.getString("url");
+        String newPropId = jsonRsp.getString("propId");
 
         assertNotNull("urlOfNewPropDef was null.", urlOfNewPropDef);
         
@@ -561,69 +598,31 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
         assertEquals("Wrong property label.", propertyLabel, newPropObject.getString("label"));
+        
+        return newPropId;
     }
 
-    public void testPutAndRePutCustomPropertyDefinition() throws Exception
+    public void testPutCustomPropertyDefinition() throws Exception
     {
-        final String propertyLabel = "Original name åçîéøü";
-        final String propId = "propId" + System.currentTimeMillis();
+        final String propertyLabel = "Original label åçîéøü";
+        String propId = postCustomPropertyDefinition(propertyLabel, null);
         
-        String jsonString = new JSONStringer().object()
-            .key("label").value(propertyLabel)
-            .key("mandatory").value(false)
-            .key("dataType").value("d:text")
-            .key("element").value("record")
-        .endObject()
-        .toString();
-        
-        // Submit the JSON request.
-        final int expectedStatus = 200;
-        String propDefnUrl = "/api/rma/admin/custompropertydefinitions/" + propId;
-        String propDefnWithElementUrl = propDefnUrl + "?element=record";
-        
-        System.out.println("PUT " + propDefnWithElementUrl);
-        
-        Response rsp = sendRequest(new PutRequest(propDefnWithElementUrl,
-                                 jsonString, APPLICATION_JSON), expectedStatus);
-        
-        String rspContent = rsp.getContentAsString();
-
-        System.out.println(rspContent);
-        
-        JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
-        String urlOfNewPropDef = jsonRsp.getString("url");
-        assertNotNull("urlOfNewPropDef was null.", urlOfNewPropDef);
-        
-        // GET from the URL to ensure it's valid
-        System.out.println("GET " + propDefnUrl);
-        rsp = sendRequest(new GetRequest(propDefnUrl), 200);
-        rspContent = rsp.getContentAsString();
-        
-        System.out.println(rspContent);
-        
-        jsonRsp = new JSONObject(new JSONTokener(rspContent));
-        
-        JSONObject dataObject = jsonRsp.getJSONObject("data");
-        assertNotNull("JSON data object was null", dataObject);
-        JSONObject customPropsObject = dataObject.getJSONObject("customProperties");
-        assertNotNull("JSON customProperties object was null", customPropsObject);
-        assertEquals("Wrong customProperties length.", 1, customPropsObject.length());
-        
-        // Now PUT again to the same URL this time specifying only an updated name (aka label).
+        // PUT specifies only an updated label.
         final String updatedLabel = "Updated label";
-        jsonString = new JSONStringer().object()
+        String jsonString = new JSONStringer().object()
             .key("label").value(updatedLabel)
         .endObject()
         .toString();
     
-        rsp = sendRequest(new PutRequest(propDefnUrl,
-                                 jsonString, APPLICATION_JSON), expectedStatus);
+        String propDefnUrl = "/api/rma/admin/custompropertydefinitions/" + propId;
+        Response rsp = sendRequest(new PutRequest(propDefnUrl,
+                                 jsonString, APPLICATION_JSON), 200);
     
-        rspContent = rsp.getContentAsString();
+        String rspContent = rsp.getContentAsString();
         System.out.println(rspContent);
     
-        jsonRsp = new JSONObject(new JSONTokener(rspContent));
-        urlOfNewPropDef = jsonRsp.getString("url");
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        String urlOfNewPropDef = jsonRsp.getString("url");
         assertNotNull("urlOfNewPropDef was null.", urlOfNewPropDef);
     
         // GET from the URL again to ensure it's valid
@@ -633,20 +632,19 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         System.out.println(rspContent);
         
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
-        dataObject = jsonRsp.getJSONObject("data");
+        JSONObject dataObject = jsonRsp.getJSONObject("data");
         assertNotNull("JSON data object was null", dataObject);
-        customPropsObject = dataObject.getJSONObject("customProperties");
+        JSONObject customPropsObject = dataObject.getJSONObject("customProperties");
         assertNotNull("JSON customProperties object was null", customPropsObject);
         assertEquals("Wrong customProperties length.", 1, customPropsObject.length());
         
         Object keyToSoleProp = customPropsObject.keys().next();
         
-        System.out.println("Updated property defn: " + keyToSoleProp);
-        
         JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
         assertEquals("Wrong property label.", updatedLabel, newPropObject.getString("label"));
     }
 
+    @SuppressWarnings("unchecked")
     public void testGetCustomProperties() throws Exception
     {
         // Ensure that there is at least one custom property.
@@ -663,7 +661,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONObject customPropsObj = (JSONObject)dataObj.get("customProperties");
         assertNotNull("JSON 'customProperties' object was null", customPropsObj);
         
-        for (java.util.Iterator iter = customPropsObj.keys(); iter.hasNext();) {
+        for (Iterator iter = customPropsObj.keys(); iter.hasNext();) {
             System.out.println(customPropsObj.get((String)iter.next()));
         }
 

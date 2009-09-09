@@ -1,31 +1,15 @@
 <webscript>
-  <shortname>Add or update a Custom Property Definition to the custom model</shortname>
+  <shortname>Updates a Custom Property Definition.</shortname>
   <description><![CDATA[
-  This webscript can be used either to create a custom property definition with a particular<br/>
-  propId or to update an existing property definition.<br/>
+  This webscript can be used to update an existing property definition.<br/>
   <br/>
-  In the case of create, the 'element' query-param is mandatory and<br/>
-  should have one of the following values:</br>
-  'recordSeries', 'recordCategory', 'recordFolder' or 'record'.<br/>
-  <br/>
-  The value for 'propId' must only contain URL/QName-valid characters and it must also be unique.<br/>
-  <br/>
+  There is currently support only for updating the 'label'.<br/>
   The body of the PUT should be in the form, e.g.<br/>
   {<br/>
-  &nbsp;&nbsp;&nbsp;"label" : "original label",<br/>
-  &nbsp;&nbsp;&nbsp;"dataType" : "d:boolean",<br/>
-  &nbsp;&nbsp;&nbsp;"mandatory" : false<br/>
-  }<br/>
-  <br/>
-  In the case of an update to an existing property definition, there is currently support for<br/>
-  updating the 'label' only. In this case there is no need to specify
-  an 'element' query param.<br/>
-  {<br/>
-  &nbsp;&nbsp;&nbsp;"label" : "updated label",<br/>
+  &nbsp;&nbsp;&nbsp;"label" : "updated label value",<br/>
   }<br/>
   ]]>
   </description>
-  <url>/api/rma/admin/custompropertydefinitions/{propId}/?element={element}</url>
   <url>/api/rma/admin/custompropertydefinitions/{propId}</url>
   <format default="json">argument</format>
   <authentication>user</authentication>

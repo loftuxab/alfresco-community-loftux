@@ -27,10 +27,12 @@ package org.alfresco.module.org_alfresco_module_dod5015.script;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.ParameterCheck;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
@@ -40,27 +42,22 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 /**
- * Implementation for Java backed webscript to add/update RM custom property definitions
- * to the custom model.
+ * Implementation for Java backed webscript to update RM custom property definitions
+ * in the custom model.
  * 
  * @author Neil McErlean
  */
-public class CustomPropertyDefinitionPut extends AbstractCustomPropertyDefnWrite
+public class CustomPropertyDefinitionPut extends AbstractRmWebScript
 {
+    private RecordsManagementAdminService rmAdminService;
+
+    private static final String PARAM_LABEL = "label";
+    private static final String PROP_ID = "propId";
+    private static final String URL = "url";
+
     public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
     {
         this.rmAdminService = rmAdminService;
-    }
-
-    protected boolean isRequestToCreateNewProp(Map<String, Serializable> params)
-    {
-        // If the URL includes an 'element', then it is a create, else an update
-        return params.get(PARAM_ELEMENT) != null;
-    }
-    
-    protected String getUrlResult(WebScriptRequest req, QName propQName)
-    {
-        return req.getServicePath();
     }
 
     @Override
@@ -72,7 +69,7 @@ public class CustomPropertyDefinitionPut extends AbstractCustomPropertyDefnWrite
         {
             json = new JSONObject(new JSONTokener(req.getContent().getContent()));
             
-            ftlModel = handlePropertyRequest(req, json);
+            ftlModel = handlePropertyDefinitionUpdate(req, json);
         }
         catch (IOException iox)
         {
@@ -91,7 +88,7 @@ public class CustomPropertyDefinitionPut extends AbstractCustomPropertyDefnWrite
     /**
      * Applies custom properties.
      */
-    protected Map<String, Object> handlePropertyRequest(WebScriptRequest req, JSONObject json)
+    protected Map<String, Object> handlePropertyDefinitionUpdate(WebScriptRequest req, JSONObject json)
             throws JSONException
     {
         Map<String, Object> result = new HashMap<String, Object>();
@@ -99,22 +96,57 @@ public class CustomPropertyDefinitionPut extends AbstractCustomPropertyDefnWrite
         Map<String, Serializable> params = getParamsFromUrlAndJson(req, json);
         
         QName propertyQName;
-        if (isRequestToCreateNewProp(params))
-        {
-            propertyQName = createNewPropertyDefinition(params);
-        }
-        else
-        {
-            propertyQName = updatePropertyDefinition(params);
-        }
+        propertyQName = updatePropertyDefinition(params);
         String localName = propertyQName.getLocalName();
         
         result.put("success", true);
         result.put(PROP_ID, localName);
     
-        String urlResult = getUrlResult(req, propertyQName);
+        String urlResult = req.getServicePath();
         result.put(URL, urlResult);
     
         return result;
+    }
+
+    protected QName updatePropertyDefinition(Map<String, Serializable> params)
+    {
+        String label = (String)params.get(PARAM_LABEL);
+        String propId = (String)params.get(PROP_ID);
+        ParameterCheck.mandatoryString("propId", propId);
+        
+        QName propQName = rmAdminService.getQNameForClientId(propId);
+        
+        if (propQName == null)
+        {
+            throw new WebScriptException(Status.STATUS_NOT_FOUND,
+                    "Could not find property definition for: " + propId);
+        }
+    
+        return rmAdminService.updateCustomPropertyDefinition(propQName, label);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Map<String, Serializable> getParamsFromUrlAndJson(WebScriptRequest req, JSONObject json)
+            throws JSONException
+    {
+        Map<String, Serializable> params;
+        params = new HashMap<String, Serializable>();
+        
+        Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
+        String propId = templateVars.get(PROP_ID);
+        if (propId != null)
+        {
+            params.put(PROP_ID, (Serializable)propId);
+        }
+        
+        for (Iterator iter = json.keys(); iter.hasNext(); )
+        {
+            String nextKeyString = (String)iter.next();
+            String nextValueString = json.getString(nextKeyString);
+            
+            params.put(nextKeyString, nextValueString);
+        }
+        
+        return params;
     }
 }
