@@ -828,12 +828,16 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         Response rsp = sendRequest(new GetRequest(RMA_AUDITLOG_URL), 200);
         // check response
         assertEquals("application/json", rsp.getContentType());
-        //System.out.println(rsp.getContentAsString());
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        
+        // export the full RM audit log 
+        rsp = sendRequest(new GetRequest(RMA_AUDITLOG_URL + "?export=true"), 200);
+        // check response
+        assertEquals("application/json", rsp.getContentType());
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         // get category
         NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Civilian Files", "Foreign Employee Award Files");
-        //NodeRef recordCategory = new NodeRef("workspace://SpacesStore/cc2f1431-5e15-4c66-b79b-3f76c227dd9b");
         assertNotNull(recordCategory);
         
         // construct the URL
@@ -844,7 +848,6 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(auditUrl), 200);
         // check response
         assertEquals("application/json", rsp.getContentType());
-        //System.out.println(rsp.getContentAsString());
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         // get the audit log with all restrictions in place
@@ -852,14 +855,12 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(filteredAuditUrl), 200);
         // check response
         assertEquals("application/json", rsp.getContentType());
-        //System.out.println(rsp.getContentAsString());
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         // attempt to get the audit log with invalid restrictions in place
         filteredAuditUrl = auditUrl + "?user=fred&size=abc&from=2009&to=2010";
         rsp = sendRequest(new GetRequest(filteredAuditUrl), 200);
         assertEquals("application/json", rsp.getContentType());
-        //System.out.println(rsp.getContentAsString());
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         // start the RM audit log
@@ -897,6 +898,40 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
         assertFalse(dataObj.getBoolean("enabled"));
+    }
+    
+    public void testFileAuditLogAsRecord() throws IOException, JSONException
+    {
+        // Attempt to store audit log at non existent destination, make sure we get 404
+        JSONObject jsonPostData = new JSONObject();
+        jsonPostData.put("destination", "workspace://SpacesStore/09ca1e02-1c87-4a53-97e7-xxxxxxxxxxxx");
+        String jsonPostString = jsonPostData.toString();
+        Response rsp = sendRequest(new PostRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 404);
+        
+        // Attempt to store audit log at wrong type of destination, make sure we get 400
+        NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Civilian Files", "Foreign Employee Award Files");
+        assertNotNull(recordCategory);
+        jsonPostData = new JSONObject();
+        jsonPostData.put("destination", recordCategory.toString());
+        jsonPostString = jsonPostData.toString();
+        rsp = sendRequest(new PostRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 400);
+        
+        // TODO: create a record folder to store the audit log in 
+        /*NodeRef destination = null;
+        
+        // Store the full audit log as a record
+        jsonPostData = new JSONObject();
+        jsonPostData.put("destination", destination);
+        jsonPostString = jsonPostData.toString();
+        rsp = sendRequest(new PostRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 200);
+        
+        // check the response
+        System.out.println(rsp.getContentAsString());
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        assertTrue(jsonRsp.has("success"));
+        assertTrue(jsonRsp.getBoolean("success"));
+        */
+        // TODO: Store a filtered audit log as a record
     }
     
     private void declareRecord(NodeRef recordOne)
