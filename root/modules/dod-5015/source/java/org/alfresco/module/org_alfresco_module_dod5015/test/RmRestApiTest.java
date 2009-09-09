@@ -53,7 +53,6 @@ import org.alfresco.repo.web.scripts.BaseWebScriptTest;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
-import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -572,7 +571,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         String jsonString = new JSONStringer().object()
             .key("label").value(propertyLabel)
             .key("mandatory").value(false)
-            .key("dataType").value(DataTypeDefinition.TEXT)
+            .key("dataType").value("d:text")
             .key("element").value("record")
         .endObject()
         .toString();
