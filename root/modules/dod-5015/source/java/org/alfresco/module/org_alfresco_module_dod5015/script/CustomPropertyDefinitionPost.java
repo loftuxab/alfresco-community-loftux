@@ -24,11 +24,20 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.script;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.scripts.Cache;
+import org.alfresco.web.scripts.Status;
+import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  * Implementation for Java backed webscript to add RM custom property definitions
@@ -38,6 +47,11 @@ import org.alfresco.web.scripts.WebScriptRequest;
  */
 public class CustomPropertyDefinitionPost extends AbstractCustomPropertyDefnWrite
 {
+    public void setRecordsManagementAdminService(RecordsManagementAdminService rmAdminService)
+    {
+        this.rmAdminService = rmAdminService;
+    }
+
     protected boolean isRequestToCreateNewProp(Map<String, Serializable> params)
     {
         // A POST request always tries to create a new property definition
@@ -49,4 +63,58 @@ public class CustomPropertyDefinitionPost extends AbstractCustomPropertyDefnWrit
         return req.getServicePath() + "/" + propQName.getLocalName();
     }
 
+    @Override
+    protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
+    {
+        JSONObject json = null;
+        Map<String, Object> ftlModel = null;
+        try
+        {
+            json = new JSONObject(new JSONTokener(req.getContent().getContent()));
+            
+            ftlModel = handlePropertyRequest(req, json);
+        }
+        catch (IOException iox)
+        {
+            throw new WebScriptException(Status.STATUS_BAD_REQUEST,
+                    "Could not read content from req.", iox);
+        }
+        catch (JSONException je)
+        {
+            throw new WebScriptException(Status.STATUS_BAD_REQUEST,
+                        "Could not parse JSON from req.", je);
+        }
+        
+        return ftlModel;
+    }
+
+    /**
+     * Applies custom properties.
+     */
+    protected Map<String, Object> handlePropertyRequest(WebScriptRequest req, JSONObject json)
+            throws JSONException
+    {
+        Map<String, Object> result = new HashMap<String, Object>();
+        
+        Map<String, Serializable> params = getParamsFromUrlAndJson(req, json);
+        
+        QName propertyQName;
+        if (isRequestToCreateNewProp(params))
+        {
+            propertyQName = createNewPropertyDefinition(params);
+        }
+        else
+        {
+            propertyQName = updatePropertyDefinition(params);
+        }
+        String localName = propertyQName.getLocalName();
+        
+        result.put("success", true);
+        result.put(PROP_ID, localName);
+    
+        String urlResult = getUrlResult(req, propertyQName);
+        result.put(URL, urlResult);
+    
+        return result;
+    }
 }
