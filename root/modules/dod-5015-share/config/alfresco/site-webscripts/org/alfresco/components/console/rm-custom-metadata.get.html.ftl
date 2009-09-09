@@ -74,9 +74,11 @@
          </div>
          <div class="field-row">
             <input type="checkbox" id="${el}-create-use-list" /><label for="${el}-create-use-list">${msg("label.use-list")}:</label>
-            <!-- TODO: generate list of values drop-down-->
+            <!-- generated list of values constraints drop-down-->
             <select id="${el}-create-list">
-               <option value="">REGIONS</option>
+               <#list constraints as c>
+               <option value="${c.constraintName}">${c.constraintTitle?html}</option>
+               </#list>
             </select>
          </div>
          <div class="field-row">
@@ -116,9 +118,11 @@
          </div>
          <div class="field-row">
             <input type="checkbox" id="${el}-edit-use-list" /><label for="${el}-edit-use-list">${msg("label.use-list")}:</label>
-            <!-- TODO: generate list of values drop-down-->
+            <!-- generated list of values constraints drop-down-->
             <select id="${el}-edit-list">
-               <option value="">REGIONS</option>
+               <#list constraints as c>
+               <option value="${c.constraintName}">${c.constraintTitle?html}</option>
+               </#list>
             </select>
          </div>
          <div class="field-row">
