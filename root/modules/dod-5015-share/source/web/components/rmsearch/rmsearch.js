@@ -254,6 +254,7 @@
             params += "&folders=" + (Dom.get(this.id + "-folders").checked);
             params += "&categories=" + (Dom.get(this.id + "-categories").checked);
             params += "&series=" + (Dom.get(this.id + "-series").checked);
+            params += "&frozen=" + (Dom.get(this.id + "-frozen").checked);
             
             // TODO: prepopulate dialog with current saved search name if any selected
             
@@ -292,6 +293,7 @@
          Dom.get(this.id + "-folders").checked = false;
          Dom.get(this.id + "-categories").checked = false;
          Dom.get(this.id + "-series").checked = false;
+         Dom.get(this.id + "-frozen").checked = false;
          Dom.get(this.id + "-terms").value = "";
          
          // reset sorting options
@@ -328,8 +330,21 @@
          var searchObj = args[1];
          if (searchObj)
          {
-            // add to our search to the list
-            this.options.savedSearches.push(searchObj);
+            // add to our search to the list - if not already present
+            var found = false;
+            for (var i=0, j=this.options.savedSearches.length; i<j; i++)
+            {
+               var search = this.options.savedSearches[i];
+               if (search.label === searchObj.label)
+               {
+                  found = true;
+                  break;
+               }
+            }
+            if (!found)
+            {
+               this.options.savedSearches.push(searchObj);
+            }
             
             // rebuild the menu component
             this._initSavedSearchMenu();
@@ -426,6 +441,7 @@
          var userQuery = YAHOO.lang.trim(queryElem.value);
          
          var query = "";
+         
          var selectRecords = Dom.get(this.id + "-records").checked;
          if (selectRecords)
          {
@@ -438,6 +454,11 @@
          if (selectRecords && Dom.get(this.id + "-vital").checked)
          {
             query += (query.length != 0 ? ' AND ' : '') + 'ASPECT:"rma:vitalRecord"';
+         }
+         
+         if (Dom.get(this.id + "-frozen").checked)
+         {
+            query += (query.length != 0 ? ' AND ' : '') + 'ASPECT:"rma:frozen"';
          }
          
          var containerQuery = "";
@@ -576,6 +597,12 @@
                      case "series":
                      {
                         Dom.get(me.id + "-series").checked = (pair[1] === "true");
+                        break;
+                     }
+                     
+                     case "frozen":
+                     {
+                        Dom.get(me.id + "-frozen").checked = (pair[1] === "true");
                         break;
                      }
                      

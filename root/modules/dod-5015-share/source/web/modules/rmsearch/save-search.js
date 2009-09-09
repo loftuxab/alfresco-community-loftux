@@ -97,6 +97,8 @@
          sort: ""
       },
       
+      _form: null,
+      
       /**
        * Shows the SaveSearch dialog to the user.
        *
@@ -221,6 +223,7 @@
          form.setSubmitAsJSON(true);
          form.applyTabFix();
          form.init();
+         this._form = form;
          
          // Show the panel
          this._showPanel();
@@ -312,6 +315,8 @@
       {
          // The panel gui has been showed before and its gui has already been loaded and created
          this.widgets.panel.show();
+         
+         this._form.updateSubmitElements();
          
          // Firefox insertion caret fix
          Alfresco.util.caretFix(this.id + "-form");
