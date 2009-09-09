@@ -77,6 +77,7 @@
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getRecordFolders=RM.Read.0,AFTER_RM.FilterNode
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getRecords=RM.Read.0,AFTER_RM.FilterNode
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getDispositionSchedule=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getDispositionPeriodProperties=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.addDispositionActionDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.removeDispositionActionDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.updateDispositionActionDefinition=RM_ALLOW
@@ -576,6 +577,18 @@
         <property name="nodeService" ref="NodeService"/>
         <property name="recordsManagementService" ref="RecordsManagementService"/>
         <property name="policyComponent" ref="policyComponent"/>
+    </bean>
+    
+    <!-- Period Properties -->
+    
+    <bean id="DispositionPeriodProperties" class="org.alfresco.module.org_alfresco_module_dod5015.DispositionPeriodProperties">
+        <property name="propertyList">
+            <list>
+                <value>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</value>
+                <value>{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAsOf</value>
+                <value>{http://www.alfresco.org/model/recordsmanagement/1.0}dateFiled</value>
+            </list>
+        </property>
     </bean>
     
 </beans>    

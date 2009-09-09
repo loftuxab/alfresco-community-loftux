@@ -200,4 +200,11 @@ public interface RecordsManagementService
      * @return a suggested next record identifier
      */
     String getNextRecordIdentifier(NodeRef container);
+    
+    /**
+     * Returns the list of disposition period properties
+     * 
+     * @return list of disposition period properties
+     */
+    List<QName> getDispositionPeriodProperties();
 }

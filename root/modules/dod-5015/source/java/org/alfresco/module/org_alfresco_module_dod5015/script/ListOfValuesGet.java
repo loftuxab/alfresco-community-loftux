@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
@@ -55,10 +55,21 @@ import org.springframework.util.StringUtils;
  */
 public class ListOfValuesGet extends DeclarativeWebScript
 {
+    protected RecordsManagementService rmService;
     protected RecordsManagementActionService rmActionService;
     protected RecordsManagementEventService rmEventService;
     protected DictionaryService ddService;
     protected NamespaceService namespaceService;
+    
+    /**
+     * Sets the RecordsManagementService instance
+     * 
+     * @param rmService The RecordsManagementService instance
+     */
+    public void setRecordsManagementService(RecordsManagementService rmService)
+    {
+        this.rmService = rmService;
+    }
     
     /**
      * Sets the RecordsManagementActionService instance
@@ -215,13 +226,8 @@ public class ListOfValuesGet extends DeclarativeWebScript
      */
     protected Map<String, Object> createPeriodPropertiesModel(String baseUrl)
     {
-        // TODO: make the list of period properties configurable
-        List<QName> periodProperties = new ArrayList<QName>(3);
-        periodProperties.add(RecordsManagementModel.PROP_CUT_OFF_DATE);
-        periodProperties.add(RecordsManagementModel.PROP_DISPOSITION_AS_OF);
-        periodProperties.add(RecordsManagementModel.PROP_DATE_FILED);
-        
         // iterate over all period properties and get the label from their type definition
+        List<QName> periodProperties = this.rmService.getDispositionPeriodProperties();
         List<Map<String, String>> items = new ArrayList<Map<String, String>>(periodProperties.size());
         for (QName periodProperty : periodProperties)
         {
