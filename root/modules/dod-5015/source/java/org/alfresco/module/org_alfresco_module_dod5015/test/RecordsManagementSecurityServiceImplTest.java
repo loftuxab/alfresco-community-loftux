@@ -31,8 +31,8 @@ import java.util.Set;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
 import org.alfresco.module.org_alfresco_module_dod5015.security.Role;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -41,13 +41,15 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransacti
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
 import org.alfresco.util.PropertyMap;
-import org.hibernate.engine.TransactionHelper;
 
 /**
  * Event service implementation unit test
@@ -62,6 +64,7 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
 	private NodeService nodeService;
 	private AuthenticationService authenticationService;
 	private AuthorityService authorityService;
+	private PermissionService permissionService;
 	private PersonService personService;
 	private RecordsManagementSecurityService rmSecurityService;
 	private RetryingTransactionHelper transactionHelper;
@@ -78,6 +81,7 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
 		this.authorityService = (AuthorityService)this.applicationContext.getBean("authorityService");
 		this.rmSecurityService = (RecordsManagementSecurityService)this.applicationContext.getBean("RecordsManagementSecurityService");
 		this.transactionHelper = (RetryingTransactionHelper)this.applicationContext.getBean("retryingTransactionHelper");
+		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
 		
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -222,6 +226,56 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
         return userName;
 	}
 	
+	public void testExecutionAsRMAdmin()
+	{
+	    NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
+        final NodeRef filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
+                TYPE_FILE_PLAN,
+                TYPE_FILE_PLAN).getChildRef();
+        
+        setComplete();
+        endTransaction();
+        
+        transactionHelper.doInTransaction(new RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                System.out.println("Groups:");
+                Set<String> temp = authorityService.getAllRootAuthorities(AuthorityType.GROUP);
+                for (String g : temp)
+                {
+                    System.out.println("   - " + g);
+                }
+                System.out.println("");
+                
+                assertTrue(permissionService.hasPermission(filePlan, RMPermissionModel.READ_RECORDS).equals(AccessStatus.ALLOWED));
+                assertTrue(permissionService.hasPermission(filePlan, RMPermissionModel.FILE_RECORDS).equals(AccessStatus.ALLOWED));
+                assertTrue(permissionService.hasPermission(filePlan, RMPermissionModel.FILING).equals(AccessStatus.ALLOWED));
+                
+                Role adminRole = rmSecurityService.getRole(filePlan, "Administrator");
+                assertNotNull(adminRole);
+                String adminUser = createAndAddUserToRole(adminRole.getRoleGroupName());
+                AuthenticationUtil.setFullyAuthenticatedUser(adminUser);
+                
+                try
+                {
+                    assertTrue(permissionService.hasPermission(filePlan, RMPermissionModel.READ_RECORDS).equals(AccessStatus.ALLOWED));
+                    assertTrue(permissionService.hasPermission(filePlan, RMPermissionModel.FILE_RECORDS).equals(AccessStatus.ALLOWED));
+                    assertTrue(permissionService.hasPermission(filePlan, RMPermissionModel.FILING).equals(AccessStatus.ALLOWED));
+                    
+                    // Read the properties of the filePlan
+                    nodeService.getProperties(filePlan);                    
+                }
+                finally
+                {
+                    AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+                }
+                
+                return null;
+            }
+        });
+	}
+	
 	public void testDefaultRolesBootstrap()
 	{
 	    NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
@@ -302,7 +356,7 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
                 System.out.println("\nAdministrator capabilities: ");
                 for (String cap : caps)
                 {
-                    assertNotNull(rmSecurityService.getCapability(cap));
+                    assertNotNull("No capability called " + cap, rmSecurityService.getCapability(cap));
                     System.out.println(cap);
                 }
                 
