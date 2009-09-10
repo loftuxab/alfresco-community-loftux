@@ -156,7 +156,7 @@
          </associations>
       </aspect>
       
-      <!-- These aspects are intentionally empty. New references and/or properties
+      <!-- These aspects are intentionally empty. New properties
            will be defined at runtime. These new definitions will then be
            programmatically added to these aspects. -->
       <aspect name="rmc:customRecordSeriesProperties">
