@@ -589,6 +589,54 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return generatedQName;
     }
     
+    public QName updateCustomChildAssocDefinition(QName refQName, String newSource, String newTarget)
+    {
+        String compoundId = getCompoundIdFor(newSource, newTarget);
+        return persistUpdatedAssocTitle(refQName, compoundId);
+    }
+    
+    public QName updateCustomAssocDefinition(QName refQName, String newLabel)
+    {
+        return persistUpdatedAssocTitle(refQName, newLabel);
+    }
+
+    /**
+     * This method writes the specified String into the association's title property.
+     * For RM custom properties and references, Title is used to store the identifier.
+     */
+    private QName persistUpdatedAssocTitle(QName refQName, String newTitle)
+    {
+        ParameterCheck.mandatory("refQName", refQName);
+        
+        AssociationDefinition assocDefn = dictionaryService.getAssociation(refQName);
+        if (assocDefn == null)
+        {
+            throw new AlfrescoRuntimeException("DictionaryService does not contain association definition " + refQName);
+        }
+        
+        M2Model deserializedModel = readCustomContentModel();
+        M2Aspect customAssocsAspect = deserializedModel.getAspect(RMC_CUSTOM_ASSOCS);
+        for (M2ClassAssociation assoc : customAssocsAspect.getAssociations())
+        {
+            if (refQName.toPrefixString(namespaceService).equals(assoc.getName()))
+            {
+                if (newTitle != null)
+                {
+                    assoc.setTitle(newTitle);
+                }
+            }
+        }
+        writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("persistUpdatedAssocTitle: "+refQName+
+                    "=" + newTitle + " to aspect: " + RMC_CUSTOM_ASSOCS);
+        }
+        
+        return refQName;
+    }
+
     public void addCustomConstraintDefinition(QName constraintName, String title, boolean caseSensitive, List<String> allowedValues) 
     {
         ParameterCheck.mandatory("constraintName", constraintName);
@@ -847,6 +895,14 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 
     public String getCompoundIdFor(String sourceId, String targetId)
     {
+        ParameterCheck.mandatoryString("sourceId", sourceId);
+        ParameterCheck.mandatoryString("targetId", targetId);
+        
+        if (sourceId.contains(SOURCE_TARGET_ID_SEPARATOR))
+        {
+            throw new IllegalArgumentException("sourceId cannot contain '" + SOURCE_TARGET_ID_SEPARATOR
+                    + "': " + sourceId);
+        }
         StringBuilder result = new StringBuilder();
         result.append(sourceId)
             .append(SOURCE_TARGET_ID_SEPARATOR)
