@@ -93,6 +93,14 @@
          propDeleteButtons: null,
          
          /**
+          * Flag ensuring the property list is not updated multiple times.
+          * 
+          * @property updateComplete
+          * @type boolean
+          */
+         updateComplete: true,
+         
+         /**
           * onLoad ConsolePanel event handler
           * 
           * @method onLoad
@@ -192,8 +200,7 @@
                         </div>
                         <div>
                            <p class="property-title">Project Name</p>
-                           <p>Type: Text</p>
-                           <p>Selection list: regions</p>
+                           <p>Type: Text  Selection list: Regions</p>
                         </div>
                      </div>
                   */
@@ -201,21 +208,25 @@
                   Dom.addClass(div, "theme-bg-color-2");
                   Dom.addClass(div, "property-item");
                   var html = '<div class="property-actions"><span id="' + editBtnContainerId + '"></span><span id="' + deleteBtnContainerId + '"></span>';
-                  html += '</div><div><p class="property-title">' + $html(prop.label) + '</p>';
-                  html += '<p>' + parent._msg('label.type') + ': ' + parent._dataTypeLabel(prop.dataType) + '</p>';
-                  // TODO: display selection list constraint
-                  //html += '<p>' + this._msg('label.selection-list') + ': ' + prop.xx + '</p>';
-                  html += '</div></div>';
+                  html += '</div><div><p class="property-title">' + $html(prop.label) + '</p><p>';
+                  html += parent._msg('label.type') + ': ' + parent._dataTypeLabel(prop.dataType);
+                  // display any selection list constraint applied and if mandatory value
+                  if (prop.constraintRefs.length !== 0)
+                  {
+                     html += '&nbsp;&nbsp;&nbsp;' + parent._msg('label.selection-list') + ': ' + prop.constraintRefs[0].title;
+                  }
+                  if (prop.mandatory)
+                  {
+                     html += '&nbsp;&nbsp;&nbsp;' + parent._msg('label.mandatory');
+                  }
+                  html += '</p></div></div>';
                   div.innerHTML = html;
                   
                   // insert into the DOM for display
                   elPropList.appendChild(div);
                   
                   // generate buttons (NOTE: must occur after DOM insertion)
-                  //
-                  // TODO: disabled until Edit/Delete is resolved in the repository
-                  //
-                  /*var editBtn = new YAHOO.widget.Button(
+                  var editBtn = new YAHOO.widget.Button(
                   {
                      type: "button",
                      label: parent._msg("button.edit"),
@@ -229,7 +240,9 @@
                      }
                   });
                   this.propEditButtons[index] = editBtn;
-                  var deleteBtn = new YAHOO.widget.Button(
+                  
+                  // TODO: Delete disabled until resolved in the repository
+                  /*var deleteBtn = new YAHOO.widget.Button(
                   {
                      type: "button",
                      label: parent._msg("button.delete"),
@@ -256,6 +269,8 @@
                elPropList.appendChild(div);
             }
             Alfresco.util.Anim.fadeIn(elPropList);
+            
+            this.updateComplete = true;
          },
          
          /**
@@ -292,26 +307,42 @@
           */
          onUpdate: function onUpdate()
          {
-            // clear the list of meta-data items
-            var elPropList = Dom.get(parent.id + "-property-list");
-            elPropList.innerHTML = "";
-            
-            // reset widget references
-            this.propDeleteButtons = {};
-            this.propEditButtons = {};
-            
-            // perform ajax call to get the custom props for the object type
-            Alfresco.util.Ajax.request(
+            if (this.updateComplete)
             {
-               method: Alfresco.util.Ajax.GET,
-               url: Alfresco.constants.PROXY_URI + "api/rma/admin/custompropertydefinitions?element=" + parent.currentType,
-               successCallback:
+               this.updateComplete = false;
+               
+               // clear the list of meta-data items
+               var elPropList = Dom.get(parent.id + "-property-list");
+               elPropList.innerHTML = "";
+               
+               // reset widget references
+               this.propDeleteButtons = {};
+               this.propEditButtons = {};
+               
+               // perform ajax call to get the custom props for the object type
+               Alfresco.util.Ajax.request(
                {
-                  fn: this.onCustomPropertiesLoaded,
-                  scope: this
-               },
-               failureMessage: parent._msg("message.getpropertiesfail")
-            });
+                  method: Alfresco.util.Ajax.GET,
+                  url: Alfresco.constants.PROXY_URI + "api/rma/admin/custompropertydefinitions?element=" + parent.currentType,
+                  successCallback:
+                  {
+                     fn: this.onCustomPropertiesLoaded,
+                     scope: this
+                  },
+                  failureCallback:
+                  {
+                     fn: function()
+                     {
+                        Alfresco.util.PopupManager.displayMessage(
+                        {
+                           text: parent._msg("message.getpropertiesfail")
+                        });
+                        this.updateComplete = true;
+                     },
+                     scope: this
+                  }
+               });
+            }
          },
          
          /**
@@ -358,6 +389,7 @@
             
             // Form field validation
             form.addValidation(parent.id + "-create-label", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-create-label", Alfresco.forms.validation.nodeName, null, "keyup");
             
             // Initialise the form
             form.init();
@@ -374,13 +406,14 @@
           */
          onBeforeShow: function onBeforeShow()
          {
-            // clear form
+            // reset form
             Dom.get(parent.id + "-create-label").value = "";
             Dom.get(parent.id + "-create-type").selectedIndex = 0
             Dom.get(parent.id + "-create-use-list").checked = false;
             Dom.get(parent.id + "-create-use-list").disabled = false;
-            Dom.get(parent.id + "-create-mandatory").checked = false;
+            Dom.get(parent.id + "-create-list").disabled = false;
             Dom.get(parent.id + "-create-list").selectedIndex = 0;
+            Dom.get(parent.id + "-create-mandatory").checked = false;
             this.createForm.updateSubmitElements();
          },
          
@@ -409,7 +442,8 @@
             
             var obj =
             {
-               //name: label.replace(/\s/g, "").toLowerCase(),
+               // strip whitespace, encode as URL and finally replace '%' with '_' to make valid qname
+               propId: encodeURIComponent(label.replace(/\s/g, "")).replace("%", "_"),
                dataType: dataType,
                mandatory: mandatory,
                label: label
@@ -454,8 +488,8 @@
                      var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
                      Alfresco.util.PopupManager.displayPrompt(
                      {
-                        title: this._msg("message.failure"),
-                        text: this._msg("message.create-failure", json.message)
+                        title: parent._msg("message.failure"),
+                        text: parent._msg("message.create-failure", json.message)
                      });
                   },
                   scope: this
@@ -521,6 +555,7 @@
             
             // Form field validation
             form.addValidation(parent.id + "-edit-label", Alfresco.forms.validation.mandatory, null, "keyup");
+            form.addValidation(parent.id + "-edit-label", Alfresco.forms.validation.nodeName, null, "keyup");
             
             // Initialise the form
             form.init();
@@ -536,18 +571,39 @@
          {
             var prop = parent.currentProperty;
             
-            // title message
+            // title label
             Dom.get(parent.id + "-edit-metadata-item").innerHTML = prop.label;
             
-            // apply current property values to form
+            // apply property values to form
             Dom.get(parent.id + "-edit-label").value = prop.label;
             Dom.get(parent.id + "-edit-type").innerHTML = parent._dataTypeLabel(prop.dataType);
-            // TODO: apply LOV constraints etc.
-            Dom.get(parent.id + "-edit-use-list").checked = false;
-            Dom.get(parent.id + "-edit-use-list").disabled = true;
-            Dom.get(parent.id + "-edit-list").disabled = true;
-            Dom.get(parent.id + "-edit-mandatory").checked = false;
-            Dom.get(parent.id + "-edit-list").selectedIndex = 0;
+            
+            // apply LOV constraints if present
+            if (prop.constraintRefs.length !== 0)
+            {
+               // the constraint IDs in the options list are of the form "rmc_name" not "rmc:name"
+               var constraintId = prop.constraintRefs[0].name.replace(":", "_");
+               var listOptions = Dom.get(parent.id + "-edit-list").children;
+               for (var i=0, j=listOptions.length; i<j; i++)
+               {
+                  if (listOptions[i].value === constraintId)
+                  {
+                     Dom.get(parent.id + "-edit-list").selectedIndex = i;
+                     break;
+                  }
+               }
+               Dom.get(parent.id + "-edit-use-list").checked = true;
+            }
+            else
+            {
+               Dom.get(parent.id + "-edit-list").selectedIndex = 0;
+               Dom.get(parent.id + "-edit-use-list").checked = false;
+            }
+            
+            // mandatory field value - cannot be changed currently
+            Dom.get(parent.id + "-edit-mandatory").checked = prop.mandatory;
+            Dom.get(parent.id + "-edit-mandatory").disabled = true;
+            
             this.editForm.updateSubmitElements();
          },
          
@@ -572,24 +628,27 @@
          {
             var label = Dom.get(parent.id + "-edit-label").value;
             
-            //
-            // TODO: OUT OF DATE - need PUT REST API in place to update label!
-            //
-            
-            // TODO: add mandatory field support
-            // TODO: add list of values selection (constraint)
-            
+            // TODO: add mandatory field edit once supported in the repo
             var obj =
             {
-               name: parent.currentProperty.name,
-               dataType: parent.currentProperty.dataType,
-               title: label
+               label: label
             };
+            
+            var constraint = null;
+            var useConstraint = Dom.get(parent.id + "-edit-use-list").checked;
+            if (parent.currentProperty.dataType === "d:text" && useConstraint)
+            {
+               constraint = Dom.get(parent.id + "-edit-list").value;
+               if (constraint !== null)
+               {
+                  obj.constraintRef = constraint.replace("_", ":");
+               }
+            }
             
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.PROXY_URI + "api/rma/admin/custompropertydefinitions?element=" + parent.currentType,
-               method: Alfresco.util.Ajax.POST,
+               url: Alfresco.constants.PROXY_URI + "api/rma/admin/custompropertydefinitions/" + parent.currentProperty.propId,
+               method: Alfresco.util.Ajax.PUT,
                dataObj: obj,
                requestContentType: Alfresco.util.Ajax.JSON,
                successCallback:
@@ -614,8 +673,8 @@
                      var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
                      Alfresco.util.PopupManager.displayPrompt(
                      {
-                        title: this._msg("message.failure"),
-                        text: this._msg("message.edit-failure", json.message)
+                        title: parent._msg("message.failure"),
+                        text: parent._msg("message.edit-failure", json.message)
                      });
                   },
                   scope: this
