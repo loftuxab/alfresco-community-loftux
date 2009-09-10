@@ -36,6 +36,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -244,6 +245,13 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                             displayLabel = object.getString("displayLabel");
                         }
                         
+                        // Determine whether the role is an admin role or not
+                        boolean isAdmin = false;
+                        if (object.has("isAdmin") == true)
+                        {
+                            isAdmin = object.getBoolean("isAdmin");
+                        }
+                                                
                         // Get the roles capabilities
                         Set<Capability> capabilities = new HashSet<Capability>(30);
                         if (object.has("capabilities") == true)
@@ -252,25 +260,23 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                             for (int index = 0; index < arrCaps.length(); index++)
                             {
                                 String capName = arrCaps.getString(index);
-                                // Handle special "Filing" capability
-                                if ("Filing".equals(capName) == true)
+                                Capability capability = getCapability(capName);
+                                if (capability == null)
                                 {
-                                    permissionService.setPermission(rmRootNode, getFullRoleName(name, rmRootNode), capName, true);
+                                    throw new AlfrescoRuntimeException("The capability '" + capName + "' configured for the deafult boostrap role '" + name + "' is invalid.");
                                 }
-                                else
-                                {
-                                    Capability capability = getCapability(capName);
-                                    if (capability == null)
-                                    {
-                                        throw new AlfrescoRuntimeException("The capability '" + capName + "' configured for the deafult boostrap role '" + name + "' is invalid.");
-                                    }
-                                    capabilities.add(capability);
-                                }
+                                capabilities.add(capability);
                             }
                         }
                         
                         // Create the role
-                        createRole(rmRootNode, name, displayLabel, capabilities);
+                        Role role = createRole(rmRootNode, name, displayLabel, capabilities);
+                        
+                        // Add any additional admin permissions
+                        if (isAdmin == true)
+                        {
+                            permissionService.setPermission(rmRootNode, role.getRoleGroupName(), RMPermissionModel.FILING, true);
+                        }
                     }
                 }
                 catch (JSONException exception)
@@ -417,7 +423,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 String displayLabel = authorityService.getAuthorityDisplayName(roleAuthority);                
                 Set<String> capabilities = getCapabilities(rmRootNode, roleAuthority);
                 
-                return new Role(name, displayLabel, capabilities, getFullRoleName(role, rmRootNode));
+                return new Role(name, displayLabel, capabilities, roleAuthority);
             }
         }, AuthenticationUtil.getAdminUserName());
     }
@@ -437,7 +443,11 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         {
             if (permission.getAuthority().equals(roleAuthority) == true)
             {
-                capabilities.add(permission.getPermission());
+                String capabilityName = permission.getPermission();
+                if (getCapability(capabilityName) != null)
+                {
+                    capabilities.add(permission.getPermission());
+                }
             }
         }
         return capabilities;
@@ -496,7 +506,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 {
                     capStrings.add(capability.getName());
                 }
-                return new Role(role, roleDisplayLabel, capStrings, fullRoleName);
+                return new Role(role, roleDisplayLabel, capStrings, roleGroup);
             }
         }, AuthenticationUtil.getAdminUserName());
     }
@@ -528,7 +538,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 {
                     capStrings.add(capability.getName());
                 }
-                return new Role(role, roleDisplayLabel, capStrings, getFullRoleName(role, rmRootNode));
+                return new Role(role, roleDisplayLabel, capStrings, roleAuthority);
                 
             }
         }, AuthenticationUtil.getAdminUserName());

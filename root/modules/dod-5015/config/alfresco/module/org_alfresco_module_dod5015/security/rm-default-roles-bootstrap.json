@@ -2,6 +2,7 @@
    {
       "name" : "User",
       "displayLabel" : "Records Management User",
+      "isAdmin" : false,
       "capabilities" :
       [
          "DeclareRecords",
@@ -11,6 +12,7 @@
    {
       "name" : "PowerUser",
       "displayLabel" : "Records Management Power User",
+      "isAdmin" : false,
       "capabilities" :
       [
          "DeclareRecords",
@@ -29,6 +31,7 @@
    {
       "name" : "SecurityOfficer",
       "displayLabel" : "Records Management Security Officer",
+      "isAdmin" : false,
       "capabilities" :
       [
           "DeclareRecords",
@@ -51,6 +54,7 @@
    {
       "name" : "RecordsManager",
       "displayLabel" : "Records Management Records Manager",
+      "isAdmin" : false,
       "capabilities" :
       [
           "DeclareRecords",
@@ -116,6 +120,7 @@
    {
       "name" : "Administrator",
       "displayLabel" : "Records Management Administrator",
+      "isAdmin" : true, 
       "capabilities" :
       [
           "DeclareRecords",
@@ -175,8 +180,7 @@
           "UpgradeDowngradeAndDeclassifyRecords",
           "UpdateExemptionCategories",
           "MapClassificationGuideMetadata",
-          "ManageAccessControls",
-          "Filing"
+          "ManageAccessControls"
       ]
    }
 ]
