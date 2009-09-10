@@ -118,8 +118,6 @@
          var dummyEl = Dom.get(this.id + "-event-template-dummy");
          dummyEl.parentNode.removeChild(dummyEl);
          this.widgets.actionTemplateEl = Dom.get(this.id + "-action-template");
-         dummyEl = Dom.get(this.id + "-action-template-dummy");
-         dummyEl.parentNode.removeChild(dummyEl);
 
          this._loadActions();
       },
@@ -141,17 +139,25 @@
                {
                   if (response.json)
                   {
-                     var schedule = response.json.data,
+                     var dummyEl = Dom.get(this.id + "-action-template-dummy"),
+                        schedule = response.json.data,
                         actions = schedule.actions ? schedule.actions : [],
                         action,
                         actionEl;
-                     
-                     for (var i = 0, ii = actions.length; i < ii; i++)
+                     if(actions.length == 0)
                      {
-                        action = actions[i];
-                        actionEl = this._createAction(action);
-                        actionEl = this.widgets.actionListEl.appendChild(actionEl);
-                        this._setupActionForm(action, actionEl);
+                        dummyEl.innerHTML = this.msg("message.noSteps");  
+                     }
+                     else
+                     {
+                        dummyEl.parentNode.removeChild(dummyEl);
+                        for (var i = 0, ii = actions.length; i < ii; i++)
+                        {
+                           action = actions[i];
+                           actionEl = this._createAction(action);
+                           actionEl = this.widgets.actionListEl.appendChild(actionEl);
+                           this._setupActionForm(action, actionEl);
+                        }
                      }
                   }
                   this.widgets.createButton.set("disabled", false);                  
@@ -203,11 +209,25 @@
          var actionType = action.name,
                actionTypeEl = Dom.getElementsByClassName("action-type", "select", actionEl)[0],
                actionLocationEl = Dom.getElementsByClassName("action-location", "select", actionEl)[0],
-               actionLocationSpan = Dom.getElementsByClassName("action-location-section", "span", actionEl)[0];
+               actionLocationSpan = Dom.getElementsByClassName("action-location-section", "span", actionEl)[0],
+               actionLocationRestrictedSpan = Dom.getElementsByClassName("action-location-restricted-section", "span", actionEl)[0];
          if(actionType == "transfer")
          {
-            Alfresco.util.setSelectedIndex(actionLocationEl, action.location);
+            // Display location since its a transfer action
             Dom.removeClass(actionLocationSpan, "hidden");
+            Dom.addClass(actionLocationRestrictedSpan, "hidden");
+            var locationSetInDropDown = Alfresco.util.setSelectedIndex(actionLocationEl, action.location) !== null;
+            if(action.location && action.location !== "" && !locationSetInDropDown)
+            {
+               /**
+                * The action/step had a location set but the current user hasn't been granted access
+                * to the value of the location, there display the location as a text label instead
+                */
+               actionLocationRestrictedSpan.innerHTML = action.location;
+               Dom.removeClass(actionLocationRestrictedSpan, "hidden");
+               Dom.addClass(actionLocationEl, "hidden");
+               actionLocationEl.disabled = true;
+            }
          }
          else
          {
@@ -990,7 +1010,12 @@
             eligibleOnFirstCompleteEvent: true,
             events: []
          };
-         var newActionEl = this._createAction(action);
+         var newActionEl = this._createAction(action),
+               dummyEl = Dom.get(this.id + "-action-template-dummy");
+         if(dummyEl)
+         {
+            dummyEl.parentNode.removeChild(dummyEl);
+         }
          this.widgets.actionListEl.appendChild(newActionEl);
          this._setupActionForm(action, newActionEl);
          this.onEditActionClick(null,
