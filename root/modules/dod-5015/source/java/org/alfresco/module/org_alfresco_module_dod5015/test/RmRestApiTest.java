@@ -1036,6 +1036,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(jsonRsp.has("record"));
         assertNotNull(jsonRsp.get("record"));
         assertTrue(nodeService.exists(new NodeRef(jsonRsp.getString("record"))));
+        assertTrue(jsonRsp.has("recordName"));
+        assertNotNull(jsonRsp.get("recordName"));
+        assertTrue(jsonRsp.getString("recordName").startsWith("audit_"));
         
         // Store a filtered audit log as a record
         jsonPostData = new JSONObject();
@@ -1054,6 +1057,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(jsonRsp.has("record"));
         assertNotNull(jsonRsp.get("record"));
         assertTrue(nodeService.exists(new NodeRef(jsonRsp.getString("record"))));
+        assertTrue(jsonRsp.has("recordName"));
+        assertNotNull(jsonRsp.get("recordName"));
+        assertTrue(jsonRsp.getString("recordName").startsWith("audit_"));
     }
     
     private void declareRecord(NodeRef recordOne)
