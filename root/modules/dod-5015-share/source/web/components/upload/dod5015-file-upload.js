@@ -79,6 +79,45 @@
 
    YAHOO.extend(Alfresco.RecordsFileUpload, Alfresco.FileUpload,
    {
+
+      /**
+       * Shows uploader in single import mode.
+       *
+       * @property MODE_SINGLE_IMPORT
+       * @static
+       * @type int
+       */
+      MODE_SINGLE_IMPORT: 4,
+
+
+      /**
+       * The default config for the gui state for the uploader.
+       * The user can override these properties in the show() method to use the
+       * uploader for both single & multi uploads and single updates.
+       *
+       * @property defaultShowConfig
+       * @type object
+       */
+      defaultShowConfig:
+      {
+         siteId: null,
+         containerId: null,
+         uploadDirectory: null,
+         updateNodeRef: null,
+         updateFilename: null,
+         mode: this.MODE_SINGLE_UPLOAD,
+         filter: [],
+         onFileUploadComplete: null,
+         overwrite: false,
+         thumbnails: null,
+         htmlUploadURL: null,
+         flashUploadURL: null,
+         username: null,
+         importDestination: null,
+         htmlImportURL: null,
+         flashImportURL: null
+      },
+
       /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
@@ -100,6 +139,52 @@
          {
             throw new Error("No instance of uploader type '" + uploadType + "' exists.");            
          }
+      },
+
+      /**
+       * Show can be called multiple times and will display the uploader dialog
+       * in different ways depending on the config parameter.
+       *
+       * @method show
+       * @param config {object} describes how the upload dialog should be displayed
+       * The config may contain all attributes that the super class (Alfresco.FileUpload)
+       * accepts in its show method, and also the following:
+       * {
+       *    siteId: {string},        // site to upload file(s) to
+       *    containerId: {string},   // container to upload file(s) to (i.e. a doclib id)
+       *    uploadPath: {string},    // directory path inside the component to where the uploaded file(s) should be save
+       *    updateNodeRef: {string}, // nodeRef to the document that should be updated
+       *    updateFilename: {string},// The name of the file that should be updated, used to display the tip
+       *    mode: {int},             // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
+       *    filter: {array},         // limits what kind of files the user can select in the OS file selector
+       *    onFileUploadComplete: null, // Callback after upload
+       *    overwrite: false         // If true and in mode MODE_XXX_UPLOAD it tells
+       *                             // the backend to overwrite a versionable file with the existing name
+       *                             // If false and in mode MODE_XXX_UPLOAD it tells
+       *                             // the backend to append a number to the versionable filename to avoid
+       *                             // an overwrite and a new version
+       *    htmlUploadURL: null,     // Overrides default url to post the file to if the html version is used
+       *    flashUploadURL: null,    // Overrides default url to post the files to if the flash version is used
+       *    username: null           // If a file should be associated with a user
+       *    importDestination: {string},   // nodeRef to the filePlan to which the acp file shall be imported to
+       *    htmlImportURL: null,     // Overrides default url to import the file to if the html version is used
+       *    flashImportURL: null     // Overrides default url to import the files to if the flash version is used
+       * }
+       */
+      show: function FU_show(config)
+      {
+         // Check which import url to use
+         if (this.hasRequiredFlashPlayer)
+         {
+            config.importURL = this.showConfig.flashImportURL;
+         }
+         else
+         {
+            config.importURL = this.showConfig.htmlImportURL;
+         }
+
+         // Let superclass do the actual show
+         Alfresco.RecordsFileUpload.superclass.show.call(this, config);
       }
    });
 })();

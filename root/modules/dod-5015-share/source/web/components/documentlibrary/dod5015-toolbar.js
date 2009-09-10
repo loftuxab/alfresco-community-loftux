@@ -47,6 +47,7 @@
    Alfresco.RecordsDocListToolbar = function(htmlId)
    {
       return Alfresco.RecordsDocListToolbar.superclass.constructor.call(this, htmlId);
+      this.filePlanNodeRef = null;
    };
    
    Alfresco.RecordsDocListToolbar.containerMap =
@@ -71,6 +72,7 @@
     */
    YAHOO.lang.augmentObject(Alfresco.RecordsDocListToolbar.prototype,
    {
+
       /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
@@ -439,6 +441,25 @@
        */
       onImport: function DLTB_onImport(e, p_obj)
       {
+         // Create Uploader (Importer) component if it doesn't exist
+         if (this.fileUpload === null)
+         {
+            this.fileUpload = Alfresco.getRecordsFileUploadInstance();
+         }
+
+         // Show uploader for multiple files
+         var singleImportConfig =
+         {
+            mode: this.fileUpload.MODE_SINGLE_IMPORT,
+            importDestination: this.modules.docList.doclistMetadata.parent,
+            filter: [
+               {
+                  description: this.msg("import.filetype.description"),
+                  extensions: "*.acp"
+               }
+            ]
+         };
+         this.fileUpload.show(singleImportConfig);
       },
 
       /**
@@ -450,10 +471,15 @@
        */
       onExportAll: function DLTB_onExportAll(e, p_obj)
       {
+         // Url to webscript to get the nodeRefs for the top level series
+         var url = Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/treenode/site/";
+         url += encodeURIComponent(this.options.siteId) + "/" + encodeURIComponent(this.options.containerId);
+         url += "?perms=false";
+
          // Load all series so they (and all their child objects) can be exported
          Alfresco.util.Ajax.jsonGet(
          {
-            url: Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/treenode/site/rmsite/documentLibrary?perms=false",
+            url: url,
             successCallback:
             {
                fn: function(serverResponse)
