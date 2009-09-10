@@ -18,7 +18,7 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
          <div class="header">${msg("header.action")}</div>
          <hr />
          <ol id="${el}-actionList" class="action-list">
-            <li id="${el}-action-template-dummy"></li>
+            <li id="${el}-action-template-dummy">${msg("message.loadingSteps")}</li>
          </ol>
       </div>
    </div>
@@ -84,11 +84,13 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                      <span class="action-location-section">
                         ${msg("label.to")}
                         <select name="location" class="action-location">
-                           <#list locations as location>
+                           <#list transferLocations as location>
                            <option value="${location.value}">${location.label}</option>
                            </#list>
                         </select>
+                        <span class="action-location-restricted-section">&nbsp;</span>
                      </span>
+
                   </div>
                   <div class="section">
                      <input type="checkbox" class="period-enabled" checked="true" />

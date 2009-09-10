@@ -54,17 +54,34 @@ function main()
             periodProperties.sort(sortByLabel);
             model.periodProperties = periodProperties;
          }
-         // Hard coded for now
-         model.locations = [
-            {
-               value: "",
-               label: msg.get("label.select.location")
-            },
-            {
-               value: "NARA",
-               label: "NARA"
-            }
-         ];
+      }
+      else if (repoJSON.status.code)
+      {
+         status.setCode(repoJSON.status.code, repoJSON.message);
+         return;
+      }
+   }
+
+   repoResponse = scriptRemoteConnector.get("/api/rma/rmconstraints/rmc_tlList");
+   if (repoResponse.status == 401)
+   {
+      status.setCode(repoResponse.status, "error.loggedOut");
+      return;
+   }
+   else
+   {
+      var repoJSON = eval('(' + repoResponse + ')');
+
+      // Check if we got a positive result
+      if (repoJSON.data)
+      {
+         var data = repoJSON.data;
+         if(data && data.allowedValuesForCurrentUser)
+         {
+            var transferLocations = data.allowedValuesForCurrentUser;
+            transferLocations.sort(sortByLabel);
+            model.transferLocations = transferLocations;
+         }
       }
       else if (repoJSON.status.code)
       {
