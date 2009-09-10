@@ -399,7 +399,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         String propId = postCustomPropertyDefinition(propertyLabel, null);
         
         // PUT specifies only an updated label or a new constraint ref.
-        final String updatedLabel = "Updated label";
+        final String updatedLabel = "Updated label πø^¨¥†®";
         final String updatedConstraint = "rmc:tlList";
         String jsonString = new JSONStringer().object()
             .key("label").value(updatedLabel)
