@@ -227,14 +227,13 @@
              */
             renderCellActions = function ViewPanelHandler__setupDataTable_renderCellActions(elCell, oRecord, oColumn, oData)
             {
-               /*
                var editBtn = new YAHOO.widget.Button(
                {
                   container: elCell,
                   label: parent.msg("button.edit")
                });
                editBtn.on("click", me.onEditReferenceClick, oRecord, me);
-
+               /*
                var deleteBtn = new YAHOO.widget.Button(
                {
                   container: elCell,
@@ -589,8 +588,8 @@
             if (parent.refId && parent.refId != "")
             {
                // Existing reference, prepare form
-               this.widgets.editForm.setAjaxSubmitMethod(Alfresco.util.Ajax.POST);
-               editFormEl.attributes.action.nodeValue = Alfresco.constants.PROXY_URI_RELATIVE + "api/rma/admin/customreferencedefinitions";
+               this.widgets.editForm.setAjaxSubmitMethod(Alfresco.util.Ajax.PUT);
+
                Dom.removeClass(parent.id + "-edit-title", "hidden");
                Dom.addClass(parent.id + "-create-title", "hidden");
 
@@ -606,8 +605,8 @@
                         if (serverResponse.json)
                         {
                            var ref = serverResponse.json.data.customReferences[0];
+                           editFormEl.attributes.action.nodeValue = Alfresco.constants.PROXY_URI_RELATIVE + "api/rma/admin/customreferencedefinitions/" + parent.refId;
                            Dom.get(parent.id + "-type-" + ref.referenceType).checked = true;
-                           //Dom.get(parent.id + "-refId").value = (ref.refId) ? ref.refId : "";
                            Dom.get(parent.id + "-bidirectional-label").value = (ref.referenceType == "bidirectional" && ref.label) ? ref.label : "";
                            Dom.get(parent.id + "-parentchild-source").value = (ref.referenceType == "parentchild" && ref.source) ? ref.source: "";
                            Dom.get(parent.id + "-parentchild-target").value = (ref.referenceType == "parentchild" && ref.target) ? ref.target : "";
