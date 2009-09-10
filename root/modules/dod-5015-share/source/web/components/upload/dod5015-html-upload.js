@@ -24,7 +24,7 @@
  */
 
 /**
- * Records RecordsHtmlUpload component.
+ * RecordsHtmlUpload component.
  *
  * Popups a YUI panel and displays a filelist and buttons to browse for files
  * and upload them. Files can be removed and uploads can be cancelled.
@@ -43,8 +43,8 @@
  * this.htmlUpload.show(multiUploadConfig);
  *
  * @namespace Alfresco
- * @class Alfresco.RecordsRecordsHtmlUpload
- * @extends Alfresco.RecordsHtmlUpload
+ * @class Alfresco.RecordsHtmlUpload
+ * @extends Alfresco.HtmlUpload
  */
 (function()
 {
@@ -77,6 +77,16 @@
 
    YAHOO.extend(Alfresco.RecordsHtmlUpload, Alfresco.HtmlUpload,
    {
+
+      /**
+       * Shows uploader in single import mode.
+       *
+       * @property MODE_SINGLE_IMPORT
+       * @static
+       * @type int
+       */
+      MODE_SINGLE_IMPORT: 4,
+      
       /**
        * Fired by YUI when parent element is available for scripting.
        * Initial History Manager event registration
@@ -116,6 +126,11 @@
          menu.render();
          this.widgets.recordType.set("selectedMenuItem", menu.getItem(menu.srcElement.selectedIndex));
 
+         // Save reference to html eements so we can modify them later
+         this.widgets.destination = Dom.get(this.id + "-destination-hidden");
+         this.widgets.recordTypeSection = Dom.get(this.id + "-recordTypeSection-div");
+
+         // Call super class
          Alfresco.RecordsHtmlUpload.superclass.onReady.call(this);
       },
 
@@ -155,7 +170,48 @@
        */
       _applyConfig: function RecordsHtmlUpload__applyConfig()
       {
+         // Call super class that does that applies the main part of the config attributes 
          Alfresco.RecordsHtmlUpload.superclass._applyConfig.call(this);
+
+         if (this.showConfig.mode === this.MODE_SINGLE_IMPORT)
+         {
+            // Hide the record type form & flash tips
+            Dom.addClass(this.widgets.recordTypeSection, "hidden");
+            Dom.addClass(this.widgets.singleUploadTip, "hidden");
+
+            // Set the panel title
+            this.widgets.titleText.innerHTML = this.msg("header.singleImport", this.name);
+
+            // Set the forms action url
+            var formEl = Dom.get(this.id + "-htmlupload-form");
+            if (this.showConfig.importURL === null)
+            {
+               // The .html suffix is required - it is not possible to do a multipart post using an ajax call.
+               // So it has to be a FORM submit, to make it feel like an ajax call a a hidden iframe is used.
+               // Since the component still needs to be called when the upload is finished, the script returns
+               // an html template with SCRIPT tags inside that which calls the component that triggered it.
+               formEl.action = Alfresco.constants.PROXY_URI + "api/rma/admin/import.html";
+            }
+            else
+            {
+               formEl.action = Alfresco.constants.PROXY_URI + this.showConfig.importURL;
+            }
+            // Set the file input name to match the import webscripts
+            this.widgets.filedata.setAttribute("name", "archive");
+
+            // Set the hidden parameters
+            this.widgets.destination.value = this.showConfig.importDestination;
+         }
+         else
+         {
+            // Display the record type form & flash tips
+            Dom.removeClass(this.widgets.recordTypeSection, "hidden");
+            Dom.removeClass(this.widgets.singleUploadTip, "hidden");            
+
+            // Set the file input name to match the upload webscripts
+            this.widgets.filedata.setAttribute("name", "filedata");
+         }
       }
+
    });
 })();

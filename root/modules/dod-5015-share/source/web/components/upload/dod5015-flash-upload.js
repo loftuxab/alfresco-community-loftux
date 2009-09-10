@@ -49,6 +49,12 @@
  */
 (function()
 {
+
+   /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom;
+
    /**
     * RecordsFlashUpload constructor.
     *
@@ -65,6 +71,9 @@
       Alfresco.RecordsFlashUpload.superclass.constructor.call(this, htmlId);
 
       this.name = "Alfresco.RecordsFlashUpload";
+      this.defaultShowConfig.importDestination = null;
+      this.defaultShowConfig.importUrl = null;
+
       Alfresco.util.ComponentManager.reregister(this);
       
       return this;
@@ -72,6 +81,16 @@
 
    YAHOO.extend(Alfresco.RecordsFlashUpload, Alfresco.FlashUpload,
    {
+
+      /**
+       * Shows uploader in single import mode.
+       *
+       * @property MODE_SINGLE_IMPORT
+       * @static
+       * @type int
+       */
+      MODE_SINGLE_IMPORT: 4,
+
       /**
        * Fired by YUI when parent element is available for scripting.
        * Initial History Manager event registration
@@ -110,6 +129,10 @@
             this.set("label", oMenuItem.cfg.getProperty("text"));
          };
          this.widgets.recordType.on("selectedMenuItemChange", fnRecordTypeItemChange);
+
+         // Save a reference to the HTMLElement displaying recordTypeSection input so we can hide or show it
+         this.widgets.recordTypeSection = Dom.get(this.id + "-recordTypeSection-div");
+
       },
 
       /**
@@ -130,6 +153,36 @@
          return fileUpload;
       },
 
+
+      /**
+       * Adjust the gui according to the config passed into the show method.
+       *
+       * @method _applyConfig
+       * @private
+       * @override
+       */
+      _applyConfig: function RecordsFlashUpload__applyConfig()
+      {
+         Alfresco.RecordsFlashUpload.superclass._applyConfig.call(this);
+
+         // Set the panel title
+         if (this.showConfig.mode === this.MODE_SINGLE_IMPORT)
+         {
+            this.titleText.innerHTML = this.msg("header.singleImport");
+         }
+
+         if (this.showConfig.mode === this.MODE_SINGLE_IMPORT)
+         {
+            // Hide the record type form
+            Dom.addClass(this.widgets.recordTypeSection, "hidden");
+         }
+         else
+         {
+            // Display the record type form
+            Dom.removeClass(this.widgets.recordTypeSection, "hidden");
+         }
+      },
+
       /**
        * Starts to upload as many files as specified by noOfUploadsToStart
        * as long as there are files left to upload.
@@ -141,17 +194,20 @@
        */
       _uploadFromQueue: function RecordsFlashUpload__uploadFromQueue(noOfUploadsToStart)
       {
-         // generate upload POST url
-         var url;
-         if (this.showConfig.uploadURL === null)
+         // Generate upload POST url
+         var url = Alfresco.constants.PROXY_URI,
+               fileParamName;
+         if(this.showConfig.mode === this.MODE_SINGLE_IMPORT)
          {
-            url = Alfresco.constants.PROXY_URI + "api/upload";
+            url += (this.showConfig.importURL) ? this.showConfig.importURL : "api/rma/admin/import";
+            fileParamName = "archive";
          }
          else
          {
-            url = Alfresco.constants.PROXY_URI + this.showConfig.uploadURL;
+            url += (this.showConfig.uploadURL) ? this.showConfig.uploadURL : "api/upload";
+            fileParamName = "filedata";
          }
-         
+
          // Flash does not correctly bind to the session cookies during POST
          // so we manually patch the jsessionid directly onto the URL instead
          url += ";jsessionid=" + YAHOO.util.Cookie.get("JSESSIONID");
@@ -171,31 +227,41 @@
             {
                // Upload has NOT been started for this file, start it now
                fileInfo.state = this.STATE_UPLOADING;
-               
-               attributes =
+               if (this.showConfig.mode === this.MODE_SINGLE_IMPORT)
                {
-                  siteId: this.showConfig.siteId,
-                  containerId: this.showConfig.containerId,
-                  username: this.showConfig.username
-               };
-               if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
-               {         
-                  attributes.updateNodeRef = this.showConfig.updateNodeRef;
-                  attributes.majorVersion = !this.minorVersion.checked;
-                  attributes.description = this.description.value;
+                  attributes =
+                  {
+                     destination: this.showConfig.importDestination,
+                     username: this.showConfig.username
+                  };
                }
                else
                {
-                  attributes.uploadDirectory = this.showConfig.uploadDirectory;
-                  attributes.contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
-                  attributes.aspects = recordType;
-                  attributes.overwrite = this.showConfig.overwrite;
-                  if (this.showConfig.thumbnails)
+                  attributes =
                   {
-                     attributes.thumbnails = this.showConfig.thumbnails;
+                     siteId: this.showConfig.siteId,
+                     containerId: this.showConfig.containerId,
+                     username: this.showConfig.username
+                  };
+                  if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+                  {
+                     attributes.updateNodeRef = this.showConfig.updateNodeRef;
+                     attributes.majorVersion = !this.minorVersion.checked;
+                     attributes.description = this.description.value;
+                  }
+                  else
+                  {
+                     attributes.uploadDirectory = this.showConfig.uploadDirectory;
+                     attributes.contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
+                     attributes.aspects = recordType;
+                     attributes.overwrite = this.showConfig.overwrite;
+                     if (this.showConfig.thumbnails)
+                     {
+                        attributes.thumbnails = this.showConfig.thumbnails;
+                     }
                   }
                }
-               this.uploader.upload(flashId, url, "POST", attributes, "filedata");
+               this.uploader.upload(flashId, url, "POST", attributes, fileParamName);
                startedUploads++;
             }
          }
