@@ -9,11 +9,7 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <div class="yui-t1">
-         <div id="yui-main">
-            <@region id="permissions" scope="template" protected=true />
-         </div>
-      </div>
+      <@region id="permissions" scope="template" protected=true />
    </div>
 </@>
 

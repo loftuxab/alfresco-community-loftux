@@ -1,0 +1,33 @@
+.permissions
+{
+}
+
+.permissions .hidden
+{
+   display: none;
+}
+
+.permissions .title
+{
+   margin: 16px 10px 4px;
+   font-size: 146.5%;
+   font-weight: bold;
+   color: #515D6B;
+   padding-bottom: 0.5em;
+}
+
+.permissions .alignright
+{
+   text-align: right;
+}
+
+.permissions .floatright
+{
+   float: right;
+}
+
+.permissions .header
+{
+   font-weight: bold;
+   font-size: 108%;
+}
