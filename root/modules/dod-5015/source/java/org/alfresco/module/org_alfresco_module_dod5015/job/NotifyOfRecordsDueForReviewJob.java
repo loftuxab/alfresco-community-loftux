@@ -87,7 +87,7 @@ public class NotifyOfRecordsDueForReviewJob implements Job
                     .getJobDataMap().get("from");
         final String subject = (String)context.getJobDetail()
                     .getJobDataMap().get("subject");
-        final String template = "PATH:\"/app:company_home/app:dictionary/cm:records_management/cm:records_management_email_templates/cm:notify-records-due-for-review-email.ftl\"";
+        final String template = "/app:company_home/app:dictionary/cm:records_management/cm:records_management_email_templates/cm:notify-records-due-for-review-email.ftl";
         
         if (logger.isDebugEnabled())
         {
@@ -98,8 +98,10 @@ public class NotifyOfRecordsDueForReviewJob implements Job
         {
             public Object doWork() throws Exception
             {
-                // Query is for all records that are due for review and for which
-                // a notification has not been sent.
+                /**
+                 *  Query is for all records that are due for review and for which
+                 *  notification has not been sent.
+                 */
                 StringBuilder queryBuffer = new StringBuilder();
                 queryBuffer.append("+ASPECT:\"rma:vitalRecord\" ");
                 
@@ -112,47 +114,80 @@ public class NotifyOfRecordsDueForReviewJob implements Job
 
                 ResultSet results = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
                             SearchService.LANGUAGE_LUCENE, query);
-
+             
                 final List<NodeRef> resultNodes = results.getNodeRefs();
                 
                 if (logger.isDebugEnabled())
                 {
                     logger.debug("Found " + resultNodes.size() + " nodes due for review and without notification.");
                 }
-                               
-                if(resultNodes.size() > 0)
+                
+                /**
+                 * Search for the email template
+                 */
+                ResultSet templateResults = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
+                            SearchService.LANGUAGE_XPATH, template);
+                
+                final List<NodeRef> templateNodes = templateResults.getNodeRefs();
+                if(templateNodes.size() == 0)
                 {
-                    List<Record> arrayList = new ArrayList<Record>();
-                    Map<String, Object> model = new HashMap<String, Object>(8, 1.0f);
+                    logger.error("Notify Records Job, unable to find email template:" + template);
+                }
                     
-                    for (NodeRef currentNode : resultNodes)
-                    {
-                        Map<QName, Serializable> props = nodeService.getProperties(currentNode);
-                        Record record = new Record();
-                        record.setName((String)props.get(ContentModel.PROP_NAME));
-                        arrayList.add(record);
-                    }
+                /**
+                 * If we have something to do and a template to do it with
+                 */
+                if(resultNodes.size() > 0 && templateNodes.size() > 0)
+                {
+                    final NodeRef templateNodeRef = templateNodes.get(0);
                     
-                    model.put("records", arrayList);
-
-                    String emailText = templateService.processTemplate(template, model);        
-                    
-                    /**
-                     * Send an email for the records management notification
-                     */
-                    Action emailAction = actionService.createAction("mail");
-                    emailAction.setParameterValue(MailActionExecuter.PARAM_TO, to);
-                    emailAction.setParameterValue(MailActionExecuter.PARAM_FROM, from);
-                    emailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, subject);
-                    emailAction.setParameterValue(MailActionExecuter.PARAM_TEXT, emailText);
-                    emailAction.setExecuteAsynchronously(false);
-                    actionService.executeAction(emailAction, null);
-
                     /**
                      * Set the notification issued property
                      */
                     RetryingTransactionHelper trn = trxService.getRetryingTransactionHelper();
-                    RetryingTransactionCallback<Boolean> txCallback = new RetryingTransactionCallback<Boolean>()
+                    
+                    /**
+                     * Send the email message - but we must not retry since email is not transactional
+                     */
+                    RetryingTransactionCallback<Boolean> txCallbackSendEmail = new RetryingTransactionCallback<Boolean>()
+                    {
+                        // Set the notification issued property.
+                        public Boolean execute() throws Throwable
+                        {
+                            List<Map<String,Object>> arrayList = new ArrayList<Map<String,Object>>();
+                            
+                            Map<String, Object> model = new HashMap<String, Object>(8, 1.0f);
+                    
+                            for (NodeRef currentNode : resultNodes)
+                            {
+                                Map<QName, Serializable> props = nodeService.getProperties(currentNode);
+                                Map<String, Object> record = new HashMap<String, Object>();
+                                for(QName key : props.keySet())
+                                {
+                                    record.put(key.toPrefixString().replace(":", "_"), props.get(key));
+                                }
+                                arrayList.add(record);
+                            }
+                    
+                            model.put("records", arrayList);
+                            
+                            String emailText = templateService.processTemplate(templateNodeRef.toString(), model);  
+                            
+                            /**
+                             * Send an email for the records management notification
+                             */
+                            Action emailAction = actionService.createAction("mail");
+                            emailAction.setParameterValue(MailActionExecuter.PARAM_TO, to);
+                            emailAction.setParameterValue(MailActionExecuter.PARAM_FROM, from);
+                            emailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, subject);
+                            emailAction.setParameterValue(MailActionExecuter.PARAM_TEXT, emailText);
+                            emailAction.setExecuteAsynchronously(false);
+                            actionService.executeAction(emailAction, null);
+                            return null;
+                        }
+                    };
+                    
+                    RetryingTransactionCallback<Boolean> txUpdateNodesCallback = new RetryingTransactionCallback<Boolean>()
                     {
                         // Set the notification issued property.
                         public Boolean execute() throws Throwable
@@ -164,11 +199,14 @@ public class NotifyOfRecordsDueForReviewJob implements Job
                             return Boolean.TRUE;
                         }
                     };
-                    
+      
                     /**
                      * Now do the work, one action in each transaction
                      */
-                    trn.doInTransaction(txCallback);
+                    trn.setMaxRetries(0);   // don't retry the send email
+                    trn.doInTransaction(txCallbackSendEmail);
+                    trn.setMaxRetries(10);
+                    trn.doInTransaction(txUpdateNodesCallback);
                 }
                 return null;
             }
@@ -180,22 +218,7 @@ public class NotifyOfRecordsDueForReviewJob implements Job
             logger.debug("Job " + this.getClass().getSimpleName() + " finished");
         }     
     }  // end of execute method
-    
-    class Record
-    {
-        private String name;
-
-        private void setName(String name)
-        {
-            this.name = name;
-        }
-
-        private String getName()
-        {
-            return name;
-        }
-    }
-    
+        
 }
 
 
