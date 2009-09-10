@@ -30,6 +30,7 @@
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
     
+    <!-- TODO Delete this -->
     <!-- REST impl for DELETE Custom Property Definitions -->
     <bean id="webscript.org.alfresco.rma.custompropdefinition.delete" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropertyDefinitionDelete" parent="rmBaseWebscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
@@ -39,6 +40,11 @@
     <bean id="webscript.org.alfresco.rma.customrefdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceDefinitionsGet" parent="webscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
         <property name="namespaceService" ref="NamespaceService"/>
+    </bean>
+
+    <!-- REST impl for PUT Custom Reference Definitions -->
+    <bean id="webscript.org.alfresco.rma.customrefdefinition.put" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceDefinitionPut" parent="rmBaseWebscript">
+        <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
     </bean>
 
     <!-- REST impl for POST Custom Reference Definitions -->

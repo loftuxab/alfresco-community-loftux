@@ -186,7 +186,30 @@ public interface RecordsManagementAdminService
      * @return the QName of the newly-created association.
      */
     public QName addCustomChildAssocDefinition(String source, String target);
-    
+
+    /**
+     * This method updates the source and target values for the specified child association.
+     * The source and target will be combined into a single string and stored in the title property.
+     * Source and target are String metadata for RM parent/child custom references.
+     * 
+     * @param refQName qname of the child association.
+     * @param newSource the new value for the source field.
+     * @param newTarget the new value for the target field.
+     * @see #getCompoundIdFor(String, String)
+     * @see #splitSourceTargetId(String)
+     */
+    public QName updateCustomChildAssocDefinition(QName refQName, String newSource, String newTarget);
+
+    /**
+     * This method updates the label value for the specified association.
+     * The label will be stored in the title property.
+     * Label is String metadata for bidirectional custom references.
+     * 
+     * @param refQName qname of the child association.
+     * @param newLabel the new value for the label field.
+     */
+    public QName updateCustomAssocDefinition(QName refQName, String newLabel);
+
     /**
      * This method returns ConstraintDefinition objects defined in the rmc model
      * (note: not property references or in-line defs)
@@ -213,8 +236,6 @@ public interface RecordsManagementAdminService
      * @param title the human-readable title e.g. My foo list
      * @param caseSensitive
      * @param allowedValues the allowed values list
-     * 
-     * TODO exceptions?
      */
     public void addCustomConstraintDefinition(QName constraintName, String title, boolean caseSensitive, List<String> allowedValues);
     
@@ -226,8 +247,6 @@ public interface RecordsManagementAdminService
      * 
      * @param constraintName the name e.g. rmc:foo.
      * 
-     * TODO exceptions?
-     * 
      * @deprecated currently throws UnsupportedOperationException
      */
     public void removeCustomConstraintDefinition(QName constraintName);
@@ -237,8 +256,6 @@ public interface RecordsManagementAdminService
      * 
      * @param name the name e.g. rmc:foo of the custom constraint.
      * @param newValues
-     * 
-     * TODO exceptions?
      */
     public void changeCustomConstraintValues(QName constraintName, List<String> newValues);
     

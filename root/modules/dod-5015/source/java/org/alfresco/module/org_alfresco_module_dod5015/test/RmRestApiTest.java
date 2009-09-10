@@ -67,7 +67,6 @@ import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
-import org.alfresco.util.GUID;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.web.scripts.TestWebScriptServer.DeleteRequest;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
@@ -330,8 +329,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     }
 
     /**
-     * This method creates a child and a non-child reference and returns the system-time
-     * used in creating unique labels, sources and targets.
+     * This method creates a child and a non-child reference and returns their generated ids.
+     * 
+     * 
      * @return String[] with element 0 = refId of p/c ref, 1 = refId pf bidi.
      */
 	private String[] postCustomReferences() throws JSONException, IOException,
@@ -392,6 +392,54 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         return result;
 	}
+
+    public void testPutCustomPropertyDefinition() throws Exception
+    {
+        final String propertyLabel = "Original label åçîéøü";
+        String propId = postCustomPropertyDefinition(propertyLabel, null);
+        
+        // PUT specifies only an updated label or a new constraint ref.
+        final String updatedLabel = "Updated label";
+        final String updatedConstraint = "rmc:tlList";
+        String jsonString = new JSONStringer().object()
+            .key("label").value(updatedLabel)
+            .key("constraintRef").value(updatedConstraint)
+        .endObject()
+        .toString();
+    
+        String propDefnUrl = "/api/rma/admin/custompropertydefinitions/" + propId;
+        Response rsp = sendRequest(new PutRequest(propDefnUrl,
+                                 jsonString, APPLICATION_JSON), 200);
+    
+        String rspContent = rsp.getContentAsString();
+        System.out.println(rspContent);
+    
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        String urlOfNewPropDef = jsonRsp.getString("url");
+        assertNotNull("urlOfNewPropDef was null.", urlOfNewPropDef);
+    
+        // GET from the URL again to ensure it's valid
+        rsp = sendRequest(new GetRequest(propDefnUrl), 200);
+        rspContent = rsp.getContentAsString();
+        
+        System.out.println(rspContent);
+        
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        JSONObject dataObject = jsonRsp.getJSONObject("data");
+        assertNotNull("JSON data object was null", dataObject);
+        JSONObject customPropsObject = dataObject.getJSONObject("customProperties");
+        assertNotNull("JSON customProperties object was null", customPropsObject);
+        assertEquals("Wrong customProperties length.", 1, customPropsObject.length());
+        
+        Object keyToSoleProp = customPropsObject.keys().next();
+        
+        JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
+        assertEquals("Wrong property label.", updatedLabel, newPropObject.getString("label"));
+        JSONArray constraintRefsArray = newPropObject.getJSONArray("constraintRefs");
+        assertEquals("ConstraintRefsArray wrong length.", 1, constraintRefsArray.length());
+        String recoveredConstraintTitle = constraintRefsArray.getJSONObject(0).getString("title");
+        assertEquals("Wrong constraint.", "Transfer Locations", recoveredConstraintTitle);
+    }
 
     public void testGetCustomReferences() throws IOException, JSONException
     {
@@ -602,33 +650,47 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         return newPropId;
     }
 
-    public void testPutCustomPropertyDefinition() throws Exception
+    public void testPutCustomReferenceDefinition() throws Exception
     {
-        final String propertyLabel = "Original label åçîéøü";
-        String propId = postCustomPropertyDefinition(propertyLabel, null);
+        String[] generatedRefIds = postCustomReferences();
+        final String pcRefId = generatedRefIds[0];
+        final String bidiRefId = generatedRefIds[1];
         
-        // PUT specifies only an updated label or a new constraint ref.
-        final String updatedLabel = "Updated label";
-        final String updatedConstraint = "rmc:tlList";
+        // GET the custom refs in order to retrieve the label/source/target
+        String refDefnUrl = "/api/rma/admin/customreferencedefinitions/" + bidiRefId;
+        Response rsp = sendRequest(new GetRequest(refDefnUrl), 200);
+
+        String rspContent = rsp.getContentAsString();
+        System.out.println(rspContent);
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+
+        refDefnUrl = "/api/rma/admin/customreferencedefinitions/" + pcRefId;
+        rsp = sendRequest(new GetRequest(refDefnUrl), 200);
+
+        rspContent = rsp.getContentAsString();
+        System.out.println(rspContent);
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        
+        // Update the bidirectional reference.
+        final String updatedBiDiLabel = "Updated label üøéîçå";
         String jsonString = new JSONStringer().object()
-            .key("label").value(updatedLabel)
-            .key("constraintRef").value(updatedConstraint)
+            .key("label").value(updatedBiDiLabel)
         .endObject()
         .toString();
     
-        String propDefnUrl = "/api/rma/admin/custompropertydefinitions/" + propId;
-        Response rsp = sendRequest(new PutRequest(propDefnUrl,
+        refDefnUrl = "/api/rma/admin/customreferencedefinitions/" + bidiRefId;
+        rsp = sendRequest(new PutRequest(refDefnUrl,
                                  jsonString, APPLICATION_JSON), 200);
-    
-        String rspContent = rsp.getContentAsString();
+        
+        rspContent = rsp.getContentAsString();
         System.out.println(rspContent);
     
-        JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
-        String urlOfNewPropDef = jsonRsp.getString("url");
-        assertNotNull("urlOfNewPropDef was null.", urlOfNewPropDef);
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        String urlOfNewRefDef = jsonRsp.getString("url");
+        assertNotNull("urlOfNewRefDef was null.", urlOfNewRefDef);
     
-        // GET from the URL again to ensure it's valid
-        rsp = sendRequest(new GetRequest(propDefnUrl), 200);
+        // GET the bidi reference to ensure it's valid
+        rsp = sendRequest(new GetRequest(refDefnUrl), 200);
         rspContent = rsp.getContentAsString();
         
         System.out.println(rspContent);
@@ -636,18 +698,51 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         JSONObject dataObject = jsonRsp.getJSONObject("data");
         assertNotNull("JSON data object was null", dataObject);
-        JSONObject customPropsObject = dataObject.getJSONObject("customProperties");
-        assertNotNull("JSON customProperties object was null", customPropsObject);
-        assertEquals("Wrong customProperties length.", 1, customPropsObject.length());
+        JSONArray customRefsObject = dataObject.getJSONArray("customReferences");
+        assertNotNull("JSON customReferences object was null", customRefsObject);
+        assertEquals("Wrong customReferences length.", 1, customRefsObject.length());
         
-        Object keyToSoleProp = customPropsObject.keys().next();
+        JSONObject newRefObject = customRefsObject.getJSONObject(0);
+        assertEquals("Wrong property label.", updatedBiDiLabel, newRefObject.getString("label"));
+
+        // Update the parent/child reference.
+        final String updatedPcSource = "Updated source ∆Ωç√∫";
+        final String updatedPcTarget = "Updated target ∆Ωç√∫";
+        jsonString = new JSONStringer().object()
+            .key("source").value(updatedPcSource)
+            .key("target").value(updatedPcTarget)
+        .endObject()
+        .toString();
+    
+        refDefnUrl = "/api/rma/admin/customreferencedefinitions/" + pcRefId;
+        rsp = sendRequest(new PutRequest(refDefnUrl,
+                                 jsonString, APPLICATION_JSON), 200);
         
-        JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
-        assertEquals("Wrong property label.", updatedLabel, newPropObject.getString("label"));
-        JSONArray constraintRefsArray = newPropObject.getJSONArray("constraintRefs");
-        assertEquals("ConstraintRefsArray wrong length.", 1, constraintRefsArray.length());
-        String recoveredConstraintTitle = constraintRefsArray.getJSONObject(0).getString("title");
-        assertEquals("Wrong constraint.", "Transfer Locations", recoveredConstraintTitle);
+        rspContent = rsp.getContentAsString();
+        System.out.println(rspContent);
+    
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        urlOfNewRefDef = jsonRsp.getString("url");
+        assertNotNull("urlOfNewRefDef was null.", urlOfNewRefDef);
+    
+        // GET the parent/child reference to ensure it's valid
+        refDefnUrl = "/api/rma/admin/customreferencedefinitions/" + pcRefId;
+
+        rsp = sendRequest(new GetRequest(refDefnUrl), 200);
+        rspContent = rsp.getContentAsString();
+        
+        System.out.println(rspContent);
+        
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        dataObject = jsonRsp.getJSONObject("data");
+        assertNotNull("JSON data object was null", dataObject);
+        customRefsObject = dataObject.getJSONArray("customReferences");
+        assertNotNull("JSON customReferences object was null", customRefsObject);
+        assertEquals("Wrong customReferences length.", 1, customRefsObject.length());
+        
+        newRefObject = customRefsObject.getJSONObject(0);
+        assertEquals("Wrong reference source.", updatedPcSource, newRefObject.getString("source"));
+        assertEquals("Wrong reference target.", updatedPcTarget, newRefObject.getString("target"));
     }
 
     @SuppressWarnings("unchecked")
