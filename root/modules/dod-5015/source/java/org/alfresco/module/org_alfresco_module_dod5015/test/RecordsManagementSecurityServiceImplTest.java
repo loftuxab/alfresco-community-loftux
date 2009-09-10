@@ -36,6 +36,8 @@ import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
 import org.alfresco.module.org_alfresco_module_dod5015.security.Role;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -45,13 +47,15 @@ import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
 import org.alfresco.util.PropertyMap;
+import org.hibernate.engine.TransactionHelper;
 
 /**
  * Event service implementation unit test
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest implements RecordsManagementModel
+public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest 
+                                                      implements DOD5015Model
 {    
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     
@@ -60,6 +64,7 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
 	private AuthorityService authorityService;
 	private PersonService personService;
 	private RecordsManagementSecurityService rmSecurityService;
+	private RetryingTransactionHelper transactionHelper;
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -72,7 +77,8 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
 		this.personService = (PersonService)this.applicationContext.getBean("PersonService");
 		this.authorityService = (AuthorityService)this.applicationContext.getBean("authorityService");
 		this.rmSecurityService = (RecordsManagementSecurityService)this.applicationContext.getBean("RecordsManagementSecurityService");
-
+		this.transactionHelper = (RetryingTransactionHelper)this.applicationContext.getBean("retryingTransactionHelper");
+		
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
 	}
@@ -214,5 +220,95 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest imp
         authorityService.addAuthority(role, userName);
 	    
         return userName;
+	}
+	
+	public void testDefaultRolesBootstrap()
+	{
+	    NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
+        final NodeRef filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
+                TYPE_FILE_PLAN,
+                TYPE_FILE_PLAN).getChildRef();
+        
+        setComplete();
+        endTransaction();
+        
+        transactionHelper.doInTransaction(new RetryingTransactionCallback<Object>()
+        {
+
+            public Object execute() throws Throwable
+            {
+                Set<Role> roles = rmSecurityService.getRoles(filePlan);
+                assertNotNull(roles);
+                assertEquals(5, roles.size());
+                
+                Role role = rmSecurityService.getRole(filePlan, "User");
+                assertNotNull(role);
+                assertEquals("User", role.getName());
+                assertNotNull(role.getDisplayLabel());
+                Set<String> caps = role.getCapabilities();
+                assertNotNull(caps);
+                System.out.println("\nUser capabilities: ");
+                for (String cap : caps)
+                {
+                    assertNotNull(rmSecurityService.getCapability(cap));
+                    System.out.println(cap);
+                }                
+                
+                role = rmSecurityService.getRole(filePlan, "PowerUser");
+                assertNotNull(role);
+                assertEquals("PowerUser", role.getName());
+                assertNotNull(role.getDisplayLabel());
+                caps = role.getCapabilities();
+                assertNotNull(caps);
+                System.out.println("\nPowerUser capabilities: ");
+                for (String cap : caps)
+                {
+                    assertNotNull(rmSecurityService.getCapability(cap));
+                    System.out.println(cap);
+                }
+                
+                role = rmSecurityService.getRole(filePlan, "SecurityOfficer");
+                assertNotNull(role);
+                assertEquals("SecurityOfficer", role.getName());
+                assertNotNull(role.getDisplayLabel());
+                caps = role.getCapabilities();
+                assertNotNull(caps);
+                System.out.println("\nSecurityOfficer capabilities: ");
+                for (String cap : caps)
+                {
+                    assertNotNull(rmSecurityService.getCapability(cap));
+                    System.out.println(cap);
+                }
+                
+                role = rmSecurityService.getRole(filePlan, "RecordsManager");
+                assertNotNull(role);
+                assertEquals("RecordsManager", role.getName());
+                assertNotNull(role.getDisplayLabel());
+                caps = role.getCapabilities();
+                assertNotNull(caps);
+                System.out.println("\nRecordsManager capabilities: ");
+                for (String cap : caps)
+                {
+                    assertNotNull(rmSecurityService.getCapability(cap));
+                    System.out.println(cap);
+                }
+                
+                role = rmSecurityService.getRole(filePlan, "Administrator");
+                assertNotNull(role);
+                assertEquals("Administrator", role.getName());
+                assertNotNull(role.getDisplayLabel());
+                caps = role.getCapabilities();
+                assertNotNull(caps);
+                System.out.println("\nAdministrator capabilities: ");
+                for (String cap : caps)
+                {
+                    assertNotNull(rmSecurityService.getCapability(cap));
+                    System.out.println(cap);
+                }
+                
+                return null;
+            }
+    
+        });
 	}
 }

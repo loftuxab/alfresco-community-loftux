@@ -95,10 +95,12 @@
     
     <!-- Records Management Security Service -->
     
-    <bean id="recordsManagementSecurityService" class="org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityServiceImpl" depends-on="org_alfresco_module_dod5015_dictionaryBootstrap">        
+    <bean id="recordsManagementSecurityService" class="org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityServiceImpl" depends-on="org_alfresco_module_dod5015_dictionaryBootstrap" init-method="init">        
         <property name="voter" ref="rmEntryVoter"/>
         <property name="authorityService" ref="AuthorityService"/>
         <property name="permissionService" ref="PermissionService"/>
+        <property name="nodeService" ref="NodeService"/>
+        <property name="policyComponent" ref="policyComponent"/>
     </bean>
     
     <bean id="RecordsManagementSecurityService" class="org.springframework.aop.framework.ProxyFactoryBean">

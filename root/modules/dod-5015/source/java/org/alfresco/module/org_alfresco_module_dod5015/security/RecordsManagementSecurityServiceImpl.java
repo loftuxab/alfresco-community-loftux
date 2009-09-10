@@ -24,28 +24,42 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.security;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
+import org.alfresco.repo.policy.JavaBehaviour;
+import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Records management permission service implementation
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementSecurityServiceImpl implements RecordsManagementSecurityService
+public class RecordsManagementSecurityServiceImpl implements RecordsManagementSecurityService, RecordsManagementModel
 {
     /** Entry voter for capability related support */
     private RMEntryVoter voter;
@@ -55,6 +69,10 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     
     /** Permission service */
     private PermissionService permissionService;
+    
+    private PolicyComponent policyComponent;
+    
+    private NodeService nodeService;
     
     /** Records management role zone */
     public static final String RM_ROLE_ZONE_PREFIX = "rmRoleZone";
@@ -88,6 +106,48 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     {
         this.permissionService = permissionService;
     }  
+    
+    /**
+     * Set the policy component
+     * 
+     * @param policyComponent
+     */
+    public void setPolicyComponent(PolicyComponent policyComponent)
+    {
+        this.policyComponent = policyComponent;
+    }
+    
+    /**
+     * Set the node service
+     * 
+     * @param nodeService
+     */
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+    
+    public void init()
+    {
+        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"), 
+                ASPECT_RECORDS_MANAGEMENT_ROOT, 
+                new JavaBehaviour(this, "onCreateRootNode", NotificationFrequency.TRANSACTION_COMMIT));
+    }
+    
+    /**
+     * Create root node behaviour
+     * 
+     * @param childAssocRef
+     */
+    public void onCreateRootNode(ChildAssociationRef childAssocRef)
+    {
+       // Bootstrp in the default set of roles for the newly created root node
+        NodeRef rmRootNode = childAssocRef.getChildRef();
+        if (nodeService.exists(rmRootNode) == true)
+        {
+            bootstrapDefaultRoles(rmRootNode);
+        }
+    }
     
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#getCapabilities()
@@ -127,6 +187,127 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     public Set<QName> getProtectedProperties()
     {
        return voter.getProtectedProperties();
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#bootstrapDefaultRoles(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public void bootstrapDefaultRoles(final NodeRef rmRootNode)
+    {
+        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+        {
+            public Object doWork()
+            {
+                try
+                {
+                    JSONArray array = null;
+                    try
+                    {
+                        // Load up the default roles from JSON
+                        InputStream is = getClass().getClassLoader().getResourceAsStream("alfresco/module/org_alfresco_module_dod5015/security/rm-default-roles-bootstrap.json");
+                        if  (is == null)
+                        {
+                            throw new AlfrescoRuntimeException("Could not load default bootstrap roles configuration");
+                        }
+                        array = new JSONArray(convertStreamToString(is));
+                    }
+                    catch (IOException ioe)
+                    {
+                        throw new AlfrescoRuntimeException("Unable to load rm-default-roles-bootstrap.json configuration file.", ioe);
+                    }
+                    
+                    // Add each role to the rm root node
+                    for (int i = 0; i < array.length(); i++)
+                    {
+                        JSONObject object = array.getJSONObject(i);
+                        
+                        // Get the name of the role
+                        String name = null;
+                        if (object.has("name") == true)
+                        {
+                            name = object.getString("name");
+                            if (existsRole(rmRootNode, name) == true)
+                            {
+                                throw new AlfrescoRuntimeException("The bootstrap role " + name + " already exists on the rm root node " + rmRootNode.toString());
+                            }
+                        }
+                        else
+                        {
+                            throw new AlfrescoRuntimeException("No name given to default bootstrap role.  Check json configuration file.");
+                        }
+                        
+                                                
+                        // Get the role's display label
+                        String displayLabel = name;
+                        if (object.has("displayLabel") == true)
+                        {
+                            displayLabel = object.getString("displayLabel");
+                        }
+                        
+                        // Get the roles capabilities
+                        Set<Capability> capabilities = new HashSet<Capability>(30);
+                        if (object.has("capabilities") == true)
+                        {
+                            JSONArray arrCaps = object.getJSONArray("capabilities");
+                            for (int index = 0; index < arrCaps.length(); index++)
+                            {
+                                String capName = arrCaps.getString(index);
+                                // Handle special "Filing" capability
+                                if ("Filing".equals(capName) == true)
+                                {
+                                    permissionService.setPermission(rmRootNode, getFullRoleName(name, rmRootNode), capName, true);
+                                }
+                                else
+                                {
+                                    Capability capability = getCapability(capName);
+                                    if (capability == null)
+                                    {
+                                        throw new AlfrescoRuntimeException("The capability '" + capName + "' configured for the deafult boostrap role '" + name + "' is invalid.");
+                                    }
+                                    capabilities.add(capability);
+                                }
+                            }
+                        }
+                        
+                        // Create the role
+                        createRole(rmRootNode, name, displayLabel, capabilities);
+                    }
+                }
+                catch (JSONException exception)
+                {
+                    throw new AlfrescoRuntimeException("Error loading json configuration file rm-default-roles-bootstrap.json", exception);
+                }
+                
+                return null;
+            }
+        }, AuthenticationUtil.getAdminUserName());
+    }
+    
+    public String convertStreamToString(InputStream is) throws IOException
+    {
+        /*
+        * To convert the InputStream to String we use the BufferedReader.readLine()
+        * method. We iterate until the BufferedReader return null which means
+        * there's no more data to read. Each line will appended to a StringBuilder
+        * and returned as String.
+        */
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+         
+        String line = null;
+        try 
+        {
+            while ((line = reader.readLine()) != null) 
+            {
+                sb.append(line + "\n");
+            }
+        }
+        finally 
+        {
+            try {is.close();} catch (IOException e) {}
+        }
+         
+        return sb.toString();
     }
     
     /**

@@ -76,6 +76,13 @@ public interface RecordsManagementSecurityService
     Set<QName> getProtectedProperties();
     
     /**
+     * Creates the initial set of default roles for a root records management node
+     * 
+     * @param rmRootNode  
+     */
+    void bootstrapDefaultRoles(NodeRef rmRootNode);
+    
+    /**
      * Get all the available roles for the given records management root node
      * 
      * @param rmRootNode
