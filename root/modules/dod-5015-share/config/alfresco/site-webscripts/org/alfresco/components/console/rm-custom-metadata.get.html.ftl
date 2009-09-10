@@ -118,7 +118,7 @@
          </div>
          <div class="field-row">
             <input type="checkbox" id="${el}-edit-use-list" /><label for="${el}-edit-use-list">${msg("label.use-list")}:</label>
-            <!-- generated list of values constraints drop-down-->
+            <!-- generated list of values constraints drop-down -->
             <select id="${el}-edit-list">
                <#list constraints as c>
                <option value="${c.constraintName}">${c.constraintTitle?html}</option>

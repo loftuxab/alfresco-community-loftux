@@ -48,6 +48,8 @@
 {
    border-left: 1px solid #444444;
    height: 30em;
+   overflow-x: hidden;
+   overflow-y: scroll;
 }
 
 .metadata .view-main
