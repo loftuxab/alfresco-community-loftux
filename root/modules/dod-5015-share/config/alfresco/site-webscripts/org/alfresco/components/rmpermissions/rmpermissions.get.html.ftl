@@ -1,5 +1,9 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RecordsPermissions("${args.htmlid}").setMessages(${messages});
+   new Alfresco.RecordsPermissions("${args.htmlid}").setOptions({
+    siteId: "${page.url.templateArgs.site!""}",
+    nodeRef: "${page.url.args.nodeRef!""}",
+    docName: "${page.url.args.docName!""}"
+ }).setMessages(${messages});
 //]]></script>
 
 <#assign el=args.htmlid>
