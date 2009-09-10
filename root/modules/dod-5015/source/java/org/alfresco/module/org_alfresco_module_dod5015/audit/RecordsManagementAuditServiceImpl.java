@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -409,12 +410,15 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
         
         try
         {
+            Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+            properties.put(ContentModel.PROP_NAME, auditTrail.getName());
+            
             // file the audit log as an undeclared record
             record = this.nodeService.createNode(destination, 
                         ContentModel.ASSOC_CONTAINS, 
                         QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, 
                                     QName.createValidLocalName(auditTrail.getName())), 
-                        ContentModel.TYPE_CONTENT).getChildRef();
+                        ContentModel.TYPE_CONTENT, properties).getChildRef();
 
             // Set the content
             ContentWriter writer = this.contentService.getWriter(record, ContentModel.PROP_CONTENT, true);

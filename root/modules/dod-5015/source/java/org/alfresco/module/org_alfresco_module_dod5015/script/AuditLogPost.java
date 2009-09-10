@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -56,6 +57,7 @@ public class AuditLogPost extends BaseAuditRetrievalWebScript
     protected static final String PARAM_DESTINATION = "destination";
     protected static final String RESPONSE_SUCCESS = "success";
     protected static final String RESPONSE_RECORD = "record";
+    protected static final String RESPONSE_RECORD_NAME = "recordName";
     
     @Override
     public void execute(WebScriptRequest req, WebScriptResponse res) throws IOException
@@ -122,6 +124,8 @@ public class AuditLogPost extends BaseAuditRetrievalWebScript
             if (record != null)
             {
                 responseJSON.put(RESPONSE_RECORD, record.toString());
+                responseJSON.put(RESPONSE_RECORD_NAME, 
+                            (String)nodeService.getProperty(record, ContentModel.PROP_NAME));
             }
             
             // setup response
