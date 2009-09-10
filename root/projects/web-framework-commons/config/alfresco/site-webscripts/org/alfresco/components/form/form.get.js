@@ -651,7 +651,12 @@ function createDefaultSetFromServerFields(mode, formModel)
       // if a field was created add to the set's list of children
       if (field !== null)
       {
-         set.children.push(field);
+         formUIFields[field.id] = field;
+         set.children.push(
+         {
+            id : field.id,
+            kind : field.kind
+         });
       }
    }
    
