@@ -1,10 +1,11 @@
 <script type="text/javascript" charset="utf-8">    
     new Alfresco.RM_Audit('${htmlid}-audit').setOptions({
-       'siteId': "${page.url.templateArgs.site!""}",
+       'siteId': "${page.url.templateArgs.site!"rm"}",
+       'containerId': "${template.properties.container!"documentLibrary"}",       
        'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT,
        'enabled' : ${auditStatus.enabled?string},
        'startDate':"${auditStatus.started}",
-       'stopDate':"${auditStatus.stopped}"
+       'stopDate':"${auditStatus.stopped}",
     }).setMessages(${messages});
   </script>
   
@@ -23,6 +24,8 @@
             </button>
             <button id="${htmlid}-audit-view" name="audit-view" class="audit-view">${msg("label.button-view-log")}</button>
             <button id="${htmlid}-audit-clear" name="audit-clear" class="audit-clear">${msg("label.button-clear")}</button>
+            <button id="${htmlid}-audit-export" name="audit-export" class="audit-export">${msg("label.button-export")}</button>
+            <button id="${htmlid}-audit-declare-record" name="audit-declare-record" class="audit-declare-record">${msg("label.button-declare-record")}</button>            
          </div>
 	   </div>
     </div>    

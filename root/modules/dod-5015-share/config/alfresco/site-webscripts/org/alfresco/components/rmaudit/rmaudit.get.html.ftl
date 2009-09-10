@@ -1,7 +1,8 @@
 <script type="text/javascript" charset="utf-8">    
     new Alfresco.RM_Audit('${htmlid}-audit').setOptions(
        {
-          'siteId': "${page.url.templateArgs.site!""}",
+          'siteId': "${page.url.templateArgs.site!"rm"}",
+          'containerId': "${template.properties.container!"documentLibrary"}",          
           'viewMode':Alfresco.RM_Audit.VIEW_MODE_COMPACT,
           'enabled' : ${auditStatus.enabled?string},
           'startDate':"${auditStatus.started}",
@@ -13,7 +14,7 @@
     ).setMessages(${messages});
   </script>
 <div id="${htmlid}-audit" class="audit">
- <div class="yui-gc">
+ <div class="yui-gd">
    	<div class="yui-u first">
           <div id="${htmlid}-audit-info" class="audit-info">
             <h1>${msg("label.title")}</h1>
@@ -21,6 +22,12 @@
             <p id="${htmlid}-audit-to-date" class="audit-to-date">${msg('label.to')}</p>
           </div>
    	</div>
+	   <div class="yui-u">
+		   <div id="${htmlid}-auditActions" class="auditActions">
+            <button id="${htmlid}-audit-export" name="audit-export" class="audit-export">${msg("label.button-export")}</button>
+            <button id="${htmlid}-audit-declare-record" name="audit-declare-record" class="audit-declare-record">${msg("label.button-declare-record")}</button>            
+         </div>
+	   </div>   	
     </div>    
     <div id="${htmlid}-audit-log" class="yui-gc audit-log">
    	<div class="yui-u">
@@ -34,4 +41,5 @@
          </div>    
       </div>
     </div>
+    <div id="${htmlid}-copyMoveFileTo"></div>
 </div>

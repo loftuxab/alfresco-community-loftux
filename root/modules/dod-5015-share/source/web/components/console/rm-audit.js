@@ -28,7 +28,10 @@
       Alfresco.RM_Audit.superclass.constructor.call(this, "Alfresco.RM_Audit", htmlId,["button", "container", "datasource", "datatable", "paginator", "json"]);
       Alfresco.util.ComponentManager.register(this);
       this.showingFilter = false;
-
+      //search filter person
+      this.activePerson = "";
+      //query parameters for datasource
+      this.queryParams = {};
       return this;
    };
 
@@ -91,7 +94,21 @@
                      handler:this.onRemoveFilter,
                      scope : this
                }
-            }
+            },
+            {
+               rule : 'button.audit-export',
+               o : {
+                  handler: this.onExportLog,
+                  scope : this
+               }
+            },
+            {
+               rule : 'button.audit-declare-record',
+               o : {
+                  handler: this.onDeclareRecord,
+                  scope : this
+               }
+            }            
          ]);
          return this;
       },
@@ -124,9 +141,9 @@
          
          // Decoupled event listeners
          YAHOO.Bubbling.on("personSelected", this.onPersonSelected, this);
-         YAHOO.Bubbling.on('PersonFilterActivated',this.personFilterActivated);
-         YAHOO.Bubbling.on('PersonFilterDeactivated',this.personFilterDeactivated);
-         
+         YAHOO.Bubbling.on('PersonFilterActivated',this.onPersonFilterActivated, this);
+         YAHOO.Bubbling.on('PersonFilterDeactivated',this.onPersonFilterDeactivated,this);
+         YAHOO.Bubbling.on('AuditRecordLocationSelected', this.onAuditRecordLocationSelected, this);
          var buttons = Sel.query('button',this.id).concat(Sel.query('input[type=submit]',this.id));
 
          // Create widget button while reassigning classname to src element (since YUI removes classes). 
@@ -141,6 +158,7 @@
               this.widgets[id]._button.className=button.className;
             }
          }
+         //an audit log for node and not in console (all nodes)
          if (this.options.nodeRef)
          {
             var nodeRef = this.options.nodeRef.split('/');
@@ -149,27 +167,44 @@
          else {
             this.dataUri = Alfresco.constants.PROXY_URI+'api/rma/admin/rmauditlog';
          }
+         //if not in full mode, then we want to restrict to 20
+         if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
+         {
+            this.dataUri+='?size=20';
+         }
          //Sets up datatable.
          var DS = this.widgets['auditDataSource'] = new YAHOO.util.DataSource(this.dataUri);
          
          DS.responseType = YAHOO.util.DataSource.TYPE_JSON;
          DS.responseSchema = {
             resultsList:'data.entries',
-            fields: ["timestamp","user","role","event"]
+            fields: ["timestamp","fullName","userRole","event"]
          };
-         var DT = this.widgets['rolesDataTable'] = new YAHOO.widget.DataTable(this.id+"-auditDT",
+
+         //date cell formatter
+         var renderCellDate = function RecordsResults_renderCellDate(elCell, oRecord, oColumn, oData)
+         {
+            if (oData)
+            {
+               elCell.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(oData));
+            }
+         };
+
+         var DT = this.widgets['auditDataTable'] = new YAHOO.widget.DataTable(this.id+"-auditDT",
              [
-               {key:"timestamp", label:this.msg('label.timestamp'), sortable:true, resizeable:true},
-               {key:"user", label:this.msg('label.user'),  sortable:true, resizeable:true},
-               {key:"role", label:this.msg('label.role'),  sortable:true, resizeable:true},
+               {key:"timestamp", label:this.msg('label.timestamp'), formatter: renderCellDate, sortable:true, resizeable:true},
+               {key:"fullName", label:this.msg('label.user'),  sortable:true, resizeable:true},
+               {key:"userRole", label:this.msg('label.role'),  sortable:true, resizeable:true},
                {key:"event", label:this.msg('label.event'),  sortable:true, resizeable:true}
             ], 
             DS, 
             {
-               caption:this.msg('label.pagination','20')
+               caption:this.msg('label.pagination','0')
             }
          );
-         
+         //so we can update caption to list number of results
+         this.widgets['auditDataSource'].subscribe('responseParseEvent', this.updateCaption, this, true);
+
          this.widgets['status-date'] = Dom.get(this.id+'-status-date');
 
          this.validAuditDates = (this.options.startDate!=="");
@@ -184,7 +219,7 @@
             {
                this.toggleUI();            
             }  
-         }         
+         }        
       },
       
       /**
@@ -305,6 +340,133 @@
       },
       
       /**
+       * Handler for export log button. Exports log
+       *  
+       */      
+      onExportLog: function RM_Audit_onExportLog()
+      {
+         // console.log(arguments.callee.name);
+      },
+
+      /**
+       * Handler for declare as record log button. Declares log as record
+       *  
+       */      
+      onDeclareRecord: function RM_Audit_onDeclareRecord()
+      {  
+         //show location dialog
+         if (!this.modules.selectAuditRecordLocation)
+         {
+            this.modules.selectAuditRecordLocation = new Alfresco.module.SelectAuditRecordLocation(this.id + "-copyMoveFileTo");
+            Alfresco.util.addMessages(Alfresco.messages.scope[this.name], "Alfresco.module.SelectAuditRecordLocation");            
+         }
+
+
+         this.modules.selectAuditRecordLocation.setOptions(
+            {
+               mode: 'file',
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: '',
+               files: {}
+            }).showDialog();
+            
+      }, 
+  
+      onAuditRecordLocationSelected : function RM_Audit_AuditRecordLocationSelected(e, args)
+      {
+         var me = this;
+         var dataObj = {
+            destination: args[1].nodeRef
+         };
+
+         if (this.activePerson)
+         {
+            dataObj.user = this.activePerson.userName;
+         }
+
+         Alfresco.util.Ajax.jsonPost(
+         {
+            url: Alfresco.constants.PROXY_URI + "api/rma/admin/rmauditlog",
+            dataObj : dataObj,
+            successCallback:
+            {
+               fn: function(serverResponse)
+               {
+                  // apply current property values to form
+                  if (serverResponse.json)
+                  {
+                     var data = serverResponse.json.data;
+
+                     if (data.success)
+                     {
+                        Alfresco.util.PopupManager.displayPrompt(
+                        {
+                           title: this.msg('label.declare-record'),
+                           text: this.msg("label.declared-log-message"),
+                           noEscape: true,
+                           buttons: [
+                           {
+                              text: this.msg('button.view-record'),
+                              handler: function viewRecordHandler()
+                              {
+                                 window.location.href = Alfresco.constants.URL_PAGECONTEXT+'site/' +  me.options.siteId + '/documentlibrary?nodeRef='+data.nodeRef;
+                              }
+                           },
+                           {
+                              text: this.msg('button.ok'),
+                              handler: function()
+                              {
+                                 this.destroy();
+                              },
+                              isDefault: true
+                           }               
+                           ]
+                        });
+                     }
+                     else
+                     {
+                        Alfresco.util.PopupManager.displayMessage({
+                           text: this.msg('message.declare-log-fail'),
+                           spanClass: 'message',
+                           modal: true,
+                           noEscape: true,
+                           displayTime: 1
+                        });                        
+                     }
+                  }
+               },
+               scope: this
+            },
+            // failureMessage: me.msg("message.declare-log-fail")
+            failureCallback: {
+               fn: function fail_declare_record(o)
+               {
+                  if (o.json.status.code==400)
+                  {
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: me.msg('label.declare-record'),
+                        text: o.json.message,
+                        buttons: [
+                        {
+                           text: me.msg('button.ok'), 
+                           handler: function()
+                           {
+                              this.destroy();
+                           },
+                           isDefault: false
+                        }
+                        ]
+                     });                     
+                  }
+               }
+            }
+         });         
+      },
+      
+
+      /**
        * Handler for specify button. Shows the fields in order for user to
        * filter results. Needs to be replaced by people picker
        *  
@@ -338,7 +500,7 @@
          this.widgets['specifyfilter'].set('label',this.msg('label.button-specify'));
          Dom.removeClass(this.widgets['people-finder'],'active');
          this.showingFilter = false;
-         YAHOO.Bubbling.fire('PersonFilterActivated'); 
+         YAHOO.Bubbling.fire('PersonFilterActivated',{person:person}); 
       },
       
       /**
@@ -387,7 +549,7 @@
       {
          Dom.removeClass(Sel.query('.personFilter',this.id)[0], 'active');
          this._changeFilterText('');
-         YAHOO.Bubbling.fire('PersonFilterDeactivated');
+         YAHOO.Bubbling.fire('PersonFilterDeactivated',{person:null});
       },
       
       /**
@@ -479,15 +641,49 @@
          
       },
 
-      personFilterActivated: function(e,args)
+      onPersonFilterActivated: function RM_Audit_personFilterActivated(e,args)
       {
-
+         this.activePerson = args[1].person;
+         this.queryParams.user = this.activePerson.userName;
+         this._query();
       },
 
-      personFilterDeactivated: function(e,args)
+      onPersonFilterDeactivated: function RM_Audit_personFilterDeactivated(e,args)
       {
-
-      }
+         this.activePerson = "";
+         delete this.queryParams.user;  
+         this._query();       
+      },
       
+      _buildQuery : function RM_Audit__buildQuery()
+      {
+         var qs = Alfresco.util.toQueryString(this.queryParams);
+         //if we are already using a qs parameter so we need to make it append friendly
+         if ((qs !== "") && this.dataUri.indexOf('?')!=-1)
+         {
+            qs = '&' + qs.split('?')[1];            
+         }
+         return qs;
+      },
+      
+      _query : function RM_Audit__reQuery()
+      {
+         var q = this._buildQuery();
+         // Sends a request to the DataSource for more data
+         var oCallback = {
+            success : this.widgets['auditDataTable'].onDataReturnInitializeTable,
+            failure : this.widgets['auditDataTable'].onDataReturnInitializeTable,
+            scope : this.widgets['auditDataTable']
+         };
+
+         this.widgets['auditDataTable'].getDataSource().sendRequest(q, oCallback);
+      },
+      
+      updateCaption : function RM_updateCaption(o)
+      {
+         var numResults = o.response.results.length;
+         this.widgets['auditDataTable']._elCaption.innerHTML = this.msg('label.pagination', numResults);
+         
+      }
    });
 })();
