@@ -133,6 +133,12 @@
    background-image: url(images/unfreeze-record-16.png);
 }
 
+.doclist .record .onActionViewAuditLog a,
+.doclist .record-nonelec .onActionViewAuditLog a,
+.doclist .onActionViewAuditLog a
+{
+   background-image: url(images/view-audit-log-16.png);
+}
 
 /**
  * Actions: Undeclared Records
