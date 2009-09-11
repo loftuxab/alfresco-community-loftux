@@ -579,25 +579,36 @@
             Dom.get(parent.id + "-edit-type").innerHTML = parent._dataTypeLabel(prop.dataType);
             
             // apply LOV constraints if present
-            if (prop.constraintRefs.length !== 0)
+            if (prop.dataType === "d:text")
             {
-               // the constraint IDs in the options list are of the form "rmc_name" not "rmc:name"
-               var constraintId = prop.constraintRefs[0].name.replace(":", "_");
-               var listOptions = Dom.get(parent.id + "-edit-list").children;
-               for (var i=0, j=listOptions.length; i<j; i++)
+               if (prop.constraintRefs.length !== 0)
                {
-                  if (listOptions[i].value === constraintId)
+                  // the constraint IDs in the options list are of the form "rmc_name" not "rmc:name"
+                  var constraintId = prop.constraintRefs[0].name.replace(":", "_");
+                  var listOptions = Dom.get(parent.id + "-edit-list").children;
+                  for (var i=0, j=listOptions.length; i<j; i++)
                   {
-                     Dom.get(parent.id + "-edit-list").selectedIndex = i;
-                     break;
+                     if (listOptions[i].value === constraintId)
+                     {
+                        Dom.get(parent.id + "-edit-list").selectedIndex = i;
+                        break;
+                     }
                   }
+                  Dom.get(parent.id + "-edit-use-list").checked = true;
                }
-               Dom.get(parent.id + "-edit-use-list").checked = true;
+               else
+               {
+                  Dom.get(parent.id + "-edit-list").selectedIndex = 0;
+                  Dom.get(parent.id + "-edit-use-list").checked = false;
+               }
+               
+               Dom.get(parent.id + "-edit-list").disabled = false;
+               Dom.get(parent.id + "-edit-use-list").disabled = false;
             }
             else
             {
-               Dom.get(parent.id + "-edit-list").selectedIndex = 0;
-               Dom.get(parent.id + "-edit-use-list").checked = false;
+               Dom.get(parent.id + "-edit-list").disabled = true;
+               Dom.get(parent.id + "-edit-use-list").disabled = true;
             }
             
             // mandatory field value - cannot be changed currently
@@ -634,15 +645,18 @@
                label: label
             };
             
-            var constraint = null;
-            var useConstraint = Dom.get(parent.id + "-edit-use-list").checked;
-            if (parent.currentProperty.dataType === "d:text" && useConstraint)
+            if (parent.currentProperty.dataType === "d:text")
             {
-               constraint = Dom.get(parent.id + "-edit-list").value;
-               if (constraint !== null)
+               var constraint = null;
+               if (Dom.get(parent.id + "-edit-use-list").checked)
                {
-                  obj.constraintRef = constraint.replace("_", ":");
+                  constraint = Dom.get(parent.id + "-edit-list").value;
+                  if (constraint !== null)
+                  {
+                     constraint = constraint.replace("_", ":");
+                  }
                }
+               obj.constraintRef = constraint;
             }
             
             Alfresco.util.Ajax.request(
