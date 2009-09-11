@@ -77,10 +77,17 @@ public class AuditLogGet extends BaseAuditRetrievalWebScript
         {
             if (auditTrail != null)
             {
-                auditTrail.delete();
-                
                 if (logger.isDebugEnabled())
-                    logger.debug("Deleted temporary file: " + auditTrail.getAbsolutePath());
+                {
+                    logger.debug(
+                            "Audit results written to file: \n" +
+                            "   File:      " + auditTrail + "\n" +
+                            "   Parameter: " + parseQueryParameters(req));
+                }
+                else
+                {
+                    auditTrail.delete();
+                }
             }
         }
     }
