@@ -560,4 +560,21 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
             }
         }, AuthenticationUtil.getAdminUserName());
     }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#assignRoleToAuthority(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.lang.String)
+     */
+    public void assignRoleToAuthority(final NodeRef rmRootNode, final String role, final String authorityName)
+    {
+        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+        {
+            public Boolean doWork() throws Exception
+            {                                
+                String roleAuthority = authorityService.getName(AuthorityType.GROUP, getFullRoleName(role, rmRootNode));
+                authorityService.addAuthority(roleAuthority, authorityName);             
+                return null;
+                
+            }
+        }, AuthenticationUtil.getAdminUserName());
+    }
 }

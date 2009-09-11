@@ -67,11 +67,23 @@ public class RmRolesGet extends DeclarativeWebScript
     public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
         Map<String, Object> model = new HashMap<String, Object>();
+        Set<Role> roles = null;
         
+        // TODO should be passed 
         List<NodeRef> roots = rmService.getRecordsManagementRoots();
         NodeRef root = roots.get(0);
         
-        Set<Role> roles = rmSecurityService.getRoles(root);
+        // Get the user filter
+        String user  = req.getParameter("user");
+        if (user != null && user.length() != 0)
+        {
+            roles = rmSecurityService.getRolesByUser(root, user);
+        }
+        else
+        {
+            roles = rmSecurityService.getRoles(root);
+        }
+        
         model.put("roles", roles);
         
         return model;

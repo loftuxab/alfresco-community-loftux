@@ -145,4 +145,13 @@ public interface RecordsManagementSecurityService
      * @param role
      */
     void deleteRole(NodeRef rmRootNode, String role);
+    
+    /**
+     * Assign a role to an authority
+     * 
+     * @param authorityName
+     * @param rmRootNode
+     * @param role
+     */
+    void assignRoleToAuthority(NodeRef rmRootNode, String role, String authorityName);
 }
