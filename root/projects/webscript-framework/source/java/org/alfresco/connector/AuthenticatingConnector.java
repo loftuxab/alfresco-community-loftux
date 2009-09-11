@@ -24,6 +24,7 @@
  */
 package org.alfresco.connector;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -205,6 +206,17 @@ public class AuthenticatingConnector implements Connector
             uri = handshakeOrGuest(uri);
 
             // now that we've authenticated, try again
+            if (in.markSupported())
+            {
+                try
+                {
+                    in.reset();
+                }
+                catch (IOException ioErr)
+                {
+                    // if we cannot reset the stream - there's nothing else we can do
+                }
+            }
             response = this.connector.call(uri, context, in);
             
             if (logger.isDebugEnabled())
@@ -249,6 +261,17 @@ public class AuthenticatingConnector implements Connector
             uri = handshakeOrGuest(uri);
             
             // now that we've authenticated, try again
+            if (in.markSupported())
+            {
+                try
+                {
+                    in.reset();
+                }
+                catch (IOException ioErr)
+                {
+                    // if we cannot reset the stream - there's nothing else we can do
+                }
+            }
             response = this.connector.call(uri, context, in, out);
             
             if (logger.isDebugEnabled())
