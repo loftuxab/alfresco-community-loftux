@@ -88,6 +88,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 {
     protected static final String GET_NODE_AUDITLOG_URL_FORMAT = "/api/node/{0}/rmauditlog";
     protected static final String GET_TRANSFER_URL_FORMAT = "/api/node/{0}/transfers/{1}";
+    protected static final String TRANSFER_REPORT_URL_FORMAT = "/api/node/{0}/transfers/{1}/report";
     protected static final String REF_INSTANCES_URL_FORMAT = "/api/node/{0}/customreferences";
     protected static final String RMA_AUDITLOG_URL = "/api/rma/admin/rmauditlog";
     protected static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
@@ -925,6 +926,43 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         transferUrl = MessageFormat.format(GET_TRANSFER_URL_FORMAT, rootNodeUrl, transferId);
         rsp = sendRequest(new GetRequest(transferUrl), 200);
         assertEquals("application/zip", rsp.getContentType());
+        
+        // Test retrieval of transfer report, will be in JSON format
+        String transferReportUrl = MessageFormat.format(TRANSFER_REPORT_URL_FORMAT, rootNodeUrl, transferId);
+        rsp = sendRequest(new GetRequest(transferReportUrl), 200);
+        System.out.println(rsp.getContentAsString());
+        assertEquals("application/json", rsp.getContentType());
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        assertTrue(jsonRsp.has("data"));
+        JSONObject data = jsonRsp.getJSONObject("data");
+        assertTrue(data.has("transferDate"));
+        assertNotNull(data.getString("transferDate"));
+        assertTrue(data.has("transferPerformedBy"));
+        assertEquals("System", data.getString("transferPerformedBy"));
+        assertTrue(data.has("dispositionAuthority"));
+        assertEquals("N1-218-00-3 item 18", data.getString("dispositionAuthority"));
+        assertTrue(data.has("items"));
+        JSONArray items = data.getJSONArray("items");
+        assertEquals("Expecting 1 transferred folder", 1, items.length());
+        JSONObject folder = items.getJSONObject(0);
+        assertTrue(folder.has("type"));
+        assertEquals("folder", folder.getString("type"));
+        assertTrue(folder.has("name"));
+        assertTrue(folder.getString("name").length() > 0);
+        assertTrue(folder.has("nodeRef"));
+        assertTrue(folder.getString("nodeRef").startsWith("workspace://SpacesStore/"));
+        assertTrue(folder.has("children"));
+        JSONArray records = folder.getJSONArray("children");
+        assertEquals("Expecting 1 transferred record", 1, records.length());
+        JSONObject record = records.getJSONObject(0);
+        assertTrue(record.has("type"));
+        assertEquals("record", record.getString("type"));
+        assertTrue(record.has("name"));
+        assertTrue(record.getString("name").length() > 0);
+        assertTrue(record.has("nodeRef"));
+        assertTrue(record.getString("nodeRef").startsWith("workspace://SpacesStore/"));
+        
+        // TODO: Test transfer report 'file as record'
     }
     
     public void testAudit() throws IOException, JSONException
