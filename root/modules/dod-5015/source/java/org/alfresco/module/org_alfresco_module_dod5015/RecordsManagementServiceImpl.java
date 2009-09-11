@@ -166,12 +166,12 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
          * Prevent content nodes being added to dod series and category.
          * Content can only be added to dod folders.
          */
-        this.policyComponent.bindAssociationBehaviour(
-                    QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"), 
-                    DOD5015Model.TYPE_RECORDS_MANAGEMENT_CONTAINER, 
-                    ContentModel.ASSOC_CONTAINS, 
-                    new JavaBehaviour(this, "onAddContentToContainer", NotificationFrequency.EVERY_EVENT));     
-           
+        /*this.policyComponent.bindAssociationBehaviour(
+                    QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"),
+                    DOD5015Model.TYPE_RECORDS_MANAGEMENT_CONTAINER,
+                    ContentModel.ASSOC_CONTAINS,
+                    new JavaBehaviour(this, "onAddContentToContainer", NotificationFrequency.EVERY_EVENT));*/    
+        
         // Register class behaviours.
         this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"),
                 ASPECT_VITAL_RECORD_DEFINITION,
@@ -221,7 +221,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
      * @param bNew
      */
     public void onAddContentToContainer(ChildAssociationRef childAssocRef, boolean bNew)
-    {   
+    {
         if (childAssocRef.getTypeQName().equals(ContentModel.ASSOC_CONTAINS))
         {
             QName childType = nodeService.getType(childAssocRef.getChildRef());
