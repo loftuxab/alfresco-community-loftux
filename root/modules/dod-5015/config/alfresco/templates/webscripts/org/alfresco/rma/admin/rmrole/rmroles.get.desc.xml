@@ -6,7 +6,7 @@
 
   ]]>
   </description>
-  <url>/api/rma/admin/rmroles</url>
+  <url>/api/rma/admin/rmroles?user={user?}</url>
   <format default="json">argument</format>
   <authentication>user</authentication>
   <transaction allow="readonly">required</transaction>

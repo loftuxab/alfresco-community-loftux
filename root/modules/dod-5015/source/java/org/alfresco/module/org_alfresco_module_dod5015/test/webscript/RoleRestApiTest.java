@@ -98,6 +98,9 @@ public class RoleRestApiTest extends BaseWebScriptTest implements RecordsManagem
         rmSecurityService.createRole(rmRootNode, role1, "My Test Role", getListOfCapabilities(5));
         rmSecurityService.createRole(rmRootNode, role2, "My Test Role Too", getListOfCapabilities(5));
         
+        // Add the admin user to one of the roles
+        rmSecurityService.assignRoleToAuthority(rmRootNode, role1, "admin");
+        
         try
         {
             // Get the roles
@@ -122,7 +125,25 @@ public class RoleRestApiTest extends BaseWebScriptTest implements RecordsManagem
             assertEquals("My Test Role Too", roleObj.get("displayLabel"));
             caps = roleObj.getJSONArray("capabilities");
             assertNotNull(caps);
-            assertEquals(5, caps.length());                       
+            assertEquals(5, caps.length());   
+            
+            // Get the roles for "admin"
+            rsp = sendRequest(new GetRequest(GET_ROLES_URL + "?user=admin"),200);
+            rspContent = rsp.getContentAsString();
+            
+            obj = new JSONObject(rspContent);
+            roles = obj.getJSONObject("data");
+            assertNotNull(roles);
+            
+            roleObj = roles.getJSONObject(role1);
+            assertNotNull(roleObj);
+            assertEquals(role1, roleObj.get("name"));
+            assertEquals("My Test Role", roleObj.get("displayLabel"));
+            caps = roleObj.getJSONArray("capabilities");
+            assertNotNull(caps);
+            assertEquals(5, caps.length());
+            
+            assertFalse(roles.has(role2));
         }
         finally
         {
@@ -179,10 +200,11 @@ public class RoleRestApiTest extends BaseWebScriptTest implements RecordsManagem
         
         try
         {
-            Set<Capability> caps = getListOfCapabilities(4,6);
+            Set<Capability> caps = getListOfCapabilities(4,8);
             JSONArray arrCaps = new JSONArray();
             for (Capability cap : caps)
             {
+                System.out.println(cap.getName());
                 arrCaps.put(cap.getName());
             }
             
