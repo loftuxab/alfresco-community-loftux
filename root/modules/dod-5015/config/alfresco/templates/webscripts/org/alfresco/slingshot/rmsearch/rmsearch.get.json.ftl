@@ -16,6 +16,7 @@
 			"createdOn": "<@dateFormat item.createdOn />",
 			"createdByUser": "${item.createdByUser}",
 			"createdBy": "${item.createdBy}",
+			"author": "${item.author!''}",
 			"size": ${item.size?c},
 			<#if item.browseUrl??>"browseUrl": "${item.browseUrl}",</#if>
 			"parentFolder": "${item.parentFolder!""}",
