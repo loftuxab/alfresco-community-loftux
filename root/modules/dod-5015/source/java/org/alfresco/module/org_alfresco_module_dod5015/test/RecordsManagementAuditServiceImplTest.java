@@ -116,6 +116,28 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         txnHelper.doInTransaction(testCallback);
     }
     
+    public void testQuery_UserLimited()
+    {
+        final int limit = 1;
+        final String user = AuthenticationUtil.getAdminUserName();        // The user being tested
+        
+        RetryingTransactionCallback<List<RecordsManagementAuditEntry>> testCallback =
+            new RetryingTransactionCallback<List<RecordsManagementAuditEntry>>()
+        {
+            public List<RecordsManagementAuditEntry> execute() throws Throwable
+            {
+                RecordsManagementAuditQueryParameters params = new RecordsManagementAuditQueryParameters();
+                params.setUser(user);
+                params.setMaxEntries(limit);
+                List<RecordsManagementAuditEntry> entries = rmAuditService.getAuditTrail(params);
+                return entries;
+            }
+        };
+        List<RecordsManagementAuditEntry> entries = txnHelper.doInTransaction(testCallback);
+        assertNotNull(entries);
+        assertEquals("Expected results to be limited", limit, entries.size());
+    }
+    
     public void testQuery_Node()
     {
         RetryingTransactionCallback<List<RecordsManagementAuditEntry>> allResultsCallback =
