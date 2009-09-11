@@ -116,13 +116,13 @@ public interface RecordsManagementAdminService
     public QName setCustomPropertyDefinitionLabel(QName propQName, String newLabel);
 
     /**
-     * Adds a new list of values constraint to the custom property definition.
+     * Sets a new list of values constraint on the custom property definition.
      * 
      * @param propQName the qname of the property definition
      * @param newLovConstraint the List-Of-Values constraintRef.
      * @return the propId.
      */
-    public QName addCustomPropertyDefinitionConstraint(QName propQName, QName newLovConstraint);
+    public QName setCustomPropertyDefinitionConstraint(QName propQName, QName newLovConstraint);
 
     /**
      * Removes all list of values constraints from the custom property definition.
