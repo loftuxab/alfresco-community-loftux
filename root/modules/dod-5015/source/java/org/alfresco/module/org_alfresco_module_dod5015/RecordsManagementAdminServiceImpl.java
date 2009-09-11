@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -828,10 +829,17 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         deserializedModel.toXML(baos);
         
-        final String updatedModelXml = baos.toString();
-        
-        writer.putContent(updatedModelXml);
-        // putContent closes all resources.
+        String updatedModelXml;
+        try
+        {
+            updatedModelXml = baos.toString("UTF-8");
+            writer.putContent(updatedModelXml);
+            // putContent closes all resources.
+            // so we don't have to.
+        } catch (UnsupportedEncodingException uex)
+        {
+            throw new AlfrescoRuntimeException("Exception when writing custom model xml.", uex);
+        }
     }
 
     

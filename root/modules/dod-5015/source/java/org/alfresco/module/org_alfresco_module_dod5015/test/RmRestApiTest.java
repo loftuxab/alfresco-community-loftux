@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +42,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminServiceImpl;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -371,7 +371,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         rspContent = rsp.getContentAsString();
         assertTrue(rspContent.contains("success"));
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
 
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         String generatedBidiRefId = jsonRsp.getJSONObject("data").getString("refId");
@@ -412,7 +412,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
                                  jsonString, APPLICATION_JSON), 200);
     
         String rspContent = rsp.getContentAsString();
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
     
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
         String urlOfNewPropDef = jsonRsp.getString("url");
@@ -422,7 +422,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(propDefnUrl), 200);
         rspContent = rsp.getContentAsString();
         
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
         
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         JSONObject dataObject = jsonRsp.getJSONObject("data");
@@ -458,9 +458,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONArray customRefsObj = (JSONArray)dataObj.get("customReferences");
         assertNotNull("JSON 'customReferences' object was null", customRefsObj);
         
-        for (int i = 0; i < customRefsObj.length(); i++) {
-            System.out.println(customRefsObj.getString(i));
-        }
+//        for (int i = 0; i < customRefsObj.length(); i++) {
+//            System.out.println(customRefsObj.getString(i));
+//        }
 
         assertTrue("There should be at least two custom references. Found " + customRefsObj, customRefsObj.length() >= 2);
 
@@ -502,7 +502,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     
         Response rsp = sendRequest(new PostRequest(refInstancesUrl,
 	                             jsonString, APPLICATION_JSON), 200);
-        System.out.println(rsp.getContentAsString());
+//        System.out.println(rsp.getContentAsString());
 
 	    // Add a child ref
 	    jsonString = new JSONStringer().object()
@@ -513,14 +513,14 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 	    
 	    rsp = sendRequest(new PostRequest(refInstancesUrl,
 	    		jsonString, APPLICATION_JSON), 200);
-        System.out.println(rsp.getContentAsString());
+//        System.out.println(rsp.getContentAsString());
 	    
 	    
         // Now retrieve the applied references from the REST API
         rsp = sendRequest(new GetRequest(refInstancesUrl), 200);
 
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
-        System.out.println(jsonRsp);
+//        System.out.println(jsonRsp);
         
         JSONObject dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
@@ -528,9 +528,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONArray customRefsArray = (JSONArray)dataObj.get("customReferences");
         assertNotNull("JSON 'customReferences' object was null", customRefsArray);
 
-        for (int i = 0; i < customRefsArray.length(); i++) {
-            System.out.println(customRefsArray.get(i));
-        }
+//        for (int i = 0; i < customRefsArray.length(); i++) {
+//            System.out.println(customRefsArray.get(i));
+//        }
         final int customRefsCount = customRefsArray.length();
         assertTrue("There should be at least one custom reference. Found " + customRefsArray, customRefsCount > 0);
         
@@ -619,7 +619,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         String rspContent = rsp.getContentAsString();
 
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
         
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
         String urlOfNewPropDef = jsonRsp.getString("url");
@@ -631,7 +631,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(urlOfNewPropDef), 200);
         rspContent = rsp.getContentAsString();
         
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
         
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         JSONObject dataObject = jsonRsp.getJSONObject("data");
@@ -642,7 +642,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         Object keyToSoleProp = customPropsObject.keys().next();
         
-        System.out.println("New property defn: " + keyToSoleProp);
+//        System.out.println("New property defn: " + keyToSoleProp);
         
         JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
         assertEquals("Wrong property label.", propertyLabel, newPropObject.getString("label"));
@@ -661,14 +661,14 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         Response rsp = sendRequest(new GetRequest(refDefnUrl), 200);
 
         String rspContent = rsp.getContentAsString();
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
 
         refDefnUrl = "/api/rma/admin/customreferencedefinitions/" + pcRefId;
         rsp = sendRequest(new GetRequest(refDefnUrl), 200);
 
         rspContent = rsp.getContentAsString();
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         
         // Update the bidirectional reference.
@@ -683,7 +683,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
                                  jsonString, APPLICATION_JSON), 200);
         
         rspContent = rsp.getContentAsString();
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
     
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         String urlOfNewRefDef = jsonRsp.getString("url");
@@ -693,7 +693,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(refDefnUrl), 200);
         rspContent = rsp.getContentAsString();
         
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
         
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         JSONObject dataObject = jsonRsp.getJSONObject("data");
@@ -719,7 +719,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
                                  jsonString, APPLICATION_JSON), 200);
         
         rspContent = rsp.getContentAsString();
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
     
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         urlOfNewRefDef = jsonRsp.getString("url");
@@ -731,7 +731,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(refDefnUrl), 200);
         rspContent = rsp.getContentAsString();
         
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
         
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         dataObject = jsonRsp.getJSONObject("data");
@@ -745,8 +745,13 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertEquals("Wrong reference target.", updatedPcTarget, newRefObject.getString("target"));
     }
 
-    @SuppressWarnings("unchecked")
     public void testGetCustomProperties() throws Exception
+    {
+        getCustomProperties();
+    }
+
+    private String getCustomProperties() throws Exception, IOException,
+            UnsupportedEncodingException, JSONException
     {
         // Ensure that there is at least one custom property.
         this.testPostCustomPropertyDefinition();
@@ -754,7 +759,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         final int expectedStatus = 200;
         Response rsp = sendRequest(new GetRequest("/api/rma/admin/custompropertydefinitions?element=record"), expectedStatus);
 
-        JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        String contentAsString = rsp.getContentAsString();
+//        System.out.println(contentAsString);
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(contentAsString));
 
         JSONObject dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
@@ -762,12 +769,10 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONObject customPropsObj = (JSONObject)dataObj.get("customProperties");
         assertNotNull("JSON 'customProperties' object was null", customPropsObj);
         
-        for (Iterator iter = customPropsObj.keys(); iter.hasNext();) {
-            System.out.println(customPropsObj.get((String)iter.next()));
-        }
-
         final int customPropsCount = customPropsObj.length();
         assertTrue("There should be at least one custom property. Found " + customPropsObj, customPropsCount > 0);
+        
+        return contentAsString;
     }
     
     public void testExport() throws Exception
@@ -1116,44 +1121,47 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         return recordOne;
 	}   
 
-    public void off_testPotentialEncodingProblem() throws Exception
+    public void testPropertyLabelWithAccentedChars() throws Exception
     {
-        long number = System.currentTimeMillis(); // To allow test reruns
+        final long number = System.currentTimeMillis();
+        
         // Create a property with a simple name
-        postCustomPropertyDefinition("simple", "simpleId" + number); // label, id
+        final String simplePropId = "simpleId" + number;
+        postCustomPropertyDefinition("simple", simplePropId);
+
         // Create a property whose name has accented chars
-        postCustomPropertyDefinition("øoê≈çœ", "accentedId" + number); // label, id
+        final String originalAccentedLabel = "øoê≈çœ";
+        final String accentedPropId = "accentedId" + number;
+        postCustomPropertyDefinition(originalAccentedLabel, accentedPropId);
 
         // We'll update the label on the simple-name property a few times.
         // This will cause the repeated read and write of the entire RM custom model xml file
         // This should also leave the accented-char property unchanged.
-        putCustomProp("one", "simpleId" + number);
-        putCustomProp("two", "simpleId" + number);
-        putCustomProp("three", "simpleId" + number);
-        putCustomProp("four", "simpleId" + number);
-        putCustomProp("five", "simpleId" + number);
+        putCustomPropDefinition("one", simplePropId);
+        putCustomPropDefinition("two", simplePropId);
+        putCustomPropDefinition("three", simplePropId);
+        putCustomPropDefinition("four", simplePropId);
+        putCustomPropDefinition("five", simplePropId);
         
         // Now get all the custom properties back.
-        this.testGetCustomProperties();
+        String rspContent = getCustomProperties();
         
-        // The GET test method includes system.outs of the property JSON responses which will
-        // include the title. If all is well it should still be "øoê≈çœ".
-        
-        // On MacOS I get: (search console for 'accented')
-        // {
-        //   "multiValued":false,
-        //   "defaultValue":"",
-        //   "dataType":"d:text",
-        //   "constraintRefs":[],
-        //   "label":"øoê≈çœ",
-        //   "description":"Dynamically defined test property",
-        //   "propId":"accentedId1252661861762",
-        //   "mandatory":false,
-        //   "protected":false
-        // }
+        JSONObject rspObject = new JSONObject(new JSONTokener(rspContent));
+        JSONObject dataObj = rspObject.getJSONObject("data");
+        assertNotNull("jsonObject was null", dataObj);
+
+        JSONObject customPropertiesObj = dataObj.getJSONObject("customProperties");
+        assertNotNull("customPropertiesObj was null", customPropertiesObj);
+
+        JSONObject accentedPropertyObj = customPropertiesObj.getJSONObject(RecordsManagementCustomModel.RM_CUSTOM_PREFIX
+                + ":" + accentedPropId);
+        assertNotNull("accentedPropertyObj was null", accentedPropertyObj);
+
+        String labelObj = accentedPropertyObj.getString("label");
+        assertEquals("labelObj was changed.", originalAccentedLabel, labelObj);
     }
 
-    private void putCustomProp(String label, String id) throws JSONException, IOException,
+    private void putCustomPropDefinition(String label, String id) throws JSONException, IOException,
             UnsupportedEncodingException
     {
         String jsonString = new JSONStringer().object()
@@ -1166,7 +1174,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
                                  jsonString, APPLICATION_JSON), 200);
     
         String rspContent = rsp.getContentAsString();
-        System.out.println(rspContent);
+//        System.out.println(rspContent);
     
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
         String urlOfNewPropDef = jsonRsp.getString("url");
