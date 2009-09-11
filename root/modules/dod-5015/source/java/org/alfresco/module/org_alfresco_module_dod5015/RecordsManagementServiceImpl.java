@@ -162,6 +162,16 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                 ContentModel.ASSOC_CONTAINS, 
                 new JavaBehaviour(this, "onCreateRecordFolder", NotificationFrequency.TRANSACTION_COMMIT));
         
+        /**
+         * Prevent content nodes being added to dod series and category.
+         * Content can only be added to dod folders.
+         */
+        this.policyComponent.bindAssociationBehaviour(
+                    QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"), 
+                    DOD5015Model.TYPE_RECORDS_MANAGEMENT_CONTAINER, 
+                    ContentModel.ASSOC_CONTAINS, 
+                    new JavaBehaviour(this, "onAddContentToContainer", NotificationFrequency.EVERY_EVENT));     
+           
         // Register class behaviours.
         this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"),
                 ASPECT_VITAL_RECORD_DEFINITION,
@@ -199,6 +209,28 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     {
         // File the document
         rmActionService.executeRecordsManagementAction(childAssocRef.getChildRef(), "file");
+    }
+    
+    /**
+     * On add content to container
+     * 
+     * Prevents content nodes being added to record series and record category folders
+     * by imap, cifs etc.
+     * 
+     * @param childAssocRef
+     * @param bNew
+     */
+    public void onAddContentToContainer(ChildAssociationRef childAssocRef, boolean bNew)
+    {   
+        if (childAssocRef.getTypeQName().equals(ContentModel.ASSOC_CONTAINS))
+        {
+            QName childType = nodeService.getType(childAssocRef.getChildRef());
+            
+            if(childType.equals(ContentModel.TYPE_CONTENT))
+            {
+                throw new AlfrescoRuntimeException("Can not add content nodes to a records management category or series, please add content to record folder.");   
+            }
+        }
     }
     
     /**
