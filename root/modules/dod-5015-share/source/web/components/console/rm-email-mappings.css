@@ -41,3 +41,22 @@
 {
    font-size:100%;
 }
+
+.emailMappings .emailProperty-menu,
+.emailMappings .rmProperty-menu
+{
+   visibility:hidden;
+}
+
+#email-menu-container,
+#rm-menu-container
+{
+   position:relative;
+   display:inline;
+}
+
+#emailProperty-text,
+#rmProperty-text
+{
+   vertical-align:bottom;
+}

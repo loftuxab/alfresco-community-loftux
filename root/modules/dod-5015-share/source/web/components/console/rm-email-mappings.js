@@ -74,7 +74,27 @@ Alfresco.RM = Alfresco.RM || {};
                      handler:this.onAddMapping,
                      scope : this
                }
-            }                                  
+            },
+            {
+               rule : 'button#emailProperty-but-button',
+               o : {
+                  handler : function showEmailProp(e)
+                  {
+                     this.widgets['emailProperty-menu'].show();
+                  },
+                  scope : this
+               }
+            },
+            {
+               rule : 'button#rmProperty-but-button',
+               o : {
+                  handler : function showRmProp(e)
+                  {
+                     this.widgets['rmProperty-menu'].show();
+                  },
+                  scope : this
+               }
+            }                                           
          ]);
          return this;
       },
@@ -166,8 +186,6 @@ Alfresco.RM = Alfresco.RM || {};
        */      
       onAddMapping: function RM_EmailMappings_onAddMapping()
       {
-
-
          if (this.currentValues['emailProperty'] && this.currentValues['rmProperty'])
          {
             var oMap = {
@@ -179,6 +197,14 @@ Alfresco.RM = Alfresco.RM || {};
             {
                this.dataMap.add(oMap);
                this.renderMapping(oMap);
+               Alfresco.util.PopupManager.displayMessage({
+                     text: Alfresco.util.message('message.added', "Alfresco.RM.EmailMappings"),
+                     spanClass: 'message',
+                     modal: true,
+                     noEscape: true,
+                     displayTime: 5
+                  });
+               
             }
          }
       },
@@ -216,62 +242,80 @@ Alfresco.RM = Alfresco.RM || {};
          }
          
          this.widgets['list'] = Sel.query('#emailMappings-list ul')[0];
-
+         
          //handles menu selection; sets label and stores selected values
          var onHandleMenuSelection = function(menuItem, menuName) {
             var menuItemText = menuItem.cfg.getConfig().text;
-            var menuItemValue = menuItem.value;
 
-            this.widgets[menuName + '-menu'].set('label',menuItemText);
-            this.currentValues[menuName] = {value:menuItemValue,label:menuItemText};
+            this.widgets[menuName + '-text'].value=menuItemText;
+            this.currentValues[menuName] = {value:menuItemText,label:menuItemText};
             if (menuName == 'emailProperty')
             {
-               this.updateMenu(menuItemValue);
+               this.updateMenu(menuItemText);
             }
             this.widgets['add-mapping'].set('disabled',menuItem.cfg.getProperty('disabled'));
 
          };
+         //textfields
+         this.widgets['emailProperty-text'] = Dom.get('emailProperty-text');
+         this.widgets['rmProperty-text'] = Dom.get('rmProperty-text');
 
-         
-         //create menus
-         this.widgets['emailProperty-menu'] = new YAHOO.widget.Button("emailMappings-emailProperty-button", {
-               type: "split", 
-               menu: 'emailMappings-emailProperty-menu',
-               lazyloadmenu:false
+         this.widgets['emailProperty-text'].value = "";
+         this.widgets['rmProperty-text'].value = "";
+         // enable add button if textfields have entries
+         var toggleAddButton = function toggleAddButton()
+         {
+            var emProp = this.widgets['emailProperty-text'].value;
+            var rmProp = this.widgets['rmProperty-text'].value;
+
+            this.currentValues['emailProperty'] = {value:emProp,label:emProp};
+            this.currentValues['rmProperty'] = {value:rmProp, label:rmProp};
+
+            if ((emProp!="") && (rmProp!=""))
+            {
+               this.widgets['add-mapping'].set('disabled',false);               
             }
-         );
-         
-         this.widgets['emailProperty-menu'].getMenu().subscribe('click', function handleMenuSelection(e, args) {
-            // me.onHandleRMMenuSelection(e,args);
-            var menuName = 'emailProperty';
+            else
+            {
+               this.widgets['add-mapping'].set('disabled',true);
+            }
+         };
+         Event.addListener(this.widgets['emailProperty-text'], "keyup", toggleAddButton, null, this);
+         Event.addListener(this.widgets['rmProperty-text'], "keyup", toggleAddButton, null, this);         
+         //create menus
+         this.widgets['emailProperty-menu'] = new YAHOO.widget.Menu("emailMappings-emailProperty-menu", {
+            position:'dynamic',
+            context:['emailProperty-text','tl','bl']
+         });
 
+         this.widgets['emailProperty-menu'].addItems(this.options.email);
+         this.widgets['emailProperty-menu'].render('email-menu-container');
+         this.widgets['emailProperty-menu'].subscribe('click', function handleMenuSelection(e, args) {
+            var menuName = 'emailProperty';
             return function (e, args) {
                onHandleMenuSelection.call(this, args[1], menuName);
+               return false;
             };
          }(), this, true);
-         
+
             
-         this.widgets['rmProperty-menu'] = new YAHOO.widget.Button("emailMappings-rmProperty-button",{
-               type: "split", 
-               menu: 'emailMappings-rmProperty-menu',
-               lazyloadmenu:false               
-            }
-         );
+         this.widgets['rmProperty-menu'] = new YAHOO.widget.Menu("emailMappings-rmProperty-menu",{
+            position:'dynamic',
+            context:['rmProperty-text','tl','bl']
+         });
+         this.widgets['rmProperty-menu'].addItems(this.options.rm);
+         this.widgets['rmProperty-menu'].render('rm-menu-container');
 
-         this.widgets['rmProperty-menu'].getMenu().subscribe('click', function handleMenuSelection(e, args) {
+         this.widgets['rmProperty-menu'].subscribe('click', function handleMenuSelection(e, args) {
             var menuName = 'rmProperty';
-
             return function (e, args) {
                onHandleMenuSelection.call(this, args[1], menuName);
+               return false;
             };
          }(), this, true);
 
          //load data
          this.dataMap.load();
-         //set up initial state
-         onHandleMenuSelection.call(this,this.widgets['emailProperty-menu'].getMenu().getItem(0),'emailProperty');
-         onHandleMenuSelection.call(this,this.widgets['rmProperty-menu'].getMenu().getItem(0),'rmProperty');    
-         
       },
       
       /**
@@ -285,19 +329,18 @@ Alfresco.RM = Alfresco.RM || {};
       {
          var mappedValues = this.dataMap.getSelectionByKey(menuItemValue);
 
-         var rmMenu = this.widgets['rmProperty-menu'].getMenu();
+         var rmMenu = this.widgets['rmProperty-menu'];
          var rmItems = rmMenu.getItems();
-         for (var i=0,len = rmItems.length; i < len; i++)
-         {
-               rmItems[i].cfg.setProperty('disabled', false);     
-         }
+
          if (mappedValues !== '')
          {
             for (var i=0,len = rmItems.length; i < len; i++)
             {
                var menuItem = rmItems[i];
-               menuItem.cfg.setProperty('disabled', false);               
-               if (mappedValues.indexOf(menuItem.value) != -1)
+
+               menuItem.cfg.setProperty('disabled', false);
+               
+               if (mappedValues.indexOf(menuItem.cfg.getConfig().text) != -1)
                {
                   menuItem.cfg.setProperty('disabled', true);
                }
@@ -324,7 +367,8 @@ Alfresco.RM = Alfresco.RM || {};
       onDataSave : function RM_EmailMappings_onDataSave(e, args)
       {
          this.widgets['save-mappings'].set('disabled', true);
-         this.widgets['discard-mappings'].set('disabled', true);                    
+         this.widgets['discard-mappings'].set('disabled', true);
+         this.updateMenu(this.widgets['emailProperty-text'].value);
       },
       
       /**
@@ -428,33 +472,30 @@ Alfresco.RM = Alfresco.RM || {};
       
       remove: function RM_EmailMappings_Data_remove(obj)
       {
-         //if valid, mark for deletion and reindex internal representation
-         // if (this.isValidDeletion(obj))
-         // {
-            //removing a new mapping but one that hasn't been saved
-            if (this.markedForAddition.indexOf(obj.from + '::' + obj.to) != -1)
-            {
-               this.markedForAddition = this.markedForAddition.replace(obj.from + '::' + obj.to + ',', '');
-            }
-            else
-            {
-               this.markedForDeletion+=obj.from + '::' + obj.to + ',';
-            }
 
-            var a = [];
-            for (var i=0,len=this.data.mappings.length;i<len;i++)
+         //removing a new mapping but one that hasn't been saved
+         if (this.markedForAddition.indexOf(obj.from + '::' + obj.to) != -1)
+         {
+            this.markedForAddition = this.markedForAddition.replace(obj.from + '::' + obj.to + ',', '');
+         }
+         else
+         {
+            this.markedForDeletion+=obj.from + '::' + obj.to + ',';
+         }
+
+         var a = [];
+         for (var i=0,len=this.data.mappings.length;i<len;i++)
+         {
+            var o = this.data.mappings[i];
+            if ((o.from != obj.from) || (o.to != obj.to))
             {
-               var o = this.data.mappings[i];
-               if ((o.from != obj.from) || (o.to != obj.to))
-               {
-                  a.push(o);
-               }
+               a.push(o);
             }
-            this.data.mappings = a;
-            //reindex this.data 
-            this._index();
-            YAHOO.Bubbling.fire('EmailMappingsChanged', {markedForAddition:this.markedForAddition,markedForDeletion:this.markedForDeletion});            
-         // }
+         }
+         this.data.mappings = a;
+         //reindex this.data 
+         this._index();
+         YAHOO.Bubbling.fire('EmailMappingsChanged', {markedForAddition:this.markedForAddition,markedForDeletion:this.markedForDeletion});            
       },
       
       /**

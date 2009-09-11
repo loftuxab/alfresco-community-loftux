@@ -1,5 +1,23 @@
 <script type="text/javascript" charset="utf-8">    
-    new Alfresco.RM.EmailMappings('${htmlid}-emailMappings').setOptions({mappings:[]}).setMessages(${messages});
+    new Alfresco.RM.EmailMappings('${htmlid}-emailMappings').setOptions({
+       mappings:[],
+       email:[
+          'Thread-Index',
+          'messageSubject',
+          'message-ID',
+          'message-To',
+          'message-From',
+          'messageCc'
+          ],
+       rm: [
+          'imap:threadIndex',
+          'cm:description',
+          'imap:messageSubject',
+          'cm:title',
+          'imap:messageFrom',
+          'imap:messageCc'
+          ]
+      }).setMessages(${messages});
   </script>
   
   <div id="${htmlid}-emailMappings" class="emailMappings">
@@ -9,26 +27,14 @@
 		   <div>
             <form action="email_submit" method="get" accept-charset="utf-8">
                <span>${msg('label.map')}</span>
-               <input id="emailMappings-emailProperty-button" name="emailMappings-emailProperty-button" type="button" value="${msg('label.select-email')}" />
-                  <select id="emailMappings-emailProperty-menu">
-                     <option value="Thread-Index">Thread-Index</option>
-                     <option value="messageSubject">messageSubject</option>
-                     <option value="Message-ID">message-ID</option>
-                     <option value="Message-To">message-To</option>                     
-                     <option value="messageFrom">messageFrom</option>
-                     <option value="messageCc">messageCc</option>                           
-                  </select>
+               <input type="text" name="emailProperty-text" value="" id="emailProperty-text" />
+               
+               <button id="emailProperty-but" name="emailProperty-but"><img src="${page.url.context}/components/images/expanded.png" title="${msg('label.select-email')}"/></button>      
+               <div id="email-menu-container"></div>
                <span>to</span>
-               <input id="emailMappings-rmProperty-button" name="emailMappings-rmProperty-button" type="button" value="${msg('label.select-rm')}" />
-                  <select id="emailMappings-rmProperty-menu">
-                     <option value="imap:threadIndex" disabled >imap:threadIndex</option>
-                     <option value="cm:description" disabled>cm:description</option>
-                     <option value="imap:messageId">imap:messageId</option>
-                     <option value="imap:messageSubject" disabled>imap:messageSubject</option>
-                     <option value="cm:title">cm:title</option>
-                     <option value="imap:messageFrom">imap:messageFrom</option>
-                     <option value="imap:messageCc">imap:messageCc</option>                     
-                  </select>
+               <input type="text" name="rmProperty-text" value="" id="rmProperty-text" />               
+               <button id="rmProperty-but" name="rmProperty-but"><img src="${page.url.context}/components/images/expanded.png" title="${msg('label.select-rm')}"/></button>
+               <div id="rm-menu-container"></div>
                <button id="add-mapping" name="email-add" disabled>${msg('label.add')}</button>              
             </form>
          </div>
