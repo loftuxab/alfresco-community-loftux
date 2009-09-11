@@ -56,6 +56,7 @@ function getRecord(siteId, node)
       modifiedByUser: node.properties["cm:modifier"],
       createdOn: node.properties["cm:created"],
       createdByUser: node.properties["cm:creator"],
+      author: node.properties["cm:author"],
       properties: {}
    };
    

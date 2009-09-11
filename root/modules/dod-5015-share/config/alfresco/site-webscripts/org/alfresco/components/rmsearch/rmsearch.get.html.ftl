@@ -60,6 +60,7 @@
                      <option value="cm:created">${msg("label.created")}</option>
                      <option value="cm:modifier">${msg("label.modifier")}</option>
                      <option value="cm:modified">${msg("label.modified")}</option>
+                     <option value="cm:author">${msg("label.author")}</option>
                      <option value="rma:originator">${msg("label.originator")}</option>
                      <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
                      <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
@@ -71,6 +72,11 @@
                      <option value="rma:location">${msg("label.location")}</option>
                      <option value="rma:address">${msg("label.address")}</option>
                      <option value="rmc:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                     <option value="rma:recordSearchDispositionEvents">${msg("label.dispositionEvents")}</option>
+                     <option value="rma:recordSearchDispositionActionName">${msg("label.dispositionActionName")}</option>
+                     <option value="rma:recordSearchDispositionActionAsOf">${msg("label.dispositionActionAsOf")}</option>
+                     <option value="rma:recordSearchDispositionEventsEligible">${msg("label.dispositionEventsEligible")}</option>
+                     <option value="rma:recordSearchVitalRecordReviewPeriod">${msg("label.vitalRecordReviewPeriod")}</option>
                      <#list meta as d>
                      <option value="${d.name}">${d.title}</option>
                      </#list>

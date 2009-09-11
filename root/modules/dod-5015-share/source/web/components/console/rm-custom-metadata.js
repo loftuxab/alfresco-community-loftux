@@ -442,8 +442,8 @@
             
             var obj =
             {
-               // strip whitespace, encode as URL and finally replace '%' with '_' to make valid qname
-               propId: encodeURIComponent(label.replace(/\s/g, "")).replace("%", "_"),
+               // strip whitespace, encode as URL and finally replace all '%' with '_' to make valid qname
+               propId: encodeURIComponent(label.replace(/\s/g, "")).replace(/%/g, "_"),
                dataType: dataType,
                mandatory: mandatory,
                label: label
