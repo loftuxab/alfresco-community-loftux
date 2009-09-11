@@ -415,12 +415,12 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(propDefnUrl), 200);
         String rspContent = rsp.getContentAsString();
         
-        // System.out.println(rspContent);
+//         System.out.println(rspContent);
 
-        // PUT an additional constraint ref.
-        final String additionalConstraint = "rmc:tlList";
+        // PUT an updated constraint ref.
+        final String updatedConstraint = "rmc:tlList";
         jsonString = new JSONStringer().object()
-            .key("constraintRef").value(additionalConstraint)
+            .key("constraintRef").value(updatedConstraint)
         .endObject()
         .toString();
     
@@ -429,7 +429,6 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
                                  jsonString, APPLICATION_JSON), 200);
     
         rspContent = rsp.getContentAsString();
-        // System.out.println(rspContent);
     
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
         String urlOfNewPropDef = jsonRsp.getString("url");
@@ -453,10 +452,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
         assertEquals("Wrong property label.", updatedLabel, newPropObject.getString("label"));
         JSONArray constraintRefsArray = newPropObject.getJSONArray("constraintRefs");
-        assertEquals("ConstraintRefsArray wrong length.", 2, constraintRefsArray.length());
-        String firstConstraintTitle = constraintRefsArray.getJSONObject(0).getString("title");
-        String secondConstraintTitle = constraintRefsArray.getJSONObject(1).getString("title");
-        assertFalse("2 constraints had the same title.", firstConstraintTitle.equals(secondConstraintTitle));
+        assertEquals("ConstraintRefsArray wrong length.", 1, constraintRefsArray.length());
+        String retrievedUpdatedTitle = constraintRefsArray.getJSONObject(0).getString("name");
+        assertEquals("Constraints had wrong name.", "rmc:tlList", retrievedUpdatedTitle);
 
         // PUT again to remove all constraints
         jsonString = new JSONStringer().object()
@@ -476,7 +474,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(propDefnUrl), 200);
         rspContent = rsp.getContentAsString();
         
-        // System.out.println(rspContent);
+//         System.out.println(rspContent);
         
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         dataObject = jsonRsp.getJSONObject("data");

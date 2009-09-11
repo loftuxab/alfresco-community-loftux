@@ -330,7 +330,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return propQName;
     }
     
-    public QName addCustomPropertyDefinitionConstraint(QName propQName, QName newLovConstraint)
+    public QName setCustomPropertyDefinitionConstraint(QName propQName, QName newLovConstraint)
     {
         ParameterCheck.mandatory("propQName", propQName);
         
@@ -352,17 +352,17 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         String lovConstraintQNameAsString = newLovConstraint.toPrefixString(namespaceService);
         
         // Add the constraint - if it isn't already there.
-        boolean constraintAlreadyExists = false;
+        String refOfExistingConstraint = null;
+        
         for (M2Constraint c : targetProp.getConstraints())
         {
-            String ref = c.getRef();
-            if (lovConstraintQNameAsString.equals(ref))
-            {
-                constraintAlreadyExists = true;
-            }
+            // There should only be one constraint.
+            refOfExistingConstraint = c.getRef();
+            break;
         }
-        if (!constraintAlreadyExists)
+        if (refOfExistingConstraint != null)
         {
+            targetProp.removeConstraintRef(refOfExistingConstraint);
             targetProp.addConstraintRef(lovConstraintQNameAsString);
         }
         

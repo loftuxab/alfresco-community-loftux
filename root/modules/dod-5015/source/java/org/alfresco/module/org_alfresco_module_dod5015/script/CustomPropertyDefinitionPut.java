@@ -110,7 +110,7 @@ public class CustomPropertyDefinitionPut extends AbstractRmWebScript
 
     /**
      * If label has a non-null value, it is set on the property def.
-     * If constraintRef has a non-null value, it is added to the constraints on this propDef.
+     * If constraintRef has a non-null value, it is set on this propDef.
      * If constraintRef has a null value, all constraints for that propDef are removed.
      * 
      * @param params
@@ -147,7 +147,7 @@ public class CustomPropertyDefinitionPut extends AbstractRmWebScript
             else
             {
                 QName constraintRefQName = QName.createQName(constraintRef, namespaceService);
-                result = rmAdminService.addCustomPropertyDefinitionConstraint(propQName, constraintRefQName);
+                result = rmAdminService.setCustomPropertyDefinitionConstraint(propQName, constraintRefQName);
             }
         }
         return result;
