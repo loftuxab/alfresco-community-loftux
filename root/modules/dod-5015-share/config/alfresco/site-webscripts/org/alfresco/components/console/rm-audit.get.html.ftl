@@ -5,7 +5,7 @@
        'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT,
        'enabled' : ${auditStatus.enabled?string},
        'startDate':"${auditStatus.started}",
-       'stopDate':"${auditStatus.stopped}",
+       'stopDate':"${auditStatus.stopped}"
     }).setMessages(${messages});
   </script>
   

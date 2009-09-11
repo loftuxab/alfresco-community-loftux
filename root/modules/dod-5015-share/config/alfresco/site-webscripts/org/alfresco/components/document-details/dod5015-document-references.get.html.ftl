@@ -3,7 +3,7 @@
    {
       siteId: "${page.url.templateArgs.site!""}",
       containerId: "${template.properties.container!"documentLibrary"}",
-      nodeRef : "${page.url.args.nodeRef}",
+      nodeRef : "${page.url.args.nodeRef}"
    }).setMessages(
       ${messages}
    );
