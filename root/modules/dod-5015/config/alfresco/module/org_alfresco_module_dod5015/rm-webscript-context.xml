@@ -141,18 +141,28 @@
         <property name="importerService" ref="ImporterService"/>
     </bean>
     
+    <!-- Base bean for transfer web scripts -->
+    <bean id="rmBaseTransferWebscript" parent="webscript" abstract="true">
+       <property name="nodeService" ref="nodeService"/>
+       <property name="contentService" ref="ContentService"/>
+       <property name="permissionService" ref="PermissionService"/>
+       <property name="mimetypeService" ref="mimetypeService"/>
+       <property name="exporterService" ref="ExporterService"/>
+    </bean>
+    
     <!-- REST impl for GET transfer -->
-    <bean id="webscript.org.alfresco.rma.transfer.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.TransferGet" parent="webscript">
-        <property name="nodeService" ref="nodeService"/>
-        <property name="contentService" ref="ContentService"/>
-        <property name="permissionService" ref="PermissionService"/>
-        <property name="mimetypeService" ref="mimetypeService"/>
-        <property name="exporterService" ref="ExporterService"/>
+    <bean id="webscript.org.alfresco.rma.transfer.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.TransferGet" parent="rmBaseTransferWebscript">
+    </bean>
+    
+    <!-- REST impl for GET transfer report -->
+    <bean id="webscript.org.alfresco.rma.transferreport.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.TransferReportGet" parent="rmBaseTransferWebscript">
+       <property name="dictionaryService" ref="DictionaryService"/>
+       <property name="recordsManagementService" ref="RecordsManagementService"/>
     </bean>
     
     <!-- RM Role API-->
     
-   <bean id="webscript.org.alfresco.rma.admin.rmrole.rmroles.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.admin.RmRolesGet" parent="webscript">
+    <bean id="webscript.org.alfresco.rma.admin.rmrole.rmroles.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.admin.RmRolesGet" parent="webscript">
        <property name="recordsManagementService" ref="RecordsManagementService"/>
        <property name="recordsManagementSecurityService" ref="RecordsManagementSecurityService"/>
     </bean>
