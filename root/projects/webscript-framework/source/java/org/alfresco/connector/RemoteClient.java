@@ -614,7 +614,7 @@ public class RemoteClient extends AbstractClient
                     method.releaseConnection();
                     method = null;
                 }
-
+                
                 switch (this.requestMethod)
                 {
                     default:
@@ -637,7 +637,7 @@ public class RemoteClient extends AbstractClient
                 
                 // Switch off automatic redirect handling as we want to process them ourselves and maintain cookies
                 method.setFollowRedirects(false);
-
+                
                 // proxy over any headers from the request stream to proxied request
                 if (req != null)
                 {
@@ -653,7 +653,7 @@ public class RemoteClient extends AbstractClient
                         }
                     }
                 }
-
+                
                 // apply request properties, allows for the assignment and override of specific header properties
                 if (this.requestProperties != null && this.requestProperties.size() != 0)
                 {
@@ -666,7 +666,7 @@ public class RemoteClient extends AbstractClient
                             logger.trace("Set request header: " + headerName + "=" + headerValue);
                     }
                 }
-
+                
                 // Apply cookies
                 if (this.cookies != null && !this.cookies.isEmpty())
                 {
@@ -683,14 +683,12 @@ public class RemoteClient extends AbstractClient
                     }
 
                     String cookieString = builder.toString();
-
-                    if (logger.isDebugEnabled())
-                    {
+                    
+                    if (debug)
                         logger.debug("Setting cookie header: " + cookieString);
-                    }
                     method.setRequestHeader("Cookie", cookieString);
                 }
-
+                
                 // HTTP basic auth support
                 if (this.username != null && this.password != null)
                 {
@@ -699,12 +697,12 @@ public class RemoteClient extends AbstractClient
                     if (debug)
                         logger.debug("Applied HTTP Basic Authorization");
                 }
-
+                
                 // prepare the POST/PUT entity data if input supplied
                 if (in != null)
                 {
                     method.setRequestHeader("Content-Type", this.requestContentType);
-
+                    
                     // apply content-length here if known (i.e. from proxied req)
                     // if this is not set, then the content will be buffered in memory
                     int contentLength = InputStreamRequestEntity.CONTENT_LENGTH_AUTO;
@@ -712,13 +710,12 @@ public class RemoteClient extends AbstractClient
                     {
                         contentLength = req.getContentLength();
                     }
-
+                    
                     if (debug)
-                        logger.debug("Setting content-type=" + this.requestContentType + " content-length="
-                                + contentLength);
-
+                        logger.debug("Setting content-type=" + this.requestContentType + " content-length=" + contentLength);
+                    
                     ((EntityEnclosingMethod) method).setRequestEntity(new InputStreamRequestEntity(in, contentLength));
-
+                    
                     // apply any supplied POST request parameters
                     if (req != null && contentLength == 0 && method instanceof PostMethod)
                     {
@@ -737,7 +734,7 @@ public class RemoteClient extends AbstractClient
                         }
                     }
                 }
-
+                
                 // execute the method to get the response code
                 responseCode = client.executeMethod(method);
                 redirectURL = processResponse(redirectURL, method);
