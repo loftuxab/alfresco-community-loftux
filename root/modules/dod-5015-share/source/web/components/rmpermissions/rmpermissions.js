@@ -51,17 +51,10 @@
     */
    Alfresco.RecordsPermissions = function(htmlId)
    {
-      /* Mandatory properties */
-      this.name = "Alfresco.RecordsPermissions";
-      
       /* Super class constructor call */
-      Alfresco.RecordsPermissions.superclass.constructor.call(this, htmlId);
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-      
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "datatable", "json", "menu"], this.onComponentsLoaded, this);
+      Alfresco.RecordsPermissions.superclass.constructor.call(
+         this, "Alfresco.RecordsPermissions", htmlId,
+         ["button", "container", "datasource", "datatable", "json", "menu"]);
       
       return this;
    };
@@ -79,7 +72,10 @@
          var me = this;
          
          // Buttons
-         //this.widgets.searchButton = Alfresco.util.createYUIButton(this, "search-button", this.onSearchClick);
+         this.widgets.addButton = Alfresco.util.createYUIButton(this, "addusergroup-button", this.onAddClick);
+         
+         // Events
+         Event.on(this.id + "-inherit", "change", this.onInheritCheckChanged, this, true);
       },
       
       /**
@@ -88,13 +84,25 @@
        */
       
       /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
+       * Fired when the Add User/Group button is clicked.
+       * 
+       * @method onAddClick
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
        */
+      onAddClick: function RecordsPermissions_onAddClick(e, args)
+      {
+      },
       
+      /**
+       * Fired when the Inherit Permissions checkbox state is changed.
+       * 
+       * @method onInheritCheckChanged
+       * @param e {object} DomEvent
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onInheritCheckChanged: function RecordsPermissions_onInheritCheckChanged(e, args)
+      {
+      }
    });
 })();
