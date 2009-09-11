@@ -430,7 +430,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONObject customPropsObject = dataObject.getJSONObject("customProperties");
         assertNotNull("JSON customProperties object was null", customPropsObject);
         assertEquals("Wrong customProperties length.", 1, customPropsObject.length());
-        
+
         Object keyToSoleProp = customPropsObject.keys().next();
         
         JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
@@ -1115,4 +1115,61 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         return recordOne;
 	}   
+
+    public void off_testPotentialEncodingProblem() throws Exception
+    {
+        long number = System.currentTimeMillis(); // To allow test reruns
+        // Create a property with a simple name
+        postCustomPropertyDefinition("simple", "simpleId" + number); // label, id
+        // Create a property whose name has accented chars
+        postCustomPropertyDefinition("øoê≈çœ", "accentedId" + number); // label, id
+
+        // We'll update the label on the simple-name property a few times.
+        // This will cause the repeated read and write of the entire RM custom model xml file
+        // This should also leave the accented-char property unchanged.
+        putCustomProp("one", "simpleId" + number);
+        putCustomProp("two", "simpleId" + number);
+        putCustomProp("three", "simpleId" + number);
+        putCustomProp("four", "simpleId" + number);
+        putCustomProp("five", "simpleId" + number);
+        
+        // Now get all the custom properties back.
+        this.testGetCustomProperties();
+        
+        // The GET test method includes system.outs of the property JSON responses which will
+        // include the title. If all is well it should still be "øoê≈çœ".
+        
+        // On MacOS I get: (search console for 'accented')
+        // {
+        //   "multiValued":false,
+        //   "defaultValue":"",
+        //   "dataType":"d:text",
+        //   "constraintRefs":[],
+        //   "label":"øoê≈çœ",
+        //   "description":"Dynamically defined test property",
+        //   "propId":"accentedId1252661861762",
+        //   "mandatory":false,
+        //   "protected":false
+        // }
+    }
+
+    private void putCustomProp(String label, String id) throws JSONException, IOException,
+            UnsupportedEncodingException
+    {
+        String jsonString = new JSONStringer().object()
+            .key("label").value(label)
+        .endObject()
+        .toString();
+    
+        String propDefnUrl = "/api/rma/admin/custompropertydefinitions/" + id;
+        Response rsp = sendRequest(new PutRequest(propDefnUrl,
+                                 jsonString, APPLICATION_JSON), 200);
+    
+        String rspContent = rsp.getContentAsString();
+        System.out.println(rspContent);
+    
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        String urlOfNewPropDef = jsonRsp.getString("url");
+        assertNotNull("urlOfNewPropDef was null.", urlOfNewPropDef);
+    }
 }
