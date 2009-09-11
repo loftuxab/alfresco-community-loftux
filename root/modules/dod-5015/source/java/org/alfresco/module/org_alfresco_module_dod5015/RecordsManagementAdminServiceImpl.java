@@ -303,7 +303,34 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         return propId;
     }
 
-    public QName updateCustomPropertyDefinition(QName propQName, String newLabel, QName lovConstraint)
+    public QName setCustomPropertyDefinitionLabel(QName propQName, String newLabel)
+    {
+        ParameterCheck.mandatory("propQName", propQName);
+        
+        PropertyDefinition propDefn = dictionaryService.getProperty(propQName);
+        if (propDefn == null)
+        {
+            throw new AlfrescoRuntimeException("DictionaryService does not contain property definition " + propQName);
+        }
+        
+        if (newLabel == null) return propQName;
+        
+        M2Model deserializedModel = readCustomContentModel();
+        M2Property targetProperty = findProperty(propQName, deserializedModel);
+
+        targetProperty.setTitle(newLabel);
+        writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("setCustomPropertyDefinitionLabel: "+propQName+
+                    "=" + newLabel);
+        }
+        
+        return propQName;
+    }
+    
+    public QName addCustomPropertyDefinitionConstraint(QName propQName, QName newLovConstraint)
     {
         ParameterCheck.mandatory("propQName", propQName);
         
@@ -314,54 +341,85 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         }
         
         M2Model deserializedModel = readCustomContentModel();
-        List<M2Aspect> aspects = deserializedModel.getAspects();
-        // Search through the aspects looking for the custom property
-        M2Aspect targetAspect = null;
-        for (M2Aspect aspect : aspects)
+        M2Property targetProp = findProperty(propQName, deserializedModel);
+        String dataType = targetProp.getType();
+
+        if (! dataType.equals(DataTypeDefinition.TEXT.toPrefixString(namespaceService)))
         {
-            for (M2Property prop : aspect.getProperties())
+            throw new AlfrescoRuntimeException("Cannot apply constraint '"+newLovConstraint+
+                    "' to property '" + targetProp.getName() + "' with datatype '" + dataType + "' (expected: dataType = TEXT)");
+        }
+        String lovConstraintQNameAsString = newLovConstraint.toPrefixString(namespaceService);
+        
+        // Add the constraint - if it isn't already there.
+        boolean constraintAlreadyExists = false;
+        for (M2Constraint c : targetProp.getConstraints())
+        {
+            String ref = c.getRef();
+            if (lovConstraintQNameAsString.equals(ref))
             {
-                if (propQName.toPrefixString(namespaceService).equals(prop.getName()))
-                {
-                    targetAspect = aspect;
-                    String dataType = prop.getType();
-                    if (newLabel != null)
-                    {
-                        prop.setTitle(newLabel);
-                    }
-                    if (lovConstraint != null)
-                    {
-                        if (! dataType.equals(DataTypeDefinition.TEXT.toPrefixString(namespaceService)))
-                        {
-                            throw new AlfrescoRuntimeException("Cannot apply constraint '"+lovConstraint+
-                                    "' to property '" + prop.getName() + "' with datatype '" + dataType + "' (expected: dataType = TEXT)");
-                        }
-                        String lovConstraintQNameAsString = lovConstraint.toPrefixString(namespaceService);
-                        if (!prop.getConstraints().isEmpty())
-                        {
-                            prop.removeConstraintRef(lovConstraintQNameAsString);
-                        }
-                        
-                        prop.addConstraintRef(lovConstraintQNameAsString);
-                    }
-                }
+                constraintAlreadyExists = true;
             }
         }
-        // Handle case where the property definition was not found
-        if (targetAspect == null)
+        if (!constraintAlreadyExists)
         {
-            throw new AlfrescoRuntimeException("Custom model does not contain property definition " + propQName);
+            targetProp.addConstraintRef(lovConstraintQNameAsString);
         }
         
         writeCustomContentModel(deserializedModel);
         
         if (logger.isInfoEnabled())
         {
-            logger.info("updateCustomPropertyDefinition: "+propQName+
-                    "=" + newLabel + " to aspect: "+targetAspect);
+            logger.info("addCustomPropertyDefinitionConstraint: "+lovConstraintQNameAsString);
         }
         
         return propQName;
+    }
+
+    public QName removeCustomPropertyDefinitionConstraints(QName propQName)
+    {
+        ParameterCheck.mandatory("propQName", propQName);
+        
+        PropertyDefinition propDefn = dictionaryService.getProperty(propQName);
+        if (propDefn == null)
+        {
+            throw new AlfrescoRuntimeException("DictionaryService does not contain property definition " + propQName);
+        }
+        
+        M2Model deserializedModel = readCustomContentModel();
+        M2Property targetProperty = findProperty(propQName, deserializedModel);
+        
+        // Need to count backwards to remove constraints
+        for (int i = targetProperty.getConstraints().size() - 1; i >= 0; i--) {
+            String ref = targetProperty.getConstraints().get(i).getRef();
+            targetProperty.removeConstraintRef(ref);
+        }
+        
+        writeCustomContentModel(deserializedModel);
+        
+        if (logger.isInfoEnabled())
+        {
+            logger.info("removeCustomPropertyDefinitionConstraints: "+propQName);
+        }
+        
+        return propQName;
+    }
+
+    private M2Property findProperty(QName propQName, M2Model deserializedModel)
+    {
+        List<M2Aspect> aspects = deserializedModel.getAspects();
+        // Search through the aspects looking for the custom property
+        for (M2Aspect aspect : aspects)
+        {
+            for (M2Property prop : aspect.getProperties())
+            {
+                if (propQName.toPrefixString(namespaceService).equals(prop.getName()))
+                {
+                    return prop;
+                }
+            }
+        }
+        throw new AlfrescoRuntimeException("Custom model does not contain property definition " + propQName);
     }
 
     public void removeCustomPropertyDefinition(QName propQName)

@@ -108,23 +108,49 @@ public class CustomPropertyDefinitionPut extends AbstractRmWebScript
         return result;
     }
 
+    /**
+     * If label has a non-null value, it is set on the property def.
+     * If constraintRef has a non-null value, it is added to the constraints on this propDef.
+     * If constraintRef has a null value, all constraints for that propDef are removed.
+     * 
+     * @param params
+     * @return
+     */
     protected QName updatePropertyDefinition(Map<String, Serializable> params)
     {
-        String label = (String)params.get(PARAM_LABEL);
-        String constraintRef = (String)params.get(PARAM_CONSTRAINT_REF);
-        QName constraintRefQName = QName.createQName(constraintRef, namespaceService);
+        QName result = null;
+        
         String propId = (String)params.get(PROP_ID);
         ParameterCheck.mandatoryString("propId", propId);
-        
+
         QName propQName = rmAdminService.getQNameForClientId(propId);
-        
         if (propQName == null)
         {
             throw new WebScriptException(Status.STATUS_NOT_FOUND,
                     "Could not find property definition for: " + propId);
         }
-    
-        return rmAdminService.updateCustomPropertyDefinition(propQName, label, constraintRefQName);
+        
+        if (params.containsKey(PARAM_LABEL))
+        {
+            String label = (String)params.get(PARAM_LABEL);
+            result = rmAdminService.setCustomPropertyDefinitionLabel(propQName, label);
+        }
+
+        if (params.containsKey(PARAM_CONSTRAINT_REF))
+        {
+            String constraintRef = (String)params.get(PARAM_CONSTRAINT_REF);
+            
+            if (constraintRef == null)
+            {
+                result = rmAdminService.removeCustomPropertyDefinitionConstraints(propQName);
+            }
+            else
+            {
+                QName constraintRefQName = QName.createQName(constraintRef, namespaceService);
+                result = rmAdminService.addCustomPropertyDefinitionConstraint(propQName, constraintRefQName);
+            }
+        }
+        return result;
     }
 
     @SuppressWarnings("unchecked")
@@ -144,7 +170,11 @@ public class CustomPropertyDefinitionPut extends AbstractRmWebScript
         for (Iterator iter = json.keys(); iter.hasNext(); )
         {
             String nextKeyString = (String)iter.next();
-            String nextValueString = json.getString(nextKeyString);
+            String nextValueString = null;
+            if (!json.isNull(nextKeyString))
+            {
+                nextValueString = json.getString(nextKeyString);
+            }
             
             params.put(nextKeyString, nextValueString);
         }

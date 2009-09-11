@@ -396,24 +396,40 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 
     public void testPutCustomPropertyDefinition() throws Exception
     {
+        // POST to create a property definition with a known propId
         final String propertyLabel = "Original label åçîéøü";
         String propId = postCustomPropertyDefinition(propertyLabel, null);
         
-        // PUT specifies only an updated label or a new constraint ref.
+        // PUT an updated label.
         final String updatedLabel = "Updated label πø^¨¥†®";
-        final String updatedConstraint = "rmc:tlList";
         String jsonString = new JSONStringer().object()
             .key("label").value(updatedLabel)
-            .key("constraintRef").value(updatedConstraint)
         .endObject()
         .toString();
     
         String propDefnUrl = "/api/rma/admin/custompropertydefinitions/" + propId;
         Response rsp = sendRequest(new PutRequest(propDefnUrl,
                                  jsonString, APPLICATION_JSON), 200);
-    
+
+        // GET from the URL again to ensure it's valid
+        rsp = sendRequest(new GetRequest(propDefnUrl), 200);
         String rspContent = rsp.getContentAsString();
-//        System.out.println(rspContent);
+        
+        // System.out.println(rspContent);
+
+        // PUT an additional constraint ref.
+        final String additionalConstraint = "rmc:tlList";
+        jsonString = new JSONStringer().object()
+            .key("constraintRef").value(additionalConstraint)
+        .endObject()
+        .toString();
+    
+        propDefnUrl = "/api/rma/admin/custompropertydefinitions/" + propId;
+        rsp = sendRequest(new PutRequest(propDefnUrl,
+                                 jsonString, APPLICATION_JSON), 200);
+    
+        rspContent = rsp.getContentAsString();
+        // System.out.println(rspContent);
     
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
         String urlOfNewPropDef = jsonRsp.getString("url");
@@ -437,9 +453,44 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONObject newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
         assertEquals("Wrong property label.", updatedLabel, newPropObject.getString("label"));
         JSONArray constraintRefsArray = newPropObject.getJSONArray("constraintRefs");
-        assertEquals("ConstraintRefsArray wrong length.", 1, constraintRefsArray.length());
-        String recoveredConstraintTitle = constraintRefsArray.getJSONObject(0).getString("title");
-        assertEquals("Wrong constraint.", "Transfer Locations", recoveredConstraintTitle);
+        assertEquals("ConstraintRefsArray wrong length.", 2, constraintRefsArray.length());
+        String firstConstraintTitle = constraintRefsArray.getJSONObject(0).getString("title");
+        String secondConstraintTitle = constraintRefsArray.getJSONObject(1).getString("title");
+        assertFalse("2 constraints had the same title.", firstConstraintTitle.equals(secondConstraintTitle));
+
+        // PUT again to remove all constraints
+        jsonString = new JSONStringer().object()
+            .key("constraintRef").value(null)
+        .endObject()
+        .toString();
+    
+        rsp = sendRequest(new PutRequest(propDefnUrl,
+                                 jsonString, APPLICATION_JSON), 200);
+    
+        rspContent = rsp.getContentAsString();
+//        System.out.println(rspContent);
+    
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+    
+        // GET from the URL again to ensure it's valid
+        rsp = sendRequest(new GetRequest(propDefnUrl), 200);
+        rspContent = rsp.getContentAsString();
+        
+        // System.out.println(rspContent);
+        
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        dataObject = jsonRsp.getJSONObject("data");
+        assertNotNull("JSON data object was null", dataObject);
+        customPropsObject = dataObject.getJSONObject("customProperties");
+        assertNotNull("JSON customProperties object was null", customPropsObject);
+        assertEquals("Wrong customProperties length.", 1, customPropsObject.length());
+
+        keyToSoleProp = customPropsObject.keys().next();
+        
+        newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
+        assertEquals("Wrong property label.", updatedLabel, newPropObject.getString("label"));
+        constraintRefsArray = newPropObject.getJSONArray("constraintRefs");
+        assertEquals("ConstraintRefsArray wrong length.", 0, constraintRefsArray.length());
     }
 
     public void testGetCustomReferences() throws IOException, JSONException
@@ -594,7 +645,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
                 .key("mandatory").value(false)
                 .key("dataType").value("d:text")
                 .key("element").value("record")
-//                .key("constraintRef").value("rmc:smList")
+                .key("constraintRef").value("rmc:smList")
                 // Note no propId
             .endObject()
             .toString();
@@ -607,7 +658,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
             .key("mandatory").value(false)
             .key("dataType").value("d:text")
             .key("element").value("record")
-//            .key("constraintRef").value("rmc:smList")
+            .key("constraintRef").value("rmc:smList")
             .key("propId").value(propId)
         .endObject()
         .toString();
