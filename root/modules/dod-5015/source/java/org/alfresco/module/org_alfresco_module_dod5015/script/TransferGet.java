@@ -34,6 +34,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.view.ExporterCrawlerParameters;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.web.scripts.Cache;
+import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.WebScriptResponse;
 import org.apache.commons.logging.Log;
@@ -51,8 +53,9 @@ public class TransferGet extends BaseTransferWebScript
     private static Log logger = LogFactory.getLog(TransferGet.class);
     
     @Override
-    protected File executeTransfer(WebScriptRequest req, WebScriptResponse res,
-                NodeRef[] itemsToTransfer) throws IOException
+    protected File executeTransfer(NodeRef[] itemsToTransfer,
+                WebScriptRequest req, WebScriptResponse res, 
+                Status status, Cache cache) throws IOException
     {
         // setup the ACP parameters
         ExporterCrawlerParameters params = new ExporterCrawlerParameters();

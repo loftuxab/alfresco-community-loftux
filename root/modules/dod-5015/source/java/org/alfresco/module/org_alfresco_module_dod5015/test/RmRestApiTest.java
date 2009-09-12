@@ -912,23 +912,39 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         txn = transactionService.getUserTransaction(false);
         txn.begin();
         
-        // Create the document
+        // Create 2 documents
+        Map<QName, Serializable> props1 = new HashMap<QName, Serializable>(1);
+        props1.put(ContentModel.PROP_NAME, "record1");
         NodeRef recordOne = this.nodeService.createNode(newRecordFolder, 
                                                         ContentModel.ASSOC_CONTAINS, 
-                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "record"), 
-                                                        ContentModel.TYPE_CONTENT).getChildRef();
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "record1"), 
+                                                        ContentModel.TYPE_CONTENT, props1).getChildRef();
         
         // Set the content
-        ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
-        writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        writer.setEncoding("UTF-8");
-        writer.putContent("There is some content in this record");
+        ContentWriter writer1 = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+        writer1.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer1.setEncoding("UTF-8");
+        writer1.putContent("There is some content for record 1");
+        
+        Map<QName, Serializable> props2 = new HashMap<QName, Serializable>(1);
+        props2.put(ContentModel.PROP_NAME, "record2");
+        NodeRef recordTwo = this.nodeService.createNode(newRecordFolder, 
+                                                        ContentModel.ASSOC_CONTAINS, 
+                                                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "record2"), 
+                                                        ContentModel.TYPE_CONTENT, props2).getChildRef();
+        
+        // Set the content
+        ContentWriter writer2 = this.contentService.getWriter(recordTwo, ContentModel.PROP_CONTENT, true);
+        writer2.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        writer2.setEncoding("UTF-8");
+        writer2.putContent("There is some content for record 2");
         txn.commit();
         
         // declare the new record
         txn = transactionService.getUserTransaction(false);
         txn.begin();
         declareRecord(recordOne);
+        declareRecord(recordTwo);
         
         // prepare for the transfer
         Map<String, Serializable> params = new HashMap<String, Serializable>(3);
@@ -967,8 +983,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         transferUrl = MessageFormat.format(GET_TRANSFER_URL_FORMAT, rootNodeUrl, transferId);
         rsp = sendRequest(new GetRequest(transferUrl), 404);
         
-        // retrieve the id of the first transfer
-        NodeRef transferNodeRef = assocs.get(0).getChildRef();
+        // retrieve the id of the last transfer
+        NodeRef transferNodeRef = assocs.get(assocs.size()-1).getChildRef();
         
         // Test successful retrieval of transfer archive
         transferId = transferNodeRef.getId();
@@ -979,7 +995,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         // Test retrieval of transfer report, will be in JSON format
         String transferReportUrl = MessageFormat.format(TRANSFER_REPORT_URL_FORMAT, rootNodeUrl, transferId);
         rsp = sendRequest(new GetRequest(transferReportUrl), 200);
-        System.out.println(rsp.getContentAsString());
+        //System.out.println(rsp.getContentAsString());
         assertEquals("application/json", rsp.getContentType());
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         assertTrue(jsonRsp.has("data"));
@@ -1002,16 +1018,54 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(folder.getString("nodeRef").startsWith("workspace://SpacesStore/"));
         assertTrue(folder.has("children"));
         JSONArray records = folder.getJSONArray("children");
-        assertEquals("Expecting 1 transferred record", 1, records.length());
-        JSONObject record = records.getJSONObject(0);
-        assertTrue(record.has("type"));
-        assertEquals("record", record.getString("type"));
-        assertTrue(record.has("name"));
-        assertTrue(record.getString("name").length() > 0);
-        assertTrue(record.has("nodeRef"));
-        assertTrue(record.getString("nodeRef").startsWith("workspace://SpacesStore/"));
+        assertEquals("Expecting 2 transferred records", 2, records.length());
+        JSONObject record1 = records.getJSONObject(0);
+        assertTrue(record1.has("type"));
+        assertEquals("record", record1.getString("type"));
+        assertTrue(record1.has("name"));
+        assertEquals("record1", record1.getString("name"));
+        assertTrue(record1.has("nodeRef"));
+        assertTrue(record1.getString("nodeRef").startsWith("workspace://SpacesStore/"));
         
-        // TODO: Test transfer report 'file as record'
+        // Test filing a transfer report as a record
+     
+        // Attempt to store transfer report at non existent destination, make sure we get 404
+        JSONObject jsonPostData = new JSONObject();
+        jsonPostData.put("destination", "workspace://SpacesStore/09ca1e02-1c87-4a53-97e7-xxxxxxxxxxxx");
+        String jsonPostString = jsonPostData.toString();
+        rsp = sendRequest(new PostRequest(transferReportUrl, jsonPostString, APPLICATION_JSON), 404);
+        
+        // Attempt to store audit log at wrong type of destination, make sure we get 400
+        NodeRef wrongCategory = TestUtilities.getRecordCategory(searchService, "Civilian Files", 
+                    "Foreign Employee Award Files");
+        assertNotNull(wrongCategory);
+        jsonPostData = new JSONObject();
+        jsonPostData.put("destination", wrongCategory.toString());
+        jsonPostString = jsonPostData.toString();
+        rsp = sendRequest(new PostRequest(transferReportUrl, jsonPostString, APPLICATION_JSON), 400);
+        
+        // get record folder to file into
+        NodeRef destination = TestUtilities.getRecordFolder(searchService, "Civilian Files", 
+                    "Foreign Employee Award Files", "Christian Bohr");
+        assertNotNull(destination);
+        
+        // Store the full audit log as a record
+        jsonPostData = new JSONObject();
+        jsonPostData.put("destination", destination);
+        jsonPostString = jsonPostData.toString();
+        rsp = sendRequest(new PostRequest(transferReportUrl, jsonPostString, APPLICATION_JSON), 200);
+        
+        // check the response
+        System.out.println(rsp.getContentAsString());
+        jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        assertTrue(jsonRsp.has("success"));
+        assertTrue(jsonRsp.getBoolean("success"));
+        assertTrue(jsonRsp.has("record"));
+        assertNotNull(jsonRsp.get("record"));
+        assertTrue(nodeService.exists(new NodeRef(jsonRsp.getString("record"))));
+        assertTrue(jsonRsp.has("recordName"));
+        assertNotNull(jsonRsp.get("recordName"));
+        assertTrue(jsonRsp.getString("recordName").startsWith("report_"));
     }
     
     public void testAudit() throws IOException, JSONException

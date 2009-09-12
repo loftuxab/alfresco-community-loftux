@@ -33,7 +33,6 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -42,6 +41,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.util.TempFileProvider;
+import org.alfresco.web.scripts.Cache;
+import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.WebScriptResponse;
 import org.apache.commons.logging.Log;
@@ -84,8 +85,9 @@ public class TransferReportGet extends BaseTransferWebScript
     }
     
     @Override
-    protected File executeTransfer(WebScriptRequest req, WebScriptResponse res,
-                NodeRef[] itemsToTransfer) throws IOException
+    protected File executeTransfer(NodeRef[] itemsToTransfer,
+                WebScriptRequest req, WebScriptResponse res, 
+                Status status, Cache cache) throws IOException
     {
         // generate the report (will be in JSON format)
         File report = generateTransferReport(itemsToTransfer);
@@ -97,6 +99,13 @@ public class TransferReportGet extends BaseTransferWebScript
         return report;
     }
     
+    /**
+     * Generates a File containing the JSON representation of a transfer report.
+     * 
+     * @param itemsToTransfer Array of NodeRefs being transferred
+     * @return File containing JSON representation of a transfer report
+     * @throws IOException
+     */
     File generateTransferReport(NodeRef[] itemsToTransfer) throws IOException
     {
         File report = TempFileProvider.createTempFile(REPORT_FILE_PREFIX, REPORT_FILE_SUFFIX);
@@ -152,6 +161,13 @@ public class TransferReportGet extends BaseTransferWebScript
         return report;
     }
     
+    /**
+     * Generates the JSON to represent the given NodeRefs
+     * 
+     * @param writer Writer to write to
+     * @param itemsToTransfer NodeRefs being transferred
+     * @throws IOException
+     */
     protected void generateTransferItemsJSON(Writer writer, NodeRef[] itemsToTransfer)
         throws IOException
     {
@@ -167,29 +183,30 @@ public class TransferReportGet extends BaseTransferWebScript
                 writer.write(",");
             }
             
-            writer.write("\n");
-            if (nodeService.hasAspect(item, RecordsManagementModel.ASPECT_RECORD))
-            {
-                generateTransferRecordJSON(writer, item);
-            }
-            else if (ddService.isSubClass(nodeService.getType(item), ContentModel.TYPE_FOLDER))
+            if (ddService.isSubClass(nodeService.getType(item), ContentModel.TYPE_FOLDER))
             {
                 generateTransferFolderJSON(writer, item);
             }
             else
             {
-                // ignore anything other than records and container nodes
-                continue;
+                generateTransferRecordJSON(writer, item);
             }
         }
     }
     
+    /**
+     * Generates the JSON to represent the given folder.
+     * 
+     * @param writer Writer to write to
+     * @param folderNode Folder being transferred
+     * @throws IOException
+     */
     protected void generateTransferFolderJSON(Writer writer, NodeRef folderNode)
         throws IOException
     {
         // TODO: Add identation
         
-        writer.write("{\n\"type\":\"folder\",\n");
+        writer.write("\n{\n\"type\":\"folder\",\n");
         writer.write("\"name\":\"");
         writer.write((String)nodeService.getProperty(folderNode, ContentModel.PROP_NAME));
         writer.write("\",\n\"nodeRef\":\"");
@@ -211,28 +228,30 @@ public class TransferReportGet extends BaseTransferWebScript
             }
             
             NodeRef childRef = child.getChildRef();
-            if (nodeService.hasAspect(childRef, RecordsManagementModel.ASPECT_RECORD))
-            {
-                generateTransferRecordJSON(writer, childRef);
-            }
-            else if (ddService.isSubClass(nodeService.getType(childRef), ContentModel.TYPE_FOLDER))
+            if (ddService.isSubClass(nodeService.getType(childRef), ContentModel.TYPE_FOLDER))
             {
                 generateTransferFolderJSON(writer, childRef);
             }
             else
             {
-                // ignore anything other than records and container nodes
-                continue;
+                generateTransferRecordJSON(writer, childRef);
             }
         }
         
         writer.write("\n]\n}");
     }
     
+    /**
+     * Generates the JSON to represent the given record.
+     * 
+     * @param writer Writer to write to
+     * @param recordNode Record being transferred
+     * @throws IOException
+     */
     protected void generateTransferRecordJSON(Writer writer, NodeRef recordNode)
         throws IOException
     {
-        writer.write("{\n\"type\":\"record\",\n");
+        writer.write("\n{\n\"type\":\"record\",\n");
         writer.write("\"name\":\"");
         writer.write((String)nodeService.getProperty(recordNode, ContentModel.PROP_NAME));
         writer.write("\",\n\"nodeRef\":\"");

@@ -125,7 +125,7 @@ public abstract class BaseTransferWebScript extends StreamACP
             NodeRef[] itemsToTransfer = getTransferNodes(transferNode);
             
             // execute the transfer operation
-            tempFile = executeTransfer(req, res, itemsToTransfer);
+            tempFile = executeTransfer(itemsToTransfer, req, res, status, cache);
         }
         catch (Throwable e)
         {
@@ -144,10 +144,29 @@ public abstract class BaseTransferWebScript extends StreamACP
         }
     }
     
-    protected abstract File executeTransfer(WebScriptRequest req, WebScriptResponse res, 
-                NodeRef[] itemsToTransfer) throws IOException;
+    /**
+     * Abstract method subclasses implement to perform the actual logic required.
+     * 
+     * @param itemsToTransfer Array of NodeRefs to transfer
+     * @param req The request
+     * @param res The response
+     * @param status Status object
+     * @param cache Cache object
+     * @return File object representing the file containing the JSON of the report
+     * @throws IOException
+     */
+    protected abstract File executeTransfer(NodeRef[] itemsToTransfer,
+                WebScriptRequest req, WebScriptResponse res, 
+                Status status, Cache cache) throws IOException;
     
-    
+    /**
+     * Finds a transfer object with the given id in the given file plan.
+     * This method returns null if a transfer with the given id is not found.
+     * 
+     * @param filePlan The file plan to search
+     * @param transferId The id of the transfer being requested
+     * @return The transfer node or null if not found
+     */
     protected NodeRef findTransferNode(NodeRef filePlan, String transferId)
     {
         NodeRef transferNode = null;
@@ -167,6 +186,12 @@ public abstract class BaseTransferWebScript extends StreamACP
         return transferNode;
     }
     
+    /**
+     * Returns an array of NodeRefs representing the items to be transferred.
+     * 
+     * @param transferNode The transfer object
+     * @return Array of NodeRefs
+     */
     protected NodeRef[] getTransferNodes(NodeRef transferNode)
     {
         List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(transferNode, 
