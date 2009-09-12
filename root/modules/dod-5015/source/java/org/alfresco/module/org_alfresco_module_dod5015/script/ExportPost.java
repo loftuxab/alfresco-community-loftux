@@ -134,10 +134,10 @@ public class ExportPost extends StreamACP
            // try and delete the temporary file
            if (tempACPFile != null)
            {
-               tempACPFile.delete();
-               
                if (logger.isDebugEnabled())
-                   logger.debug("Deleted temporary archive: " + tempACPFile.getAbsolutePath());
+                   logger.debug("Deleting temporary archive: " + tempACPFile.getAbsolutePath());
+               
+               tempACPFile.delete();
            }
         }
     }

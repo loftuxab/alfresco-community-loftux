@@ -136,10 +136,10 @@ public abstract class BaseTransferWebScript extends StreamACP
            // try and delete the temporary file
            if (tempFile != null)
            {
-               tempFile.delete();
-               
                if (logger.isDebugEnabled())
-                   logger.debug("Deleted temporary file: " + tempFile.getAbsolutePath());
+                   logger.debug("Deleting temporary file: " + tempFile.getAbsolutePath());
+               
+               tempFile.delete();
            }
         }
     }
