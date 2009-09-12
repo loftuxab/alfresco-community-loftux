@@ -66,6 +66,7 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
 
     protected static final String AUDIT_TRAIL_FILE_PREFIX = "audit_";
     protected static final String AUDIT_TRAIL_FILE_SUFFIX = ".json";
+    protected static final String FILE_ACTION = "file";
         
     private NodeService nodeService;
     private ContentService contentService;
@@ -427,17 +428,17 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
             writer.putContent(auditTrail);
             
             // file the node as a record
-            this.rmActionService.executeRecordsManagementAction(record, "file");
+            this.rmActionService.executeRecordsManagementAction(record, FILE_ACTION);
         }
         finally
         {
-            auditTrail.delete();
-            
             if (logger.isDebugEnabled())
             {
-                logger.debug("Deleted temporary file holding audit trail: " + 
+                logger.debug("Deleting temporary file holding audit trail: " + 
                             auditTrail.getAbsolutePath());
             }
+            
+            auditTrail.delete();
         } 
         
         return record;
