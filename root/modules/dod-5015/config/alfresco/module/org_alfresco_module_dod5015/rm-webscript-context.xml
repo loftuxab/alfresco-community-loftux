@@ -160,6 +160,13 @@
        <property name="recordsManagementService" ref="RecordsManagementService"/>
     </bean>
     
+    <!-- REST impl for POST transfer report -->
+    <bean id="webscript.org.alfresco.rma.transferreport.post" class="org.alfresco.module.org_alfresco_module_dod5015.script.TransferReportPost" parent="rmBaseTransferWebscript">
+       <property name="dictionaryService" ref="DictionaryService"/>
+       <property name="recordsManagementService" ref="RecordsManagementService"/>
+       <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
+    </bean>
+    
     <!-- RM Role API-->
     
     <bean id="webscript.org.alfresco.rma.admin.rmrole.rmroles.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.admin.RmRolesGet" parent="webscript">
