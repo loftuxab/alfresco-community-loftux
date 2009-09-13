@@ -24,6 +24,11 @@ img.root=@@ALF_IMG@@
 swf.exe=@@ALF_SWF@@/pdf2swf
 
 #
+# Initial admin password
+#-------------
+alfresco_user_store.adminpassword=@@ADMIN_PWD@@
+
+#
 # MySQL connection
 #-------------
 #mysql#db.driver=org.gjt.mm.mysql.Driver
