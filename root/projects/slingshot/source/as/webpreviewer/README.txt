@@ -1,4 +1,4 @@
-ANOUT THIS FOLDER
+ABOUT THIS FOLDER
 =================
 
 This folder contains the source code for the WebPreviewer Flash/FLEX/Actionscript component 
