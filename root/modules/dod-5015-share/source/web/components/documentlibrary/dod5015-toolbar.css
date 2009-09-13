@@ -20,6 +20,12 @@
    background-image: url(images/export-disabled-16.png);
 }
 
+.toolbar .report button
+{
+   background: transparent url(images/file-report-16.png) no-repeat 12px 4px;
+   padding-left: 32px;
+}
+
 .toolbar .selected-items
 {
    float: left;

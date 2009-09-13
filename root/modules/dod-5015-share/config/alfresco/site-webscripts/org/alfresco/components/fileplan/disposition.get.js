@@ -8,7 +8,7 @@ function main()
    // Request the disposition actions
    var nodeRef = page.url.args.nodeRef.replace(":/", "");
 
-   // Call the repo to create the site
+   // Call the repo to get the disposition schedule
    var scriptRemoteConnector = remote.connect("alfresco");
    var repoResponse = scriptRemoteConnector.get("/api/node/" + nodeRef + "/dispositionschedule");
    if (repoResponse.status == 401)

@@ -1,5 +1,6 @@
+<#assign el=args.htmlid>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RecordsDocListToolbar("${args.htmlid}").setOptions(
+   new Alfresco.RecordsDocListToolbar("${el}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
       hideNavBar: ${(preferences.hideNavBar!false)?string}
@@ -7,29 +8,35 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="toolbar">
+<div id="${el}-body" class="toolbar">
 
-   <div id="${args.htmlid}-headerBar" class="header-bar flat-button theme-bg-2">
+   <div id="${el}-headerBar" class="header-bar flat-button theme-bg-2">
       <div class="left">
          <div class="hideable toolbar-hidden DocListTree">
-            <div class="new-folder"><button id="${args.htmlid}-newContainer-button" name="">${msg("button.new-series")}</button></div>
+            <div class="new-folder"><button id="${el}-newContainer-button" name="">${msg("button.new-series")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
          <div class="hideable toolbar-hidden DocListTree">
-            <div class="file-upload"><button id="${args.htmlid}-fileUpload-button" name="fileUpload">${msg("button.upload")}</button></div>
+            <div class="file-upload"><button id="${el}-fileUpload-button" name="fileUpload">${msg("button.upload")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
          <div class="hideable toolbar-hidden DocListTree">
-            <div class="import"><button id="${args.htmlid}-import-button" name="import">${msg("button.import")}</button></div>
+            <div class="import"><button id="${el}-import-button" name="import">${msg("button.import")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
          <div class="hideable toolbar-hidden DocListTree">
-            <div class="export-all"><button id="${args.htmlid}-exportAll-button" name="exportAll">${msg("button.export-all")}</button></div>
+            <div class="export-all"><button id="${el}-exportAll-button" name="exportAll">${msg("button.export-all")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
+         
+         <div class="hideable toolbar-hidden DocListTree">
+            <div class="report"><button id="${el}-report-button" name="report">${msg("button.report")}</button></div>
+            <div class="separator">&nbsp;</div>
+         </div>
+
          <div class="selected-items">
-            <button class="no-access-check" id="${args.htmlid}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}</button>
-            <div id="${args.htmlid}-selectedItems-menu" class="yuimenu">
+            <button class="no-access-check" id="${el}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}</button>
+            <div id="${el}-selectedItems-menu" class="yuimenu">
                <div class="bd">
                   <ul>
                   <#list actionSet as action>
@@ -43,26 +50,26 @@
          </div>
       </div>
       <div class="right">
-         <div class="customize" style="display: none;"><button id="${args.htmlid}-customize-button" name="customize">${msg("button.customize")}</button></div>
-         <div class="hide-navbar"><button id="${args.htmlid}-hideNavBar-button" name="hideNavBar">${msg("button.navbar.hide")}</button></div>
+         <div class="customize" style="display: none;"><button id="${el}-customize-button" name="customize">${msg("button.customize")}</button></div>
+         <div class="hide-navbar"><button id="${el}-hideNavBar-button" name="hideNavBar">${msg("button.navbar.hide")}</button></div>
       </div>
    </div>
 
-   <div id="${args.htmlid}-navBar" class="nav-bar flat-button theme-bg-4">
+   <div id="${el}-navBar" class="nav-bar flat-button theme-bg-4">
       <div class="hideable toolbar-hidden DocListTree">
-         <div class="folder-up"><button class="no-access-check" id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
+         <div class="folder-up"><button class="no-access-check" id="${el}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
          <div class="separator">&nbsp;</div>
       </div>
       <div class="hideable toolbar-hidden DocListFilePlan_transfers">
-         <div class="folder-up"><button class="no-access-check" id="${args.htmlid}-transfersFolderUp-button" name="transfersFolderUp">${msg("button.up")}</button></div>
+         <div class="folder-up"><button class="no-access-check" id="${el}-transfersFolderUp-button" name="transfersFolderUp">${msg("button.up")}</button></div>
          <div class="separator">&nbsp;</div>
       </div>
       <div class="hideable toolbar-hidden DocListFilePlan_holds">
-         <div class="folder-up"><button class="no-access-check" id="${args.htmlid}-holdsFolderUp-button" name="holdsFolderUp">${msg("button.up")}</button></div>
+         <div class="folder-up"><button class="no-access-check" id="${el}-holdsFolderUp-button" name="holdsFolderUp">${msg("button.up")}</button></div>
          <div class="separator">&nbsp;</div>
       </div>
-      <div id="${args.htmlid}-breadcrumb" class="breadcrumb hideable toolbar-hidden DocListTree"></div>
-      <div id="${args.htmlid}-description" class="description hideable toolbar-hidden DocListFilter TagFilter DocListSavedSearch DocListFilePlan"></div>
+      <div id="${el}-breadcrumb" class="breadcrumb hideable toolbar-hidden DocListTree"></div>
+      <div id="${el}-description" class="description hideable toolbar-hidden DocListFilter TagFilter DocListSavedSearch DocListFilePlan"></div>
    </div>
 
 </div>

@@ -47,7 +47,6 @@
    Alfresco.RecordsDocListToolbar = function(htmlId)
    {
       return Alfresco.RecordsDocListToolbar.superclass.constructor.call(this, htmlId);
-      this.filePlanNodeRef = null;
    };
    
    Alfresco.RecordsDocListToolbar.containerMap =
@@ -110,6 +109,14 @@
             disabled: true,
             value: "Create"
          });
+
+         // Report button
+
+         this.widgets.reportButton = Alfresco.util.createYUIButton(this, "report-button", this.onPrintReport,
+         {
+            disabled: true
+         });
+         
 
          // Export All button: only "read" access required
          this.widgets.exportAllButton = Alfresco.util.createYUIButton(this, "exportAll-button", this.onExportAll);
@@ -460,6 +467,21 @@
             ]
          };
          this.fileUpload.show(singleImportConfig);
+      },
+
+
+      /**
+       * Print Report button click handler
+       *
+       * @method onPrintReport
+       * @param e {object} DomEvent
+       * @param p_obj {object} Object passed back from addListener method
+       */
+      onPrintReport: function DLTB_onPrintReport(e, p_obj)
+      {
+         var parentNodeRef = this.modules.docList.doclistMetadata.parent;
+         var url = Alfresco.constants.URL_PAGECONTEXT + 'fileplanreport?nodeRef=' + parentNodeRef;
+         window.open(url, 'fileplanreport','width=550,height=650,scrollbars=yes,resizable=yes,toolbar=no,menubar=no');
       },
 
       /**
