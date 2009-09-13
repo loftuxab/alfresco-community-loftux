@@ -218,8 +218,7 @@ SetupType ::F6005EED-F116-409B-82E7-662D4A7065E8 -setup Install -active Yes -pla
 SetupType ::840E153B-F29E-4184-8941-3C26F456EB0D -setup Install -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows MacOS-X} -name Custom -parent SetupTypes
 
 InstallComponent 185DEE53-68ED-4921-9CA3-E480BE16988A -setup Install -type pane -title {Welcome Screen} -component Welcome -active Yes -parent StandardInstall
-InstallComponent D700B54B-CEAC-48E9-8AC8-94D982B73406 -setup Install -type pane -conditions {3FB18EB1-8713-42CF-AF1C-26756FA05D10 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B E4263D69-552B-472B-9E4B-0B6107059767 DB7D13C4-CEC7-4844-92E8-1B29E675F8D2 564F22DF-AD7C-4877-AC0B-9DB2EBF4F6EB} -title {Select Destination} -component SelectDestination -command insert -active Yes -parent StandardInstall
-Condition 3FB18EB1-8713-42CF-AF1C-26756FA05D10 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {Script Condition} -component ScriptCondition -TreeObject::id 3FB18EB1-8713-42CF-AF1C-26756FA05D10
+InstallComponent D700B54B-CEAC-48E9-8AC8-94D982B73406 -setup Install -type pane -conditions {9C2D555B-3A2C-4590-B66D-8D0C54B8B35B E4263D69-552B-472B-9E4B-0B6107059767 DB7D13C4-CEC7-4844-92E8-1B29E675F8D2 564F22DF-AD7C-4877-AC0B-9DB2EBF4F6EB} -title {Select Destination} -component SelectDestination -command reorder -active Yes -parent StandardInstall
 Condition 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Permission Condition} -component FilePermissionCondition -TreeObject::id 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B
 Condition E4263D69-552B-472B-9E4B-0B6107059767 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id E4263D69-552B-472B-9E4B-0B6107059767
 Condition DB7D13C4-CEC7-4844-92E8-1B29E675F8D2 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id DB7D13C4-CEC7-4844-92E8-1B29E675F8D2
@@ -411,12 +410,6 @@ InstallDir
 3AD5798F-A12B-4033-81BE-280FE617C152,Message,subst
 1
 
-3FB18EB1-8713-42CF-AF1C-26756FA05D10,Comment
-{Do not display this pane if this is an upgrade install unless there is more than one installation present}
-
-3FB18EB1-8713-42CF-AF1C-26756FA05D10,Script
-{!<%UpgradeInstall%> || <%PreviousInstallCount%> != 1}
-
 4961FB8A-BDAE-4264-9BFE-576BDE388928,Background
 white
 
@@ -446,6 +439,9 @@ ViewReadme
 
 564F22DF-AD7C-4877-AC0B-9DB2EBF4F6EB,CheckCondition
 {Before Next Pane is Displayed}
+
+564F22DF-AD7C-4877-AC0B-9DB2EBF4F6EB,FailureMessage
+{Unable to find Java}
 
 564F22DF-AD7C-4877-AC0B-9DB2EBF4F6EB,String
 <%JavaFound%>
@@ -793,7 +789,7 @@ D700B54B-CEAC-48E9-8AC8-94D982B73406,Caption,subst
 1
 
 D700B54B-CEAC-48E9-8AC8-94D982B73406,Conditions
-{5 conditions}
+{4 conditions}
 
 D700B54B-CEAC-48E9-8AC8-94D982B73406,DestinationLabel,subst
 0
@@ -812,6 +808,9 @@ D700B54B-CEAC-48E9-8AC8-94D982B73406,Title,subst
 
 D7C4D154-102D-4E69-BCE9-DE736306B3F2,Alias
 {Startup Actions}
+
+DB7D13C4-CEC7-4844-92E8-1B29E675F8D2,CheckCondition
+{Before Next Pane is Displayed}
 
 DB7D13C4-CEC7-4844-92E8-1B29E675F8D2,FailureMessage
 {Unable to locate Alfresco Share}
