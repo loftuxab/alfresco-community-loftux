@@ -2,14 +2,23 @@
 {
 	"data":
 	{
-		"customReferences":
+		"customReferencesFrom":
 		[
-			<#list customRefs as ref>
+			<#list customRefsFrom as ref>
 			{
-                <#assign keys = ref?keys>
-                <#list keys as key>"${key}": "${ref[key]}"<#if key_has_next>,</#if></#list>
+				<#assign keys = ref?keys>
+				<#list keys as key>"${key}": "${ref[key]}"<#if key_has_next>,</#if></#list>
 			}<#if ref_has_next>,</#if>
-    		</#list>
+			</#list>
+		],
+		"customReferencesTo":
+		[
+			<#list customRefsTo as ref>
+			{
+				<#assign keys = ref?keys>
+				<#list keys as key>"${key}": "${ref[key]}"<#if key_has_next>,</#if></#list>
+			}<#if ref_has_next>,</#if>
+			</#list>
 		]
 	}
 }

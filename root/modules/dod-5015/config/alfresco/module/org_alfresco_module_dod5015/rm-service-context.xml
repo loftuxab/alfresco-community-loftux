@@ -350,8 +350,10 @@
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.updateCustomAssocDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.updateCustomChildAssocDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomReferenceDefinitions=RM_ALLOW
-                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomReferencesFor=RM_ALLOW
-                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomChildReferencesFor=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomReferencesFrom=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomReferencesTo=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomChildReferences=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomParentReferences=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.addCustomReference=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.removeCustomReference=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService.getCustomConstraintDefinitions=RM_ALLOW

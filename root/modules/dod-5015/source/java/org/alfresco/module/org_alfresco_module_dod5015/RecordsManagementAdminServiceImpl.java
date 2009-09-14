@@ -541,18 +541,30 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 		invokeOnRemoveReference(fromNode, toNode, assocId);
 	}
 
-	public List<AssociationRef> getCustomReferencesFor(NodeRef node)
+	public List<AssociationRef> getCustomReferencesFrom(NodeRef node)
 	{
     	List<AssociationRef> retrievedAssocs = nodeService.getTargetAssocs(node, RegexQNamePattern.MATCH_ALL);
     	return retrievedAssocs;
 	}
 
-	public List<ChildAssociationRef> getCustomChildReferencesFor(NodeRef node)
+	public List<ChildAssociationRef> getCustomChildReferences(NodeRef node)
 	{
     	List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(node);
     	return childAssocs;
 	}
 	
+    public List<AssociationRef> getCustomReferencesTo(NodeRef node)
+    {
+        List<AssociationRef> retrievedAssocs = nodeService.getSourceAssocs(node, RegexQNamePattern.MATCH_ALL);
+        return retrievedAssocs;
+    }
+
+    public List<ChildAssociationRef> getCustomParentReferences(NodeRef node)
+    {
+        List<ChildAssociationRef> result = nodeService.getParentAssocs(node);
+        return result;
+    }
+
     public QName addCustomAssocDefinition(String label)
     {
         ParameterCheck.mandatoryString("label", label);

@@ -152,19 +152,37 @@ public interface RecordsManagementAdminService
     public Map<QName, AssociationDefinition> getCustomReferenceDefinitions();
     
     /**
-     * Returns a List of all associations <i>from</i> the given node.
+     * Fetches all associations <i>from</i> the given source.
      * 
      * @param node the node from which the associations start.
      * @return a List of associations.
      */
-    public List<AssociationRef> getCustomReferencesFor(NodeRef node);
+    public List<AssociationRef> getCustomReferencesFrom(NodeRef node);
     
     /**
+     * Fetches all child associations of the given source. i.e. all associations where the
+     * given node is the parent.
      * 
      * @param node
      * @return
      */
-    public List<ChildAssociationRef> getCustomChildReferencesFor(NodeRef node);
+    public List<ChildAssociationRef> getCustomChildReferences(NodeRef node);
+
+    /**
+     * Returns a List of all associations <i>to</i> the given node.
+     * 
+     * @param node the node to which the associations point.
+     * @return a List of associations.
+     */
+    public List<AssociationRef> getCustomReferencesTo(NodeRef node);
+    
+    /**
+     * Fetches all child associations where the given node is the child.
+     * 
+     * @param node
+     * @return
+     */
+    public List<ChildAssociationRef> getCustomParentReferences(NodeRef node);
     
     /**
      * This method adds the specified custom reference instance between the specified nodes.

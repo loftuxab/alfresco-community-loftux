@@ -57,7 +57,8 @@ public class CustomRefsGet extends AbstractRmWebScript
     private static final String CHILD_REF = "childRef";
     private static final String SOURCE_REF = "sourceRef";
     private static final String TARGET_REF = "targetRef";
-    private static final String CUSTOM_REFS = "customRefs";
+    private static final String CUSTOM_REFS_FROM = "customRefsFrom";
+    private static final String CUSTOM_REFS_TO = "customRefsTo";
     
     private static Log logger = LogFactory.getLog(CustomRefsGet.class);
     private RecordsManagementAdminService rmAdminService;
@@ -79,30 +80,47 @@ public class CustomRefsGet extends AbstractRmWebScript
             logger.debug("Getting custom reference instances for " + node);
         }
 
-    	List<Map<String, String>> listOfReferenceData = new ArrayList<Map<String, String>>();
-    	
-    	List<AssociationRef> assocs = this.rmAdminService.getCustomReferencesFor(node);
-    	for (AssociationRef assRef : assocs)
-    	{
-    		Map<String, String> data = new HashMap<String, String>();
-
-    		QName typeQName = assRef.getTypeQName();
-            AssociationDefinition assDef = rmAdminService.getCustomReferenceDefinitions().get(typeQName);
-            
-            if (assDef != null)
-            {
-                data.put(LABEL, assDef.getTitle());
-                data.put(REF_ID, typeQName.getLocalName());
-                data.put(REFERENCE_TYPE, CustomReferenceType.BIDIRECTIONAL.toString());
-                data.put(SOURCE_REF, assRef.getSourceRef().toString());
-                data.put(TARGET_REF, assRef.getTargetRef().toString());
-                
-                listOfReferenceData.add(data);
-            }
-        }
+        // All the references that come 'out' from this node.
+        List<Map<String, String>> listOfOutwardReferenceData = new ArrayList<Map<String, String>>();
         
-    	List<ChildAssociationRef> childAssocs = this.rmAdminService.getCustomChildReferencesFor(node);
-    	for (ChildAssociationRef childAssRef : childAssocs)
+        List<AssociationRef> assocsFromThisNode = this.rmAdminService.getCustomReferencesFrom(node);
+        addBidirectionalReferenceData(listOfOutwardReferenceData, assocsFromThisNode);
+        
+        List<ChildAssociationRef> childAssocs = this.rmAdminService.getCustomChildReferences(node);
+        addParentChildReferenceData(listOfOutwardReferenceData, childAssocs);
+        
+        // All the references that come 'in' to this node.
+        List<Map<String, String>> listOfInwardReferenceData = new ArrayList<Map<String, String>>();
+        
+        List<AssociationRef> toAssocs = this.rmAdminService.getCustomReferencesTo(node);
+        addBidirectionalReferenceData(listOfInwardReferenceData, toAssocs);
+        
+        List<ChildAssociationRef> parentAssocs = this.rmAdminService.getCustomParentReferences(node);
+        addParentChildReferenceData(listOfInwardReferenceData, parentAssocs);
+        
+    	if (logger.isDebugEnabled())
+    	{
+    		logger.debug("Retrieved custom reference instances: " + assocsFromThisNode);
+    	}
+    	
+        ftlModel.put(CUSTOM_REFS_FROM, listOfOutwardReferenceData);
+        ftlModel.put(CUSTOM_REFS_TO, listOfInwardReferenceData);
+
+        return ftlModel;
+    }
+
+    /**
+     * This method goes through the associationRefs specified and constructs a Map<String, String>
+     * for each assRef. FTL-relevant data are added to that map. The associationRefs must all be
+     * parent/child references.
+     * 
+     * @param listOfReferenceData
+     * @param assocs
+     */
+    private void addParentChildReferenceData(List<Map<String, String>> listOfReferenceData,
+            List<ChildAssociationRef> childAssocs)
+    {
+        for (ChildAssociationRef childAssRef : childAssocs)
     	{
     		Map<String, String> data = new HashMap<String, String>();
 
@@ -127,14 +145,36 @@ public class CustomRefsGet extends AbstractRmWebScript
                 listOfReferenceData.add(data);
             }
     	}
-    	
-    	if (logger.isDebugEnabled())
-    	{
-    		logger.debug("Retrieved custom reference instances: " + assocs);
-    	}
-    	
-    	ftlModel.put(CUSTOM_REFS, listOfReferenceData);
+    }
 
-        return ftlModel;
+    /**
+     * This method goes through the associationRefs specified and constructs a Map<String, String>
+     * for each assRef. FTL-relevant data are added to that map. The associationRefs must all be
+     * bidirectional references.
+     * 
+     * @param listOfReferenceData
+     * @param assocs
+     */
+    private void addBidirectionalReferenceData(List<Map<String, String>> listOfReferenceData,
+            List<AssociationRef> assocs)
+    {
+        for (AssociationRef assRef : assocs)
+    	{
+    		Map<String, String> data = new HashMap<String, String>();
+
+    		QName typeQName = assRef.getTypeQName();
+            AssociationDefinition assDef = rmAdminService.getCustomReferenceDefinitions().get(typeQName);
+            
+            if (assDef != null)
+            {
+                data.put(LABEL, assDef.getTitle());
+                data.put(REF_ID, typeQName.getLocalName());
+                data.put(REFERENCE_TYPE, CustomReferenceType.BIDIRECTIONAL.toString());
+                data.put(SOURCE_REF, assRef.getSourceRef().toString());
+                data.put(TARGET_REF, assRef.getTargetRef().toString());
+                
+                listOfReferenceData.add(data);
+            }
+        }
     }
 }
