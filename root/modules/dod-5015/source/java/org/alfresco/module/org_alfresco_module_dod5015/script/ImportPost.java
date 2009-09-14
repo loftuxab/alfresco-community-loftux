@@ -35,21 +35,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
 import org.alfresco.repo.exporter.ACPExportPackageHandler;
 import org.alfresco.repo.importer.ACPImportPackageHandler;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
-import org.alfresco.repo.tenant.TenantService;
-import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.util.TempFileProvider;
-import org.alfresco.web.app.Application;
-import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
@@ -60,7 +57,6 @@ import org.alfresco.web.scripts.servlet.FormData.FormField;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.jsf.FacesContextUtils;
 
 /**
  * Imports an ACP file into a records management container.
@@ -80,6 +76,8 @@ public class ImportPost extends DeclarativeWebScript
     protected NodeService nodeService;
     protected DictionaryService dictionaryService;
     protected ImporterService importerService;
+    protected RecordsManagementService rmService;
+    protected RecordsManagementSecurityService rmSecurityService;
     
     /**
      * @param nodeService
@@ -107,6 +105,26 @@ public class ImportPost extends DeclarativeWebScript
     public void setImporterService(ImporterService importerService) 
     {
         this.importerService = importerService;
+    }
+    
+    /**
+     * Sets the RecordsManagementSecurityService instance
+     * 
+     * @param rmSecurityService The RecordsManagementSecurityService instance
+     */
+    public void setRecordsManagementSecurityService(RecordsManagementSecurityService rmSecurityService)
+    {
+        this.rmSecurityService = rmSecurityService;
+    }
+    
+    /**
+     * Sets the RecordsManagementService instance
+     * 
+     * @param rmService The RecordsManagementService instance
+     */
+    public void setRecordsManagementService(RecordsManagementService rmService)
+    {
+        this.rmService = rmService;
     }
     
     @Override
@@ -140,6 +158,17 @@ public class ImportPost extends DeclarativeWebScript
             {
                 status.setCode(HttpServletResponse.SC_NOT_FOUND, 
                             "NodeRef '" + destination + "' does not exist.");
+            }
+            
+            // as there is no 'import capability' and the RM admin user is different from
+            // the DM admin user (meaning the webscript 'admin' authentication can't be used)
+            // perform a manual check here to ensure the current user has the RM admin role.
+            boolean isAdmin = this.rmSecurityService.hasRMAdminRole(
+                        this.rmService.getRecordsManagementRoot(destination), 
+                        AuthenticationUtil.getRunAsUser());
+            if (!isAdmin)
+            {
+                throw new WebScriptException(Status.STATUS_FORBIDDEN, "Access Denied");
             }
             
             File acpFile = null;

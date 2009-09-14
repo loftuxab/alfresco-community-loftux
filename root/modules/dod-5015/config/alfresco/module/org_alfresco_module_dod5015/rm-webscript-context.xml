@@ -139,6 +139,8 @@
         <property name="nodeService" ref="NodeService"/>
         <property name="dictionaryService" ref="DictionaryService"/>
         <property name="importerService" ref="ImporterService"/>
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
+        <property name="recordsManagementSecurityService" ref="RecordsManagementSecurityService"/>
     </bean>
     
     <!-- Base bean for transfer web scripts -->
