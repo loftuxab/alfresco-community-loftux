@@ -363,8 +363,8 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         if (refOfExistingConstraint != null)
         {
             targetProp.removeConstraintRef(refOfExistingConstraint);
-            targetProp.addConstraintRef(lovConstraintQNameAsString);
         }
+        targetProp.addConstraintRef(lovConstraintQNameAsString);
         
         writeCustomContentModel(deserializedModel);
         
