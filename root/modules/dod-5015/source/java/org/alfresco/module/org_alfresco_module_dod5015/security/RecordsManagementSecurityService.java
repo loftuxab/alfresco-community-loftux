@@ -117,6 +117,15 @@ public interface RecordsManagementSecurityService
     boolean existsRole(NodeRef rmRootNode, String role);
     
     /**
+     * Determines whether the given user has the RM Admin role
+     * 
+     * @param rmRootNode RM root node
+     * @param user Username to check
+     * @return true if the user has the RM Admin role, false otherwise
+     */
+    boolean hasRMAdminRole(NodeRef rmRootNode, String user);
+    
+    /**
      * Create a new role
      * 
      * @param rmRootNode

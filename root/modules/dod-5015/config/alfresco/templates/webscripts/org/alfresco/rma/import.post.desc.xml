@@ -11,7 +11,7 @@
   </description>
   <url>/api/rma/admin/import</url>
   <format default="json" />
-  <authentication>admin</authentication>
+  <authentication>user</authentication>
   <transaction>required</transaction>
   <lifecycle>internal</lifecycle>
 </webscript>

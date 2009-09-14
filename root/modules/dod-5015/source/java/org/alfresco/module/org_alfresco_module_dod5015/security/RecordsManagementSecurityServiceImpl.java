@@ -471,6 +471,29 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         }, AuthenticationUtil.getAdminUserName()).booleanValue();
     }
     
+    /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#hasRMAdminRole(org.alfresco.service.cmr.repository.NodeRef, java.lang.String)
+     */
+    public boolean hasRMAdminRole(NodeRef rmRootNode, String user)
+    {
+        boolean isRMAdmin = false;
+        
+        Set<Role> userRoles = this.getRolesByUser(rmRootNode, user);
+        if (userRoles != null)
+        {
+            for (Role role : userRoles)
+            {
+                if (role.getName().equals("Administrator"))
+                {
+                    isRMAdmin = true;
+                    break;
+                }
+            }
+        }
+        
+        return isRMAdmin;
+    }
+    
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#createRole(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.lang.String, java.util.Set)
      */
