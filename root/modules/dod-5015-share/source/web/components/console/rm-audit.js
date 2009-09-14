@@ -585,6 +585,7 @@
                         noEscape: true,
                         displayTime: 1
                      });
+                     window.location.reload();
                   }
                },
                scope: this
