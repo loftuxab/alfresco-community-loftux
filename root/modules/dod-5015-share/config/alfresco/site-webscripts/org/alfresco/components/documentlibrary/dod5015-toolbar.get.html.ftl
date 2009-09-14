@@ -20,8 +20,8 @@
             <div class="file-upload"><button id="${el}-fileUpload-button" name="fileUpload">${msg("button.upload")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
-         <div class="hideable toolbar-hidden DocListTree">
-            <div class="import"><button id="${el}-import-button" name="import">${msg("button.import")}</button></div>
+         <div id="${el}-import-section" class="toolbar-hidden">
+            <div class="import"><button id="${el}-import-button" name="import" class="no-access-check">${msg("button.import")}</button></div>
             <div class="separator">&nbsp;</div>
          </div>
          <div class="hideable toolbar-hidden DocListTree">
