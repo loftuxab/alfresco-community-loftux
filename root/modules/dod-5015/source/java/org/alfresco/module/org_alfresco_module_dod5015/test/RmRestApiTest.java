@@ -324,9 +324,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 //                                 jsonString, APPLICATION_JSON), expectedStatus);
     }
     
-    public void testPostCustomReferences() throws IOException, JSONException
+    public void testPostCustomReferenceDefinitions() throws IOException, JSONException
     {
-        postCustomReferences();
+        postCustomReferenceDefinitions();
     }
 
     /**
@@ -335,7 +335,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
      * 
      * @return String[] with element 0 = refId of p/c ref, 1 = refId pf bidi.
      */
-	private String[] postCustomReferences() throws JSONException, IOException,
+	private String[] postCustomReferenceDefinitions() throws JSONException, IOException,
 			UnsupportedEncodingException {
 	    String[] result = new String[2];
 		
@@ -347,6 +347,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         .endObject()
         .toString();
         
+//        System.out.println(jsonString);
+        
         // Submit the JSON request.
         final int expectedStatus = 200;
         Response rsp = sendRequest(new PostRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL,
@@ -354,6 +356,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         String rspContent = rsp.getContentAsString();
         assertTrue(rspContent.contains("success"));
+        
+//        System.out.println(rspContent);
 
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
         String generatedChildRefId = jsonRsp.getJSONObject("data").getString("refId");
@@ -366,18 +370,20 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         .endObject()
         .toString();
         
+//        System.out.println(jsonString);
+        
         // Submit the JSON request.
         rsp = sendRequest(new PostRequest(RMA_CUSTOM_REFS_DEFINITIONS_URL,
                                  jsonString, APPLICATION_JSON), expectedStatus);
         
         rspContent = rsp.getContentAsString();
         assertTrue(rspContent.contains("success"));
+        
 //        System.out.println(rspContent);
 
         jsonRsp = new JSONObject(new JSONTokener(rspContent));
         String generatedBidiRefId = jsonRsp.getJSONObject("data").getString("refId");
         result[1] = generatedBidiRefId;
-
 
         // Now assert that both have appeared in the data dictionary.
         AspectDefinition customAssocsAspect =
@@ -534,7 +540,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     public void testGetCustomReferences() throws IOException, JSONException
     {
         // Ensure that there is at least one custom reference.
-        postCustomReferences();
+        postCustomReferenceDefinitions();
 
         // GET all custom reference definitions
         final int expectedStatus = 200;
@@ -570,7 +576,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue("There should be exactly 1 custom references. Found " + customRefsObj.length(), customRefsObj.length() == 1);
     }
 
-    public void testGetAndDeleteCustomReferenceInstances() throws Exception
+    public void testGetPostAndRemoveCustomReferenceInstances() throws Exception
     {
     	// Create test records.
         NodeRef recordFolder = retrievePreexistingRecordFolder();
@@ -578,20 +584,29 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         NodeRef testRecord2 = createRecord(recordFolder, "testRecord2" + System.currentTimeMillis());
 
         String node1Url = testRecord1.toString().replace("://", "/");
-        String refInstancesUrl = MessageFormat.format(REF_INSTANCES_URL_FORMAT, node1Url);
+        String refInstancesRecord1Url = MessageFormat.format(REF_INSTANCES_URL_FORMAT, node1Url);
 
         // Create reference types.
-        String[] generatedRefIds = postCustomReferences();
+        String[] generatedRefIds = postCustomReferenceDefinitions();
 
+//        System.out.println("Posted custom reference definitions:");
+        for (String refId : generatedRefIds)
+        {
+//            System.out.println("refId: " + refId);
+        }
+        
         // Add a standard ref
         String jsonString = new JSONStringer().object()
             .key("toNode").value(testRecord2.toString())
             .key("refId").value(generatedRefIds[1])
         .endObject()
         .toString();
+
+//        System.out.println(jsonString);
     
-        Response rsp = sendRequest(new PostRequest(refInstancesUrl,
+        Response rsp = sendRequest(new PostRequest(refInstancesRecord1Url,
 	                             jsonString, APPLICATION_JSON), 200);
+
 //        System.out.println(rsp.getContentAsString());
 
 	    // Add a child ref
@@ -601,28 +616,69 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 	    .endObject()
 	    .toString();
 	    
-	    rsp = sendRequest(new PostRequest(refInstancesUrl,
+//	    System.out.println(jsonString);
+	    
+	    rsp = sendRequest(new PostRequest(refInstancesRecord1Url,
 	    		jsonString, APPLICATION_JSON), 200);
-//        System.out.println(rsp.getContentAsString());
+
+//	    System.out.println(rsp.getContentAsString());
 	    
 	    
         // Now retrieve the applied references from the REST API
-        rsp = sendRequest(new GetRequest(refInstancesUrl), 200);
+	    // 1. references on the 'from' record.
+        rsp = sendRequest(new GetRequest(refInstancesRecord1Url), 200);
 
-        JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
-//        System.out.println(jsonRsp);
+        String contentAsString = rsp.getContentAsString();
+//        System.out.println(contentAsString);
         
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(contentAsString));
+
         JSONObject dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
         
-        JSONArray customRefsArray = (JSONArray)dataObj.get("customReferences");
-        assertNotNull("JSON 'customReferences' object was null", customRefsArray);
+        JSONArray customRefsFromArray = (JSONArray)dataObj.get("customReferencesFrom");
+        assertNotNull("JSON 'customReferencesFrom' object was null", customRefsFromArray);
 
-//        for (int i = 0; i < customRefsArray.length(); i++) {
-//            System.out.println(customRefsArray.get(i));
-//        }
-        final int customRefsCount = customRefsArray.length();
-        assertTrue("There should be at least one custom reference. Found " + customRefsArray, customRefsCount > 0);
+        for (int i = 0; i < customRefsFromArray.length(); i++) {
+//            System.out.println(customRefsFromArray.get(i));
+        }
+        
+        int customRefsCount = customRefsFromArray.length();
+        assertTrue("There should be at least one custom reference. Found " + customRefsFromArray, customRefsCount > 0);
+        
+        JSONArray customRefsToArray = (JSONArray)dataObj.get("customReferencesTo");
+        assertNotNull("JSON 'customReferencesTo' object was null", customRefsToArray);
+        assertEquals("customReferencesTo wrong length.", 0, customRefsToArray.length());
+        
+        // 2. Back-references on the 'to' record
+        String node2Url = testRecord2.toString().replace("://", "/");
+        String refInstancesRecord2Url = MessageFormat.format(REF_INSTANCES_URL_FORMAT, node2Url);
+
+        rsp = sendRequest(new GetRequest(refInstancesRecord2Url), 200);
+
+        contentAsString = rsp.getContentAsString();
+//        System.out.println(contentAsString);
+        
+        jsonRsp = new JSONObject(new JSONTokener(contentAsString));
+
+        dataObj = (JSONObject)jsonRsp.get("data");
+        assertNotNull("JSON 'data' object was null", dataObj);
+        
+        customRefsToArray = (JSONArray)dataObj.get("customReferencesTo");
+        assertNotNull("JSON 'customReferencesTo' object was null", customRefsToArray);
+
+        for (int i = 0; i < customRefsToArray.length(); i++) {
+//            System.out.println(customRefsToArray.get(i));
+        }
+        
+        customRefsCount = customRefsToArray.length();
+        assertTrue("There should be at least one custom reference. Found " + customRefsToArray, customRefsCount > 0);
+        
+        customRefsFromArray = (JSONArray)dataObj.get("customReferencesFrom");
+        assertNotNull("JSON 'customReferencesFrom' object was null", customRefsFromArray);
+        assertEquals("customReferencesFrom wrong length.", 0, customRefsFromArray.length());
+
+
         
         // Now to delete a reference instance of each type
         String protocol = testRecord2.getStoreRef().getProtocol();
@@ -631,25 +687,25 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         final String queryFormat = "?st={0}&si={1}&id={2}";
         String urlQueryString = MessageFormat.format(queryFormat, protocol, identifier, recId);
 
-        rsp = sendRequest(new DeleteRequest(refInstancesUrl + "/" + generatedRefIds[1] + urlQueryString), 200);
+        rsp = sendRequest(new DeleteRequest(refInstancesRecord1Url + "/" + generatedRefIds[1] + urlQueryString), 200);
         assertTrue(rsp.getContentAsString().contains("success"));
 
-        rsp = sendRequest(new DeleteRequest(refInstancesUrl + "/"
+        rsp = sendRequest(new DeleteRequest(refInstancesRecord1Url + "/"
         		+ generatedRefIds[0]
         		+ urlQueryString), 200);
         assertTrue(rsp.getContentAsString().contains("success"));
         
         // Get the reference instances back and confirm they've been removed.
-        rsp = sendRequest(new GetRequest(refInstancesUrl), 200);
+        rsp = sendRequest(new GetRequest(refInstancesRecord1Url), 200);
 
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
         
-        customRefsArray = (JSONArray)dataObj.get("customReferences");
-        assertNotNull("JSON 'customReferences' object was null", customRefsArray);
-        assertTrue("customRefsArray was unexpectedly not empty.", customRefsArray.length() == 0);
+        customRefsFromArray = (JSONArray)dataObj.get("customReferencesFrom");
+        assertNotNull("JSON 'customReferences' object was null", customRefsFromArray);
+        assertTrue("customRefsArray was unexpectedly not empty.", customRefsFromArray.length() == 0);
     }
     
     public void testPostCustomPropertyDefinition() throws Exception
@@ -742,7 +798,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 
     public void testPutCustomReferenceDefinition() throws Exception
     {
-        String[] generatedRefIds = postCustomReferences();
+        String[] generatedRefIds = postCustomReferenceDefinitions();
         final String pcRefId = generatedRefIds[0];
         final String bidiRefId = generatedRefIds[1];
         
