@@ -33,6 +33,7 @@ function main()
             recordSeries.push(getRecordSeries(seriesNode));
          }
       }
+      recordSeries.sort(sortByName);
       model.recordSeries = recordSeries;
    }
    else if(node.type == "{http://www.alfresco.org/model/dod5015/1.0}recordSeries")
@@ -54,6 +55,18 @@ function main()
       recordFolders.push(getRecordFolder(node, "" + recordCategory.parent.name + "/" + recordCategory.name + "/"));
       model.recordFolders = recordFolders;
    }
+}
+
+/**
+ * Sort helper function for objects with names
+ *
+ * @method sortByName
+ * @param obj1
+ * @param obj2
+ */
+function sortByName(obj1, obj2)
+{
+   return (obj1.name > obj2.name) ? 1 : (obj1.name < obj2.name) ? -1 : 0;
 }
 
 /**
@@ -85,6 +98,7 @@ function getRecordSeries(seriesNode)
          recordCategories.push(getRecordCategory(categoryNode, "/" + seriesNode.name + "/"));
       }
    }
+   recordCategories.sort(sortByName);
    recordSerie.recordCategories = recordCategories;
 
    // Return Record Series
@@ -146,6 +160,7 @@ function getRecordCategory(categoryNode, parentPath)
    }
 
    // Add Record Category to the list
+   recordFolders.sort(sortByName);
    recordCategory.recordFolders = recordFolders;
    recordCategory.dispositionActions = dispositionActions;
    return recordCategory;
