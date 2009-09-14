@@ -546,7 +546,7 @@
        */
       onActionUndoCutoff: function RDLA_onActionUndoCutoff(assets)
       {
-         this._dod5015Action("message.undo-cutoff", assets, "undoCutoff");
+         this._dod5015Action("message.undo-cutoff", assets, "unCutoff");
       },
 
       /**
