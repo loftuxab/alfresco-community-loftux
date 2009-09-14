@@ -489,6 +489,46 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertEquals("Wrong property label.", updatedLabel, newPropObject.getString("label"));
         constraintRefsArray = newPropObject.getJSONArray("constraintRefs");
         assertEquals("ConstraintRefsArray wrong length.", 0, constraintRefsArray.length());
+        
+        // Finally PUT a constraint on a PropertyDefn that has been cleared of constraints.
+        // This was raised as an issue
+        final String readdedConstraint = "rmc:tlList";
+        jsonString = new JSONStringer().object()
+            .key("constraintRef").value(readdedConstraint)
+        .endObject()
+        .toString();
+    
+        propDefnUrl = "/api/rma/admin/custompropertydefinitions/" + propId;
+        rsp = sendRequest(new PutRequest(propDefnUrl,
+                                 jsonString, APPLICATION_JSON), 200);
+    
+        rspContent = rsp.getContentAsString();
+    
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+//        System.out.println("PUTting a constraint back again.");
+//        System.out.println(rspContent);
+    
+        // And GET from the URL again
+        rsp = sendRequest(new GetRequest(propDefnUrl), 200);
+        rspContent = rsp.getContentAsString();
+        
+//        System.out.println(rspContent);
+        
+        jsonRsp = new JSONObject(new JSONTokener(rspContent));
+        dataObject = jsonRsp.getJSONObject("data");
+        assertNotNull("JSON data object was null", dataObject);
+        customPropsObject = dataObject.getJSONObject("customProperties");
+        assertNotNull("JSON customProperties object was null", customPropsObject);
+        assertEquals("Wrong customProperties length.", 1, customPropsObject.length());
+
+        keyToSoleProp = customPropsObject.keys().next();
+        
+        newPropObject = customPropsObject.getJSONObject((String)keyToSoleProp);
+        assertEquals("Wrong property label.", updatedLabel, newPropObject.getString("label"));
+        constraintRefsArray = newPropObject.getJSONArray("constraintRefs");
+        assertEquals("ConstraintRefsArray wrong length.", 1, constraintRefsArray.length());
+        String readdedUpdatedTitle = constraintRefsArray.getJSONObject(0).getString("name");
+        assertEquals("Constraints had wrong name.", "rmc:tlList", readdedUpdatedTitle);
     }
 
     public void testGetCustomReferences() throws IOException, JSONException
