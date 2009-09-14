@@ -162,15 +162,25 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                 ContentModel.ASSOC_CONTAINS, 
                 new JavaBehaviour(this, "onCreateRecordFolder", NotificationFrequency.TRANSACTION_COMMIT));
         
+
         /**
          * Prevent content nodes being added to dod series and category.
          * Content can only be added to dod folders.
+         * 
+         * TODO still allows nodes to be created at top level since ACP import creates a temporary node 
+         * in the current folder rather than being in a temporary location.
          */
-        /*this.policyComponent.bindAssociationBehaviour(
-                    QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"),
-                    DOD5015Model.TYPE_RECORDS_MANAGEMENT_CONTAINER,
-                    ContentModel.ASSOC_CONTAINS,
-                    new JavaBehaviour(this, "onAddContentToContainer", NotificationFrequency.EVERY_EVENT));*/    
+        this.policyComponent.bindAssociationBehaviour(
+                    QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"), 
+                    DOD5015Model.TYPE_RECORD_SERIES, 
+                    ContentModel.ASSOC_CONTAINS, 
+                    new JavaBehaviour(this, "onAddContentToContainer", NotificationFrequency.EVERY_EVENT));
+
+        this.policyComponent.bindAssociationBehaviour(
+                    QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"), 
+                    DOD5015Model.TYPE_RECORD_CATEGORY, 
+                    ContentModel.ASSOC_CONTAINS, 
+                    new JavaBehaviour(this, "onAddContentToContainer", NotificationFrequency.EVERY_EVENT));
         
         // Register class behaviours.
         this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"),
