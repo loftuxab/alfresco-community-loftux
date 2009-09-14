@@ -41,6 +41,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
@@ -192,23 +193,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService);
 	    }
 	}
-
-    @Override
-    protected void onTearDownInTransaction() throws Exception
-    {
-//        try
-//        {
-//            UserTransaction txn = transactionService.getUserTransaction(false);
-//            txn.begin();
-//            this.nodeService.deleteNode(filePlan);
-//            txn.commit();
-//        }
-//        catch (Exception e)
-//        {
-//            // Nothing
-//            //System.out.println("DID NOT DELETE FILE PLAN!");
-//        }
-    }  
 
     /**
      * This test method creates a non-vital record and then moves it to a vital folder
@@ -1343,6 +1327,13 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             {
                 assertEquals(eventCount, events.size());
             }
+            
+            DispositionActionDefinition daDef = da.getDispositionActionDefinition();
+            assertNotNull(daDef);
+            Period period = daDef.getPeriod();
+            assertNotNull(period);
+            assertEquals(period.getPeriodType(), this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD));
+            assertEquals(period.getExpression(), this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD_EXPRESSION));
 	    }
         
         VitalRecordDefinition vrd = this.rmService.getVitalRecordDefinition(record);

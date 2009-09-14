@@ -767,7 +767,13 @@
             </property>              
             <property name="rma:recordSearchDispositionActionAsOf">
                <type>d:date</type>
-            </property>                          
+            </property>                
+            <property name="rma:recordSearchDispositionPeriod">
+               <type>d:text</type>
+            </property>                
+            <property name="rma:recordSearchDispositionPeriodExpression">
+               <type>d:text</type>
+            </property>                        
             <property name="rma:recordSearchDispositionEventsEligible">
                <type>d:boolean</type>
             </property>                          

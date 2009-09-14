@@ -59,6 +59,8 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
     public static final QName PROP_RS_DISPOSITION_EVENTS = QName.createQName(RM_URI, "recordSearchDispositionEvents");
     public static final QName PROP_RS_VITAL_RECORD_REVIEW_PERIOD = QName.createQName(RM_URI, "recordSearchVitalRecordReviewPeriod");
     public static final QName PROP_RS_VITAL_RECORD_REVIEW_PERIOD_EXPRESSION = QName.createQName(RM_URI, "recordSearchVitalRecordReviewPeriodExpression");
+    public static final QName PROP_RS_DISPOSITION_PERIOD = QName.createQName(RM_URI, "recordSearchDispositionPeriod");
+    public static final QName PROP_RS_DISPOSITION_PERIOD_EXPRESSION = QName.createQName(RM_URI, "recordSearchDispositionPeriodExpression");
     
     /** Policy component */
     private PolicyComponent policyComponent;
@@ -68,6 +70,9 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
     
     /**  Records management service */
     private RecordsManagementService recordsManagementService;
+    
+    /** Records management service registry */
+    private RecordsManagementServiceRegistry recordsManagementServiceRegistry;
 
     /**
      * @param nodeService the nodeService to set
@@ -85,11 +90,23 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
         this.policyComponent = policyComponent;
     }
     
+    /**
+     * @param recordsManagementService  the records management service
+     */
     public void setRecordsManagementService(RecordsManagementService recordsManagementService)
     {
         this.recordsManagementService = recordsManagementService;
     }
     
+    /**
+     * @param recordsManagementServiceRegistry  the records management service registry
+     */
+    public void setRecordsManagementServiceRegistry(RecordsManagementServiceRegistry recordsManagementServiceRegistry)
+    {
+        this.recordsManagementServiceRegistry = recordsManagementServiceRegistry;
+    }
+    
+    /** Java behaviour */
     private JavaBehaviour onAddSearchAspect = new JavaBehaviour(this, "rmSearchAspectAdd", NotificationFrequency.TRANSACTION_COMMIT);
     
     /**
@@ -116,8 +133,7 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
         this.policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"), 
                 ASPECT_RM_SEARCH, 
-                onAddSearchAspect);
-        
+                onAddSearchAspect);        
         
         // Vital Records Review Details Rollup
         this.policyComponent.bindClassBehaviour(
@@ -198,10 +214,28 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
      */
     private void updateDispositionActionProperties(NodeRef record, NodeRef dispositionAction)
     {
-        this.nodeService.setProperty(record, PROP_RS_DISPOSITION_ACTION_NAME, this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_ACTION));
-        this.nodeService.setProperty(record, PROP_RS_DISPOSITION_ACTION_AS_OF, this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_AS_OF));
-        this.nodeService.setProperty(record, PROP_RS_DISPOSITION_EVENTS_ELIGIBLE, this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_EVENTS_ELIGIBLE));
-       
+        Map<QName, Serializable> props = nodeService.getProperties(record);
+        
+        DispositionAction da = new DispositionActionImpl(recordsManagementServiceRegistry, dispositionAction);
+        
+        props.put(PROP_RS_DISPOSITION_ACTION_NAME, da.getName()); 
+        props.put(PROP_RS_DISPOSITION_ACTION_AS_OF, da.getAsOfDate()); 
+        props.put(PROP_RS_DISPOSITION_EVENTS_ELIGIBLE, this.nodeService.getProperty(dispositionAction, PROP_DISPOSITION_EVENTS_ELIGIBLE));
+        
+        DispositionActionDefinition daDefinition = da.getDispositionActionDefinition();        
+        Period period = daDefinition.getPeriod();
+        if (period != null)
+        {
+            props.put(PROP_RS_DISPOSITION_PERIOD, period.getPeriodType());
+            props.put(PROP_RS_DISPOSITION_PERIOD_EXPRESSION, period.getExpression());            
+        }
+        else
+        {
+            props.put(PROP_RS_DISPOSITION_PERIOD, null);
+            props.put(PROP_RS_DISPOSITION_PERIOD_EXPRESSION, null);
+        }
+        
+        nodeService.setProperties(record, props);       
     }
 
     public void eventExecutionUpdate(ChildAssociationRef childAssocRef, boolean isNewNode)
