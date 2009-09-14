@@ -328,6 +328,13 @@ var Evaluator =
             {
                permissions["download"] = true;
             }
+            
+            /* Undeclare Record */
+            if (asset.hasAspect("rma:cutOff") == false)
+            {
+               permissions["undeclare"] = true;
+            }
+            
             break;
 
 

@@ -7,7 +7,7 @@
          <action type="simple-link" id="onActionEditDetails" permission="EditDeclaredRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionReviewed" permission="CycleVitalRecords" label="actions.reviewed" />
          <action type="action-link" id="onActionEditReviewAsOf" permission="PlanningReviewCycles,reviewAsOf" label="actions.edit-review-as-of-date" />
-         <action type="action-link" id="onActionUndeclare" permission="UndeclareRecords" label="actions.undeclare" />
+         <action type="action-link" id="onActionUndeclare" permission="UndeclareRecords,undeclare" label="actions.undeclare" />
          <action type="action-link" id="onActionCutoff" permission="ApproveRecordsScheduledForCutoff,cutoff" label="actions.cutoff" />
          <action type="action-link" id="onActionUndoCutoff" permission="CreateModifyRecordsInCutoffFolders,undoCutoff" label="actions.undo-cutoff" />
          <action type="action-link" id="onActionDestroy" permission="DestroyRecordsScheduledForDestruction,destroy" label="actions.destroy" />
