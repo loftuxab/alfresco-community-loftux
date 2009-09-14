@@ -46,6 +46,7 @@
     */
    Alfresco.RecordsDocListToolbar = function(htmlId)
    {
+      YAHOO.Bubbling.on("userRMRoles", this.onUserRMRoles, this);
       return Alfresco.RecordsDocListToolbar.superclass.constructor.call(this, htmlId);
    };
    
@@ -106,8 +107,7 @@
          // Import button: user needs "Create" access
          this.widgets.importButton = Alfresco.util.createYUIButton(this, "import-button", this.onImport,
          {
-            disabled: true,
-            value: "Create"
+            disabled: true
          });
 
          // Report button
@@ -171,6 +171,24 @@
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
+
+         Alfresco.util.Ajax.jsonGet({
+            url: Alfresco.constants.PROXY_URI + "api/rma/admin/rmroles?user=" + Alfresco.constants.USERNAME,
+            successCallback:
+            {
+               fn: function(response){
+                  if (response.json && response.json.data)
+                  {                     
+                     // Fire event to inform any listening components that the users rmroles are available
+                     YAHOO.Bubbling.fire("userRMRoles",
+                     {
+                        roles: response.json.data
+                     });
+                  }                  
+               },
+               scope: this
+            }
+         });
       },
 
       /**
@@ -187,7 +205,28 @@
          var holdsFolderEnabled = (this.currentFilter.filterId == "holds" && this.currentFilter.filterData !== "");
          this.widgets.holdsFolderUp.set("disabled", !holdsFolderEnabled);
       },
-      
+
+
+      /**
+       * User RMRoles event handler
+       *
+       * @method onUserRMRoles
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onUserRMRoles: function DLTB_onUserRMRoles(layer, args)
+      {
+         var obj = args[1];
+         if (obj && obj.roles)
+         {
+            if(obj.roles.Administrator)
+            {
+               // Let RM Administrators do imports
+               Dom.removeClass(this.id + "-import-section", "toolbar-hidden");
+               this.widgets.importButton.set("disabled", false);
+            }
+         }
+      },
 
       /**
        * YUI WIDGET EVENT HANDLERS
