@@ -357,6 +357,10 @@
             eventListEl.appendChild(this._createEvent(i, action.events[i]));
          }
 
+         // Set id on description textarea so it later can be referenced for validation
+         var descriptionEl = Dom.getElementsByClassName("description", "textarea", actionEl)[0];
+         descriptionEl.setAttribute("id", elId + "-description");
+
          // Make sure enabling and disabling is correct
          this._disableEnablePeriodElements(periodUnitEl, periodAmountEl, periodActionEl);
 
@@ -396,7 +400,7 @@
 
          // Add validation
          actionForm.addValidation(elId + "-periodAmount", Alfresco.forms.validation.number, null, "keyup");
-         //actionForm.addValidation(elId + "-periodAmount", Alfresco.forms.validation.mandatory, null, "keyup");
+         actionForm.addValidation(elId + "-description", Alfresco.forms.validation.mandatory, null, "keyup");
          var periodEnabledCheckBox = Dom.getElementsByClassName("period-enabled", "input", actionEl)[0];
          Event.addListener(periodEnabledCheckBox, "click", function(e, obj)
          {
