@@ -152,9 +152,6 @@ Yes
 LaunchApplication
 Yes
 
-MYSQLPORT
-3306
-
 OOFiles
 <%InstallDir%>/OpenOfficeInstallFiles
 
@@ -3905,12 +3902,12 @@ InstallComponent A7CCD851-05EF-4236-8321-7766DF06A256 -setup Install -type actio
 InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -title {Delete File} -component DeleteFile -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D
 InstallComponent 7F2F989E-9F6C-4CAC-AFF2-A925549A20D2 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
-InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane -conditions {238C7BD9-0EDF-4953-BC37-C32F5C2D089D E95B44DE-53E1-4944-AEE6-C2D89CCA323B} -title {Connect MySQL} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane -conditions {238C7BD9-0EDF-4953-BC37-C32F5C2D089D E95B44DE-53E1-4944-AEE6-C2D89CCA323B} -title {Connect MySQL} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
 Condition 238C7BD9-0EDF-4953-BC37-C32F5C2D089D -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 238C7BD9-0EDF-4953-BC37-C32F5C2D089D
 Condition E95B44DE-53E1-4944-AEE6-C2D89CCA323B -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id E95B44DE-53E1-4944-AEE6-C2D89CCA323B
 InstallComponent 702B15CC-0F7B-4BF0-9498-7C1BE3A26C18 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE
 InstallComponent E230D053-6033-4990-B404-368AAA25BE36 -setup Install -type action -title {Create Checkbutton} -component AddWidget -command reorder -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE
-InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 3907E462-D52C-48BA-A959-7B629D58FF6F} -title {Check DB Port} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 3907E462-D52C-48BA-A959-7B629D58FF6F} -title {Check DB Port} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
 Condition 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8
 Condition 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Port Test Condition} -component PortTestCondition -TreeObject::id 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631
 Condition 3907E462-D52C-48BA-A959-7B629D58FF6F -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Port Test Condition} -component PortTestCondition -TreeObject::id 3907E462-D52C-48BA-A959-7B629D58FF6F
@@ -4108,7 +4105,7 @@ No
 <%InstallDir%>
 
 07D6DE98-FC0F-4F51-AE10-75314D0B4651,FileSize
-890599
+890672
 
 07D6DE98-FC0F-4F51-AE10-75314D0B4651,Name
 SPP
@@ -4419,7 +4416,7 @@ false
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-25898366
+26002992
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -4720,7 +4717,7 @@ Yes
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-117107251
+117338434
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
