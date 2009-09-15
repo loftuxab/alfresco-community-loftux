@@ -1001,15 +1001,16 @@
        */
       onCreateActionButtonClick: function DispositionEdit_onCreateActionButtonClick(e, obj)
       {
+         var noOfActions = Dom.getElementsByClassName("action", "li", this.widgets.actionListEl).length;
          var action =
          {
             id: "",
-            index: Dom.getElementsByClassName("action", "li", this.widgets.actionListEl).length,
+            index: noOfActions,
             title: this.msg("label.title.new"),
             name: "",
             type: "",
             period : null,
-            periodProperty: null,
+            periodProperty: (noOfActions == 0 ? "rma:dateFiled": "rma:cutOffDate"),
             description: "",
             eligibleOnFirstCompleteEvent: true,
             events: []
