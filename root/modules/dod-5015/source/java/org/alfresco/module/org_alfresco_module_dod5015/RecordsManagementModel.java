@@ -103,6 +103,7 @@ public interface RecordsManagementModel extends RecordsManagementCustomModel
     // Record component identifier aspect
     public static QName ASPECT_RECORD_COMPONENT_ID = QName.createQName(RM_URI, "recordComponentIdentifier");
     public static QName PROP_IDENTIFIER = QName.createQName(RM_URI, "identifier");
+    public static QName PROP_DB_UNIQUENESS_ID = QName.createQName(RM_URI, "dbUniquenessId");
     
     // Vital record definition aspect
     public static QName ASPECT_VITAL_RECORD_DEFINITION = QName.createQName(RM_URI, "vitalRecordDefinition");

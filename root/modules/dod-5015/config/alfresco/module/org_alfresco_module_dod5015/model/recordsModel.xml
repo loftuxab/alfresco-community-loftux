@@ -471,6 +471,12 @@
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
+            <property name="rma:dbUniquenessId">
+               <title>Database uniqueness id</title>
+               <type>d:text</type>
+               <protected>true</protected>
+               <mandatory>false</mandatory>
+            </property>
          </properties>
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
@@ -759,9 +765,13 @@
 
 
       <!-- Aspect to facilitate search -->
-      <aspect name="rma:recordSearch">
-         <title>Record Search</title>
-         <properties>
+      <aspect name="rma:recordSearch">      
+         <title>Record Search</title>               
+         <properties>                           
+            <property name="rma:recordSearchHasDispositionSchedule">
+               <type>d:boolean</type>
+               <default>false</default>
+            </property>               
             <property name="rma:recordSearchDispositionActionName">
                <type>d:text</type>
             </property>
