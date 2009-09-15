@@ -381,7 +381,7 @@
                metadata = oRecord.getData("metadata") || {},
                avatarUrl = Alfresco.constants.URL_CONTEXT + "components/images/" + (authType == "USER" ? "no-user-photo-64.png" : "group-64.png");
 
-            if (metadata.avatar !== undefined)
+            if (metadata.avatar && metadata.avatar.length !== 0)
             {
                avatarUrl = Alfresco.constants.PROXY_URI + metadata.avatar + "?c=queue&ph=true";
             }
