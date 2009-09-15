@@ -576,6 +576,25 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue("There should be exactly 1 custom references. Found " + customRefsObj.length(), customRefsObj.length() == 1);
     }
 
+    public void testGetDodCustomTypes() throws IOException, JSONException
+    {
+        final int expectedStatus = 200;
+        Response rsp = sendRequest(new GetRequest("/api/rma/admin/dodcustomtypes"), expectedStatus);
+
+        String rspContent = rsp.getContentAsString();
+        JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+
+        // System.out.println(rspContent);
+        
+        JSONObject dataObj = (JSONObject)jsonRsp.get("data");
+        assertNotNull("JSON 'data' object was null", dataObj);
+        
+        JSONArray customTypesObj = (JSONArray)dataObj.get("dodCustomTypes");
+        assertNotNull("JSON 'dodCustomTypes' object was null", customTypesObj);
+        
+        assertEquals("Wrong DOD custom types count.", 4, customTypesObj.length());
+    }
+
     public void testGetPostAndRemoveCustomReferenceInstances() throws Exception
     {
     	// Create test records.

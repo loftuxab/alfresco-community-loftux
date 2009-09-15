@@ -15,6 +15,11 @@
         <property name="recordsManagementService" ref="RecordsManagementService"/>
     </bean>
 
+    <!-- REST impl for GET DOD Custom Types -->
+    <bean id="webscript.org.alfresco.rma.dodcustomtypes.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.DodCustomTypesGet" parent="webscript">
+        <property name="dictionaryService" ref="DictionaryService"/>
+    </bean>
+
     <!-- REST impl for GET Custom Property Definitions -->
     <bean id="webscript.org.alfresco.rma.custompropdefinitions.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.CustomPropertyDefinitionsGet" parent="webscript">
         <property name="recordsManagementAdminService" ref="RecordsManagementAdminService"/>
