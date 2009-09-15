@@ -178,7 +178,12 @@
          DS.responseType = YAHOO.util.DataSource.TYPE_JSON;
          DS.responseSchema = {
             resultsList:'data.entries',
-            fields: ["timestamp","fullName","userRole","event"]
+            fields: ["timestamp","fullName","userRole","event"],
+            metaFields: {
+               "enabled": "data.enabled",
+               "stopDate": "data.stopped",
+               "startDate": "data.started"
+            }
          };
 
          //date cell formatter
@@ -203,7 +208,7 @@
             }
          );
          //so we can update caption to list number of results
-         this.widgets['auditDataSource'].subscribe('responseParseEvent', this.updateCaption, this, true);
+         this.widgets['auditDataSource'].subscribe('responseParseEvent', this.updateUI, this, true);
 
          this.widgets['status-date'] = Dom.get(this.id+'-status-date');
 
@@ -680,11 +685,19 @@
          this.widgets['auditDataTable'].getDataSource().sendRequest(q, oCallback);
       },
       
-      updateCaption : function RM_updateCaption(o)
+      updateUI : function RM_updateCaption(o)
       {
-         var numResults = o.response.results.length;
-         this.widgets['auditDataTable']._elCaption.innerHTML = this.msg('label.pagination', numResults);
-         
+         var response = o.response;
+         this.options.enabled = response.meta.enabled;
+         this.options.startDate = response.meta.startDate;
+         this.options.stopDate = response.meta.stopDate;
+         if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
+         {
+            this.toggleUI();
+         }
+
+         //update caption
+         this.widgets['auditDataTable']._elCaption.innerHTML = this.msg('label.pagination', response.results.length); 
       }
    });
 })();
