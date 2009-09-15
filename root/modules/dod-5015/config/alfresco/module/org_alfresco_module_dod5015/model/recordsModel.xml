@@ -9,7 +9,7 @@
    <description>Records Management Model</description>
    <author>Roy Wetherall</author>
    <version>1.0</version>
-   
+
    <!-- Imports are required to allow references to definitions in other models -->
    <imports>
       <!-- Import Alfresco Dictionary Definitions -->
@@ -19,14 +19,14 @@
       <!-- Import Alfresco Content Domain Model Definitions -->
       <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys" />
    </imports>
-   
+
    <!-- Records Management Namespace -->
    <namespaces>
       <namespace uri="http://www.alfresco.org/model/recordsmanagement/1.0" prefix="rma"/>
    </namespaces>
-   
+
    <types>
-      
+
       <!-- Caveat config - allowed values for users/groups for supplemental markings and/or user-defined fields -->
       <type name="rma:caveatConfig">
          <title>Caveat Config</title>
@@ -36,7 +36,7 @@
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
       </type>
-      
+
       <type name="rma:emailConfig">
          <title>Email Config</title>
          <parent>cm:content</parent>
@@ -44,50 +44,50 @@
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
       </type>
-      
-      <!-- Records management container type -->      
+
+      <!-- Records management container type -->
       <type name="rma:recordsManagementContainer">
          <title>Records Managment Container</title>
          <parent>cm:folder</parent>
          <archive>false</archive>
-         
+
          <mandatory-aspects>
             <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
 
-      </type>       
-      
+      </type>
+
       <type name="rma:dispositionSchedule">
-        <title>Disposition Schedule</title>        
+        <title>Disposition Schedule</title>
         <parent>cm:cmobject</parent>
-        
+
         <properties>
-                        
+
             <property name="rma:dispositionAuthority">
                <title>Disposition Authority</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
-            
+
             <property name="rma:dispositionInstructions">
                <title>Disposition Instructions</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
-            
+
             <property name="rma:recordLevelDisposition">
                <title>Record Level Disposition</title>
                <type>d:boolean</type>
                <mandatory>true</mandatory>
                <default>false</default>
             </property>
-    
+
          </properties>
-         
+
          <associations>
-            
+
             <child-association name="rma:dispositionActionDefinitions">
                 <title>Disposition Actions</title>
                 <source>
@@ -100,56 +100,56 @@
                     <many>true</many>
                 </target>
             </child-association>
-         
+
          </associations>
 
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
       </type>
-            
+
       <type name="rma:dispositionActionDefinition">
-         
+
          <title>Disposition Action Definition</title>
          <parent>cm:cmobject</parent>
-         
+
          <properties>
-            
+
             <property name="rma:dispositionActionName">
                <title>Disposition Action Name</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
-            
+
             <property name="rma:dispositionDescription">
                 <title>Disposition Description</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
             </property>
-            
+
             <property name="rma:dispositionLocation">
                 <title>Disposition Location</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
             </property>
-            
+
             <property name="rma:dispositionPeriod">
                <title>Disposition Period</title>
                <type>d:period</type>
                <mandatory>false</mandatory>
                <default>none|0</default>
-            </property> 
-            
+            </property>
+
             <property name="rma:dispositionPeriodProperty">
                <title>Disposition Period Property</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property>       
-                                                      
+            </property>
+
             <property name="rma:dispositionEvent">
                <title>Disposition Event</title>
-               <type>d:text</type>               
-               <multiple>true</multiple>              
+               <type>d:text</type>
+               <multiple>true</multiple>
             </property>
 
             <property name="rma:dispositionEventCombination">
@@ -158,24 +158,24 @@
                <mandatory>true</mandatory>
                <default>or</default>
             </property>
-            
-         </properties>       
+
+         </properties>
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
       </type>
-      
+
       <type name="rma:recordFolder">
-         
+
          <title>Record Folder</title>
          <parent>cm:folder</parent>
          <archive>false</archive>
-         
+
          <properties>
-                    
+
             <!-- cm:name used for the Folder Identifier -->
-            <!-- cm:title used for the Folder Name -->                                      
-                                                     
+            <!-- cm:title used for the Folder Name -->
+
             <property name="rma:isClosed">
                <title>Record Folder Closed</title>
                <description>Indicates whether the folder is closed</description>
@@ -184,77 +184,77 @@
                <mandatory>true</mandatory>
                <default>false</default>
             </property>
-            
-         </properties>       
-         
-         <mandatory-aspects>         
+
+         </properties>
+
+         <mandatory-aspects>
             <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
             <aspect>rma:commonRecordDetails</aspect>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
-         
+
       </type>
-            
+
       <type name="rma:nonElectronicDocument">
-         
+
          <title>Non-Electronic Document</title>
          <parent>cm:content</parent>
-         <archive>false</archive>           
+         <archive>false</archive>
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
       </type>
-      
+
       <type name="rma:dispositionAction">
-         <title>Disposition Action</title>  
-         <parent>cm:cmobject</parent>       
-         <properties>            
+         <title>Disposition Action</title>
+         <parent>cm:cmobject</parent>
+         <properties>
             <property name="rma:dispositionActionId">
                <title>Disposition Action Id</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
-            </property>    
+            </property>
             <property name="rma:dispositionAction">
-               <title>Disposition Action</title> 
+               <title>Disposition Action</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
-            </property>              
+            </property>
             <property name="rma:dispositionAsOf">
                <title>Disposition Action Date</title>
                <type>d:date</type>
                <mandatory>false</mandatory>
-            </property>               
+            </property>
             <property name="rma:dispositionEventsEligible">
                <title>Disposition Events Eligible</title>
                <type>d:boolean</type>
                <default>false</default>
-            </property>             
+            </property>
             <property name="rma:dispositionActionStartedAt">
                <title>Disposition Action Started At</title>
                <type>d:date</type>
                <mandatory>false</mandatory>
-            </property>              
+            </property>
             <property name="rma:dispositionActionStartedBy">
                <title>Disposition Action Started By</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property>              
+            </property>
             <property name="rma:dispositionActionCompletedAt">
                <title>Disposition Action Completed At</title>
                <type>d:date</type>
                <mandatory>false</mandatory>
-            </property>              
+            </property>
             <property name="rma:dispositionActionCompletedBy">
                <title>Disposition Action Copmleted By</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
-            </property> 
-                        
+            </property>
+
          </properties>
-         
+
          <associations>
-            
+
             <child-association name="rma:eventExecutions">
                 <title>Event executions</title>
                 <source>
@@ -267,23 +267,23 @@
                     <many>true</many>
                 </target>
             </child-association>
-         
+
          </associations>
-          
+
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
-         
+
       </type>
-      
+
       <type name="rma:eventExecution">
-      
+
          <title>Event Execution</title>
          <description>Execution details of an event</description>
          <parent>cm:cmobject</parent>
-         
+
          <properties>
-         
+
             <property name="rma:eventExecutionName">
                <title>Event Name</title>
                <type>d:text</type>
@@ -309,33 +309,33 @@
                <title>Event completed at</title>
                <type>d:date</type>
                <mandatory>false</mandatory>
-            </property>         
-         
+            </property>
+
          </properties>
-         
+
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
       </type>
-    
-      
+
+
       <type name="rma:hold">
          <title>Hold</title>
          <parent>cm:folder</parent>
          <archive>false</archive>
-         
+
          <properties>
-         
+
             <property name="rma:holdReason">
                <title>Hold Reason</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
-         
+
          </properties>
-         
+
          <associations>
-            
+
             <child-association name="rma:frozenRecords">
                 <title>Frozen Records</title>
                 <source>
@@ -348,34 +348,34 @@
                     <many>true</many>
                 </target>
             </child-association>
-         
+
          </associations>
-         
+
          <mandatory-aspects>
             <aspect>cm:titled</aspect>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
 
-      </type>  
-      
+      </type>
+
       <type name="rma:transfer">
          <title>Transfer</title>
          <parent>cm:folder</parent>
          <archive>false</archive>
-  
+
          <properties>
-         
+
             <property name="rma:transferAccessionIndicator">
                <title>Transfer Accession Indicator</title>
                <type>d:boolean</type>
                <mandatory>true</mandatory>
                <default>true</default>
             </property>
-         
+
          </properties>
-         
+
          <associations>
-            
+
             <child-association name="rma:transferred">
                 <title>Transferred</title>
                 <source>
@@ -388,31 +388,31 @@
                     <many>true</many>
                 </target>
             </child-association>
-         
+
          </associations>
-         
+
          <mandatory-aspects>
             <aspect>cm:titled</aspect>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
 
       </type>
-    
+
    </types>
-   
+
    <aspects>
-   
+
 	  <!-- rma:filePlanComponent is a marker interface for all things RM -->
       <!-- Security uses it as a key to determine which implementation to use -->
-       
+
       <aspect name="rma:filePlanComponent">
           <title>File Plan Component</title>
-      </aspect>  
-      
+      </aspect>
+
       <aspect name="rma:recordsManagementRoot">
-        <title>Records Management Root</title>         
+        <title>Records Management Root</title>
          <associations>
-            
+
             <child-association name="rma:holds">
                 <title>Holds</title>
                 <source>
@@ -425,8 +425,8 @@
                     <many>true</many>
                 </target>
             </child-association>
-            
-             
+
+
             <child-association name="rma:transfers">
                 <title>Transfers</title>
                 <source>
@@ -439,13 +439,13 @@
                     <many>true</many>
                 </target>
             </child-association>
-         
+
          </associations>
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
       </aspect>
-	   
+
       <aspect name="rma:declaredRecord">
          <title>Declared Record</title>
          <properties>
@@ -460,12 +460,12 @@
          </properties>
 		 <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
-         </mandatory-aspects>       
+         </mandatory-aspects>
       </aspect>
-   
+
       <aspect name="rma:recordComponentIdentifier">
          <title>Record component identifier</title>
-         <properties>                
+         <properties>
             <property name="rma:identifier">
                <title>Record Component Identifier</title>
                <type>d:text</type>
@@ -476,128 +476,128 @@
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
       </aspect>
-      
+
       <aspect name="rma:vitalRecordDefinition">
-         <title>Vital Record Definition</title>                  
+         <title>Vital Record Definition</title>
          <properties>
             <property name="rma:reviewPeriod">
                <title>Review Period</title>
                <type>d:period</type>
                <mandatory>true</mandatory>
                <default>none|0</default>
-            </property>            
+            </property>
             <property name="rma:vitalRecordIndicator">
                <title>Vital Record Indicator</title>
                <type>d:boolean</type>
                <mandatory>true</mandatory>
                <default>false</default>
-            </property>            
+            </property>
          </properties>
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
-      </aspect>            
-      
+      </aspect>
+
       <!-- Record Meta-data -->
-         
+
       <aspect name="rma:record">
          <title>Record</title>
          <!-- Explicitly turn off archiving for all nodes with this aspect -->
          <archive>false</archive>
-         
+
          <properties>
-         
+
             <!-- rma:identifier used for the Unique Record Identifier -->
             <!-- cm:title used for the Title -->
-            
+
             <property name="rma:dateFiled">
                <title>Date Filed</title>
                <type>d:date</type>
                <mandatory>true</mandatory>
             </property>
-            
+
             <property name="rma:publicationDate">
                <title>Publication Date</title>
                <type>d:date</type>
                <mandatory>true</mandatory>
             </property>
-            
+
             <property name="rma:originator">
                <title>Originator</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
-            
+
             <property name="rma:originatingOrganization">
                <title>Originating Organization</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
             </property>
-                                    
+
             <property name="rma:mediaType">
                <title>Media Type</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
-                        
+
             <property name="rma:format">
                <title>Format</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
-                        
+
             <property name="rma:dateReceived">
                <title>Date Received</title>
                <type>d:date</type>
                <mandatory>false</mandatory>
-            </property> 
-                        
+            </property>
+
             <!-- TODO
-                 Do we need to model this as broken up address?  
+                 Do we need to model this as broken up address?
                  Should we have a separate property for other address or just a multivalue property?
             -->
             <property name="rma:address">
-               <title>Address</title>
-               <type>d:text</type>
-               <mandatory>false</mandatory>
-            </property>                        
-            <property name="rma:otherAddress">
-               <title>Other Address</title>
+               <title>Addressee</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
-            
+            <property name="rma:otherAddress">
+               <title>Other Addressee</title>
+               <type>d:text</type>
+               <mandatory>false</mandatory>
+            </property>
+
          </properties>
-         
+
          <mandatory-aspects>
             <aspect>cm:titled</aspect>
             <aspect>rma:recordComponentIdentifier</aspect>
             <aspect>rma:commonRecordDetails</aspect>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
-         
+
       </aspect>
-      
+
       <aspect name="rma:commonRecordDetails">
         <properties>
-            
+
             <property name="rma:location">
                <title>Location</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
             </property>
-            
+
         </properties>
         <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
         </mandatory-aspects>
       </aspect>
-   
-      <!-- State management aspects -->   
-   
+
+      <!-- State management aspects -->
+
       <aspect name="rma:vitalRecord">
-         <title>Vital Record</title>         
-         <properties>                
+         <title>Vital Record</title>
+         <properties>
             <property name="rma:reviewAsOf">
                <title>Next Review Date</title>
                <type>d:date</type>
@@ -613,12 +613,12 @@
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
-      </aspect> 
-      
+      </aspect>
+
       <aspect name="rma:scheduled">
-        <title>Scheduled</title>         
+        <title>Scheduled</title>
          <associations>
-            
+
             <child-association name="rma:dispositionSchedule">
                 <title>Disposition Schedule</title>
                 <source>
@@ -631,17 +631,17 @@
                     <many>false</many>
                 </target>
             </child-association>
-         
+
          </associations>
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
       </aspect>
-      
+
       <aspect name="rma:dispositionLifecycle">
-        <title>Disposition Lifecycle</title>         
+        <title>Disposition Lifecycle</title>
          <associations>
-            
+
             <child-association name="rma:nextDispositionAction">
                 <title>Next disposition action</title>
                 <source>
@@ -654,8 +654,8 @@
                     <many>false</many>
                 </target>
             </child-association>
-            
-             
+
+
             <child-association name="rma:dispositionActionHistory">
                 <title>Disposition Action History</title>
                 <source>
@@ -668,17 +668,17 @@
                     <many>true</many>
                 </target>
             </child-association>
-         
+
          </associations>
          <mandatory-aspects>
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
-      </aspect>      
-   
+      </aspect>
+
       <!-- TODO remove cutOffDate since it can be retrieved from action history -->
       <aspect name="rma:cutOff">
-         <title>Cut Off</title>         
-         <properties>                
+         <title>Cut Off</title>
+         <properties>
             <property name="rma:cutOffDate">
                <title>Cut Off Date</title>
                <type>d:date</type>
@@ -686,25 +686,25 @@
             </property>
          </properties>
       </aspect>
-      
+
       <!-- Transfered marker aspect -->
       <aspect name="rma:transferred">
-         <title>Transferred</title>         
+         <title>Transferred</title>
       </aspect>
-            
+
       <!-- Ascended marker aspect -->
       <aspect name="rma:ascended">
-         <title>Ascended</title>         
+         <title>Ascended</title>
       </aspect>
-      
+
       <aspect name="rma:frozen">
-         <title>Frozen</title>         
-         <properties>                
+         <title>Frozen</title>
+         <properties>
             <property name="rma:frozenAt">
                <title>Frozen At Date</title>
                <type>d:date</type>
                <mandatory>true</mandatory>
-            </property>              
+            </property>
             <property name="rma:frozenBy">
                <title>Frozen By</title>
                <type>d:text</type>
@@ -715,7 +715,7 @@
             <aspect>rma:filePlanComponent</aspect>
          </mandatory-aspects>
       </aspect>
-      
+
       <aspect name="rma:caveatConfigRoot">
          <title>Caveat Config Root</title>
          <associations>
@@ -738,7 +738,7 @@
          </mandatory-aspects>
          -->
       </aspect>
-      
+
       <aspect name="rma:emailConfigRoot">
          <title>Email Config Root</title>
          <associations>
@@ -756,44 +756,44 @@
             </child-association>
          </associations>
       </aspect>
-  
-      
+
+
       <!-- Aspect to facilitate search -->
-      <aspect name="rma:recordSearch">      
-         <title>Record Search</title>               
-         <properties>                
+      <aspect name="rma:recordSearch">
+         <title>Record Search</title>
+         <properties>
             <property name="rma:recordSearchDispositionActionName">
                <type>d:text</type>
-            </property>              
+            </property>
             <property name="rma:recordSearchDispositionActionAsOf">
                <type>d:date</type>
-            </property>                
+            </property>
             <property name="rma:recordSearchDispositionPeriod">
                <type>d:text</type>
-            </property>                
+            </property>
             <property name="rma:recordSearchDispositionPeriodExpression">
                <type>d:text</type>
-            </property>                        
+            </property>
             <property name="rma:recordSearchDispositionEventsEligible">
                <type>d:boolean</type>
-            </property>                          
+            </property>
             <property name="rma:recordSearchDispositionEvents">
-               <type>d:text</type>           
-               <multiple>true</multiple>   
-            </property>                          
+               <type>d:text</type>
+               <multiple>true</multiple>
+            </property>
             <property name="rma:recordSearchVitalRecordReviewPeriod">
-               <type>d:text</type>         
-            </property>                                                    
+               <type>d:text</type>
+            </property>
             <property name="rma:recordSearchVitalRecordReviewPeriodExpression">
-               <type>d:text</type>         
-            </property>  
+               <type>d:text</type>
+            </property>
          </properties>
       </aspect>
-      
+
       <aspect name="rma:versionedRecord">
          <title>Versioned Record</title>
-      </aspect> 
+      </aspect>
 
    </aspects>
-   
+
 </model>
