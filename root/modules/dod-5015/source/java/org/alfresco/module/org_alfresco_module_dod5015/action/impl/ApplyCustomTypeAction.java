@@ -25,6 +25,7 @@
 package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ public class ApplyCustomTypeAction extends RMActionExecuterAbstractBase
 {
     private static Log logger = LogFactory.getLog(ApplyCustomTypeAction.class);
     private QName customTypeAspect;
+    private List<ParameterDefinition> parameterDefinitions;
 
     public void setCustomTypeAspect(String customTypeAspect)
     {
@@ -68,10 +70,6 @@ public class ApplyCustomTypeAction extends RMActionExecuterAbstractBase
             logger.debug("Executing action [" + action.getActionDefinitionName() + "] on " + actionedUponNodeRef);
         }
         
-        
-        // TODO Should we prevent the application of a custom type to a record
-        //      that has already been declared?
-
         // Apply the appropriate aspect and set the properties.
         Map<QName, Serializable> aspectProps = getPropertyValues(action);
         this.nodeService.addAspect(actionedUponNodeRef, customTypeAspect, aspectProps);
@@ -132,6 +130,31 @@ public class ApplyCustomTypeAction extends RMActionExecuterAbstractBase
             }
         }
     }
-    
-    
+
+    @Override
+    protected synchronized List<ParameterDefinition> getParameterDefintions()
+    {
+        // We can take these parameter definitions from the properties defined in the dod model.
+        if (this.parameterDefinitions == null)
+        {
+            AspectDefinition aspectDefinition = dictionaryService.getAspect(customTypeAspect);
+            if (aspectDefinition == null)
+            {
+                throw new AlfrescoRuntimeException("Unrecognised customTypeAspect: " + customTypeAspect);
+            }
+            
+            Map<QName, PropertyDefinition> props = aspectDefinition.getProperties();
+            
+            this.parameterDefinitions = new ArrayList<ParameterDefinition>(props.size());
+            
+            for (QName qn : props.keySet())
+            {
+                String paramName = qn.toPrefixString(namespaceService);
+                QName paramType = props.get(qn).getDataType().getName();
+                boolean paramIsMandatory = props.get(qn).isMandatory();
+                parameterDefinitions.add(new ParameterDefinitionImpl(paramName, paramType, paramIsMandatory, null));
+            }
+        }
+        return parameterDefinitions;
+    }
 }
