@@ -580,8 +580,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     {
     	// Create test records.
         NodeRef recordFolder = retrievePreexistingRecordFolder();
-        NodeRef testRecord1 = createRecord(recordFolder, "testRecord1" + System.currentTimeMillis());
-        NodeRef testRecord2 = createRecord(recordFolder, "testRecord2" + System.currentTimeMillis());
+        NodeRef testRecord1 = createRecord(recordFolder, "testRecord1" + System.currentTimeMillis(), "The from recørd");
+        NodeRef testRecord2 = createRecord(recordFolder, "testRecord2" + System.currentTimeMillis(), "The to récord");
 
         String node1Url = testRecord1.toString().replace("://", "/");
         String refInstancesRecord1Url = MessageFormat.format(REF_INSTANCES_URL_FORMAT, node1Url);
@@ -1339,15 +1339,17 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         return resultNodeRefs;
     }
 
-	private NodeRef createRecord(NodeRef recordFolder, String name)
+	private NodeRef createRecord(NodeRef recordFolder, String name, String title)
 	{
     	// Create the document
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
         props.put(ContentModel.PROP_NAME, name);
+        props.put(ContentModel.PROP_TITLE, title);
         NodeRef recordOne = this.nodeService.createNode(recordFolder, 
                                                         ContentModel.ASSOC_CONTAINS, 
                                                         QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name), 
-                                                        ContentModel.TYPE_CONTENT).getChildRef();
+                                                        ContentModel.TYPE_CONTENT,
+                                                        props).getChildRef();
         
         // Set the content
         ContentWriter writer = this.contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);

@@ -6,14 +6,16 @@
    {<br/>
    "data":<br/>
    &nbsp;&nbsp;{<br/>
+   &nbsp;&nbsp;"nodeName": "samplename",<br/>
+   &nbsp;&nbsp;"nodeTitle": "sample title",<br/>
    &nbsp;&nbsp;"customReferencesFrom":<br/>
    &nbsp;&nbsp;&nbsp;&nbsp;[<br/>
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{<br/>
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;refId": "09876543-wxyz-0987-wxyz-098765432109",<br/>
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;referenceType": "bidirectional",<br/>
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;label": "BiDi",<br/>
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;targetRef": "workspace://SpacesStore/zyxwvuts-4321-zyxw-4321-zyxwvutsrqpo",<br/>
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sourceRef": "workspace://SpacesStore/a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1"<br/>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"refId": "09876543-wxyz-0987-wxyz-098765432109",<br/>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"referenceType": "bidirectional",<br/>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"label": "BiDi",<br/>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"targetRef": "workspace://SpacesStore/zyxwvuts-4321-zyxw-4321-zyxwvutsrqpo",<br/>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"sourceRef": "workspace://SpacesStore/a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1"<br/>
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
    &nbsp;&nbsp;&nbsp;&nbsp;]<br/>
    &nbsp;&nbsp;"customReferencesTo":<br/>

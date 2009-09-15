@@ -2,6 +2,8 @@
 {
 	"data":
 	{
+		"nodeName": "${nodeName!""}",
+		"nodeTitle": "${nodeTitle!""}",
 		"customReferencesFrom":
 		[
 			<#list customRefsFrom as ref>

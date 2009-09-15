@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
@@ -59,6 +60,8 @@ public class CustomRefsGet extends AbstractRmWebScript
     private static final String TARGET_REF = "targetRef";
     private static final String CUSTOM_REFS_FROM = "customRefsFrom";
     private static final String CUSTOM_REFS_TO = "customRefsTo";
+    private static final String NODE_NAME = "nodeName";
+    private static final String NODE_TITLE = "nodeTitle";
     
     private static Log logger = LogFactory.getLog(CustomRefsGet.class);
     private RecordsManagementAdminService rmAdminService;
@@ -103,6 +106,8 @@ public class CustomRefsGet extends AbstractRmWebScript
     		logger.debug("Retrieved custom reference instances: " + assocsFromThisNode);
     	}
     	
+        ftlModel.put(NODE_NAME, nodeService.getProperty(node, ContentModel.PROP_NAME));
+        ftlModel.put(NODE_TITLE, nodeService.getProperty(node, ContentModel.PROP_TITLE));
         ftlModel.put(CUSTOM_REFS_FROM, listOfOutwardReferenceData);
         ftlModel.put(CUSTOM_REFS_TO, listOfInwardReferenceData);
 
