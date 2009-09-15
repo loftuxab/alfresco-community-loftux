@@ -78,21 +78,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         
-        RetryingTransactionCallback<NodeRef> setUpCallback = new RetryingTransactionCallback<NodeRef>()
-        {
-            public NodeRef execute() throws Throwable
-            {
-                NodeRef nodeRef = TestUtilities.loadFilePlanData(
-                        null,
-                        serviceRegistry.getNodeService(),
-                        serviceRegistry.getImporterService(),
-                        serviceRegistry.getPermissionService());
-                // Do some stuff
-                rmService.getRecordsManagementRoot(nodeRef);
-                return nodeRef;
-            }
-        };
-        filePlan = txnHelper.doInTransaction(setUpCallback);
+        filePlan = createFilePlan();
     }
     
     @Override
@@ -101,7 +87,11 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         AuthenticationUtil.clearCurrentSecurityContext();
     }
     
-    public void testQuery_All()
+    /**
+     * Perform a full query audit for RM
+     * @return              Returns all the results
+     */
+    private List<RecordsManagementAuditEntry> queryAll()
     {
         RetryingTransactionCallback<List<RecordsManagementAuditEntry>> testCallback =
             new RetryingTransactionCallback<List<RecordsManagementAuditEntry>>()
@@ -113,7 +103,36 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
                 return entries;
             }
         };
-        txnHelper.doInTransaction(testCallback);
+        return txnHelper.doInTransaction(testCallback);
+    }
+    
+    /**
+     * Create a new fileplan
+     */
+    private NodeRef createFilePlan()
+    {
+        RetryingTransactionCallback<NodeRef> setUpCallback = new RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                // Ensure that auditing is on
+                rmAuditService.start();
+                NodeRef nodeRef = TestUtilities.loadFilePlanData(
+                        null,
+                        serviceRegistry.getNodeService(),
+                        serviceRegistry.getImporterService(),
+                        serviceRegistry.getPermissionService());
+                // Do some stuff
+                rmService.getRecordsManagementRoot(nodeRef);
+                return nodeRef;
+            }
+        };
+        return txnHelper.doInTransaction(setUpCallback);
+    }
+    
+    public void testQuery_All()
+    {
+        queryAll();
     }
     
     public void testQuery_UserLimited()
@@ -160,7 +179,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         for (RecordsManagementAuditEntry entry : entries)
         {
             NodeRef nodeRef = entry.getNodeRef();
-            assertNotNull("Found ntry with null nodeRef: " + entry, nodeRef);
+            assertNotNull("Found entry with null nodeRef: " + entry, nodeRef);
             if (chosenNodeRef == null)
             {
                 chosenNodeRef = nodeRef;
@@ -190,5 +209,43 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         assertNotNull("Expect a list of results for the query", entries);
         assertTrue("No results were found for node: " + chosenNodeRefFinal, entries.size() > 0);
         assertEquals("Incorrect number of results for node: " + chosenNodeRefFinal, count, entries.size());
+    }
+    
+    public void testStartStopDelete()
+    {
+        // Stop the audit
+        rmAuditService.stop();
+        List<RecordsManagementAuditEntry> result1 = queryAll();
+        assertNotNull(result1);
+        assertTrue(result1.size() > 0);
+
+        // Upload a new fileplan
+        createFilePlan();
+        // There should be no new audit entries
+        List<RecordsManagementAuditEntry> result2 = queryAll();
+        assertNotNull(result2);
+        assertEquals(
+                "Audit results should not have changed after auditing was disabled",
+                result1.size(), result2.size());
+        
+        // repeat with a start
+        rmAuditService.start();
+        createFilePlan();
+        
+        List<RecordsManagementAuditEntry> result3 = queryAll();
+        assertNotNull(result3);
+        assertTrue(
+                "Expected more results after enabling audit",
+                result3.size() > result1.size());
+        
+        // Stop and delete all entries
+        rmAuditService.stop();
+        rmAuditService.clear();
+        // There should be no entries
+        List<RecordsManagementAuditEntry> result4 = queryAll();
+        assertNotNull(result4);
+        assertEquals(
+                "Audit entries should have been cleared",
+                0, result4.size());
     }
 }

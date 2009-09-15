@@ -73,9 +73,6 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
     private AuditService auditService;
     private RecordsManagementActionService rmActionService;
 
-    // temporary field to hold imaginary enabled flag
-    private boolean enabled = false;
-    
     /**
      * Sets the NodeService instance
      * 
@@ -121,7 +118,9 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
      */
 	public boolean isEnabled()
     {
-        return this.enabled;
+        return auditService.isAuditEnabled(
+                RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
+                RecordsManagementAuditService.RM_AUDIT_PATH_ROOT);
     }
 	
     /**
@@ -129,9 +128,9 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
      */
     public void start()
     {
-        // TODO: Start RM auditing properly!
-        this.enabled = true;
-        
+        auditService.enableAudit(
+                RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
+                RecordsManagementAuditService.RM_AUDIT_PATH_ROOT);
         if (logger.isInfoEnabled())
             logger.info("Started Records Management auditing");
     }
@@ -141,9 +140,9 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
      */
     public void stop()
     {
-        // TODO: Stop RM auditing properly!
-        this.enabled = false;
-        
+        auditService.disableAudit(
+                RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
+                RecordsManagementAuditService.RM_AUDIT_PATH_ROOT);
         if (logger.isInfoEnabled())
             logger.info("Stopped Records Management auditing");
     }
@@ -153,8 +152,7 @@ public class RecordsManagementAuditServiceImpl implements RecordsManagementAudit
      */
     public void clear()
     {
-        // TODO: Clear the RM audit trail
-        
+        auditService.clearAudit(RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME);
         if (logger.isInfoEnabled())
             logger.debug("Records Management audit log has been cleared");
     }
