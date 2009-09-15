@@ -112,19 +112,25 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         // Bind in Template Model elements
         RenderContext context = getRenderContext();
         
-        // populate the root template properties
-        try
+        // in the case of an internal error such as script compliation failing
+        // the rendercontext can be null - as we are building template model
+        // for the webscript status page - no futher work required here.
+        if (context != null)
         {
-            ProcessorModelHelper.populateTemplateModel(context, params);
-        }
-        catch (RendererExecutionException ree)
-        {
-            // This exception is only thrown when processing
-            // template objects, thus it shouldn't occur for web scripts
-        }
-        catch (UnsupportedEncodingException uee)
-        {
-            // TODO: how to handle this?
+            // populate the root template properties
+            try
+            {
+                ProcessorModelHelper.populateTemplateModel(context, params);
+            }
+            catch (RendererExecutionException ree)
+            {
+                // This exception is only thrown when processing
+                // template objects, thus it shouldn't occur for web scripts
+            }
+            catch (UnsupportedEncodingException uee)
+            {
+                // TODO: how to handle this?
+            }
         }
         
         return params;
