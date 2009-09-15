@@ -1,11 +1,8 @@
 <script type="text/javascript" charset="utf-8">    
     new Alfresco.RM_Audit('${htmlid}-audit').setOptions({
        'siteId': "${page.url.templateArgs.site!"rm"}",
-       'containerId': "${template.properties.container!"documentLibrary"}",       
-       'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT,
-       'enabled' : ${auditStatus.enabled?string},
-       'startDate':"${auditStatus.started}",
-       'stopDate':"${auditStatus.stopped}"
+       'containerId': "${template.properties.container!"documentLibrary"}",
+       'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT
     }).setMessages(${messages});
   </script>
   
@@ -19,9 +16,7 @@
    	</div>
 	   <div class="yui-u">
 		   <div id="${htmlid}-auditActions" class="auditActions">
-            <button id="${htmlid}-audit-toggle" name="audit-toggle" value="${auditStatus.enabled?string}" class="audit-toggle">
-               <#if (auditStatus.enabled)>${msg("label.button-stop")}<#else>${msg("label.button-start")}</#if>
-            </button>
+            <button id="${htmlid}-audit-toggle" name="${htmlid}-audit-toggle" value="" class="audit-toggle"></button>
             <button id="${htmlid}-audit-view" name="audit-view" class="audit-view">${msg("label.button-view-log")}</button>
             <button id="${htmlid}-audit-clear" name="audit-clear" class="audit-clear">${msg("label.button-clear")}</button>
             <button id="${htmlid}-audit-export" name="audit-export" class="audit-export">${msg("label.button-export")}</button>

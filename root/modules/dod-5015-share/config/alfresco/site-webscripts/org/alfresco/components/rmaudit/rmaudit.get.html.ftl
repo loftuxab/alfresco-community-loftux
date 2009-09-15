@@ -2,11 +2,8 @@
     new Alfresco.RM_Audit('${htmlid}-audit').setOptions(
        {
           'siteId': "${page.url.templateArgs.site!"rm"}",
-          'containerId': "${template.properties.container!"documentLibrary"}",          
-          'viewMode':Alfresco.RM_Audit.VIEW_MODE_COMPACT,
-          'enabled' : ${auditStatus.enabled?string},
-          'startDate':"${auditStatus.started}",
-          'stopDate':"${auditStatus.stopped}"
+          'containerId': "${template.properties.container!"documentLibrary"}",
+          'viewMode':Alfresco.RM_Audit.VIEW_MODE_COMPACT
           <#if (nodeRef?exists)>
             ,'nodeRef' : '${nodeRef}'
           </#if>          
