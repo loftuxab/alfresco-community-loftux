@@ -96,6 +96,10 @@
                      <input type="checkbox" id="${el}-metadata-supplementalMarkingList" />
                      <label for="${el}-metadata-supplementalMarkingList">${msg("label.supplementalMarkingList")}</label>
                   </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-dispositionActionAsOf" />
+                     <label for="${el}-metadata-dispositionActionAsOf">${msg("label.dispositionActionAsOf")}</label>
+                  </li>
                   <#list meta as d>
                   <#assign prop=d.name?substring(4)>
                   <li>

@@ -255,7 +255,7 @@
                        "createdOn", "createdByUser", "createdBy", "author", "size", "browseUrl", "parentFolder",
                        "properties.rma_identifier", "properties.rma_dateFiled", "properties.rma_publicationDate", "properties.rma_dateReceived",
                        "properties.rma_originator", "properties.rma_originatingOrganization", "properties.rma_mediaType", "properties.rma_format", "properties.rma_location",
-                       "properties.rma_address", "properties.rmc_supplementalMarkingList", "properties.rma_reviewAsOf"];
+                       "properties.rma_address", "properties.rmc_supplementalMarkingList", "properties.rma_reviewAsOf", "properties.rma_recordSearchDispositionActionAsOf"];
          // add the custom meta fields - 'rmc' namespace
          for (var i=0, j=this.options.customFields.length; i<j; i++)
          {
@@ -445,7 +445,8 @@
             { key: "dateReceived", label: me._msg("label.dateReceived"), field: "properties.rma_dateReceived", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true },
             { key: "location", label: me._msg("label.location"), field: "properties.rma_location", sortable: true, resizeable: true, hidden: true },
             { key: "address", label: me._msg("label.address"), field: "properties.rma_address", sortable: true, resizeable: true, hidden: true },
-            { key: "supplementalMarkingList", label: me._msg("label.supplementalMarkingList"), field: "properties.rmc_supplementalMarkingList", sortable: true, resizeable: true, hidden: true }
+            { key: "supplementalMarkingList", label: me._msg("label.supplementalMarkingList"), field: "properties.rmc_supplementalMarkingList", sortable: true, resizeable: true, hidden: true },
+            { key: "dispositionActionAsOf", label: me._msg("label.dispositionActionAsOf"), field: "properties.rma_recordSearchDispositionActionAsOf", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true }
          ];
          
          // Add the custom metadata columns
