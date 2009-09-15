@@ -11,7 +11,10 @@ function getDocName(nodeRef)
    }
    else return nodeRef;
 }
-
+/*
+ * Note, "From" is customreferences from this node and *not* from other documents to this node.
+ * 
+ */ 
 function getDocReferences()
 {
 
@@ -21,7 +24,7 @@ function getDocReferences()
    if (result.status == 200)
    {
       var data = eval('(' + result + ')');
-      var docrefs = data.data.customReferences;
+      var docrefs = data.data.customReferencesFrom;
       
       for (var i=0,len = docrefs.length;i<len;i++)
       {
