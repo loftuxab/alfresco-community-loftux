@@ -35,11 +35,78 @@
 .permissions .list
 {
    background-color: #ffffff;
-   padding: 0.8em;
+   padding: 0.5em;
    border: 1px solid #444444;
 }
 
 .permissions .inherit
 {
    padding: 0.5em 1em 0em 0em;
+}
+
+.permissions .list-item
+{
+   padding: 0.6em;
+}
+
+.permissions .label
+{
+   color: #000;
+}
+
+.permissions .readonly-label
+{
+   color: #000;
+   margin: 0.3em 6.5em 0 1.2em;
+}
+
+.permissions .hint-label
+{
+   margin-left: 0.5em;
+   color: #aaa;
+}
+
+.permissions .controls-header
+{
+   float: right;
+   min-width: 20em;
+}
+
+.permissions .controls
+{
+   float: right;
+   margin-top: -0.5em;
+   min-width: 20em;
+}
+
+.permissions .actions
+{
+   float: right;
+   min-width: 8em;
+}
+
+.permissions .center
+{
+   padding-top: 1em;
+   text-align: center;
+   width: 100%;
+}
+
+.permissions .authority-picker
+{
+   display: none;
+   position: absolute;
+   right: 0.5em;
+   top: 13em;
+   z-index: 100;
+}
+
+.permissions .authority-picker.active
+{
+   display: inline;
+}
+
+.permissions .authority-finder
+{
+   margin: 0;
 }
