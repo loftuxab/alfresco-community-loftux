@@ -64,6 +64,13 @@
         </property>
     </bean>
     
+    <!-- -->
+    
+    <bean id="recordComponentIdentifierAspect" class="org.alfresco.module.org_alfresco_module_dod5015.identifier.RecordComponentIdentifierAspect" init-method="init">
+        <property name="policyComponent" ref="policyComponent"/>
+        <property name="nodeService" ref="NodeService"/>  
+    </bean>
+    
     <!-- Import fixed permission definitions for RM -->
     <import resource="classpath:alfresco/module/org_alfresco_module_dod5015/rm-public-services-security-context.xml"/>
     
@@ -205,41 +212,6 @@
          <value>0 30 3 * * ?</value>
       </property>
    </bean>
-	
-
-    
-    <!--
-    <bean id="scheduledDispositionJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
-    <property name="jobClass">
-    <value>org.alfresco.module.org_alfresco_module_dod5015.action.ScheduledDispositionJob</value>
-    </property>
-    <property name="jobDataAsMap">
-    <map>
-    <entry key="nodeService">
-    <ref bean="nodeService" />
-    </entry>
-    <entry key="searchService">
-    <ref bean="searchService"/>
-    </entry>
-    <entry key="recordsManagementActionService">
-    <ref bean="recordsManagementActionService" />
-    </entry>
-    </map>
-    </property>
-    </bean>
-    
-    <bean id="scheduledDispositionTrigger" class="org.alfresco.util.CronTriggerBean">
-    <property name="jobDetail">
-    <ref bean="scheduledDispositionJobDetail" />
-    </property>
-    <property name="scheduler">
-    <ref bean="schedulerFactory" />
-    </property>
-    <property name="cronExpression">
-    <value>0,30 * * ? * *</value>
-    </property>
-    </bean>
-    -->
     
     <bean id="RecordsManagementBootstrap" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementBootstrap">
         <property name="transactionService" ref="transactionService"/>
@@ -248,10 +220,7 @@
         <property name="caveatConfigService" ref="caveatConfigService"/>
         <property name="customEmailMappingService" ref="customEmailMappingService"/>
     </bean>
-    
 
-    
-    
     <!-- Java script interface for rm caveat config-->
     <bean id="rmConfigServiceScript" parent="baseJavaScriptExtension" class="org.alfresco.module.org_alfresco_module_dod5015.caveat.ScriptRMCaveatConfigService">
         <property name="extensionName">

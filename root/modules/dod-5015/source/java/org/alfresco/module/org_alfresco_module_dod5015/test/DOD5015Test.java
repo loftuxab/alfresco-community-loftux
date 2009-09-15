@@ -89,6 +89,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.GUID;
 import org.alfresco.util.PropertyMap;
 
 /**
@@ -376,6 +377,63 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         final List<NodeRef> resultNodeRefs = types.getNodeRefs();
         return resultNodeRefs;
+    }
+    
+    /**
+     * Test duplicate id's
+     */
+    public void xxtestDuplicateIDs()
+    {
+        List<NodeRef> roots = rmService.getRecordsManagementRoots();
+        final NodeRef root = roots.get(0);
+        setComplete();
+        endTransaction();
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                String name1 = GUID.generate();
+                Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
+                props.put(ContentModel.PROP_NAME, name1);
+                props.put(PROP_IDENTIFIER, "bob");
+                ChildAssociationRef assoc = nodeService.createNode(
+                                            root, 
+                                            ContentModel.ASSOC_CONTAINS, 
+                                            QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name1), 
+                                            TYPE_RECORD_SERIES,
+                                            props);
+                
+                return assoc.getChildRef();
+            }          
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                try
+                {
+                    String name1 = GUID.generate();   
+                    Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
+                    props.put(ContentModel.PROP_NAME, name1);
+                    props.put(PROP_IDENTIFIER, "bob");
+                    ChildAssociationRef assoc = nodeService.createNode(
+                                                root, 
+                                                ContentModel.ASSOC_CONTAINS, 
+                                                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name1), 
+                                                TYPE_RECORD_SERIES,
+                                                props);
+                    fail("Cant duplicate series id");
+                }
+                catch (Exception e)
+                {
+                    // expected
+                }
+                
+                return null;
+            }          
+        });
     }
 
     public void testDispositionLifecycle_0318_01_basictest() throws Exception
