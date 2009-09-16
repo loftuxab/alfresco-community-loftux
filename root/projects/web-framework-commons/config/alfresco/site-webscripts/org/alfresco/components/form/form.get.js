@@ -1219,6 +1219,18 @@ function createFieldConstraint(constraintId, constraintParams, fieldDef, fieldCo
          {
             constraintMsg = fieldConstraintConfig.message;
          }
+         
+         // look for overridden validation handler
+         if (fieldConstraintConfig.validationHandler !== null)
+         {
+            constraint.validationHandler = fieldConstraintConfig.validationHandler;
+         }
+         
+         // look for overridden event
+         if (fieldConstraintConfig.event !== null)
+         {
+            constraint.event = fieldConstraintConfig.event;
+         }
       }
       else if (typeof defaultConstraintConfig.messageId !== "undefined" && 
                defaultConstraintConfig.messageId !== null)
