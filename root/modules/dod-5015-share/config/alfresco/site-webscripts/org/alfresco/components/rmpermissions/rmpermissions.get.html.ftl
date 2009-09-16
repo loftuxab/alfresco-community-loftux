@@ -29,14 +29,14 @@
    
    <!-- Permissions List -->
    <div class="list">
-      <div class="list-item">
+      <div class="list-item-header theme-bg-color-4">
          <div class="controls-header">
             <span class="header">${msg("label.permissions")}</span>
             <div class="actions"><span class="header">${msg("label.actions")}</span></div>
          </div>
          <div class="header">${msg("label.usersgroups")}</div>
       </div>
-      <div id="${el}-list"></div>
+      <div id="${el}-list" class="theme-bg-color-3"></div>
    </div>
    
    <!-- Finish button -->
