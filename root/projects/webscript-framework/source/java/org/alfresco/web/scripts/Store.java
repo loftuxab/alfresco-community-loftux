@@ -27,10 +27,6 @@ package org.alfresco.web.scripts;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.alfresco.connector.Response;
-import org.alfresco.connector.ResponseStatus;
-import org.alfresco.connector.exception.ConnectorProviderException;
-
 import freemarker.cache.TemplateLoader;
 
 
@@ -72,27 +68,36 @@ public interface Store
     /**
      * Gets the paths of given document pattern within given path/sub-paths in this store
      * 
-     * @param path             start path
-     * @param includeSubPaths  if true, include sub-paths
-     * @param documentPattern  document name, allows wildcards, eg. *.ftl or my*.ftl
-     * @return  array of document paths
+     * @param path
+     *            start path
+     * @param includeSubPaths
+     *            if true, include sub-paths
+     * @param documentPattern
+     *            document name, allows wildcards, eg. *.ftl or my*.ftl
+     * @return array of document paths
+     * @throws IOException
+     *             If an error occurs searching for documents
      */
-    public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern);
+    public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern) throws IOException;
     
     /**
      * Gets the paths of all Web Script description documents in this store
      * 
      * @return array of description document paths
+     * @throws IOException
+     *             If an error occurs searching for documents
      */
-    public String[] getDescriptionDocumentPaths();
+    public String[] getDescriptionDocumentPaths() throws IOException;
 
     /**
      * Gets the paths of all implementation files for a given Web Script
      * 
      * @param script  web script
      * @return  array of implementation document paths
+     * @throws IOException
+     *             If an error occurs searching for documents
      */
-    public String[] getScriptDocumentPaths(WebScript script);
+    public String[] getScriptDocumentPaths(WebScript script) throws IOException;
     
     /**
      * Gets the paths of all documents in this store
