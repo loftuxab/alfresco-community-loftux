@@ -163,17 +163,28 @@
       },
       
       /**
-       * Authority selected event handler.
-       * This event is fired from Group picker - so we much ensure
-       * the event is for the current panel by checking panel visibility.
-       *
-       * @method onGroupSelected
+       * Authority selected event handler. This event is fired from Authority picker.
+       * 
+       * @method onAuthoritySelected
        * @param e DomEvent
        * @param args Event parameters (depends on event type)
        */
       onAuthoritySelected: function ViewPanelHandler_onAuthoritySelected(e, args)
       {
-         //alert(args[1].itemName);
+         // construct permission descriptor and add permission row
+         var permission =
+         {
+            "id": "ReadRecords",
+            "authority":
+            {
+               "id": args[1].itemName,
+               "label": args[1].displayName
+            },
+            "inherited": false
+         };
+         this.addPermissionRow(permission, true);
+         
+         // remove authority selector popup
          Dom.removeClass(this.widgets.authorityFinder, "active");
          this.showingFilter = false;
       },
@@ -230,9 +241,16 @@
          
          var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
          var perms = json.data.permissions;
+         
+         // sort the array from the json response - inherited permissions shown first
+         perms.sort(function(a, b)
+         {
+            return (a.inherited > b.inherited) ? -1 : (a.inherited < b.inherited) ? 1 : 0;
+         });
+         
          for (var i in perms)
          {
-            this.addPermissionRow(perms[i]);
+            this.addPermissionRow(perms[i], false);
          }
       },
       
@@ -253,10 +271,24 @@
        * 
        * @method addPermissionRow
        * @param permission {object} See above
+       * @param created {boolean} If true then this is a newly created permission.
        */
-      addPermissionRow: function RecordsPermissions_addPermissionRow(permission)
+      addPermissionRow: function RecordsPermissions_addPermissionRow(permission, created)
       {
          var me = this;
+         
+         // quick exit from the function if the added authority already exists as a local permission
+         if (created)
+         {
+            for (var n in this.permissions)
+            {
+               var perm = this.permissions[n];
+               if (perm.inherited === false && perm.remove === false && perm.authority === permission.authority.id)
+               {
+                  return;
+               }
+            }
+         }
          
          var elPermList = Dom.get(this.id + "-list");
          
@@ -270,7 +302,9 @@
             "authority": permission.authority.id,
             "id": permission.id,
             "remove": false,
+            "created": created,
             "modified": false,
+            "inherited": permission.inherited,
             "el": div
          };
          this.permissions.push(p);
@@ -286,28 +320,16 @@
          var msgLocal = this.msg("label.local");
          
          // construct row data
-         var allowModify = false;
-         var allowRemove = false;
          var html = '<div class="list-item"><div class="controls">';
          if (permission.inherited)
          {
-            // inherited - additional permissions can be granted if not already at maximum
-            if (permission.id !== "Filing")
-            {
-               html += '<div class="actions"></div><span id="' + modifyMenuContainerId + '"></span>';
-               allowModify = true;
-            }
-            else
-            {
-               html += '<div class="actions"></div><div class="readonly-label">' + (permission.id === "Filing" ? msgReadFile : msgReadOnly) + '</div>';
-            }
+            // inherited permission - read only
+            html += '<div class="actions"></div><div class="readonly-label">' + (permission.id === "Filing" ? msgReadFile : msgReadOnly) + '</div>';
          }
          else
          {
             // directly applied permission - can modify or remove
             html += '<div class="actions"><span id="' + removeBtnContainerId + '"></span></div><span id="' + modifyMenuContainerId + '"></span>';
-            allowModify = true;
-            allowRemove = true;
          }
          html += '</div><span class="label">' + $html(permission.authority.label) + '</span>';
          html += '<span class="hint-label">(' + (permission.inherited ? msgInherited : msgLocal) + ')</span>';
@@ -319,42 +341,48 @@
          elPermList.appendChild(div);
          
          // generate menu and buttons (NOTE: must occur after DOM insertion)
-         this.modifyMenus[i] = new YAHOO.widget.Button(
+         if (permission.inherited === false)
          {
-            type: "menu",
-            container: modifyMenuContainerId,
-            menu: [
-               { text: msgReadOnly, value: "ReadRecords" },
-               { text: msgReadFile, value: "Filing" }
-            ]
-         });
-         // set menu button text on current permission
-         this.modifyMenus[i].set("label", (permission.id === "Filing" ? msgReadFile : msgReadOnly));
-         // subscribe to the menu click event
-         this.modifyMenus[i].getMenu().subscribe("click", function(p_sType, p_aArgs, index)
-         {
-            var menuItem = p_aArgs[1];
-            if (menuItem)
+            this.modifyMenus[i] = new YAHOO.widget.Button(
             {
-               me.modifyMenus[index].set("label", menuItem.cfg.getProperty("text"));
-               // TODO: update modified permissions value
-               alert(menuItem.value);
-            }
-         }, i);
-         
-         this.removeButtons[i] = new YAHOO.widget.Button(
-         {
-            type: "button",
-            label: this.msg("button.remove"),
-            name: this.id + '-removeButton-' + i,
-            container: removeBtnContainerId,
-            onclick:
+               type: "menu",
+               container: modifyMenuContainerId,
+               menu: [
+                  { text: msgReadOnly, value: "ReadRecords" },
+                  { text: msgReadFile, value: "Filing" }
+               ]
+            });
+            // set menu button text on current permission
+            this.modifyMenus[i].set("label", (permission.id === "Filing" ? msgReadFile : msgReadOnly));
+            // subscribe to the menu click event
+            this.modifyMenus[i].getMenu().subscribe("click", function(p_sType, p_aArgs, index)
             {
-               fn: this.onClickRemovePermission,
-               obj: i,
-               scope: this
-            }
-         });
+               var menuItem = p_aArgs[1];
+               if (menuItem)
+               {
+                  // update menu button text to selected item label
+                  me.modifyMenus[index].set("label", menuItem.cfg.getProperty("text"));
+                  
+                  // update modified permissions value and set as modified
+                  me.permissions[i].id = menuItem.value;
+                  me.permissions[i].modified = true;
+               }
+            }, i);
+            
+            this.removeButtons[i] = new YAHOO.widget.Button(
+            {
+               type: "button",
+               label: this.msg("button.remove"),
+               name: this.id + '-removeButton-' + i,
+               container: removeBtnContainerId,
+               onclick:
+               {
+                  fn: this.onClickRemovePermission,
+                  obj: i,
+                  scope: this
+               }
+            });
+         }
       },
       
       /**
@@ -384,8 +412,10 @@
       {
          if (!this.showingFilter)
          {
-            Dom.addClass(this.widgets.authorityFinder, "active");
             this.modules.authorityFinder.clearResults();
+            Dom.addClass(this.widgets.authorityFinder, "active");
+            var el = Dom.get(this.id + "-authoritypicker-search-text");
+            el.focus();
             this.showingFilter = true;            
          }
          else
@@ -415,6 +445,109 @@
        */
       onFinishClick: function RecordsPermissions_onFinishClick(e, args)
       {
+         this.widgets.finishButton.set("disabled", true);
+         
+         var obj =
+         {
+            "permissions": []
+         };
+         
+         for (var i in this.permissions)
+         {
+            var p = this.permissions[i];
+            // we either: add newly created permissions or remove existing ones or update existing ones
+            if ((p.created && p.remove === false) ||
+                (p.created === false && p.remove) ||
+                (p.created === false && p.modified))
+            {
+               // special case for "upgrading" or "downgrading" existing permissions
+               if (p.created === false && p.modified)
+               {
+                  // first remove existing permission
+                  var permission = 
+                  {
+                     "id": (p.id === "Filing" ? "ReadRecords": "Filing"),
+                     "authority": p.authority,
+                     "remove": true
+                  };
+                  obj.permissions.push(permission);
+               }
+               var permission = 
+               {
+                  "id": p.id,
+                  "authority": p.authority,
+                  "remove": p.remove
+               };
+               obj.permissions.push(permission);
+            }
+         }
+         
+         if (obj.permissions.length !== 0)
+         {
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.replace(":/", "") + "/rmpermissions",
+               method: Alfresco.util.Ajax.POST,
+               dataObj: obj,
+               requestContentType: Alfresco.util.Ajax.JSON,
+               successCallback:
+               {
+                  fn: function(res)
+                  {
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.finish-success")
+                     });
+                     
+                     // return to appropriate location
+                     this._navigateForward();
+                  },
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: function(res)
+                  {
+                     var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: this.msg("message.failure"),
+                        text: this.msg("message.finish-failure", json.message)
+                     });
+                     this.widgets.finishButton.set("disabled", false);
+                  },
+                  scope: this
+               }
+            });
+         }
+         else
+         {
+            // return to appropriate location
+            this._navigateForward();
+         }
+      },
+      
+      /**
+       * Displays the corresponding return page for the current node.
+       * 
+       * @method _navigateForward
+       * @private
+       */
+      _navigateForward: function RecordsPermissions__navigateForward()
+      {
+         // Did we come from the document library? If so, then direct the user back there
+         if (document.referrer.match(/documentlibrary([?]|$)/))
+         {
+            history.go(-1);
+         }
+         else
+         {
+            // go back to the appropriate details page for the node
+            var pageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId +
+               "/" + this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
+            
+            window.location.href = pageUrl;
+         }
       }
    });
 })();

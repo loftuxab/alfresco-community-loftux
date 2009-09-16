@@ -2,7 +2,8 @@
    new Alfresco.RecordsPermissions("${args.htmlid}").setOptions({
     siteId: "${page.url.templateArgs.site!""}",
     nodeRef: "${page.url.args.nodeRef!""}",
-    docName: "${page.url.args.docName!""}"
+    nodeType: "${page.url.args.nodeType!""}",
+    itemName: "${page.url.args.itemName!""}"
  }).setMessages(${messages});
 //]]></script>
 
@@ -24,7 +25,7 @@
       <label for="${el}-inherit">${msg("label.inherit")}</label>
    </div>
    -->
-   <div class="title">${msg("label.title", '${page.url.args.docName!""}')?html}</div>
+   <div class="title">${msg("label.title", '${page.url.args.itemName!""}')?html}</div>
    
    <!-- Permissions List -->
    <div class="list">

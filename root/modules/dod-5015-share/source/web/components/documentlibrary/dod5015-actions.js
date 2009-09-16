@@ -583,6 +583,21 @@
       },
       
       /**
+       * Manage Permissions
+       *
+       * @method onActionManagePermissions
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionManagePermissions: function RDLA_onActionManagePermissions(assets)
+      {
+         var pageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
+               "/rmpermissions?nodeRef=" + assets.nodeRef + "&itemName=" + encodeURIComponent(assets.displayName) +
+               "&nodeType=" + assets.type;
+         
+         window.location.href = pageUrl;
+      },
+      
+      /**
        * View audit log for a noderef
        *
        * @method _ViewAuditLog

@@ -30,26 +30,44 @@ function main()
       if (tokens[0] == "ALLOWED")
       {
          // we are only interested in the RM specific object level permissions
-         // Filing, ReadRecords, FileRecords
+         // Filing and ReadRecords
          var id = tokens[2];
          switch (id)
          {
             case "Filing":
             case "ReadRecords":
-            case "FileRecords":
             {
-               var group = groups.getGroupForFullAuthorityName(tokens[1]);
-               // check for null group - this could happen if a group is removed
-               // from the system or similar and should be handled
-               if (group != null)
+               var auth = null;
+               var authId = tokens[1];
+               var displayName;
+               if (authId.indexOf("GROUP_") === 0)
+               {
+                  auth = groups.getGroupForFullAuthorityName(authId);
+                  if (auth != null)
+                  {
+                     displayName = auth.displayName;
+                  }
+               }
+               else
+               {
+                  auth = people.getPerson(authId);
+                  if (auth != null)
+                  {
+                     displayName = auth.properties.firstName + " " + auth.properties.lastName;
+                  }
+               }
+               
+               // check for null authority - this could happen if a group is removed
+               // from the system or similar and should be handled here
+               if (auth != null)
                {
                   result.push(
                      {
                         id: id,
                         authority:
                         {
-                           id: tokens[1],
-                           label: group.displayName
+                           id: authId,
+                           label: displayName
                         },
                         inherited: (tokens[3] == "INHERITED")
                      }
