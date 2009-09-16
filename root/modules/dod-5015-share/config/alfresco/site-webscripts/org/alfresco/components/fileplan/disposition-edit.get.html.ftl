@@ -8,6 +8,11 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
       <#list events as event>
       ${event.value}: { label: "${event.label}", automatic: ${event.automatic?string} }<#if (event_has_next)>, </#if>
       </#list>
+   },
+   actions: {
+      <#list dispositionActions as action>
+      ${action.value}: { label: "${action.label}" }<#if (action_has_next)>, </#if>
+      </#list>
    }
 });
 //]]></script>
@@ -25,11 +30,12 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
 
    <div id="${el}-flowButtons">
       <hr />
-      <span id="${el}-createaction-button" class="yui-button createaction">
-          <span class="first-child">
-              <button type="button">${msg("button.createaction")}</button>
-          </span>
-      </span>
+      <input id="${el}-createaction-button" class="yui-button createaction createaction-button" name="createaction-button" value="${msg("button.createaction")}" type="button" >
+      <select id="${el}-createaction-menu" class="createaction-menu" name="createaction-menu">
+         <#list dispositionActions as action>
+         <option value="${action.value}">${action.label}</option>
+         </#list>
+      </select>
    </div>
 
    <div class="main-buttons">
@@ -74,15 +80,10 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                <form class="action-form" method="" action="">
                   <input type="hidden" name="period" value="" class="period" />
                   <input type="hidden" name="id" value="" class="id" />
+                  <input type="hidden" name="name" value="" class="action-name" />
                   <div class="section">
-                     ${msg("label.action")}
-                     <select name="name" class="action-type">
-                        <#list dispositionActions as action>
-                        <option value="${action.value}">${action.label}</option>
-                        </#list>
-                     </select>
                      <span class="action-location-section">
-                        ${msg("label.to")}
+                        ${msg("label.transferTo")}:
                         <select name="location" class="action-location">
                            <#list transferLocations as location>
                            <option value="${location.value}">${location.label}</option>

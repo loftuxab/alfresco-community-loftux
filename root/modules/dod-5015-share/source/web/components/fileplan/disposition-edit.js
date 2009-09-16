@@ -93,7 +93,16 @@
           * @type {object} with objects like { label: string, automatic: boolean}
           *       and the event name {string} as the key.
           */
-         events: {}
+         events: {},
+
+         /**
+          * The actions available and their labels
+          *
+          * @property actions
+          * @type {object} with objects like { label: string}
+          *       and the action name/type {string} as the key.
+          */
+         actions: {}
       },
 
       /**
@@ -106,12 +115,36 @@
          this.widgets.actionListEl = Dom.get(this.id + "-actionList");
          this.widgets.flowButtons = Dom.get(this.id + "-flowButtons");
 
-         // Save reference to buttons so we can change label and such later
-         this.widgets.createButton = Alfresco.util.createYUIButton(this, "createaction-button", this.onCreateActionButtonClick,
-         {
-            disabled: true
-         });
+         // Create done button
          this.widgets.doneButton = Alfresco.util.createYUIButton(this, "done-button", this.onDoneActionsButtonClick);
+
+         // Create action button
+         var createActionButtonEl = Dom.get(this.id + "-createaction-button"),
+            createActionMenuEl = Dom.get(this.id + "-createaction-menu")
+            me = this;
+         var createActionButton = Alfresco.util.createYUIButton(this, "createaction-button", null,
+         {
+            type: "menu",
+            lazyloadmenu: false,
+            menu: createActionMenuEl,
+            disabled: true
+         }, createActionButtonEl);
+         this.widgets.createActionButton = createActionButton;
+
+         // Make sure only allowed actions are enabled when the menu appears
+         createActionButton.getMenu().subscribe("beforeShow", function(p_sType, p_aArgs, aItemsArray)
+         {
+            me._disableUnallowedActions();
+         }, []);
+
+         // Make sure clicks on disabled values doesn't add an action
+         createActionButton.getMenu().subscribe("click", function(p_sType, p_aArgs)
+         {
+            if (p_aArgs[1] && !p_aArgs[1].cfg.getProperty("disabled"))
+            {
+               me._createNewAction(p_aArgs[1].value);
+            }
+         });
 
          // Get the templates and remove the dummy placeholders from the DOM
          this.widgets.eventTemplateEl = Dom.get(this.id + "-event-template");
@@ -160,7 +193,7 @@
                         }
                      }
                   }
-                  this.widgets.createButton.set("disabled", false);                  
+                  this.widgets.createActionButton.set("disabled", false);
                },
                scope: this
             },
@@ -205,13 +238,13 @@
          // Description
          Dom.getElementsByClassName("description", "textarea", actionEl)[0].value = action.description ? action.description : "";
 
-         // Action type & location
-         var actionType = action.name,
-               actionTypeEl = Dom.getElementsByClassName("action-type", "select", actionEl)[0],
-               actionLocationEl = Dom.getElementsByClassName("action-location", "select", actionEl)[0],
-               actionLocationSpan = Dom.getElementsByClassName("action-location-section", "span", actionEl)[0],
-               actionLocationRestrictedSpan = Dom.getElementsByClassName("action-location-restricted-section", "span", actionEl)[0];
-         if(actionType == "transfer")
+         // Action name & location
+         var actionName = action.name,
+            actionNameEl = Dom.getElementsByClassName("action-name", "input", actionEl)[0],
+            actionLocationEl = Dom.getElementsByClassName("action-location", "select", actionEl)[0],
+            actionLocationSpan = Dom.getElementsByClassName("action-location-section", "span", actionEl)[0],
+            actionLocationRestrictedSpan = Dom.getElementsByClassName("action-location-restricted-section", "span", actionEl)[0];
+         if(actionName == "transfer")
          {
             // Display location since its a transfer action
             Dom.removeClass(actionLocationSpan, "hidden");
@@ -234,14 +267,8 @@
             Alfresco.util.setSelectedIndex(actionLocationEl, "");
             Dom.addClass(actionLocationSpan, "hidden");
          }
-         Event.addListener(actionTypeEl, "change", this.onActionTypeSelectChange,
-         {
-            actionEl: actionEl,
-            actionLocationSpan: actionLocationSpan,
-            actionLocationEl: actionLocationEl
-         }, this);
-         var actionTitle = Alfresco.util.setSelectedIndex(actionTypeEl, actionType);
-         actionTitle = actionTitle ? actionTitle : actionType;
+         // Display the actions label and set it in the form
+         actionNameEl.value = actionName;
 
          // Period Amount
          var periodAmount = (period && period.length > 1) ? period[1] : null,
@@ -281,7 +308,7 @@
 
          addEventButton.getMenu().subscribe("beforeShow", function(p_sType, p_aArgs, aItemsArray)
          {
-            me._disableUnusedEvents(addEventButton, actionEl);
+            me._disableUsedEvents(addEventButton, actionEl);
          }, []);
 
          addEventButton.getMenu().subscribe("click", function(p_sType, p_aArgs)
@@ -365,7 +392,7 @@
          this._disableEnablePeriodElements(periodUnitEl, periodAmountEl, periodActionEl);
 
          // Title
-         this._refreshTitle(actionEl, actionTitle);
+         this._refreshTitle(actionEl);
 
          return actionEl;
       },
@@ -594,29 +621,29 @@
        *
        * @method _refreshTitle
        * @param actionEl The action HTML element
-       * @param actionType (optional) Will use the text from the action drop down if not given
        */
-      _refreshTitle: function DispositionEdit__refreshTitle(actionEl, actionType)
+      _refreshTitle: function DispositionEdit__refreshTitle(actionEl)
       {
-         var actionTypeEl = Dom.getElementsByClassName("action-type", "select", actionEl)[0],
-               periodUnitSelect = Dom.getElementsByClassName("period-unit", "select", actionEl)[0],
-               periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0];
-         var title = "",
-               actionType = actionType ? actionType : actionTypeEl.options[actionTypeEl.selectedIndex].text;
+         var actionName = Dom.getElementsByClassName("action-name", "input", actionEl)[0].value,
+            actionDescriptor = this.options.actions[actionName];
+            actionNameLabel = actionDescriptor ? actionDescriptor.label : actionName;
+            periodUnitSelect = Dom.getElementsByClassName("period-unit", "select", actionEl)[0],
+            periodAmountEl = Dom.getElementsByClassName("period-amount", "input", actionEl)[0],
+            title = "";
          if (!periodUnitSelect.disabled && periodUnitSelect.options[periodUnitSelect.selectedIndex].value != "none")
          {
             if (periodAmountEl.disabled || periodAmountEl.value == "" || periodAmountEl.value == "0")
             {
                title = this.msg(
                      "label.title.noTime",
-                     actionType,
+                     actionNameLabel,
                      periodUnitSelect.options[periodUnitSelect.selectedIndex].text.toLowerCase());
             }
             else
             {
                title = this.msg(
                      "label.title.complex",
-                     actionType,
+                     actionNameLabel,
                      periodAmountEl.value,
                      periodUnitSelect.options[periodUnitSelect.selectedIndex].text.toLowerCase());
             }
@@ -625,7 +652,7 @@
          {
             title = this.msg(
                   "label.title.simple",
-                  actionType
+                  actionNameLabel
                   );
          }
 
@@ -720,29 +747,6 @@
          }
       },
 
-
-      /**
-       * Called when user changes the action type amount
-       *
-       * @method onActionTypeSelectChange
-       * @param e click event object
-       * @param obj callback object containg action info & HTMLElements
-       */
-      onActionTypeSelectChange: function DispositionEdit_onActionTypeSelectChange(e, obj)
-      {
-         var actionTypeEl = e.currentTarget;
-         if(actionTypeEl.options[actionTypeEl.selectedIndex].value == "transfer")
-         {
-            Dom.removeClass(obj.actionLocationSpan, "hidden");
-         }
-         else
-         {
-            Alfresco.util.setSelectedIndex(obj.actionLocationEl, "");
-            Dom.addClass(obj.actionLocationSpan, "hidden");
-         }
-         this._refreshTitle(obj.actionEl);
-      },
-
       /**
        * Called when user changes the period amount
        *
@@ -804,14 +808,51 @@
          Dom.addClass(obj.actionEl, relation == "true" ? "or" : "and");
       },
 
+
+      /**
+       * Makes sure only allowed actions are enabled in the menu
+       *
+       * @method _disableUnallowedActions
+       * @private
+       */
+      _disableUnallowedActions: function DispositionEdit__disableUnallowedActions()
+      {
+         // Find out what actions that has been used
+         var actionNames = Dom.getElementsByClassName("action-name", "input", this.widgets.actionListEl);
+         var usedActionNames = {};
+         for (var i = 0; i < actionNames.length; i++)
+         {
+            usedActionNames[actionNames[i].value] = true;
+         }
+
+         // Clear event menu and disable/enable events in the menu
+         var items = this.widgets.createActionButton.getMenu().getItems(),
+            item,
+            disabled,
+            disableAll = usedActionNames["destroy"] ? true : false, // "destroy" is in use and it MUST be the last action
+            onlyEnableCutoff = actionNames.length == 0; // No actions are in use and "cutoff MUST be the first
+         for (i = 0; i < items.length; i++)
+         {
+            item = items[i];
+            /**
+             * Disable item if:
+             * - all items shall be disabled
+             * - OR the item already is used
+             * - OR if only cutoff shall be enabled (and this isn't "cutoff")
+             */
+            disabled = (disableAll) || (usedActionNames[item.value] ? true : false) || (onlyEnableCutoff && item.value != "cutoff");
+            item.cfg.setProperty("disabled", disabled);
+         }
+      },
+
       /**
        * Makes sure only unused events are enabled in the menu
        *
-       * @method _disableUnusedEvents
+       * @method _disableUsedEvents
        * @param addEventButton The button used to add event
        * @param actionEl The action HTMLElement
        */
-      _disableUnusedEvents: function DispositionEdit__disableUnusedEvents(addEventButton, actionEl)
+      _disableUsedEvents: function DispositionEdit__disableUsedEvents(addEventButton, actionEl)
       {
          // Find out what events that has been used
          var actionEventValues = Dom.getElementsByClassName("action-event-name-value", "input", actionEl);
@@ -993,13 +1034,12 @@
       },
 
       /**
-       * Called when user clicks the cancel action button
+       * Called when user selected a vliad option in the create action menu button
        *
-       * @method onCreateActionButtonClick
-       * @param e click event object
-       * @param obj callback object containg action info & HTMLElements
+       * @method _createNewAction
+       * @param actionName {string} The name of the action to create
        */
-      onCreateActionButtonClick: function DispositionEdit_onCreateActionButtonClick(e, obj)
+      _createNewAction: function DispositionEdit__createNewAction(actionName)
       {
          var noOfActions = Dom.getElementsByClassName("action", "li", this.widgets.actionListEl).length;
          var action =
@@ -1007,8 +1047,7 @@
             id: "",
             index: noOfActions,
             title: this.msg("label.title.new"),
-            name: "",
-            type: "",
+            name: actionName,
             period : null,
             periodProperty: (noOfActions == 0 ? "rma:dateFiled": "rma:cutOffDate"),
             description: "",
