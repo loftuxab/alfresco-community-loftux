@@ -80,7 +80,7 @@ public class TransferReportPost extends TransferReportGet
     }
     
     @Override
-    protected File executeTransfer(NodeRef[] itemsToTransfer,
+    protected File executeTransfer(NodeRef transferNode,
                 WebScriptRequest req, WebScriptResponse res, 
                 Status status, Cache cache) throws IOException
     {
@@ -132,7 +132,7 @@ public class TransferReportPost extends TransferReportGet
                 logger.debug("Filing transfer report as record in record folder: " + destination);
         
             // generate the report (will be in JSON format)
-            report = generateTransferReport(itemsToTransfer);
+            report = generateTransferReport(transferNode);
             
             // file the report as a record
             NodeRef record = fileTransferReport(report, destination);

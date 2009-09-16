@@ -1100,6 +1100,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         // retrieve the id of the last transfer
         NodeRef transferNodeRef = assocs.get(assocs.size()-1).getChildRef();
+        Date transferDate = (Date)nodeService.getProperty(transferNodeRef, ContentModel.PROP_CREATED);
         
         // Test successful retrieval of transfer archive
         transferId = transferNodeRef.getId();
@@ -1116,7 +1117,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(jsonRsp.has("data"));
         JSONObject data = jsonRsp.getJSONObject("data");
         assertTrue(data.has("transferDate"));
-        assertNotNull(data.getString("transferDate"));
+        Date transferDateRsp = ISO8601DateFormat.parse(data.getString("transferDate"));
+        assertEquals(transferDate, transferDateRsp);
         assertTrue(data.has("transferPerformedBy"));
         assertEquals("System", data.getString("transferPerformedBy"));
         assertTrue(data.has("dispositionAuthority"));
