@@ -1,5 +1,13 @@
 <alfresco-config>
    
+   <config>
+      <forms>
+         <dependencies>
+            <js src="/js/rm-validation.js" />
+         </dependencies>
+      </forms>   
+   </config>
+
    <!-- Records Management Creation Forms -->
    <config evaluator="model-type" condition="dod:recordSeries">
       <forms>
@@ -173,8 +181,14 @@
                      <control-param name="activateLinks">true</control-param>
                   </control>
                </field>
-               <field id="rma:vitalRecordIndicator" set="rm" />
-               <field id="rma:reviewPeriod" set="rm" />
+               <field id="rma:vitalRecordIndicator" set="rm">
+                  <control template="/org/alfresco/components/form/controls/vital-record-indicator.ftl" />
+               </field> 
+               <field id="rma:reviewPeriod" set="rm">
+                  <constraint-handlers>
+                     <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.rmVitalRecordPeriodMandatory" />
+                  </constraint-handlers>
+               </field>
                <field id="rma:identifier" set="rm" label-id="label.categoryIdentifier" />
             </appearance>
          </form>
@@ -214,8 +228,14 @@
                </field>
                <field id="rma:identifier" set="rm" label-id="label.folderIdentifier" />
                <field id="rmc:supplementalMarkingList" set="rm" />
-               <field id="rma:vitalRecordIndicator" set="rm" />
-               <field id="rma:reviewPeriod" set="rm" />
+               <field id="rma:vitalRecordIndicator" set="rm">
+                  <control template="/org/alfresco/components/form/controls/vital-record-indicator.ftl" />
+               </field> 
+               <field id="rma:reviewPeriod" set="rm">
+                  <constraint-handlers>
+                     <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.rmVitalRecordPeriodMandatory" />
+                  </constraint-handlers>
+               </field>
                <field id="rma:location" set="rm" />
             </appearance>
          </form>
