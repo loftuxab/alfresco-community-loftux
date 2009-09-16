@@ -1,7 +1,3 @@
-.permissions
-{
-}
-
 .permissions .hidden
 {
    display: none;
@@ -32,10 +28,15 @@
    font-size: 108%;
 }
 
-.permissions .list
+.permissions .permlist
 {
    margin: 0.5em;
    border: 1px solid #444;
+}
+
+.permissions .permlist-border
+{
+   padding: 1px;
 }
 
 .permissions .inherit
@@ -62,7 +63,7 @@
 .permissions .readonly-label
 {
    color: #000;
-   margin: 0.3em 6.5em 0 1.2em;
+   margin-top: 0.3em;
 }
 
 .permissions .hint-label
@@ -74,19 +75,26 @@
 .permissions .controls-header
 {
    float: right;
-   min-width: 20em;
+   min-width: 12em;
 }
 
 .permissions .controls
 {
    float: right;
    margin-top: -0.5em;
-   min-width: 20em;
+   min-width: 12em;
+}
+
+.permissions .actions-header
+{
+   float: right;
+   min-width: 8em;
 }
 
 .permissions .actions
 {
    float: right;
+   margin-top: -0.5em;
    min-width: 8em;
 }
 
@@ -101,9 +109,11 @@
 {
    display: none;
    position: absolute;
-   right: 0.5em;
-   top: 13em;
+   right: 1em;
+   top: 12em;
    z-index: 100;
+   min-width: 30em;
+   *width: 30em;   
 }
 
 .permissions .authority-picker.active

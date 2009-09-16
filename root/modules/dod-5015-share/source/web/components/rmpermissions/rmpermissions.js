@@ -320,20 +320,20 @@
          var msgLocal = this.msg("label.local");
          
          // construct row data
-         var html = '<div class="list-item"><div class="controls">';
+         var html = '<div class="list-item"><div class="actions">';
          if (permission.inherited)
          {
             // inherited permission - read only
-            html += '<div class="actions"></div><div class="readonly-label">' + (permission.id === "Filing" ? msgReadFile : msgReadOnly) + '</div>';
+            html += '&nbsp;</div><div class="controls"><div class="readonly-label">' + (permission.id === "Filing" ? msgReadFile : msgReadOnly) + '</div>';
          }
          else
          {
             // directly applied permission - can modify or remove
-            html += '<div class="actions"><span id="' + removeBtnContainerId + '"></span></div><span id="' + modifyMenuContainerId + '"></span>';
+            html += '<span id="' + removeBtnContainerId + '"></span></div><div class="controls"><span id="' + modifyMenuContainerId + '"></span>';
          }
-         html += '</div><span class="label">' + $html(permission.authority.label) + '</span>';
+         html += '</div><div><span class="label">' + $html(permission.authority.label) + '</span>';
          html += '<span class="hint-label">(' + (permission.inherited ? msgInherited : msgLocal) + ')</span>';
-         html += '</div>';
+         html += '</div></div>';
          
          div.innerHTML = html;
          
