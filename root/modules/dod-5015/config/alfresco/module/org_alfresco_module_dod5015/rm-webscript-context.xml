@@ -247,4 +247,13 @@
         <property name="caveatConfigService" ref="CaveatConfigService" />
     </bean>
     
+    <!-- REST impl for GET User Rights Report -->
+    <bean id="webscript.org.alfresco.rma.userrightsreport.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.UserRightsReportGet" parent="webscript">
+        <property name="authorityService" ref="AuthorityService" />
+        <property name="personService" ref="PersonService" />
+        <property name="nodeService" ref="NodeService" />
+        <property name="recordsManagementService" ref="RecordsManagementService" />
+        <property name="recordsManagementSecurityService" ref="RecordsManagementSecurityService" />
+    </bean>
+    
 </beans>
