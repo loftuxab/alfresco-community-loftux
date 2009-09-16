@@ -8,7 +8,7 @@ set ALF_HOME=%~dp0
 set CATALINA_HOME=%ALF_HOME%tomcat
 
 rem Set any default JVM options
-set JAVA_OPTS=-Xms128m -Xmx512m -Xss96k -XX:MaxPermSize=128m -server -Dalfresco.home=%ALF_HOME% -Dcom.sun.management.jmxremote
+set JAVA_OPTS=-Xms128m -Xmx512m -Xss96k -XX:MaxPermSize=160m -server -Dalfresco.home=%ALF_HOME% -Dcom.sun.management.jmxremote
 
 rem --- If SetPaths.bat already exists - assume set by hand and use as is
 set PATH=%ALF_HOME%bin;%PATH%
