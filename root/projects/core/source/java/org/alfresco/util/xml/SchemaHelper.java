@@ -74,14 +74,6 @@ public class SchemaHelper
                 System.exit(1);
             }
             
-            SchemaCompiler compiler = XJC.createSchemaCompiler();
-            compiler.parseSchema(new InputSource(url.toExternalForm()));
-            S2JJAXBModel model = compiler.bind();
-            if (model == null)
-            {
-                System.out.println("Failed to produce binding model for URL " + urlStr);
-                System.exit(1);
-            }
             ErrorListener errorListener = new ErrorListener()
             {
                 public void warning(SAXParseException e)
@@ -101,6 +93,16 @@ public class SchemaHelper
                     handleException(urlStr, e);
                 }
             };
+
+            SchemaCompiler compiler = XJC.createSchemaCompiler();
+            compiler.setErrorListener(errorListener);
+            compiler.parseSchema(new InputSource(url.toExternalForm()));
+            S2JJAXBModel model = compiler.bind();
+            if (model == null)
+            {
+                System.out.println("Failed to produce binding model for URL " + urlStr);
+                System.exit(1);
+            }
             JCodeModel codeModel = model.generateCode(null, errorListener);
             codeModel.build(dir);
         }
