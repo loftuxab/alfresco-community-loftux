@@ -242,7 +242,7 @@ public class JBossVFSHelper implements PathMatchingHelper
         @SuppressWarnings("deprecation")
         public Resource createRelative(String relativePath) throws IOException
         {
-            return new VFSResource(this.file.findChild(relativePath));
+            return new VFSResource(VFS.getRoot(new URL(getURL(), relativePath)));
         }
 
         /*
