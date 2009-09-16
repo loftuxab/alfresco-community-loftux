@@ -34,9 +34,8 @@
 
 .permissions .list
 {
-   background-color: #ffffff;
-   padding: 0.5em;
-   border: 1px solid #444444;
+   margin: 0.5em;
+   border: 1px solid #444;
 }
 
 .permissions .inherit
@@ -44,9 +43,15 @@
    padding: 0.5em 1em 0em 0em;
 }
 
+.permissions .list-item-header
+{
+   padding: 0.7em 0.6em 0.5em 0.6em;
+}
+
 .permissions .list-item
 {
-   padding: 0.6em;
+   padding: 0.7em 0.6em 0.5em 0.6em;
+   border-top: 1px dotted #999;
 }
 
 .permissions .label
@@ -63,7 +68,7 @@
 .permissions .hint-label
 {
    margin-left: 0.5em;
-   color: #aaa;
+   color: #444;
 }
 
 .permissions .controls-header
