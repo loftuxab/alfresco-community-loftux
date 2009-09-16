@@ -215,7 +215,74 @@
        */
       onActionDestroy: function RDLA_onActionDestroy(assets)
       {
-         this._dod5015Action("message.destroy", assets, "destroy");
+         // If "Destroy" was triggered form the documentlist assets contain an object instead of an array
+         var me = this,
+            noOfAssets = YAHOO.lang.isArray(assets) ? assets.length : 1,
+            text;
+         if(noOfAssets == 1)
+         {
+            text = this.msg("message.confirm.destroy", (YAHOO.lang.isArray(assets) ? assets[0].displayName : assets.displayName));
+         }
+         else
+         {
+            text = this.msg("message.confirm.destroyMultiple", noOfAssets);             
+         }
+
+         // Show the first confirmation dialog
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            title: this.msg("message.confirm.destroy.title"),
+            text: text,
+            buttons: [
+            {
+               text: this.msg("button.ok"),
+               handler: function RDLA_onActionDestroy_confirm_ok()
+               {
+                  // Hide the first confirmation dialog
+                  this.destroy();
+
+                  // Display the second confirmation dialog
+                  text = (noOfAssets == 1 ? me.msg("message.confirm2.destroy") : me.msg("message.confirm2.destroyMultiple"));
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     title: me.msg("message.confirm2.destroy.title"),
+                     text: text,
+                     buttons: [
+                        {
+                           text: me.msg("button.ok"),
+                           handler: function RDLA_onActionDestroy_confirm2_ok()
+                           {
+                              // Hide the second confirmation dialog
+                              this.destroy();
+
+                              // Call the destroy action
+                              me._dod5015Action("message.destroy", assets, "destroy");
+                           },
+                           isDefault: true
+                        },
+                        {
+                           text: me.msg("button.cancel"),
+                           handler: function RDLA_onActionDestroy_confirm2_cancel()
+                           {
+                              // Hide the second confirmation dialog
+                              this.destroy();
+                           }
+                        }]
+                  });
+
+               },
+               isDefault: true
+            },
+            {
+               text: this.msg("button.cancel"),
+               handler: function RDLA_onActionDestroy_confirm_cancel()
+               {
+                  // Hide the first confirmation dialog
+                  this.destroy();
+               }
+            }]
+         });
+
       },
 
       /**
