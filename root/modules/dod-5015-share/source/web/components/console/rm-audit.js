@@ -178,7 +178,7 @@
          DS.responseType = YAHOO.util.DataSource.TYPE_JSON;
          DS.responseSchema = {
             resultsList:'data.entries',
-            fields: ["timestamp","fullName","userRole","event"],
+            fields: ["timestamp","fullName","userRole","event","nodeName","nodeRef"],
             metaFields: {
                "enabled": "data.enabled",
                "stopDate": "data.stopped",
@@ -209,7 +209,18 @@
          );
          //so we can update caption to list number of results
          this.widgets['auditDataSource'].subscribe('responseParseEvent', this.updateUI, this, true);
-
+         var me = this;
+         this.widgets['auditDataSource'].doBeforeCallback = function(oRequest, oFullResponse, oParsedResponse, oCallback) {
+            var data = oParsedResponse.results;
+            for (var i=0,len=data.length;i<len;i++)
+            {
+               var entry = data[i];
+               oParsedResponse.results[i].event += ' [<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + me.options.siteId + '/document-details?nodeRef=' + entry.nodeRef + '">' + entry.nodeName + '</a>]';
+            }
+            
+            return oParsedResponse;
+         };
+         
          this.widgets['status-date'] = Dom.get(this.id+'-status-date');
 
          this.validAuditDates = (this.options.startDate!=="");
@@ -350,7 +361,11 @@
        */      
       onExportLog: function RM_Audit_onExportLog()
       {
-         // console.log(arguments.callee.name);
+         var exportUri = this.dataUri + this._buildQuery();
+         //we can't add export to this.queryParams (for buildQuery to generate query)
+         //since export is a reserved word. So we add it manually.
+         exportUri += (exportUri.indexOf('?')==-1) ? '?export=true' : '&export=true';
+         window.location.href = exportUri;
       },
 
       /**
@@ -695,7 +710,6 @@
          {
             this.toggleUI();
          }
-
          //update caption
          this.widgets['auditDataTable']._elCaption.innerHTML = this.msg('label.pagination', response.results.length); 
       }
