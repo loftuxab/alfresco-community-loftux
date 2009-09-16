@@ -53,10 +53,13 @@ public class TransferGet extends BaseTransferWebScript
     private static Log logger = LogFactory.getLog(TransferGet.class);
     
     @Override
-    protected File executeTransfer(NodeRef[] itemsToTransfer,
+    protected File executeTransfer(NodeRef transferNode,
                 WebScriptRequest req, WebScriptResponse res, 
                 Status status, Cache cache) throws IOException
     {
+        // get all 'transferred' nodes
+        NodeRef[] itemsToTransfer = getTransferNodes(transferNode);
+        
         // setup the ACP parameters
         ExporterCrawlerParameters params = new ExporterCrawlerParameters();
         params.setCrawlSelf(true);

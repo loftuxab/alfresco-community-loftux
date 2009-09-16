@@ -121,11 +121,8 @@ public abstract class BaseTransferWebScript extends StreamACP
                 return;
             }
             
-            // get all 'transferred' nodes
-            NodeRef[] itemsToTransfer = getTransferNodes(transferNode);
-            
             // execute the transfer operation
-            tempFile = executeTransfer(itemsToTransfer, req, res, status, cache);
+            tempFile = executeTransfer(transferNode, req, res, status, cache);
         }
         catch (Throwable e)
         {
@@ -147,7 +144,7 @@ public abstract class BaseTransferWebScript extends StreamACP
     /**
      * Abstract method subclasses implement to perform the actual logic required.
      * 
-     * @param itemsToTransfer Array of NodeRefs to transfer
+     * @param transferNode The transfer node
      * @param req The request
      * @param res The response
      * @param status Status object
@@ -155,7 +152,7 @@ public abstract class BaseTransferWebScript extends StreamACP
      * @return File object representing the file containing the JSON of the report
      * @throws IOException
      */
-    protected abstract File executeTransfer(NodeRef[] itemsToTransfer,
+    protected abstract File executeTransfer(NodeRef transferNode,
                 WebScriptRequest req, WebScriptResponse res, 
                 Status status, Cache cache) throws IOException;
     

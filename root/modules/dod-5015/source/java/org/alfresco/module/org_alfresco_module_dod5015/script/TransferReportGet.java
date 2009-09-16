@@ -85,12 +85,12 @@ public class TransferReportGet extends BaseTransferWebScript
     }
     
     @Override
-    protected File executeTransfer(NodeRef[] itemsToTransfer,
+    protected File executeTransfer(NodeRef transferNode,
                 WebScriptRequest req, WebScriptResponse res, 
                 Status status, Cache cache) throws IOException
     {
         // generate the report (will be in JSON format)
-        File report = generateTransferReport(itemsToTransfer);
+        File report = generateTransferReport(transferNode);
         
         // stream the report back to the client
         streamContent(req, res, report, false);
@@ -102,16 +102,19 @@ public class TransferReportGet extends BaseTransferWebScript
     /**
      * Generates a File containing the JSON representation of a transfer report.
      * 
-     * @param itemsToTransfer Array of NodeRefs being transferred
+     * @param transferNode The transfer node
      * @return File containing JSON representation of a transfer report
      * @throws IOException
      */
-    File generateTransferReport(NodeRef[] itemsToTransfer) throws IOException
+    File generateTransferReport(NodeRef transferNode) throws IOException
     {
         File report = TempFileProvider.createTempFile(REPORT_FILE_PREFIX, REPORT_FILE_SUFFIX);
         Writer writer = null;
         try
         {
+            // get all 'transferred' nodes
+            NodeRef[] itemsToTransfer = getTransferNodes(transferNode);
+            
             if (logger.isDebugEnabled())
             {
                 logger.debug("Generating transfer report for " + itemsToTransfer.length + 
@@ -137,7 +140,8 @@ public class TransferReportGet extends BaseTransferWebScript
             // write the JSON header
             writer.write("{\n\t\"data\":\n\t{");
             writer.write("\n\t\t\"transferDate\": \"");
-            writer.write(ISO8601DateFormat.format(new Date()));
+            writer.write(ISO8601DateFormat.format(
+                        (Date)this.nodeService.getProperty(transferNode, ContentModel.PROP_CREATED)));
             writer.write("\",\n\t\t\"transferPerformedBy\": \"");
             writer.write(AuthenticationUtil.getRunAsUser());
             writer.write("\",\n\t\t\"dispositionAuthority\": \"");
