@@ -42,6 +42,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
@@ -1367,16 +1368,16 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	    DispositionAction da = rmService.getNextDispositionAction(record);
 	    if (da != null)
 	    {
-            assertTrue(this.nodeService.hasAspect(record, RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH));
+	        assertTrue(nodeService.hasAspect(record, RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH));
             assertEquals(da.getName(),
-                         this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_ACTION_NAME));
+                         nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_ACTION_NAME));
             assertEquals(da.getAsOfDate(),
-                         this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_ACTION_AS_OF));
-            assertEquals(this.nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE),
-                         this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS_ELIGIBLE));
+                         nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_ACTION_AS_OF));
+            assertEquals(nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE),
+                         nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS_ELIGIBLE));
             
             int eventCount = da.getEventCompletionDetails().size();
-            Collection<String> events = (Collection<String>)this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS);
+            Collection<String> events = (Collection<String>)nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_EVENTS);
             if (eventCount == 0)
             {
                 assertNull(events);
@@ -1390,22 +1391,33 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             assertNotNull(daDef);
             Period period = daDef.getPeriod();
             assertNotNull(period);
-            assertEquals(period.getPeriodType(), this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD));
-            assertEquals(period.getExpression(), this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD_EXPRESSION));
+            assertEquals(period.getPeriodType(), nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD));
+            assertEquals(period.getExpression(), nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD_EXPRESSION));
+	    }
+	    
+	    DispositionSchedule ds = rmService.getDispositionSchedule(record);
+	    Boolean value = (Boolean)nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_HAS_DISPOITION_SCHEDULE);
+	    if (ds != null)
+	    {
+	        assertTrue(value);
+	    }
+	    else
+	    {
+	        assertFalse(value);
 	    }
         
         VitalRecordDefinition vrd = this.rmService.getVitalRecordDefinition(record);
         if (vrd == null)
         {
-            assertNull(this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD));
-            assertNull(this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD_EXPRESSION));
+            assertNull(nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD));
+            assertNull(nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD_EXPRESSION));
         }
         else
         {
             assertEquals(vrd.getReviewPeriod().getPeriodType(),
-                         this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD));
+                         nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD));
             assertEquals(vrd.getReviewPeriod().getExpression(),
-                         this.nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD_EXPRESSION));            
+                         nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_VITAL_RECORD_REVIEW_PERIOD_EXPRESSION));            
         }
 	}
 
@@ -2193,7 +2205,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // Create record category / record folder
         
-        NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");
+        final NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");
         assertNotNull(recordCategory);
         assertEquals("AIS Audit Records", this.nodeService.getProperty(recordCategory, ContentModel.PROP_NAME));
         
@@ -2245,7 +2257,15 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         // TODO - set supplemental markings list (on record folder)
         
         // TODO review RM permissions
-        permissionService.setPermission(recordCategory, "dfranco", RMPermissionModel.FILE_RECORDS, true);
+        AuthenticationUtil.runAs(new RunAsWork<Object>()
+        {
+            public Object doWork()
+            {
+                permissionService.setPermission(recordCategory, "dfranco", RMPermissionModel.FILE_RECORDS, true);
+                return null;
+            }
+        }, "admin");
+        
         
         AuthenticationUtil.setFullyAuthenticatedUser("dfranco");
         assertEquals(AccessStatus.ALLOWED, publicServiceAccessService.hasAccess("NodeService", "exists", recordFolder));

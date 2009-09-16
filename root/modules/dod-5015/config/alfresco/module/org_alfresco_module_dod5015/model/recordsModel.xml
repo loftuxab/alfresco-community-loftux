@@ -770,7 +770,6 @@
          <properties>                           
             <property name="rma:recordSearchHasDispositionSchedule">
                <type>d:boolean</type>
-               <default>false</default>
             </property>               
             <property name="rma:recordSearchDispositionActionName">
                <type>d:text</type>
