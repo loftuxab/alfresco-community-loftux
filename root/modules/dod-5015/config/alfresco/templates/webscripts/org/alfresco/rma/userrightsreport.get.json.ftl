@@ -10,7 +10,8 @@
                 "userName": "${report.users[user].userName!""}",
                 "firstName": "${report.users[user].firstName!""}",
                 "lastName": "${report.users[user].lastName!""}",
-                "roles": [<#list report.users[user].roles as role>"${role}"<#if role_has_next>,</#if></#list>]
+                "roles": [<#list report.users[user].roles as role>"${role}"<#if role_has_next>,</#if></#list>],
+                "groups": [<#list report.users[user].groups as group>"${group}"<#if group_has_next>,</#if></#list>]
             }
             <#if user_has_next>,</#if>
             </#list>
@@ -27,7 +28,19 @@
             }
             <#if role_has_next>,</#if>
             </#list>
-		}
+		},
+		"groups":
+        {
+            <#list report.groups?keys as group>         
+            "${group}":
+            {
+                "name": "${report.groups[group].name!""}",
+                "label": "${report.groups[group].displayLabel!""}",
+                "users": [<#list report.groups[group].users as user>"${user}"<#if user_has_next>,</#if></#list>]
+            }
+            <#if group_has_next>,</#if>
+            </#list>
+        }
 	}
 }
 </#escape>
