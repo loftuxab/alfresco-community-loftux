@@ -204,10 +204,8 @@ public class ClassPathStore implements ApplicationContextAware, Store
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#getDocumentPaths(java.lang.String, boolean, java.lang.String)
      */
-    public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern)
+    public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern) throws IOException
     {
-        String[] paths;
-        
         if ((path == null) || (path.length() == 0))
         {
             path = "/";
@@ -234,24 +232,14 @@ public class ClassPathStore implements ApplicationContextAware, Store
                .append((includeSubPaths ? "**/" : ""))
                .append(documentPattern);
         
-        try
-        {
-            List<String> documentPaths = getPaths(pattern.toString());
-            paths = documentPaths.toArray(new String[documentPaths.size()]);
-        }
-        catch (IOException e)
-        {
-            // Note: Ignore: no documents found
-            paths = new String[0];
-        }
-        
-        return paths;
+        List<String> documentPaths = getPaths(pattern.toString());
+        return documentPaths.toArray(new String[documentPaths.size()]);
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#getDescriptionDocumentPaths()
      */
-    public String[] getDescriptionDocumentPaths()
+    public String[] getDescriptionDocumentPaths() throws IOException
     {
         return getDocumentPaths("/", true, "*.desc.xml");
     }
@@ -259,7 +247,7 @@ public class ClassPathStore implements ApplicationContextAware, Store
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#getScriptDocumentPaths(org.alfresco.web.scripts.WebScript)
      */
-    public String[] getScriptDocumentPaths(WebScript script)
+    public String[] getScriptDocumentPaths(WebScript script) throws IOException
     {
         String scriptPaths = script.getDescription().getId() + ".*";
         return getDocumentPaths("/", false, scriptPaths);

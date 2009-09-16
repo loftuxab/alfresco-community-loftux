@@ -83,7 +83,16 @@ public class ServiceDump extends DeclarativeWebScript
             modelStore.path = store.getBasePath();
             
             // locate script implementation files
-            String[] scriptPaths = store.getScriptDocumentPaths(script);
+            String[] scriptPaths;
+            try
+            {
+                scriptPaths = store.getScriptDocumentPaths(script);
+            }
+            catch (IOException e)
+            {
+                throw new WebScriptException("Failed to search for documents for script "
+                        + script.getDescription().getId() + " in store " + store, e);
+            }
             for (String scriptPath : scriptPaths)
             {
                 ScriptImplementation impl = new ScriptImplementation();

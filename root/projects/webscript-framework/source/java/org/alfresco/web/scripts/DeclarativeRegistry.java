@@ -207,7 +207,15 @@ public class DeclarativeRegistry
             if (logger.isDebugEnabled())
                 logger.debug("Locating Web Scripts within " + apiStore.getBasePath());
             
-            String[] serviceDescPaths = apiStore.getDescriptionDocumentPaths();
+            String[] serviceDescPaths;
+            try
+            {
+                serviceDescPaths = apiStore.getDescriptionDocumentPaths();
+            }
+            catch (IOException e)
+            {
+                throw new WebScriptException("Failed to search for web scripts in store " + apiStore, e);
+            }
             for (String serviceDescPath : serviceDescPaths)
             {
                 try

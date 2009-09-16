@@ -421,11 +421,18 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      * @see org.alfresco.web.framework.ModelObjectPersister#getAllObjectsByFilter(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
      */
     public Map<String, ModelObject> getAllObjectsByFilter(ModelPersistenceContext context, String filter)
-        throws ModelObjectPersisterException
+            throws ModelObjectPersisterException
     {
-        String[] docPaths = this.store.getDocumentPaths("", true, idToPath(filter));
-        
-        return getObjectsFromPaths(context, docPaths);
+        try
+        {
+            String[] docPaths = this.store.getDocumentPaths("", true, idToPath(filter));
+
+            return getObjectsFromPaths(context, docPaths);
+        }
+        catch (IOException e)
+        {
+            throw new ModelObjectPersisterException("Failed to get objects by filter: " + filter, e);
+        }
     }
 
     /**
