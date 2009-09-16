@@ -54,7 +54,16 @@
             <create-form template="dod5015-create-container.ftl" />
             <appearance>
                <set id="rm-custom" />
+               <field id="cm:description" mandatory="true" />
                <field id="rma:identifier" label-id="label.categoryIdentifier" />
+               <field id="rma:vitalRecordIndicator">
+                  <control template="/org/alfresco/components/form/controls/vital-record-indicator.ftl" />
+               </field> 
+               <field id="rma:reviewPeriod">
+                  <constraint-handlers>
+                     <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.rmVitalRecordPeriodMandatory" />
+                  </constraint-handlers>
+               </field>
             </appearance>
          </form>
       </forms>
@@ -176,7 +185,7 @@
             <appearance>
                <set id="rm" />
                <set id="rm-custom" />
-               <field id="cm:description">
+               <field id="cm:description" mandatory="true">
                   <control>
                      <control-param name="activateLinks">true</control-param>
                   </control>
