@@ -50,6 +50,7 @@ public class FormField
 	private static final String ATTR_HELP_TEXT = "help";
 	private static final String ATTR_SET = "set";
     private static final String ATTR_READ_ONLY = "read-only";
+    private static final String ATTR_MANDATORY = "mandatory";
 
 	private static Log logger = LogFactory.getLog(FormField.class);
     
@@ -142,6 +143,13 @@ public class FormField
         Object disabledValue = attributes.get(ATTR_READ_ONLY);
         return disabledValue instanceof String
             && "true".equalsIgnoreCase((String)disabledValue);
+    }
+    
+    public boolean isMandatory()
+    {
+        Object mandatoryValue = attributes.get(ATTR_MANDATORY);
+        return mandatoryValue instanceof String
+            && "true".equalsIgnoreCase((String)mandatoryValue);
     }
     
     public String getSet()

@@ -79,6 +79,7 @@
                 <field id="my:duplicate" label="Duplicate" read-only="true" help="This is a test for duplicate props and assocs" />
                 <field id="my:date" label="Custom Date" description-id="form.field.dateformat" />
                 <field id="my:dateTime" label="Custom Date Time" description-id="form.field.dateformat" />
+                <field id="my:mandatory" label="Force Mandatory Field" mandatory="true" />
              </appearance>
           </form>
 

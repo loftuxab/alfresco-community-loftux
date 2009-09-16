@@ -954,6 +954,13 @@ function setupFieldState(fieldDef, fieldConfig)
    
    fieldDef.disabled = disabled;
    delete fieldDef.protectedField;
+   
+   // configure mandatory state (but only if the field definition indicates
+   // that it is an optional field
+   if (!fieldDef.mandatory && fieldConfig !== null && fieldConfig.mandatory)
+   {
+      fieldDef.mandatory = true;
+   }
 }
 
 /**

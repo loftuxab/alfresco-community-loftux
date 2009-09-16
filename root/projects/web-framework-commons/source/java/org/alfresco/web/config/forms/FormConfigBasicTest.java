@@ -598,4 +598,19 @@ public class FormConfigBasicTest extends BaseTest
         assertFalse(hiddenFieldsDefaultForm.isFieldHidden("non:existent", Mode.CREATE));
         
     }
+    
+    /**
+     * Tests the 'mandatory' attribute
+     */
+    public void testMandatoryField() throws Exception
+    {
+        // make sure the default for a field without mandatory attribute is false
+        FormField duplicateField = myExampleDefaultForm.getFields().get("my:duplicate");
+        assertNotNull(duplicateField);
+        assertFalse(duplicateField.isMandatory());
+        
+        FormField mandatoryField = myExampleDefaultForm.getFields().get("my:mandatory");
+        assertNotNull(mandatoryField);
+        assertTrue(mandatoryField.isMandatory());
+    }
 }
