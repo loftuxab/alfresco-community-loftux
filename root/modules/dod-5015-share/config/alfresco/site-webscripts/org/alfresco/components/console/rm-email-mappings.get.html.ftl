@@ -25,10 +25,8 @@
    	<div class="yui-u first">
          <h2>${msg('label.email-mappings')}</h2>
 		   <div>
-            <form action="email_submit" method="get" accept-charset="utf-8">
                <span>${msg('label.map')}</span>
-               <input type="text" name="emailProperty-text" value="" id="emailProperty-text" />
-               
+               <input type="text" name="emailProperty-text" value="" id="emailProperty-text" /> 
                <button id="emailProperty-but" name="emailProperty-but"><img src="${page.url.context}/components/images/expanded.png" title="${msg('label.select-email')}"/></button>      
                <div id="email-menu-container"></div>
                <span>to</span>
@@ -36,7 +34,6 @@
                <button id="rmProperty-but" name="rmProperty-but"><img src="${page.url.context}/components/images/expanded.png" title="${msg('label.select-rm')}"/></button>
                <div id="rm-menu-container"></div>
                <button id="add-mapping" name="email-add" disabled>${msg('label.add')}</button>              
-            </form>
          </div>
    	</div>
     </div>    
@@ -46,6 +43,6 @@
     </div>
     <div id="emailMappings-actions" class="emailMappings-actions">
        <input type="submit" name="save-mappings" value="${msg('label.save')}" id="save-mappings" disabled/>
-       <button id="discard-mappings" name="discard-mappings" disabled>${msg('label.discard')}</button>              
+       <button id="discard-mappings" name="discard-mappings" disabled>${msg('label.discard')}</button>    
     </div>
   </div>
