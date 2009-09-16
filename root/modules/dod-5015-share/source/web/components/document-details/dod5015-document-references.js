@@ -97,16 +97,11 @@
       {
          Event.on(this.id,'click',this.onInteractionEvent, null, this);
          
-         this.registerEventHandler('click',[
-            {
-               rule : 'button.manageRef',
-               o : {
-                     handler:this.goToManageReferences,
-                     scope : this
-               }
-            },                       
-
-         ]);
+         this.registerEventHandler('click','button.manageRef',{
+               handler:this.goToManageReferences,
+               scope : this
+            }
+         );
          
          return this;
       },
