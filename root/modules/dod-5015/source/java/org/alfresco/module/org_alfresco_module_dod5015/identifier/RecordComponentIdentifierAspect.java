@@ -32,6 +32,8 @@ import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -66,7 +68,7 @@ public class RecordComponentIdentifierAspect implements NodeServicePolicies.OnUp
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
-    }
+    }     
 
     /**
      * Initialise method
@@ -82,42 +84,47 @@ public class RecordComponentIdentifierAspect implements NodeServicePolicies.OnUp
     /**
      * @see org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy#onUpdateProperties(org.alfresco.service.cmr.repository.NodeRef, java.util.Map, java.util.Map)
      */
-    public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after)
+    public void onUpdateProperties(final NodeRef nodeRef, final Map<QName, Serializable> before, final Map<QName, Serializable> after)
     {
-        // Check whether the identifier property has changed
-        String beforeId = (String)before.get(PROP_IDENTIFIER);
-        String afterId = (String)after.get(PROP_IDENTIFIER);
-        if (before != null && after == null)
+        AuthenticationUtil.runAs(new RunAsWork<Object>()
         {
-            // Get the db id
-            String dbId = (String)nodeService.getProperty(nodeRef, PROP_DB_UNIQUENESS_ID);
-            if (dbId != null)
-            {            
-                // TODO do we need to clear this out of the Db??
-                // uniquenessService.clear(dbId);
+            public Object doWork()
+            {
+                // Check whether the identifier property has changed
+                String beforeId = (String)before.get(PROP_IDENTIFIER);
+                String afterId = (String)after.get(PROP_IDENTIFIER);
+                if (before != null && after == null)
+                {
+                    // Get the db id
+                    String dbId = (String)nodeService.getProperty(nodeRef, PROP_DB_UNIQUENESS_ID);
+                    if (dbId != null)
+                    {            
+                        // TODO do we need to clear this out of the Db??
+                        // uniquenessService.clear(dbId);
+                        
+                        // Clear the DbUniquenessId
+                        nodeService.setProperty(nodeRef, PROP_DB_UNIQUENESS_ID, null);
+                    }
+                }
+                else if (after != null && 
+                        (before == null || after.equals(before) == false))
+                {
+                    // Get the context node
+                    ChildAssociationRef childAssoc = nodeService.getPrimaryParent(nodeRef);
+                    NodeRef context = childAssoc.getParentRef();
+                    
+                    // Get the db id (if null then carry on)
+                    String dbId = (String)nodeService.getProperty(nodeRef, PROP_DB_UNIQUENESS_ID); 
+                    
+                    // TODO Check for uniqueness
+                    //dbId = uniquenesService.isUnique(dbId, afterId, context);            
+                    
+                    // Set the DbUniquenessId
+                    nodeService.setProperty(nodeRef, PROP_DB_UNIQUENESS_ID, dbId);
+                }
                 
-                // Clear the DbUniquenessId
-                nodeService.setProperty(nodeRef, PROP_DB_UNIQUENESS_ID, null);
+                return null;
             }
-        }
-        else if (after != null && 
-                (before == null || after.equals(before) == false))
-        {
-            // Get the context node
-            ChildAssociationRef childAssoc = nodeService.getPrimaryParent(nodeRef);
-            NodeRef context = childAssoc.getParentRef();
-            
-            // Get the db id (if null then carry on)
-            String dbId = (String)nodeService.getProperty(nodeRef, PROP_DB_UNIQUENESS_ID); 
-            
-            // TODO Check for uniqueness
-            //dbId = uniquenesService.isUnique(dbId, afterId, context);            
-            
-            // Set the DbUniquenessId
-            nodeService.setProperty(nodeRef, PROP_DB_UNIQUENESS_ID, dbId);
-        }
-        
+        }, AuthenticationUtil.getSystemUserName()); 
     }
-
-
 }

@@ -61,6 +61,7 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
     public static final QName PROP_RS_VITAL_RECORD_REVIEW_PERIOD_EXPRESSION = QName.createQName(RM_URI, "recordSearchVitalRecordReviewPeriodExpression");
     public static final QName PROP_RS_DISPOSITION_PERIOD = QName.createQName(RM_URI, "recordSearchDispositionPeriod");
     public static final QName PROP_RS_DISPOSITION_PERIOD_EXPRESSION = QName.createQName(RM_URI, "recordSearchDispositionPeriodExpression");
+    public static final QName PROP_RS_HAS_DISPOITION_SCHEDULE = QName.createQName(RM_URI, "recordSearchHasDispositionSchedule");
     
     /** Policy component */
     private PolicyComponent policyComponent;
@@ -133,7 +134,17 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
         this.policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"), 
                 ASPECT_RM_SEARCH, 
-                onAddSearchAspect);        
+                onAddSearchAspect);  
+        
+        this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"), 
+                ASPECT_RECORD, 
+                new JavaBehaviour(this, "onAddRecordAspect", NotificationFrequency.TRANSACTION_COMMIT));  
+        
+        this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"), 
+                TYPE_RECORD_FOLDER, 
+                new JavaBehaviour(this, "recordFolderCreate", NotificationFrequency.TRANSACTION_COMMIT));
         
         // Vital Records Review Details Rollup
         this.policyComponent.bindClassBehaviour(
@@ -185,6 +196,44 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
         {
             onAddSearchAspect.enable();
         }
+    }
+    
+    public void onAddRecordAspect(NodeRef nodeRef, QName aspectTypeQName)
+    {
+        if (nodeService.exists(nodeRef) == true)
+        {
+            applySearchAspect(nodeRef);
+            
+            DispositionSchedule ds = recordsManagementService.getDispositionSchedule(nodeRef);
+            if (ds == null)
+            {
+                nodeService.setProperty(nodeRef, PROP_RS_HAS_DISPOITION_SCHEDULE, false);
+            }
+            else
+            {
+                nodeService.setProperty(nodeRef, PROP_RS_HAS_DISPOITION_SCHEDULE, true);                
+            }
+        }
+    }
+    
+    public void recordFolderCreate(ChildAssociationRef childAssocRef)
+    {
+        NodeRef nodeRef = childAssocRef.getChildRef();
+        if (nodeService.exists(nodeRef) == true)
+        {
+            applySearchAspect(nodeRef);
+            
+            DispositionSchedule ds = recordsManagementService.getDispositionSchedule(nodeRef);
+            if (ds == null)
+            {
+                nodeService.setProperty(nodeRef, PROP_RS_HAS_DISPOITION_SCHEDULE, false);
+            }
+            else
+            {
+                nodeService.setProperty(nodeRef, PROP_RS_HAS_DISPOITION_SCHEDULE, true);                
+            }
+        }
+       
     }
     
     public void dispositionActionCreate(ChildAssociationRef childAssocRef)
