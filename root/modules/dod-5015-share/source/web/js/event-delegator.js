@@ -92,7 +92,7 @@
        */
       registerEventHandler: function registerEventHandler(eventName, rule, o)
       {
-         if (YAHOO.lang.isArray(rule))
+         if ((!YAHOO.lang.isUndefined(rule)) && YAHOO.lang.isArray(rule))
          {
             for (var i = 0, len = rule.length; i < len; i++)
             {
