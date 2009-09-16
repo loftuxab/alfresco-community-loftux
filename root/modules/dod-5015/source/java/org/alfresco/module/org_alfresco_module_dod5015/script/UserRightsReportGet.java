@@ -128,6 +128,7 @@ public class UserRightsReportGet extends DeclarativeWebScript
         // construct all the maps etc. needed to build the model 
         Map<String, UserModel> usersMap = new HashMap<String, UserModel>(8);
         Map<String, RoleModel> rolesMap = new HashMap<String, RoleModel>(8);
+        Map<String, GroupModel> groupsMap = new HashMap<String, GroupModel>(8);
         
         // TODO: deal with presence of more than one root, for now we know it's only 1
         NodeRef rmRootNode = rmRoots.get(0);
@@ -145,7 +146,7 @@ public class UserRightsReportGet extends DeclarativeWebScript
                 rolesMap.put(roleName, roleModel);
             }
             
-            // get the users for the current role
+            // get the users for the current RM role
             String group = role.getRoleGroupName();
             Set<String> users = this.authorityService.getContainedAuthorities(AuthorityType.USER, group, true);
             roleModel.setUsers(users);
@@ -165,12 +166,48 @@ public class UserRightsReportGet extends DeclarativeWebScript
                 
                 userModel.addRole(roleName);
             }
+            
+            // get the groups for the cuurent RM role
+            Set<String> groups = this.authorityService.getContainedAuthorities(AuthorityType.GROUP, group, false);
+            roleModel.setGroups(groups);
+            
+            // setup a user model object for each user in each group
+            for (String groupName : groups)
+            {
+                GroupModel groupModel = groupsMap.get(groupName);
+                if (groupModel == null)
+                {
+                    groupModel = new GroupModel(groupName, 
+                                this.authorityService.getAuthorityDisplayName(groupName));
+                    groupsMap.put(groupName, groupModel);
+                }
+                
+                // get users in each group
+                Set<String> groupUsers = this.authorityService.getContainedAuthorities(AuthorityType.USER, groupName, true);
+                for (String userName : groupUsers)
+                {
+                    UserModel userModel = usersMap.get(userName);
+                    if (userModel == null)
+                    {
+                        NodeRef userRef = this.personService.getPerson(userName);
+                        userModel = new UserModel(userName, 
+                                    (String)this.nodeService.getProperty(userRef, ContentModel.PROP_FIRSTNAME), 
+                                    (String)this.nodeService.getProperty(userRef, ContentModel.PROP_LASTNAME));
+                        usersMap.put(userName, userModel);
+                    }
+                    
+                    userModel.addGroup(groupName);
+                    userModel.addRole(roleName);
+                    groupModel.addUser(userName);
+                }
+            }
         }
         
         // add all the lists data to a Map
         Map<String, Object> reportModel = new HashMap<String, Object>(4);
         reportModel.put("users", usersMap);
         reportModel.put("roles", rolesMap);
+        reportModel.put("groups", groupsMap);
         
         // create model object with the lists model
         Map<String, Object> model = new HashMap<String, Object>(1);
@@ -186,6 +223,7 @@ public class UserRightsReportGet extends DeclarativeWebScript
     public class RoleModel extends Role
     {
         private Set<String> users = new HashSet<String>(8);
+        private Set<String> groups = new HashSet<String>(8);
         
         public RoleModel(Role role)
         {
@@ -197,14 +235,29 @@ public class UserRightsReportGet extends DeclarativeWebScript
             this.users.add(username);
         }
         
+        public void addGroup(String groupName)
+        {
+            this.groups.add(groupName);
+        }
+        
         public void setUsers(Set<String> users)
         {
             this.users = users;
         }
         
+        public void setGroups(Set<String> groups)
+        {
+            this.groups = groups;
+        }
+        
         public Set<String> getUsers()
         {
             return this.users;
+        }
+        
+        public Set<String> getGroups()
+        {
+            return this.groups;
         }
     }
     
@@ -219,6 +272,7 @@ public class UserRightsReportGet extends DeclarativeWebScript
         private String firstName;
         private String lastName;
         private Set<String> roles;
+        private Set<String> groups;
         
         public UserModel(String userName, String firstName, String lastName)
         {
@@ -226,6 +280,7 @@ public class UserRightsReportGet extends DeclarativeWebScript
             this.firstName = firstName;
             this.lastName = lastName;
             this.roles = new HashSet<String>(2);
+            this.groups = new HashSet<String>(2);
         }
 
         public String getUserName()
@@ -248,9 +303,58 @@ public class UserRightsReportGet extends DeclarativeWebScript
             return this.roles;
         }
         
+        public Set<String> getGroups()
+        {
+            return this.groups;
+        }
+        
         public void addRole(String roleName)
         {
             this.roles.add(roleName);
+        }
+        
+        public void addGroup(String groupName)
+        {
+            this.groups.add(groupName);
+        }
+    }
+    
+    /**
+     * Class to represent a group for use in a Freemarker template.
+     *
+     * @author Gavin Cornwell
+     */
+    public class GroupModel
+    {
+        private String name;
+        private String label;
+        private Set<String> users;
+        
+        public GroupModel(String name, String label)
+        {
+            this.name = name;
+            this.label = label;
+            this.users = new HashSet<String>(4);
+        }
+
+        public String getName()
+        {
+            return this.name;
+        }
+
+        public String getDisplayLabel()
+        {
+            return this.label;
+        }
+
+        public Set<String> getUsers()
+        {
+            return this.users;
+        }
+        
+        public void addUser(String userName)
+        {
+            this.users.add(userName);
         }
     }
 }
