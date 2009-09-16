@@ -496,10 +496,7 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
                 {
                     logger.debug("RM Audit: Auditing values: \n" + auditMap);
                 }
-                auditMap = auditComponent.audit(
-                        RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
-                        RecordsManagementAuditService.RM_AUDIT_PATH_ROOT,
-                        auditMap);
+                auditMap = auditComponent.recordAuditValues(RecordsManagementAuditService.RM_AUDIT_PATH_ROOT, auditMap);
                 if (auditMap.isEmpty())
                 {
                     if (logger.isDebugEnabled())

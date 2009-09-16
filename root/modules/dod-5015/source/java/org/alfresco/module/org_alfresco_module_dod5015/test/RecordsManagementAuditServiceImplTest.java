@@ -29,7 +29,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FileAction;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditEntry;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
@@ -38,6 +38,7 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -55,11 +56,10 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
     private ServiceRegistry serviceRegistry;
     private TransactionService transactionService;
     private RetryingTransactionHelper txnHelper;
-    private RecordsManagementService rmService;
     private RecordsManagementAuditService rmAuditService;
+    private SearchService searchService;
 
     private Date testStartTime;
-    @SuppressWarnings("unused")
     private NodeRef filePlan;
     
     @Override
@@ -72,8 +72,8 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         this.transactionService = serviceRegistry.getTransactionService();
         this.txnHelper = transactionService.getRetryingTransactionHelper();
         
-        this.rmService = (RecordsManagementService) ctx.getBean("RecordsManagementService");
         this.rmAuditService = (RecordsManagementAuditService) ctx.getBean("RecordsManagementAuditService");
+        this.searchService = serviceRegistry.getSearchService();
 
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -117,17 +117,33 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
             {
                 // Ensure that auditing is on
                 rmAuditService.start();
-                NodeRef nodeRef = TestUtilities.loadFilePlanData(
-                        null,
-                        serviceRegistry.getNodeService(),
-                        serviceRegistry.getImporterService(),
-                        serviceRegistry.getPermissionService());
+                // Only create the fileplan once
+                filePlan = TestUtilities.loadFilePlanData(
+                    null,
+                    serviceRegistry.getNodeService(),
+                    serviceRegistry.getImporterService(),
+                    serviceRegistry.getPermissionService());
                 // Do some stuff
-                rmService.getRecordsManagementRoot(nodeRef);
-                return nodeRef;
+                FileAction fileAction = (FileAction)ctx.getBean("file");
+                
+                // Get a record folder
+                NodeRef folderRecord = TestUtilities.getRecordFolder(
+                        searchService,
+                        "Reports",
+                        "AIS Audit Records",
+                        "January AIS Audit Records");
+                assertNotNull(folderRecord);
+                fileAction.updateNextDispositionAction(folderRecord);
+
+                return filePlan;
             }
         };
         return txnHelper.doInTransaction(setUpCallback);
+    }
+    
+    public void testSetUp()
+    {
+        // Just to get get the fileplan set up
     }
     
     public void testQuery_All()

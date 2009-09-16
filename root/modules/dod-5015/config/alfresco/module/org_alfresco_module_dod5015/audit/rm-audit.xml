@@ -17,6 +17,10 @@
        <DataGenerator name="personFullName" registeredName="auditModel.generator.personFullName"/>
     </DataGenerators>
 
+    <PathMappings>
+        <PathMap source="/DOD5015" target="/DOD5015"/>
+    </PathMappings>
+
     <Application name="DOD5015" key="DOD5015">
         <AuditPath key="actions">
             <!-- Record user details -->
