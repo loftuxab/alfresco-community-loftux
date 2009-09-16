@@ -24,6 +24,9 @@
  */
 package org.alfresco.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Utility class providing helper methods for various types of <code>equals</code> functionality
  * 
@@ -55,6 +58,60 @@ public class EqualsHelper
         else
         {
             return (left == right) || (left != null && right != null && left.equals(right));
+        }
+    }
+    
+    /**
+     * Compare two maps and generate a difference report between the actual and expected values.
+     * This method is particularly useful during unit tests as the result (if not <tt>null</tt>)
+     * can be appended to a failure message.
+     * 
+     * @param actual                the map in hand
+     * @param expected              the map expected
+     * @return                      Returns a difference report or <tt>null</tt> if there were no
+     *                              differences.  The message starts with a new line and it neatly
+     *                              formatted.
+     */
+    public static String getMapDifferenceReport(Map<?, ?> actual, Map<?, ?> expected)
+    {
+        Map<?, ?> copyResult = new HashMap<Object, Object>(actual);
+        
+        boolean failure = false;
+
+        StringBuilder sb = new StringBuilder(1024);
+        sb.append("\nValues that don't match the expected values: ");
+        for (Map.Entry<?, ?> entry : expected.entrySet())
+        {
+            Object key = entry.getKey();
+            Object expectedValue = entry.getValue();
+            Object resultValue = actual.get(key);
+            if (!EqualsHelper.nullSafeEquals(resultValue, expectedValue))
+            {
+                sb.append("\n")
+                  .append("   Key: ").append(key).append("\n")
+                  .append("      Result:   ").append(resultValue).append("\n")
+                  .append("      Expected: ").append(expectedValue);
+                failure = true;
+            }
+            copyResult.remove(key);
+        }
+        sb.append("\nValues that are present but should not be: ");
+        for (Map.Entry<?, ?> entry : copyResult.entrySet())
+        {
+            Object key = entry.getKey();
+            Object resultValue = entry.getValue();
+            sb.append("\n")
+              .append("   Key: ").append(key).append("\n")
+              .append("      Result:   ").append(resultValue);
+          failure = true;
+        }
+        if (failure)
+        {
+            return sb.toString();
+        }
+        else
+        {
+            return null;
         }
     }
 }
