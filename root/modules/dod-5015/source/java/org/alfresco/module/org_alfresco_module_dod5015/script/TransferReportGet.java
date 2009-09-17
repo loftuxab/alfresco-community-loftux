@@ -33,6 +33,7 @@ import java.util.List;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -90,7 +91,7 @@ public class TransferReportGet extends BaseTransferWebScript
                 Status status, Cache cache) throws IOException
     {
         // generate the report (will be in JSON format)
-        File report = generateTransferReport(transferNode);
+        File report = generateJSONTransferReport(transferNode);
         
         // stream the report back to the client
         streamContent(req, res, report, false);
@@ -106,7 +107,7 @@ public class TransferReportGet extends BaseTransferWebScript
      * @return File containing JSON representation of a transfer report
      * @throws IOException
      */
-    File generateTransferReport(NodeRef transferNode) throws IOException
+    File generateJSONTransferReport(NodeRef transferNode) throws IOException
     {
         File report = TempFileProvider.createTempFile(REPORT_FILE_PREFIX, REPORT_FILE_SUFFIX);
         Writer writer = null;
@@ -117,7 +118,7 @@ public class TransferReportGet extends BaseTransferWebScript
             
             if (logger.isDebugEnabled())
             {
-                logger.debug("Generating transfer report for " + itemsToTransfer.length + 
+                logger.debug("Generating JSON transfer report for " + itemsToTransfer.length + 
                             " items into file: " + report.getAbsolutePath());
             }
             
@@ -215,6 +216,8 @@ public class TransferReportGet extends BaseTransferWebScript
         writer.write((String)nodeService.getProperty(folderNode, ContentModel.PROP_NAME));
         writer.write("\",\n\"nodeRef\":\"");
         writer.write(folderNode.toString());
+        writer.write("\",\n\"id\":\"");
+        writer.write((String)nodeService.getProperty(folderNode, RecordsManagementModel.PROP_IDENTIFIER));
         writer.write("\",\n\"children\":\n[");
         
         boolean first = true;
@@ -260,6 +263,20 @@ public class TransferReportGet extends BaseTransferWebScript
         writer.write((String)nodeService.getProperty(recordNode, ContentModel.PROP_NAME));
         writer.write("\",\n\"nodeRef\":\"");
         writer.write(recordNode.toString());
-        writer.write("\"\n}");
+        writer.write("\",\n\"id\":\"");
+        writer.write((String)nodeService.getProperty(recordNode, RecordsManagementModel.PROP_IDENTIFIER));
+        writer.write("\"");
+        
+        if (this.nodeService.hasAspect(recordNode, RecordsManagementModel.ASPECT_DECLARED_RECORD))
+        {
+            writer.write(",\n\"declaredBy\":\"");
+            writer.write((String)nodeService.getProperty(recordNode, RecordsManagementModel.PROP_DECLARED_BY));
+            writer.write("\",\n\"declaredAt\":\"");
+            writer.write(ISO8601DateFormat.format(
+                        (Date)this.nodeService.getProperty(recordNode, RecordsManagementModel.PROP_DECLARED_AT)));
+            writer.write("\"");
+        }
+        
+        writer.write("\n}");
     }
 }
