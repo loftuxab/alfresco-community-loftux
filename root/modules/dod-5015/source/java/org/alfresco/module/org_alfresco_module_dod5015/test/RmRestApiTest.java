@@ -1023,6 +1023,9 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         NodeRef newRecordFolder = this.nodeService.createNode(recordCategory, ContentModel.ASSOC_CONTAINS, 
                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, QName.createValidLocalName("recordFolder")), 
                     DOD5015Model.TYPE_RECORD_FOLDER).getChildRef();
+        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>(1);
+        folderProps.put(PROP_IDENTIFIER, "2009-000000" + nodeService.getProperty(newRecordFolder, ContentModel.PROP_NODE_DBID));
+        nodeService.addProperties(newRecordFolder, folderProps);
         
         txn.commit();
         txn = transactionService.getUserTransaction(false);
@@ -1134,6 +1137,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(folder.getString("name").length() > 0);
         assertTrue(folder.has("nodeRef"));
         assertTrue(folder.getString("nodeRef").startsWith("workspace://SpacesStore/"));
+        assertTrue(folder.has("id"));
+        assertTrue(folder.getString("id").startsWith("2009-0000"));
         assertTrue(folder.has("children"));
         JSONArray records = folder.getJSONArray("children");
         assertEquals("Expecting 2 transferred records", 2, records.length());
@@ -1144,6 +1149,11 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertEquals("record1", record1.getString("name"));
         assertTrue(record1.has("nodeRef"));
         assertTrue(record1.getString("nodeRef").startsWith("workspace://SpacesStore/"));
+        assertTrue(record1.has("id"));
+        assertTrue(record1.getString("id").startsWith("2009-0000"));
+        assertTrue(record1.has("declaredBy"));
+        assertEquals("System", record1.getString("declaredBy"));
+        assertTrue(record1.has("declaredAt"));
         
         // Test filing a transfer report as a record
      
@@ -1331,10 +1341,10 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         // Declare record
         Map<QName, Serializable> propValues = this.nodeService.getProperties(recordOne);        
         propValues.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());       
-        List<String> smList = new ArrayList<String>(2);
+        /*List<String> smList = new ArrayList<String>(2);
         smList.add("FOUO");
         smList.add("NOFORN");
-        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);        
+        propValues.put(RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST, (Serializable)smList);*/        
         propValues.put(RecordsManagementModel.PROP_MEDIA_TYPE, "mediaTypeValue"); 
         propValues.put(RecordsManagementModel.PROP_FORMAT, "formatValue"); 
         propValues.put(RecordsManagementModel.PROP_DATE_RECEIVED, new Date());       
