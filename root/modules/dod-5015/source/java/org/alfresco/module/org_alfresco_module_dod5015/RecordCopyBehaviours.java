@@ -37,23 +37,6 @@ import org.alfresco.service.namespace.QName;
 /**
  * Class containing behaviour for the vitalRecordDefinition aspect.
  * 
- * TODO Many aspects to consider copying:
-{http://www.alfresco.org/model/recordsmanagement/1.0}vitalRecord
-{http://www.alfresco.org/model/recordsmanagement/1.0}recordSearch
-{http://www.alfresco.org/model/recordsmanagement/1.0}declaredRecord
-
-{http://www.alfresco.org/model/dod5015/1.0}digitalPhotographRecord
-{http://www.alfresco.org/model/recordsmanagement/1.0}filePlanComponent
-{http://www.alfresco.org/model/content/1.0}titled
-{http://www.alfresco.org/model/content/1.0}auditable
-{http://www.alfresco.org/model/recordsmanagement/1.0}recordComponentIdentifier
-{http://www.alfresco.org/model/rmcustom/1.0}customSupplementalMarkingList
-{http://www.alfresco.org/model/recordsmanagement/1.0}commonRecordDetails
-{http://www.alfresco.org/model/recordsmanagement/1.0}record
-{http://www.alfresco.org/model/content/1.0}versionable
-{http://www.alfresco.org/model/system/1.0}referenceable
-{http://www.alfresco.org/model/content/1.0}copiedfrom
- * 
  * @author neilm
  */
 public class RecordCopyBehaviours implements CopyServicePolicies.OnCopyNodePolicy,
