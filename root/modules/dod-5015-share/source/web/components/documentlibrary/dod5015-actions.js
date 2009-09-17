@@ -143,7 +143,7 @@
        */
       onActionCloseFolder: function RDLA_onActionCloseFolder(assets)
       {
-         this._dod5015Action("message.close-folder", assets, "closeRecordFolder");
+         this._dod5015Action("message.close", assets, "closeRecordFolder");
       },
 
       /**
