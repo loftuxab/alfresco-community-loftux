@@ -26,11 +26,13 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 
 import org.alfresco.repo.copy.CopyBehaviourCallback;
 import org.alfresco.repo.copy.CopyDetails;
-import org.alfresco.repo.copy.CopyServicePolicies;
 import org.alfresco.repo.copy.DefaultCopyBehaviourCallback;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -39,8 +41,7 @@ import org.alfresco.service.namespace.QName;
  * 
  * @author neilm
  */
-public class RecordCopyBehaviours implements CopyServicePolicies.OnCopyNodePolicy,
-                                          RecordsManagementModel
+public class RecordCopyBehaviours implements RecordsManagementModel
 {
     /** The policy component */
     private PolicyComponent policyComponent;
@@ -76,15 +77,49 @@ public class RecordCopyBehaviours implements CopyServicePolicies.OnCopyNodePolic
         this.policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "getCopyCallback"),
                 RecordsManagementModel.ASPECT_VITAL_RECORD,
-                new JavaBehaviour(this, "getCopyCallback"));
+                new JavaBehaviour(this, "getVitalRecordCopyCallback", NotificationFrequency.TRANSACTION_COMMIT));
+
+        this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "getCopyCallback"),
+                RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH,
+                new JavaBehaviour(this, "getRecordSearchCopyCallback", NotificationFrequency.TRANSACTION_COMMIT));
+        
+        this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onMoveNode"),
+                RecordsManagementModel.ASPECT_VITAL_RECORD, new JavaBehaviour(this, "onMoveNode", NotificationFrequency.TRANSACTION_COMMIT));
+    }
+    
+    public void onMoveNode(ChildAssociationRef oldChildAssocRef, ChildAssociationRef newChildAssocRef)
+    {
+        final NodeService nodeService = rmServiceRegistry.getNodeService();
+        
+        final VitalRecordDefinition targetVrd = rmServiceRegistry.getRecordsManagementService().getVitalRecordDefinition(newChildAssocRef.getParentRef());
+        if (targetVrd != null)
+        {
+            // Do not copy the rma:vitalRecord aspect. Or as it is here, remove it if it's there.
+            //
+            // This policy is called after the node has been moved.
+            NodeRef newlyMovedNode = newChildAssocRef.getChildRef();
+            if (nodeService.exists(newlyMovedNode) && nodeService.hasAspect(newlyMovedNode, ASPECT_VITAL_RECORD))
+            {
+                nodeService.removeAspect(newlyMovedNode, ASPECT_VITAL_RECORD);
+            }
+        }
     }
     
     /**
      * @return          Returns the {@link VitalRecordAspectCopyBehaviourCallback}
      */
-    public CopyBehaviourCallback getCopyCallback(QName classRef, CopyDetails copyDetails)
+    public CopyBehaviourCallback getVitalRecordCopyCallback(QName classRef, CopyDetails copyDetails)
     {
         return new VitalRecordAspectCopyBehaviourCallback();
+    }
+
+    /**
+     * @return          Returns the {@link RecordSearchAspectCopyBehaviourCallback}
+     */
+    public CopyBehaviourCallback getRecordSearchCopyCallback(QName classRef, CopyDetails copyDetails)
+    {
+        return new RecordSearchAspectCopyBehaviourCallback();
     }
 
     /**
@@ -103,6 +138,19 @@ public class RecordCopyBehaviours implements CopyServicePolicies.OnCopyNodePolic
             boolean targetNodeIsVital = (vrd != null && vrd.isVitalRecord());
             
             return targetNodeIsVital;
+        }
+    }
+    
+    /**
+     * Copy behaviour for the <b>rma:recordSearch</b> aspect
+     */
+    private class RecordSearchAspectCopyBehaviourCallback extends DefaultCopyBehaviourCallback
+    {
+        @Override
+        public boolean getMustCopy(QName classQName, CopyDetails copyDetails)
+        {
+            // Never copy this aspect. TODO Is this ok? I think the aspect is created in another behaviour
+            return false;
         }
     }
 }
