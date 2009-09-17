@@ -14,6 +14,16 @@
         <property name="nodeService" ref="nodeService"/>
     </bean>
 
+    <!-- Copy policy management for records -->
+    <bean id="recordCopyBehaviours" class="org.alfresco.module.org_alfresco_module_dod5015.RecordCopyBehaviours" init-method="init">
+        <property name="policyComponent">
+            <ref bean="policyComponent"/>
+        </property>
+        <property name="recordsManagementServiceRegistry">
+            <ref bean="RecordsManagementServiceRegistry"/>
+        </property>
+    </bean>
+
     <!-- Records Management Service -->
     
     <bean id="recordsManagementService" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceImpl"
