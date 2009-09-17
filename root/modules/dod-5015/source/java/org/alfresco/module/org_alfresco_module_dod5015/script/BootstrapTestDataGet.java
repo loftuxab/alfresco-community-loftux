@@ -82,34 +82,51 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
     @Override
     public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
+        boolean result = true;
         Map<String, Object> model = new HashMap<String, Object>();
         
-        ResultSet rs = searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, "TYPE:\"rma:recordFolder\"");
         try
         {
-            for (NodeRef recordFolder : rs.getNodeRefs())
+            ResultSet rs = searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, "TYPE:\"rma:recordFolder\"");
+            try
             {
-                if (nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE) == false)
+                for (NodeRef recordFolder : rs.getNodeRefs())
                 {
-                    // See if the folder has a disposition schedule that needs to be applied
-                    DispositionSchedule ds = recordsManagementService.getDispositionSchedule(recordFolder);
-                    if (ds != null)
+                    String folderName = null;
+                    try
                     {
-                        // Fire action to "set-up" the folder correctly
-                        String folderName = (String)nodeService.getProperty(recordFolder, ContentModel.PROP_NAME);
-                        logger.info("Setting up bootstraped record folder " + folderName);
-                        recordsManagementActionService.executeRecordsManagementAction(recordFolder, "setupRecordFolder");
+                        if (nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE) == false)
+                        {
+                            // See if the folder has a disposition schedule that needs to be applied
+                            DispositionSchedule ds = recordsManagementService.getDispositionSchedule(recordFolder);
+                            if (ds != null)
+                            {
+                                // Fire action to "set-up" the folder correctly
+                                folderName = (String)nodeService.getProperty(recordFolder, ContentModel.PROP_NAME);
+                                logger.info("Setting up bootstraped record folder " + folderName);
+                                recordsManagementActionService.executeRecordsManagementAction(recordFolder, "setupRecordFolder");
+                            }
+                        }
+                    }
+                    catch (Throwable exception)
+                    {
+                        logger.info("Unable to bootstrap record folder " + folderName);
+                        throw exception;
                     }
                 }
             }
+            finally
+            {
+                rs.close();
+            }
         }
-        finally
+        catch (Throwable exception)
         {
-            rs.close();
+            exception.printStackTrace();
+            result = false;
         }
         
-
-    	model.put("success", true);
+    	model.put("success", result);
     	
         return model;
     }
