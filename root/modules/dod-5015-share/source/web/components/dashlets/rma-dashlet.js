@@ -159,7 +159,7 @@
             Alfresco.util.Ajax.request(
             {
                method: Alfresco.util.Ajax.GET,
-               url: Alfresco.constants.PROXY_URI + "api/rma/bootstraptestdata?site=rm",
+               url: Alfresco.constants.PROXY_URI + "api/rma/bootstraptestdata?site=rm&import=true",
                successCallback:
                {
                   fn: function()

@@ -63,6 +63,7 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
     
     private static final String COMPONENT_DOCUMENT_LIBRARY = "documentLibrary";
     private static final String ARG_SITE_NAME = "site";
+    private static final String ARG_IMPORT = "import";
     private static final String DEFAULT_SITE_NAME = "rm";
     
     private static final StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
@@ -109,6 +110,13 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
     @Override
     public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
+        // resolve import argument
+        boolean importData = false;
+        if (req.getParameter(ARG_IMPORT) != null)
+        {
+            importData = Boolean.parseBoolean(req.getParameter(ARG_IMPORT));
+        }
+        
         // resolve rm site
         String siteName = DEFAULT_SITE_NAME;
         if (req.getParameter(ARG_SITE_NAME) != null)
@@ -128,16 +136,19 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
             filePlan = siteService.createContainer(siteName, COMPONENT_DOCUMENT_LIBRARY, DOD5015Model.TYPE_FILE_PLAN, null);
         }
         
-        // import the RM test data ACP into the the provided filePlan node reference
-        InputStream is = BootstrapTestDataGet.class.getClassLoader().getResourceAsStream(
-                "alfresco/module/org_alfresco_module_dod5015/bootstrap/DODExampleFilePlan.xml");
-        if (is == null)
+        if (importData)
         {
-            throw new AlfrescoRuntimeException("The DODExampleFilePlan.xml import file could not be found");
+            // import the RM test data ACP into the the provided filePlan node reference
+            InputStream is = BootstrapTestDataGet.class.getClassLoader().getResourceAsStream(
+                    "alfresco/module/org_alfresco_module_dod5015/bootstrap/DODExampleFilePlan.xml");
+            if (is == null)
+            {
+                throw new AlfrescoRuntimeException("The DODExampleFilePlan.xml import file could not be found");
+            }
+            Reader viewReader = new InputStreamReader(is);
+            Location location = new Location(filePlan);
+            importerService.importView(viewReader, location, null, null);
         }
-        Reader viewReader = new InputStreamReader(is);
-        Location location = new Location(filePlan);
-        importerService.importView(viewReader, location, null, null);
         
         // fix up the test dataset to fire initial events for disposition schedules
         ResultSet rs = searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, "TYPE:\"rma:recordFolder\"");
