@@ -1,0 +1,12 @@
+<webscript>
+  <shortname>Used to fix up the RM DOD bootstrap data.</shortname>
+  <description><![CDATA[
+
+  ]]>
+  </description>
+  <url>/api/rma/bootstraptestdata</url>
+  <format default="json">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+  <lifecycle>internal</lifecycle>
+</webscript>
