@@ -256,4 +256,12 @@
         <property name="recordsManagementSecurityService" ref="RecordsManagementSecurityService" />
     </bean>
     
+    <!-- REST impl for GET User Rights Report -->
+    <bean id="webscript.org.alfresco.rma.bootstraptestdata.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.BootstrapTestDataGet" parent="webscript">
+        <property name="nodeService" ref="NodeService" />
+        <property name="searchService" ref="SearchService" />
+        <property name="recordsManagementService" ref="RecordsManagementService" />
+        <property name="recordsManagementActionService" ref="RecordsManagementActionService" />
+    </bean>
+    
 </beans>

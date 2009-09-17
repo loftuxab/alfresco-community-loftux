@@ -346,11 +346,20 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
      */
     public List<NodeRef> getRecordsManagementRoots()
     {
+        List<NodeRef> result = null;
         SearchService searchService = (SearchService)applicationContext.getBean("searchService");
         StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
         String query = "ASPECT:\"" + ASPECT_RECORDS_MANAGEMENT_ROOT + "\"";        
         ResultSet resultSet = searchService.query(storeRef, SearchService.LANGUAGE_LUCENE, query);
-        return resultSet.getNodeRefs();
+        try
+        {
+            result = resultSet.getNodeRefs();
+        }
+        finally
+        {
+            resultSet.close();
+        }
+        return result;
     }
     
     /**
