@@ -110,7 +110,11 @@
                      // refresh UI appropriately
                      Dom.setStyle(this.id + "-create-site", "display", "none");
                      Dom.setStyle(this.id + "-display-site", "display", "block");
+                     Dom.setStyle(this.id + "-load-data", "display", "block");
                      Alfresco.util.Anim.pulse(this.id + "-display-site");
+                     
+                     // reset feedback message - to allow another action if required
+                     this.widgets.feedbackMessage = null;
                   },
                   scope: this
                },
@@ -124,7 +128,7 @@
                         text: this.msg("message.create-fail")
                      });
                      
-                     // reset feedback message - to allow another attempt if required
+                     // reset feedback message - to allow another action if required
                      this.widgets.feedbackMessage = null;
                   },
                   scope: this
@@ -142,6 +146,52 @@
        */
       onLoadTestData: function RMA_onLoadTestData(e, args)
       {
+         if (this.widgets.feedbackMessage === null)
+         {
+            this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
+            {
+               text: this.msg("message.importing"),
+               spanClass: "wait",
+               displayTime: 0
+            });
+            
+            // call repo-tier to perform test data import
+            Alfresco.util.Ajax.request(
+            {
+               method: Alfresco.util.Ajax.GET,
+               url: Alfresco.constants.PROXY_URI + "api/rma/bootstraptestdata?site=rm",
+               successCallback:
+               {
+                  fn: function()
+                  {
+                     this.widgets.feedbackMessage.destroy();
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.import-ok")
+                     });
+                     
+                     // reset feedback message - to allow another action if required
+                     this.widgets.feedbackMessage = null;
+                  },
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: function()
+                  {
+                     this.widgets.feedbackMessage.destroy();
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.import-fail")
+                     });
+                     
+                     // reset feedback message - to allow another action if required
+                     this.widgets.feedbackMessage = null;
+                  },
+                  scope: this
+               }
+            });
+         }
       },
       
       /**
