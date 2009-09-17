@@ -24,26 +24,21 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test.jscript;
 
-import java.io.File;
 import java.io.Serializable;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.transaction.UserTransaction;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMCaveatConfigService;
 import org.alfresco.module.org_alfresco_module_dod5015.test.TestUtilities;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.content.transform.AbstractContentTransformerTest;
 import org.alfresco.repo.jscript.ClasspathScriptLocation;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -74,10 +69,11 @@ public class RMJScriptTest extends BaseAlfrescoSpringTest implements RecordsMana
     private PermissionService permissionService;
     private ImporterService importService;    
     private SearchService searchService;
+    private RecordsManagementService rmService;
     private RecordsManagementActionService rmActionService;
     private RecordsManagementAdminService rmAdminService;
     private RMCaveatConfigService caveatConfigService;
-    
+
     private NodeRef filePlan;
     
     /*
@@ -98,6 +94,7 @@ public class RMJScriptTest extends BaseAlfrescoSpringTest implements RecordsMana
         this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
         this.rmAdminService = (RecordsManagementAdminService)this.applicationContext.getBean("RecordsManagementAdminService");
         this.caveatConfigService = (RMCaveatConfigService)this.applicationContext.getBean("caveatConfigService");
+        this.rmService = (RecordsManagementService)this.applicationContext.getBean("RecordsManagementService");
         
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -114,7 +111,8 @@ public class RMJScriptTest extends BaseAlfrescoSpringTest implements RecordsMana
             filePlan = getRoot();
             if (filePlan == null)
             {
-                filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService);
+                filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService,
+                                                        this.searchService, this.rmService, this.rmActionService);
             }
         }
         

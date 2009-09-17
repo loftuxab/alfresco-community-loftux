@@ -24,9 +24,12 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.util.BaseSpringTest;
@@ -42,6 +45,9 @@ public class DODDataLoadSystemTest extends BaseSpringTest
 	private AuthenticationComponent authenticationComponent;
 	private ImporterService importer;
     private PermissionService permissionService;
+    private SearchService searchService;
+    private RecordsManagementService rmService;
+    private RecordsManagementActionService rmActionService;
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -53,6 +59,9 @@ public class DODDataLoadSystemTest extends BaseSpringTest
 		this.authenticationComponent = (AuthenticationComponent)this.applicationContext.getBean("authenticationComponent");
 		this.importer = (ImporterService)this.applicationContext.getBean("ImporterService");
 		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
+		searchService = (SearchService)applicationContext.getBean("SearchService");
+		rmService = (RecordsManagementService)applicationContext.getBean("RecordsManagementService");
+        rmActionService = (RecordsManagementActionService)applicationContext.getBean("RecordsManagementActionService");
 		
 		
 		// Set the current security context as admin
@@ -66,7 +75,7 @@ public class DODDataLoadSystemTest extends BaseSpringTest
     
 	public void testLoadFilePlanData()
 	{
-	    TestUtilities.loadFilePlanData(null, nodeService, importer, permissionService);
+	    TestUtilities.loadFilePlanData(null, nodeService, importer, permissionService, searchService, rmService, rmActionService);
 	    
 	    setComplete();
         endTransaction();

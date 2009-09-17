@@ -108,7 +108,8 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
 	
 	private void setUpTestData()
 	{
-        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService);
+        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, 
+                this.permissionService, this.searchService, this.rmService, this.rmActionService);
 	}
 
     @Override
@@ -381,7 +382,7 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
         assertEquals("destroy", das.get(1).getName());
     }
     
-	public void testUpdateNextDispositionAction()
+	public void xxxtestUpdateNextDispositionAction()
 	{
 	    FileAction fileAction = (FileAction)applicationContext.getBean("file");
 	    

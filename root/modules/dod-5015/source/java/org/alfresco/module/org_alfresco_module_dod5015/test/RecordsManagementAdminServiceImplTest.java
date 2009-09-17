@@ -40,6 +40,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminSer
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -93,6 +94,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
     private SearchService searchService;
     private RecordsManagementActionService rmActionService;
     private RecordsManagementAdminService rmAdminService;
+    private RecordsManagementService rmService;
     private TransactionService transactionService;
     private PolicyComponent policyComponent;
     
@@ -116,6 +118,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         this.searchService = (SearchService)this.applicationContext.getBean("SearchService");
         this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
         this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
+        this.rmService = (RecordsManagementService)applicationContext.getBean("RecordsManagementService");
         
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -129,7 +132,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         // Don't reload the fileplan data on each test method.
         if (retrieveJanuaryAISVitalFolders().size() != 1)
         {
-            filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService);
+            filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService, this.searchService, this.rmService, this.rmActionService);
         }
     }
     

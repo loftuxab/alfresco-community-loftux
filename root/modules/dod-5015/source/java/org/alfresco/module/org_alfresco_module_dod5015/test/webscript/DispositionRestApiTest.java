@@ -111,7 +111,8 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         //
         // This is quite a slow call, so if this class grew to have many test methods,
         // there would be a real benefit in using something like @BeforeClass for the line below.
-        TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService);
+        TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService,
+                                    this.searchService, this.rmService, this.rmActionService);
     }
 
     public void testGetDispositionSchedule() throws Exception
@@ -170,13 +171,13 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         assertNotNull(actions);
         assertEquals(2, actions.length());
         JSONObject action1 = (JSONObject)actions.get(0);
-        assertEquals(7, action1.length());
+        assertEquals(8, action1.length());
         assertNotNull(action1.get("id"));
         assertNotNull(action1.get("url"));
         assertEquals(0, action1.getInt("index"));
         assertEquals("cutoff", action1.getString("name"));
         assertEquals("Cutoff", action1.getString("label"));
-        assertEquals("monthend|1", action1.getString("period"));
+        assertEquals("month|1", action1.getString("period"));
         assertTrue(action1.getBoolean("eligibleOnFirstCompleteEvent"));
         
         JSONObject action2 = (JSONObject)actions.get(1);
