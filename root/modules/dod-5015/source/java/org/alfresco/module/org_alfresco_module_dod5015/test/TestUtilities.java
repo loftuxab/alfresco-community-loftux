@@ -37,7 +37,9 @@ import junit.framework.Assert;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -64,7 +66,9 @@ public class TestUtilities implements DOD5015Model
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     
     public static NodeRef loadFilePlanData(String siteName, NodeService nodeService,
-            ImporterService importerService, PermissionService permissionService)
+            ImporterService importerService, PermissionService permissionService,
+            SearchService searchService, RecordsManagementService recordsManagementService,
+            RecordsManagementActionService recordsManagementActionService)
     {
         NodeRef filePlan = null;
 
@@ -92,6 +96,29 @@ public class TestUtilities implements DOD5015Model
         Reader viewReader = new InputStreamReader(is);
         Location location = new Location(filePlan);
         importerService.importView(viewReader, location, REPLACE_BINDING, null);
+                
+        ResultSet rs = searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, "TYPE:\"rma:recordFolder\"");
+        try
+        {
+            for (NodeRef recordFolder : rs.getNodeRefs())
+            {
+                if (nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE) == false)
+                {
+                    // See if the folder has a disposition schedule that needs to be applied
+                    DispositionSchedule ds = recordsManagementService.getDispositionSchedule(recordFolder);
+                    if (ds != null)
+                    {
+                        // Fire action to "set-up" the folder correctly
+                        String folderName = (String)nodeService.getProperty(recordFolder, ContentModel.PROP_NAME);
+                        recordsManagementActionService.executeRecordsManagementAction(recordFolder, "setupRecordFolder");
+                    }
+                }
+            }
+        }
+        finally
+        {
+            rs.close();
+        }
 
         return filePlan;
     }

@@ -29,6 +29,8 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FileAction;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditEntry;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
@@ -56,8 +58,11 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
     private ServiceRegistry serviceRegistry;
     private TransactionService transactionService;
     private RetryingTransactionHelper txnHelper;
-    private RecordsManagementAuditService rmAuditService;
     private SearchService searchService;
+    private RecordsManagementService rmService;
+    private RecordsManagementAuditService rmAuditService;
+    private RecordsManagementActionService rmActionService;
+
 
     private Date testStartTime;
     private NodeRef filePlan;
@@ -71,9 +76,15 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         this.serviceRegistry = (ServiceRegistry) ctx.getBean(ServiceRegistry.SERVICE_REGISTRY);
         this.transactionService = serviceRegistry.getTransactionService();
         this.txnHelper = transactionService.getRetryingTransactionHelper();
-        
+ 
+        this.rmService = (RecordsManagementService) ctx.getBean("RecordsManagementService");
+
         this.rmAuditService = (RecordsManagementAuditService) ctx.getBean("RecordsManagementAuditService");
+
+        this.rmActionService = (RecordsManagementActionService)ctx.getBean("RecordsManagementActionService");
+
         this.searchService = serviceRegistry.getSearchService();
+
 
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -117,12 +128,16 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
             {
                 // Ensure that auditing is on
                 rmAuditService.start();
-                // Only create the fileplan once
-                filePlan = TestUtilities.loadFilePlanData(
-                    null,
-                    serviceRegistry.getNodeService(),
-                    serviceRegistry.getImporterService(),
-                    serviceRegistry.getPermissionService());
+
+                NodeRef nodeRef = TestUtilities.loadFilePlanData(
+                        null,
+                        serviceRegistry.getNodeService(),
+                        serviceRegistry.getImporterService(),
+                        serviceRegistry.getPermissionService(),
+                        serviceRegistry.getSearchService(),
+                        rmService,
+                        rmActionService);
+
                 // Do some stuff
                 FileAction fileAction = (FileAction)ctx.getBean("file");
                 

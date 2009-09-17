@@ -135,7 +135,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         //
         // This is quite a slow call, so if this class grew to have many test methods,
         // there would be a real benefit in using something like @BeforeClass for the line below.
-        TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.services.getPermissionService());
+        TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.services.getPermissionService(),
+                                       this.searchService, this.rmService, this.rmActionService);
     }
 
     /**
