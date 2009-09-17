@@ -592,8 +592,11 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         if (this.nodeService.hasAspect(nodeRef, ASPECT_SCHEDULED) == true)
         {
             List<ChildAssociationRef> childAssocs = this.nodeService.getChildAssocs(nodeRef, ASSOC_DISPOSITION_SCHEDULE, RegexQNamePattern.MATCH_ALL);
-            ChildAssociationRef firstChildAssocRef = childAssocs.get(0);
-            result = firstChildAssocRef.getChildRef();
+            if (childAssocs.size() != 0)
+            {
+                ChildAssociationRef firstChildAssocRef = childAssocs.get(0);
+                result = firstChildAssocRef.getChildRef();
+            }
         }
         else
         {

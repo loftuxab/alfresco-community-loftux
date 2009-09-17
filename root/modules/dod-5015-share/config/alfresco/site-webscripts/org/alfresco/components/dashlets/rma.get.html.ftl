@@ -14,7 +14,7 @@
       <div id="${args.htmlid}-create-site" class="detail-list-item" <#if foundsite>style="display:none"</#if>>
          <a id="${args.htmlid}-create-site-link" href="#">${msg("label.create-site")}</a>
       </div>
-      <div class="detail-list-item">
+      <div id="${args.htmlid}-load-data" class="detail-list-item" <#if !foundsite>style="display:none"</#if>>
          <a id="${args.htmlid}-load-data-link" href="#">${msg("label.load-test-data")}</a>
       </div>
       <div class="detail-list-item last-item">
