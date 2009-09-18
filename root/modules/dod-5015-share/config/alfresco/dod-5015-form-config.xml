@@ -153,6 +153,7 @@
                <hide id="cm:owner" />
                <hide id="cm:accessed" />
                <hide id="cm:contains" />
+               <hide id="rma:dbUniquenessId" />
             </field-visibility>
             <appearance>
                <set id="rm" />
@@ -163,7 +164,6 @@
                   </control>
                </field>
                <field id="rma:identifier" set="rm" label-id="label.seriesIdentifier" />
-               <field id="rma:dbUniquenessId" set="rm" />
             </appearance>
          </form>
       </forms>
@@ -185,6 +185,7 @@
                <hide id="cm:accessed" />
                <hide id="cm:contains" />
                <hide id="rma:dispositionSchedule" />
+               <hide id="rma:dbUniquenessId" />
             </field-visibility>
             <appearance>
                <set id="rm" />
@@ -197,7 +198,6 @@
                <field id="rma:vitalRecordIndicator" set="rm">
                   <control template="/org/alfresco/components/form/controls/vital-record-indicator.ftl" />
                </field>
-               <field id="rma:dbUniquenessId" set="rm" />
                <field id="rma:reviewPeriod" set="rm">
                   <constraint-handlers>
                      <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.rmVitalRecordPeriodMandatory" />
@@ -225,6 +225,7 @@
                <hide id="cm:accessed" />
                <hide id="cm:contains" />
                <hide id="rma:isClosed" />
+               <hide id="rma:dbUniquenessId" />
                <hide id="rma:nextDispositionAction" />
                <hide id="rma:dispositionActionHistory" />
                <hide id="rma:recordSearchDispositionActionName" />
@@ -246,7 +247,6 @@
                   </control>
                </field>
                <field id="rma:identifier" set="rm" label-id="label.folderIdentifier" />
-               <field id="rma:dbUniquenessId" set="rm" />
                <field id="rmc:supplementalMarkingList" set="rm" />
                <field id="rma:vitalRecordIndicator" set="rm">
                   <control template="/org/alfresco/components/form/controls/vital-record-indicator.ftl" />
