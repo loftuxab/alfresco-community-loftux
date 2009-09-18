@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -448,25 +449,32 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
     
     private List<String> getRMAllowedValues(String userName, Set<String> userGroupFullNames, String constraintName)
     {
-        // note: userName and userGroupNames must not be null
-        List<String> allowedValues = new ArrayList<String>(5);
+        Set<String>allowedValues = new HashSet<String>();
         
+        // note: userName and userGroupNames must not be null        
         Map<String, List<String>> caveatConstraintDef = caveatConfig.get(constraintName);
         
         if (caveatConstraintDef != null)
         {
-            for (Map.Entry<String, List<String>> entry : caveatConstraintDef.entrySet())
+            List<String> direct = caveatConstraintDef.get(userName);
+            if(direct != null)
             {
-                String authorityName = entry.getKey();
-                if (userName.equals(authorityName) || userGroupFullNames.contains(authorityName))
+                allowedValues.addAll(direct);   
+            }
+            
+            for (String group :  userGroupFullNames)
+            {
+                List<String> values = caveatConstraintDef.get(group);
+                if(values != null)
                 {
-                    // union of allowed values
-                    allowedValues.addAll(entry.getValue());
+                    allowedValues.addAll(values);   
                 }
             }
         }
         
-        return allowedValues;
+        List<String>ret = new ArrayList();
+        ret.addAll(allowedValues);
+        return ret;
     }
     
     /**
