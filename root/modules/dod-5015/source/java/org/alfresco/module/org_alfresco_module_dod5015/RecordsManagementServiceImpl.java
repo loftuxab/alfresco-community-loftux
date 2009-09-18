@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -395,35 +396,51 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
      */
     public List<String> getNamePath(NodeRef nodeRef)
     {
-//        NodeRef rootNodeRef = getRecordsManagementRoot(nodeRef);
-//        FileFolderService fileFolderService = serviceRegistry.getFileFolderService();
-//        List<FileInfo> path;
-//        try
-//        {
-//            path = fileFolderService.getNamePath(rootNodeRef, nodeRef);
-//        }
-//        catch (Throwable e)
-//        {
-//            throw new AlfrescoRuntimeException(
-//                    "Unable to get name path for node: \n" +
-//                    "   Node: " + nodeRef + "\n" +
-//                    "   Root: " + rootNodeRef,
-//                    e);
-//        }
-//        List<String> ret = new ArrayList<String>(path.size() + 1);
-//        ret.add((String)nodeService.getProperty(rootNodeRef, ContentModel.PROP_NAME));
-//        for (FileInfo fileInfo : path)
-//        {
-//            ret.add(fileInfo.getName());
-//        }
-        // A bit of mock-up
-        List<String> ret = new ArrayList<String>(5);
-        ret.clear();
-        ret.add("THIS");
-        ret.add("IS");
-        ret.add("A");
-        ret.add("MOCK-UP");
-        return ret;
+        LinkedList<String> namePath = new LinkedList<String>();
+        try
+        {
+            getNamePathRecursive(nodeRef, namePath);
+        }
+        catch (Throwable e)
+        {
+            throw new AlfrescoRuntimeException(
+                    "Unable to get name path for node: \n" +
+                    "   Node: " + nodeRef,
+                    e);
+        }
+        return namePath;
+    }
+    
+    /**
+     * Helper method to build a <b>cm:name</b> path from the node to the RM root
+     */
+    private void getNamePathRecursive(NodeRef nodeRef, LinkedList<String> namePath)
+    {
+        if (!nodeService.hasAspect(nodeRef, ASPECT_FILE_PLAN_COMPONENT))
+        {
+            throw new AlfrescoRuntimeException("RM nodes must have aspect " + ASPECT_FILE_PLAN_COMPONENT);
+        }
+        // Get the name of the current node
+        String name = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
+        // Prepend it to the path
+        namePath.addFirst(name);
+        // Are we at the root
+        if (nodeService.hasAspect(nodeRef, ASPECT_RECORDS_MANAGEMENT_ROOT))
+        {
+            // We're done
+        }
+        else
+        {
+            ChildAssociationRef assocRef = nodeService.getPrimaryParent(nodeRef);
+            if (assocRef == null)
+            {
+                // We hit the top of the store
+                throw new AlfrescoRuntimeException("Didn't find a RM root");
+            }
+            // Recurse
+            nodeRef = assocRef.getParentRef();
+            getNamePathRecursive(nodeRef, namePath);
+        }
     }
 
     /**
