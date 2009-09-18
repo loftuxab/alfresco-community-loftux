@@ -665,7 +665,7 @@ public class RecordsManagementAuditServiceImpl
                     user,
                     fromTime,
                     toTime,
-                    RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF, nodeRef.toString(),
+                    RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF, nodeRef,
                     maxEntries);
         }
         else
