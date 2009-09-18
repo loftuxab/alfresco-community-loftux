@@ -42,6 +42,8 @@ import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -363,7 +365,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     }
     
     /**
-     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#getRecordsManagementRoot(org.alfresco.service.cmr.repository.NodeRef)
+     * {@inheritDoc}
      */
     public NodeRef getRecordsManagementRoot(NodeRef nodeRef)
     {
@@ -387,7 +389,43 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         
         return result;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<String> getNamePath(NodeRef nodeRef)
+    {
+//        NodeRef rootNodeRef = getRecordsManagementRoot(nodeRef);
+//        FileFolderService fileFolderService = serviceRegistry.getFileFolderService();
+//        List<FileInfo> path;
+//        try
+//        {
+//            path = fileFolderService.getNamePath(rootNodeRef, nodeRef);
+//        }
+//        catch (Throwable e)
+//        {
+//            throw new AlfrescoRuntimeException(
+//                    "Unable to get name path for node: \n" +
+//                    "   Node: " + nodeRef + "\n" +
+//                    "   Root: " + rootNodeRef,
+//                    e);
+//        }
+//        List<String> ret = new ArrayList<String>(path.size() + 1);
+//        ret.add((String)nodeService.getProperty(rootNodeRef, ContentModel.PROP_NAME));
+//        for (FileInfo fileInfo : path)
+//        {
+//            ret.add(fileInfo.getName());
+//        }
+        // A bit of mock-up
+        List<String> ret = new ArrayList<String>(5);
+        ret.clear();
+        ret.add("THIS");
+        ret.add("IS");
+        ret.add("A");
+        ret.add("MOCK-UP");
+        return ret;
+    }
+
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#isRecord(org.alfresco.service.cmr.repository.NodeRef)
      */
