@@ -47,6 +47,8 @@ public interface RecordsManagementAuditService
     public static final String RM_AUDIT_SNIPPET_DESCRIPTION = "/description";
     public static final String RM_AUDIT_SNIPPET_NODE = "/node";
     public static final String RM_AUDIT_SNIPPET_CHANGES = "/changes";
+    public static final String RM_AUDIT_SNIPPET_BEFORE = "/before";
+    public static final String RM_AUDIT_SNIPPET_AFTER = "/after";
 
     public static final String RM_AUDIT_DATA_PERSON_FULLNAME = "/DOD5015/event/person/fullName";
     public static final String RM_AUDIT_DATA_PERSON_ROLES = "/DOD5015/event/person/roles";
@@ -54,7 +56,8 @@ public interface RecordsManagementAuditService
     public static final String RM_AUDIT_DATA_NODE_NODEREF = "/DOD5015/event/node/noderef";
     public static final String RM_AUDIT_DATA_NODE_NAME = "/DOD5015/event/node/name";
     public static final String RM_AUDIT_DATA_NODE_NAMEPATH = "/DOD5015/event/node/namePath";
-    public static final String RM_AUDIT_DATA_NODE_CHANGES = "/DOD5015/event/node/changes/value";
+    public static final String RM_AUDIT_DATA_NODE_CHANGES_BEFORE = "/DOD5015/event/node/changes/before/value";
+    public static final String RM_AUDIT_DATA_NODE_CHANGES_AFTER = "/DOD5015/event/node/changes/after/value";
     
     /**
      * Starts RM auditing.

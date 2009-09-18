@@ -65,6 +65,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.AbstractLifecycleBean;
 import org.alfresco.util.ISO8601DateFormat;
+import org.alfresco.util.Pair;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.util.PropertyCheck;
 import org.alfresco.util.PropertyMap;
@@ -454,13 +455,22 @@ public class RecordsManagementAuditServiceImpl
                 // Property changes
                 Map<QName, Serializable> propertiesBefore = auditedNode.getNodePropertiesBefore();
                 Map<QName, Serializable> propertiesAfter = auditedNode.getNodePropertiesAfter();
-                Map<QName, Serializable> propertyChanges = PropertyMap.getDelta(propertiesBefore, propertiesAfter);
+                Pair<Map<QName, Serializable>, Map<QName, Serializable>> deltaPair =
+                        PropertyMap.getBeforeAndAfterMapsForChanges(propertiesBefore, propertiesAfter);
                 auditMap.put(
                         AuditApplication.buildPath(
                                 RecordsManagementAuditService.RM_AUDIT_SNIPPET_EVENT,
                                 RecordsManagementAuditService.RM_AUDIT_SNIPPET_NODE,
-                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_CHANGES),
-                        (Serializable) propertyChanges);
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_CHANGES,
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_BEFORE),
+                        (Serializable) deltaPair.getFirst());
+                auditMap.put(
+                        AuditApplication.buildPath(
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_EVENT,
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_NODE,
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_CHANGES,
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_AFTER),
+                        (Serializable) deltaPair.getSecond());
                 // Audit it
                 if (logger.isDebugEnabled())
                 {
@@ -586,8 +596,11 @@ public class RecordsManagementAuditServiceImpl
                 String namePath = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAMEPATH);
                 String description = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_EVENT_DESCRIPTION);
                 @SuppressWarnings("unchecked")
-                Map<QName, Serializable> changedProperties = (Map<QName, Serializable>) values.get(
-                        RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES);
+                Map<QName, Serializable> beforeProperties = (Map<QName, Serializable>) values.get(
+                        RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES_BEFORE);
+                @SuppressWarnings("unchecked")
+                Map<QName, Serializable> afterProperties = (Map<QName, Serializable>) values.get(
+                        RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES_AFTER);
                 
                 // TODO: Plug the 'changedProperties' into the entry ...
                 RecordsManagementAuditEntry entry = new RecordsManagementAuditEntry(
