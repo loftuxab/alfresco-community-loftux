@@ -19,24 +19,27 @@
 
     <PathMappings>
         <PathMap source="/DOD5015" target="/DOD5015"/>
+        <!-- Force the fullName generator to trigger -->
+        <PathMap source="/DOD5015/event/node" target="/DOD5015/event/person"/>
     </PathMappings>
 
     <Application name="DOD5015" key="DOD5015">
-        <AuditPath key="actions">
+        <AuditPath key="event">
             <!-- Record user details -->
             <AuditPath key="person">
                 <GenerateValue key="fullName" dataGenerator="personFullName"/>
             </AuditPath>
-            <!-- Record the name and description of the action as well as the actioned-upon node -->
-            <AuditPath key="actionName">
+            <!-- Record a description of the event -->
+            <AuditPath key="description">
                 <RecordValue key="value" dataExtractor="simpleValue"/>
             </AuditPath>
-            <AuditPath key="actionDescription">
-                <RecordValue key="value" dataExtractor="simpleValue"/>
-            </AuditPath>
+            <!-- Record the node's details -->
             <AuditPath key="node">
                 <RecordValue key="noderef" dataExtractor="simpleValue"/>
                 <RecordValue key="name" dataExtractor="nodeName"/>
+                <AuditPath key="changes">
+                    <RecordValue key="value" dataExtractor="simpleValue"/>
+                </AuditPath>
             </AuditPath>
             <!--
                 RM action parameters
