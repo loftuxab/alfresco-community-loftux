@@ -25,30 +25,28 @@
 package org.alfresco.module.org_alfresco_module_dod5015.audit;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
-import org.alfresco.module.org_alfresco_module_dod5015.security.Role;
 import org.alfresco.repo.audit.extractor.AbstractDataExtractor;
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 
 /**
- * An extractor that uses a node context to determine the currently-authenticated
- * user's RM roles.  This is not a data generator because it can only function in
- * the context of a give node.
+ * An extractor that extracts the <b>cm:name</b> path from the RM root down to
+ * - and including - the node's own name.  This will only extract data if the
+ * node is a {@link RecordsManagementModel#ASPECT_FILE_PLAN_COMPONENT fileplan component}.
+ * 
+ * @see RecordsManagementService#getNamePath(NodeRef)
  * 
  * @author Derek Hulley
  * @since 3.2
  */
-public final class AuthenticatedUserRolesDataExtractor extends AbstractDataExtractor
+public final class FilePlanNamePathDataExtractor extends AbstractDataExtractor
 {
     private NodeService nodeService;
     private RecordsManagementService rmService;
-    private RecordsManagementSecurityService rmSecurityService;
 
     /**
      * Used to check that the node in the context is a fileplan component
@@ -67,14 +65,6 @@ public final class AuthenticatedUserRolesDataExtractor extends AbstractDataExtra
     }
 
     /**
-     * Used to get roles
-     */
-    public void setRmSecurityService(RecordsManagementSecurityService rmSecurityService)
-    {
-        this.rmSecurityService = rmSecurityService;
-    }
-
-    /**
      * @return              Returns <tt>true</tt> if the data is a NodeRef and it represents
      *                      a fileplan component
      */
@@ -90,25 +80,14 @@ public final class AuthenticatedUserRolesDataExtractor extends AbstractDataExtra
     public Serializable extractData(Serializable value) throws Throwable
     {
         NodeRef nodeRef = (NodeRef) value;
-        String user = AuthenticationUtil.getFullyAuthenticatedUser();
-        if (user == null)
-        {
-            // No-one is authenticated
-            return null;
-        }
         
         // Get the rm root
-        NodeRef rmRootNodeRef = rmService.getRecordsManagementRoot(nodeRef);
+        List<String> namePath = rmService.getNamePath(nodeRef);
         
-        Set<Role> roles = rmSecurityService.getRolesByUser(rmRootNodeRef, user);
-        StringBuilder sb = new StringBuilder(100);
-        for (Role role : roles)
+        StringBuilder sb = new StringBuilder(128);
+        for (String name : namePath)
         {
-            if (sb.length() > 0)
-            {
-                sb.append(", ");
-            }
-            sb.append(role.getDisplayLabel());
+            sb.append("/").append(name);
         }
         
         // Done

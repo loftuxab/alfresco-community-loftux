@@ -53,6 +53,7 @@ public interface RecordsManagementAuditService
     public static final String RM_AUDIT_DATA_EVENT_DESCRIPTION = "/DOD5015/event/description/value";
     public static final String RM_AUDIT_DATA_NODE_NODEREF = "/DOD5015/event/node/noderef";
     public static final String RM_AUDIT_DATA_NODE_NAME = "/DOD5015/event/node/name";
+    public static final String RM_AUDIT_DATA_NODE_NAMEPATH = "/DOD5015/event/node/namePath";
     public static final String RM_AUDIT_DATA_NODE_CHANGES = "/DOD5015/event/node/changes/value";
     
     /**

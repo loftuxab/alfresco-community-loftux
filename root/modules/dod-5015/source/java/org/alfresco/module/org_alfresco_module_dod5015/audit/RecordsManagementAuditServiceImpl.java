@@ -583,6 +583,7 @@ public class RecordsManagementAuditServiceImpl
                 String userRoles = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLES);
                 NodeRef nodeRef = (NodeRef) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF);
                 String nodeName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME);
+                String namePath = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAMEPATH);
                 String description = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_EVENT_DESCRIPTION);
                 @SuppressWarnings("unchecked")
                 Map<QName, Serializable> changedProperties = (Map<QName, Serializable>) values.get(
