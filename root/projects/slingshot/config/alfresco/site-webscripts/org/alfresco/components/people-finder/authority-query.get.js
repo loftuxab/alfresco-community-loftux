@@ -42,7 +42,7 @@ var getApiMappings = function()
    {
       apiMappings.push(
       {
-         url: "/api/people?filter=" + args.filter,
+         url: "/api/people?filter=" + encodeURIComponent(args.filter),
          rootObject: "people",
          fn: mapUser
       });
@@ -52,7 +52,7 @@ var getApiMappings = function()
    {
       apiMappings.push(
       {
-         url: "/api/groups?zone=APP.DEFAULT&shortNameFilter=" + args.filter,
+         url: "/api/groups?zone=APP.DEFAULT&shortNameFilter=" + encodeURIComponent(args.filter),
          rootObject: "data",
          fn: mapGroup
       });
