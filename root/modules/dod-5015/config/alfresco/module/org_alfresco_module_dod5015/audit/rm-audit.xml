@@ -42,7 +42,12 @@
                 <RecordValue key="name" dataExtractor="nodeName"/>
                 <RecordValue key="namePath" dataExtractor="namePath"/>
                 <AuditPath key="changes">
-                    <RecordValue key="value" dataExtractor="simpleValue"/>
+	                <AuditPath key="before">
+	                    <RecordValue key="value" dataExtractor="simpleValue"/>
+	                </AuditPath>
+                    <AuditPath key="after">
+                        <RecordValue key="value" dataExtractor="simpleValue"/>
+                    </AuditPath>
                 </AuditPath>
             </AuditPath>
             <!--
