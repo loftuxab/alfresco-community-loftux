@@ -4,7 +4,7 @@
 
       <actionSet id="recordSeries">
          <action type="simple-link" id="onActionViewDetails" href="{recordSeriesDetailsUrl}" label="actions.view-details" />
-         <action type="simple-link" id="onActionEditDetails" permisson="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action type="simple-link" id="onActionEditDetails" permission="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionManagePermissions" permission="ManageAccessControls" label="actions.manage-permissions" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="MoveRecords" label="actions.move-to" />
@@ -14,7 +14,7 @@
 
       <actionSet id="recordCategory">
          <action type="simple-link" id="onActionViewDetails" href="{recordCategoryDetailsUrl}" label="actions.view-details" />
-         <action type="simple-link" id="onActionEditDetails" permisson="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action type="simple-link" id="onActionEditDetails" permission="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionManagePermissions" permission="ManageAccessControls" label="actions.manage-permissions" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="MoveRecords" label="actions.move-to" />
@@ -24,7 +24,7 @@
 
       <actionSet id="recordFolder">
          <action type="simple-link" id="onActionViewDetails" href="{recordFolderDetailsUrl}" label="actions.view-details" />
-         <action type="simple-link" id="onActionEditDetails" permisson="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action type="simple-link" id="onActionEditDetails" permission="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionCloseFolder" permission="closeFolder" label="actions.close-folder" />
          <action type="action-link" id="onActionOpenFolder" permission="openFolder" label="actions.open-folder" />
          <action type="action-link" id="onActionCutoff" permission="ApproveRecordsScheduledForCutoff,cutoff" label="actions.cutoff" />
@@ -45,7 +45,7 @@
 
       <actionSet id="record">
          <action type="simple-link" id="onActionDownload" permission="download" href="{downloadUrl}" label="actions.download" />
-         <action type="simple-link" id="onActionEditDetails" permisson="EditDeclaredRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action type="simple-link" id="onActionEditDetails" permission="EditDeclaredRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionReviewed" permission="CycleVitalRecords" label="actions.reviewed" />
          <action type="action-link" id="onActionEditReviewAsOf" permission="PlanningReviewCycles,reviewAsOf" label="actions.edit-review-as-of-date" />
          <action type="action-link" id="onActionUndeclare" permission="UndeclareRecords,undeclare" label="actions.undeclare" />
@@ -67,7 +67,7 @@
 
       <actionSet id="undeclaredRecord">
          <action type="simple-link" id="onActionDownload" permission="download" href="{downloadUrl}" label="actions.download" />
-         <action type="simple-link" id="onActionEditDetails" permisson="EditRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action type="simple-link" id="onActionEditDetails" permission="EditRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionDeclare" permission="DeclareRecords" label="actions.declare" />
          <action type="action-link" id="onActionUploadNewVersion" permission="HIDDEN" label="actions.upload-new-version" />
          <action type="action-link" id="onActionSplitEmail" permission="split-email" label="actions.split-email" />
@@ -105,7 +105,7 @@
 
       <actionSet id="folder">
          <action type="simple-link" id="onActionViewDetails" href="{folderDetailsUrl}" label="actions.view-details" />
-         <action type="simple-link" id="onActionEditDetails" permisson="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
+         <action type="simple-link" id="onActionEditDetails" permission="EditNonRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
          <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />
       </actionSet>
