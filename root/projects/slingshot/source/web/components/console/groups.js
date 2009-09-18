@@ -552,6 +552,7 @@
             this.modules.searchPeopleFinder.setOptions(
             {
                singleSelectMode: true,
+               showSelf: true,
                minSearchTermLength: 3
             });
 
