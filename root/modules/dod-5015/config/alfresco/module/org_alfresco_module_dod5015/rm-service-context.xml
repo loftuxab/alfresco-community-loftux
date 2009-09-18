@@ -381,9 +381,12 @@
     
     <!-- Records Management Audit Service -->
     
-    <bean id="recordsManagementAuditService" class="org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditServiceImpl">
-        <property name="auditService" ref="AuditService" />
-        <property name="nodeService" ref="NodeService" />
+    <bean id="recordsManagementAuditService" class="org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditServiceImpl" init-method="init">
+        <property name="policyComponent" ref="policyComponent" />
+        <property name="transactionService" ref="transactionService" />
+        <property name="nodeService" ref="nodeService" />
+        <property name="auditComponent" ref="auditComponent" />
+        <property name="auditService" ref="auditService" />
         <property name="contentService" ref="ContentService" />
         <property name="recordsManagementActionService" ref="RecordsManagementActionService" />
     </bean>
