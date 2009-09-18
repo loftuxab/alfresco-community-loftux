@@ -76,6 +76,7 @@
                      <option value="rma:recordSearchDispositionActionName">${msg("label.dispositionActionName")}</option>
                      <option value="rma:recordSearchDispositionActionAsOf">${msg("label.dispositionActionAsOf")}</option>
                      <option value="rma:recordSearchDispositionEventsEligible">${msg("label.dispositionEventsEligible")}</option>
+                     <option value="rma:recordSearchDispositionPeriod">${msg("label.dispositionPeriod")}</option>
                      <option value="rma:recordSearchVitalRecordReviewPeriod">${msg("label.vitalRecordReviewPeriod")}</option>
                      <option value="rma:recordSearchHasDispositionSchedule">${msg("label.hasDispositionSchedule")}</option>
                      <#list meta as d>
