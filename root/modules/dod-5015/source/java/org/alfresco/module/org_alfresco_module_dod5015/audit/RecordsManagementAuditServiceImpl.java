@@ -580,7 +580,7 @@ public class RecordsManagementAuditServiceImpl
                 
                 Date timestamp = new Date(time);
                 String fullName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_FULLNAME);
-                String userRole = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLE);
+                String userRoles = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLES);
                 NodeRef nodeRef = (NodeRef) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF);
                 String nodeName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME);
                 String description = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_EVENT_DESCRIPTION);
@@ -593,7 +593,7 @@ public class RecordsManagementAuditServiceImpl
                         timestamp,
                         user,
                         fullName,
-                        userRole,
+                        userRoles,              // A concatenated string of roles
                         nodeRef,
                         nodeName,
                         description);

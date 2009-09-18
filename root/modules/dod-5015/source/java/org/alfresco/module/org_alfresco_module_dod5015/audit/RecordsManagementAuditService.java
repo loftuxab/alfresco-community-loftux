@@ -49,7 +49,7 @@ public interface RecordsManagementAuditService
     public static final String RM_AUDIT_SNIPPET_CHANGES = "/changes";
 
     public static final String RM_AUDIT_DATA_PERSON_FULLNAME = "/DOD5015/event/person/fullName";
-    public static final String RM_AUDIT_DATA_PERSON_ROLE = "/DOD5015/event/person/role";
+    public static final String RM_AUDIT_DATA_PERSON_ROLES = "/DOD5015/event/person/roles";
     public static final String RM_AUDIT_DATA_EVENT_DESCRIPTION = "/DOD5015/event/description/value";
     public static final String RM_AUDIT_DATA_NODE_NODEREF = "/DOD5015/event/node/noderef";
     public static final String RM_AUDIT_DATA_NODE_NAME = "/DOD5015/event/node/name";

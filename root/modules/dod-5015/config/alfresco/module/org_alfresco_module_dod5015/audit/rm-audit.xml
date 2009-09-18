@@ -11,6 +11,7 @@
     <DataExtractors>
        <DataExtractor name="simpleValue" registeredName="auditModel.extractor.simpleValue"/>
        <DataExtractor name="nodeName" registeredName="auditModel.extractor.nodeName"/>
+       <DataExtractor name="userRoles" registeredName="org_alfresco_module_dod5015_userRolesExtractor"/>
     </DataExtractors>
     
     <DataGenerators>
@@ -27,6 +28,7 @@
         <AuditPath key="event">
             <!-- Record user details -->
             <AuditPath key="person">
+                <RecordValue key="roles" dataExtractor="userRoles"/>
                 <GenerateValue key="fullName" dataGenerator="personFullName"/>
             </AuditPath>
             <!-- Record a description of the event -->
