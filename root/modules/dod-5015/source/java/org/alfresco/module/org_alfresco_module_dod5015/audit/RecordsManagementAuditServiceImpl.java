@@ -593,8 +593,10 @@ public class RecordsManagementAuditServiceImpl
                 String userRoles = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLES);
                 NodeRef nodeRef = (NodeRef) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF);
                 String nodeName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME);
+                String nodeType = null;
                 String namePath = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAMEPATH);
                 String description = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_EVENT_DESCRIPTION);
+                String identifier = null;
                 @SuppressWarnings("unchecked")
                 Map<QName, Serializable> beforeProperties = (Map<QName, Serializable>) values.get(
                         RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES_BEFORE);
@@ -602,7 +604,7 @@ public class RecordsManagementAuditServiceImpl
                 Map<QName, Serializable> afterProperties = (Map<QName, Serializable>) values.get(
                         RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES_AFTER);
                 
-                // TODO: Plug the 'changedProperties' into the entry ...
+                // TODO: Refactor this to use the builder pattern
                 RecordsManagementAuditEntry entry = new RecordsManagementAuditEntry(
                         timestamp,
                         user,
@@ -610,7 +612,12 @@ public class RecordsManagementAuditServiceImpl
                         userRoles,              // A concatenated string of roles
                         nodeRef,
                         nodeName,
-                        description);
+                        nodeType,
+                        description,
+                        identifier,
+                        namePath,
+                        beforeProperties,
+                        afterProperties);
                 
                 // write out the entry to the file in JSON format
                 writeEntryToFile(entry);
