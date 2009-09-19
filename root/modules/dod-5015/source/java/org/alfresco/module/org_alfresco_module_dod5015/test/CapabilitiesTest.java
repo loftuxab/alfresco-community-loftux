@@ -42,6 +42,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FreezeAction;
@@ -98,6 +99,8 @@ public class CapabilitiesTest extends TestCase
     private NodeRef filePlan;
 
     private PermissionService permissionService;
+    
+    private RecordsManagementService recordsManagementService;
 
     private RecordsManagementSecurityService recordsManagementSecurityService;
 
@@ -187,6 +190,7 @@ public class CapabilitiesTest extends TestCase
         authorityService = (AuthorityService) ctx.getBean("authorityService");
         personService = (PersonService) ctx.getBean("personService");
 
+        recordsManagementService = (RecordsManagementService) ctx.getBean("RecordsManagementService");
         recordsManagementSecurityService = (RecordsManagementSecurityService) ctx.getBean("RecordsManagementSecurityService");
         recordsManagementActionService = (RecordsManagementActionService) ctx.getBean("RecordsManagementActionService");
         recordsManagementEventService = (RecordsManagementEventService) ctx.getBean("RecordsManagementEventService");
@@ -246,43 +250,61 @@ public class CapabilitiesTest extends TestCase
 
         for (PermissionReference pr : permissionModel.getImmediateGranteePermissions(permissionModel.getPermissionReference(null, RMPermissionModel.ROLE_USER)))
         {
-            permissionService.setPermission(filePlan, rmUsers, pr.getName(), true);
+            setPermission(filePlan, rmUsers, pr.getName(), true);
         }
         authorityService.addAuthority(rmUsers, rm_user);
-        permissionService.setPermission(filePlan, rm_user, RMPermissionModel.FILING, true);
+        setPermission(filePlan, rm_user, RMPermissionModel.FILING, true);
 
         for (PermissionReference pr : permissionModel.getImmediateGranteePermissions(permissionModel.getPermissionReference(null, RMPermissionModel.ROLE_POWER_USER)))
         {
-            permissionService.setPermission(filePlan, rmPowerUsers, pr.getName(), true);
+            setPermission(filePlan, rmPowerUsers, pr.getName(), true);
         }
         authorityService.addAuthority(rmPowerUsers, rm_power_user);
-        permissionService.setPermission(filePlan, rm_power_user, RMPermissionModel.FILING, true);
+        setPermission(filePlan, rm_power_user, RMPermissionModel.FILING, true);
 
         for (PermissionReference pr : permissionModel.getImmediateGranteePermissions(permissionModel.getPermissionReference(null, RMPermissionModel.ROLE_SECURITY_OFFICER)))
         {
-            permissionService.setPermission(filePlan, rmSecurityOfficers, pr.getName(), true);
+            setPermission(filePlan, rmSecurityOfficers, pr.getName(), true);
         }
         authorityService.addAuthority(rmSecurityOfficers, rm_security_officer);
-        permissionService.setPermission(filePlan, rm_security_officer, RMPermissionModel.FILING, true);
+        setPermission(filePlan, rm_security_officer, RMPermissionModel.FILING, true);
 
         for (PermissionReference pr : permissionModel.getImmediateGranteePermissions(permissionModel.getPermissionReference(null, RMPermissionModel.ROLE_RECORDS_MANAGER)))
         {
-            permissionService.setPermission(filePlan, rmRecordsManagers, pr.getName(), true);
+            setPermission(filePlan, rmRecordsManagers, pr.getName(), true);
         }
         authorityService.addAuthority(rmRecordsManagers, rm_records_manager);
-        permissionService.setPermission(filePlan, rm_records_manager, RMPermissionModel.FILING, true);
+        setPermission(filePlan, rm_records_manager, RMPermissionModel.FILING, true);
 
         for (PermissionReference pr : permissionModel.getImmediateGranteePermissions(permissionModel.getPermissionReference(null, RMPermissionModel.ROLE_ADMINISTRATOR)))
         {
-            permissionService.setPermission(filePlan, rmAdministrators, pr.getName(), true);
+            setPermission(filePlan, rmAdministrators, pr.getName(), true);
         }
         authorityService.addAuthority(rmAdministrators, rm_administrator);
-        permissionService.setPermission(filePlan, rm_administrator, RMPermissionModel.FILING, true);
+        setPermission(filePlan, rm_administrator, RMPermissionModel.FILING, true);
 
         testTX.commit();
         testTX = transactionService.getUserTransaction();
         testTX.begin();
 
+    }
+    
+    private void setPermission(NodeRef nodeRef, String authority, String permission, boolean allow)
+    {
+        permissionService.setPermission(nodeRef, authority, permission, allow);
+        if (recordsManagementService.isRecordsManagementContainer(nodeRef) == true)
+        {
+            List<ChildAssociationRef> assocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+            for (ChildAssociationRef assoc : assocs)
+            {
+                NodeRef child = assoc.getChildRef();
+                if (recordsManagementService.isRecordFolder(child) == true ||
+                    recordsManagementService.isRecordsManagementContainer(child) == true)
+                {
+                    setPermission(child, authority, permission, allow);
+                }
+            }
+        }
     }
 
     private Map<QName, Serializable> createDefaultProperties(String userName)
@@ -2164,11 +2186,17 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.VIEW_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
     }
+    
+    private void setFilingOnRecordFolder(NodeRef recordFolder, String authority)
+    {
+        permissionService.setPermission(recordFolder, authority, RMPermissionModel.FILING, true);
+        permissionService.setPermission(nodeService.getPrimaryParent(recordFolder).getParentRef(), authority, RMPermissionModel.READ_RECORDS, true);        
+    }
 
     public void testRecordFolderAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
-        permissionService.setPermission(recordFolder_1, rm_records_manager, RMPermissionModel.FILING, true);
+        setFilingOnRecordFolder(recordFolder_1, rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -2236,6 +2264,7 @@ public class CapabilitiesTest extends TestCase
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
         permissionService.setPermission(recordFolder_1, rm_security_officer, RMPermissionModel.FILING, true);
+        permissionService.setPermission(nodeService.getPrimaryParent(recordFolder_1).getParentRef(), rm_security_officer, RMPermissionModel.READ_RECORDS, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2301,6 +2330,8 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsPowerUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
+        permissionService.setPermission(recordFolder_1, rm_power_user, RMPermissionModel.FILING, true);
+        permissionService.setPermission(nodeService.getPrimaryParent(recordFolder_1).getParentRef(), rm_power_user, RMPermissionModel.READ_RECORDS, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2366,6 +2397,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
+        setFilingOnRecordFolder(recordFolder_1, rm_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2627,6 +2659,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
+        setFilingOnRecord(record_1, rm_records_manager);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -2693,6 +2726,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordAsSecurityOfficer()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
+        setFilingOnRecord(record_1, rm_security_officer);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2755,9 +2789,17 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.VIEW_UPDATE_REASONS_FOR_FREEZE, AccessStatus.DENIED);
     }
 
+    private void setFilingOnRecord(NodeRef record, String authority)
+    {
+        NodeRef recordFolder = nodeService.getPrimaryParent(record).getParentRef();
+        permissionService.setPermission(recordFolder, authority, RMPermissionModel.FILING, true);
+        permissionService.setPermission(nodeService.getPrimaryParent(recordFolder).getParentRef(), authority, RMPermissionModel.READ_RECORDS, true);        
+    }
+    
     public void testRecordAsPowerUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
+        setFilingOnRecord(record_1, rm_power_user);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(record_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
