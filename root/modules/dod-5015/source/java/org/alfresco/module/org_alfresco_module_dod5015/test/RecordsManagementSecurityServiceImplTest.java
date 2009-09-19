@@ -24,13 +24,20 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import javax.jcr.AccessDeniedException;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
@@ -38,18 +45,23 @@ import org.alfresco.module.org_alfresco_module_dod5015.security.Role;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.namespace.NamespaceService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 import org.alfresco.util.GUID;
 import org.alfresco.util.PropertyMap;
+import org.antlr.gunit.gUnitParser.file_return;
 
 /**
  * Event service implementation unit test
@@ -67,6 +79,7 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
 	private PermissionService permissionService;
 	private PersonService personService;
 	private RecordsManagementSecurityService rmSecurityService;
+	private RecordsManagementActionService rmActionService;
 	private RetryingTransactionHelper transactionHelper;
 	
 	@Override
@@ -82,6 +95,7 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
 		this.rmSecurityService = (RecordsManagementSecurityService)this.applicationContext.getBean("RecordsManagementSecurityService");
 		this.transactionHelper = (RetryingTransactionHelper)this.applicationContext.getBean("retryingTransactionHelper");
 		this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
+		this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
 		
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -89,86 +103,107 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
 	
 	public void testRoles()
 	{
-	    NodeRef rmRootNode = createRMRootNodeRef();
+	    final NodeRef rmRootNode = createRMRootNodeRef();
 	    
-	    Set<Role> roles = rmSecurityService.getRoles(rmRootNode);
-	    assertNotNull(roles);
-	    assertEquals(0, roles.size());
-	    
-	    rmSecurityService.createRole(rmRootNode, "MyRole", "My Role", getListOfCapabilities(5));
-	    
-	    roles = rmSecurityService.getRoles(rmRootNode);
-        assertNotNull(roles);
-        assertEquals(1, roles.size());
+	    setComplete();
+        endTransaction();
         
-        Role role = new ArrayList<Role>(roles).get(0);
-        assertNotNull(role);
-        assertEquals("MyRole", role.getName());
-        assertEquals("My Role", role.getDisplayLabel());
-        assertNotNull(role.getCapabilities());
-        assertEquals(5, role.getCapabilities().size());
-        assertNotNull(role.getRoleGroupName());
-        
-        // Add a user to the role
-        String userName = createAndAddUserToRole(role.getRoleGroupName());
-        
-        // Check that we can retrieve the users roles
-        Set<Role> userRoles = rmSecurityService.getRolesByUser(rmRootNode, userName);
-        assertNotNull(userRoles);
-        assertEquals(1, userRoles.size());
-        Role userRole  = userRoles.iterator().next();
-        assertEquals("MyRole", userRole.getName());
-        
-        try
+        transactionHelper.doInTransaction(new RetryingTransactionCallback<Object>()
         {
-            rmSecurityService.createRole(rmRootNode, "MyRole", "My Role", getListOfCapabilities(5));
-            fail("Duplicate role id's not allowed for the same rm root node");
-        }
-        catch (AlfrescoRuntimeException e)
-        {
-            // Expected
-        }
-        
-        rmSecurityService.createRole(rmRootNode, "MyRole2", "My Role", getListOfCapabilities(5));
-        
-        roles = rmSecurityService.getRoles(rmRootNode);
-        assertNotNull(roles);
-        assertEquals(2, roles.size());    
-        
-        Set<Capability> list = getListOfCapabilities(3, 4);
-        assertEquals(3, list.size());
-        
-        Role result = rmSecurityService.updateRole(rmRootNode, "MyRole", "SomethingDifferent", list);
-        
-        assertNotNull(result);
-        assertEquals("MyRole", result.getName());
-        assertEquals("SomethingDifferent", result.getDisplayLabel());
-        assertNotNull(result.getCapabilities());
-        assertEquals(3, result.getCapabilities().size());
-        assertNotNull(result.getRoleGroupName());
-	 
-        roles = rmSecurityService.getRoles(rmRootNode);
-        assertNotNull(roles);
-        assertEquals(2, roles.size());
-        
-        for (Role role2 : roles)
-        {
-            if (role2.equals("MyRole") == true)
-            {
+            public Object execute() throws Throwable
+            {	    
+        	    Set<Role> roles = rmSecurityService.getRoles(rmRootNode);
+        	    assertNotNull(roles);
+        	    assertEquals(5, roles.size());
+        	    
+        	    rmSecurityService.createRole(rmRootNode, "MyRole", "My Role", getListOfCapabilities(5));
+        	    
+        	    roles = rmSecurityService.getRoles(rmRootNode);
+                assertNotNull(roles);
+                assertEquals(6, roles.size());
+                
+                Role role = findRole(roles, "MyRole");
+                assertNotNull(role);
+                assertEquals("MyRole", role.getName());
+                assertEquals("My Role", role.getDisplayLabel());
+                assertNotNull(role.getCapabilities());
+                assertEquals(5, role.getCapabilities().size());
+                assertNotNull(role.getRoleGroupName());
+                
+                // Add a user to the role
+                String userName = createAndAddUserToRole(role.getRoleGroupName());
+                
+                // Check that we can retrieve the users roles
+                Set<Role> userRoles = rmSecurityService.getRolesByUser(rmRootNode, userName);
+                assertNotNull(userRoles);
+                assertEquals(1, userRoles.size());
+                Role userRole  = userRoles.iterator().next();
+                assertEquals("MyRole", userRole.getName());
+                
+                try
+                {
+                    rmSecurityService.createRole(rmRootNode, "MyRole", "My Role", getListOfCapabilities(5));
+                    fail("Duplicate role id's not allowed for the same rm root node");
+                }
+                catch (AlfrescoRuntimeException e)
+                {
+                    // Expected
+                }
+                
+                rmSecurityService.createRole(rmRootNode, "MyRole2", "My Role", getListOfCapabilities(5));
+                
+                roles = rmSecurityService.getRoles(rmRootNode);
+                assertNotNull(roles);
+                assertEquals(7, roles.size());    
+                
+                Set<Capability> list = getListOfCapabilities(3, 4);
+                assertEquals(3, list.size());
+                
+                Role result = rmSecurityService.updateRole(rmRootNode, "MyRole", "SomethingDifferent", list);
+                
+                assertNotNull(result);
+                assertEquals("MyRole", result.getName());
+                assertEquals("SomethingDifferent", result.getDisplayLabel());
+                assertNotNull(result.getCapabilities());
+                assertEquals(3, result.getCapabilities().size());
+                assertNotNull(result.getRoleGroupName());
+        	 
+                roles = rmSecurityService.getRoles(rmRootNode);
+                assertNotNull(roles);
+                assertEquals(7, roles.size());
+                
+                Role role2 = findRole(roles, "MyRole");
                 assertNotNull(role2);
                 assertEquals("MyRole", role2.getName());
                 assertEquals("SomethingDifferent", role2.getDisplayLabel());
                 assertNotNull(role2.getCapabilities());
                 assertEquals(3, role2.getCapabilities().size());
                 assertNotNull(role2.getRoleGroupName());
+                
+                rmSecurityService.deleteRole(rmRootNode, "MyRole2");
+                
+                roles = rmSecurityService.getRoles(rmRootNode);
+                assertNotNull(roles);
+                assertEquals(6, roles.size());
+                
+                return null;       
             }
-        }
-        
-        rmSecurityService.deleteRole(rmRootNode, "MyRole2");
-        
-        roles = rmSecurityService.getRoles(rmRootNode);
-        assertNotNull(roles);
-        assertEquals(1, roles.size());
+        });
+	}
+	
+	private Role findRole(Set<Role> roles, String name)
+	{
+	    Role result = null;
+	    for (Role role : roles)
+        {
+            if (name.equals(role.getName()) == true)
+            {
+                result = role;
+                break;
+            }
+        }    
+	    
+	    return result;
 	}
 	
 	private Set<Capability> getListOfCapabilities(int size)
@@ -201,8 +236,25 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
 	
 	private NodeRef createRMRootNodeRef()
 	{
-	    NodeRef root = this.nodeService.getRootNode(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore"));
-	    return this.nodeService.createNode(root, ContentModel.ASSOC_CHILDREN, ContentModel.ASSOC_CHILDREN, DOD5015Model.TYPE_FILE_PLAN).getChildRef();
+	    NodeRef root = this.nodeService.getRootNode(SPACES_STORE);
+	    NodeRef filePlan = this.nodeService.createNode(root, ContentModel.ASSOC_CHILDREN, ContentModel.ASSOC_CHILDREN, DOD5015Model.TYPE_FILE_PLAN).getChildRef();	    
+	    
+	    return filePlan;
+	}
+	
+	private NodeRef addFilePlanCompoent(NodeRef parent, QName type)
+	{
+	    String id = GUID.generate();
+        String seriesName = "Series" + id;
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
+        props.put(ContentModel.PROP_NAME, seriesName);
+        props.put(PROP_IDENTIFIER, id);
+        return nodeService.createNode(
+                    parent, 
+                    ContentModel.ASSOC_CONTAINS, 
+                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, seriesName), 
+                    type,
+                    props).getChildRef();
 	}
 	
 	private String createAndAddUserToRole(String role)
@@ -226,12 +278,27 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
         return userName;
 	}
 	
+	private String createUser()
+    {
+        // Create an athentication
+        String userName = GUID.generate();
+        authenticationService.createAuthentication(userName, "PWD".toCharArray());
+                
+        // Create a person
+        PropertyMap ppOne = new PropertyMap(4);
+        ppOne.put(ContentModel.PROP_USERNAME, userName);
+        ppOne.put(ContentModel.PROP_FIRSTNAME, "firstName");
+        ppOne.put(ContentModel.PROP_LASTNAME, "lastName");
+        ppOne.put(ContentModel.PROP_EMAIL, "email@email.com");
+        ppOne.put(ContentModel.PROP_JOBTITLE, "jobTitle");        
+        personService.createPerson(ppOne);
+           
+        return userName;
+    }
+	
 	public void testExecutionAsRMAdmin()
 	{
-	    NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
-        final NodeRef filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
-                TYPE_FILE_PLAN,
-                TYPE_FILE_PLAN).getChildRef();
+        final NodeRef filePlan = createRMRootNodeRef();
         
         setComplete();
         endTransaction();
@@ -363,6 +430,196 @@ public class RecordsManagementSecurityServiceImplTest extends BaseSpringTest
                 return null;
             }
     
+        });
+	}
+	
+//	public void xxxtestCapabilityGroups()
+//	{
+//	    Set<Capability> caps = rmSecurityService.getCapabilities();
+//	    for (Capability cap : caps)
+//        {
+//            String group = cap.getGroup();
+//            assertTrue(authorityService.authorityExists(group));
+//        }
+//	    
+//	    final NodeRef filePlan = createRMRootNodeRef();
+//	    final NodeRef recordSeries = addSeries(filePlan);
+//	    
+//	    setComplete();
+//        endTransaction();
+//        
+//        transactionHelper.doInTransaction(new RetryingTransactionCallback<Object>()
+//        {
+//            public Object execute() throws Throwable
+//            {
+//                Set<AccessPermission> aps = permissionService.getAllSetPermissions(recordSeries);
+//                System.out.println("\nPermissions on new series node: ");
+//                for (AccessPermission ap : aps)
+//                {
+//                    System.out.println("   - " + ap.getAuthority() + " has " + ap.getPermission());
+//                }
+//                
+//                return null;
+//            }
+//        });
+//	}
+	
+	public void testCreateNewRMUserAccessToFilePlan()
+	{
+	    final NodeRef rmRootNode = createRMRootNodeRef();        
+	    
+	    final NodeRef seriesOne = addFilePlanCompoent(rmRootNode, TYPE_RECORD_SERIES);
+	    final NodeRef seriesTwo = addFilePlanCompoent(rmRootNode, TYPE_RECORD_SERIES);        
+        final NodeRef seriesThree = addFilePlanCompoent(rmRootNode, TYPE_RECORD_SERIES);
+        
+	    final NodeRef catOne = addFilePlanCompoent(seriesOne, TYPE_RECORD_CATEGORY); 
+	    final NodeRef catTwo = addFilePlanCompoent(seriesOne, TYPE_RECORD_CATEGORY);  
+        final NodeRef catThree = addFilePlanCompoent(seriesOne, TYPE_RECORD_CATEGORY);         
+	    
+        final NodeRef folderOne = addFilePlanCompoent(catOne, TYPE_RECORD_FOLDER);
+        final NodeRef folderTwo = addFilePlanCompoent(catOne, TYPE_RECORD_FOLDER);
+        final NodeRef folderThree = addFilePlanCompoent(catOne, TYPE_RECORD_FOLDER);
+        
+        setComplete();
+        endTransaction();
+        
+        transactionHelper.doInTransaction(new RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {       
+                // Create a new role
+                Set<Capability> caps = new HashSet<Capability>(1);
+                caps.add(rmSecurityService.getCapability(RMPermissionModel.VIEW_RECORDS));
+                
+                Role role = rmSecurityService.createRole(rmRootNode, "TestRole", "My Test Role", caps);
+                String user = createUser();
+
+                // Check the role group and allRole group are set up correctly
+                Set<String> groups = authorityService.getContainingAuthorities(AuthorityType.GROUP, role.getRoleGroupName(), true);
+                assertNotNull(groups);
+                // expect allRole group and the capability group
+                assertEquals(1, groups.size());
+                List<String> tempList = new ArrayList<String>(groups);
+                assertTrue(tempList.get(0).startsWith("GROUP_AllRoles"));
+                
+                // User shouldn't be able to see the file plan node                
+                AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+                {
+                    public Object doWork() throws Exception
+                    {
+                        // Check the permissions of the group on the root node
+                        assertEquals(AccessStatus.DENIED, permissionService.hasPermission(rmRootNode, RMPermissionModel.READ_RECORDS));
+                        
+                        try
+                        {                            
+                            nodeService.getChildAssocs(rmRootNode);
+                            fail("The user shouldn't be able to read the children");
+                        }
+                        catch (AlfrescoRuntimeException e)
+                        {
+                            // expected
+                        }
+                        
+                        return null;
+                    }
+                }, user);
+                
+                // Assign the new user to the role
+                rmSecurityService.assignRoleToAuthority(rmRootNode, role.getName(), user);
+                        
+                // Prove that all the series are there
+                List<ChildAssociationRef> assocs = nodeService.getChildAssocs(rmRootNode);
+                assertNotNull(assocs);
+                assertEquals(3, assocs.size());
+                
+                // User should be able to see the file plan node
+                AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+                {
+                    public Object doWork() throws Exception
+                    {
+                        // Check user has read on the root
+                        assertEquals(AccessStatus.ALLOWED, permissionService.hasPermission(rmRootNode, RMPermissionModel.READ_RECORDS));
+                        
+                        // Check that the user can not see any of the series
+                        List<ChildAssociationRef> assocs = nodeService.getChildAssocs(rmRootNode);
+                        assertNotNull(assocs);
+                        assertEquals(0, assocs.size());
+                        
+                        return null;
+                    }
+                }, user);
+                
+                // Add read permissions to one of the series
+                permissionService.setPermission(seriesOne, user, RMPermissionModel.READ_RECORDS, true);
+                
+                // Show that user can now see that series
+                AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+                {
+                    public Object doWork() throws Exception
+                    {
+                        // Check that the user can not see any of the series
+                        List<ChildAssociationRef> assocs = nodeService.getChildAssocs(rmRootNode);
+                        assertNotNull(assocs);
+                        assertEquals(1, assocs.size());
+                        
+                        return null;
+                    }
+                }, user);
+                
+                // Add the read permission and file permission to get to the folder
+                permissionService.setPermission(catOne, user, RMPermissionModel.READ_RECORDS, true);
+                permissionService.setPermission(folderOne, user, RMPermissionModel.FILING, true);
+                
+                // TODO check visibility of items as we add the permissions
+                // TODO check that records inherit the permissions ok
+                
+                // Try and close the folder as the new user
+                AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+                {
+                    public Object doWork() throws Exception
+                    {
+                        try
+                        {
+                            rmActionService.executeRecordsManagementAction(folderOne, "closeRecordFolder");
+                            fail("User does not have the capability for this");
+                        }
+                        catch (org.alfresco.repo.security.permissions.AccessDeniedException exception)
+                        {
+                            // expected
+                        }
+                        
+                        return null;
+                    }
+                }, user);
+                
+                // Add the capability to the role
+                Set<Capability> caps2 = new HashSet<Capability>(1);
+                caps2.add(rmSecurityService.getCapability(RMPermissionModel.VIEW_RECORDS));
+                caps2.add(rmSecurityService.getCapability(RMPermissionModel.CLOSE_FOLDERS));
+                rmSecurityService.updateRole(rmRootNode, "TestRole", "My Test Role", caps2);
+                
+                Set<AccessPermission> aps = permissionService.getAllSetPermissions(rmRootNode);
+                System.out.println("\nPermissions on new series node: ");
+                for (AccessPermission ap : aps)
+                {
+                    System.out.println("   - " + ap.getAuthority() + " has " + ap.getPermission());
+                }
+                
+                // Try and close the folder as the new user
+                AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+                {
+                    public Object doWork() throws Exception
+                    {
+                        assertEquals(AccessStatus.ALLOWED, permissionService.hasPermission(rmRootNode, RMPermissionModel.CLOSE_FOLDERS));
+                        
+                        rmActionService.executeRecordsManagementAction(folderOne, "closeRecordFolder");
+                        
+                        return null;
+                    }
+                }, user);
+                
+                return null;
+            }
         });
 	}
 }

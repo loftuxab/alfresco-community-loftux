@@ -79,9 +79,8 @@ public class TestUtilities implements DOD5015Model
             NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
             filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
                     TYPE_FILE_PLAN,
-                    TYPE_FILE_PLAN).getChildRef();
-            permissionService.setPermission(filePlan, PermissionService.ALL_AUTHORITIES, RMPermissionModel.ROLE_USER, true);
-        } else
+                    TYPE_FILE_PLAN).getChildRef();        } 
+        else
         {
             // Find the file plan in the site provided
             // TODO

@@ -34,7 +34,7 @@ import org.alfresco.service.namespace.QName;
  * @author andyh
  *
  */
-public class DeleteCapability extends AbstractCapability
+public class DeleteCapability extends AbstractGroupCapability
 {
 
     /* (non-Javadoc)

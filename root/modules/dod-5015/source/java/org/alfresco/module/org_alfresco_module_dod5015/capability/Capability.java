@@ -43,6 +43,13 @@ public interface Capability
     public AccessStatus hasPermission(NodeRef nodeRef);
 
     /**
+     * Indicates whether this is a group capability or not
+     * 
+     * @return
+     */
+    public boolean isGroupCapability();
+    
+    /**
      * Get the name of the capability
      * @return
      */

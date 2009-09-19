@@ -37,7 +37,7 @@ import org.alfresco.service.namespace.QName;
 /**
  * @author andyh
  */
-public class UpdateCapability extends AbstractCapability
+public class UpdateCapability extends AbstractGroupCapability
 {
 
     /*

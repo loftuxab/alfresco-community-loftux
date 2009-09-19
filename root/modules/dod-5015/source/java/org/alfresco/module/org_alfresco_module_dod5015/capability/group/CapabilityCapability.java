@@ -31,7 +31,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
  * @author andyh
  *
  */
-public class CapabilityCapability extends AbstractCapability
+public class CapabilityCapability extends AbstractGroupCapability
 {
 
     /* (non-Javadoc)
