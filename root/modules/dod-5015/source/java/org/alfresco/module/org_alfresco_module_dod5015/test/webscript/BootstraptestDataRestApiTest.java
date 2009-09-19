@@ -25,17 +25,13 @@
 package org.alfresco.module.org_alfresco_module_dod5015.test.webscript;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.test.TestUtilities;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.web.scripts.TestWebScriptServer.GetRequest;
 
 /**
@@ -51,39 +47,38 @@ public class BootstraptestDataRestApiTest extends BaseWebScriptTest implements R
     protected static final String APPLICATION_JSON = "application/json";
     
     protected NodeService nodeService;
-    protected ImporterService importService;
-    protected PermissionService permissionService;
     protected RetryingTransactionHelper transactionHelper;
-    protected SearchService searchService;
-    protected RecordsManagementService rmService;
-    protected RecordsManagementActionService rmActionService;
     
     @Override
     protected void setUp() throws Exception
     {
         super.setUp();
         nodeService = (NodeService) getServer().getApplicationContext().getBean("NodeService");
-        importService = (ImporterService)getServer().getApplicationContext().getBean("importerComponent");
-        permissionService = (PermissionService)getServer().getApplicationContext().getBean("PermissionService");
-        transactionHelper = (RetryingTransactionHelper)getServer().getApplicationContext().getBean("retryingTransactionHelper");
-        searchService = (SearchService)getServer().getApplicationContext().getBean("SearchService");
-        rmService = (RecordsManagementService)getServer().getApplicationContext().getBean("RecordsManagementService");
-        rmActionService = (RecordsManagementActionService)getServer().getApplicationContext().getBean("RecordsManagementActionService");
-        
-        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
-        {
-            public Object execute() throws Throwable
-            {
-                AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());             
-                TestUtilities.loadFilePlanData(null, nodeService, importService, permissionService, searchService, rmService, rmActionService);
-                return null;
-            }           
-        });         
+        transactionHelper = (RetryingTransactionHelper)getServer().getApplicationContext().getBean("retryingTransactionHelper");           
     }   
 
     public void testBoostrapTestData() throws Exception
     {
+        final NodeRef filePlan = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());             
+                return TestUtilities.loadFilePlanData(getServer().getApplicationContext(), false, true);
+            }           
+        });      
+        
         sendRequest(new GetRequest(URL), 200);
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+                nodeService.deleteNode(filePlan);
+                return null;
+            }           
+        });  
     }
     
 }

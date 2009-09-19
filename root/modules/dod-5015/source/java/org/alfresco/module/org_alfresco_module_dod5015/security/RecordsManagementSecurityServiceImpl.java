@@ -208,7 +208,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
      * 
      * @param nodeRef
      */
-    private void setUpPermissions(final NodeRef nodeRef)
+    public void setUpPermissions(final NodeRef nodeRef)
     {
         if (nodeService.exists(nodeRef) == true)
         {        

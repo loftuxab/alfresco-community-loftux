@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,6 +49,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEvent
 import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.web.scripts.BaseWebScriptTest;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
@@ -106,6 +106,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     protected RecordsManagementService rmService;
     protected RecordsManagementActionService rmActionService;
     protected RecordsManagementAdminService rmAdminService;
+    protected RetryingTransactionHelper transactionHelper;
 
     private static final String BI_DI = "BiDi";
     private static final String CHILD_SRC = "childSrc";
@@ -128,6 +129,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         this.rmService = (RecordsManagementService)getServer().getApplicationContext().getBean("RecordsManagementService");
         this.rmActionService = (RecordsManagementActionService)getServer().getApplicationContext().getBean("RecordsManagementActionService");
         this.rmAdminService = (RecordsManagementAdminService)getServer().getApplicationContext().getBean("RecordsManagementAdminService");
+        transactionHelper = (RetryingTransactionHelper)getServer().getApplicationContext().getBean("retryingTransactionHelper");  
         
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
 
@@ -135,8 +137,13 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         //
         // This is quite a slow call, so if this class grew to have many test methods,
         // there would be a real benefit in using something like @BeforeClass for the line below.
-        TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.services.getPermissionService(),
-                                       this.searchService, this.rmService, this.rmActionService);
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {         
+                return TestUtilities.loadFilePlanData(getServer().getApplicationContext());
+            }           
+        }); 
     }
 
     /**

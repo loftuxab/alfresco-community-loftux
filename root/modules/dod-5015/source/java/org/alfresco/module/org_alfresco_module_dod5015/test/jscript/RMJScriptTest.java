@@ -111,8 +111,7 @@ public class RMJScriptTest extends BaseAlfrescoSpringTest implements RecordsMana
             filePlan = getRoot();
             if (filePlan == null)
             {
-                filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService,
-                                                        this.searchService, this.rmService, this.rmActionService);
+                filePlan = TestUtilities.loadFilePlanData(applicationContext);
             }
         }
         

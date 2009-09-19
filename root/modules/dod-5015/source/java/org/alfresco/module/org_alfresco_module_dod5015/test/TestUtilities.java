@@ -37,23 +37,26 @@ import junit.framework.Assert;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
-import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
+import org.alfresco.module.org_alfresco_module_dod5015.script.BootstrapTestDataGet;
+import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchParameters;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.view.ImporterBinding;
 import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.cmr.view.Location;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ISO9075;
+import org.springframework.context.ApplicationContext;
 
 /**
  * This class is an initial placeholder for miscellaneous helper methods used in
@@ -65,26 +68,40 @@ public class TestUtilities implements DOD5015Model
 {
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     
-    public static NodeRef loadFilePlanData(String siteName, NodeService nodeService,
-            ImporterService importerService, PermissionService permissionService,
-            SearchService searchService, RecordsManagementService recordsManagementService,
-            RecordsManagementActionService recordsManagementActionService)
+    public static NodeRef loadFilePlanData(ApplicationContext applicationContext)
     {
+        return TestUtilities.loadFilePlanData(applicationContext, true, false);
+    }
+    
+    public static NodeRef loadFilePlanData(ApplicationContext applicationContext, boolean patchData, boolean alwaysLoad)
+    {
+        NodeService nodeService = (NodeService)applicationContext.getBean("NodeService"); 
+        AuthorityService authorityService = (AuthorityService)applicationContext.getBean("AuthorityService");
+        PermissionService permissionService = (PermissionService)applicationContext.getBean("PermissionService");       
+        SearchService searchService = (SearchService)applicationContext.getBean("SearchService"); 
+        ImporterService importerService = (ImporterService)applicationContext.getBean("importerComponent");
+        RecordsManagementService recordsManagementService = (RecordsManagementService)applicationContext.getBean("RecordsManagementService");
+        RecordsManagementActionService recordsManagementActionService = (RecordsManagementActionService)applicationContext.getBean("RecordsManagementActionService");
+        RecordsManagementSecurityService recordsManagementSecurityService = (RecordsManagementSecurityService)applicationContext.getBean("RecordsManagementSecurityService");
+        
         NodeRef filePlan = null;
-
-        // If no siteName is provided create a filePlan in a well known location
-        if (siteName == null)
+        NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
+        
+        if (alwaysLoad == false)
         {
-            // For now creating the filePlan beneath the
-            NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
-            filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
-                    TYPE_FILE_PLAN,
-                    TYPE_FILE_PLAN).getChildRef();        } 
-        else
-        {
-            // Find the file plan in the site provided
-            // TODO
+            // Try and find a file plan hanging from the root node
+            List<ChildAssociationRef> assocs = nodeService.getChildAssocs(rootNode, ContentModel.ASSOC_CHILDREN, TYPE_FILE_PLAN);
+            if (assocs.size() != 0)
+            {
+                filePlan = assocs.get(0).getChildRef();
+                return filePlan;
+            }                 
         }
+        
+        // For now creating the filePlan beneath the
+        filePlan = nodeService.createNode(rootNode, ContentModel.ASSOC_CHILDREN,
+                TYPE_FILE_PLAN,
+                TYPE_FILE_PLAN).getChildRef();        
 
         // Do the data load into the the provided filePlan node reference
         // TODO ...
@@ -95,28 +112,13 @@ public class TestUtilities implements DOD5015Model
         Reader viewReader = new InputStreamReader(is);
         Location location = new Location(filePlan);
         importerService.importView(viewReader, location, REPLACE_BINDING, null);
-                
-        ResultSet rs = searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, "TYPE:\"rma:recordFolder\"");
-        try
+          
+        if (patchData == true)
         {
-            for (NodeRef recordFolder : rs.getNodeRefs())
-            {
-                if (nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE) == false)
-                {
-                    // See if the folder has a disposition schedule that needs to be applied
-                    DispositionSchedule ds = recordsManagementService.getDispositionSchedule(recordFolder);
-                    if (ds != null)
-                    {
-                        // Fire action to "set-up" the folder correctly
-                        String folderName = (String)nodeService.getProperty(recordFolder, ContentModel.PROP_NAME);
-                        recordsManagementActionService.executeRecordsManagementAction(recordFolder, "setupRecordFolder");
-                    }
-                }
-            }
-        }
-        finally
-        {
-            rs.close();
+            // Tempory call out to patch data after AMP
+            BootstrapTestDataGet.patchLoadedData(searchService, nodeService, recordsManagementService, 
+                    recordsManagementActionService, permissionService, 
+                    authorityService, recordsManagementSecurityService);
         }
 
         return filePlan;
@@ -179,7 +181,7 @@ public class TestUtilities implements DOD5015Model
 
         public UUID_BINDING getUUIDBinding()
         {
-            return UUID_BINDING.UPDATE_EXISTING;
+            return UUID_BINDING.REPLACE_EXISTING;
         }
 
         public String getValue(String key)
