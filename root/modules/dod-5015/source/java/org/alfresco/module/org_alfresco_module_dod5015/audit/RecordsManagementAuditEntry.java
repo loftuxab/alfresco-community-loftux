@@ -24,11 +24,15 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.audit;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.Map;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ISO8601DateFormat;
 import org.alfresco.util.ParameterCheck;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,14 +49,22 @@ public final class RecordsManagementAuditEntry
     private final String userRole;
     private final NodeRef nodeRef;
     private final String nodeName;
+    private final String nodeType;
     private final String event;
+    private final String identifier;
+    private final String path;
+    private final Map<QName, Serializable> beforeProperties;
+    private final Map<QName, Serializable> afterProperties;
  
     /**
      * Default constructor
      */
     public RecordsManagementAuditEntry(Date timestamp, 
                 String userName, String fullName, String userRole, 
-                NodeRef nodeRef, String nodeName, String event)
+                NodeRef nodeRef, String nodeName, String nodeType, 
+                String event, String identifier, String path,
+                Map<QName, Serializable> beforeProperties,
+                Map<QName, Serializable> afterProperties)
     {
         ParameterCheck.mandatory("timestamp", timestamp);
         ParameterCheck.mandatory("userName", userName);
@@ -63,7 +75,12 @@ public final class RecordsManagementAuditEntry
         this.fullName = fullName;
         this.nodeRef = nodeRef;
         this.nodeName = nodeName;
+        this.nodeType = nodeType;
         this.event = event;
+        this.identifier = identifier;
+        this.path = path;
+        this.beforeProperties = beforeProperties;
+        this.afterProperties = afterProperties;
     }
     
     @Override
@@ -78,6 +95,10 @@ public final class RecordsManagementAuditEntry
           .append(", nodeRef=").append(nodeRef)
           .append(", nodeName=").append(nodeName)
           .append(", event=").append(event)
+          .append(", identifier=").append(identifier)
+          .append(", path=").append(path)
+          .append(", beforeProperties=").append(beforeProperties)
+          .append(", afterProperties=").append(afterProperties)
           .append(")");
         return sb.toString();
     }
@@ -98,8 +119,48 @@ public final class RecordsManagementAuditEntry
             entry.put("fullName", this.fullName == null ? "": this.fullName);
             entry.put("nodeRef", this.nodeRef == null ? "": this.nodeRef);
             entry.put("nodeName", this.nodeName == null ? "": this.nodeName);
+            entry.put("nodeType", this.nodeType == null ? "": this.nodeType);
             entry.put("event", this.event == null ? "": this.event);
+            entry.put("identifier", this.identifier == null ? "": this.identifier);
+            entry.put("path", this.path == null ? "": this.path);
         
+            JSONArray changedValues = new JSONArray();
+            
+            if (this.beforeProperties != null && this.afterProperties != null)
+            {
+                // create an entry for each property that existed before
+                for (QName valueName : this.beforeProperties.keySet())
+                {
+                    JSONObject changedValue = new JSONObject();
+                    changedValue.put("name", valueName);
+                    changedValue.put("previous", this.beforeProperties.get(valueName));
+                    
+                    Serializable newValue = this.afterProperties.get(valueName);
+                    changedValue.put("new", newValue == null ? "" : newValue.toString());
+                    
+                    changedValues.put(changedValue);
+                }
+                
+                // create an entry for each property that exists after but has
+                // not already been added
+                for (QName valueName : this.afterProperties.keySet())
+                {
+                    if (!this.beforeProperties.containsKey(valueName))
+                    {
+                        JSONObject changedValue = new JSONObject();
+                        changedValue.put("name", valueName);
+                        changedValue.put("previous", "");
+                        
+                        Serializable newValue = this.afterProperties.get(valueName);
+                        changedValue.put("new", newValue == null ? "" : newValue.toString());
+                        
+                        changedValues.put(changedValue);
+                    }
+                }
+            }
+            
+            entry.put("changedValues", changedValues);
+            
             return entry.toString();
         }
         catch (JSONException je)
@@ -170,6 +231,15 @@ public final class RecordsManagementAuditEntry
     {
         return this.nodeName;
     }
+    
+    /**
+     * 
+     * @return The type of the node the audit log entry is for
+     */
+    public String getNodeType()
+    {
+        return this.nodeType;
+    }
 
     /**
      * 
@@ -179,5 +249,44 @@ public final class RecordsManagementAuditEntry
     public String getEvent()
     {
         return this.event;
+    }
+
+    /**
+     * An identifier for the item being audited, for example for a record
+     * it will be the unique record identifier, for a user it would be the 
+     * username etc.
+     * 
+     * @return Ad identifier for the thing being audited
+     */
+    public String getIdentifier()
+    {
+        return this.identifier;
+    }
+
+    /**
+     * 
+     * @return The path to the object being audited
+     */
+    public String getPath()
+    {
+        return this.path;
+    }
+
+    /**
+     * 
+     * @return Map of properties before the audited action
+     */
+    public Map<QName, Serializable> getBeforeProperties()
+    {
+        return this.beforeProperties;
+    }
+    
+    /**
+     * 
+     * @return Map of properties after the audited action
+     */
+    public Map<QName, Serializable> getAfterProperties()
+    {
+        return this.beforeProperties;
     }
 }
