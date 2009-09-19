@@ -1232,14 +1232,14 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         // get the audit log with all restrictions in place
-        String filteredAuditUrl = auditUrl + "?user=gavinc&size=5&from=2009-01-01&to=2009-12-31";
+        String filteredAuditUrl = auditUrl + "?user=gavinc&size=5&from=2009-01-01&to=2009-12-31&event=Login";
         rsp = sendRequest(new GetRequest(filteredAuditUrl), 200);
         // check response
         assertEquals("application/json", rsp.getContentType());
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
         // attempt to get the audit log with invalid restrictions in place
-        filteredAuditUrl = auditUrl + "?user=fred&size=abc&from=2009&to=2010";
+        filteredAuditUrl = auditUrl + "?user=fred&size=abc&from=2009&to=2010&property=wrong";
         rsp = sendRequest(new GetRequest(filteredAuditUrl), 200);
         assertEquals("application/json", rsp.getContentType());
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
@@ -1327,6 +1327,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         jsonPostData.put("size", "50");
         jsonPostData.put("user", "gavinc");
         jsonPostData.put("event", "Update Metadata");
+        jsonPostData.put("path", "/documentLibrary/Gav Series");
+        jsonPostData.put("property", "{http://www.alfresco.org/model/content/1.0}modified");
         jsonPostString = jsonPostData.toString();
         rsp = sendRequest(new PostRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 200);
         

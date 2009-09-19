@@ -35,6 +35,8 @@ import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.web.scripts.content.StreamContent;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.namespace.InvalidQNameException;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,6 +59,8 @@ public class BaseAuditRetrievalWebScript extends StreamContent
     protected final static String PARAM_EVENT = "event";
     protected final static String PARAM_FROM = "from";
     protected final static String PARAM_TO = "to";
+    protected final static String PARAM_PATH = "path";
+    protected final static String PARAM_PROPERTY = "property";
     protected final static String DATE_PATTERN = "yyyy-MM-dd";
     
     protected RecordsManagementAuditService rmAuditService;
@@ -106,6 +110,8 @@ public class BaseAuditRetrievalWebScript extends StreamContent
         String event = null;
         String from = null;
         String to = null;
+        String path = null;
+        String property = null;
         
         if (MimetypeMap.MIMETYPE_JSON.equals(req.getContentType()))
         {
@@ -132,6 +138,14 @@ public class BaseAuditRetrievalWebScript extends StreamContent
                 {
                     to = json.getString(PARAM_TO);
                 }
+                if (json.has(PARAM_PATH))
+                {
+                    path = json.getString(PARAM_PATH);
+                }
+                if (json.has(PARAM_PROPERTY))
+                {
+                    property = json.getString(PARAM_PROPERTY);
+                }
             }
             catch (IOException ioe)
             {
@@ -153,6 +167,8 @@ public class BaseAuditRetrievalWebScript extends StreamContent
             event = req.getParameter(PARAM_EVENT);
             from = req.getParameter(PARAM_FROM);
             to = req.getParameter(PARAM_TO);
+            path = req.getParameter(PARAM_PATH);
+            property = req.getParameter(PARAM_PROPERTY);
         }
 
         // setup the audit query parameters object
@@ -198,6 +214,28 @@ public class BaseAuditRetrievalWebScript extends StreamContent
             {
                 if (logger.isWarnEnabled())
                     logger.warn("Ignoring to parameter as '" + to + "' does not conform to the date pattern: " + DATE_PATTERN);
+            }
+        }
+        
+        // NOTE: only take the path parameter into consideration if the 
+        //       NodeRef has not already been supplied via the URL
+        if (nodeRef == null && path != null && path.length() > 0)
+        {
+            // TODO: convert the path into a NodeRef and then use params.setNodeRef()
+            if (logger.isWarnEnabled())
+                logger.warn("Ignoring path parameter as it is not supported yet!");
+        }
+        
+        if (property != null && property.length() > 0)
+        {
+            try
+            {
+                params.setProperty(QName.createQName(property));
+            }
+            catch (InvalidQNameException iqe)
+            {
+                if (logger.isWarnEnabled())
+                    logger.warn("Ignoring property parameter as '" + property + "' is an invalid QName");
             }
         }
         
