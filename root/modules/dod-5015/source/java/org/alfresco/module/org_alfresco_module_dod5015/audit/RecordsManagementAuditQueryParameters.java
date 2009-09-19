@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.audit;
 import java.util.Date;
 
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.namespace.QName;
 
 /**
  * Class to represent the parameters for a Records Management 
@@ -42,6 +43,7 @@ public final class RecordsManagementAuditQueryParameters
     private Date dateFrom;
     private Date dateTo;
     private String event;
+    private QName property;
 
     /**
      * Default constructor.
@@ -169,6 +171,26 @@ public final class RecordsManagementAuditQueryParameters
     {
         this.event = event;
     }
+    
+    /**
+     * 
+     * @return The property to retrieve entries for
+     */
+    public QName getProperty()
+    {
+        return this.property;
+    }
+
+    /**
+     * Restricts the audit trail to only those entries that involve
+     * the given property.
+     * 
+     * @param property The property to retrieve entries for
+     */
+    public void setProperty(QName property)
+    {
+        this.property = property;
+    }
 
     /*
      * @see java.lang.Object#toString()
@@ -181,7 +203,8 @@ public final class RecordsManagementAuditQueryParameters
         builder.append(" (nodeRef='").append(nodeRef).append("', user='")
         .append(user).append("', dateFrom='").append(dateFrom)
         .append("', dateTo='").append(dateTo).append("', maxEntries='")
-        .append(maxEntries).append("', event='").append(event).append("')");
+        .append(maxEntries).append("', event='").append(event)
+        .append("', property='").append(property).append("')");
         
         return builder.toString();
     }
