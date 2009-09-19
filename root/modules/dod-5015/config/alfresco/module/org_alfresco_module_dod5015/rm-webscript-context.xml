@@ -261,9 +261,12 @@
         <property name="nodeService" ref="NodeService" />
         <property name="searchService" ref="SearchService" />
         <property name="importerService" ref="ImporterService"/>
+        <property name="permissionService" ref="PermissionService"/>
         <property name="siteService" ref="SiteService"/>
         <property name="recordsManagementService" ref="RecordsManagementService" />
         <property name="recordsManagementActionService" ref="RecordsManagementActionService" />
+        <property name="authorityService" ref="AuthorityService"/>
+        <property name="recordsManagementSecurityService" ref="RecordsManagementSecurityService"/>
     </bean>
     
 </beans>

@@ -111,8 +111,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         //
         // This is quite a slow call, so if this class grew to have many test methods,
         // there would be a real benefit in using something like @BeforeClass for the line below.
-        TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService,
-                                    this.searchService, this.rmService, this.rmActionService);
+        TestUtilities.loadFilePlanData(getServer().getApplicationContext());
     }
 
     public void testGetDispositionSchedule() throws Exception

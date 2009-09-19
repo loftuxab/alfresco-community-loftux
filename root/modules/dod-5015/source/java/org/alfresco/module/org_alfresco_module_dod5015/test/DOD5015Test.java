@@ -192,8 +192,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	    // Don't reload the fileplan data on each test method.
 	    if (retrieveJanuaryAISVitalFolders().size() != 1)
 	    {
-            filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService,
-                    searchService, rmService, rmActionService);
+            filePlan = TestUtilities.loadFilePlanData(applicationContext);
 	    }
 	}
 

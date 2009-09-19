@@ -108,8 +108,7 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
 	
 	private void setUpTestData()
 	{
-        filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, 
-                this.permissionService, this.searchService, this.rmService, this.rmActionService);
+        filePlan = TestUtilities.loadFilePlanData(applicationContext);
 	}
 
     @Override

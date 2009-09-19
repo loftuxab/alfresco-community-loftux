@@ -129,14 +129,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
                 // Ensure that auditing is on
                 rmAuditService.start();
 
-                NodeRef nodeRef = TestUtilities.loadFilePlanData(
-                        null,
-                        serviceRegistry.getNodeService(),
-                        serviceRegistry.getImporterService(),
-                        serviceRegistry.getPermissionService(),
-                        serviceRegistry.getSearchService(),
-                        rmService,
-                        rmActionService);
+                NodeRef nodeRef = TestUtilities.loadFilePlanData(ctx);
 
                 // Do some stuff
                 FileAction fileAction = (FileAction)ctx.getBean("file");

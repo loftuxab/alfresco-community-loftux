@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
@@ -37,11 +38,18 @@ import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
+import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
+import org.alfresco.module.org_alfresco_module_dod5015.security.Role;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.cmr.view.ImporterService;
@@ -74,8 +82,10 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
     private RecordsManagementActionService recordsManagementActionService;
     private ImporterService importerService;
     private SiteService siteService;
-    
-    
+    private PermissionService permissionService;
+    private RecordsManagementSecurityService recordsManagementSecurityService;
+    private AuthorityService authorityService;
+        
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
@@ -106,6 +116,20 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
         this.siteService = siteService;
     }
     
+    public void setPermissionService(PermissionService permissionService)
+    {
+        this.permissionService = permissionService;
+    }
+    
+    public void setAuthorityService(AuthorityService authorityService)
+    {
+        this.authorityService = authorityService;
+    }
+    
+    public void setRecordsManagementSecurityService(RecordsManagementSecurityService recordsManagementSecurityService)
+    {
+        this.recordsManagementSecurityService = recordsManagementSecurityService;
+    }
     
     @Override
     public Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
@@ -123,21 +147,22 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
         {
             siteName = req.getParameter(ARG_SITE_NAME);
         }
-        SiteInfo site = siteService.getSite(siteName);
-        if (site == null)
-        {
-            throw new AlfrescoRuntimeException("Records Management site does not exist: " + siteName);
-        }
-        
-        // resolve documentLibrary (filePlan) container
-        NodeRef filePlan = siteService.getContainer(siteName, COMPONENT_DOCUMENT_LIBRARY);
-        if (filePlan == null)
-        {
-            filePlan = siteService.createContainer(siteName, COMPONENT_DOCUMENT_LIBRARY, DOD5015Model.TYPE_FILE_PLAN, null);
-        }
         
         if (importData)
         {
+            SiteInfo site = siteService.getSite(siteName);
+            if (site == null)
+            {
+                throw new AlfrescoRuntimeException("Records Management site does not exist: " + siteName);
+            }
+            
+            // resolve documentLibrary (filePlan) container
+            NodeRef filePlan = siteService.getContainer(siteName, COMPONENT_DOCUMENT_LIBRARY);
+            if (filePlan == null)
+            {
+                filePlan = siteService.createContainer(siteName, COMPONENT_DOCUMENT_LIBRARY, DOD5015Model.TYPE_FILE_PLAN, null);
+            }
+            
             // import the RM test data ACP into the the provided filePlan node reference
             InputStream is = BootstrapTestDataGet.class.getClassLoader().getResourceAsStream(
                     "alfresco/module/org_alfresco_module_dod5015/bootstrap/DODExampleFilePlan.xml");
@@ -150,34 +175,136 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
             importerService.importView(viewReader, location, null, null);
         }
         
-        // fix up the test dataset to fire initial events for disposition schedules
-        ResultSet rs = searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, "TYPE:\"rma:recordFolder\"");
-        try
-        {
-            for (NodeRef recordFolder : rs.getNodeRefs())
-            {
-                if (nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE) == false)
-                {
-                    // See if the folder has a disposition schedule that needs to be applied
-                    DispositionSchedule ds = recordsManagementService.getDispositionSchedule(recordFolder);
-                    if (ds != null)
-                    {
-                        // Fire action to "set-up" the folder correctly
-                        String folderName = (String)nodeService.getProperty(recordFolder, ContentModel.PROP_NAME);
-                        logger.info("Setting up bootstraped record folder " + folderName);
-                        recordsManagementActionService.executeRecordsManagementAction(recordFolder, "setupRecordFolder");
-                    }
-                }
-            }
-        }
-        finally
-        {
-            rs.close();
-        }
+        // Patch data
+        BootstrapTestDataGet.patchLoadedData(searchService, nodeService, recordsManagementService, 
+                                             recordsManagementActionService, permissionService,
+                                             authorityService, recordsManagementSecurityService);
         
         Map<String, Object> model = new HashMap<String, Object>(1, 1.0f);
     	model.put("success", true);
     	
         return model;
+    }
+    
+    /**
+     * Temp method to patch AMP'ed data
+     * 
+     * @param searchService
+     * @param nodeService
+     * @param recordsManagementService
+     * @param recordsManagementActionService
+     */
+    public static void patchLoadedData( final SearchService searchService, 
+                                        final NodeService nodeService, 
+                                        final RecordsManagementService recordsManagementService,
+                                        final RecordsManagementActionService recordsManagementActionService,
+                                        final PermissionService permissionService,
+                                        final AuthorityService authorityService,
+                                        final RecordsManagementSecurityService recordsManagementSecurityService)
+    {
+        AuthenticationUtil.RunAsWork<Object> runAsWork = new AuthenticationUtil.RunAsWork<Object>()
+        {
+            public Object doWork() throws Exception
+            {
+                java.util.List<NodeRef> rmRoots = recordsManagementService.getRecordsManagementRoots();
+                logger.info("Bootstraping " + rmRoots.size() + " rm roots ...");
+                for (NodeRef rmRoot : rmRoots)
+                {
+                    if (permissionService.getInheritParentPermissions(rmRoot) == true)
+                    {
+                        logger.info("Updating permissions for rm root " + rmRoot);
+                        permissionService.setInheritParentPermissions(rmRoot, false);
+                    }
+                    
+                    String allRoleShortName = "AllRoles" + rmRoot.getId();
+                    String allRoleGroupName = authorityService.getName(AuthorityType.GROUP, allRoleShortName);
+                    
+                    if (authorityService.authorityExists(allRoleGroupName) == false)
+                    {       
+                        logger.info("Creating all roles group for root node " + rmRoot.toString());
+                        
+                        // Create "all" role group for root node
+                        String allRoles = authorityService.createAuthority(AuthorityType.GROUP, 
+                                                                           allRoleShortName, 
+                                                                           "All Roles", 
+                                                                           null);
+                        
+                        // Put all the role groups in it
+                        Set<Role> roles = recordsManagementSecurityService.getRoles(rmRoot);
+                        for (Role role : roles)
+                        {
+                            logger.info("   - adding role group " + role.getRoleGroupName() + " to all roles group");
+                            authorityService.addAuthority(allRoles, role.getRoleGroupName());
+                        }
+                        
+                        // Set the permissions
+                        permissionService.setPermission(rmRoot, allRoles, RMPermissionModel.READ_RECORDS, true);
+                    }
+                }
+                
+                // Make sure all the containers do not inherit permissions
+                ResultSet rs = searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, "TYPE:\"rma:recordsManagementContainer\"");
+                try
+                {
+                    logger.info("Bootstraping " + rs.length() + " record containers ...");
+                    
+                    for (NodeRef container : rs.getNodeRefs())
+                    {
+                        String containerName = (String)nodeService.getProperty(container, ContentModel.PROP_NAME);
+                        
+                        // Set permissions
+                        if (permissionService.getInheritParentPermissions(container) == true)
+                        {
+                            logger.info("Updating permissions for record container " + containerName);
+                            permissionService.setInheritParentPermissions(container, false);
+                        }
+                    }
+                }
+                finally
+                {
+                    rs.close();
+                }
+                
+                // fix up the test dataset to fire initial events for disposition schedules
+                rs = searchService.query(SPACES_STORE, SearchService.LANGUAGE_LUCENE, "TYPE:\"rma:recordFolder\"");
+                try
+                {
+                    logger.info("Bootstraping " + rs.length() + " record folders ...");
+                    
+                    for (NodeRef recordFolder : rs.getNodeRefs())
+                    {
+                        String folderName = (String)nodeService.getProperty(recordFolder, ContentModel.PROP_NAME);
+                        
+                        // Set permissions
+                        if (permissionService.getInheritParentPermissions(recordFolder) == true)
+                        {
+                            logger.info("Updating permissions for record folder " + folderName);
+                            permissionService.setInheritParentPermissions(recordFolder, false);
+                        }
+                        
+                        if (nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE) == false)
+                        {
+                            // See if the folder has a disposition schedule that needs to be applied
+                            DispositionSchedule ds = recordsManagementService.getDispositionSchedule(recordFolder);
+                            if (ds != null)
+                            {
+                                // Fire action to "set-up" the folder correctly
+                                logger.info("Setting up bootstraped record folder " + folderName);
+                                recordsManagementActionService.executeRecordsManagementAction(recordFolder, "setupRecordFolder");
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    rs.close();
+                }
+                
+                return null;
+            }
+        };
+        
+        AuthenticationUtil.runAs(runAsWork, AuthenticationUtil.getAdminUserName());
+        
     }
 }

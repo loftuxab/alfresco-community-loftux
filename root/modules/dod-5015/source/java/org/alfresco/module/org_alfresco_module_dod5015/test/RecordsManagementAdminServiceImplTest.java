@@ -132,7 +132,7 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         // Don't reload the fileplan data on each test method.
         if (retrieveJanuaryAISVitalFolders().size() != 1)
         {
-            filePlan = TestUtilities.loadFilePlanData(null, this.nodeService, this.importService, this.permissionService, this.searchService, this.rmService, this.rmActionService);
+            filePlan = TestUtilities.loadFilePlanData(applicationContext);
         }
     }
     
