@@ -35,7 +35,7 @@ import org.alfresco.service.cmr.security.AccessStatus;
  * @author andyh
  *
  */
-public class WriteContentCapability extends AbstractCapability
+public class WriteContentCapability extends AbstractGroupCapability
 {
 
     /* (non-Javadoc)

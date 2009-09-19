@@ -39,10 +39,12 @@ import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementA
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -60,7 +62,7 @@ public abstract class AbstractCapability implements Capability
     protected List<RecordsManagementAction> actions = new ArrayList<RecordsManagementAction>(1);
 
     protected List<String> actionNames = new ArrayList<String>(1);
-
+    
     public AbstractCapability()
     {
         super();
@@ -77,6 +79,14 @@ public abstract class AbstractCapability implements Capability
         this.actionNames.add(action.getName());
         voter.addProtectedAspects(action.getProtectedAspects());
         voter.addProtectedProperties(action.getProtectedProperties());
+    }
+    
+    /** 
+     * @see org.alfresco.module.org_alfresco_module_dod5015.capability.Capability#isGroupCapability()
+     */
+    public boolean isGroupCapability()
+    {
+        return false;
     }
 
     AccessStatus translate(int vote)

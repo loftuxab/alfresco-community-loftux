@@ -28,15 +28,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
+import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -60,7 +63,8 @@ import org.json.JSONObject;
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementSecurityServiceImpl implements RecordsManagementSecurityService, RecordsManagementModel
+public class RecordsManagementSecurityServiceImpl implements RecordsManagementSecurityService, 
+                                                             RecordsManagementModel
 {
     /** Entry voter for capability related support */
     private RMEntryVoter voter;
@@ -71,8 +75,10 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     /** Permission service */
     private PermissionService permissionService;
     
+    /** Policy component */
     private PolicyComponent policyComponent;
     
+    /** Node service */
     private NodeService nodeService;
     
     /** Records management role zone */
@@ -128,11 +134,20 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         this.nodeService = nodeService;
     }
     
+    /**
+     * Initialisation method
+     */
     public void init()
     {
         policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"), 
                 ASPECT_RECORDS_MANAGEMENT_ROOT, 
                 new JavaBehaviour(this, "onCreateRootNode", NotificationFrequency.TRANSACTION_COMMIT));
+        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"), 
+                TYPE_RECORDS_MANAGEMENT_CONTAINER, 
+                new JavaBehaviour(this, "onCreateRMContainer", NotificationFrequency.TRANSACTION_COMMIT));
+        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"), 
+                TYPE_RECORD_FOLDER, 
+                new JavaBehaviour(this, "onCreateRecordFolder", NotificationFrequency.TRANSACTION_COMMIT));
     }
     
     /**
@@ -142,11 +157,71 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
      */
     public void onCreateRootNode(ChildAssociationRef childAssocRef)
     {
-       // Bootstrp in the default set of roles for the newly created root node
-        NodeRef rmRootNode = childAssocRef.getChildRef();
+        final NodeRef rmRootNode = childAssocRef.getChildRef();
         if (nodeService.exists(rmRootNode) == true)
         {
+            AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+            {
+                public Object doWork()
+                {
+                    // Create "all" role group for root node
+                    String allRoles = authorityService.createAuthority(AuthorityType.GROUP, getAllRolesGroupShortName(rmRootNode), "All Roles", null);                    
+                    
+                    // Set the permissions
+                    permissionService.setInheritParentPermissions(rmRootNode, false);
+                    permissionService.setPermission(rmRootNode, allRoles, RMPermissionModel.READ_RECORDS, true);
+                    return null;
+                }
+            }, AuthenticationUtil.getAdminUserName());
+                        
+            // Bootstrp in the default set of roles for the newly created root node
             bootstrapDefaultRoles(rmRootNode);
+        }
+    }
+    
+    /**
+     * @param rmRootNode
+     * @return
+     */
+    private String getAllRolesGroupShortName(NodeRef rmRootNode)
+    {
+        return "AllRoles" + rmRootNode.getId();
+    }
+    
+    /**
+     * @param childAssocRef
+     */
+    public void onCreateRMContainer(ChildAssociationRef childAssocRef)
+    {
+        setUpPermissions(childAssocRef.getChildRef());
+    }
+    
+    /**
+     * @param childAssocRef
+     */
+    public void onCreateRecordFolder(ChildAssociationRef childAssocRef)
+    {
+        setUpPermissions(childAssocRef.getChildRef());
+    }
+    
+    /**
+     * 
+     * @param nodeRef
+     */
+    private void setUpPermissions(final NodeRef nodeRef)
+    {
+        if (nodeService.exists(nodeRef) == true)
+        {        
+            AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+            {
+                public Object doWork()
+                {
+                    // Break inheritance 
+                    permissionService.setInheritParentPermissions(nodeRef, false);
+                                    
+                    return null;
+                }
+            }, AuthenticationUtil.getAdminUserName());         
         }
     }
     
@@ -155,7 +230,16 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
      */
     public Set<Capability> getCapabilities()
     {
-        return new HashSet<Capability>(voter.getAllCapabilities());
+        Collection<Capability> caps = voter.getAllCapabilities();
+        Set<Capability> result = new HashSet<Capability>(caps.size());
+        for (Capability cap : caps)
+        {
+            if (cap.isGroupCapability() == false)
+            {
+                result.add(cap);
+            }
+        }
+        return result;
     }
     
     /**
@@ -428,18 +512,12 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         }, AuthenticationUtil.getAdminUserName());
     }
     
-    /**
-     * Gets the capabilities of a role on a node
-     * 
-     * @param rmRootNode
-     * @param roleAuthority
-     * @return
-     */
     private Set<String> getCapabilities(NodeRef rmRootNode, String roleAuthority)
     {
         Set<AccessPermission> permissions = permissionService.getAllSetPermissions(rmRootNode);
         Set<String> capabilities = new HashSet<String>(52);
         for (AccessPermission permission : permissions)
+
         {
             if (permission.getAuthority().equals(roleAuthority) == true)
             {
@@ -449,7 +527,9 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                     capabilities.add(permission.getPermission());
                 }
             }
+
         }
+
         return capabilities;
     }
 
@@ -518,12 +598,17 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 zones.add(AuthorityService.ZONE_APP_DEFAULT);
                 String roleGroup = authorityService.createAuthority(AuthorityType.GROUP, fullRoleName, roleDisplayLabel, zones);
                 
+                // Add the roleGroup to the "all" role group
+                String allRoleGroup = authorityService.getName(AuthorityType.GROUP, getAllRolesGroupShortName(rmRootNode));
+                authorityService.addAuthority(allRoleGroup, roleGroup);
+                
                 // Assign the various capabilities to the group on the root records management node
                 for (Capability capability : capabilities)
                 {
                     permissionService.setPermission(rmRootNode, roleGroup, capability.getName(), true);
                 }
                 
+                // Create the role
                 Set<String> capStrings = new HashSet<String>(capabilities.size());
                 for (Capability capability : capabilities)
                 {
@@ -533,7 +618,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
             }
         }, AuthenticationUtil.getAdminUserName());
     }
-
+    
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#updateRole(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.lang.String, java.util.Set)
      */
@@ -544,10 +629,13 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
             public Role doWork() throws Exception
             {                                
                 String roleAuthority = authorityService.getName(AuthorityType.GROUP, getFullRoleName(role, rmRootNode));
-
-                authorityService.setAuthorityDisplayName(roleAuthority, roleDisplayLabel);
                 
-                // Remove all the current capabilities                
+                // Reset the role display name
+                authorityService.setAuthorityDisplayName(roleAuthority, roleDisplayLabel);
+
+                // TODO this needs to be improved, removing all and readding is not ideal
+                
+                // Clear the current capabilities
                 permissionService.clearPermission(rmRootNode, roleAuthority);
                 
                 // Re-add the provided capabilities

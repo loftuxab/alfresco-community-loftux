@@ -34,7 +34,7 @@ import org.alfresco.service.namespace.QName;
  * @author andyh
  *
  */
-public class DeclareCapability extends AbstractCapability
+public class DeclareCapability extends AbstractGroupCapability
 {
 
     /* (non-Javadoc)

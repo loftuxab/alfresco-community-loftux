@@ -33,7 +33,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.namespace.QName;
 
-public class CreateCapability extends AbstractCapability
+public class CreateCapability extends AbstractGroupCapability
 {
 
     public CreateCapability()

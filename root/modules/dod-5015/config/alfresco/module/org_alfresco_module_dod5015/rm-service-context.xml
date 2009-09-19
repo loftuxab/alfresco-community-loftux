@@ -156,7 +156,7 @@
                 <![CDATA[  
                 org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getProtectedAspects=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getProtectedProperties=RM_ALLOW
-                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getCapabilities=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getCapabilities=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getCapability=RM_ALLOW                
                 ]]>
             </value>

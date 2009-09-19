@@ -1246,6 +1246,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
+        permissionService.setPermission(recordSeries, rm_records_manager, RMPermissionModel.FILING, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -1312,6 +1313,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsSecurityOfficer()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
+        permissionService.setPermission(recordSeries, rm_security_officer, RMPermissionModel.FILING, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1377,6 +1379,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsPowerUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
+        permissionService.setPermission(recordSeries, rm_power_user, RMPermissionModel.FILING, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1442,6 +1445,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordSeriesAsUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
+        permissionService.setPermission(recordSeries, rm_user, RMPermissionModel.FILING, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordSeries);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1703,6 +1707,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
+        permissionService.setPermission(recordCategory_1, rm_records_manager, RMPermissionModel.FILING, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -1769,6 +1774,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsSecurityOfficer()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
+        permissionService.setPermission(recordCategory_1, rm_security_officer, RMPermissionModel.FILING, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1834,6 +1840,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsPowerUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_power_user);
+        permissionService.setPermission(recordCategory_1, rm_power_user, RMPermissionModel.FILING, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -1899,6 +1906,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordCategoryAsUser()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_user);
+        permissionService.setPermission(recordCategory_1, rm_user, RMPermissionModel.FILING, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordCategory_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
@@ -2160,6 +2168,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsRecordsManager()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_records_manager);
+        permissionService.setPermission(recordFolder_1, rm_records_manager, RMPermissionModel.FILING, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.ALLOWED);
@@ -2226,6 +2235,7 @@ public class CapabilitiesTest extends TestCase
     public void testRecordFolderAsSecurityOfficer()
     {
         AuthenticationUtil.setFullyAuthenticatedUser(rm_security_officer);
+        permissionService.setPermission(recordFolder_1, rm_security_officer, RMPermissionModel.FILING, true);
         Map<Capability, AccessStatus> access = recordsManagementSecurityService.getCapabilities(recordFolder_1);
         assertEquals(65, access.size()); // 58 + File
         check(access, RMPermissionModel.ACCESS_AUDIT, AccessStatus.DENIED);
