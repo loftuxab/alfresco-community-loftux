@@ -113,7 +113,7 @@ public class AuditLogPost extends BaseAuditRetrievalWebScript
         
             // parse the other parameters and get a file containing the audit trail
             NodeRef record = this.rmAuditService.fileAuditTrailAsRecord(parseQueryParameters(req), 
-                        destination);
+                        destination, parseReportFormat(req));
             
             if (logger.isDebugEnabled())
                 logger.debug("Filed audit trail as new record: " + record);

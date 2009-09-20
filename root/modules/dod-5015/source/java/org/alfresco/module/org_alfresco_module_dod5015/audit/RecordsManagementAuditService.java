@@ -40,6 +40,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public interface RecordsManagementAuditService
 {
+    public enum ReportFormat { HTML, JSON }
+    
     public static final String RM_AUDIT_APPLICATION_NAME = "DOD5015";
     public static final String RM_AUDIT_PATH_ROOT = "/DOD5015";
     public static final String RM_AUDIT_SNIPPET_EVENT = "/event";
@@ -114,9 +116,10 @@ public interface RecordsManagementAuditService
      * audit trail.
      * 
      * @param params        Parameters to use to retrieve audit trail (never <tt>null</tt>)
+     * @param format        The format the report should be produced in
      * @return              File containing JSON representation of audit trail
      */
-    File getAuditTrailFile(RecordsManagementAuditQueryParameters params);
+    File getAuditTrailFile(RecordsManagementAuditQueryParameters params, ReportFormat format);
     
     /**
      * Retrieves a list of audit log entries using the provided parameters
@@ -145,7 +148,9 @@ public interface RecordsManagementAuditService
      * 
      * @param params        Parameters to use to retrieve audit trail (never <tt>null</tt>)
      * @param destination   NodeRef representing a record folder in which to file the audit log
+     * @param format        The format the report should be produced in
      * @return              NodeRef of the undeclared record filed
      */
-    NodeRef fileAuditTrailAsRecord(RecordsManagementAuditQueryParameters params, NodeRef destination);
+    NodeRef fileAuditTrailAsRecord(RecordsManagementAuditQueryParameters params, 
+                NodeRef destination, ReportFormat format);
 }
