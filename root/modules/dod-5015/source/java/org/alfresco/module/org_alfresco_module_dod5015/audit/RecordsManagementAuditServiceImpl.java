@@ -106,7 +106,7 @@ public class RecordsManagementAuditServiceImpl
     
     private boolean shutdown = false;
     private RMAuditTxnListener txnListener;
-
+    
     public RecordsManagementAuditServiceImpl()
     {
     }
@@ -506,7 +506,7 @@ public class RecordsManagementAuditServiceImpl
     /**
      * {@inheritDoc}
      */
-    public File getAuditTrailFile(RecordsManagementAuditQueryParameters params)
+    public File getAuditTrailFile(RecordsManagementAuditQueryParameters params, ReportFormat format)
     {
         ParameterCheck.mandatory("params", params);
         
@@ -516,7 +516,7 @@ public class RecordsManagementAuditServiceImpl
             File auditTrailFile = TempFileProvider.createTempFile(AUDIT_TRAIL_FILE_PREFIX, AUDIT_TRAIL_FILE_SUFFIX);
             fileWriter = new FileWriter(auditTrailFile);
             // Get the results, dumping to file
-            getAuditTrailImpl(params, null, fileWriter);
+            getAuditTrailImpl(params, null, fileWriter, format);
             // Done
             return auditTrailFile;
         }
@@ -544,7 +544,7 @@ public class RecordsManagementAuditServiceImpl
         List<RecordsManagementAuditEntry> entries = new ArrayList<RecordsManagementAuditEntry>(50);
         try
         {
-            getAuditTrailImpl(params, entries, null);
+            getAuditTrailImpl(params, entries, null, null);
             // Done
             return entries;
         }
@@ -560,15 +560,18 @@ public class RecordsManagementAuditServiceImpl
      * 
      * @param params                the search parameters
      * @param results               the list to which individual results will be dumped
+     * @param writer                Writer to write the audit trail
+     * @param reportFormat          Format to write the audit trail in, ignored if writer is <code>null</code>
      */
     private void getAuditTrailImpl(
             RecordsManagementAuditQueryParameters params,
             final List<RecordsManagementAuditEntry> results,
-            final Writer writer)
+            final Writer writer,
+            final ReportFormat reportFormat)
             throws IOException
     {
         if (logger.isDebugEnabled())
-            logger.debug("Retrieving audit trail using parameters: " + params);
+            logger.debug("Retrieving audit trail in '" + reportFormat + "' format using parameters: " + params);
         
         // define the callback
         AuditQueryCallback callback = new AuditQueryCallback()
@@ -619,7 +622,7 @@ public class RecordsManagementAuditServiceImpl
                         beforeProperties,
                         afterProperties);
                 
-                // write out the entry to the file in JSON format
+                // write out the entry to the file in requested format
                 writeEntryToFile(entry);
                 
                 if (results != null)
@@ -646,7 +649,14 @@ public class RecordsManagementAuditServiceImpl
                 {
                     if (!firstEntry)
                     {
-                        writer.write(",");
+                        if (reportFormat == ReportFormat.JSON)
+                        {
+                            writer.write(",");
+                        }
+                        else
+                        {
+                            // TODO: write out HTML
+                        }
                     }
                     else
                     {
@@ -654,8 +664,16 @@ public class RecordsManagementAuditServiceImpl
                     }
                     
                     // write the entry to the file
-                    writer.write("\n\t\t");
-                    writer.write(entry.toJSONString());
+                    if (reportFormat == ReportFormat.JSON)
+                    {
+                        writer.write("\n\t\t");
+                        writer.write(entry.toJSONString());
+                    }
+                    else
+                    {
+                        // TODO: write out HTML
+                        // writer.write(entry.toHTML());
+                    }
                 }
                 catch (IOException ioe)
                 {
@@ -669,8 +687,8 @@ public class RecordsManagementAuditServiceImpl
         Long toTime = (params.getDateTo() == null ? null : new Long(params.getDateTo().getTime()));
         int maxEntries = params.getMaxEntries();
         
-        // start the audit trail JSON
-        writeAuditTrailHeader(writer);
+        // start the audit trail report
+        writeAuditTrailHeader(writer, reportFormat);
         
         if (logger.isDebugEnabled())
         {
@@ -701,14 +719,15 @@ public class RecordsManagementAuditServiceImpl
                     maxEntries);
         }
         
-        // finish off the audit trail JSON
-        writeAuditTrailFooter(writer);
+        // finish off the audit trail report
+        writeAuditTrailFooter(writer, reportFormat);
     }
     
     /**
      * {@inheritDoc}
      */
-    public NodeRef fileAuditTrailAsRecord(RecordsManagementAuditQueryParameters params, NodeRef destination)
+    public NodeRef fileAuditTrailAsRecord(RecordsManagementAuditQueryParameters params, 
+                NodeRef destination, ReportFormat format)
     {
         ParameterCheck.mandatory("params", params);
         ParameterCheck.mandatory("destination", destination);
@@ -718,7 +737,7 @@ public class RecordsManagementAuditServiceImpl
         NodeRef record = null;
         
         // get the audit trail for the provided parameters
-        File auditTrail = this.getAuditTrailFile(params);
+        File auditTrail = this.getAuditTrailFile(params, format);
         
         if (logger.isDebugEnabled())
         {
@@ -740,7 +759,7 @@ public class RecordsManagementAuditServiceImpl
 
             // Set the content
             ContentWriter writer = this.contentService.getWriter(record, ContentModel.PROP_CONTENT, true);
-            writer.setMimetype(MimetypeMap.MIMETYPE_JSON);
+            writer.setMimetype(format == ReportFormat.JSON ? MimetypeMap.MIMETYPE_JSON : MimetypeMap.MIMETYPE_HTML);
             writer.setEncoding("UTF-8");
             writer.putContent(auditTrail);
             
@@ -751,23 +770,25 @@ public class RecordsManagementAuditServiceImpl
         {
             if (logger.isDebugEnabled())
             {
-                logger.debug("Deleting temporary file holding audit trail: " + 
-                            auditTrail.getAbsolutePath());
+                logger.debug("Audit trail report saved to temporary file: " + auditTrail.getAbsolutePath());
             }
-            
-            auditTrail.delete();
+            else
+            {
+                auditTrail.delete();
+            }
         } 
         
         return record;
     }
     
     /**
-     * Writes the start of the audit JSON stream to the given writer
+     * Writes the start of the audit trail stream to the given writer
      * 
      * @param writer The writer to write to
+     * @param reportFormat The format to write the header in
      * @throws IOException
      */
-    private void writeAuditTrailHeader(Writer writer) throws IOException
+    private void writeAuditTrailHeader(Writer writer, ReportFormat reportFormat) throws IOException
     {
         if (writer == null)
         {
@@ -784,12 +805,13 @@ public class RecordsManagementAuditServiceImpl
     }
     
     /**
-     * Writes the end of the audit JSON stream to the given writer
+     * Writes the end of the audit trail stream to the given writer
      * 
      * @param writer The writer to write to
+     * @param reportFormat The format to write the footer in
      * @throws IOException
      */
-    private void writeAuditTrailFooter(Writer writer) throws IOException
+    private void writeAuditTrailFooter(Writer writer, ReportFormat reportFormat) throws IOException
     {
         if (writer == null)
         {

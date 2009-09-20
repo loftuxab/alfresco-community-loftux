@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
+import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService.ReportFormat;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.web.scripts.content.StreamContent;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -240,5 +241,31 @@ public class BaseAuditRetrievalWebScript extends StreamContent
         }
         
         return params;
+    }
+    
+    /**
+     * Parses the given request for the format the audit report 
+     * should be returned in
+     * 
+     * @param req The request
+     * @return The format for the report
+     */
+    protected ReportFormat parseReportFormat(WebScriptRequest req)
+    {
+        String format = req.getFormat();
+        
+        if (format != null)
+        {
+            if (format.equalsIgnoreCase("json"))
+            {
+                return ReportFormat.JSON;
+            }
+            else if (format.equalsIgnoreCase("html"))
+            {
+                return ReportFormat.HTML;
+            }
+        }
+        
+        return ReportFormat.JSON;
     }
 }
