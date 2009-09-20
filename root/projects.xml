@@ -2327,7 +2327,7 @@
    <target name="package-dod5015-share-war"
            depends="package-dod5015-share-extension">
       <echo>Installing DOD 5015 into Share WAR...</echo>
-      <install-amp ampfile="${dir.module.dod5015.dist}/${file.name.amp.dod5015.share}" 
+      <install-amp ampfile="${dir.module.dod5015.share.dist}/${file.name.amp.dod5015.share}" 
                    warfile="${dir.project.slingshot.dist}/${file.name.war.slingshot}" />
    </target>
     
