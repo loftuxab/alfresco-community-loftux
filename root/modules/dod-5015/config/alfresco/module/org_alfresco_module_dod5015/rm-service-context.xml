@@ -457,6 +457,7 @@
                 org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService.start=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService.stop=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService.fileAuditTrailAsRecord=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService.getAuditEvents=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService.*=RM_DENY
                 ]]>
             </value>

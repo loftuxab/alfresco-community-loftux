@@ -97,6 +97,7 @@
     <bean id="webscript.org.alfresco.rma.listofvalues.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.ListOfValuesGet" parent="webscript">
         <property name="recordsManagementService" ref="RecordsManagementService"/>
         <property name="recordsManagementActionService" ref="RecordsManagementActionService"/>
+        <property name="recordsManagementAuditService" ref="RecordsManagementAuditService"/>
         <property name="recordsManagementEventService" ref="RecordsManagementEventService"/>
         <property name="dictionaryService" ref="DictionaryService"/>
         <property name="namespaceService" ref="NamespaceService"/>

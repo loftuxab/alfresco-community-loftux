@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -857,6 +858,50 @@ public class RecordsManagementAuditServiceImpl
         } 
         
         return record;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    public List<AuditEvent> getAuditEvents()
+    {
+        // TODO: make this list configurable and localisable.
+        
+        List<AuditEvent> events = new ArrayList<AuditEvent>(16);
+        events.add(new AuditEvent(RM_AUDIT_EVENT_UPDATE_RM_OBJECT, "Updated Metadata"));
+        events.add(new AuditEvent(RM_AUDIT_EVENT_CREATE_RM_OBJECT, "Created Object"));
+        events.add(new AuditEvent(RM_AUDIT_EVENT_DELETE_RM_OBJECT, "Delete Object"));
+        events.add(new AuditEvent("Login", "Login"));
+        events.add(new AuditEvent("Logout", "Logout"));
+        
+        events.add(new AuditEvent("file", "Filed Record"));
+        events.add(new AuditEvent("reviewed", "Reviewed"));
+        events.add(new AuditEvent("cutoff", "Cut Off"));
+        events.add(new AuditEvent("unCutoff", "Reversed Cut Off"));
+        events.add(new AuditEvent("destroy", "Destroyed Item"));
+        events.add(new AuditEvent("openRecordFolder", "Opened Record Folder"));
+        events.add(new AuditEvent("closeRecordFolder", "Closed Record Folder"));
+        events.add(new AuditEvent("setupRecordFolder", "Setup Recorder Folder"));
+        events.add(new AuditEvent("declareRecord", "Declare Record"));
+        events.add(new AuditEvent("freeze", "Froze Item"));
+        events.add(new AuditEvent("relinquishHold", "Relinquished Hold"));
+        events.add(new AuditEvent("editHoldReason", "Updated Hold Reason"));
+        events.add(new AuditEvent("editReviewAsOfDate", "Updated Review As Of Date"));
+        events.add(new AuditEvent("editDispositionActionAsOfDate", "Updated Disposition As Of Date"));
+        events.add(new AuditEvent("broadcastVitalRecordDefinition", "Updated Vital Record Definition"));
+        events.add(new AuditEvent("broadcastDispositionActionDefinitionUpdate", "Updated Disposition Action Definition"));
+        events.add(new AuditEvent("completeEvent", "Completed Event"));
+        events.add(new AuditEvent("undoEvent", "Reversed Completed Event"));
+        events.add(new AuditEvent("transfer", "Transferred Item"));
+        events.add(new AuditEvent("transferComplete", "Completed Transfer"));
+        events.add(new AuditEvent("accession", "Accession"));
+        events.add(new AuditEvent("accessionComplete", "Completed Accession"));
+        events.add(new AuditEvent("applyScannedRecord", "Set Record As A Scanned Record"));
+        events.add(new AuditEvent("applyPdfRecord", "Set Record As PDF A Record"));
+        events.add(new AuditEvent("applyDigitalPhotographRecord", "Set Record As A Digital Photographic Record"));
+        events.add(new AuditEvent("applyWebRecord", "Set Record As A Web Record"));
+        
+        return Collections.unmodifiableList(events);
     }
     
     /**

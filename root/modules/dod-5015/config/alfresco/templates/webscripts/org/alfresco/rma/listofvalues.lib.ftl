@@ -55,6 +55,19 @@
 				}<#if item_has_next>,</#if>
 				</#list>
 			]
+		},
+		"auditEvents":
+		{
+			"url": "${lists.auditEvents.url}",
+			"items":
+			[
+				<#list lists.auditEvents.items as item>
+				{
+					"label": "${item.label}",
+					"value": "${item.value}"
+				}<#if item_has_next>,</#if>
+				</#list>
+			]
 		}
 	}
 }

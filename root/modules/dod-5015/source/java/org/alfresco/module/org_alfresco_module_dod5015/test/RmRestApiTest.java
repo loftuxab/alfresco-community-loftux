@@ -46,6 +46,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
+import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
 import org.alfresco.module.org_alfresco_module_dod5015.script.CustomReferenceType;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -91,6 +92,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     protected static final String TRANSFER_REPORT_URL_FORMAT = "/api/node/{0}/transfers/{1}/report";
     protected static final String REF_INSTANCES_URL_FORMAT = "/api/node/{0}/customreferences";
     protected static final String RMA_AUDITLOG_URL = "/api/rma/admin/rmauditlog";
+    protected static final String GET_LIST_URL = "/api/rma/admin/listofvalues";
     protected static final String RMA_ACTIONS_URL = "/api/rma/actions/ExecutionQueue";
     protected static final String APPLICATION_JSON = "application/json";
     protected static final String RMA_CUSTOM_PROPS_DEFINITIONS_URL = "/api/rma/admin/custompropertydefinitions";
@@ -105,6 +107,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     protected ServiceRegistry services;
     protected RecordsManagementService rmService;
     protected RecordsManagementActionService rmActionService;
+    protected RecordsManagementAuditService rmAuditService;
     protected RecordsManagementAdminService rmAdminService;
     protected RetryingTransactionHelper transactionHelper;
 
@@ -128,6 +131,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         this.services = (ServiceRegistry)getServer().getApplicationContext().getBean("ServiceRegistry");
         this.rmService = (RecordsManagementService)getServer().getApplicationContext().getBean("RecordsManagementService");
         this.rmActionService = (RecordsManagementActionService)getServer().getApplicationContext().getBean("RecordsManagementActionService");
+        this.rmAuditService = (RecordsManagementAuditService)getServer().getApplicationContext().getBean("RecordsManagementAuditService");
         this.rmAdminService = (RecordsManagementAdminService)getServer().getApplicationContext().getBean("RecordsManagementAdminService");
         transactionHelper = (RetryingTransactionHelper)getServer().getApplicationContext().getBean("retryingTransactionHelper");  
         
@@ -1205,8 +1209,26 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
     
     public void testAudit() throws IOException, JSONException
     {
+        // call the list service to get audit events
+        Response rsp = sendRequest(new GetRequest(GET_LIST_URL), 200);
+        //System.out.println("GET : " + rsp.getContentAsString());
+        assertEquals("application/json;charset=UTF-8", rsp.getContentType());
+            
+        // get response as JSON and check
+        JSONObject jsonParsedObject = new JSONObject(new JSONTokener(rsp.getContentAsString()));
+        assertNotNull(jsonParsedObject);
+        JSONObject data = jsonParsedObject.getJSONObject("data");
+        JSONObject events = data.getJSONObject("auditEvents");
+        JSONArray items = events.getJSONArray("items");
+        assertEquals(this.rmAuditService.getAuditEvents().size(), items.length());
+        assertTrue(items.length() > 0);
+        JSONObject item = items.getJSONObject(0);
+        assertTrue(item.length() == 2);
+        assertTrue(item.has("label"));
+        assertTrue(item.has("value"));
+
         // get the full RM audit log 
-        Response rsp = sendRequest(new GetRequest(RMA_AUDITLOG_URL), 200);
+        rsp = sendRequest(new GetRequest(RMA_AUDITLOG_URL), 200);
         // check response
         assertEquals("application/json", rsp.getContentType());
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
