@@ -395,7 +395,7 @@
                actionUrl: exportWebscriptUrl,
                doBeforeDialogShow:
                {
-                  fn: function ViewPanelHandler_onNewListOfValueClick_SimpleDialog_doBeforeDialogShow(p_config, p_simpleDialog, p_obj)
+                  fn: function RDLA_onActionExport_SimpleDialog_doBeforeDialogShow(p_config, p_simpleDialog, p_obj)
                   {
                      // Set the hidden nodeRefs field to a comma-separated list of nodeRef:s
                      YAHOO.util.Dom.get(this.id + "-exportDialog-nodeRefs").value = this.actionExportNodeRefs.join(",");
@@ -405,7 +405,7 @@
                firstFocus: this.id + "-exportDialog-acp",
                doBeforeFormSubmit:
                {
-                  fn: function ViewPanelHandler_onNewListOfValueClick_SimpleDialog_doBeforeFormSubmit()
+                  fn: function RDLA_onActionExport_SimpleDialog_doBeforeFormSubmit()
                   {
                      // Close dialog now since no callback is provided since we are submitting in a hidden iframe.
                      this.modules.exportDialog.hide();
@@ -663,7 +663,48 @@
          
          window.location.href = pageUrl;
       },
-      
+
+      /**
+       * Set Record Type
+       *
+       * @method onActionSetRecordType
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionSetRecordType: function RDLA_onActionSetRecordType(assets)
+      {
+         // Open the set record type dialog
+         var setRecordTypeWebscriptUrl = Alfresco.constants.PROXY_URI + "slingshot/doclib/action/aspects/node/" + assets.nodeRef.replace(":/", "");
+         if (!this.modules.setRecordTypeDialog)
+         {
+            // Load if for the first time
+            this.modules.setRecordTypeDialog = new Alfresco.module.SimpleDialog(this.id + "-setRecordTypeDialog").setOptions(
+            {
+               width: "30em",
+               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/set-record-type",
+               actionUrl: setRecordTypeWebscriptUrl,
+               firstFocus: this.id + "-setRecordTypeDialog-recordType",
+               onSuccess:
+               {
+                  fn: function RDLA_onActionSetRecordType_SimpleDialog_success(response)
+                  {
+                     // Fire event so compnents on page are refreshed
+                     YAHOO.Bubbling.fire("metadataRefresh");
+                  }
+               }
+            });
+         }
+         else
+         {
+            // Open the set record type dialog again
+            this.modules.setRecordTypeDialog.setOptions(
+            {
+               actionUrl: setRecordTypeWebscriptUrl,
+               clearForm: true
+            });
+         }
+         this.modules.setRecordTypeDialog.show();
+      },
+
       /**
        * View audit log for a noderef
        *

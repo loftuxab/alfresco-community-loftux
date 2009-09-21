@@ -363,6 +363,28 @@ var Evaluator =
             else
             {
                permissions["download"] = true;
+
+               /* Set Record Type */
+               var dod5015URI = "{http://www.alfresco.org/model/dod5015/1.0}",
+                  recordTypes = [
+                     dod5015URI + "scannedRecord",
+                     dod5015URI + "webRecord",
+                     dod5015URI + "digitalPhotographRecord",
+                     dod5015URI + "pdfRecord"
+                  ];
+               // TODO replace hard coded record types
+               for (var i = 0, il = recordTypes.length; i < il; i++)
+               {
+                  if (asset.hasAspect(recordTypes[i]))
+                  {
+                     break;
+                  }
+               }
+               if(i == il)
+               {
+                  // Give permission if no record type had been set before
+                  permissions["setRecordType"] = true;
+               }
             }
             break;
 
