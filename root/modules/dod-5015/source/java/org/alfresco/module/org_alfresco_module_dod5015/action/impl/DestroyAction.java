@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.action.impl;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -65,7 +66,20 @@ public class DestroyAction extends RMDispositionActionExecuterAbstractBase imple
     @Override
     protected void executeRecordFolderLevelDisposition(Action action, NodeRef recordFolder)
     {
-        this.nodeService.deleteNode(recordFolder);
+        if (ghostingEnabled)
+        {
+            nodeService.addAspect(recordFolder, DOD5015Model.ASPECT_GHOSTED, Collections.<QName, Serializable> emptyMap());  
+        }
+        else
+        {
+            nodeService.deleteNode(recordFolder);
+        }
+        
+        List<NodeRef> records = this.recordsManagementService.getRecords(recordFolder);
+        for (NodeRef record : records)
+        {
+            executeRecordLevelDisposition(action, record);
+        }
     }
 
     @Override
