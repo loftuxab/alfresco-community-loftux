@@ -69,6 +69,7 @@
          <action type="simple-link" id="onActionDownload" permission="download" href="{downloadUrl}" label="actions.download" />
          <action type="simple-link" id="onActionEditDetails" permission="EditRecordMetadata" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionDeclare" permission="DeclareRecords" label="actions.declare" />
+         <action type="action-link" id="onActionSetRecordType" permission="CreateModifyDestroyRecordTypes,setRecordType" label="actions.setRecordType" />
          <action type="action-link" id="onActionUploadNewVersion" permission="HIDDEN" label="actions.upload-new-version" />
          <action type="action-link" id="onActionSplitEmail" permission="split-email" label="actions.split-email" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
