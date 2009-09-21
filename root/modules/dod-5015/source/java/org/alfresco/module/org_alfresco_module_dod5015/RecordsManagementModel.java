@@ -125,9 +125,6 @@ public interface RecordsManagementModel extends RecordsManagementCustomModel
     // Ascended aspect
     public static QName ASPECT_ASCENDED = QName.createQName(RM_URI, "ascended");
     
-    // Destroyed aspect
-    public static QName ASPECT_DESTROYED = QName.createQName(RM_URI, "destroyed");
-    
     // Disposition schedule aspect
     public static QName ASPECT_DISPOSITION_LIFECYCLE = QName.createQName(RM_URI, "dispositionLifecycle");
     public static QName ASSOC_NEXT_DISPOSITION_ACTION = QName.createQName(RM_URI, "nextDispositionAction");
