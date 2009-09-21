@@ -17,7 +17,9 @@
          "userAccess":
          {
          <#list user.permissions?keys as perm>
-            "${perm?string}": true<#if perm_has_next>,</#if>
+            <#if user.permissions[perm]?is_boolean>
+            "${perm?string}": ${user.permissions[perm]?string}<#if perm_has_next>,</#if>
+            </#if>
          </#list>
          }
       }
@@ -48,7 +50,7 @@
          "mimetype": "${d.mimetype!""}",
          "fileName": "${d.name}",
          "displayName": "${d.name?replace(workingCopyLabel, "")}",
-         "status": "<#list item.status?keys as s><#if item.status[s] == true>${s}<#if s_has_next>,</#if></#if></#list>",
+         "status": "<#list item.status?keys as s><#if item.status[s]?is_boolean && item.status[s] == true>${s}<#if s_has_next>,</#if></#if></#list>",
          "title": "${d.properties.title!""}",
          "description": "${d.properties.description!""}",
          "author": "${d.properties.author!""}",
@@ -82,7 +84,9 @@
             "userAccess":
             {
             <#list item.actionPermissions?keys as actionPerm>
-               "${actionPerm?string}": true<#if actionPerm_has_next>,</#if>
+               <#if item.actionPermissions[actionPerm]?is_boolean>
+               "${actionPerm?string}": ${item.actionPermissions[actionPerm]?string}<#if actionPerm_has_next>,</#if>
+               </#if>
             </#list>
             }
          },
