@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.jscript;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistry;
+import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
 import org.alfresco.repo.jscript.BaseScopableProcessorExtension;
 import org.alfresco.repo.jscript.ScriptNode;
 import org.alfresco.scripts.ScriptException;
@@ -61,5 +62,18 @@ public class ScriptRecordsManagmentService extends BaseScopableProcessorExtensio
         }
         
         return result;
+    }
+    
+    /**
+     * Set the RM permission
+     * 
+     * @param node
+     * @param permission
+     * @param authority
+     */
+    public void setPermission(ScriptNode node, String permission, String authority)
+    {
+        RecordsManagementSecurityService securityService = rmServices.getRecordsManagementSecurityService();
+        securityService.setPermission(node.getNodeRef(), authority, permission);
     }
 }

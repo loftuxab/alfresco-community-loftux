@@ -112,6 +112,7 @@
         <property name="permissionService" ref="PermissionService"/>
         <property name="nodeService" ref="NodeService"/>
         <property name="policyComponent" ref="policyComponent"/>
+        <property name="recordsManagementService" ref="RecordsManagementService"/>
     </bean>
     
     <bean id="RecordsManagementSecurityService" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -157,7 +158,19 @@
                 org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getProtectedAspects=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getProtectedProperties=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getCapabilities=RM_ALLOW
-                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getCapability=RM_ALLOW                
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getCapability=RM_ALLOW                  
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.setPermission=RM_ALLOW                    
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.bootstrapDefaultRoles=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getRoles=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getRolesByUser=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.getRole=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.existsRole=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.hasRMAdminRole=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.createRole=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.updateRole=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.deleteRole=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService.assignRoleToAuthority=RM_ALLOW
+                     
                 ]]>
             </value>
         </property>

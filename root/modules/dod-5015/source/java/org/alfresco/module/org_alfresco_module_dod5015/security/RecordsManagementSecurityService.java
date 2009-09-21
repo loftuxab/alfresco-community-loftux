@@ -163,4 +163,13 @@ public interface RecordsManagementSecurityService
      * @param role
      */
     void assignRoleToAuthority(NodeRef rmRootNode, String role, String authorityName);
+    
+    /**
+     * 
+     * @param nodeRef
+     * @param authority
+     * @param permission
+     * @param allow
+     */
+    void setPermission(NodeRef nodeRef, String authority, String permission);
 }
