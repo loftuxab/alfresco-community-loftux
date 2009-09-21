@@ -44,8 +44,8 @@ import org.alfresco.repo.audit.AuditComponent;
 import org.alfresco.repo.audit.model.AuditApplication;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.node.NodeServicePolicies;
+import org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
-import org.alfresco.repo.node.NodeServicePolicies.OnDeleteNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
@@ -87,7 +87,7 @@ public class RecordsManagementAuditServiceImpl
         extends AbstractLifecycleBean
         implements RecordsManagementAuditService,
                    NodeServicePolicies.OnCreateNodePolicy,
-                   NodeServicePolicies.OnDeleteNodePolicy,
+                   NodeServicePolicies.BeforeDeleteNodePolicy,
                    NodeServicePolicies.OnUpdatePropertiesPolicy
 {
     /** Logger */
@@ -218,9 +218,9 @@ public class RecordsManagementAuditServiceImpl
                 this,
                 new JavaBehaviour(this, "onCreateNode"));   
         policyComponent.bindClassBehaviour(
-                OnDeleteNodePolicy.QNAME,
+                BeforeDeleteNodePolicy.QNAME,
                 this,
-                new JavaBehaviour(this, "onDeleteNode"));   
+                new JavaBehaviour(this, "beforeDeleteNode"));   
     }
 
     @Override
@@ -340,17 +340,17 @@ public class RecordsManagementAuditServiceImpl
     
     public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after)
     {
-        auditRMEvent(nodeRef, RM_AUDIT_EVENT_ON_UPDATE_PROPERTIES, before, after);
+        auditRMEvent(nodeRef, RM_AUDIT_EVENT_UPDATE_PROPERTIES, before, after);
     }
 
-    public void onDeleteNode(ChildAssociationRef childAssocRef, boolean isNodeArchived)
+    public void beforeDeleteNode(NodeRef nodeRef)
     {
-        auditRMEvent(childAssocRef.getChildRef(), RM_AUDIT_EVENT_ON_DELETE_RECORD, null, null);
+        auditRMEvent(nodeRef, RM_AUDIT_EVENT_DELETE_RECORD, null, null);
     }
 
     public void onCreateNode(ChildAssociationRef childAssocRef)
     {
-        auditRMEvent(childAssocRef.getChildRef(), RM_AUDIT_EVENT_ON_CREATE_RECORD, null, null);
+        auditRMEvent(childAssocRef.getChildRef(), RM_AUDIT_EVENT_CREATE_RECORD, null, null);
     }
 
     /**
@@ -379,33 +379,60 @@ public class RecordsManagementAuditServiceImpl
             Map<QName, Serializable> nodePropertiesBefore,
             Map<QName, Serializable> nodePropertiesAfter)
     {
-        Map<NodeRef, RMAuditNode> auditedNodes = TransactionalResourceHelper.getMap(KEY_RM_AUDIT_NODE_RECORDS);
-        RMAuditNode auditedNode = auditedNodes.get(nodeRef);
-        if (auditedNode == null)
+        // If we are deleting nodes, then we need to audit NOW
+        if (eventName.equals(RecordsManagementAuditService.RM_AUDIT_EVENT_DELETE_RECORD))
         {
-            auditedNode = new RMAuditNode();
-            auditedNodes.put(nodeRef, auditedNode);
-            // Bind the listener to the txn.  We could do it anywhere in the method, this position ensures
-            // that we avoid some rebinding of the listener
-            AlfrescoTransactionSupport.bindListener(txnListener);
+            // Deleted nodes will not be available at the end of the transaction.  The data needs to
+            // be extracted now and the audit entry needs to be created now.
+            Map<String, Serializable> auditMap = new HashMap<String, Serializable>(13);
+            auditMap.put(
+                    AuditApplication.buildPath(
+                            RecordsManagementAuditService.RM_AUDIT_SNIPPET_EVENT,
+                            RecordsManagementAuditService.RM_AUDIT_SNIPPET_NAME),
+                    eventName);
+            // Action node
+            auditMap.put(
+                    AuditApplication.buildPath(
+                            RecordsManagementAuditService.RM_AUDIT_SNIPPET_EVENT,
+                            RecordsManagementAuditService.RM_AUDIT_SNIPPET_NODE),
+                    nodeRef);
+            auditMap = auditComponent.recordAuditValues(RecordsManagementAuditService.RM_AUDIT_PATH_ROOT, auditMap);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("RM Audit: Audited node deletion: \n" + auditMap);
+            }
         }
-        // Only update the eventName if it has not already been done
-        if (auditedNode.getEventName() == null)
+        else
         {
-            auditedNode.setEventName(eventName);
+            // Create an event for auditing post-commit
+            Map<NodeRef, RMAuditNode> auditedNodes = TransactionalResourceHelper.getMap(KEY_RM_AUDIT_NODE_RECORDS);
+            RMAuditNode auditedNode = auditedNodes.get(nodeRef);
+            if (auditedNode == null)
+            {
+                auditedNode = new RMAuditNode();
+                auditedNodes.put(nodeRef, auditedNode);
+                // Bind the listener to the txn.  We could do it anywhere in the method, this position ensures
+                // that we avoid some rebinding of the listener
+                AlfrescoTransactionSupport.bindListener(txnListener);
+            }
+            // Only update the eventName if it has not already been done
+            if (auditedNode.getEventName() == null)
+            {
+                auditedNode.setEventName(eventName);
+            }
+            // Set the properties before the start if they are not already available
+            if (auditedNode.getNodePropertiesBefore() == null)
+            {
+                auditedNode.setNodePropertiesBefore(nodePropertiesBefore);
+            }
+            // Set the after values if they are provided.
+            // Overwrite as we assume that these represent the latest state of the node.
+            if (nodePropertiesAfter != null)
+            {
+                auditedNode.setNodePropertiesAfter(nodePropertiesAfter);
+            }
+            // That is it.  The values are queued for the end of the transaction.
         }
-        // Set the properties before the start if they are not already available
-        if (auditedNode.getNodePropertiesBefore() == null)
-        {
-            auditedNode.setNodePropertiesBefore(nodePropertiesBefore);
-        }
-        // Set the after values if they are provided.
-        // Overwrite as we assume that these represent the latest state of the node.
-        if (nodePropertiesAfter != null)
-        {
-            auditedNode.setNodePropertiesAfter(nodePropertiesAfter);
-        }
-        // That is it.  The values are queued for the end of the transaction.
     }
 
     /**
@@ -458,6 +485,13 @@ public class RecordsManagementAuditServiceImpl
             for (Map.Entry<NodeRef, RMAuditNode> entry : auditedNodes.entrySet())
             {
                 NodeRef nodeRef = entry.getKey();
+                
+                // If the node is gone, then do nothing
+                if (!nodeService.exists(nodeRef))
+                {
+                    continue;
+                }
+                
                 RMAuditNode auditedNode = entry.getValue();
                 
                 Map<String, Serializable> auditMap = new HashMap<String, Serializable>(13);

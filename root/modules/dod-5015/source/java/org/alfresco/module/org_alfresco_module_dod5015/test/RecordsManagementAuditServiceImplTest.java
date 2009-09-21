@@ -38,6 +38,7 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
@@ -54,6 +55,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
     private ApplicationContext ctx;
     
     private ServiceRegistry serviceRegistry;
+    private NodeService nodeService;
     private TransactionService transactionService;
     private RetryingTransactionHelper txnHelper;
     private SearchService searchService;
@@ -76,6 +78,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         this.rmAuditService = (RecordsManagementAuditService) ctx.getBean("RecordsManagementAuditService");
 
         this.searchService = serviceRegistry.getSearchService();
+        this.nodeService = serviceRegistry.getNodeService();
 
 
         // Set the current security context as admin
@@ -225,6 +228,16 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         assertNotNull("Expect a list of results for the query", entries);
         assertTrue("No results were found for node: " + chosenNodeRefFinal, entries.size() > 0);
         // We can't check the size because we need entries for the node and any children as well
+        
+        // Clear the log
+        rmAuditService.clear();
+        entries = txnHelper.doInTransaction(nodeResultsCallback);
+        assertTrue("Should have cleared all audit entries", entries.isEmpty());
+        
+        // Delete the node
+        nodeService.deleteNode(chosenNodeRefFinal);
+        entries = txnHelper.doInTransaction(nodeResultsCallback);
+        assertFalse("Should have recorded node deletion", entries.isEmpty());
     }
     
     public void testStartStopDelete()
