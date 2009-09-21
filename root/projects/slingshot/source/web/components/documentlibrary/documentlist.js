@@ -530,7 +530,7 @@
             resultsList: "items",
             fields:
             [
-               "index", "nodeRef", "type", "isLink", "mimetype", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
+               "index", "nodeRef", "type", "isFolder", "isLink", "mimetype", "fileName", "displayName", "status", "lockedBy", "lockedByUser", "title", "description",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "version", "size", "contentUrl", "actionSet", "tags",
                "activeWorkflows", "isFavourite", "location", "permissions", "onlineEditUrl"
             ],

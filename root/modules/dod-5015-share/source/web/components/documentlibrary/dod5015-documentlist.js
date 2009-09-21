@@ -117,7 +117,7 @@
             resultsList: "items",
             fields:
             [
-               "index", "nodeRef", "type", "mimetype", "fileName", "displayName", "status", "title", "description", "author",
+               "index", "nodeRef", "type", "isFolder", "mimetype", "fileName", "displayName", "status", "title", "description", "author",
                "createdOn", "createdBy", "createdByUser", "modifiedOn", "modifiedBy", "modifiedByUser", "size", "version", "contentUrl", "actionSet", "tags",
                "location", "permissions", "dod5015"
             ],
