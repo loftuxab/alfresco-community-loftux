@@ -61,6 +61,7 @@ public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionEx
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
      *      org.alfresco.service.cmr.repository.NodeRef)
      */
+    @SuppressWarnings("unchecked")
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {

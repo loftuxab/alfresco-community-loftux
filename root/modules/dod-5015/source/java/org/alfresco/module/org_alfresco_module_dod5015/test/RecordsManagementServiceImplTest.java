@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.transaction.UserTransaction;
 
@@ -40,12 +41,15 @@ import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefiniti
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FileAction;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.service.cmr.model.FileFolderService;
+import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -71,6 +75,7 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
 	
 	private NodeRef filePlan;
 	
+    private FileFolderService fileFolderService;
 	private ImporterService importService;
 	private NodeService nodeService;
 	private NodeService unprotectedNodeService;
@@ -88,7 +93,8 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
 		super.onSetUpInTransaction();
 
 		// Get the service required in the tests
-		this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); 
+        this.fileFolderService = (FileFolderService)this.applicationContext.getBean("FileFolderService"); 
+        this.nodeService = (NodeService)this.applicationContext.getBean("NodeService"); 
 		this.unprotectedNodeService = (NodeService)this.applicationContext.getBean("nodeService"); 
 		this.importService = (ImporterService)this.applicationContext.getBean("importerComponent");
 		this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
@@ -380,7 +386,334 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
         assertEquals("cutoff", das.get(0).getName());
         assertEquals("destroy", das.get(1).getName());
     }
-    
+	
+    public void testMoveRecordWithinFileplan()
+    {
+        setComplete();
+        endTransaction();
+
+        // We need record folders for test-filing as follows:
+        // 1. A 'clean' record folder with no disposition schedult and no review period.
+        // 2. A 'vital' record folder which has a review period defined.
+        // 3. A 'dispositionable' record folder which has an applicable disposition schedule.
+        //
+        // The example fileplan includes a folder which covers [2] and [3] together.
+        
+        final NodeRef cleanRecordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        NodeRef result = TestUtilities.getRecordFolder(searchService, "Civilian Files", "Case Files and Papers", "Gilbert Competency Hearing");
+                        assertNotNull("cleanRecordFolder was null", result);
+                        
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(result);
+                        assertNull("cleanRecordFolder had non-null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertTrue("cleanRecordFolder had non-empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(result);
+                        assertEquals("cleanRecordFolder had wrong review period.", "0", vitalRecordDefinition.getReviewPeriod().getExpression());
+                        assertNull("cleanRecordFolder had non-null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return result;
+                    }
+                });
+        final NodeRef dispAndVitalRecordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        NodeRef result = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");
+                        assertNotNull("dispositionAndVitalRecordFolder was null", result);
+                        
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(result);
+                        assertNotNull("dispositionAndVitalRecordFolder had null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertFalse("dispositionAndVitalRecordFolder had empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(result);
+                        assertFalse("dispositionAndVitalRecordFolder had wrong review period.", "none|0".equals(vitalRecordDefinition.getReviewPeriod().getExpression()));
+                        assertNotNull("dispositionAndVitalRecordFolder had null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return result;
+                    }
+                });
+        
+        // Create a record in the 'clean' folder.
+        final NodeRef testRecord = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        final NodeRef result = nodeService.createNode(cleanRecordFolder, ContentModel.ASSOC_CONTAINS,
+                                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI,
+                                        "Record" + System.currentTimeMillis() + ".txt"),
+                                ContentModel.TYPE_CONTENT).getChildRef();
+                        
+                        rmActionService.executeRecordsManagementAction(result, "file");
+                        TestUtilities.declareRecord(result, unprotectedNodeService, rmActionService);
+                        return result;
+                    }
+                });
+
+        // Ensure it's devoid of all disposition and review-related state.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(testRecord);
+                        assertNull("testRecord had non-null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertTrue("testRecord had non-empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(testRecord);
+                        assertEquals("testRecord had wrong review period.", "0", vitalRecordDefinition.getReviewPeriod().getExpression());
+                        assertNull("testRecord had non-null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return null;
+                    }
+                });
+        
+        // Move from non-vital to vital - also non-dispositionable to dispositionable at the same time.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        nodeService.moveNode(testRecord, dispAndVitalRecordFolder, ContentModel.ASSOC_CONTAINS, ContentModel.ASSOC_CONTAINS);
+                        return null;
+                    }
+                });
+
+        // Assert that the disposition and review-related data are correct after the move.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(testRecord);
+                        assertNotNull("testRecord had null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertFalse("testRecord had empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(testRecord);
+                        assertFalse("testRecord had wrong review period.", "0".equals(vitalRecordDefinition.getReviewPeriod().getExpression()));
+                        assertNotNull("testRecord had null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return null;
+                    }
+                });
+
+        // Move the test record back from vital to non-vital - also dispositionable to non-dispositionable at the same time.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        nodeService.moveNode(testRecord, cleanRecordFolder, ContentModel.ASSOC_CONTAINS, ContentModel.ASSOC_CONTAINS);
+                        return null;
+                    }
+                });
+        
+        // Assert that the disposition and review-related data are correct after the move.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(testRecord);
+                        assertNull("testRecord had non-null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertTrue("testRecord had non-empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(testRecord);
+                        assertEquals("testRecord had wrong review period.", "0", vitalRecordDefinition.getReviewPeriod().getExpression());
+                        assertNull("testRecord had non-null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return null;
+                    }
+                });
+
+        //TODO check the search aspect
+        
+        // Tidy up.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        nodeService.deleteNode(testRecord);
+
+                        return null;
+                    }
+                });
+    }
+   
+    public void off_testCopyRecordWithinFileplan()
+    {
+        setComplete();
+        endTransaction();
+
+        // We need record folders for test-filing as follows:
+        // 1. A 'clean' record folder with no disposition schedule and no review period.
+        // 2. A 'vital' record folder which has a review period defined.
+        // 3. A 'dispositionable' record folder which has an applicable disposition schedule.
+        //
+        // The example fileplan includes a folder which covers [2] and [3] together.
+        
+        final NodeRef cleanRecordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        NodeRef result = TestUtilities.getRecordFolder(searchService, "Civilian Files", "Case Files and Papers", "Gilbert Competency Hearing");
+                        assertNotNull("cleanRecordFolder was null", result);
+                        
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(result);
+                        assertNull("cleanRecordFolder had non-null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertTrue("cleanRecordFolder had non-empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(result);
+                        assertEquals("cleanRecordFolder had wrong review period.", "0", vitalRecordDefinition.getReviewPeriod().getExpression());
+                        assertNull("cleanRecordFolder had non-null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return result;
+                    }
+                });
+        final NodeRef dispAndVitalRecordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        NodeRef result = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");
+                        assertNotNull("dispositionAndVitalRecordFolder was null", result);
+                        
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(result);
+                        assertNotNull("dispositionAndVitalRecordFolder had null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertFalse("dispositionAndVitalRecordFolder had empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(result);
+                        assertFalse("dispositionAndVitalRecordFolder had wrong review period.", "none|0".equals(vitalRecordDefinition.getReviewPeriod().getExpression()));
+                        assertNotNull("dispositionAndVitalRecordFolder had null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return result;
+                    }
+                });
+        
+        // Create a record in the 'clean' folder.
+        final NodeRef testRecord = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        final NodeRef result = nodeService.createNode(cleanRecordFolder, ContentModel.ASSOC_CONTAINS,
+                                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI,
+                                        "Record" + System.currentTimeMillis() + ".txt"),
+                                ContentModel.TYPE_CONTENT).getChildRef();
+                        
+                        rmActionService.executeRecordsManagementAction(result, "file");
+                        TestUtilities.declareRecord(result, unprotectedNodeService, rmActionService);
+                        return result;
+                    }
+                });
+
+        // Ensure it's devoid of all disposition and review-related state.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(testRecord);
+                        assertNull("testRecord had non-null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertTrue("testRecord had non-empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(testRecord);
+                        assertEquals("testRecord had wrong review period.", "0", vitalRecordDefinition.getReviewPeriod().getExpression());
+                        assertNull("testRecord had non-null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return null;
+                    }
+                });
+        
+        // Copy from non-vital to vital - also non-dispositionable to dispositionable at the same time.
+        final NodeRef copiedNode = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        FileInfo fileInfo = fileFolderService.copy(testRecord, dispAndVitalRecordFolder, null);
+                        NodeRef n = fileInfo.getNodeRef();
+                        return n;
+                    }
+                });
+
+        // Assert that the disposition and review-related data are correct after the copy.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(copiedNode);
+                        assertNotNull("copiedNode had null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertFalse("copiedNode had empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(copiedNode);
+                        assertFalse("copiedNode had wrong review period.", "0".equals(vitalRecordDefinition.getReviewPeriod().getExpression()));
+                        assertNotNull("copiedNode had null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return null;
+                    }
+                });
+
+        // Create a record in the 'vital and disposition' folder.
+        final NodeRef testRecord2 = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        final NodeRef result = nodeService.createNode(dispAndVitalRecordFolder, ContentModel.ASSOC_CONTAINS,
+                                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI,
+                                        "Record2" + System.currentTimeMillis() + ".txt"),
+                                ContentModel.TYPE_CONTENT).getChildRef();
+                        
+                        rmActionService.executeRecordsManagementAction(result, "file");
+                        TestUtilities.declareRecord(result, unprotectedNodeService, rmActionService);
+                        return result;
+                    }
+                });
+
+        // Check the vital and disposition status.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(testRecord2);
+                        assertNotNull("testRecord2 had null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertFalse("testRecord2 had empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(testRecord2);
+                        assertFalse("testRecord2 had wrong review period.", "0".equals(vitalRecordDefinition.getReviewPeriod().getExpression()));
+                        assertNotNull("testRecord2 had null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return null;
+                    }
+                });
+
+        // copy the record back from vital to non-vital - also dispositionable to non-dispositionable at the same time.
+        final NodeRef copiedBackNode = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        FileInfo fileInfo = fileFolderService.copy(testRecord2, cleanRecordFolder, null); // TODO Something wrong here.
+                        NodeRef n = fileInfo.getNodeRef();
+                        return n;
+                    }
+                });
+        
+        // Assert that the disposition and review-related data are correct after the copy-back.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        final DispositionSchedule dispositionSchedule = rmService.getDispositionSchedule(copiedBackNode);
+                        assertNull("copiedBackNode had non-null disposition instructions.", dispositionSchedule.getDispositionInstructions());
+                        assertTrue("copiedBackNode had non-empty disposition instruction definitions.", dispositionSchedule.getDispositionActionDefinitions().isEmpty());
+
+                        final VitalRecordDefinition vitalRecordDefinition = rmService.getVitalRecordDefinition(copiedBackNode);
+                        assertEquals("copiedBackNode had wrong review period.", "0", vitalRecordDefinition.getReviewPeriod().getExpression());
+                        assertNull("copiedBackNode had non-null review date.", vitalRecordDefinition.getNextReviewDate());
+                        return null;
+                    }
+                });
+
+        //TODO check the search aspect
+        
+        // Tidy up.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        nodeService.deleteNode(copiedBackNode);
+                        nodeService.deleteNode(testRecord2);
+                        nodeService.deleteNode(copiedNode);
+                        nodeService.deleteNode(testRecord);
+
+                        return null;
+                    }
+                });
+    }
+   
 	public void xxxtestUpdateNextDispositionAction()
 	{
 	    FileAction fileAction = (FileAction)applicationContext.getBean("file");

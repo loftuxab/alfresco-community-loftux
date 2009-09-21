@@ -149,7 +149,6 @@ public class RecordCopyBehaviours implements RecordsManagementModel
         @Override
         public boolean getMustCopy(QName classQName, CopyDetails copyDetails)
         {
-            // Never copy this aspect. TODO Is this ok? I think the aspect is created in another behaviour
             return false;
         }
     }
