@@ -27,7 +27,6 @@ package org.alfresco.module.org_alfresco_module_dod5015.audit;
 import java.io.Serializable;
 import java.util.List;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.repo.audit.extractor.AbstractDataExtractor;
@@ -35,8 +34,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 
 /**
- * An extractor that extracts the <b>cm:name</b> path from the RM root down to
- * - and including - the node's own name.  This will only extract data if the
+ * An extractor that extracts the NodeRef path from the RM root down to
+ * - and including - the node itself.  This will only extract data if the
  * node is a {@link RecordsManagementModel#ASPECT_FILE_PLAN_COMPONENT fileplan component}.
  * 
  * @see RecordsManagementService#getNodeRefPath(NodeRef)
@@ -44,7 +43,7 @@ import org.alfresco.service.cmr.repository.NodeService;
  * @author Derek Hulley
  * @since 3.2
  */
-public final class FilePlanNamePathDataExtractor extends AbstractDataExtractor
+public final class FilePlanNodeRefPathDataExtractor extends AbstractDataExtractor
 {
     private NodeService nodeService;
     private RecordsManagementService rmService;
@@ -85,14 +84,7 @@ public final class FilePlanNamePathDataExtractor extends AbstractDataExtractor
         // Get path from the RM root
         List<NodeRef> nodeRefPath = rmService.getNodeRefPath(nodeRef);
         
-        StringBuilder sb = new StringBuilder(128);
-        for (NodeRef pathNodeRef : nodeRefPath)
-        {
-            String name = (String)nodeService.getProperty(pathNodeRef, ContentModel.PROP_NAME);
-            sb.append("/").append(name);
-        }
-        
         // Done
-        return sb.toString();
+        return (Serializable) nodeRefPath;
     }
 }

@@ -43,8 +43,6 @@ import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
-import org.alfresco.service.cmr.model.FileFolderService;
-import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -394,36 +392,34 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     /**
      * {@inheritDoc}
      */
-    public List<String> getNamePath(NodeRef nodeRef)
+    public List<NodeRef> getNodeRefPath(NodeRef nodeRef)
     {
-        LinkedList<String> namePath = new LinkedList<String>();
+        LinkedList<NodeRef> nodeRefPath = new LinkedList<NodeRef>();
         try
         {
-            getNamePathRecursive(nodeRef, namePath);
+            getNodeRefPathRecursive(nodeRef, nodeRefPath);
         }
         catch (Throwable e)
         {
             throw new AlfrescoRuntimeException(
-                    "Unable to get name path for node: \n" +
+                    "Unable to get NodeRef path for node: \n" +
                     "   Node: " + nodeRef,
                     e);
         }
-        return namePath;
+        return nodeRefPath;
     }
     
     /**
-     * Helper method to build a <b>cm:name</b> path from the node to the RM root
+     * Helper method to build a <b>NodeRef</b> path from the node to the RM root
      */
-    private void getNamePathRecursive(NodeRef nodeRef, LinkedList<String> namePath)
+    private void getNodeRefPathRecursive(NodeRef nodeRef, LinkedList<NodeRef> nodeRefPath)
     {
         if (!nodeService.hasAspect(nodeRef, ASPECT_FILE_PLAN_COMPONENT))
         {
             throw new AlfrescoRuntimeException("RM nodes must have aspect " + ASPECT_FILE_PLAN_COMPONENT);
         }
-        // Get the name of the current node
-        String name = (String)nodeService.getProperty(nodeRef, ContentModel.PROP_NAME);
         // Prepend it to the path
-        namePath.addFirst(name);
+        nodeRefPath.addFirst(nodeRef);
         // Are we at the root
         if (nodeService.hasAspect(nodeRef, ASPECT_RECORDS_MANAGEMENT_ROOT))
         {
@@ -439,7 +435,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
             }
             // Recurse
             nodeRef = assocRef.getParentRef();
-            getNamePathRecursive(nodeRef, namePath);
+            getNodeRefPathRecursive(nodeRef, nodeRefPath);
         }
     }
 

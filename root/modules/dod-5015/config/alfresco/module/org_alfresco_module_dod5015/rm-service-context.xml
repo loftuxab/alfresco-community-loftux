@@ -79,7 +79,7 @@
                 <![CDATA[
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getRecordsManagementRoots=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getRecordsManagementRoot=RM.Read.0,AFTER_RM.FilterNode
-                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getNamePath=RM.Read.0
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getNodeRefPath=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isRecord=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isRecordDeclared=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isRecordFolderDeclared=RM.Read.0
@@ -384,11 +384,13 @@
     
     <bean id="recordsManagementAuditService" class="org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditServiceImpl" init-method="init">
         <property name="policyComponent" ref="policyComponent" />
+        <property name="dictionaryService" ref="dictionaryService" />
         <property name="transactionService" ref="transactionService" />
         <property name="nodeService" ref="nodeService" />
         <property name="auditComponent" ref="auditComponent" />
         <property name="auditService" ref="auditService" />
         <property name="contentService" ref="ContentService" />
+        <property name="recordsManagementService" ref="RecordsManagementService" />
         <property name="recordsManagementActionService" ref="RecordsManagementActionService" />
     </bean>
     

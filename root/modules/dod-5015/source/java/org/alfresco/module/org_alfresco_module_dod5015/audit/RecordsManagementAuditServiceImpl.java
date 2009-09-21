@@ -37,6 +37,7 @@ import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.repo.audit.AuditComponent;
@@ -55,6 +56,8 @@ import org.alfresco.repo.transaction.TransactionalResourceHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.audit.AuditService;
 import org.alfresco.service.cmr.audit.AuditService.AuditQueryCallback;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -97,11 +100,13 @@ public class RecordsManagementAuditServiceImpl
     protected static final String FILE_ACTION = "file";
     
     private PolicyComponent policyComponent;
+    private DictionaryService dictionaryService;
     private TransactionService transactionService;
     private NodeService nodeService;
     private ContentService contentService;
     private AuditComponent auditComponent;
     private AuditService auditService;
+    private RecordsManagementService rmService;
     private RecordsManagementActionService rmActionService;
     
     private boolean shutdown = false;
@@ -117,6 +122,14 @@ public class RecordsManagementAuditServiceImpl
     public void setPolicyComponent(PolicyComponent policyComponent)
     {
         this.policyComponent = policyComponent;
+    }
+
+    /**
+     * Provides user-readable names for types
+     */
+    public void setDictionaryService(DictionaryService dictionaryService)
+    {
+        this.dictionaryService = dictionaryService;
     }
 
     /**
@@ -160,6 +173,14 @@ public class RecordsManagementAuditServiceImpl
     }
     
     /**
+     * Set the  RecordsManagementService
+     */
+    public void setRecordsManagementService(RecordsManagementService rmService)
+    {
+        this.rmService = rmService;
+    }
+
+    /**
      * Sets the RecordsManagementActionService instance
      */
     public void setRecordsManagementActionService(RecordsManagementActionService rmActionService)
@@ -178,6 +199,7 @@ public class RecordsManagementAuditServiceImpl
         PropertyCheck.mandatory(this, "contentService", contentService);
         PropertyCheck.mandatory(this, "auditComponent", auditComponent);
         PropertyCheck.mandatory(this, "auditService", auditService);
+        PropertyCheck.mandatory(this, "rmService", rmService);
         PropertyCheck.mandatory(this, "rmActionService", rmActionService);
     }
     
@@ -277,7 +299,7 @@ public class RecordsManagementAuditServiceImpl
      */
     private static class RMAuditNode
     {
-        private String description;
+        private String eventName;
         private Map<QName, Serializable> nodePropertiesBefore;
         private Map<QName, Serializable> nodePropertiesAfter;
         
@@ -285,14 +307,14 @@ public class RecordsManagementAuditServiceImpl
         {
         }
 
-        public String getDescription()
+        public String getEventName()
         {
-            return description;
+            return eventName;
         }
 
-        public void setDescription(String description)
+        public void setEventName(String eventName)
         {
-            this.description = description;
+            this.eventName = eventName;
         }
 
         public Map<QName, Serializable> getNodePropertiesBefore()
@@ -318,17 +340,17 @@ public class RecordsManagementAuditServiceImpl
     
     public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after)
     {
-        auditRMEvent(nodeRef, "Updated properties", before, after);
+        auditRMEvent(nodeRef, RM_AUDIT_EVENT_ON_UPDATE_PROPERTIES, before, after);
     }
 
     public void onDeleteNode(ChildAssociationRef childAssocRef, boolean isNodeArchived)
     {
-        auditRMEvent(childAssocRef.getChildRef(), "Deleted Record", null, null);
+        auditRMEvent(childAssocRef.getChildRef(), RM_AUDIT_EVENT_ON_DELETE_RECORD, null, null);
     }
 
     public void onCreateNode(ChildAssociationRef childAssocRef)
     {
-        auditRMEvent(childAssocRef.getChildRef(), "Created Record", null, null);
+        auditRMEvent(childAssocRef.getChildRef(), RM_AUDIT_EVENT_ON_CREATE_RECORD, null, null);
     }
 
     /**
@@ -340,20 +362,20 @@ public class RecordsManagementAuditServiceImpl
             NodeRef nodeRef,
             Map<String, Serializable> parameters)
     {
-        auditRMEvent(nodeRef, action.getDescription(), null, null);
+        auditRMEvent(nodeRef, action.getName(), null, null);
     }
     
     /**
      * Audit an event for a node
      * 
      * @param nodeRef               the node to which the event applies
-     * @param description           a description of the event
+     * @param eventName             the name of the event
      * @param nodePropertiesBefore  properties before the event (optional)
      * @param nodePropertiesAfter   properties after the event (optional)
      */
     private void auditRMEvent(
             NodeRef nodeRef,
-            String description,
+            String eventName,
             Map<QName, Serializable> nodePropertiesBefore,
             Map<QName, Serializable> nodePropertiesAfter)
     {
@@ -367,10 +389,10 @@ public class RecordsManagementAuditServiceImpl
             // that we avoid some rebinding of the listener
             AlfrescoTransactionSupport.bindListener(txnListener);
         }
-        // Only update the description if it has not already been done
-        if (auditedNode.getDescription() == null)
+        // Only update the eventName if it has not already been done
+        if (auditedNode.getEventName() == null)
         {
-            auditedNode.setDescription(description);
+            auditedNode.setEventName(eventName);
         }
         // Set the properties before the start if they are not already available
         if (auditedNode.getNodePropertiesBefore() == null)
@@ -440,12 +462,12 @@ public class RecordsManagementAuditServiceImpl
                 
                 Map<String, Serializable> auditMap = new HashMap<String, Serializable>(13);
                 // Action description
-                String actionDescription = auditedNode.getDescription();
+                String eventName = auditedNode.getEventName();
                 auditMap.put(
                         AuditApplication.buildPath(
                                 RecordsManagementAuditService.RM_AUDIT_SNIPPET_EVENT,
-                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_DESCRIPTION),
-                        actionDescription);
+                                RecordsManagementAuditService.RM_AUDIT_SNIPPET_NAME),
+                        eventName);
                 // Action node
                 auditMap.put(
                         AuditApplication.buildPath(
@@ -592,20 +614,28 @@ public class RecordsManagementAuditServiceImpl
                 }
                 
                 Date timestamp = new Date(time);
+                String eventName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_EVENT_NAME);
                 String fullName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_FULLNAME);
                 String userRoles = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLES);
                 NodeRef nodeRef = (NodeRef) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF);
                 String nodeName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME);
-                String nodeType = null;
+                QName nodeTypeQname = (QName) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_TYPE);
+                String nodeIdentifier = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_IDENTIFIER);
                 String namePath = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAMEPATH);
-                String description = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_EVENT_DESCRIPTION);
-                String identifier = null;
                 @SuppressWarnings("unchecked")
                 Map<QName, Serializable> beforeProperties = (Map<QName, Serializable>) values.get(
                         RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES_BEFORE);
                 @SuppressWarnings("unchecked")
                 Map<QName, Serializable> afterProperties = (Map<QName, Serializable>) values.get(
                         RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES_AFTER);
+                
+                // Convert some of the values to recognizable forms
+                String nodeType = null;
+                if (nodeTypeQname != null)
+                {
+                    TypeDefinition typeDef = dictionaryService.getType(nodeTypeQname);
+                    nodeType = (typeDef != null) ? typeDef.getTitle() : null;
+                }
                 
                 // TODO: Refactor this to use the builder pattern
                 RecordsManagementAuditEntry entry = new RecordsManagementAuditEntry(
@@ -616,8 +646,8 @@ public class RecordsManagementAuditServiceImpl
                         nodeRef,
                         nodeName,
                         nodeType,
-                        description,
-                        identifier,
+                        eventName,
+                        nodeIdentifier,
                         namePath,
                         beforeProperties,
                         afterProperties);

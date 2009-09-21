@@ -42,11 +42,15 @@ public interface RecordsManagementAuditService
 {
     public enum ReportFormat { HTML, JSON }
     
+    public static final String RM_AUDIT_EVENT_ON_UPDATE_PROPERTIES = "Update Metadata";
+    public static final String RM_AUDIT_EVENT_ON_CREATE_RECORD = "Create Record";
+    public static final String RM_AUDIT_EVENT_ON_DELETE_RECORD = "Delete Record";
+    
     public static final String RM_AUDIT_APPLICATION_NAME = "DOD5015";
     public static final String RM_AUDIT_PATH_ROOT = "/DOD5015";
     public static final String RM_AUDIT_SNIPPET_EVENT = "/event";
     public static final String RM_AUDIT_SNIPPET_PERSON = "/person";
-    public static final String RM_AUDIT_SNIPPET_DESCRIPTION = "/description";
+    public static final String RM_AUDIT_SNIPPET_NAME = "/name";
     public static final String RM_AUDIT_SNIPPET_NODE = "/node";
     public static final String RM_AUDIT_SNIPPET_CHANGES = "/changes";
     public static final String RM_AUDIT_SNIPPET_BEFORE = "/before";
@@ -54,9 +58,11 @@ public interface RecordsManagementAuditService
 
     public static final String RM_AUDIT_DATA_PERSON_FULLNAME = "/DOD5015/event/person/fullName";
     public static final String RM_AUDIT_DATA_PERSON_ROLES = "/DOD5015/event/person/roles";
-    public static final String RM_AUDIT_DATA_EVENT_DESCRIPTION = "/DOD5015/event/description/value";
+    public static final String RM_AUDIT_DATA_EVENT_NAME = "/DOD5015/event/name/value";
     public static final String RM_AUDIT_DATA_NODE_NODEREF = "/DOD5015/event/node/noderef";
     public static final String RM_AUDIT_DATA_NODE_NAME = "/DOD5015/event/node/name";
+    public static final String RM_AUDIT_DATA_NODE_TYPE = "/DOD5015/event/node/type";
+    public static final String RM_AUDIT_DATA_NODE_IDENTIFIER = "/DOD5015/event/node/identifier";
     public static final String RM_AUDIT_DATA_NODE_NAMEPATH = "/DOD5015/event/node/namePath";
     public static final String RM_AUDIT_DATA_NODE_CHANGES_BEFORE = "/DOD5015/event/node/changes/before/value";
     public static final String RM_AUDIT_DATA_NODE_CHANGES_AFTER = "/DOD5015/event/node/changes/after/value";
