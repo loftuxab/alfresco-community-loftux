@@ -11,8 +11,11 @@
     <DataExtractors>
        <DataExtractor name="simpleValue" registeredName="auditModel.extractor.simpleValue"/>
        <DataExtractor name="nodeName" registeredName="auditModel.extractor.nodeName"/>
+       <DataExtractor name="nodeType" registeredName="auditModel.extractor.nodeType"/>
        <DataExtractor name="userRoles" registeredName="org_alfresco_module_dod5015_userRolesExtractor"/>
        <DataExtractor name="namePath" registeredName="org_alfresco_module_dod5015_namePathExtractor"/>
+       <DataExtractor name="nodeRefPath" registeredName="org_alfresco_module_dod5015_nodeRefPathExtractor"/>
+       <DataExtractor name="nodeIdentifier" registeredName="org_alfresco_module_dod5015_identifierExtractor"/>
     </DataExtractors>
     
     <DataGenerators>
@@ -33,14 +36,17 @@
                 <GenerateValue key="fullName" dataGenerator="personFullName"/>
             </AuditPath>
             <!-- Record a description of the event -->
-            <AuditPath key="description">
+            <AuditPath key="name">
                 <RecordValue key="value" dataExtractor="simpleValue"/>
             </AuditPath>
             <!-- Record the node's details -->
             <AuditPath key="node">
                 <RecordValue key="noderef" dataExtractor="simpleValue"/>
                 <RecordValue key="name" dataExtractor="nodeName"/>
+                <RecordValue key="type" dataExtractor="nodeType"/>
                 <RecordValue key="namePath" dataExtractor="namePath"/>
+                <RecordValue key="nodeRefPath" dataExtractor="nodeRefPath"/>
+                <RecordValue key="identifier" dataExtractor="nodeIdentifier"/>
                 <AuditPath key="changes">
 	                <AuditPath key="before">
 	                    <RecordValue key="value" dataExtractor="simpleValue"/>

@@ -53,14 +53,15 @@ public interface RecordsManagementService
     NodeRef getRecordsManagementRoot(NodeRef nodeRef);
     
     /**
-     * Gets the <b>cm:name</b> sequence from the {@link #getRecordsManagementRoot(NodeRef) root}
-     * down to the fileplan component given.  The array will start with the name of the root and end
-     * with the name of the fileplan component node given.
+     * Gets the <b>NodeRef</b> sequence from the {@link #getRecordsManagementRoot(NodeRef) root}
+     * down to the fileplan component given.  The array will start with the <b>NodeRef</b> of the root
+     * and end with the name of the fileplan component node given.
      * 
      * @param nodeRef           a fileplan component
-     * @return                  Returns a name path starting with the name of the records management root
+     * @return                  Returns a <b>NodeRef</b> path starting with the name of the
+     *                          records management root
      */
-    List<String> getNamePath(NodeRef nodeRef);
+    List<NodeRef> getNodeRefPath(NodeRef nodeRef);
     
     /**
      * Indicates whether the given node is a record or not.

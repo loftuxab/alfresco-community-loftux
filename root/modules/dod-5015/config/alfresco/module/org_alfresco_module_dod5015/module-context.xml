@@ -44,6 +44,17 @@
         <property name="rmService" ref="recordsManagementService" />
     </bean>
     
+    <bean id="org_alfresco_module_dod5015_nodeRefPathExtractor" class="org.alfresco.module.org_alfresco_module_dod5015.audit.FilePlanNodeRefPathDataExtractor">
+        <property name="registry" ref="auditModel.extractorRegistry" />
+        <property name="nodeService" ref="nodeService" />
+        <property name="rmService" ref="recordsManagementService" />
+    </bean>
+    
+    <bean id="org_alfresco_module_dod5015_identifierExtractor" class="org.alfresco.module.org_alfresco_module_dod5015.audit.FilePlanIdentifierDataExtractor">
+        <property name="registry" ref="auditModel.extractorRegistry" />
+        <property name="nodeService" ref="nodeService" />
+    </bean>
+    
     <bean id="org_alfresco_module_dod5015_auditModel" class="org.alfresco.repo.audit.model.AuditModelReader">
         <property name="auditModelUrl">
            <value>classpath:alfresco/module/org_alfresco_module_dod5015/audit/rm-audit.xml</value>

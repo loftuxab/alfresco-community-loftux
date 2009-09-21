@@ -29,8 +29,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
-import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FileAction;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditEntry;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
@@ -59,9 +57,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
     private TransactionService transactionService;
     private RetryingTransactionHelper txnHelper;
     private SearchService searchService;
-    private RecordsManagementService rmService;
     private RecordsManagementAuditService rmAuditService;
-    private RecordsManagementActionService rmActionService;
 
 
     private Date testStartTime;
@@ -77,11 +73,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         this.transactionService = serviceRegistry.getTransactionService();
         this.txnHelper = transactionService.getRetryingTransactionHelper();
  
-        this.rmService = (RecordsManagementService) ctx.getBean("RecordsManagementService");
-
         this.rmAuditService = (RecordsManagementAuditService) ctx.getBean("RecordsManagementAuditService");
-
-        this.rmActionService = (RecordsManagementActionService)ctx.getBean("RecordsManagementActionService");
 
         this.searchService = serviceRegistry.getSearchService();
 
@@ -129,7 +121,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
                 // Ensure that auditing is on
                 rmAuditService.start();
 
-                NodeRef nodeRef = TestUtilities.loadFilePlanData(ctx);
+                TestUtilities.loadFilePlanData(ctx);
 
                 // Do some stuff
                 FileAction fileAction = (FileAction)ctx.getBean("file");
@@ -232,7 +224,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         entries = txnHelper.doInTransaction(nodeResultsCallback);
         assertNotNull("Expect a list of results for the query", entries);
         assertTrue("No results were found for node: " + chosenNodeRefFinal, entries.size() > 0);
-        assertEquals("Incorrect number of results for node: " + chosenNodeRefFinal, count, entries.size());
+        // We can't check the size because we need entries for the node and any children as well
     }
     
     public void testStartStopDelete()
