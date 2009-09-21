@@ -37,6 +37,7 @@ import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -211,15 +212,15 @@ public class RecordsManagementAuditServiceImpl
         // Register to listen for property changes to rma:record types
         policyComponent.bindClassBehaviour(
                 OnUpdatePropertiesPolicy.QNAME,
-                this,
+                RecordsManagementModel.ASPECT_RECORD_COMPONENT_ID,
                 new JavaBehaviour(this, "onUpdateProperties"));   
         policyComponent.bindClassBehaviour(
                 OnCreateNodePolicy.QNAME,
-                this,
+                RecordsManagementModel.ASPECT_RECORD_COMPONENT_ID,
                 new JavaBehaviour(this, "onCreateNode"));   
         policyComponent.bindClassBehaviour(
                 BeforeDeleteNodePolicy.QNAME,
-                this,
+                RecordsManagementModel.ASPECT_RECORD_COMPONENT_ID,
                 new JavaBehaviour(this, "beforeDeleteNode"));   
     }
 
@@ -340,17 +341,17 @@ public class RecordsManagementAuditServiceImpl
     
     public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after)
     {
-        auditRMEvent(nodeRef, RM_AUDIT_EVENT_UPDATE_PROPERTIES, before, after);
+        auditRMEvent(nodeRef, RM_AUDIT_EVENT_UPDATE_RM_OBJECT, before, after);
     }
 
     public void beforeDeleteNode(NodeRef nodeRef)
     {
-        auditRMEvent(nodeRef, RM_AUDIT_EVENT_DELETE_RECORD, null, null);
+        auditRMEvent(nodeRef, RM_AUDIT_EVENT_DELETE_RM_OBJECT, null, null);
     }
 
     public void onCreateNode(ChildAssociationRef childAssocRef)
     {
-        auditRMEvent(childAssocRef.getChildRef(), RM_AUDIT_EVENT_CREATE_RECORD, null, null);
+        auditRMEvent(childAssocRef.getChildRef(), RM_AUDIT_EVENT_CREATE_RM_OBJECT, null, null);
     }
 
     /**
@@ -380,7 +381,7 @@ public class RecordsManagementAuditServiceImpl
             Map<QName, Serializable> nodePropertiesAfter)
     {
         // If we are deleting nodes, then we need to audit NOW
-        if (eventName.equals(RecordsManagementAuditService.RM_AUDIT_EVENT_DELETE_RECORD))
+        if (eventName.equals(RecordsManagementAuditService.RM_AUDIT_EVENT_DELETE_RM_OBJECT))
         {
             // Deleted nodes will not be available at the end of the transaction.  The data needs to
             // be extracted now and the audit entry needs to be created now.
