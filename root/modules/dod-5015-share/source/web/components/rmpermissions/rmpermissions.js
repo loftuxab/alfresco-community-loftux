@@ -107,9 +107,6 @@
          this.widgets.addButton = Alfresco.util.createYUIButton(this, "addusergroup-button", this.onAddClick);
          this.widgets.finishButton = Alfresco.util.createYUIButton(this, "finish-button", this.onFinishClick);
          
-         // Events
-         Event.on(this.id + "-inherit", "change", this.onInheritCheckChanged, this, true);
-         
          // Load in the Authority Finder component from the server
          Alfresco.util.Ajax.request(
          {
@@ -179,8 +176,7 @@
             {
                "id": args[1].itemName,
                "label": args[1].displayName
-            },
-            "inherited": false
+            }
          };
          this.addPermissionRow(permission, true);
          
@@ -242,10 +238,10 @@
          var json = Alfresco.util.parseJSON(res.serverResponse.responseText);
          var perms = json.data.permissions;
          
-         // sort the array from the json response - inherited permissions shown first
+         // sort the array from the json response - alphabetically
          perms.sort(function(a, b)
          {
-            return (a.inherited > b.inherited) ? -1 : (a.inherited < b.inherited) ? 1 : 0;
+            return (a.authority.label > b.authority.label) ? -1 : (a.authority.label < b.authority.label) ? 1 : 0;
          });
          
          for (var i in perms)
@@ -264,8 +260,7 @@
        *    {
        *       "id": "GROUP_ALFRESCO_ADMINISTRATORS",
        *       "label": "ALFRESCO_ADMINISTRATORS"
-       *    },
-       *    "inherited": false
+       *    }
        * }
        * Generally provided via JSON call or created for a new permission.
        * 
@@ -283,7 +278,7 @@
             for (var n in this.permissions)
             {
                var perm = this.permissions[n];
-               if (perm.inherited === false && perm.remove === false && perm.authority === permission.authority.id)
+               if (perm.remove === false && perm.authority === permission.authority.id)
                {
                   return;
                }
@@ -304,7 +299,6 @@
             "remove": false,
             "created": created,
             "modified": false,
-            "inherited": permission.inherited,
             "el": div
          };
          this.permissions.push(p);
@@ -316,24 +310,11 @@
          // messages
          var msgReadOnly = this.msg("label.readonly");
          var msgReadFile = this.msg("label.readandfile");
-         var msgInherited = this.msg("label.inherited");
-         var msgLocal = this.msg("label.local");
          
          // construct row data
          var html = '<div class="list-item"><div class="actions">';
-         if (permission.inherited)
-         {
-            // inherited permission - read only
-            html += '&nbsp;</div><div class="controls"><div class="readonly-label">' + (permission.id === "Filing" ? msgReadFile : msgReadOnly) + '</div>';
-         }
-         else
-         {
-            // directly applied permission - can modify or remove
-            html += '<span id="' + removeBtnContainerId + '"></span></div><div class="controls"><span id="' + modifyMenuContainerId + '"></span>';
-         }
-         html += '</div><div><span class="label">' + $html(permission.authority.label) + '</span>';
-         html += '<span class="hint-label">(' + (permission.inherited ? msgInherited : msgLocal) + ')</span>';
-         html += '</div></div>';
+         html += '<span id="' + removeBtnContainerId + '"></span></div><div class="controls"><span id="' + modifyMenuContainerId + '"></span>';
+         html += '</div><div><span class="label">' + $html(permission.authority.label) + '</span></div></div>';
          
          div.innerHTML = html;
          
@@ -341,48 +322,45 @@
          elPermList.appendChild(div);
          
          // generate menu and buttons (NOTE: must occur after DOM insertion)
-         if (permission.inherited === false)
+         this.modifyMenus[i] = new YAHOO.widget.Button(
          {
-            this.modifyMenus[i] = new YAHOO.widget.Button(
+            type: "menu",
+            container: modifyMenuContainerId,
+            menu: [
+               { text: msgReadOnly, value: "ReadRecords" },
+               { text: msgReadFile, value: "Filing" }
+            ]
+         });
+         // set menu button text on current permission
+         this.modifyMenus[i].set("label", (permission.id === "Filing" ? msgReadFile : msgReadOnly));
+         // subscribe to the menu click event
+         this.modifyMenus[i].getMenu().subscribe("click", function(p_sType, p_aArgs, index)
+         {
+            var menuItem = p_aArgs[1];
+            if (menuItem)
             {
-               type: "menu",
-               container: modifyMenuContainerId,
-               menu: [
-                  { text: msgReadOnly, value: "ReadRecords" },
-                  { text: msgReadFile, value: "Filing" }
-               ]
-            });
-            // set menu button text on current permission
-            this.modifyMenus[i].set("label", (permission.id === "Filing" ? msgReadFile : msgReadOnly));
-            // subscribe to the menu click event
-            this.modifyMenus[i].getMenu().subscribe("click", function(p_sType, p_aArgs, index)
+               // update menu button text to selected item label
+               me.modifyMenus[index].set("label", menuItem.cfg.getProperty("text"));
+               
+               // update modified permissions value and set as modified
+               me.permissions[i].id = menuItem.value;
+               me.permissions[i].modified = true;
+            }
+         }, i);
+         
+         this.removeButtons[i] = new YAHOO.widget.Button(
+         {
+            type: "button",
+            label: this.msg("button.remove"),
+            name: this.id + '-removeButton-' + i,
+            container: removeBtnContainerId,
+            onclick:
             {
-               var menuItem = p_aArgs[1];
-               if (menuItem)
-               {
-                  // update menu button text to selected item label
-                  me.modifyMenus[index].set("label", menuItem.cfg.getProperty("text"));
-                  
-                  // update modified permissions value and set as modified
-                  me.permissions[i].id = menuItem.value;
-                  me.permissions[i].modified = true;
-               }
-            }, i);
-            
-            this.removeButtons[i] = new YAHOO.widget.Button(
-            {
-               type: "button",
-               label: this.msg("button.remove"),
-               name: this.id + '-removeButton-' + i,
-               container: removeBtnContainerId,
-               onclick:
-               {
-                  fn: this.onClickRemovePermission,
-                  obj: i,
-                  scope: this
-               }
-            });
-         }
+               fn: this.onClickRemovePermission,
+               obj: i,
+               scope: this
+            }
+         });
       },
       
       /**
@@ -423,17 +401,6 @@
             Dom.removeClass(this.widgets.authorityFinder, "active");
             this.showingFilter = false;
          }
-      },
-      
-      /**
-       * Fired when the Inherit Permissions checkbox state is changed.
-       * 
-       * @method onInheritCheckChanged
-       * @param e {object} DomEvent
-       * @param args {array} Event parameters (depends on event type)
-       */
-      onInheritCheckChanged: function RecordsPermissions_onInheritCheckChanged(e, args)
-      {
       },
       
       /**
