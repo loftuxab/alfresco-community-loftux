@@ -42,9 +42,9 @@ public interface RecordsManagementAuditService
 {
     public enum ReportFormat { HTML, JSON }
     
-    public static final String RM_AUDIT_EVENT_UPDATE_PROPERTIES = "Update Metadata";
-    public static final String RM_AUDIT_EVENT_CREATE_RECORD = "Create Record";
-    public static final String RM_AUDIT_EVENT_DELETE_RECORD = "Delete Record";
+    public static final String RM_AUDIT_EVENT_UPDATE_RM_OBJECT = "Update RM Object";
+    public static final String RM_AUDIT_EVENT_CREATE_RM_OBJECT = "Create RM Object";
+    public static final String RM_AUDIT_EVENT_DELETE_RM_OBJECT = "Delete RM Object";
     
     public static final String RM_AUDIT_APPLICATION_NAME = "DOD5015";
     public static final String RM_AUDIT_PATH_ROOT = "/DOD5015";
