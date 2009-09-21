@@ -16,7 +16,7 @@
   </description>
   <url>/api/rma/admin/rmauditlog</url>
   <url>/api/node/{store_type}/{store_id}/{id}/rmauditlog</url>
-  <format default="json">argument</format>
+  <format default="html">argument</format>
   <authentication>user</authentication>
   <transaction>required</transaction>
   <lifecycle>internal</lifecycle>
