@@ -44,7 +44,7 @@ function main()
       }
       else
       {
-         node.setPermission(id, authority);
+         rmService.setPermission(node, id, authority);
       }
    }
 }

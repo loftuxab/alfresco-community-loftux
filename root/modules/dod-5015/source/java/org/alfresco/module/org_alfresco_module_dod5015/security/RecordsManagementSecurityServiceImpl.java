@@ -30,16 +30,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
-import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -54,6 +55,7 @@ import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,6 +79,8 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     
     /** Policy component */
     private PolicyComponent policyComponent;
+    
+    private RecordsManagementService recordsManagementService;
     
     /** Node service */
     private NodeService nodeService;
@@ -122,6 +126,16 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     public void setPolicyComponent(PolicyComponent policyComponent)
     {
         this.policyComponent = policyComponent;
+    }
+    
+    /**
+     * Set records management service
+     * 
+     * @param recordsManagementService  records management service
+     */
+    public void setRecordsManagementService(RecordsManagementService recordsManagementService)
+    {
+        this.recordsManagementService = recordsManagementService;
     }
     
     /**
@@ -687,5 +701,60 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 
             }
         }, AuthenticationUtil.getAdminUserName());
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#setPermission(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.lang.String, boolean)
+     */
+    public void setPermission(final NodeRef nodeRef, final String authority, final String permission)
+    {
+        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+        {
+            public Boolean doWork() throws Exception
+            { 
+                if (nodeService.hasAspect(nodeRef, ASPECT_RECORDS_MANAGEMENT_ROOT) == false &&
+                    recordsManagementService.isRecordsManagementContainer(nodeRef) == true)
+                {
+                    setReadPermissionUp(nodeRef, authority);
+                    setPermissionDown(nodeRef, authority, permission);
+                }
+                else if (recordsManagementService.isRecordFolder(nodeRef) == true)
+                {
+                    setReadPermissionUp(nodeRef, authority);
+                    permissionService.setPermission(nodeRef, authority, permission, true);
+                }
+                
+                return null;
+            }
+        }, AuthenticationUtil.getAdminUserName());
+    }
+    
+    private void setReadPermissionUp(NodeRef nodeRef, String authority)
+    {
+        NodeRef parent = nodeService.getPrimaryParent(nodeRef).getParentRef();
+        if (parent != null &&
+            nodeService.hasAspect(parent, ASPECT_RECORDS_MANAGEMENT_ROOT) == false)
+        {
+            permissionService.setPermission(parent, authority, RMPermissionModel.READ_RECORDS, true);
+            setReadPermissionUp(parent, authority);
+        }
+    }
+    
+    private void setPermissionDown(NodeRef nodeRef, String authority, String permission)
+    {
+        permissionService.setPermission(nodeRef, authority, permission, true);
+        if (recordsManagementService.isRecordsManagementContainer(nodeRef) == true)
+        {
+            List<ChildAssociationRef> assocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+            for (ChildAssociationRef assoc : assocs)
+            {
+                NodeRef child = assoc.getChildRef();
+                if (recordsManagementService.isRecordsManagementContainer(child) == true ||
+                    recordsManagementService.isRecordFolder(child) == true)
+                {
+                    setPermissionDown(child, authority, permission);
+                }
+            }
+        }
     }
 }
