@@ -33,6 +33,8 @@ import java.util.Set;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
+import org.alfresco.module.org_alfresco_module_dod5015.audit.AuditEvent;
+import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEvent;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -57,6 +59,7 @@ public class ListOfValuesGet extends DeclarativeWebScript
 {
     protected RecordsManagementService rmService;
     protected RecordsManagementActionService rmActionService;
+    protected RecordsManagementAuditService rmAuditService;
     protected RecordsManagementEventService rmEventService;
     protected DictionaryService ddService;
     protected NamespaceService namespaceService;
@@ -79,6 +82,16 @@ public class ListOfValuesGet extends DeclarativeWebScript
     public void setRecordsManagementActionService(RecordsManagementActionService rmActionService)
     {
         this.rmActionService = rmActionService;
+    }
+    
+    /**
+     * Sets the RecordsManagementAuditService instance
+     * 
+     * @param rmAuditService The RecordsManagementAuditService instance
+     */
+    public void setRecordsManagementAuditService(RecordsManagementAuditService rmAuditService)
+    {
+        this.rmAuditService = rmAuditService;
     }
     
     /**
@@ -124,6 +137,7 @@ public class ListOfValuesGet extends DeclarativeWebScript
         listsModel.put("events", createEventsModel(requestUrl));
         listsModel.put("periodTypes", createPeriodTypesModel(requestUrl));
         listsModel.put("periodProperties", createPeriodPropertiesModel(requestUrl));
+        listsModel.put("auditEvents", createAuditEventsModel(requestUrl));
         
         // create model object with the lists model
         Map<String, Object> model = new HashMap<String, Object>(1);
@@ -250,6 +264,33 @@ public class ListOfValuesGet extends DeclarativeWebScript
         // create the model
         Map<String, Object> model = new HashMap<String, Object>(2);
         model.put("url", baseUrl + "/periodproperties");
+        model.put("items", items);
+        
+        return model;
+    }
+    
+    /**
+     * Creates the model for the list of audit events.
+     * 
+     * @param baseUrl The base URL of the service
+     * @return model of audit events list
+     */
+    protected Map<String, Object> createAuditEventsModel(String baseUrl)
+    {
+        // iterate over all audit events
+        List<AuditEvent> auditEvents = this.rmAuditService.getAuditEvents();
+        List<Map<String, String>> items = new ArrayList<Map<String, String>>(auditEvents.size());
+        for (AuditEvent event : auditEvents)
+        {
+            Map<String, String> item = new HashMap<String, String>(2);
+            item.put("label", event.getLabel());
+            item.put("value", event.getName());
+            items.add(item);
+        }
+        
+        // create the model
+        Map<String, Object> model = new HashMap<String, Object>(2);
+        model.put("url", baseUrl + "/auditevents");
         model.put("items", items);
         
         return model;

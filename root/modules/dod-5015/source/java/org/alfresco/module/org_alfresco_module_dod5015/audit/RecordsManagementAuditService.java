@@ -159,4 +159,11 @@ public interface RecordsManagementAuditService
      */
     NodeRef fileAuditTrailAsRecord(RecordsManagementAuditQueryParameters params, 
                 NodeRef destination, ReportFormat format);
+    
+    /**
+     * Retrieves a list of audit events.
+     * 
+     * @return List of audit events
+     */
+    List<AuditEvent> getAuditEvents();
 }
