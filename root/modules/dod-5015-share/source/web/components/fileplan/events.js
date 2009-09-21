@@ -349,7 +349,11 @@
             },
             successCallback:
             {
-               fn: this.refreshEvents,
+               fn: function(response)
+               {
+                  // Fire event so the events panel and other listeners may refresh
+                  YAHOO.Bubbling.fire("metadataRefresh");
+               },
                scope: this
             },
             failureCallback:
