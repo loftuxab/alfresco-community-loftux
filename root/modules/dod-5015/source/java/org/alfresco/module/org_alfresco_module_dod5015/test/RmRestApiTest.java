@@ -1327,7 +1327,6 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         jsonPostData.put("size", "50");
         jsonPostData.put("user", "gavinc");
         jsonPostData.put("event", "Update Metadata");
-        jsonPostData.put("path", "/documentLibrary/Gav Series");
         jsonPostData.put("property", "{http://www.alfresco.org/model/content/1.0}modified");
         jsonPostString = jsonPostData.toString();
         rsp = sendRequest(new PostRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 200);

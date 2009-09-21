@@ -58,6 +58,7 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransacti
 import org.alfresco.service.cmr.audit.AuditService;
 import org.alfresco.service.cmr.audit.AuditService.AuditQueryCallback;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
+import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.dictionary.TypeDefinition;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -97,7 +98,8 @@ public class RecordsManagementAuditServiceImpl
     private static final String KEY_RM_AUDIT_NODE_RECORDS = "RMAUditNodeRecords";
     
     protected static final String AUDIT_TRAIL_FILE_PREFIX = "audit_";
-    protected static final String AUDIT_TRAIL_FILE_SUFFIX = ".json";
+    protected static final String AUDIT_TRAIL_JSON_FILE_SUFFIX = ".json";
+    protected static final String AUDIT_TRAIL_HTML_FILE_SUFFIX = ".html";
     protected static final String FILE_ACTION = "file";
     
     private PolicyComponent policyComponent;
@@ -107,6 +109,7 @@ public class RecordsManagementAuditServiceImpl
     private ContentService contentService;
     private AuditComponent auditComponent;
     private AuditService auditService;
+    private NamespaceService namespaceService;
     private RecordsManagementService rmService;
     private RecordsManagementActionService rmActionService;
     
@@ -171,6 +174,14 @@ public class RecordsManagementAuditServiceImpl
     public void setAuditService(AuditService auditService)
     {
         this.auditService = auditService;
+    }
+    
+    /**
+     * Sets the NamespaceService instance
+     */
+    public void setNamespaceService(NamespaceService namespaceService)
+    {
+        this.namespaceService = namespaceService;
     }
     
     /**
@@ -570,7 +581,8 @@ public class RecordsManagementAuditServiceImpl
         FileWriter fileWriter = null;
         try
         {
-            File auditTrailFile = TempFileProvider.createTempFile(AUDIT_TRAIL_FILE_PREFIX, AUDIT_TRAIL_FILE_SUFFIX);
+            File auditTrailFile = TempFileProvider.createTempFile(AUDIT_TRAIL_FILE_PREFIX, 
+                format == ReportFormat.HTML ? AUDIT_TRAIL_HTML_FILE_SUFFIX : AUDIT_TRAIL_JSON_FILE_SUFFIX);
             fileWriter = new FileWriter(auditTrailFile);
             // Get the results, dumping to file
             getAuditTrailImpl(params, null, fileWriter, format);
@@ -674,6 +686,8 @@ public class RecordsManagementAuditServiceImpl
                 
                 // TODO: Refactor this to use the builder pattern
                 RecordsManagementAuditEntry entry = new RecordsManagementAuditEntry(
+                        dictionaryService, 
+                        namespaceService,
                         timestamp,
                         user,
                         fullName,
@@ -714,13 +728,13 @@ public class RecordsManagementAuditServiceImpl
                 {
                     if (!firstEntry)
                     {
-                        if (reportFormat == ReportFormat.JSON)
+                        if (reportFormat == ReportFormat.HTML)
                         {
-                            writer.write(",");
+                            writer.write("\n");
                         }
                         else
                         {
-                            // TODO: write out HTML
+                            writer.write(",");
                         }
                     }
                     else
@@ -729,15 +743,14 @@ public class RecordsManagementAuditServiceImpl
                     }
                     
                     // write the entry to the file
-                    if (reportFormat == ReportFormat.JSON)
+                    if (reportFormat == ReportFormat.HTML)
                     {
-                        writer.write("\n\t\t");
-                        writer.write(entry.toJSONString());
+                        writer.write(entry.toHTML());
                     }
                     else
                     {
-                        // TODO: write out HTML
-                        // writer.write(entry.toHTML());
+                        writer.write("\n\t\t");
+                        writer.write(entry.toJSONString());
                     }
                 }
                 catch (IOException ioe)
@@ -753,7 +766,7 @@ public class RecordsManagementAuditServiceImpl
         int maxEntries = params.getMaxEntries();
         
         // start the audit trail report
-        writeAuditTrailHeader(writer, reportFormat);
+        writeAuditTrailHeader(writer, params, reportFormat);
         
         if (logger.isDebugEnabled())
         {
@@ -824,7 +837,7 @@ public class RecordsManagementAuditServiceImpl
 
             // Set the content
             ContentWriter writer = this.contentService.getWriter(record, ContentModel.PROP_CONTENT, true);
-            writer.setMimetype(format == ReportFormat.JSON ? MimetypeMap.MIMETYPE_JSON : MimetypeMap.MIMETYPE_HTML);
+            writer.setMimetype(format == ReportFormat.HTML ? MimetypeMap.MIMETYPE_HTML : MimetypeMap.MIMETYPE_JSON);
             writer.setEncoding("UTF-8");
             writer.putContent(auditTrail);
             
@@ -853,20 +866,81 @@ public class RecordsManagementAuditServiceImpl
      * @param reportFormat The format to write the header in
      * @throws IOException
      */
-    private void writeAuditTrailHeader(Writer writer, ReportFormat reportFormat) throws IOException
+    private void writeAuditTrailHeader(Writer writer, 
+                RecordsManagementAuditQueryParameters params, 
+                ReportFormat reportFormat) throws IOException
     {
         if (writer == null)
         {
             return;
         }
-        writer.write("{\n\t\"data\":\n\t{");
-        writer.write("\n\t\t\"started\": \"");
-        writer.write(ISO8601DateFormat.format(getDateLastStarted()));
-        writer.write("\",\n\t\t\"stopped\": \"");
-        writer.write(ISO8601DateFormat.format(getDateLastStopped()));
-        writer.write("\",\n\t\t\"enabled\": ");
-        writer.write(Boolean.toString(isEnabled()));
-        writer.write(",\n\t\t\"entries\":[");
+        
+        if (reportFormat == ReportFormat.HTML)
+        {
+            // write header as HTML
+            writer.write("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
+            writer.write("<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n");
+            writer.write("<title>Audit Report</title></head>\n");
+            writer.write("<style>\n");
+            writer.write("body { font-family: arial,verdana; font-size: 81%; color: #333; }\n");
+            writer.write(".label { margin-right: 5px; font-weight: bold; }\n");
+            writer.write(".value { margin-right: 40px; }\n");
+            writer.write(".audit-info { background-color: #efefef; padding: 10px; margin-bottom: 4px; }\n");
+            writer.write(".audit-entry { border: 1px solid #bbb; margin-top: 15px; }\n");
+            writer.write(".audit-entry-header { background-color: #bbb; padding: 8px; }\n");
+            writer.write(".audit-entry-node { padding: 10px; }\n");
+            writer.write(".changed-values-table { margin-left: 6px; margin-bottom: 2px;width: 99%; }\n");
+            writer.write(".changed-values-table th { text-align: left; background-color: #eee; padding: 4px; }\n");
+            writer.write(".changed-values-table td { width: 33%; padding: 4px; border-top: 1px solid #eee; }\n");
+            writer.write("</style>\n");
+            writer.write("<body>\n<h2>Audit Report</h2>\n");
+            writer.write("<div class=\"audit-info\">\n");
+            
+            writer.write("<span class=\"label\">From:</span>");
+            writer.write("<span class=\"value\">");
+            // if there's no filtered date use the date the log was started
+            Date from = params.getDateFrom();
+            writer.write(from == null ? this.getDateLastStarted().toString() : from.toString());
+            writer.write("</span>");
+            
+            writer.write("<span class=\"label\">To:</span>");
+            writer.write("<span class=\"value\">");
+            // if there's no filtered date use the date the log was stopped
+            Date to = params.getDateTo();
+            writer.write(to == null ? this.getDateLastStopped().toString() : to.toString());
+            writer.write("</span>");
+            
+            writer.write("<span class=\"label\">Property:</span>");
+            writer.write("<span class=\"value\">");
+            QName prop = params.getProperty();
+            writer.write(prop == null ? "All" : getPropertyLabel(prop, this.dictionaryService, this.namespaceService));
+            writer.write("</span>");
+            
+            writer.write("<span class=\"label\">User:</span>");
+            writer.write("<span class=\"value\">");
+            writer.write(params.getUser() == null ? "All" : params.getUser());
+            writer.write("</span>");
+            
+            writer.write("<span class=\"label\">Event:</span>");
+            writer.write("<span class=\"value\">");
+            // TODO: Lookup the event display name to return rather than the event key
+            writer.write(params.getEvent() == null ? "All" : params.getEvent());
+            writer.write("</span>\n");
+            
+            writer.write("</div>\n");
+        }
+        else
+        {
+            // write header as JSON
+            writer.write("{\n\t\"data\":\n\t{");
+            writer.write("\n\t\t\"started\": \"");
+            writer.write(ISO8601DateFormat.format(getDateLastStarted()));
+            writer.write("\",\n\t\t\"stopped\": \"");
+            writer.write(ISO8601DateFormat.format(getDateLastStopped()));
+            writer.write("\",\n\t\t\"enabled\": ");
+            writer.write(Boolean.toString(isEnabled()));
+            writer.write(",\n\t\t\"entries\":[");
+        }
     }
     
     /**
@@ -882,6 +956,42 @@ public class RecordsManagementAuditServiceImpl
         {
             return;
         }
-        writer.write("\n\t\t]\n\t}\n}");
+        if (reportFormat == ReportFormat.HTML)
+        {
+            // write footer as HTML
+            writer.write("\n</body></html>");
+        }
+        else
+        {
+            // write footer as JSON
+            writer.write("\n\t\t]\n\t}\n}");
+        }
+    }
+    
+    /**
+     * Returns the label for a property QName
+     * 
+     * @param property The property to get label for
+     * @param ddService DictionaryService instance
+     * @param namespaceService NamespaceService instance
+     * @return The label
+     */
+    public static String getPropertyLabel(QName property, 
+                DictionaryService ddService, NamespaceService namespaceService)
+    {
+        String label = null;
+        
+        PropertyDefinition propDef = ddService.getProperty(property);
+        if (propDef != null)
+        {
+            label = propDef.getTitle();
+        }
+        
+        if (label == null)
+        {
+            label = property.getLocalName();
+        }
+        
+        return label;
     }
 }
