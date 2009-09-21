@@ -19,12 +19,6 @@
          </span>
       </div>
    </div>
-   <!-- Inherit Permissions checkbox
-   <div class="floatright inherit">
-      <input type="checkbox" id="${el}-inherit" />
-      <label for="${el}-inherit">${msg("label.inherit")}</label>
-   </div>
-   -->
    <div class="title">${msg("label.title", '${page.url.args.itemName!""}')?html}</div>
    
    <!-- Permissions List -->
