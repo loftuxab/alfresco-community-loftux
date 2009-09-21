@@ -14,7 +14,9 @@
          "userAccess":
          {
          <#list item.permissions?keys as perm>
-            "${perm?string}": true<#if perm_has_next>,</#if>
+            <#if item.permissions[perm]?is_boolean>
+            "${perm?string}": ${item.permissions[perm]?string}<#if perm_has_next>,</#if>
+            </#if>
          </#list>
          },
       </#if>
