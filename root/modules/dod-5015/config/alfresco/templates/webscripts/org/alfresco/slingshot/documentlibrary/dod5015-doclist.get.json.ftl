@@ -47,6 +47,7 @@
          "index": ${item_index},
          "nodeRef": "${d.nodeRef}",
          "type": "${item.type}",
+         "isFolder": ${d.isContainer?string},
          "mimetype": "${d.mimetype!""}",
          "fileName": "${d.name}",
          "displayName": "${d.name?replace(workingCopyLabel, "")}",

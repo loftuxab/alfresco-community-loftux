@@ -127,7 +127,7 @@
                },
                event:
                {
-                  name: assets.type == "folder" ? "folderDeleted" : "fileDeleted",
+                  name: assets.isFolder ? "folderDeleted" : "fileDeleted",
                   obj:
                   {
                      path: filePath
