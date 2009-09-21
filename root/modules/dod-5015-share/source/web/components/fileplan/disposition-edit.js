@@ -768,7 +768,7 @@
        */
       onPeriodUnitSelectChange: function DispositionEdit_onPeriodUnitSelectChange(e, obj)
       {
-         var periodUnitEl = e.target;
+         var periodUnitEl = Event.getTarget(e);
          this._disableEnablePeriodElements(periodUnitEl, obj.periodAmountEl, obj.periodActionEl);
          this._refreshTitle(obj.actionEl);
       },
