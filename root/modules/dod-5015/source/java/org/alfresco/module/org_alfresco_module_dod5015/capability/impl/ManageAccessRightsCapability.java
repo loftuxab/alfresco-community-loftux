@@ -48,9 +48,12 @@ public class ManageAccessRightsCapability extends AbstractCapability
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.MANAGE_ACCESS_RIGHTS) == AccessStatus.ALLOWED)
+            if (!isFrozen(nodeRef))
             {
-                return AccessDecisionVoter.ACCESS_GRANTED;
+                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.MANAGE_ACCESS_RIGHTS) == AccessStatus.ALLOWED)
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
             }
             return AccessDecisionVoter.ACCESS_DENIED;
         }
