@@ -83,7 +83,7 @@
                                 <view:properties>
                                     <cm:name>January AIS Audit Records</cm:name>
                                     <cm:title>January AIS Audit Records</cm:title>
-                                    <rma:identifier>0318-01</rma:identifier>
+                                    <rma:identifier>0318-01-01</rma:identifier>
                                     <rma:reviewPeriod>week|1</rma:reviewPeriod>
                                     <rma:vitalRecordIndicator>true</rma:vitalRecordIndicator>
                                 </view:properties>
@@ -139,7 +139,7 @@
                             <rma:recordFolder view:childName="cm:1st Quarter Unit Manning Documents">
                                 <view:properties>
                                     <cm:name>1st Quarter Unit Manning Documents</cm:name>
-                                    <rma:identifier>0318-02</rma:identifier>
+                                    <rma:identifier>0318-02-01</rma:identifier>
                                     <cm:title>1st Quarter Unit Manning Documents</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -192,7 +192,7 @@
                             <rma:recordFolder view:childName="cm:FY08 Overtime Reports">
                                 <view:properties>
                                     <cm:name>FY08 Overtime Reports</cm:name>
-                                    <rma:identifier>0318-03</rma:identifier>
+                                    <rma:identifier>0318-03-01</rma:identifier>
                                     <cm:title>FY08 Overtime Reports</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -244,7 +244,7 @@
                             <rma:recordFolder view:childName="cm:CY08 Unit Manning Documents">
                                 <view:properties>
                                     <cm:name>CY08 Unit Manning Documents</cm:name>
-                                    <rma:identifier>0318-04</rma:identifier>
+                                    <rma:identifier>0318-04-01</rma:identifier>
                                     <cm:title>CY08 Unit Manning Documents</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -359,14 +359,14 @@
                             <rma:recordFolder view:childName="cm:COL Bob Johnson">
                                 <view:properties>
                                     <cm:name>COL Bob Johnson</cm:name>
-                                    <rma:identifier>0412-02</rma:identifier>
+                                    <rma:identifier>0412-02-01</rma:identifier>
                                     <cm:title>COL Bob Johnson</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
                             <rma:recordFolder view:childName="cm:PFC Alan Murphy">
                                 <view:properties>
                                     <cm:name>PFC Alan Murphy</cm:name>
-                                    <rma:identifier>0412-02</rma:identifier>
+                                    <rma:identifier>0412-02-02</rma:identifier>
                                     <cm:title>PFC Alan Murphy</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -423,14 +423,14 @@
                             <rma:recordFolder view:childName="cm:Commander's Administrative Assistant">
                                 <view:properties>
                                     <cm:name>Commander's Administrative Assistant</cm:name>
-                                    <rma:identifier>0412-03</rma:identifier>
+                                    <rma:identifier>0412-03-01</rma:identifier>
                                     <cm:title>Commander's Administrative Assistant</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
                             <rma:recordFolder view:childName="cm:Equal Opportunity Coordinator">
                                 <view:properties>
                                     <cm:name>Equal Opportunity Coordinator</cm:name>
-                                    <rma:identifier>0412-03</rma:identifier>
+                                    <rma:identifier>0412-03-02</rma:identifier>
                                     <cm:title>Equal Opportunity Coordinator</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -562,14 +562,14 @@
                             <rma:recordFolder view:childName="cm:Christian Bohr">
                                 <view:properties>
                                     <cm:name>Christian Bohr</cm:name>
-                                    <rma:identifier>0430-02</rma:identifier>
+                                    <rma:identifier>0430-02-01</rma:identifier>
                                     <cm:title>Christian Bohr</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
                             <rma:recordFolder view:childName="cm:Karl Planck">
                                 <view:properties>
                                     <cm:name>Karl Planck</cm:name>
-                                    <rma:identifier>0430-02</rma:identifier>
+                                    <rma:identifier>0430-02-02</rma:identifier>
                                     <cm:title>Karl Planck</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -594,7 +594,7 @@
                             <rma:recordFolder view:childName="cm:Gilbert Competency Hearing">
                                 <view:properties>
                                     <cm:name>Gilbert Competency Hearing</cm:name>
-                                    <rma:identifier>0430-03</rma:identifier>
+                                    <rma:identifier>0430-03-01</rma:identifier>
                                     <cm:title>Gilbert Competency Hearing</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -651,7 +651,7 @@
                             <rma:recordFolder view:childName="cm:Gilbert WGI Records">
                                 <view:properties>
                                     <cm:name>Gilbert WGI Records</cm:name>
-                                    <rma:identifier>0430-04</rma:identifier>
+                                    <rma:identifier>0430-04-01</rma:identifier>
                                     <cm:title>Gilbert WGI Records</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -711,7 +711,7 @@
                             <rma:recordFolder view:childName="cm:Martin Payroll Differential and Allowances">
                                 <view:properties>
                                     <cm:name>Martin Payroll Differential and Allowances</cm:name>
-                                    <rma:identifier>0430-05</rma:identifier>
+                                    <rma:identifier>0430-05-01</rma:identifier>
                                     <cm:title>Martin Payroll Differential and Allowances</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -782,21 +782,21 @@
                             <rma:recordFolder view:childName="cm:Bob Prentice Training Records (2008)">
                                 <view:properties>
                                     <cm:name>Bob Prentice Training Records (2008)</cm:name>
-                                    <rma:identifier>0950-01</rma:identifier>
+                                    <rma:identifier>0950-01-01</rma:identifier>
                                     <cm:title>Bob Prentice Training Records (2008)</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
                             <rma:recordFolder view:childName="cm:Beth Tanaka Training Records (2008)">
                                 <view:properties>
                                     <cm:name>Beth Tanaka Training Records (2008)</cm:name>
-                                    <rma:identifier>0950-01</rma:identifier>
+                                    <rma:identifier>0950-01-02</rma:identifier>
                                     <cm:title>Beth Tanaka Training Records (2008)</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
                             <rma:recordFolder view:childName="cm:Chuck Stevens Training Records (2008)">
                                 <view:properties>
                                     <cm:name>Chuck Stevens Training Records (2008)</cm:name>
-                                    <rma:identifier>0950-01</rma:identifier>
+                                    <rma:identifier>0950-01-03</rma:identifier>
                                     <cm:title>Chuck Stevens Training Records (2008)</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -894,14 +894,14 @@
                             <rma:recordFolder view:childName="cm:January Cockpit Crew Training">
                                 <view:properties>
                                     <cm:name>January Cockpit Crew Training</cm:name>
-                                    <rma:identifier>0950-03</rma:identifier>
+                                    <rma:identifier>0950-03-01</rma:identifier>
                                     <cm:title>January Cockpit/Crew Training</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
                             <rma:recordFolder view:childName="cm:February Cockpit Crew Training">
                                 <view:properties>
                                     <cm:name>February Cockpit Crew Training</cm:name>
-                                    <rma:identifier>0950-03</rma:identifier>
+                                    <rma:identifier>0950-03-02</rma:identifier>
                                     <cm:title>February Cockpit/Crew Training</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
@@ -965,7 +965,7 @@
                             <rma:recordFolder view:childName="cm:Phoenix Mars Mission">
                                 <view:properties>
                                     <cm:name>Phoenix Mars Mission</cm:name>
-                                    <rma:identifier>0950-04</rma:identifier>
+                                    <rma:identifier>0950-04-01</rma:identifier>
                                     <cm:title>Phoenix Mars Mission</cm:title>
                                 </view:properties>
                             </rma:recordFolder>
