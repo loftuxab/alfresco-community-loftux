@@ -29,30 +29,35 @@ import java.util.Map;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.node.NodeServicePolicies;
+import org.alfresco.repo.node.NodeServicePolicies.BeforeDeleteNodePolicy;
+import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.repo.props.PropertyValueComponent;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.PropertyCheck;
 
 /**
  * Record component identifier aspect behaviour
  * 
  * @author Roy Wetherall
  */
-public class RecordComponentIdentifierAspect implements NodeServicePolicies.OnUpdatePropertiesPolicy,
-                                                        RecordsManagementModel
+public class RecordComponentIdentifierAspect
+        implements NodeServicePolicies.OnUpdatePropertiesPolicy,
+                   NodeServicePolicies.BeforeDeleteNodePolicy,
+                   RecordsManagementModel
 {
-    /** Policy component */    
-    private PolicyComponent policyComponent;
+    private static final String CONTEXT_VALUE = "rma:identifier";
     
-    /** Node service */
+    private PolicyComponent policyComponent;
     private NodeService nodeService;
+    private PropertyValueComponent propertyValueComponent;
 
     /**
      * @param policyComponent the policyComponent to set
@@ -68,21 +73,42 @@ public class RecordComponentIdentifierAspect implements NodeServicePolicies.OnUp
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
-    }     
+    }
+
+    /**
+     * Set the component to manage the unique properties
+     */
+    public void setPropertyValueComponent(PropertyValueComponent propertyValueComponent)
+    {
+        this.propertyValueComponent = propertyValueComponent;
+    }
 
     /**
      * Initialise method
      */
     public void init()
     {
+        PropertyCheck.mandatory(this, "policyComponent", policyComponent);
+        PropertyCheck.mandatory(this, "nodeService", nodeService);
+        PropertyCheck.mandatory(this, "propertyValueComponent", propertyValueComponent);
+        
         policyComponent.bindClassBehaviour(
-                QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"), 
+                OnUpdatePropertiesPolicy.QNAME,
                 ASPECT_RECORD_COMPONENT_ID, 
-                new JavaBehaviour(this, "onUpdateProperties", NotificationFrequency.TRANSACTION_COMMIT));
+                new JavaBehaviour(this, "onUpdateProperties", NotificationFrequency.EVERY_EVENT));
+        policyComponent.bindClassBehaviour(
+                BeforeDeleteNodePolicy.QNAME, 
+                ASPECT_RECORD_COMPONENT_ID, 
+                new JavaBehaviour(this, "beforeDeleteNode", NotificationFrequency.EVERY_EVENT));
+        policyComponent.bindClassBehaviour(
+                BeforeDeleteNodePolicy.QNAME, 
+                ASPECT_RECORD_COMPONENT_ID, 
+                new JavaBehaviour(this, "beforeDeleteNode", NotificationFrequency.EVERY_EVENT));
     }
 
     /**
-     * @see org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy#onUpdateProperties(org.alfresco.service.cmr.repository.NodeRef, java.util.Map, java.util.Map)
+     * Ensures that the {@link RecordsManagementModel#PROP_IDENTIFIER rma:identifier} property remains
+     * unique within the context of the parent node.
      */
     public void onUpdateProperties(final NodeRef nodeRef, final Map<QName, Serializable> before, final Map<QName, Serializable> after)
     {
@@ -93,38 +119,65 @@ public class RecordComponentIdentifierAspect implements NodeServicePolicies.OnUp
                 // Check whether the identifier property has changed
                 String beforeId = (String)before.get(PROP_IDENTIFIER);
                 String afterId = (String)after.get(PROP_IDENTIFIER);
-                if (before != null && after == null)
-                {
-                    // Get the db id
-                    String dbId = (String)nodeService.getProperty(nodeRef, PROP_DB_UNIQUENESS_ID);
-                    if (dbId != null)
-                    {            
-                        // TODO do we need to clear this out of the Db??
-                        // uniquenessService.clear(dbId);
-                        
-                        // Clear the DbUniquenessId
-                        nodeService.setProperty(nodeRef, PROP_DB_UNIQUENESS_ID, null);
-                    }
-                }
-                else if (after != null && 
-                        (before == null || after.equals(before) == false))
-                {
-                    // Get the context node
-                    ChildAssociationRef childAssoc = nodeService.getPrimaryParent(nodeRef);
-                    NodeRef context = childAssoc.getParentRef();
-                    
-                    // Get the db id (if null then carry on)
-                    String dbId = (String)nodeService.getProperty(nodeRef, PROP_DB_UNIQUENESS_ID); 
-                    
-                    // TODO Check for uniqueness
-                    //dbId = uniquenesService.isUnique(dbId, afterId, context);            
-                    
-                    // Set the DbUniquenessId
-                    nodeService.setProperty(nodeRef, PROP_DB_UNIQUENESS_ID, dbId);
-                }
-                
+                updateUniqueness(nodeRef, beforeId, afterId);
                 return null;
             }
         }, AuthenticationUtil.getSystemUserName()); 
+    }
+
+    /**
+     * Cleans up the {@link RecordsManagementModel#PROP_IDENTIFIER rma:identifier} property unique triplet.
+     */
+    public void beforeDeleteNode(final NodeRef nodeRef)
+    {
+        AuthenticationUtil.runAs(new RunAsWork<Object>()
+        {
+            public Object doWork()
+            {
+                String beforeId = (String) nodeService.getProperty(nodeRef, PROP_IDENTIFIER);
+                updateUniqueness(nodeRef, beforeId, null);
+                return null;
+            }
+        }, AuthenticationUtil.getSystemUserName()); 
+    }
+    
+    /**
+     * Updates the uniqueness check using the values provided.  If the after value is <tt>null</tt>
+     * then this is considered to be a removal.
+     */
+    private void updateUniqueness(NodeRef nodeRef, String beforeId, String afterId)
+    {
+        ChildAssociationRef childAssoc = nodeService.getPrimaryParent(nodeRef);
+        NodeRef contextNodeRef = childAssoc.getParentRef();
+        
+        if (beforeId == null)
+        {
+            if (afterId != null)
+            {
+                // Just create it
+                propertyValueComponent.createPropertyUniqueContext(CONTEXT_VALUE, contextNodeRef, afterId);
+            }
+            else
+            {
+                // This happens if the unique property is not present
+            }
+        }
+        else if (afterId == null)
+        {
+            if (beforeId != null)
+            {
+                // The before value was not null, so remove it
+                propertyValueComponent.deletePropertyUniqueContexts(CONTEXT_VALUE, contextNodeRef, beforeId);
+            }
+            // Do a blanket removal in case this is a contextual nodes
+            propertyValueComponent.deletePropertyUniqueContexts(CONTEXT_VALUE, nodeRef);
+        }
+        else
+        {
+            // This is a full update
+            propertyValueComponent.updatePropertyUniqueContext(
+                    CONTEXT_VALUE, contextNodeRef, beforeId,
+                    CONTEXT_VALUE, contextNodeRef, afterId);
+        }
     }
 }
