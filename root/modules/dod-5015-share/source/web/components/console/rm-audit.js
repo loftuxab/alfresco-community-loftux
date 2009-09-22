@@ -25,7 +25,7 @@
     */
    Alfresco.RM_Audit = function RM_Audit_constructor(htmlId)
    {
-      Alfresco.RM_Audit.superclass.constructor.call(this, "Alfresco.RM_Audit", htmlId,["button", "container", "datasource", "datatable", "paginator", "json"]);
+      Alfresco.RM_Audit.superclass.constructor.call(this, "Alfresco.RM_Audit", htmlId,["button", "container", "datasource", "datatable", "paginator", "json", "calendar"]);
       Alfresco.util.ComponentManager.register(this);
       this.showingFilter = false;
       //search filter person
@@ -75,10 +75,23 @@
                         handler:this.onViewLog,
                         scope : this
                   }
-               }
+               },
+               {
+                  rule : 'button.audit-details',
+                  o : {
+                     handler: this.onShowDetails,
+                     scope : this
+                  }
+               },
+               {
+                  rule : 'button.audit-apply',
+                  o : {
+                     handler: this.onApplyFilters,
+                     scope : this
+                  }
+               }                   
             ]);
          }
-         //people picker functionality
          this.registerEventHandler('click',
          [
             {
@@ -108,46 +121,26 @@
                   handler: this.onDeclareRecord,
                   scope : this
                }
-            }            
+            }                     
          ]);
-         return this;
-      },
-      
-     /**
-       * Fired by YUI when parent element is available for scripting
-       * @method onReady
-       * 
-       */
-      onReady: function RM_Audit_onReady()
-      {
-         this.initEvents();
-         
-         // Load the People Finder component from the server
-         Alfresco.util.Ajax.request(
-         {
-            url: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/people-finder",
-            dataObj:
-            {
-               htmlid: this.id + "-peoplefinder"
-            },
-            successCallback:
-            {
-               fn: this.onPeopleFinderLoaded,
-               scope: this
-            },
-            failureMessage: "Could not load People Finder component",
-            execScripts: true
-         });
          
          // Decoupled event listeners
          YAHOO.Bubbling.on("personSelected", this.onPersonSelected, this);
          YAHOO.Bubbling.on('PersonFilterActivated',this.onPersonFilterActivated, this);
          YAHOO.Bubbling.on('PersonFilterDeactivated',this.onPersonFilterDeactivated,this);
          YAHOO.Bubbling.on('AuditRecordLocationSelected', this.onAuditRecordLocationSelected, this);
+         
+         return this;
+      },
+      
+      initWidgets: function RM_Audit_initWidgets()
+      {
+         var me = this; 
+         
+         //init buttons
          var buttons = Sel.query('button',this.id).concat(Sel.query('input[type=submit]',this.id));
-
          // Create widget button while reassigning classname to src element (since YUI removes classes). 
-         // We need the classname so we can identify what action to take when it is interacted with (event  delegation).
+         // We need the classname so we can identify what action to take when it is interacted with (event delegation).
          for (var i=0, len = buttons.length; i<len; i++)
          {
             var button= buttons[i];
@@ -158,20 +151,95 @@
               this.widgets[id]._button.className=button.className;
             }
          }
-         //an audit log for node and not in console (all nodes)
-         if (this.options.nodeRef)
+         
+         //initialize dates in UI
+         this.widgets['status-date'] = Dom.get(this.id+'-status-date');
+
+         this.validAuditDates = (this.options.startDate!=="");
+         if (this.validAuditDates)
          {
-            var nodeRef = this.options.nodeRef.split('/');
-            this.dataUri = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/node/{store_type}/{store_id}/{id}/rmauditlog", { store_type: nodeRef[0], store_id: nodeRef[1], id: nodeRef[2] });
-         }
-         else {
-            this.dataUri = Alfresco.constants.PROXY_URI+'api/rma/admin/rmauditlog';
-         }
-         //if not in full mode, then we want to restrict to 20
-         if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
+            if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_COMPACT)
+            {
+               Dom.get(this.id+'-from-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.startDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);
+               Dom.get(this.id+'-to-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.stopDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);  
+            }
+            else
+            {
+               this.toggleUI();            
+            }  
+         }                
+         //initialise menus
+         //property menu
+         this.widgets['propertyMenu'] = new YAHOO.widget.Button(this.id + "-property",
          {
-            this.dataUri+='?size=20';
-         }
+            type: "menu",
+            menu: this.id + "-property-menu"
+         });
+         
+         //events menu
+         this.widgets['eventMenu'] = new YAHOO.widget.Button(this.id + "-events",
+         {
+            type: "menu",
+            menu: this.id + "-events-menu"
+         });
+
+         this.widgets['propertyMenu'].on("selectedMenuItemChange", function selectedPropertyMenuItemChange(event)
+         {
+            var oMenuItem = event.newValue;
+            if (oMenuItem)
+            {
+               this.set('label', oMenuItem.cfg.getProperty('text'));
+            }
+
+            if (oMenuItem.value!="ALL")
+            {
+               me.queryParams.property=oMenuItem.value;
+            }
+            else
+            {
+               delete me.queryParams.property;
+            }
+         
+         });         
+         
+         this.widgets['eventMenu'].on("selectedMenuItemChange", function selectedEventMenuItemChange(event)
+         {
+            var oMenuItem = event.newValue;
+            if (oMenuItem)
+            {
+               this.set('label', oMenuItem.cfg.getProperty('text'));
+            }            
+            if (oMenuItem.value!="ALL")
+            {
+               me.queryParams.event=oMenuItem.value;
+            }
+            else
+            {
+               delete me.queryParams.event;
+            }
+         });
+         
+         //initialise calendar pickers
+         //fromDate calendar
+         var theDate = new Date();
+         var page = (theDate.getMonth() + 1) + "/" + theDate.getFullYear();
+         var selected = (theDate.getMonth() + 1) + "/" + theDate.getDate() + "/" + theDate.getFullYear();
+         this.widgets.fromCalendar = new YAHOO.widget.Calendar(null, this.id + "-fromDate-cal", { title: this.msg("message.select-from-date"), close: true });
+         this.widgets.fromCalendar.cfg.setProperty("pagedate", page);
+         this.widgets.fromCalendar.cfg.setProperty("selected", selected);
+         this.widgets.fromCalendar.selectEvent.subscribe(this.onDatePickerSelection,  {cal:this.widgets.fromCalendar,el:Dom.get(this.id+'-fromDate'),scope:this},true);
+
+         Event.addListener(this.id + "-fromDate-icon", "click", function () { this.widgets.toCalendar.hide();this.widgets.fromCalendar.show(); }, this, true);
+         //toDate calendar
+         this.widgets.toCalendar = new YAHOO.widget.Calendar(null, this.id + "-toDate-cal", { title: this.msg("message.select-to-date"), close: true });
+         this.widgets.toCalendar.cfg.setProperty("pagedate", page);
+         this.widgets.toCalendar.cfg.setProperty("selected", selected);
+         this.widgets.toCalendar.selectEvent.subscribe(this.onDatePickerSelection, {cal:this.widgets.toCalendar,el:Dom.get(this.id+'-toDate'),scope:this}, true );  
+
+         Event.addListener(this.id + "-toDate-icon", "click", function () { this.widgets.fromCalendar.hide();this.widgets.toCalendar.show(); }, this, true);         
+         // render the calendar control
+         this.widgets.fromCalendar.render();
+         this.widgets.toCalendar.render();             
          //Sets up datatable.
          var DS = this.widgets['auditDataSource'] = new YAHOO.util.DataSource(this.dataUri);
          
@@ -194,48 +262,83 @@
                elCell.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(oData));
             }
          };
-
-         var DT = this.widgets['auditDataTable'] = new YAHOO.widget.DataTable(this.id+"-auditDT",
+        
+         // Add the custom formatter to the shortcuts
+         YAHOO.widget.DataTable.Formatter.eventCellFormatter = function eventCellFormatter(elLiner, oRecord, oColumn, oData) {
+            var oRecordData = oRecord._oData;
+            elLiner.innerHTML = oRecordData.event + ' [<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + me.options.siteId + '/document-details?nodeRef=' + oRecordData.nodeRef + '">' + oRecordData.nodeName + '</a>]';
+            //add details button
+            var but = new YAHOO.widget.Button(
+            {
+               label:me.msg('label.button-details'),
+               //use an id that easily references the results using an array index.
+               id:'log-' + oRecord._nCount,
+               container:elLiner       
+            });
+            //need this for display
+            but.addClass('audit-details-button');
+            //and this for event handling1
+            but._button.className = 'audit-details';
+         };
+         
+         this.widgets['auditDataTable'] = new YAHOO.widget.DataTable(this.id+"-auditDT",
              [
                {key:"timestamp", label:this.msg('label.timestamp'), formatter: renderCellDate, sortable:true, resizeable:true},
                {key:"fullName", label:this.msg('label.user'),  sortable:true, resizeable:true},
                {key:"userRole", label:this.msg('label.role'),  sortable:true, resizeable:true},
-               {key:"event", label:this.msg('label.event'),  sortable:true, resizeable:true}
+               {key:"event", label:this.msg('label.event'),  formatter:"eventCellFormatter", sortable:true, resizeable:true}
             ], 
             DS, 
             {
                caption:this.msg('label.pagination','0')
             }
          );
-         //so we can update caption to list number of results
-         this.widgets['auditDataSource'].subscribe('responseParseEvent', this.updateUI, this, true);
-         var me = this;
-         this.widgets['auditDataSource'].doBeforeCallback = function(oRequest, oFullResponse, oParsedResponse, oCallback) {
-            var data = oParsedResponse.results;
-            for (var i=0,len=data.length;i<len;i++)
-            {
-               var entry = data[i];
-               oParsedResponse.results[i].event += ' [<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + me.options.siteId + '/document-details?nodeRef=' + entry.nodeRef + '">' + entry.nodeName + '</a>]';
-            }
-            
-            return oParsedResponse;
-         };
          
-         this.widgets['status-date'] = Dom.get(this.id+'-status-date');
-
-         this.validAuditDates = (this.options.startDate!=="");
-         if (this.validAuditDates)
+         //subscribe to event so we can update UI and options metadata
+         this.widgets['auditDataSource'].subscribe('responseParseEvent', this.updateUI, this, true);
+         
+         // Load the People Finder component from the server
+         Alfresco.util.Ajax.request(
          {
-            if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_COMPACT)
+            url: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/people-finder",
+            dataObj:
             {
-               Dom.get(this.id+'-from-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.startDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);
-               Dom.get(this.id+'-to-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.stopDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);  
-            }
-            else
+               htmlid: this.id + "-peoplefinder"
+            },
+            successCallback:
             {
-               this.toggleUI();            
-            }  
-         }        
+               fn: this.onPeopleFinderLoaded,
+               scope: this
+            },
+            failureMessage: "Could not load People Finder component",
+            execScripts: true
+         });                
+      },
+     /**
+       * Fired by YUI when parent element is available for scripting
+       * @method onReady
+       * 
+       */
+      onReady: function RM_Audit_onReady()
+      {
+         this.initEvents();
+         //initialize data uri         
+         //an audit log for node and not in console (all nodes)
+         if (this.options.nodeRef)
+         {
+            var nodeRef = this.options.nodeRef.split('/');
+            this.dataUri = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "api/node/{store_type}/{store_id}/{id}/rmauditlog", { store_type: nodeRef[0], store_id: nodeRef[1], id: nodeRef[2] });
+         }
+         else {
+            this.dataUri = Alfresco.constants.PROXY_URI+'api/rma/admin/rmauditlog';
+         }
+         //if not in full mode, then we want to restrict to 20
+         if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
+         {
+            // this.dataUri+='?size=20';
+         }
+         this.initWidgets();
+        
       },
       
       /**
@@ -248,6 +351,7 @@
          var statusDate = (this.options.enabled) ? this.options.startDate : this.options.stopDate;
          var statusMessage = (this.options.enabled) ? 'label.started-at' : 'label.stopped-at';
          this.widgets['status-date'].innerHTML = this.msg(statusMessage,formatDate(fromISO8601(statusDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime));         
+         
          //update start/stop button
          if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
          {   
@@ -485,7 +589,30 @@
          });         
       },
       
-
+      /**
+       * Handles the date being changed in the date picker YUI control.
+       * 
+       * @method onDatePickerSelection
+       * @param type
+       * @param args
+       * @param obj
+       * @private
+       */
+      onDatePickerSelection: function RM_Audit_onDatePickerSelection(type, args, obj)
+      {
+         // update the date field - contains an array of [year, month, day]
+         var selected = args[0][0];
+         obj.cal.hide();
+         // convert to query date format and insert
+         var date = YAHOO.lang.substitute("{year}-{month}-{day}",
+         {
+            year: selected[0],
+            month: Alfresco.util.pad(selected[1], 2),
+            day: Alfresco.util.pad(selected[2], 2)
+         });
+         obj.el.value  = date;
+      },
+      
       /**
        * Handler for specify button. Shows the fields in order for user to
        * filter results. Needs to be replaced by people picker
@@ -676,6 +803,15 @@
          this._query();       
       },
       
+      /**
+       * Displays dialog with more info about log entry
+       *  
+       */
+      onShowDetails: function RM_Audit__showDetails()
+      {
+         
+      },
+      
       _buildQuery : function RM_Audit__buildQuery()
       {
          var qs = Alfresco.util.toQueryString(this.queryParams);
@@ -687,6 +823,28 @@
          return qs;
       },
       
+      onApplyFilters : function RM_Audit__applyFilters()
+      {
+         var entriesValue = Dom.get(this.id+'-entries').value;
+         //event,property and user filters set the queryParams using their handlers so only need to manually
+         //check if entries or date filters are been used and if so, add to query params.
+         var filterMap = [{uiId:this.id+'-entries',queryId:'size'},{uiId:this.id+'-fromDate',queryId:'from'},{uiId:this.id+'-toDate',queryId:'to'}];
+         for (var i=0,len = filterMap.length;i<len;i++)
+         {
+            var mapping = filterMap[i];
+            var uiValue = Dom.get(mapping.uiId).value;
+            if (uiValue!=="")
+            {
+               this.queryParams[mapping.queryId] = uiValue;
+            }
+            else
+            {
+               delete this.queryParams[mapping.queryId];
+            }
+         }
+         this._query();  
+      },
+      
       _query : function RM_Audit__reQuery()
       {
          var q = this._buildQuery();
@@ -696,16 +854,19 @@
             failure : this.widgets['auditDataTable'].onDataReturnInitializeTable,
             scope : this.widgets['auditDataTable']
          };
-
          this.widgets['auditDataTable'].getDataSource().sendRequest(q, oCallback);
       },
-      
-      updateUI : function RM_updateCaption(o)
+      /**
+       * Updates UI and options metadata
+       *  
+       */
+      updateUI : function RM_Audit_updateUI(o)
       {
          var response = o.response;
          this.options.enabled = response.meta.enabled;
          this.options.startDate = response.meta.startDate;
          this.options.stopDate = response.meta.stopDate;
+         this.options.results = response.results;
          if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
          {
             this.toggleUI();
