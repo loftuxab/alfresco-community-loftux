@@ -118,7 +118,7 @@ var Evaluator =
       if (asset.hasAspect("rma:cutOff"))
       {
          status["cutoff"] = true;
-         permissions["undoCutoff"] = true;
+         permissions["undo-cutoff"] = true;
       }
 
       /* Transferred status */
@@ -138,7 +138,7 @@ var Evaluator =
       {
          if (asset.properties["rma:reviewAsOf"] != null)
          {
-            permissions["reviewAsOf"] = true;
+            permissions["review-as-of"] = true;
          }
       }
    },
@@ -160,7 +160,7 @@ var Evaluator =
 
       if (actionAsOf != null)
       {
-         permissions["dispositionAsOf"] = true;
+         permissions["disposition-as-of"] = true;
          
          // Check if action asOf date has passed
          if (actionAsOf < now)
@@ -292,7 +292,7 @@ var Evaluator =
                }
                if (capabilities["ReOpenFolders"])
                {
-                  permissions["openFolder"] = true;
+                  permissions["open-folder"] = true;
                }
             }
             else
@@ -300,7 +300,7 @@ var Evaluator =
                status["open"] = true;
                if (capabilities["CloseFolders"])
                {
-                  permissions["closeFolder"] = true;
+                  permissions["close-folder"] = true;
                }
             }
 
@@ -365,25 +365,22 @@ var Evaluator =
                permissions["download"] = true;
 
                /* Set Record Type */
-               var dod5015URI = "{http://www.alfresco.org/model/dod5015/1.0}",
-                  recordTypes = [
-                     dod5015URI + "scannedRecord",
-                     dod5015URI + "webRecord",
-                     dod5015URI + "digitalPhotographRecord",
-                     dod5015URI + "pdfRecord"
-                  ];
-               // TODO replace hard coded record types
-               for (var i = 0, il = recordTypes.length; i < il; i++)
+               var recordTypes =
+               [
+                  "dod:scannedRecord",
+                  "dod:webRecord",
+                  "dod:digitalPhotographRecord",
+                  "dod:pdfRecord"
+               ];
+               permissions["set-record-type"] = true;
+               for (var i = 0; i < recordTypes.length; i++)
                {
                   if (asset.hasAspect(recordTypes[i]))
                   {
+                     // Remove permission if record type has been set
+                     delete permissions["set-record-type"];
                      break;
                   }
-               }
-               if(i == il)
-               {
-                  // Give permission if no record type had been set before
-                  permissions["setRecordType"] = true;
                }
             }
             break;
