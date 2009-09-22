@@ -43,7 +43,7 @@
    padding:0;
 }
 
-.filterActions
+/*.filterActions
 {
    float: right;
 }
@@ -63,12 +63,13 @@
 {
    display: inline;
 }
+*/
 .audit-peoplefinder
 {
    display: none;
    position: absolute;
-   right: -10px;
-   top: 1em;
+   right: 0;
+   top: 4em;
    z-index: 100;
 }
 .audit-peoplefinder.active
@@ -98,6 +99,42 @@
    width: 30em;
 }
 
+.audit .yui-gb .yui-u
+{
+   text-align:left;
+}
+
+#filters
+{
+   background-color:#DDD;
+   height:10em;
+   margin-top:1em;
+}
+#filters select,
+#filters input
+{
+   width:13em;
+}
+#filters .hd,
+#filters .bd
+{
+   margin:0.5em;
+}
+.filter label
+{
+   display:block;
+   font-weight:bold;
+
+}
+.filter
+{
+   position:relative;
+   height:10em;
+}
+.auditDT
+{
+   margin-top:-2.5em;
+}
 /* audit log popup page */
 .audit-popup-log .audit-info
 {
@@ -136,4 +173,28 @@
 .audit-popup-log .auditActions 
 {
    margin:1em;
+}
+.datepicker
+{
+   display:none;
+   position:absolute;
+   z-index:100;
+}
+
+.datepicker-icon
+{
+   vertical-align: top;
+   cursor:pointer;
+   margin-bottom:1em;
+}
+
+#filters .yuimenu .hd,
+#filters .yuimenu .bd
+{
+   margin:0;
+}
+
+.audit-details-button
+{
+   float:right;
 }
