@@ -29,7 +29,6 @@
             <create-form template="dod5015-create-container.ftl" />
             <appearance>
                <set id="rm-custom" />
-               <field id="rma:identifier" label-id="label.seriesIdentifier" />
             </appearance>
          </form>
       </forms>
@@ -57,7 +56,6 @@
             <appearance>
                <set id="rm-custom" />
                <field id="cm:description" mandatory="true" />
-               <field id="rma:identifier" label-id="label.categoryIdentifier" />
                <field id="rma:vitalRecordIndicator">
                   <control template="/org/alfresco/components/form/controls/vital-record-indicator.ftl" />
                </field> 
@@ -92,7 +90,6 @@
             <create-form template="dod5015-create-container.ftl" />
             <appearance>
                <set id="rm-custom" />
-               <field id="rma:identifier" label-id="label.folderIdentifier" />
             </appearance>
          </form>
       </forms>
@@ -109,7 +106,6 @@
             <create-form template="dod5015-create-container.ftl" />
             <appearance>
                <set id="rm-custom" />
-               <field id="rma:identifier" label-id="label.folderIdentifier" read-only="true" />
                <field id="cm:title" mandatory="true">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
@@ -163,7 +159,7 @@
                      <control-param name="activateLinks">true</control-param>
                   </control>
                </field>
-               <field id="rma:identifier" set="rm" label-id="label.seriesIdentifier" />
+               <field id="rma:identifier" set="rm" label-id="label.seriesIdentifier" read-only="true" />
             </appearance>
          </form>
       </forms>
@@ -203,7 +199,7 @@
                      <constraint type="MANDATORY" validation-handler="Alfresco.forms.validation.rmVitalRecordPeriodMandatory" />
                   </constraint-handlers>
                </field>
-               <field id="rma:identifier" set="rm" label-id="label.categoryIdentifier" />
+               <field id="rma:identifier" set="rm" label-id="label.categoryIdentifier" read-only="true" />
             </appearance>
          </form>
       </forms>
@@ -247,7 +243,7 @@
                      <control-param name="activateLinks">true</control-param>
                   </control>
                </field>
-               <field id="rma:identifier" set="rm" label-id="label.folderIdentifier" />
+               <field id="rma:identifier" set="rm" label-id="label.folderIdentifier" read-only="true" />
                <field id="rmc:supplementalMarkingList" set="rm" />
                <field id="rma:vitalRecordIndicator" set="rm">
                   <control template="/org/alfresco/components/form/controls/vital-record-indicator.ftl" />
