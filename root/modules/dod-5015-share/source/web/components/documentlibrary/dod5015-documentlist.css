@@ -21,6 +21,11 @@
    background-image: url(images/import-16.png);
 }
 
+.doclist .onActionViewAuditLog a
+{
+   background-image: url(images/view-audit-log-16.png);
+}
+
 
 /**
  * Actions: Records
@@ -133,12 +138,6 @@
    background-image: url(images/unfreeze-record-16.png);
 }
 
-.doclist .record .onActionViewAuditLog a,
-.doclist .record-nonelec .onActionViewAuditLog a,
-.doclist .onActionViewAuditLog a
-{
-   background-image: url(images/view-audit-log-16.png);
-}
 
 /**
  * Actions: Undeclared Records
@@ -165,6 +164,12 @@
 .doclist .undeclared-record-nonelec .onActionMoveTo a
 {
    background-image: url(images/move-record-to-16.png);
+}
+
+.doclist .undeclared-record .onActionSetRecordType a,
+.doclist .undeclared-record-nonelec .onActionSetRecordType a
+{
+   background-image: url(images/set-record-type-16.png);
 }
 
 .doclist .undeclared-record .onActionSplitEmail a,
