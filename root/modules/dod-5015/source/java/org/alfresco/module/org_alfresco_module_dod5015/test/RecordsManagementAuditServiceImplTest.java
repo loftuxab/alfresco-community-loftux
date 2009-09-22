@@ -29,7 +29,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.alfresco.module.org_alfresco_module_dod5015.action.impl.FileAction;
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditEntry;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
@@ -84,7 +84,22 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         
-        filePlan = createFilePlan();
+        RetryingTransactionCallback<Void> setUpCallback = new RetryingTransactionCallback<Void>()
+        {
+            public Void execute() throws Throwable
+            {
+                // Ensure that auditing is on
+                rmAuditService.start();
+                
+                if (filePlan == null)
+                {
+                    filePlan = TestUtilities.loadFilePlanData(ctx);
+                }
+                updateFilePlan();
+                return null;
+            }
+        };
+        txnHelper.doInTransaction(setUpCallback);
     }
     
     @Override
@@ -115,33 +130,19 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
     /**
      * Create a new fileplan
      */
-    private NodeRef createFilePlan()
+    private void updateFilePlan()
     {
-        RetryingTransactionCallback<NodeRef> setUpCallback = new RetryingTransactionCallback<NodeRef>()
+        RetryingTransactionCallback<Void> updateCallback = new RetryingTransactionCallback<Void>()
         {
-            public NodeRef execute() throws Throwable
+            public Void execute() throws Throwable
             {
-                // Ensure that auditing is on
-                rmAuditService.start();
-
-                TestUtilities.loadFilePlanData(ctx);
-
                 // Do some stuff
-                FileAction fileAction = (FileAction)ctx.getBean("file");
-                
-                // Get a record folder
-                NodeRef folderRecord = TestUtilities.getRecordFolder(
-                        searchService,
-                        "Reports",
-                        "AIS Audit Records",
-                        "January AIS Audit Records");
-                assertNotNull(folderRecord);
-                fileAction.updateNextDispositionAction(folderRecord);
+                nodeService.setProperty(filePlan, ContentModel.PROP_MODIFIER, "" + System.currentTimeMillis());
 
-                return filePlan;
+                return null;
             }
         };
-        return txnHelper.doInTransaction(setUpCallback);
+        txnHelper.doInTransaction(updateCallback);
     }
     
     public void testSetUp()
@@ -246,10 +247,9 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         rmAuditService.stop();
         List<RecordsManagementAuditEntry> result1 = queryAll();
         assertNotNull(result1);
-        assertTrue(result1.size() > 0);
 
-        // Upload a new fileplan
-        createFilePlan();
+        // Update the fileplan
+        updateFilePlan();
         // There should be no new audit entries
         List<RecordsManagementAuditEntry> result2 = queryAll();
         assertNotNull(result2);
@@ -259,7 +259,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         
         // repeat with a start
         rmAuditService.start();
-        createFilePlan();
+        updateFilePlan();
         
         List<RecordsManagementAuditEntry> result3 = queryAll();
         assertNotNull(result3);
