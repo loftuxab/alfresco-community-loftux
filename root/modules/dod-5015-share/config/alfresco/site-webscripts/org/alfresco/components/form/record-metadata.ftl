@@ -153,6 +153,9 @@
             <div class="set-panel-heading">${msg("label.set.disposition")}</div>
             <div class="set-panel-body">
                <@formLib.renderField field=form.fields["prop_rmDispositionInstructions"] />
+               <#if form.fields["prop_rma_recordSearchDispositionActionAsOf"]??>
+                  <@formLib.renderField field=form.fields["prop_rma_recordSearchDispositionActionAsOf"] />
+               </#if>
                <#if form.fields["prop_rma_cutOffDate"]??>
                   <@formLib.renderField field=form.fields["prop_rma_cutOffDate"] />
                </#if>

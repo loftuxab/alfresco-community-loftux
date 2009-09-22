@@ -229,7 +229,6 @@
                <hide id="rma:nextDispositionAction" />
                <hide id="rma:dispositionActionHistory" />
                <hide id="rma:recordSearchDispositionActionName" />
-               <hide id="rma:recordSearchDispositionActionAsOf" />
                <hide id="rma:recordSearchDispositionEventsEligible" />
                <hide id="rma:recordSearchDispositionEvents" />
                <hide id="rma:recordSearchHasDispositionSchedule" />
@@ -237,6 +236,7 @@
                <hide id="rma:recordSearchDispositionPeriodExpression" />
                <hide id="rma:recordSearchVitalRecordReviewPeriod" />
                <hide id="rma:recordSearchVitalRecordReviewPeriodExpression" />
+               <hide id="rma:recordSearchDispositionActionAsOf" for-mode="edit" />
             </field-visibility>
             <appearance>
                <set id="rm" />
@@ -257,6 +257,7 @@
                   </constraint-handlers>
                </field>
                <field id="rma:location" set="rm" />
+               <field id="rma:recordSearchDispositionActionAsOf" set="rm" label-id="label.dispositionAsOfDate" />
             </appearance>
          </form>
       </forms>
@@ -285,6 +286,7 @@
                <field id="rmDeclared" label-id="label.declared" />
                <field id="rmRecordType" label-id="label.recordType" />
                <field id="rmDispositionInstructions" label-id="label.dispositionInstructions" />
+               <field id="rma:recordSearchDispositionActionAsOf" label-id="label.dispositionAsOfDate" />
                <field id="cm:title" mandatory="true">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
@@ -332,6 +334,7 @@
                <field id="rmDeclared" label-id="label.declared" />
                <field id="rmRecordType" label-id="label.recordType" />
                <field id="rmDispositionInstructions" label-id="label.dispositionInstructions" />
+               <field id="rma:recordSearchDispositionActionAsOf" label-id="label.dispositionAsOfDate" />
                <field id="cm:title" mandatory="true">
                   <control template="/org/alfresco/components/form/controls/textfield.ftl" />
                </field>
