@@ -75,6 +75,7 @@ import org.alfresco.util.ParameterCheck;
 import org.alfresco.util.PropertyCheck;
 import org.alfresco.util.PropertyMap;
 import org.alfresco.util.TempFileProvider;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -975,30 +976,32 @@ public class RecordsManagementAuditServiceImpl
             writer.write("<span class=\"value\">");
             // if there's no filtered date use the date the log was started
             Date from = params.getDateFrom();
-            writer.write(from == null ? this.getDateLastStarted().toString() : from.toString());
+            writer.write(from == null ? StringEscapeUtils.escapeHtml(this.getDateLastStarted().toString()) : 
+                StringEscapeUtils.escapeHtml(from.toString()));
             writer.write("</span>");
             
             writer.write("<span class=\"label\">To:</span>");
             writer.write("<span class=\"value\">");
             // if there's no filtered date use the date the log was stopped
             Date to = params.getDateTo();
-            writer.write(to == null ? this.getDateLastStopped().toString() : to.toString());
+            writer.write(to == null ? StringEscapeUtils.escapeHtml(this.getDateLastStopped().toString()) : 
+                StringEscapeUtils.escapeHtml(to.toString()));
             writer.write("</span>");
             
             writer.write("<span class=\"label\">Property:</span>");
             writer.write("<span class=\"value\">");
             QName prop = params.getProperty();
-            writer.write(prop == null ? "All" : getPropertyLabel(prop));
+            writer.write(prop == null ? "All" : StringEscapeUtils.escapeHtml(getPropertyLabel(prop)));
             writer.write("</span>");
             
             writer.write("<span class=\"label\">User:</span>");
             writer.write("<span class=\"value\">");
-            writer.write(params.getUser() == null ? "All" : params.getUser());
+            writer.write(params.getUser() == null ? "All" : StringEscapeUtils.escapeHtml(params.getUser()));
             writer.write("</span>");
             
             writer.write("<span class=\"label\">Event:</span>");
             writer.write("<span class=\"value\">");
-            writer.write(params.getEvent() == null ? "All" : getAuditEventLabel(params.getEvent()));
+            writer.write(params.getEvent() == null ? "All" : StringEscapeUtils.escapeHtml(getAuditEventLabel(params.getEvent())));
             writer.write("</span>\n");
             
             writer.write("</div>\n");
@@ -1039,24 +1042,26 @@ public class RecordsManagementAuditServiceImpl
             writer.write("<div class=\"audit-entry-header\">");
             writer.write("<span class=\"label\">Timestamp:</span>");
             writer.write("<span class=\"value\">");
-            writer.write(entry.getTimestamp().toString());
+            writer.write(StringEscapeUtils.escapeHtml(entry.getTimestamp().toString()));
             writer.write("</span>");
             writer.write("<span class=\"label\">User:</span>");
             writer.write("<span class=\"value\">");
-            writer.write(entry.getFullName() != null ? entry.getFullName() : entry.getUserName());
+            writer.write(entry.getFullName() != null ? 
+                            StringEscapeUtils.escapeHtml(entry.getFullName()) : 
+                            StringEscapeUtils.escapeHtml(entry.getUserName()));
             writer.write("</span>");
             if (entry.getUserRole() != null && entry.getUserRole().length() > 0)
             {
                 writer.write("<span class=\"label\">Role:</span>");
                 writer.write("<span class=\"value\">");
-                writer.write(entry.getUserRole());
+                writer.write(StringEscapeUtils.escapeHtml(entry.getUserRole()));
                 writer.write("</span>");
             }
             if (entry.getEvent() != null && entry.getEvent().length() > 0)
             {
                 writer.write("<span class=\"label\">Event:</span>");
                 writer.write("<span class=\"value\">");
-                writer.write(getAuditEventLabel(entry.getEvent()));
+                writer.write(StringEscapeUtils.escapeHtml(getAuditEventLabel(entry.getEvent())));
                 writer.write("</span>\n");
             }
             writer.write("</div>\n");
@@ -1065,14 +1070,14 @@ public class RecordsManagementAuditServiceImpl
             {
                 writer.write("<span class=\"label\">Identifier:</span>");
                 writer.write("<span class=\"value\">");
-                writer.write(entry.getIdentifier());
+                writer.write(StringEscapeUtils.escapeHtml(entry.getIdentifier()));
                 writer.write("</span>");
             }
             if (entry.getNodeType() != null && entry.getNodeType().length() > 0)
             {
                 writer.write("<span class=\"label\">Type:</span>");
                 writer.write("<span class=\"value\">");
-                writer.write(entry.getNodeType());
+                writer.write(StringEscapeUtils.escapeHtml(entry.getNodeType()));
                 writer.write("</span>");
             }
             if (entry.getPath() != null && entry.getPath().length() > 0)
@@ -1088,7 +1093,7 @@ public class RecordsManagementAuditServiceImpl
                 
                 writer.write("<span class=\"label\">Location:</span>");
                 writer.write("<span class=\"value\">");
-                writer.write(displayPath);
+                writer.write(StringEscapeUtils.escapeHtml(displayPath));
                 writer.write("</span>");
             }
             writer.write("</div>\n");
@@ -1106,10 +1111,10 @@ public class RecordsManagementAuditServiceImpl
                     writer.write(getPropertyLabel(valueName));
                     writer.write("</td><td>");
                     Serializable oldValue = values.getFirst(); 
-                    writer.write(oldValue == null ? "&lt;none&gt;" : oldValue.toString());
+                    writer.write(oldValue == null ? "&lt;none&gt;" : StringEscapeUtils.escapeHtml(oldValue.toString()));
                     writer.write("</td><td>");
                     Serializable newValue = values.getSecond();
-                    writer.write(newValue == null ? "&lt;none&gt;" : newValue.toString());
+                    writer.write(newValue == null ? "&lt;none&gt;" : StringEscapeUtils.escapeHtml(newValue.toString()));
                     writer.write("</td></tr>");
                 }
                 

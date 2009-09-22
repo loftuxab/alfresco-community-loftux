@@ -55,6 +55,7 @@ import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.WebScriptResponse;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -257,13 +258,14 @@ public class TransferReportPost extends BaseTransferWebScript
             writer.write("<table cellpadding=\"3\" cellspacing=\"3\">");
             writer.write("<tr><td class=\"label\">Transfer Date:</td><td>");
             Date transferDate = (Date)this.nodeService.getProperty(transferNode, ContentModel.PROP_CREATED);
-            writer.write(transferDate.toString());
+            writer.write(StringEscapeUtils.escapeHtml(transferDate.toString()));
             writer.write("</td></tr>");
             writer.write("<tr><td class=\"label\">Performed By:</td><td>");
-            writer.write((String)this.nodeService.getProperty(transferNode, ContentModel.PROP_CREATOR));
+            writer.write(StringEscapeUtils.escapeHtml((String)this.nodeService.getProperty(transferNode, 
+                        ContentModel.PROP_CREATOR)));
             writer.write("</td></tr>");
             writer.write("<tr><td class=\"label\">Disposition Authority:</td><td>");
-            writer.write(dispositionAuthority != null ? dispositionAuthority : "");
+            writer.write(dispositionAuthority != null ? StringEscapeUtils.escapeHtml(dispositionAuthority) : "");
             writer.write("</td></tr></table>\n");
             
             writer.write("<h2>Transferred Items</h2>\n");
@@ -321,9 +323,11 @@ public class TransferReportPost extends BaseTransferWebScript
         throws IOException
     {
         writer.write("<span class=\"nodeName\">");
-        writer.write((String)this.nodeService.getProperty(folderNode, ContentModel.PROP_NAME));
+        writer.write(StringEscapeUtils.escapeHtml((String)this.nodeService.getProperty(folderNode, 
+                    ContentModel.PROP_NAME)));
         writer.write("</span>&nbsp;(Unique Folder Identifier:&nbsp;");
-        writer.write((String)this.nodeService.getProperty(folderNode, RecordsManagementModel.PROP_IDENTIFIER));
+        writer.write(StringEscapeUtils.escapeHtml((String)this.nodeService.getProperty(folderNode, 
+                    RecordsManagementModel.PROP_IDENTIFIER)));
         writer.write(")\n");
         
         writer.write("<div class=\"records\">\n");
@@ -357,18 +361,21 @@ public class TransferReportPost extends BaseTransferWebScript
     {
         writer.write("<div class=\"record\">\n");
         writer.write("  <span class=\"nodeName\">");
-        writer.write((String)this.nodeService.getProperty(recordNode, ContentModel.PROP_NAME));
+        writer.write(StringEscapeUtils.escapeHtml((String)this.nodeService.getProperty(recordNode, 
+                    ContentModel.PROP_NAME)));
         writer.write("</span>&nbsp;(Unique Record Identifier:&nbsp;");
-        writer.write((String)this.nodeService.getProperty(recordNode, RecordsManagementModel.PROP_IDENTIFIER));
+        writer.write(StringEscapeUtils.escapeHtml((String)this.nodeService.getProperty(recordNode, 
+                    RecordsManagementModel.PROP_IDENTIFIER)));
         writer.write(")");
         
         if (this.nodeService.hasAspect(recordNode, RecordsManagementModel.ASPECT_DECLARED_RECORD))
         {
             Date declaredOn = (Date)this.nodeService.getProperty(recordNode, RecordsManagementModel.PROP_DECLARED_AT);
             writer.write(" declared by ");
-            writer.write((String)this.nodeService.getProperty(recordNode, RecordsManagementModel.PROP_DECLARED_BY));
+            writer.write(StringEscapeUtils.escapeHtml((String)this.nodeService.getProperty(recordNode, 
+                        RecordsManagementModel.PROP_DECLARED_BY)));
             writer.write(" on ");
-            writer.write(declaredOn.toString());
+            writer.write(StringEscapeUtils.escapeHtml(declaredOn.toString()));
         }
         
         writer.write("\n</div>\n");
