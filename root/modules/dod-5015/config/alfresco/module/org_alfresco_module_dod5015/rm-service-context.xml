@@ -403,7 +403,6 @@
         <property name="auditComponent" ref="auditComponent" />
         <property name="auditService" ref="auditService" />
         <property name="contentService" ref="ContentService" />
-        <property name="namespaceService" ref="NamespaceService" />
         <property name="recordsManagementService" ref="RecordsManagementService" />
         <property name="recordsManagementActionService" ref="RecordsManagementActionService" />
     </bean>

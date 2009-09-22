@@ -1227,15 +1227,17 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertTrue(item.has("label"));
         assertTrue(item.has("value"));
 
-        // get the full RM audit log 
+        // get the full RM audit log and check response
         rsp = sendRequest(new GetRequest(RMA_AUDITLOG_URL), 200);
-        // check response
         assertEquals("application/json", rsp.getContentType());
         JSONObject jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
-        // export the full RM audit log 
+        // get the full RM audit log as an HTML report and check response
+        rsp = sendRequest(new GetRequest(RMA_AUDITLOG_URL + "?format=html"), 200);
+        assertEquals("text/html", rsp.getContentType());
+        
+        // export the full RM audit log and check response
         rsp = sendRequest(new GetRequest(RMA_AUDITLOG_URL + "?export=true"), 200);
-        // check response
         assertEquals("application/json", rsp.getContentType());
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         
@@ -1273,7 +1275,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new PutRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 200);
         
         // check the response
-        System.out.println(rsp.getContentAsString());
+        //System.out.println(rsp.getContentAsString());
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         JSONObject dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
@@ -1288,7 +1290,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new PutRequest(RMA_AUDITLOG_URL, jsonPostString, APPLICATION_JSON), 200);
         
         // check the response
-        System.out.println(rsp.getContentAsString());
+        //System.out.println(rsp.getContentAsString());
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);
@@ -1296,7 +1298,7 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         
         // clear the RM audit log
         rsp = sendRequest(new DeleteRequest(RMA_AUDITLOG_URL), 200);
-        System.out.println(rsp.getContentAsString());
+        //System.out.println(rsp.getContentAsString());
         jsonRsp = new JSONObject(new JSONTokener(rsp.getContentAsString()));
         dataObj = (JSONObject)jsonRsp.get("data");
         assertNotNull("JSON 'data' object was null", dataObj);

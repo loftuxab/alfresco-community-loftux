@@ -26,17 +26,14 @@ package org.alfresco.module.org_alfresco_module_dod5015.audit;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.ISO8601DateFormat;
+import org.alfresco.util.Pair;
 import org.alfresco.util.ParameterCheck;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Class to represent a Records Management audit entry.
@@ -57,28 +54,21 @@ public final class RecordsManagementAuditEntry
     private final String path;
     private final Map<QName, Serializable> beforeProperties;
     private final Map<QName, Serializable> afterProperties;
+    private Map<QName, Pair<Serializable, Serializable>> changedProperties;
     
-    private final DictionaryService dictionaryService;
-    private final NamespaceService namespaceService;
- 
     /**
      * Default constructor
      */
-    public RecordsManagementAuditEntry(DictionaryService dictionaryService,
-                NamespaceService namespaceService, Date timestamp, 
+    public RecordsManagementAuditEntry(Date timestamp, 
                 String userName, String fullName, String userRole, 
                 NodeRef nodeRef, String nodeName, String nodeType, 
                 String event, String identifier, String path,
                 Map<QName, Serializable> beforeProperties,
                 Map<QName, Serializable> afterProperties)
     {
-        ParameterCheck.mandatory("dictionaryService", dictionaryService);
-        ParameterCheck.mandatory("namespaceService", namespaceService);
         ParameterCheck.mandatory("timestamp", timestamp);
         ParameterCheck.mandatory("userName", userName);
         
-        this.dictionaryService = dictionaryService;
-        this.namespaceService = namespaceService;
         this.timestamp = timestamp;
         this.userName = userName;
         this.userRole = userRole;
@@ -109,176 +99,11 @@ public final class RecordsManagementAuditEntry
           .append(", path=").append(path)
           .append(", beforeProperties=").append(beforeProperties)
           .append(", afterProperties=").append(afterProperties)
+          .append(", changedProperties=").append(changedProperties)
           .append(")");
         return sb.toString();
     }
     
-    /**
-     * 
-     * @return The state of this audit entry as a JSON string
-     */
-    public String toJSONString()
-    {
-        try
-        {
-            JSONObject entry = new JSONObject();
-            
-            entry.put("timestamp", getTimestampString());
-            entry.put("userName", this.userName);
-            entry.put("userRole", this.userRole == null ? "": this.userRole);
-            entry.put("fullName", this.fullName == null ? "": this.fullName);
-            entry.put("nodeRef", this.nodeRef == null ? "": this.nodeRef);
-            entry.put("nodeName", this.nodeName == null ? "": this.nodeName);
-            entry.put("nodeType", this.nodeType == null ? "": this.nodeType);
-            entry.put("event", this.event == null ? "": this.event);
-            entry.put("identifier", this.identifier == null ? "": this.identifier);
-            entry.put("path", this.path == null ? "": this.path);
-        
-            JSONArray changedValues = new JSONArray();
-            
-            if (this.beforeProperties != null && this.afterProperties != null)
-            {
-                // create an entry for each property that existed before
-                for (QName valueName : this.beforeProperties.keySet())
-                {
-                    JSONObject changedValue = new JSONObject();
-                    changedValue.put("name", RecordsManagementAuditServiceImpl.getPropertyLabel(
-                                valueName, this.dictionaryService, namespaceService));
-                    changedValue.put("previous", this.beforeProperties.get(valueName));
-                    
-                    Serializable newValue = this.afterProperties.get(valueName);
-                    changedValue.put("new", newValue == null ? "" : newValue.toString());
-                    
-                    changedValues.put(changedValue);
-                }
-                
-                // create an entry for each property that exists after but has
-                // not already been added
-                for (QName valueName : this.afterProperties.keySet())
-                {
-                    if (!this.beforeProperties.containsKey(valueName))
-                    {
-                        JSONObject changedValue = new JSONObject();
-                        changedValue.put("name", RecordsManagementAuditServiceImpl.getPropertyLabel(
-                                    valueName, this.dictionaryService, namespaceService));
-                        changedValue.put("previous", "");
-                        
-                        Serializable newValue = this.afterProperties.get(valueName);
-                        changedValue.put("new", newValue == null ? "" : newValue.toString());
-                        
-                        changedValues.put(changedValue);
-                    }
-                }
-            }
-            
-            entry.put("changedValues", changedValues);
-            
-            return entry.toString();
-        }
-        catch (JSONException je)
-        {
-            return "{}";
-        }
-    }
-    
-    /**
-     * 
-     * @return The state of this audit entry as an HTML string
-     */
-    public String toHTML()
-    {
-        StringBuilder html = new StringBuilder();
-        
-        html.append("<div class=\"audit-entry\">\n");
-        html.append("<div class=\"audit-entry-header\">");
-        html.append("<span class=\"label\">Timestamp:</span>");
-        html.append("<span class=\"value\">").append(getTimestamp().toString()).append("</span>");
-        html.append("<span class=\"label\">User:</span>");
-        html.append("<span class=\"value\">");
-        html.append(this.fullName != null ? this.fullName : this.userName);
-        html.append("</span>");
-        if (this.userRole != null && this.userRole.length() > 0)
-        {
-            html.append("<span class=\"label\">Role:</span>");
-            html.append("<span class=\"value\">").append(this.userRole).append("</span>");
-        }
-        if (this.event != null && this.event.length() > 0)
-        {
-            // TODO: Lookup the event display name to return rather than the event key
-            html.append("<span class=\"label\">Event:</span>");
-            html.append("<span class=\"value\">").append(this.event).append("</span>\n");
-        }
-        html.append("</div>\n");
-        html.append("<div class=\"audit-entry-node\">");
-        if (this.identifier != null && this.identifier.length() > 0)
-        {
-            html.append("<span class=\"label\">Identifier:</span>");
-            html.append("<span class=\"value\">").append(this.identifier).append("</span>");
-        }
-        if (this.nodeType != null && this.nodeType.length() > 0)
-        {
-            html.append("<span class=\"label\">Type:</span>");
-            html.append("<span class=\"value\">").append(this.nodeType).append("</span>");
-        }
-        if (this.path != null && this.path.length() > 0)
-        {
-            // we need to strip off the first part of the path
-            String displayPath = path;
-            int idx = this.path.indexOf("/", 1);
-            if (idx != -1)
-            {
-                displayPath = "/File Plan" + path.substring(idx);
-            }
-            
-            html.append("<span class=\"label\">Location:</span>");
-            html.append("<span class=\"value\">").append(displayPath).append("</span>");
-        }
-        html.append("</div>\n");
-        
-        if (this.beforeProperties != null && this.afterProperties != null)
-        {
-            html.append("<table class=\"changed-values-table\" cellspacing=\"0\">");
-            html.append("<tr><th>Property</th><th>Previous Value</th><th>New Value</th></tr>");
-            
-            // create an entry for each property that existed before
-            for (QName valueName : this.beforeProperties.keySet())
-            {
-                html.append("<tr><td>");
-                html.append(RecordsManagementAuditServiceImpl.getPropertyLabel(
-                            valueName, this.dictionaryService, namespaceService));
-                html.append("</td><td>");
-                Serializable oldValue = this.beforeProperties.get(valueName); 
-                html.append(oldValue == null ? "&lt;none&gt;" : oldValue.toString());
-                html.append("</td><td>");
-                Serializable newValue = this.afterProperties.get(valueName);
-                html.append(newValue == null ? "&lt;none&gt;" : newValue.toString());
-                html.append("</td></tr>");
-            }
-            
-            // create an entry for each property that exists after but has
-            // not already been added
-            for (QName valueName : this.afterProperties.keySet())
-            {
-                if (!this.beforeProperties.containsKey(valueName))
-                {
-                    html.append("<tr><td>");
-                    html.append(RecordsManagementAuditServiceImpl.getPropertyLabel(
-                                valueName, this.dictionaryService, namespaceService));
-                    html.append("</td><td>&lt;none&gt;</td><td>");
-                    Serializable newValue = this.afterProperties.get(valueName);
-                    html.append(newValue == null ? "&lt;none&gt;" : newValue.toString());
-                    html.append("</td></tr>");
-                }
-            }
-            
-            html.append("</table>\n");
-        }
-        
-        html.append("</div>");
-        
-        return html.toString();
-    }
-
     /**
      * 
      * @return The date of the audit entry
@@ -381,7 +206,7 @@ public final class RecordsManagementAuditEntry
     {
         return this.path;
     }
-
+    
     /**
      * 
      * @return Map of properties before the audited action
@@ -398,5 +223,52 @@ public final class RecordsManagementAuditEntry
     public Map<QName, Serializable> getAfterProperties()
     {
         return this.beforeProperties;
+    }
+
+    /**
+     * 
+     * @return Map of changed properties
+     */
+    public Map<QName, Pair<Serializable, Serializable>> getChangedProperties()
+    {
+        if (this.changedProperties == null)
+        {
+            initChangedProperties();
+        }
+        
+        return this.changedProperties;
+    }
+    
+    /**
+     * Initialises the map of changed values given the before and after properties
+     */
+    private void initChangedProperties()
+    {
+        if (this.beforeProperties != null && this.afterProperties != null)
+        {
+            this.changedProperties = new HashMap<QName, Pair<Serializable, Serializable>>(
+                        this.beforeProperties.size() + this.afterProperties.size());
+            
+            // add all the properties present before the audited action
+            for (QName valuePropName : this.beforeProperties.keySet())
+            {
+                Pair<Serializable, Serializable> values = new Pair<Serializable, Serializable>(
+                            this.beforeProperties.get(valuePropName),
+                            this.afterProperties.get(valuePropName));
+                this.changedProperties.put(valuePropName, values);
+            }
+            
+            // add all the properties present after the audited action that
+            // have not already been added
+            for (QName valuePropName : this.afterProperties.keySet())
+            {
+                if (!this.beforeProperties.containsKey(valuePropName))
+                {
+                    Pair<Serializable, Serializable> values = new Pair<Serializable, Serializable>(null,
+                                this.afterProperties.get(valuePropName));
+                    this.changedProperties.put(valuePropName, values);
+                }
+            }
+        }
     }
 }
