@@ -48,9 +48,12 @@ public class UpdateTriggerDatesCapability extends AbstractCapability
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.UPDATE_TRIGGER_DATES) == AccessStatus.ALLOWED)
+            if (!isFrozen(nodeRef))
             {
-                return AccessDecisionVoter.ACCESS_GRANTED;
+                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.UPDATE_TRIGGER_DATES) == AccessStatus.ALLOWED)
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
             }
             return AccessDecisionVoter.ACCESS_DENIED;
         }

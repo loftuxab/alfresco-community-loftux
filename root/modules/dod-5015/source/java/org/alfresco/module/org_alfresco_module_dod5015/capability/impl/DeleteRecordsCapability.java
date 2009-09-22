@@ -48,11 +48,14 @@ public class DeleteRecordsCapability extends AbstractCapability
     {
         if (isRm(nodeRef))
         {
-            if (isRecord(nodeRef))
+            if (!isFrozen(nodeRef))
             {
-                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DELETE_RECORDS) == AccessStatus.ALLOWED)
+                if (isRecord(nodeRef))
                 {
-                    return AccessDecisionVoter.ACCESS_GRANTED;
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DELETE_RECORDS) == AccessStatus.ALLOWED)
+                    {
+                        return AccessDecisionVoter.ACCESS_GRANTED;
+                    }
                 }
             }
             return AccessDecisionVoter.ACCESS_DENIED;

@@ -48,9 +48,12 @@ public class UpdateVitalRecordCycleInformationCapability extends AbstractCapabil
     {
         if (isRm(nodeRef))
         {
-            if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION) == AccessStatus.ALLOWED)
+            if (!isFrozen(nodeRef))
             {
-                return AccessDecisionVoter.ACCESS_GRANTED;
+                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.UPDATE_VITAL_RECORD_CYCLE_INFORMATION) == AccessStatus.ALLOWED)
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
             }
             return AccessDecisionVoter.ACCESS_DENIED;
         }
