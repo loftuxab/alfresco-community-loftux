@@ -111,12 +111,10 @@
          });
 
          // Report button
-
          this.widgets.reportButton = Alfresco.util.createYUIButton(this, "report-button", this.onPrintReport,
          {
             disabled: true
          });
-         
 
          // Export All button: only "read" access required
          this.widgets.exportAllButton = Alfresco.util.createYUIButton(this, "exportAll-button", this.onExportAll);
@@ -206,7 +204,6 @@
          this.widgets.holdsFolderUp.set("disabled", !holdsFolderEnabled);
       },
 
-
       /**
        * User RMRoles event handler
        *
@@ -217,16 +214,38 @@
       onUserRMRoles: function DLTB_onUserRMRoles(layer, args)
       {
          var obj = args[1];
-         if (obj && obj.roles)
+         if (obj && obj.roles && obj.roles.Administrator)
          {
-            if(obj.roles.Administrator)
+            // Let RM Administrators do imports
+            Dom.removeClass(this.id + "-import-section", "toolbar-hidden");
+            this.widgets.importButton.set("disabled", false);
+         }
+      },
+
+      /**
+       * Document List Metadata event handler
+       * NOTE: This is a temporary fix to enable access to the View Details action from the breadcrumb.
+       *       A more complete solution is to present the full list of parent folder actions.
+       *
+       * @method onDoclistMetadata
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDoclistMetadata: function DLTB_onDoclistMetadata(layer, args)
+      {
+         var obj = args[1];
+         if (obj && obj.metadata)
+         {
+            var crumb = Dom.get(this.lastCrumbId);
+            if (crumb)
             {
-               // Let RM Administrators do imports
-               Dom.removeClass(this.id + "-import-section", "toolbar-hidden");
-               this.widgets.importButton.set("disabled", false);
+               var p = obj.metadata.parent,
+                  folderDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/" + p.type + "-details?nodeRef=" + p.nodeRef;
+               crumb.innerHTML = '<a href="' + folderDetailsUrl + '">' + crumb.innerHTML + '</a>';
             }
          }
       },
+
 
       /**
        * YUI WIDGET EVENT HANDLERS
@@ -268,7 +287,7 @@
        */
       onNewContainer: function DLTB_onNewContainer(e, p_obj)
       {
-         var destination = this.modules.docList.doclistMetadata.parent,
+         var destination = this.modules.docList.doclistMetadata.parent.nodeRef,
             folderType = p_obj.get("name"),
             label = "label.new-" + p_obj.get("name").replace(":", "_"),
             msgTitle = this.msg(label + ".title"),
@@ -390,7 +409,7 @@
          }
          
          // Show uploader for multiple files
-         var multiUploadConfig =
+         this.fileUpload.show(
          {
             siteId: this.options.siteId,
             containerId: this.options.containerId,
@@ -403,8 +422,7 @@
                fn: this.onFileUploadComplete,
                scope: this
             }
-         };
-         this.fileUpload.show(multiUploadConfig);
+         });
       },
 
       /**
@@ -414,7 +432,7 @@
        */
       onNonElectronicDocument: function DLTB_onNonElectronicDocument()
       {
-         var destination = this.modules.docList.doclistMetadata.parent,
+         var destination = this.modules.docList.doclistMetadata.parent.nodeRef,
             label = "label.new-rma_nonElectronicDocument",
             msgTitle = this.msg(label + ".title"),
             msgHeader = this.msg(label + ".header");
@@ -493,21 +511,18 @@
             this.fileUpload = Alfresco.getRecordsFileUploadInstance();
          }
 
-         // Show uploader for multiple files
-         var singleImportConfig =
+         // Show uploader for single import file
+         this.fileUpload.show(
          {
             mode: this.fileUpload.MODE_SINGLE_IMPORT,
-            importDestination: this.modules.docList.doclistMetadata.parent,
+            importDestination: this.modules.docList.doclistMetadata.parent.nodeRef,
             filter: [
-               {
-                  description: this.msg("import.filetype.description"),
-                  extensions: "*.acp"
-               }
-            ]
-         };
-         this.fileUpload.show(singleImportConfig);
+            {
+               description: this.msg("import.filetype.description"),
+               extensions: "*.acp"
+            }]
+         });
       },
-
 
       /**
        * Print Report button click handler
@@ -518,9 +533,8 @@
        */
       onPrintReport: function DLTB_onPrintReport(e, p_obj)
       {
-         var parentNodeRef = this.modules.docList.doclistMetadata.parent;
-         var url = Alfresco.constants.URL_PAGECONTEXT + 'fileplanreport?nodeRef=' + parentNodeRef;
-         window.open(url, 'fileplanreport','width=550,height=650,scrollbars=yes,resizable=yes,toolbar=no,menubar=no');
+         var url = Alfresco.constants.URL_PAGECONTEXT + 'fileplanreport?nodeRef=' + this.modules.docList.doclistMetadata.parent.nodeRef;
+         window.open(url, 'fileplanreport', 'width=550,height=650,scrollbars=yes,resizable=yes,toolbar=no,menubar=no');
       },
 
       /**
@@ -548,13 +562,12 @@
                   if (serverResponse.json && serverResponse.json.items)
                   {
                      // Display the export dialog and do the export
-                     var items = serverResponse.json.items;
-                     this.onActionExport(items);
+                     this.onActionExport(serverResponse.json.items);
                   }
                },
                scope: this
             },
-            failureMessage: this.msg("message.load-tolevel-passets.failure")
+            failureMessage: this.msg("message.load-top-level-assets.failure")
          });
       },
 

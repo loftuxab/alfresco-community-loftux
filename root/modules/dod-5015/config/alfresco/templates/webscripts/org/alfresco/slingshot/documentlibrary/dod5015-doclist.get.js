@@ -124,10 +124,13 @@ function main()
       file: null
    };
    
+   // Evaluate parent container
+   var parent = Evaluator.run(parsedArgs.parentNode);
+   
    // User permissions and role
    var user =
    {
-      permissions: Evaluator.run(parsedArgs.parentNode).permissions
+      permissions: parent.permissions
    };
    if (defaultLocation.site !== null)
    {
@@ -214,6 +217,12 @@ function main()
       });
    }
 
+   var parentMeta = filterParams.variablePath ? null :
+   {
+      nodeRef: String(parsedArgs.parentNode.nodeRef),
+      type: parent.assetType
+   };
+
    return (
    {
       luceneQuery: query,
@@ -231,7 +240,7 @@ function main()
       user: user,
       items: items,
       filePlan: parsedArgs.location.containerNode,
-      parent: filterParams.variablePath ? null : parsedArgs.parentNode
+      parent: parentMeta
    });
 }
 
