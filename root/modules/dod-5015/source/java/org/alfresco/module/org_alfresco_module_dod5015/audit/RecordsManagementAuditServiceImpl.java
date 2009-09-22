@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +77,9 @@ import org.alfresco.util.PropertyMap;
 import org.alfresco.util.TempFileProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.context.ApplicationEvent;
 
 /**
@@ -110,12 +112,12 @@ public class RecordsManagementAuditServiceImpl
     private ContentService contentService;
     private AuditComponent auditComponent;
     private AuditService auditService;
-    private NamespaceService namespaceService;
     private RecordsManagementService rmService;
     private RecordsManagementActionService rmActionService;
     
     private boolean shutdown = false;
     private RMAuditTxnListener txnListener;
+    private Map<String, AuditEvent> auditEvents;
     
     public RecordsManagementAuditServiceImpl()
     {
@@ -178,14 +180,6 @@ public class RecordsManagementAuditServiceImpl
     }
     
     /**
-     * Sets the NamespaceService instance
-     */
-    public void setNamespaceService(NamespaceService namespaceService)
-    {
-        this.namespaceService = namespaceService;
-    }
-    
-    /**
      * Set the  RecordsManagementService
      */
     public void setRecordsManagementService(RecordsManagementService rmService)
@@ -214,6 +208,80 @@ public class RecordsManagementAuditServiceImpl
         PropertyCheck.mandatory(this, "auditService", auditService);
         PropertyCheck.mandatory(this, "rmService", rmService);
         PropertyCheck.mandatory(this, "rmActionService", rmActionService);
+        PropertyCheck.mandatory(this, "dictionaryService", dictionaryService);
+        
+        // setup the audit events map
+        initAuditEvents();
+    }
+    
+    protected void initAuditEvents()
+    {
+        // TODO: make this map configurable and localisable.
+        this.auditEvents = new HashMap<String, AuditEvent>(32);
+        
+        this.auditEvents.put(RM_AUDIT_EVENT_UPDATE_RM_OBJECT, 
+                    new AuditEvent(RM_AUDIT_EVENT_UPDATE_RM_OBJECT, "Updated Metadata"));
+        this.auditEvents.put(RM_AUDIT_EVENT_CREATE_RM_OBJECT,
+                    new AuditEvent(RM_AUDIT_EVENT_CREATE_RM_OBJECT, "Created Object"));
+        this.auditEvents.put(RM_AUDIT_EVENT_DELETE_RM_OBJECT, 
+                    new AuditEvent(RM_AUDIT_EVENT_DELETE_RM_OBJECT, "Delete Object"));
+        this.auditEvents.put("Login", new AuditEvent("Login", "Login"));
+        this.auditEvents.put("Logout", new AuditEvent("Logout", "Logout"));
+        
+        this.auditEvents.put("file", 
+                    new AuditEvent("file", "Filed Record"));
+        this.auditEvents.put("reviewed", 
+                    new AuditEvent("reviewed", "Reviewed"));
+        this.auditEvents.put("cutoff", 
+                    new AuditEvent("cutoff", "Cut Off"));
+        this.auditEvents.put("unCutoff", 
+                    new AuditEvent("unCutoff", "Reversed Cut Off"));
+        this.auditEvents.put("destroy", 
+                    new AuditEvent("destroy", "Destroyed Item"));
+        this.auditEvents.put("openRecordFolder", 
+                    new AuditEvent("openRecordFolder", "Opened Record Folder"));
+        this.auditEvents.put("closeRecordFolder", 
+                    new AuditEvent("closeRecordFolder", "Closed Record Folder"));
+        this.auditEvents.put("setupRecordFolder", 
+                    new AuditEvent("setupRecordFolder", "Setup Recorder Folder"));
+        this.auditEvents.put("declareRecord", 
+                    new AuditEvent("declareRecord", "Declared Record"));
+        this.auditEvents.put("undeclareRecord", 
+                    new AuditEvent("undeclareRecord", "Undeclared Record"));
+        this.auditEvents.put("freeze", 
+                    new AuditEvent("freeze", "Froze Item"));
+        this.auditEvents.put("relinquishHold", 
+                    new AuditEvent("relinquishHold", "Relinquished Hold"));
+        this.auditEvents.put("editHoldReason", 
+                    new AuditEvent("editHoldReason", "Updated Hold Reason"));
+        this.auditEvents.put("editReviewAsOfDate", 
+                    new AuditEvent("editReviewAsOfDate", "Updated Review As Of Date"));
+        this.auditEvents.put("editDispositionActionAsOfDate", 
+                    new AuditEvent("editDispositionActionAsOfDate", "Updated Disposition As Of Date"));
+        this.auditEvents.put("broadcastVitalRecordDefinition", 
+                    new AuditEvent("broadcastVitalRecordDefinition", "Updated Vital Record Definition"));
+        this.auditEvents.put("broadcastDispositionActionDefinitionUpdate", 
+                    new AuditEvent("broadcastDispositionActionDefinitionUpdate", "Updated Disposition Action Definition"));
+        this.auditEvents.put("completeEvent", 
+                    new AuditEvent("completeEvent", "Completed Event"));
+        this.auditEvents.put("undoEvent", 
+                    new AuditEvent("undoEvent", "Reversed Completed Event"));
+        this.auditEvents.put("transfer", 
+                    new AuditEvent("transfer", "Transferred Item"));
+        this.auditEvents.put("transferComplete", 
+                    new AuditEvent("transferComplete", "Completed Transfer"));
+        this.auditEvents.put("accession", 
+                    new AuditEvent("accession", "Accession"));
+        this.auditEvents.put("accessionComplete", 
+                    new AuditEvent("accessionComplete", "Completed Accession"));
+        this.auditEvents.put("applyScannedRecord", 
+                    new AuditEvent("applyScannedRecord", "Set Record As A Scanned Record"));
+        this.auditEvents.put("applyPdfRecord", 
+                    new AuditEvent("applyPdfRecord", "Set Record As PDF A Record"));
+        this.auditEvents.put("applyDigitalPhotographRecord", 
+                    new AuditEvent("applyDigitalPhotographRecord", "Set Record As A Digital Photographic Record"));
+        this.auditEvents.put("applyWebRecord", 
+                    new AuditEvent("applyWebRecord", "Set Record As A Web Record"));
     }
     
     @Override
@@ -687,8 +755,6 @@ public class RecordsManagementAuditServiceImpl
                 
                 // TODO: Refactor this to use the builder pattern
                 RecordsManagementAuditEntry entry = new RecordsManagementAuditEntry(
-                        dictionaryService, 
-                        namespaceService,
                         timestamp,
                         user,
                         fullName,
@@ -744,15 +810,12 @@ public class RecordsManagementAuditServiceImpl
                     }
                     
                     // write the entry to the file
-                    if (reportFormat == ReportFormat.HTML)
-                    {
-                        writer.write(entry.toHTML());
-                    }
-                    else
+                    if (reportFormat == ReportFormat.JSON)
                     {
                         writer.write("\n\t\t");
-                        writer.write(entry.toJSONString());
                     }
+                    
+                    writeAuditTrailEntry(writer, entry, reportFormat);
                 }
                 catch (IOException ioe)
                 {
@@ -865,49 +928,16 @@ public class RecordsManagementAuditServiceImpl
      */
     public List<AuditEvent> getAuditEvents()
     {
-        // TODO: make this list configurable and localisable.
-        
-        List<AuditEvent> events = new ArrayList<AuditEvent>(16);
-        events.add(new AuditEvent(RM_AUDIT_EVENT_UPDATE_RM_OBJECT, "Updated Metadata"));
-        events.add(new AuditEvent(RM_AUDIT_EVENT_CREATE_RM_OBJECT, "Created Object"));
-        events.add(new AuditEvent(RM_AUDIT_EVENT_DELETE_RM_OBJECT, "Delete Object"));
-        events.add(new AuditEvent("Login", "Login"));
-        events.add(new AuditEvent("Logout", "Logout"));
-        
-        events.add(new AuditEvent("file", "Filed Record"));
-        events.add(new AuditEvent("reviewed", "Reviewed"));
-        events.add(new AuditEvent("cutoff", "Cut Off"));
-        events.add(new AuditEvent("unCutoff", "Reversed Cut Off"));
-        events.add(new AuditEvent("destroy", "Destroyed Item"));
-        events.add(new AuditEvent("openRecordFolder", "Opened Record Folder"));
-        events.add(new AuditEvent("closeRecordFolder", "Closed Record Folder"));
-        events.add(new AuditEvent("setupRecordFolder", "Setup Recorder Folder"));
-        events.add(new AuditEvent("declareRecord", "Declare Record"));
-        events.add(new AuditEvent("freeze", "Froze Item"));
-        events.add(new AuditEvent("relinquishHold", "Relinquished Hold"));
-        events.add(new AuditEvent("editHoldReason", "Updated Hold Reason"));
-        events.add(new AuditEvent("editReviewAsOfDate", "Updated Review As Of Date"));
-        events.add(new AuditEvent("editDispositionActionAsOfDate", "Updated Disposition As Of Date"));
-        events.add(new AuditEvent("broadcastVitalRecordDefinition", "Updated Vital Record Definition"));
-        events.add(new AuditEvent("broadcastDispositionActionDefinitionUpdate", "Updated Disposition Action Definition"));
-        events.add(new AuditEvent("completeEvent", "Completed Event"));
-        events.add(new AuditEvent("undoEvent", "Reversed Completed Event"));
-        events.add(new AuditEvent("transfer", "Transferred Item"));
-        events.add(new AuditEvent("transferComplete", "Completed Transfer"));
-        events.add(new AuditEvent("accession", "Accession"));
-        events.add(new AuditEvent("accessionComplete", "Completed Accession"));
-        events.add(new AuditEvent("applyScannedRecord", "Set Record As A Scanned Record"));
-        events.add(new AuditEvent("applyPdfRecord", "Set Record As PDF A Record"));
-        events.add(new AuditEvent("applyDigitalPhotographRecord", "Set Record As A Digital Photographic Record"));
-        events.add(new AuditEvent("applyWebRecord", "Set Record As A Web Record"));
-        
-        return Collections.unmodifiableList(events);
+        List<AuditEvent> listAuditEvents = new ArrayList<AuditEvent>(this.auditEvents.size());
+        listAuditEvents.addAll(this.auditEvents.values());
+        return listAuditEvents;
     }
     
     /**
      * Writes the start of the audit trail stream to the given writer
      * 
      * @param writer The writer to write to
+     * @params params The parameters being used
      * @param reportFormat The format to write the header in
      * @throws IOException
      */
@@ -958,7 +988,7 @@ public class RecordsManagementAuditServiceImpl
             writer.write("<span class=\"label\">Property:</span>");
             writer.write("<span class=\"value\">");
             QName prop = params.getProperty();
-            writer.write(prop == null ? "All" : getPropertyLabel(prop, this.dictionaryService, this.namespaceService));
+            writer.write(prop == null ? "All" : getPropertyLabel(prop));
             writer.write("</span>");
             
             writer.write("<span class=\"label\">User:</span>");
@@ -968,8 +998,7 @@ public class RecordsManagementAuditServiceImpl
             
             writer.write("<span class=\"label\">Event:</span>");
             writer.write("<span class=\"value\">");
-            // TODO: Lookup the event display name to return rather than the event key
-            writer.write(params.getEvent() == null ? "All" : params.getEvent());
+            writer.write(params.getEvent() == null ? "All" : getAuditEventLabel(params.getEvent()));
             writer.write("</span>\n");
             
             writer.write("</div>\n");
@@ -989,6 +1018,153 @@ public class RecordsManagementAuditServiceImpl
     }
     
     /**
+     * Writes an audit trail entry to the given writer
+     * 
+     * @param writer The writer to write to
+     * @param entry The entry to write
+     * @param reportFormat The format to write the header in
+     * @throws IOException
+     */
+    private void writeAuditTrailEntry(Writer writer, RecordsManagementAuditEntry entry,
+                ReportFormat reportFormat) throws IOException
+    {
+        if (writer == null)
+        {
+            return;
+        }
+        
+        if (reportFormat == ReportFormat.HTML)
+        {
+            writer.write("<div class=\"audit-entry\">\n");
+            writer.write("<div class=\"audit-entry-header\">");
+            writer.write("<span class=\"label\">Timestamp:</span>");
+            writer.write("<span class=\"value\">");
+            writer.write(entry.getTimestamp().toString());
+            writer.write("</span>");
+            writer.write("<span class=\"label\">User:</span>");
+            writer.write("<span class=\"value\">");
+            writer.write(entry.getFullName() != null ? entry.getFullName() : entry.getUserName());
+            writer.write("</span>");
+            if (entry.getUserRole() != null && entry.getUserRole().length() > 0)
+            {
+                writer.write("<span class=\"label\">Role:</span>");
+                writer.write("<span class=\"value\">");
+                writer.write(entry.getUserRole());
+                writer.write("</span>");
+            }
+            if (entry.getEvent() != null && entry.getEvent().length() > 0)
+            {
+                writer.write("<span class=\"label\">Event:</span>");
+                writer.write("<span class=\"value\">");
+                writer.write(getAuditEventLabel(entry.getEvent()));
+                writer.write("</span>\n");
+            }
+            writer.write("</div>\n");
+            writer.write("<div class=\"audit-entry-node\">");
+            if (entry.getIdentifier() != null && entry.getIdentifier().length() > 0)
+            {
+                writer.write("<span class=\"label\">Identifier:</span>");
+                writer.write("<span class=\"value\">");
+                writer.write(entry.getIdentifier());
+                writer.write("</span>");
+            }
+            if (entry.getNodeType() != null && entry.getNodeType().length() > 0)
+            {
+                writer.write("<span class=\"label\">Type:</span>");
+                writer.write("<span class=\"value\">");
+                writer.write(entry.getNodeType());
+                writer.write("</span>");
+            }
+            if (entry.getPath() != null && entry.getPath().length() > 0)
+            {
+                // we need to strip off the first part of the path
+                String path = entry.getPath();
+                String displayPath = path;
+                int idx = path.indexOf("/", 1);
+                if (idx != -1)
+                {
+                    displayPath = "/File Plan" + path.substring(idx);
+                }
+                
+                writer.write("<span class=\"label\">Location:</span>");
+                writer.write("<span class=\"value\">");
+                writer.write(displayPath);
+                writer.write("</span>");
+            }
+            writer.write("</div>\n");
+            
+            if (entry.getChangedProperties() != null)
+            {
+                writer.write("<table class=\"changed-values-table\" cellspacing=\"0\">");
+                writer.write("<tr><th>Property</th><th>Previous Value</th><th>New Value</th></tr>");
+                
+                // create an entry for each property that changed
+                for (QName valueName : entry.getChangedProperties().keySet())
+                {
+                    Pair<Serializable, Serializable> values = entry.getChangedProperties().get(valueName);
+                    writer.write("<tr><td>");
+                    writer.write(getPropertyLabel(valueName));
+                    writer.write("</td><td>");
+                    Serializable oldValue = values.getFirst(); 
+                    writer.write(oldValue == null ? "&lt;none&gt;" : oldValue.toString());
+                    writer.write("</td><td>");
+                    Serializable newValue = values.getSecond();
+                    writer.write(newValue == null ? "&lt;none&gt;" : newValue.toString());
+                    writer.write("</td></tr>");
+                }
+                
+                writer.write("</table>\n");
+            }
+            
+            writer.write("</div>");
+        }
+        else
+        {
+            try
+            {
+                JSONObject json = new JSONObject();
+                
+                json.put("timestamp", entry.getTimestampString());
+                json.put("userName", entry.getUserName());
+                json.put("userRole", entry.getUserRole() == null ? "": entry.getUserRole());
+                json.put("fullName", entry.getFullName() == null ? "": entry.getFullName());
+                json.put("nodeRef", entry.getNodeRef() == null ? "": entry.getNodeRef());
+                json.put("nodeName", entry.getNodeName() == null ? "": entry.getNodeName());
+                json.put("nodeType", entry.getNodeType() == null ? "": entry.getNodeType());
+                json.put("event", entry.getEvent() == null ? "": entry.getEvent());
+                json.put("identifier", entry.getIdentifier() == null ? "": entry.getIdentifier());
+                json.put("path", entry.getPath() == null ? "": entry.getPath());
+            
+                JSONArray changedValues = new JSONArray();
+                
+                if (entry.getChangedProperties() != null)
+                {
+                    // create an entry for each property that changed
+                    for (QName valueName : entry.getChangedProperties().keySet())
+                    {
+                        Pair<Serializable, Serializable> values = entry.getChangedProperties().get(valueName);
+                        
+                        JSONObject changedValue = new JSONObject();
+                        changedValue.put("name", getPropertyLabel(valueName));
+                        changedValue.put("previous", values.getFirst() == null ? "" : values.getFirst().toString());
+                        changedValue.put("new", values.getSecond() == null ? "" : values.getSecond().toString());
+                        
+                        changedValues.put(changedValue);
+                    }
+                }
+                
+                json.put("changedValues", changedValues);
+                
+                writer.write(json.toString());
+            }
+            catch (JSONException je)
+            {
+                writer.write("{}");
+            }
+        }
+    }
+    
+    /**
      * Writes the end of the audit trail stream to the given writer
      * 
      * @param writer The writer to write to
@@ -1001,6 +1177,7 @@ public class RecordsManagementAuditServiceImpl
         {
             return;
         }
+        
         if (reportFormat == ReportFormat.HTML)
         {
             // write footer as HTML
@@ -1014,19 +1191,18 @@ public class RecordsManagementAuditServiceImpl
     }
     
     /**
-     * Returns the label for a property QName
+     * Returns the display label for a property QName
      * 
      * @param property The property to get label for
      * @param ddService DictionaryService instance
      * @param namespaceService NamespaceService instance
      * @return The label
      */
-    public static String getPropertyLabel(QName property, 
-                DictionaryService ddService, NamespaceService namespaceService)
+    private String getPropertyLabel(QName property)
     {
         String label = null;
         
-        PropertyDefinition propDef = ddService.getProperty(property);
+        PropertyDefinition propDef = this.dictionaryService.getProperty(property);
         if (propDef != null)
         {
             label = propDef.getTitle();
@@ -1035,6 +1211,25 @@ public class RecordsManagementAuditServiceImpl
         if (label == null)
         {
             label = property.getLocalName();
+        }
+        
+        return label;
+    }
+    
+    /**
+     * Returns the display label for the given audit event key
+     * 
+     * @param eventKey The audit event key
+     * @return The display label or null if the key does not exist
+     */
+    private String getAuditEventLabel(String eventKey)
+    {
+        String label = eventKey;
+        
+        AuditEvent event = this.auditEvents.get(eventKey);
+        if (event != null)
+        {
+            label = event.getLabel();
         }
         
         return label;
