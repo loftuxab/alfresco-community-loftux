@@ -70,6 +70,7 @@
       YAHOO.Bubbling.on("deactivateAllControls", this.onDeactivateAllControls, this);
       YAHOO.Bubbling.on("selectedFilesChanged", this.onSelectedFilesChanged, this);
       YAHOO.Bubbling.on("userAccess", this.onUserAccess, this);
+      YAHOO.Bubbling.on("doclistMetadata", this.onDoclistMetadata, this);
 
       return this;
    };
@@ -165,6 +166,14 @@
       selectedFiles: null,
 
       /**
+       * Dom ID of last crumb.
+       * 
+       * @property lastCrumbId
+       * @type string
+       */
+      lastCrumbId: null,
+
+      /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
        *
@@ -224,9 +233,6 @@
          
          // Reference to Document List component
          this.modules.docList = Alfresco.util.ComponentManager.findFirst("Alfresco.DocumentList");
-
-         // Reference to Document List Tree component
-         this.modules.docListTree = Alfresco.util.ComponentManager.findFirst("Alfresco.DocListTree");
 
          // Preferences service
          this.services.preferences = new Alfresco.service.Preferences();
@@ -900,6 +906,31 @@
             this.widgets.selectedItems.set("disabled", (files.length === 0));
          }
       },
+
+      /**
+       * Document List Metadata event handler
+       * NOTE: This is a temporary fix to enable access to the View Details action from the breadcrumb.
+       *       A more complete solution is to present the full list of parent folder actions.
+       *
+       * @method onDoclistMetadata
+       * @param layer {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+      onDoclistMetadata: function DLTB_onDoclistMetadata(layer, args)
+      {
+         var obj = args[1];
+         if (obj && obj.metadata)
+         {
+            var crumb = Dom.get(this.lastCrumbId);
+            if (crumb)
+            {
+               var p = obj.metadata.parent,
+                  folderDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/folder-details?nodeRef=" + p.nodeRef;
+               crumb.innerHTML = '<a href="' + folderDetailsUrl + '">' + crumb.innerHTML + '</a>';
+            }
+         }
+      },
+      
    
       /**
        * PRIVATE FUNCTIONS
@@ -972,17 +1003,22 @@
                eCrumb.appendChild(eIcon);
             }
 
-            // Last crumb shouldn't be rendered as a link
+            // Last crumb shouldn't be rendered as a link until doclistMetadata is available
             if (j - i < 2)
             {
-               if (j > 1)
-               {
-                  eIcon.addClass("last");
-               }
                eFolder = new Element(document.createElement("span"),
                {
                   innerHTML: displayPaths[i]
                });
+               if (j > 1)
+               {
+                  eIcon.addClass("last");
+                  this.lastCrumbId = Alfresco.util.generateDomId(eFolder.get("element"));
+               }
+               else
+               {
+                  this.lastCrumbId = null;
+               }
                eFolder.addClass("folder");
                eCrumb.appendChild(eFolder);
                eBreadcrumb.appendChild(eCrumb);

@@ -10,17 +10,23 @@
    "metadata":
    {
       <#if doclist.filePlan??>"filePlan": "${doclist.filePlan.nodeRef}",</#if>
-      <#if doclist.parent??>"parent": "${doclist.parent.nodeRef}",</#if>
-      "permissions":
+      "parent":
       {
-         "userRole": "${user.role!""}",
-         "userAccess":
+      <#if doclist.parent??>
+         "nodeRef": "${doclist.parent.nodeRef}",
+         "type": "${doclist.parent.type}",
+      </#if>
+         "permissions":
          {
-         <#list user.permissions?keys as perm>
-            <#if user.permissions[perm]?is_boolean>
-            "${perm?string}": ${user.permissions[perm]?string}<#if perm_has_next>,</#if>
-            </#if>
-         </#list>
+            "userRole": "${user.role!""}",
+            "userAccess":
+            {
+            <#list user.permissions?keys as perm>
+               <#if user.permissions[perm]?is_boolean>
+               "${perm?string}": ${user.permissions[perm]?string}<#if perm_has_next>,</#if>
+               </#if>
+            </#list>
+            }
          }
       }
    },

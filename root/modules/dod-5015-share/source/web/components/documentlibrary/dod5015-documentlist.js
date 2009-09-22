@@ -132,9 +132,15 @@
          this.widgets.dataSource.doBeforeCallback = function DL_doBeforeCallback(oRequest, oFullResponse, oParsedResponse)
          {
             me.doclistMetadata = oFullResponse.metadata;
+
+            // Fire event with parent metadata
+            YAHOO.Bubbling.fire("doclistMetadata",
+            {
+               metadata: me.doclistMetadata
+            });
             
             // Container userAccess event
-            var permissions = me.doclistMetadata.permissions;
+            var permissions = me.doclistMetadata.parent.permissions;
             if (permissions && permissions.userAccess)
             {
                YAHOO.Bubbling.fire("userAccess",

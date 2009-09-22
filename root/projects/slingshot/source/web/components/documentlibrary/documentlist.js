@@ -546,6 +546,12 @@
          {
             me.doclistMetadata = oFullResponse.metadata;
             
+            // Fire event with parent metadata
+            YAHOO.Bubbling.fire("doclistMetadata",
+            {
+               metadata: me.doclistMetadata
+            });
+            
             // Reset onlineEdit flag if correct conditions not met
             if ((YAHOO.env.ua.ie === 0) || (typeof me.options.vtiServer.port != "number"))
             {
@@ -553,7 +559,7 @@
             }
             
             // Container userAccess event
-            var permissions = me.doclistMetadata.permissions;
+            var permissions = me.doclistMetadata.parent.permissions;
             if (permissions && permissions.userAccess)
             {
                YAHOO.Bubbling.fire("userAccess",
