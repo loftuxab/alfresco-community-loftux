@@ -1136,7 +1136,7 @@ public class RecordsManagementAuditServiceImpl
                 json.put("nodeRef", entry.getNodeRef() == null ? "": entry.getNodeRef());
                 json.put("nodeName", entry.getNodeName() == null ? "": entry.getNodeName());
                 json.put("nodeType", entry.getNodeType() == null ? "": entry.getNodeType());
-                json.put("event", entry.getEvent() == null ? "": entry.getEvent());
+                json.put("event", entry.getEvent() == null ? "": getAuditEventLabel(entry.getEvent()));
                 json.put("identifier", entry.getIdentifier() == null ? "": entry.getIdentifier());
                 json.put("path", entry.getPath() == null ? "": entry.getPath());
             
