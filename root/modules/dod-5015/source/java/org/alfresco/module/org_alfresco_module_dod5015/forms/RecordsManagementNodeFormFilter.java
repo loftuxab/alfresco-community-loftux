@@ -4,6 +4,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.forms;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.model.ImapModel;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
@@ -84,6 +85,12 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
                 generateRecordTypePropertyField(form, nodeRef);
                 generateCategoryIdentifierPropertyField(form, nodeRef);
                 generateDispositionInstructionsPropertyField(form, nodeRef);
+                
+                // if the record is the result of an email we need to 'protect' some fields
+                if (this.nodeService.hasAspect(nodeRef, ImapModel.ASPECT_IMAP_CONTENT))
+                {
+                    protectEmailExtractedFields(form, nodeRef);
+                }
             }
             else
             {
@@ -328,6 +335,35 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
                 form.addData(dataKeyName, categoryId);
             }
         }
+    }
+    
+    /**
+     * Marks all the fields that contain data extracted from an email
+     * as protected fields.
+     * 
+     * @param form The Form instance to add the property to
+     * @param nodeRef The node the form is being generated for
+     */
+    protected void protectEmailExtractedFields(Form form, NodeRef nodeRef)
+    {
+        // iterate round existing fields and set email fields as protected
+        List<FieldDefinition> fieldDefs = form.getFieldDefinitions();
+        for (FieldDefinition fieldDef : fieldDefs)
+        {
+            if (fieldDef.getName().equals("cm:title") || 
+                fieldDef.getName().equals("cm:author") ||
+                fieldDef.getName().equals("rma:originator") ||
+                fieldDef.getName().equals("rma:publicationDate") ||
+                fieldDef.getName().equals("rma:dateReceived") ||
+                fieldDef.getName().equals("rma:address") ||
+                fieldDef.getName().equals("rma:otherAddress"))
+            {
+                fieldDef.setProtectedField(true);
+            }
+        }
+        
+        if (logger.isDebugEnabled())
+            logger.debug("Set email related fields to be protected");
     }
     
     /**
