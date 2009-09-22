@@ -55,7 +55,9 @@
    Alfresco.Events = function Events_constructor(htmlId)
    {
       Alfresco.Events.superclass.constructor.call(this, "Alfresco.Events", htmlId, ["button", "container"]);
-      
+      this._lookForParentsDispositionSchedule = true;
+      this._dispositionScheduleAppliedToParent = false;
+
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("metadataRefresh", this.refreshEvents, this);
 
@@ -64,6 +66,24 @@
 
    YAHOO.extend(Alfresco.Events, Alfresco.component.Base,
    {
+
+      /**
+       * Makes sure a check for the parents file plan is done only once.
+       *
+       * @property _lookForParentsDispositionSchedule
+       * @type {boolean}
+       * @private
+       */
+      _lookForParentsDispositionSchedule: true,
+
+       /**
+       * True if the disposition schedule is applied to the parent
+       *
+       * @property dispositionScheduleAppliedToParent
+       * @type {boolean}
+       */
+      _dispositionScheduleAppliedToParent: false,
+
       /**
        * Object container for initialization options
        *
@@ -78,7 +98,15 @@
           * @property nodeRef
           * @type {string}
           */
-         nodeRef: null
+         nodeRef: null,
+
+         /**
+          * Current siteId.
+          *
+          * @property siteId
+          * @type string
+          */
+         siteId: null         
       },
 
       /**
@@ -114,44 +142,119 @@
        */
       refreshEvents: function Events_refreshEvents()
       {
-         Alfresco.util.Ajax.jsonGet(
+         if(!this._dispositionScheduleAppliedToParent)
          {
-            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.replace(":/", "") + "/nextdispositionaction",
-            successCallback:
+            Alfresco.util.Ajax.jsonGet(
             {
-               fn: function(response)
+               url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + this.options.nodeRef.replace(":/", "") + "/nextdispositionaction",
+               successCallback:
                {
-                  var nextDispositionAction = response.json.data;
-                  if (nextDispositionAction && nextDispositionAction.events.length === 0 && nextDispositionAction.label)
+                  fn: function(response)
                   {
-                     this._displayMessage(this.msg("label.noEventsInDispositionSchedule", nextDispositionAction.label));
-                  }
-                  else
-                  {
-                     Dom.addClass(this.widgets.messageEl, "hidden");
-                     this._onEventsLoaded(nextDispositionAction);
-                  }
-               },
-               scope: this
-            },
-            failureCallback:
-            {
-               fn: function(response)
-               {
-                  if (response.serverResponse.status == 404)
-                  {
-                     this._displayMessage(this.msg("label.noDispositionSchedule"));
-                  }
-                  else{
-                     Alfresco.util.PopupManager.displayPrompt(
+                     var nextDispositionAction = response.json.data;
+                     if (nextDispositionAction && nextDispositionAction.events.length === 0 && nextDispositionAction.label)
                      {
-                        text: this.msg("message.getEventFailure")
-                     });
-                  }
+                        this._displayMessage(this.msg("label.noEventsInDispositionSchedule", nextDispositionAction.label));
+                     }
+                     else
+                     {
+                        Dom.addClass(this.widgets.messageEl, "hidden");
+                        this._onEventsLoaded(nextDispositionAction);
+                     }
+                  },
+                  scope: this
                },
-               scope: this
-            }
-         });
+               failureCallback:
+               {
+                  fn: function(response)
+                  {
+                     if (response.serverResponse.status == 404)
+                     {
+                        // Could not find file plan for node (record) try parent's (folder's)
+                        this._getParentsDispositionSchedule();
+                     }
+                     else{
+                        Alfresco.util.PopupManager.displayPrompt(
+                        {
+                           text: this.msg("message.getEventFailure")
+                        });
+                     }
+                  },
+                  scope: this
+               }
+            });
+         }
+      },
+
+      /**
+       * Called if the nodeRef has no disposition schedule.
+       * Will locate parents disposition schedule and display
+       * the asOf date for the next action and a link to the parents events.
+       *
+       * @method _getParentsDispositionSchedule
+       * @private
+       */
+      _getParentsDispositionSchedule: function Events__getParentsDispositionSchedule()
+      {
+         if(this._lookForParentsDispositionSchedule)
+         {
+            // Only look once
+            this._lookForParentsDispositionSchedule = false;
+
+            // First get the parent nodeRef
+            Alfresco.util.Ajax.jsonGet(
+            {
+               url: Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/doclist/documents/node/" + this.options.nodeRef.replace(":/", "") + "?filter=node",
+               successCallback:
+               {
+                  fn: function (response)
+                  {
+                     if(response.json.metadata && response.json.metadata.parent)
+                     {
+                        // Get the parent nodeRef from the reponse and try to find its fileplan
+                        var parentNodeRef = response.json.metadata.parent;
+                        Alfresco.util.Ajax.jsonGet(
+                        {
+                           url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + parentNodeRef.replace(":/", "") + "/nextdispositionaction",
+                           successCallback:
+                           {
+                              fn: function(response)
+                              {
+                                 if(response.json.data)
+                                 {
+                                    // File plan found
+                                    this._dispositionScheduleAppliedToParent = true;
+
+                                    // Retreive its as of date
+                                    var asOf = Alfresco.util.fromISO8601(response.json.data.asOf);
+                                    asOf = asOf ? Alfresco.util.formatDate(asOf) : this.msg("label.none");
+
+                                    // Display a link to the fileplan's events
+                                    var msgHTML = "<div>" + this.msg("label.dispositionScheduleAppliedToFolder", asOf) + "</div><br />";
+                                    msgHTML += "<a href='" + Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/record-folder-details?nodeRef=" + parentNodeRef + "'>" + this.msg("label.linkToFoldersDispositionSchedule") + "</a>";
+                                    this._displayMessage(msgHTML);
+                                 }
+                              },
+                              scope: this
+                           },
+                           failureCallback:
+                           {
+                              fn: function(response)
+                              {
+                                 if (response.serverResponse.status == 404)
+                                 {
+                                    this._displayMessage(this.msg("label.noDispositionSchedule"));
+                                 }
+                              },
+                              scope: this
+                           }
+                        });
+                     }
+                  },
+                  scope: this
+               }
+            });
+         }
       },
 
       /**
@@ -164,7 +267,7 @@
       _displayMessage: function Events__onEventsLoaded(msg)
       {
          Dom.removeClass(this.widgets.messageEl, "hidden");
-         this.widgets.messageEl.innerHTML = this.msg(msg);
+         this.widgets.messageEl.innerHTML = msg;
          Dom.addClass(this.widgets.completedEl, "hidden");
          Dom.addClass(this.widgets.incompleteEl, "hidden");
       },
