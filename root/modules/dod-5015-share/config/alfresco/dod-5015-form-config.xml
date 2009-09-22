@@ -237,6 +237,7 @@
                <hide id="rma:recordSearchVitalRecordReviewPeriod" />
                <hide id="rma:recordSearchVitalRecordReviewPeriodExpression" />
                <hide id="rma:recordSearchDispositionActionAsOf" for-mode="edit" />
+               <hide id="rma:cutOffDate" for-mode="edit" />
             </field-visibility>
             <appearance>
                <set id="rm" />
@@ -257,6 +258,7 @@
                   </constraint-handlers>
                </field>
                <field id="rma:location" set="rm" />
+               <field id="rma:cutOffDate" set="rm" />
                <field id="rma:recordSearchDispositionActionAsOf" set="rm" label-id="label.dispositionAsOfDate" />
             </appearance>
          </form>
