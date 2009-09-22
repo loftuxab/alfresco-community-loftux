@@ -524,9 +524,19 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                                     List<String> allowedValues = getRMAllowedValues(userName, userGroupNames, conName);
                                     
                                     @SuppressWarnings("unchecked")
-                                    List<String> propValues = (List<String>)entry.getValue();
+                                    List<String> propValues = null;
+                                    Object val = entry.getValue();
+                                    if (val instanceof String)
+                                    {
+                                        propValues = new ArrayList<String>(1);
+                                        propValues.add((String)val);
+                                    }
+                                    else if (val instanceof List)
+                                    {
+                                        propValues = (List<String>)val;
+                                    }
                                     
-                                    if (! isAllowed(propValues, allowedValues))
+                                    if (propValues != null && !isAllowed(propValues, allowedValues))
                                     {
                                         if (logger.isDebugEnabled())
                                         {
