@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
@@ -46,6 +45,7 @@ import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
@@ -782,7 +782,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
        List<DispositionAction> list = getCompletedDispositionActions(nodeRef);
        if (list.isEmpty() == false)
        {
-           // Get the last dispostion action in the list
+           // Get the last disposition action in the list
            result = list.get(list.size()-1);
        }       
        return result;
@@ -810,27 +810,79 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
      */
     public VitalRecordDefinition getVitalRecordDefinition(NodeRef nodeRef)
     {
+        //TODO Problem refiling a 'none' into a 'daily'
+        // File a 'day' into a 'year' is OK
+
         NodeRef vrdNodeRef = null;
+        Boolean vri = null;
+        Period reviewPeriod = null;
         if (isRecord(nodeRef) == true)
         {
             // Get the record folders for the record
             List<NodeRef> recordFolders = getRecordFolders(nodeRef);
-            List<NodeRef> vrdNodeRefs = new ArrayList<NodeRef>(recordFolders.size());
+            
+            // Get all the vital record definitions
             for (NodeRef recordFolder : recordFolders)
             {
-                // Get all the vital record definitions
-                NodeRef temp = getVitalRecordDefinitionImpl(recordFolder);
-                if (temp != null)
+                NodeRef nextCandidateVrdNodeRef = getVitalRecordDefinitionImpl(recordFolder);
+                
+                // If the nextVrdNoderef is null, skip it.
+                if (nextCandidateVrdNodeRef == null)
                 {
-                    vrdNodeRefs.add(temp);
+                    continue;
                 }
                 
-            }
-            if (vrdNodeRefs.size() != 0)
-            {
-                // TODO figure out which vital record definition object is most relevant
-                //      for now just take the first!
-                vrdNodeRef = vrdNodeRefs.get(0);
+                Boolean nextCandidateVRI = (Boolean)nodeService.getProperty(nextCandidateVrdNodeRef, PROP_VITAL_RECORD_INDICATOR);
+                Period nextCandidateReviewPeriod = (Period)nodeService.getProperty(nextCandidateVrdNodeRef, PROP_REVIEW_PERIOD);
+
+                // If we have no potential vrdNodeRef, initially consider the first.
+                if (vrdNodeRef == null)
+                {
+                    vrdNodeRef = nextCandidateVrdNodeRef;
+                    vri = nextCandidateVRI;
+                    reviewPeriod = nextCandidateReviewPeriod;
+                }
+                else
+                {
+                    // Now we need to select a VRD.
+                    // Could refactor this out into a selectionStrategy like DispositionSchedule
+                    
+                    // Always choose the VRD with a 'true' vital record indicator over a 'false'/null one
+                    if ( (vri == null || Boolean.FALSE.equals(vri) )
+                            && Boolean.TRUE.equals(nextCandidateVRI))
+                    {
+                        vrdNodeRef = nextCandidateVrdNodeRef;
+                        vri = nextCandidateVRI;
+                        reviewPeriod = nextCandidateReviewPeriod;
+                    }
+                    else if (Boolean.TRUE.equals(nextCandidateVRI) && nextCandidateReviewPeriod != null)
+                    {
+                        // vri must be TRUE. reviewPeriod could be null.
+                        // Take the one with the earliest review date.
+                        if (reviewPeriod == null)
+                        {
+                            vrdNodeRef = nextCandidateVrdNodeRef;
+                            vri = nextCandidateVRI;
+                            reviewPeriod = nextCandidateReviewPeriod;
+                        }
+                        else
+                        {
+                            Date now = new Date();
+                            Date nextReviewForCandidate = nextCandidateReviewPeriod.getNextDate(now);
+                            Date nextReviewForCurrent = reviewPeriod.getNextDate(now);
+                            
+                            final int cmp = nextReviewForCurrent.compareTo(nextReviewForCandidate);
+                            
+                            // < 0 current is before candidate
+                            if (cmp > 0)
+                            {
+                                vrdNodeRef = nextCandidateVrdNodeRef;
+                                vri = nextCandidateVRI;
+                                reviewPeriod = nextCandidateReviewPeriod;
+                            }
+                        }
+                    }
+                }
             }
         }
         else
@@ -864,7 +916,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         else
         {
             NodeRef parent = this.nodeService.getPrimaryParent(nodeRef).getParentRef();
-            if (isRecordsManagementContainer(parent) == true) // TODO For recordFolder, I'm getting false here.
+            if (isRecordsManagementContainer(parent) == true)
             {
                 result = getVitalRecordDefinitionImpl(parent);
             }

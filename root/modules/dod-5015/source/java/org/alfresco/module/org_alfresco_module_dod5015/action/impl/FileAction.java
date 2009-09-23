@@ -56,33 +56,35 @@ public class FileAction extends RMActionExecuterAbstractBase
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {
-        // TODO check the record is within a folder?     
+        // Permissions perform the following checks so this action doesn't need to.
+        //
+        // check the record is within a folder
+        // check that the folder we are filing into is not closed
         
-        // TODO check that the folder we are filing into is not closed
+        // if this is a declared record already, it's a re-file.
+        final boolean isRefile = recordsManagementService.isRecord(actionedUponNodeRef) &&
+                recordsManagementService.isRecordDeclared(actionedUponNodeRef);
         
-        // The above are done by permissions ...
-        
-        // TODO if this is a declared record already .. what do we do? .. it's a re-file!
-        
-        // Add the record and undeclared aspect
-        nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_RECORD, null);
-        
-        // Get the disposition instrcutions for the actioned upon record
-        DispositionSchedule di = this.recordsManagementService.getDispositionSchedule(actionedUponNodeRef);
-        
-        // Get the records properties
-        Map<QName, Serializable> recordProperties = this.nodeService.getProperties(actionedUponNodeRef);
-        
-        // Calculate the filed date and record identifier
-        Calendar fileCalendar = Calendar.getInstance();
-        String year = Integer.toString(fileCalendar.get(Calendar.YEAR));
-        QName nodeDbid = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "node-dbid");
-        String recordId = year + "-" + padString(recordProperties.get(nodeDbid).toString(), 10);
-        recordProperties.put(RecordsManagementModel.PROP_DATE_FILED, fileCalendar.getTime());
-        recordProperties.put(RecordsManagementModel.PROP_IDENTIFIER, recordId);             
-        
-        // Set the record properties
-        this.nodeService.setProperties(actionedUponNodeRef, recordProperties);        
+
+        if (!isRefile)
+        {
+            // Add the record and undeclared aspect
+            nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_RECORD, null);
+
+            // Get the records properties
+            Map<QName, Serializable> recordProperties = this.nodeService.getProperties(actionedUponNodeRef);
+
+            // Calculate the filed date and record identifier
+            Calendar fileCalendar = Calendar.getInstance();
+            String year = Integer.toString(fileCalendar.get(Calendar.YEAR));
+            QName nodeDbid = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "node-dbid");
+            String recordId = year + "-" + padString(recordProperties.get(nodeDbid).toString(), 10);
+            recordProperties.put(RecordsManagementModel.PROP_DATE_FILED, fileCalendar.getTime());
+            recordProperties.put(RecordsManagementModel.PROP_IDENTIFIER, recordId);             
+
+            // Set the record properties
+            this.nodeService.setProperties(actionedUponNodeRef, recordProperties);        
+        }
 
         // Calculate the review schedule
         VitalRecordDefinition viDef = this.recordsManagementService.getVitalRecordDefinition(actionedUponNodeRef);
@@ -91,8 +93,21 @@ public class FileAction extends RMActionExecuterAbstractBase
         {
             Map<QName, Serializable> reviewProps = new HashMap<QName, Serializable>(1);
             reviewProps.put(RecordsManagementModel.PROP_REVIEW_AS_OF, reviewAsOf);
-            this.nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_VITAL_RECORD, reviewProps);
+            
+            if (!nodeService.hasAspect(actionedUponNodeRef, ASPECT_VITAL_RECORD))
+            {
+                this.nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_VITAL_RECORD, reviewProps);
+            }
+            else
+            {
+                Map<QName, Serializable> props = nodeService.getProperties(actionedUponNodeRef);
+                props.putAll(reviewProps);
+                nodeService.setProperties(actionedUponNodeRef, props);
+            }
         }
+
+        // Get the disposition instructions for the actioned upon record
+        DispositionSchedule di = this.recordsManagementService.getDispositionSchedule(actionedUponNodeRef);
         
         // Set up the disposition schedule if the dispositions are being managed at the record level
         if (di != null && di.isRecordLevelDisposition() == true)
