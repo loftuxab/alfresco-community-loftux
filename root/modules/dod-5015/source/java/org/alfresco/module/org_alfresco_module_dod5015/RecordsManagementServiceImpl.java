@@ -162,8 +162,6 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
                 TYPE_RECORDS_MANAGEMENT_CONTAINER, 
                 ContentModel.ASSOC_CONTAINS, 
                 new JavaBehaviour(this, "onCreateRecordFolder", NotificationFrequency.TRANSACTION_COMMIT));
-        
-
         /**
          * Prevent content nodes being added to dod series and category.
          * Content can only be added to dod folders.
@@ -327,6 +325,38 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
             // Apply the versioned aspect to the from node
             this.nodeService.addAspect(fromNodeRef, ASPECT_VERSIONED_RECORD, null);
         }
+        
+        // Execute script if for the reference event
+        executeReferenceScript("onCreate", reference, fromNodeRef, toNodeRef);
+    }
+    
+    /**
+     * Executes a reference script if present
+     * 
+     * @param policy
+     * @param reference
+     * @param from
+     * @param to
+     */
+    private void executeReferenceScript(String policy, QName reference, NodeRef from, NodeRef to)
+    {
+		String referenceId = reference.getLocalName();
+	
+	    // This is the filename pattern which is assumed.
+	    // e.g. a script file onCreate_superceded.js for the creation of a superseded reference
+	    String expectedScriptName = policy + "_" + referenceId + ".js";
+	     
+	    NodeRef scriptNodeRef = nodeService.getChildByName(scriptsFolderNodeRef, ContentModel.ASSOC_CONTAINS, expectedScriptName);
+	    if (scriptNodeRef != null)
+	    {
+		    Map<String, Object> objectModel = new HashMap<String, Object>(1);
+	        objectModel.put("node", from);
+	        objectModel.put("toNode", to);
+	        objectModel.put("policy", policy);
+	        objectModel.put("reference", referenceId);
+
+	        serviceRegistry.getScriptService().executeScript(scriptNodeRef, null, objectModel);
+        }
     }
     
     /**
@@ -340,6 +370,9 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
             // Apply the versioned aspect to the from node
             this.nodeService.removeAspect(fromNodeRef, ASPECT_VERSIONED_RECORD);
         }
+        
+        // Execute script if for the reference event
+        executeReferenceScript("onRemove", reference, fromNodeRef, toNodeRef);
     }
     
     /**
