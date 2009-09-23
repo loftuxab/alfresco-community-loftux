@@ -39,12 +39,17 @@ import javax.mail.Part;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeUtility;
+import javax.transaction.Status;
+import javax.transaction.UserTransaction;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.model.ImapModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.cmr.action.Action;
+import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.model.FileFolderService;
 import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.AssociationRef;
@@ -52,6 +57,8 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.apache.commons.logging.Log;
@@ -225,10 +232,91 @@ public class SplitEmailAction extends RMActionExecuterAbstractBase
         
         /**
          * Create a link from the message to the attachment
-         */
+         */       
+        createRMReference(messageNodeRef, attachmentRef.getChildRef());
+                
+        
+    }
+    
+    QName assocDef = null;
+    
+    /**
+     * Create a link from the message to the attachment
+     */       
+    private void createRMReference(NodeRef parentRef, NodeRef childRef)
+    {
+        String sourceId = "message";
+        String targetId = "attachment";
+        
+        String compoundId = recordsManagementAdminService.getCompoundIdFor(sourceId, targetId);
+        
+        Map<QName, AssociationDefinition> refs = recordsManagementAdminService.getCustomReferenceDefinitions();
+        for(QName name : refs.keySet())
+        {
+            // TODO how to find assocDef?    
+            // Refs seems to be null
+        }  
+        
+        if(assocDef == null)
+        {
+           assocDef = createReference();
+        }
+
+        recordsManagementAdminService.addCustomReference(parentRef, childRef, assocDef);      
+
+        // add the IMAP attachment aspect
         nodeService.createAssociation(
-                    messageNodeRef,
-                    attachmentRef.getChildRef(),
-                    ImapModel.ASSOC_IMAP_ATTACHMENT);
+                parentRef,
+                childRef,
+                ImapModel.ASSOC_IMAP_ATTACHMENT);
+    }
+    
+    /**
+     * Create the custom reference - need to jump through hoops with the transaction handling here 
+     * since the association is created in the post commit phase, so it can't be used within the 
+     * current transaction.
+     *
+     * @return
+     */
+    private QName createReference()
+    {
+        UserTransaction txn = null;
+        
+        try
+        {
+            txn = transactionService.getNonPropagatingUserTransaction();
+            txn.begin();
+            RetryingTransactionHelper helper = transactionService.getRetryingTransactionHelper();
+            RetryingTransactionCallback<QName> addCustomChildAssocDefinitionCallback = new RetryingTransactionCallback<QName>()
+            {
+                public QName execute() throws Throwable
+                {
+                    String sourceId = "message";
+                    String targetId = "attachment";
+                    QName assocDef = recordsManagementAdminService.addCustomChildAssocDefinition(sourceId, targetId);
+                    return assocDef;
+                }
+            };
+            QName ret = helper.doInTransaction(addCustomChildAssocDefinitionCallback);
+ 
+            txn.commit();
+            return ret;
+        }
+        catch (Exception e)
+        {
+            if(txn != null)
+            {
+                try 
+                {
+                    txn.rollback();
+                }
+                catch (Exception se)
+                {
+                    logger.error("error during creation of custom child association", se);
+                    // we can do nothing with this rollback exception.
+                }
+            }
+            throw new AlfrescoRuntimeException("Unable to create custom child association", e);
+        }
     }
 }
