@@ -1,7 +1,7 @@
 <webscript>
   <shortname>Add a Custom Reference Definition to the custom model</shortname>
   <description><![CDATA[
-  Adds a custom reference definition to the custom model.<br/>
+  Adds a custom reference definition to the custom model. Custom references are many-to-many by default.<br/>
   <br/>
   The body of the post should be in the form, e.g.<br/>
   {<br/>
