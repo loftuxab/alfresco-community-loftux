@@ -56,11 +56,11 @@ public class DeclareCapability extends AbstractGroupCapability
     
     public int evaluate(NodeRef declaree)
     {
-        if (voter.getDeclareRecordsCapability().evaluate(declaree) == AccessDecisionVoter.ACCESS_GRANTED)
+        if ((voter.getDeclareRecordsCapability().checkActionConditionsIfPresent(declaree) == AccessDecisionVoter.ACCESS_GRANTED) && voter.getDeclareRecordsCapability().evaluate(declaree) == AccessDecisionVoter.ACCESS_GRANTED)
         {
             return AccessDecisionVoter.ACCESS_GRANTED;
         }
-        if (voter.getDeclareRecordsInClosedFoldersCapability().evaluate(declaree) == AccessDecisionVoter.ACCESS_GRANTED)
+        if ((voter.getDeclareRecordsInClosedFoldersCapability().checkActionConditionsIfPresent(declaree) == AccessDecisionVoter.ACCESS_GRANTED) &&   voter.getDeclareRecordsInClosedFoldersCapability().evaluate(declaree) == AccessDecisionVoter.ACCESS_GRANTED)
         {
             return AccessDecisionVoter.ACCESS_GRANTED;
         }
