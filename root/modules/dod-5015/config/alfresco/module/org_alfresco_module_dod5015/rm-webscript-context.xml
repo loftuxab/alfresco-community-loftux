@@ -270,4 +270,8 @@
         <property name="recordsManagementSecurityService" ref="RecordsManagementSecurityService"/>
     </bean>
     
+    <!-- REST impl for GET applyfixmob1573 -->
+    <bean id="webscript.org.alfresco.rma.applyfixmob1573.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.ApplyFixMob1573Get" parent="webscript">
+        <property name="contentService" ref="ContentService" />
+    </bean>
 </beans>
