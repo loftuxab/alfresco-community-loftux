@@ -54,7 +54,7 @@ public class FileRecordsCapability extends AbstractCapability
         {
             if (checkFilingUnfrozenUncutoffOpenUndeclared(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (isRecord(nodeRef))
+                if (isRecord(nodeRef) || isFileable(nodeRef))
                 {
                     if (voter.getPermissionService().hasPermission(nodeRef, RMPermissionModel.FILE_RECORDS) == AccessStatus.ALLOWED)
                     {
