@@ -97,6 +97,20 @@
 	                      <cm:name>rma_isClosed.js</cm:name>
 	                   </view:properties>
 	               </cm:content>
+	               
+	               <cm:content view:childName="cm:onCreate_supersedes.js">
+	                   <view:aspects>
+	                      <cm:titled></cm:titled>
+	                   </view:aspects>
+	                   <view:properties>
+	                      <sys:store-protocol>workspace</sys:store-protocol>
+	                      <sys:store-identifier>SpacesStore</sys:store-identifier>
+	                      <cm:description>Records management sample script.</cm:description>
+	                      <cm:content>contentUrl=classpath:alfresco/module/org_alfresco_module_dod5015/bootstrap/content/onCreate_supersedes.js|mimetype=text/javascript|encoding=UTF-8</cm:content>
+	                      <cm:title>onCreate_supersedes.js</cm:title>
+	                      <cm:name>onCreate_supersedes.js</cm:name>
+	                   </view:properties>
+	               </cm:content>
 	             </cm:contains>
 	          </view:associations>
 	       </cm:folder>

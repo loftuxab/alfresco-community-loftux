@@ -170,7 +170,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
 		
 		// Get the test data
-		setUpTestData();
+		filePlan = TestUtilities.loadFilePlanData(applicationContext);
         
         File file = new File(System.getProperty("user.dir")+"/test-resources/testCaveatConfig1.json"); // from test-resources
         assertTrue(file.exists());
@@ -185,15 +185,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         newValues.add(FGI);
         
         rmAdminService.changeCustomConstraintValues(RecordsManagementCustomModel.CONSTRAINT_CUSTOM_SMLIST, newValues);
-	}
-	
-	private void setUpTestData()
-	{
-	    // Don't reload the fileplan data on each test method.
-	    if (retrieveJanuaryAISVitalFolders().size() != 1)
-	    {
-            filePlan = TestUtilities.loadFilePlanData(applicationContext);
-	    }
 	}
 
     /**
