@@ -4,7 +4,7 @@
    <div class="bd">
       <form id="${el}-form" action="" method="POST">
          <div class="yui-gd">
-            <div class="yui-u first"><label for="${el}-recordType">${msg("label.recordType")}</label></div>
+            <div class="yui-u first"><label for="${el}-recordType">${msg("label.record-type")}</label></div>
             <div class="yui-u">
                <select id="${el}-recordType" name="added[]">
                   <#list recordTypes as recordType>

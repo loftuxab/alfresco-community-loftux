@@ -38,6 +38,11 @@
    Alfresco.doclib.RecordsActions = {};
 
    /**
+    * YUI Library aliases
+    */
+   var Dom = YAHOO.util.Dom;
+
+   /**
     * Alfresco Slingshot aliases
     */
    var $combine = Alfresco.util.combinePaths;
@@ -331,7 +336,7 @@
          calendar.render();
          calendar.show();
          // Center the calendar
-         YAHOO.util.Dom.setStyle(calendarId, "margin", "0 2em");
+         Dom.setStyle(calendarId, "margin", "0 2em");
          // Only now can we set the panel button's callback reference to the calendar, as it was undefined on panel creation
          panel.cfg.getProperty("buttons")[0].handler.obj.callback.obj = calendar;
          panel.center();
@@ -375,13 +380,12 @@
        */
       onActionExport: function RDLA_onActionExport(assets)
       {
-         // Save the nodeRef ids
+         // Save the nodeRefs
          var nodeRefs = [];
-         for(var i = 0; i < assets.length; i++)
+         for (var i = 0, ii = assets.length; i < ii; i++)
          {
             nodeRefs.push(assets[i].nodeRef);
          }
-         this.actionExportNodeRefs = nodeRefs;
 
          // Open the export dialog
          var exportWebscriptUrl = Alfresco.constants.PROXY_URI + "api/rma/admin/export";
@@ -397,9 +401,10 @@
                {
                   fn: function RDLA_onActionExport_SimpleDialog_doBeforeDialogShow(p_config, p_simpleDialog, p_obj)
                   {
-                     // Set the hidden nodeRefs field to a comma-separated list of nodeRef:s
-                     YAHOO.util.Dom.get(this.id + "-exportDialog-nodeRefs").value = this.actionExportNodeRefs.join(",");
+                     // Set the hidden nodeRefs field to a comma-separated list of nodeRefs
+                     Dom.get(this.id + "-exportDialog-nodeRefs").value = p_obj.join(",");
                   },
+                  obj: nodeRefs,
                   scope: this
                },
                firstFocus: this.id + "-exportDialog-acp",
@@ -472,7 +477,7 @@
          calendar.render();
          calendar.show();
          // Center the calendar
-         YAHOO.util.Dom.setStyle(calendarId, "margin", "0 2em");
+         Dom.setStyle(calendarId, "margin", "0 2em");
          // Only now can we set the panel button's callback reference to the calendar, as it was undefined on panel creation
          panel.cfg.getProperty("buttons")[0].handler.obj.callback.obj = calendar;
          panel.center();
@@ -563,6 +568,47 @@
       },
 
       /**
+       * Set Record Type
+       *
+       * @method onActionSetRecordType
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionSetRecordType: function RDLA_onActionSetRecordType(assets)
+      {
+         // Open the set record type dialog
+         var setRecordTypeWebscriptUrl = Alfresco.constants.PROXY_URI + "slingshot/doclib/action/aspects/node/" + assets.nodeRef.replace(":/", "");
+         if (!this.modules.setRecordTypeDialog)
+         {
+            // Load if for the first time
+            this.modules.setRecordTypeDialog = new Alfresco.module.SimpleDialog(this.id + "-setRecordTypeDialog").setOptions(
+            {
+               width: "30em",
+               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/set-record-type",
+               actionUrl: setRecordTypeWebscriptUrl,
+               firstFocus: this.id + "-setRecordTypeDialog-recordType",
+               onSuccess:
+               {
+                  fn: function RDLA_onActionSetRecordType_SimpleDialog_success(response)
+                  {
+                     // Fire event so compnents on page are refreshed
+                     YAHOO.Bubbling.fire("metadataRefresh");
+                  }
+               }
+            });
+         }
+         else
+         {
+            // Open the set record type dialog again
+            this.modules.setRecordTypeDialog.setOptions(
+            {
+               actionUrl: setRecordTypeWebscriptUrl,
+               clearForm: true
+            });
+         }
+         this.modules.setRecordTypeDialog.show();
+      },
+
+      /**
        * Split email record action.
        *
        * @method onActionSplitEmail
@@ -640,17 +686,6 @@
       },
 
       /**
-       * View Audit log
-       *
-       * @method onActionViewAuditLog
-       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
-       */
-      onActionViewAuditLog: function RDLA_onActionViewAuditLog(assets)
-      {
-         this._viewAuditLog(assets);
-      },
-      
-      /**
        * Manage Permissions
        *
        * @method onActionManagePermissions
@@ -666,54 +701,12 @@
       },
 
       /**
-       * Set Record Type
+       * View Audit log
        *
-       * @method onActionSetRecordType
+       * @method onActionViewAuditLog
        * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
        */
-      onActionSetRecordType: function RDLA_onActionSetRecordType(assets)
-      {
-         // Open the set record type dialog
-         var setRecordTypeWebscriptUrl = Alfresco.constants.PROXY_URI + "slingshot/doclib/action/aspects/node/" + assets.nodeRef.replace(":/", "");
-         if (!this.modules.setRecordTypeDialog)
-         {
-            // Load if for the first time
-            this.modules.setRecordTypeDialog = new Alfresco.module.SimpleDialog(this.id + "-setRecordTypeDialog").setOptions(
-            {
-               width: "30em",
-               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/set-record-type",
-               actionUrl: setRecordTypeWebscriptUrl,
-               firstFocus: this.id + "-setRecordTypeDialog-recordType",
-               onSuccess:
-               {
-                  fn: function RDLA_onActionSetRecordType_SimpleDialog_success(response)
-                  {
-                     // Fire event so compnents on page are refreshed
-                     YAHOO.Bubbling.fire("metadataRefresh");
-                  }
-               }
-            });
-         }
-         else
-         {
-            // Open the set record type dialog again
-            this.modules.setRecordTypeDialog.setOptions(
-            {
-               actionUrl: setRecordTypeWebscriptUrl,
-               clearForm: true
-            });
-         }
-         this.modules.setRecordTypeDialog.show();
-      },
-
-      /**
-       * View audit log for a noderef
-       *
-       * @method _ViewAuditLog
-       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
-       * @private
-       */
-      _viewAuditLog: function RDLA__viewAuditLog(assets)
+      onActionViewAuditLog: function RDLA_onActionViewAuditLog(assets)
       {
          var openAuditLogWindow = function openAuditLogWindow()
          {
@@ -739,6 +732,7 @@
             }
          }
       },
+
       
       /**
        * DOD5015 action.
@@ -813,6 +807,5 @@
 
          this.modules.actions.genericAction(config);
       }
-            
    };
 })();

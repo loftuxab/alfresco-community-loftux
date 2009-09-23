@@ -16,9 +16,9 @@ function sortByTitle(obj1, obj2)
  */
 function main()
 {
-   // Call the repo to create the site
-   var scriptRemoteConnector = remote.connect("alfresco");
-   var repoResponse = scriptRemoteConnector.get("/api/rma/admin/dodcustomtypes");
+   // Call the repo to get the list of custom types
+   var scriptRemoteConnector = remote.connect("alfresco"),
+      repoResponse = scriptRemoteConnector.get("/api/rma/admin/dodcustomtypes");
    if (repoResponse.status == 401)
    {
       status.setCode(repoResponse.status, "error.loggedOut");
@@ -32,7 +32,7 @@ function main()
       if (repoJSON.data)
       {
          var data = repoJSON.data;
-         if(data && data.dodCustomTypes)
+         if (data && data.dodCustomTypes)
          {
             var recordTypes = data.dodCustomTypes;
             recordTypes.sort(sortByTitle);

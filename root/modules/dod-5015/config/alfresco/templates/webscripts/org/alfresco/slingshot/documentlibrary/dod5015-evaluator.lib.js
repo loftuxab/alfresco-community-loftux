@@ -178,12 +178,40 @@ var Evaluator =
    },
 
    /**
+    * Record Type evaluator
+    */
+   recordType: function Evaluator_recordType(asset)
+   {
+      /* Supported Record Types */
+      var recordTypes =
+      [
+         "digitalPhotographRecord",
+         "pdfRecord",
+         "scannedRecord",
+         "webRecord"
+      ],
+         currentRecordType = null;
+
+      for (var i = 0; i < recordTypes.length; i++)
+      {
+         if (asset.hasAspect("dod:" + recordTypes[i]))
+         {
+            currentRecordType = recordTypes[i];
+            break;
+         }
+      }
+      
+      return currentRecordType;
+   },
+
+   /**
     * Asset Evaluator - main entrypoint
     */
    run: function Evaluator_run(asset)
    {
       var assetType = Evaluator.getAssetType(asset),
          rmNode = rmService.getRecordsManagementNode(asset),
+         recordType = null,
          capabilities = {},
          actions = {},
          actionSet = "empty",
@@ -329,6 +357,13 @@ var Evaluator =
                permissions["download"] = true;
             }
             
+            /* Record Type evaluator */
+            recordType = Evaluator.recordType(asset);
+            if (recordType != null)
+            {
+               status[recordType] = true;
+            }
+            
             /* Undeclare Record */
             if (asset.hasAspect("rma:cutOff") == false)
             {
@@ -346,6 +381,13 @@ var Evaluator =
 
             /* Record and Record Folder common evaluator */
             Evaluator.recordAndRecordFolder(asset, permissions, status);
+
+            /* Record Type evaluator */
+            recordType = Evaluator.recordType(asset);
+            if (recordType != null)
+            {
+               status[recordType] = true;
+            }
             break;
 
 
@@ -364,23 +406,15 @@ var Evaluator =
             {
                permissions["download"] = true;
 
-               /* Set Record Type */
-               var recordTypes =
-               [
-                  "dod:scannedRecord",
-                  "dod:webRecord",
-                  "dod:digitalPhotographRecord",
-                  "dod:pdfRecord"
-               ];
-               permissions["set-record-type"] = true;
-               for (var i = 0; i < recordTypes.length; i++)
+               /* Record Type evaluator */
+               recordType = Evaluator.recordType(asset);
+               if (recordType != null)
                {
-                  if (asset.hasAspect(recordTypes[i]))
-                  {
-                     // Remove permission if record type has been set
-                     delete permissions["set-record-type"];
-                     break;
-                  }
+                  status[recordType] = true;
+               }
+               else
+               {
+                  permissions["set-record-type"] = true;
                }
             }
             break;
