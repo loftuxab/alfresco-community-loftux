@@ -37,6 +37,7 @@ import java.util.Set;
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
@@ -102,6 +103,9 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     
     /** Records management event service */
     protected RecordsManagementEventService recordsManagementEventService;
+    
+    /** Records management action service */
+    protected RecordsManagementAdminService recordsManagementAdminService;
     
     /** Ownable service **/
     protected OwnableService ownableService;
@@ -220,6 +224,16 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     {
         this.capabilities.addAll(capabilities);
     }
+    
+    public void setRecordsManagementAdminService(RecordsManagementAdminService recordsManagementAdminService)
+    {
+        this.recordsManagementAdminService = recordsManagementAdminService;
+    }
+
+    public RecordsManagementAdminService getRecordsManagementAdminService()
+    {
+        return recordsManagementAdminService;
+    }
 
     /**
      * Init method
@@ -237,6 +251,7 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
         PropertyCheck.mandatory(this, "recordsManagementAuditService", recordsManagementAuditService);
         PropertyCheck.mandatory(this, "recordsManagementActionService", recordsManagementActionService);
         PropertyCheck.mandatory(this, "recordsManagementService", recordsManagementService);
+        PropertyCheck.mandatory(this, "recordsManagementAdminService", recordsManagementAdminService);
         PropertyCheck.mandatory(this, "recordsManagementEventService", recordsManagementEventService);
         for(AbstractCapability capability : capabilities)
         {

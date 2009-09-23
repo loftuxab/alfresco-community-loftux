@@ -22,6 +22,7 @@
         <property name="dictionaryService" ref="dictionaryService"/>
         <property name="actionService" ref="actionService"/>
         <property name="recordsManagementAuditService" ref="recordsManagementAuditService"/>
+        <property name="recordsManagementAdminService" ref="recordsManagementAdminService"/>
         <property name="recordsManagementActionService" ref="recordsManagementActionService"/>
         <property name="recordsManagementService" ref="recordsManagementService"/>
         <property name="recordsManagementEventService" ref="recordsManagementEventService"/>
