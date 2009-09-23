@@ -371,66 +371,6 @@
          });
       },
 
-
-      /**
-       * Export action.
-       *
-       * @method onActionExport
-       * @param assets {array} Array representing one or more file(s) or folder(s) to be exported
-       */
-      onActionExport: function RDLA_onActionExport(assets)
-      {
-         // Save the nodeRefs
-         var nodeRefs = [];
-         for (var i = 0, ii = assets.length; i < ii; i++)
-         {
-            nodeRefs.push(assets[i].nodeRef);
-         }
-
-         // Open the export dialog
-         var exportWebscriptUrl = Alfresco.constants.PROXY_URI + "api/rma/admin/export";
-         if (!this.modules.exportDialog)
-         {
-            // Load if for the first time
-            this.modules.exportDialog = new Alfresco.module.SimpleDialog(this.id + "-exportDialog").setOptions(
-            {
-               width: "30em",
-               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/export",
-               actionUrl: exportWebscriptUrl,
-               doBeforeDialogShow:
-               {
-                  fn: function RDLA_onActionExport_SimpleDialog_doBeforeDialogShow(p_config, p_simpleDialog, p_obj)
-                  {
-                     // Set the hidden nodeRefs field to a comma-separated list of nodeRefs
-                     Dom.get(this.id + "-exportDialog-nodeRefs").value = p_obj.join(",");
-                  },
-                  obj: nodeRefs,
-                  scope: this
-               },
-               firstFocus: this.id + "-exportDialog-acp",
-               doBeforeFormSubmit:
-               {
-                  fn: function RDLA_onActionExport_SimpleDialog_doBeforeFormSubmit()
-                  {
-                     // Close dialog now since no callback is provided since we are submitting in a hidden iframe.
-                     this.modules.exportDialog.hide();
-                  },
-                  scope: this
-               }
-            });
-         }
-         else
-         {
-            // Open the export dialog again
-            this.modules.exportDialog.setOptions(
-            {
-               actionUrl: exportWebscriptUrl,
-               clearForm: true
-            });
-         }
-         this.modules.exportDialog.show();
-      },
-
       /**
        * Edit Review As Of Date action.
        *
@@ -482,6 +422,62 @@
          panel.cfg.getProperty("buttons")[0].handler.obj.callback.obj = calendar;
          panel.center();
          panel.show();
+      },
+
+      /**
+       * Export action.
+       *
+       * @method onActionExport
+       * @param assets {array} Array representing one or more file(s) or folder(s) to be exported
+       */
+      onActionExport: function RDLA_onActionExport(assets)
+      {
+         // Save the nodeRefs
+         var nodeRefs = [];
+         for (var i = 0, ii = assets.length; i < ii; i++)
+         {
+            nodeRefs.push(assets[i].nodeRef);
+         }
+
+         // Open the export dialog
+         if (!this.modules.exportDialog)
+         {
+            // Load if for the first time
+            this.modules.exportDialog = new Alfresco.module.SimpleDialog(this.id + "-exportDialog").setOptions(
+            {
+               width: "30em",
+               templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/export",
+               actionUrl: Alfresco.constants.PROXY_URI + "api/rma/admin/export",
+               firstFocus: this.id + "-exportDialog-acp",
+               doBeforeFormSubmit:
+               {
+                  fn: function RDLA_onActionExport_SimpleDialog_doBeforeFormSubmit()
+                  {
+                     // Close dialog now since no callback is provided since we are submitting in a hidden iframe.
+                     this.modules.exportDialog.hide();
+                  },
+                  scope: this
+               }
+            });
+         }
+
+         // doBeforeDialogShow needs re-registering each time as nodeRefs array is dynamic
+         this.modules.exportDialog.setOptions(
+         {
+            clearForm: true,
+            doBeforeDialogShow:
+            {
+               fn: function RDLA_onActionExport_SimpleDialog_doBeforeDialogShow(p_config, p_simpleDialog, p_obj)
+               {
+                  // Set the hidden nodeRefs field to a comma-separated list of nodeRefs
+                  Dom.get(this.id + "-exportDialog-nodeRefs").value = p_obj.join(",");
+               },
+               obj: nodeRefs,
+               scope: this
+            }
+         });
+
+         this.modules.exportDialog.show();
       },
 
       /**
