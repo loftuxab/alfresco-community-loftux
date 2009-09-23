@@ -79,12 +79,12 @@
                 <title>SupersededBy__Supersedes</title>
                 <source>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </source>
                 <target>
                     <class>rma:record</class>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </target>
             </child-association>
             
@@ -92,12 +92,12 @@
                 <title>ObsoletedBy__Obsoletes</title>
                 <source>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </source>
                 <target>
                     <class>rma:record</class>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </target>
             </child-association>
             
@@ -105,12 +105,12 @@
                 <title>VersionedBy__Versions</title>
                 <source>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </source>
                 <target>
                     <class>rma:record</class>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </target>
             </child-association>                       
             
@@ -118,12 +118,12 @@
                 <title>Supporting Documentation__Supported Documentation</title>
                 <source>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </source>
                 <target>
                     <class>rma:record</class>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </target>
             </child-association>                       
             
@@ -131,12 +131,12 @@
                 <title>Cross-Reference</title>
                 <source>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </source>
                 <target>
                     <class>rma:record</class>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </target>
             </association>
             
@@ -144,12 +144,12 @@
                 <title>Rendition</title>
                 <source>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </source>
                 <target>
                     <class>rma:record</class>
                     <mandatory>false</mandatory>
-                    <many>false</many>
+                    <many>true</many>
                 </target>
             </association>
          

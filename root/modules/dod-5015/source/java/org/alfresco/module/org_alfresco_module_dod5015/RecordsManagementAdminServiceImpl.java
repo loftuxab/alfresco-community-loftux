@@ -597,6 +597,11 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         M2Association newAssoc = customAssocsAspect.createAssociation(generatedShortQName);
         newAssoc.setSourceMandatory(false);
         newAssoc.setTargetMandatory(false);
+
+        // MOB-1573
+        newAssoc.setSourceMany(true);
+        newAssoc.setTargetMany(true);
+
         // The label is stored in the title.
         newAssoc.setTitle(label);
         
@@ -644,6 +649,11 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         M2ChildAssociation newAssoc = customAssocsAspect.createChildAssociation(generatedQName.toPrefixString(namespaceService));
         newAssoc.setSourceMandatory(false);
         newAssoc.setTargetMandatory(false);
+        
+        // MOB-1573
+        newAssoc.setSourceMany(true);
+        newAssoc.setTargetMany(true);
+
         // source and target are stored in title.
         newAssoc.setTitle(compoundID);
         
