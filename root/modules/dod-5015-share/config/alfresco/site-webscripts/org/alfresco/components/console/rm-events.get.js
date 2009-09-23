@@ -1,3 +1,5 @@
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/components/console/rm-console.lib.js">
+
 /**
  * Sort helper function for objects with labels
  *
@@ -10,15 +12,19 @@ function sortByLabel(obj1, obj2)
 }
 
 /**
- * Main entrypoint for component webscript logic
+ * Main entry point for component webscript logic
  *
  * @method main
  */
 function main()
 {
-   // Call the repo to create the site
-   var scriptRemoteConnector = remote.connect("alfresco");
-   var repoResponse = scriptRemoteConnector.get("/api/rma/admin/rmeventtypes");
+   var conn = remote.connect("alfresco");
+   
+   // test user capabilities - can they access Events?
+   model.hasAccess = hasCapability(conn, "CreateModifyDestroyEvents");
+   
+   // retrieve event types
+   var repoResponse = conn.get("/api/rma/admin/rmeventtypes");
    if (repoResponse.status == 401)
    {
       status.setCode(repoResponse.status, "error.loggedOut");
@@ -52,7 +58,6 @@ function main()
          return;
       }
    }
-
 }
 
 main();

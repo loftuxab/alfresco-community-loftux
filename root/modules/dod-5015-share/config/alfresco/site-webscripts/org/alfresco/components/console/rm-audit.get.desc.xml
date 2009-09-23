@@ -2,5 +2,5 @@
   <shortname>Admin Console Audit</shortname>
   <description>Administration Console - Audit</description>
   <url>/components/console/rm-audit</url>
-  <family>admin-console</family>
+  <family>rm-console</family>
 </webscript>

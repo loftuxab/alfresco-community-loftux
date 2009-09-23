@@ -1,3 +1,6 @@
+<#if !hasAccess>
+   <#include "./rm-console-access.ftl">
+<#else>
 <!--[if IE]>
 <iframe id="yui-history-iframe" src="${url.context}/yui/assets/blank.html"></iframe> 
 <![endif]-->
@@ -143,3 +146,4 @@
    </div>
 
 </div>
+</#if>

@@ -1,3 +1,5 @@
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/components/console/rm-console.lib.js">
+
 /**
  * RM Custom Metadata WebScript component
  */
@@ -13,8 +15,10 @@ function main()
    {
       constraints = eval('(' + res + ')').data;
    }
-   
    model.constraints = constraints;
+   
+   // test user capabilities - can they access Custom Metadata?
+   model.hasAccess = hasCapability(conn, "CreateModifyDestroyFileplanTypes");
 }
 
 main();
