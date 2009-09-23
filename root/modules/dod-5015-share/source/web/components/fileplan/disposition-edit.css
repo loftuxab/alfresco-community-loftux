@@ -1,9 +1,27 @@
+.disposition-edit .disposition-form,
+.disposition-edit .caption
+{
+   width: 50em;
+}
+
+.disposition-edit .caption
+{
+   text-align: right;
+   padding: 0 1em 0.5em 1em;
+}
+
 .disposition-edit .disposition-form
 {
    background-color: #F5FFF2;
    border: 1px solid #C2C2C2 !important;
    padding: 1em !important;
-   width: 50em;
+}
+
+.disposition-edit .mandatory-indicator
+{
+   color:green;
+   margin-left:0.4em;
+   margin-right:0.4em;
 }
 
 .disposition-edit .header

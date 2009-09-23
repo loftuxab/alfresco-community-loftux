@@ -18,6 +18,9 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
 //]]></script>
 <#assign el=args.htmlid>
 <div class="disposition-edit">
+   <div class="caption">
+      <span class="mandatory-indicator">*</span> ${msg("label.required.fields")}
+   </div>
    <div class="disposition-form">
       <div>
          <div class="header">${msg("header.action")}</div>
@@ -140,7 +143,7 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                   </div>
                   <div class="section">
                      <hr />
-                     ${msg("label.description")}:<br />
+                     ${msg("label.description")}: <span class="mandatory-indicator">*</span><br />
                      <textarea name="description" class="description"></textarea>
                   </div>
                   <div class="buttons">
