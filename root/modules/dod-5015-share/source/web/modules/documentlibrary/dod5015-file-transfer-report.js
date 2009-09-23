@@ -60,6 +60,29 @@
    
    YAHOO.extend(Alfresco.module.RecordsFileTransferReport, Alfresco.module.DoclibMoveTo,
    {
+
+      /**
+       * Object container for initialization options
+       */
+      options:
+      {
+         /**
+          * Current fileplan's nodeRef.
+          *
+          * @property fileplanNodeRef The fileplan's nodeRef
+          * @type string
+          */
+         fileplanNodeRef: null,
+
+         /**
+          * Object representing the transfer object with nodeRef and displayName
+          *
+          * @property transfer The nodeRef to the transfer that shall be filed
+          * @type object
+          */
+         transfer: null
+      },
+
       /**
        * Set multiple initialization options at once.
        *
@@ -73,9 +96,84 @@
          return Alfresco.module.RecordsFileTransferReport.superclass.setOptions.call(this, YAHOO.lang.merge(
          {
             templateUrl: Alfresco.constants.URL_SERVICECONTEXT + "modules/documentlibrary/dod5015/file-transfer-report",
-            dataWebScriptStem: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/",
-            dataWebScript: "file-transfer-report/site"
+            files: obj.transfer // To make the DoclibMoveTo component happy
          }, obj));
+      },
+
+      /**
+       *
+       *
+       * @method onOK
+       * @override
+       */
+      onOK: function RMCMFT_onOK()
+      {
+         // create the webscript url
+         var transferNodeRefParts = this.options.transfer.nodeRef.split("/"),
+            transferId = transferNodeRefParts[transferNodeRefParts.length - 1],
+            url = Alfresco.constants.PROXY_URI + "api/node/" + this.options.fileplanNodeRef.replace(":/", "") + "/transfers/" + transferId + "/report";
+
+         // Post file transfer report request to server
+         Alfresco.util.Ajax.jsonPost(
+         {
+            url: url,
+            dataObj:
+            {
+               destination: this.selectedNode.data.nodeRef
+            },
+            successCallback:
+            {
+               fn: function (response)
+               {
+                  // Hide the dialog
+                  this.widgets.dialog.hide();
+
+                  // Get reports record name
+                  var reportName = response.json.recordName;
+
+                  // Display success message
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this.msg("message.success", reportName)
+                  });
+
+                  // Make sure other components display the new file if present
+                  YAHOO.Bubbling.fire("filterChanged",
+                  {
+                     filterId: "path",
+                     filterData: this.selectedNode.data.path,
+                     highlightFile: reportName
+                  });                  
+               },
+               scope: this
+            },
+            failureCallback:
+            {
+               fn:function (response)
+               {
+                  // Display error
+                  var text = this.msg("message.failure");
+                  if(response.json && response.json.message)
+                  {
+                     text = response.json.message;
+                  }
+                  Alfresco.util.PopupManager.displayPrompt(
+                  {
+                     title: Alfresco.util.message("message.failure"),
+                     text: text
+                  });
+
+                  // Enable dialog buttons again
+                  this.widgets.okButton.set("disabled", false);
+                  this.widgets.cancelButton.set("disabled", false);
+               },
+               scope: this
+            }
+         });
+
+         // Disable dialog buttons
+         this.widgets.okButton.set("disabled", true);
+         this.widgets.cancelButton.set("disabled", true);
       },
 
       /**
