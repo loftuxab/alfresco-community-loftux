@@ -497,7 +497,8 @@
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             path: this.currentPath,
-            files: assets
+            fileplanNodeRef: this.doclistMetadata.filePlan,
+            transfer: assets
          }).showDialog();
       },
 
