@@ -215,7 +215,37 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
      */
     public void onCreateRecordFolder(ChildAssociationRef childAssocRef)
     {
-        setUpPermissions(childAssocRef.getChildRef());
+    	final NodeRef folderNodeRef = childAssocRef.getChildRef();
+        setUpPermissions(folderNodeRef);
+        
+        // Pull any permissions found on the parent (ie the record category)
+        final NodeRef catNodeRef = childAssocRef.getParentRef();
+        if (nodeService.exists(catNodeRef) == true)
+        {
+        	AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+            {
+                public Object doWork()
+                {
+                	Set<AccessPermission> perms = permissionService.getAllSetPermissions(catNodeRef);
+                	for (AccessPermission perm : perms) 
+                	{
+                		AccessStatus accessStatus = perm.getAccessStatus();
+                		boolean allow = false;
+                		if (AccessStatus.ALLOWED.equals(accessStatus) == true)
+                		{
+                			allow = true;
+                		}
+                		permissionService.setPermission(
+                				folderNodeRef, 
+                				perm.getAuthority(), 
+                				perm.getPermission(), 
+                				allow);
+        			}
+                	
+                    return null;
+                }
+            }, AuthenticationUtil.getAdminUserName());	
+        }
     }
     
     /**
