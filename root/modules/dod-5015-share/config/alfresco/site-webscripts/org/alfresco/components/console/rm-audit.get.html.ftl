@@ -1,4 +1,7 @@
-<script type="text/javascript" charset="utf-8">    
+<#if !hasAccess>
+   <#include "./rm-console-access.ftl">
+<#else>
+  <script type="text/javascript" charset="utf-8">    
     new Alfresco.RM_Audit('${htmlid}-audit').setOptions({
        'siteId': "${page.url.templateArgs.site!"rm"}",
        'containerId': "${template.properties.container!"documentLibrary"}",
@@ -23,7 +26,7 @@
          </div>
 	   </div>
     </div>    
-<div id="filters">
+    <div id="filters">
       <div class="yui-gb">
          <div class="yui-g first">
             <!-- the first child of a Grid needs the "first" class -->
@@ -156,3 +159,4 @@
       </div>
     </div>
   </div>
+</#if>

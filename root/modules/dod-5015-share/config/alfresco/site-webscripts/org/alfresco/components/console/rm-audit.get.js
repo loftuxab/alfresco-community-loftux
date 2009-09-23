@@ -1,19 +1,26 @@
+<import resource="classpath:alfresco/site-webscripts/org/alfresco/components/console/rm-console.lib.js">
+
 function main()
 {
    var meta = [];
    
    var conn = remote.connect("alfresco");
    
-   // retrieve the RM custom properties - for display as meta-data fields etc.
-   var elements = ["record", "recordFolder", "recordCategory", "recordSeries"];
-   for each (var el in elements)
+   // retrieve user capabilities - can they access Audit?
+   var hasAccess = hasCapability(conn, "AccessAudit");
+   if (hasAccess)
    {
-      retrieveMetadataForElement(conn, meta, el);
+      // retrieve the RM custom properties - for display as meta-data fields etc.
+      var elements = ["record", "recordFolder", "recordCategory", "recordSeries"];
+      for each (var el in elements)
+      {
+         retrieveMetadataForElement(conn, meta, el);
+      }
+      model.meta = meta;
+      model.events = retrieveAuditEvents(conn);
+      model.eventsStr = model.events.toSource();
    }
-   model.meta = meta;
-   model.events = retrieveAuditEvents(conn);
-   model.eventsStr = model.events.toSource();
-   
+   model.hasAccess = hasAccess;
 }
 
 function retrieveMetadataForElement(conn, meta, el)

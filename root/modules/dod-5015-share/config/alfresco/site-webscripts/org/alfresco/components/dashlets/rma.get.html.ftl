@@ -18,7 +18,7 @@
          <a id="${args.htmlid}-load-data-link" href="#">${msg("label.load-test-data")}</a>
       </div>
       <div class="detail-list-item last-item">
-         <a id="${args.htmlid}-role-report-link" href="${url.context}/page/site/rm/userrights">${msg("label.user-role-report")}</a>
+         <a id="${args.htmlid}-role-report-link" href="${url.context}/page/console/rm-console/">${msg("label.rm-console")}</a>
       </div>
    </div>
 </div>

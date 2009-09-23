@@ -2,5 +2,5 @@
   <shortname>Admin Console Record Management Custom Metadata</shortname>
   <description>Administration Console - Record Management Tool Custom Metadata</description>
   <url>/components/console/rm-custom-metadata</url>
-  <family>admin-console</family>
+  <family>rm-console</family>
 </webscript>

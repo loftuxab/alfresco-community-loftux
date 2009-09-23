@@ -1,3 +1,6 @@
+<#if !hasAccess>
+   <#include "./rm-console-access.ftl">
+<#else>
 <#if (action='new' || action='edit')>
 
 <script type="text/javascript">//<![CDATA[
@@ -243,4 +246,5 @@
    </div>
 </div>
 
+</#if>
 </#if>

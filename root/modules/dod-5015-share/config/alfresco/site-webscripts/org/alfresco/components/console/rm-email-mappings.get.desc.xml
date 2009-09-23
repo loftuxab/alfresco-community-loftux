@@ -2,5 +2,5 @@
   <shortname>Admin Console Email Mappings</shortname>
   <description>Administration Console - Email Mappings</description>
   <url>/components/console/rm-email-mappings</url>
-  <family>admin-console</family>
+  <family>rm-console</family>
 </webscript>
