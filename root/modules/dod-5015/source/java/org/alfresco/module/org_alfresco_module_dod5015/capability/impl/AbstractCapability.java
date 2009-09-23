@@ -576,18 +576,7 @@ public abstract class AbstractCapability implements Capability
     public boolean isFileable(NodeRef nodeRef)
     {
         QName type = voter.getNodeService().getType(nodeRef);
-        if (type.equals(ContentModel.TYPE_CONTENT))
-        {
-            return true;
-        }
-        else if (type.equals(RecordsManagementModel.TYPE_NON_ELECTRONIC_DOCUMENT))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return voter.getDictionaryService().isSubClass(type, ContentModel.TYPE_CONTENT);
     }
 
     public boolean isVitalRecord(NodeRef nodeRef)

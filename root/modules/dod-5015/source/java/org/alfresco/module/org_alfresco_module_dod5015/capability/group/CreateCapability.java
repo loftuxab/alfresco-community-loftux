@@ -68,6 +68,26 @@ public class CreateCapability extends AbstractGroupCapability
                     }
                 }
             }
+            else if ((checkFilingUnfrozenUncutoff(destination) == AccessDecisionVoter.ACCESS_GRANTED) && isClosed(destination))
+            {
+                if (isRecordFolder(voter.getNodeService().getType(destination)))
+                {
+                    if (voter.getPermissionService().hasPermission(getFilePlan(destination), RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS) == AccessStatus.ALLOWED)
+                    {
+                        return AccessDecisionVoter.ACCESS_GRANTED;
+                    }
+                }
+            }
+            else if ((checkFilingUnfrozen(destination) == AccessDecisionVoter.ACCESS_GRANTED) && isCutoff(destination))
+            {
+                if (isRecordFolder(voter.getNodeService().getType(destination)))
+                {
+                    if (voter.getPermissionService().hasPermission(getFilePlan(destination), RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS) == AccessStatus.ALLOWED)
+                    {
+                        return AccessDecisionVoter.ACCESS_GRANTED;
+                    }
+                }
+            }
         }
         if (voter.getCreateModifyDestroyFoldersCapability().evaluate(destination, type) == AccessDecisionVoter.ACCESS_GRANTED)
         {

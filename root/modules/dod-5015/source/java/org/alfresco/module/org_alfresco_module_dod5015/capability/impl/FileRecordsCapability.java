@@ -62,6 +62,26 @@ public class FileRecordsCapability extends AbstractCapability
                     }
                 }
             }
+            else if ((checkFilingUnfrozenUncutoff(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED) && isClosed(nodeRef) && !isDeclared(nodeRef))
+            {
+                if (isRecord(nodeRef) || isFileable(nodeRef))
+                {
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS) == AccessStatus.ALLOWED)
+                    {
+                        return AccessDecisionVoter.ACCESS_GRANTED;
+                    }
+                }
+            }
+            else if ((checkFilingUnfrozen(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED) && isCutoff(nodeRef))
+            {
+                if (isRecord(nodeRef) || isFileable(nodeRef))
+                {
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS) == AccessStatus.ALLOWED)
+                    {
+                        return AccessDecisionVoter.ACCESS_GRANTED;
+                    }
+                }
+            }
             return AccessDecisionVoter.ACCESS_DENIED;
 
         }
