@@ -212,7 +212,7 @@
                      if(response.json.metadata && response.json.metadata.parent)
                      {
                         // Get the parent nodeRef from the reponse and try to find its fileplan
-                        var parentNodeRef = response.json.metadata.parent;
+                        var parentNodeRef = response.json.metadata.parent.nodeRef;
                         Alfresco.util.Ajax.jsonGet(
                         {
                            url: Alfresco.constants.PROXY_URI_RELATIVE + "api/node/" + parentNodeRef.replace(":/", "") + "/nextdispositionaction",
