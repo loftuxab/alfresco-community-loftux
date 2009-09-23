@@ -30,6 +30,7 @@ import java.util.List;
 
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
@@ -62,7 +63,7 @@ public abstract class AbstractCapability implements Capability
     protected List<RecordsManagementAction> actions = new ArrayList<RecordsManagementAction>(1);
 
     protected List<String> actionNames = new ArrayList<String>(1);
-    
+
     public AbstractCapability()
     {
         super();
@@ -80,8 +81,8 @@ public abstract class AbstractCapability implements Capability
         voter.addProtectedAspects(action.getProtectedAspects());
         voter.addProtectedProperties(action.getProtectedProperties());
     }
-    
-    /** 
+
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.capability.Capability#isGroupCapability()
      */
     public boolean isGroupCapability()
@@ -336,7 +337,8 @@ public abstract class AbstractCapability implements Capability
                 logger.debug("\t\tNode ref is not null");
             }
 
-            if (isRecord(nodeRef))
+            // include records and content in the RM world as it may not yet be filed
+            if (isRecord(nodeRef) || isFileable(nodeRef))
             {
                 // Multifiling - if you have filing rights to any of the folders in which the record resides
                 // then you have filing rights.
@@ -495,8 +497,6 @@ public abstract class AbstractCapability implements Capability
         return AccessDecisionVoter.ACCESS_ABSTAIN;
     }
 
-    
-
     public int checkDelete(NodeRef nodeRef)
     {
         if (voter.getNodeService().hasAspect(nodeRef, RecordsManagementModel.ASPECT_FILE_PLAN_COMPONENT))
@@ -571,6 +571,23 @@ public abstract class AbstractCapability implements Capability
     public boolean isRecord(NodeRef nodeRef)
     {
         return voter.getNodeService().hasAspect(nodeRef, RecordsManagementModel.ASPECT_RECORD);
+    }
+
+    public boolean isFileable(NodeRef nodeRef)
+    {
+        QName type = voter.getNodeService().getType(nodeRef);
+        if (type.equals(ContentModel.TYPE_CONTENT))
+        {
+            return true;
+        }
+        else if (type.equals(RecordsManagementModel.TYPE_NON_ELECTRONIC_DOCUMENT))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean isVitalRecord(NodeRef nodeRef)
