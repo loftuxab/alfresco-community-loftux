@@ -28,8 +28,8 @@
       <actionSet id="undeclaredRecord">
          <action type="simple-link" id="onActionDownload" permission="download" href="{downloadUrl}" label="actions.download" />
          <action type="simple-link" id="onActionEditDetails" permission="UpdateProperties" href="{editMetadataUrl}" label="actions.edit-details" />
-         <action type="action-link" id="onActionDeclare" permission="DeclareRecords" label="actions.declare" />
-         <action type="action-link" id="onActionSetRecordType" permission="set-record-type" label="actions.set-record-type" />
+         <action type="action-link" id="onActionDeclare" permission="Declare" label="actions.declare" />
+         <action type="action-link" id="onActionSetRecordType" permission="UpdateProperties,set-record-type" label="actions.set-record-type" />
          <action type="action-link" id="onActionSplitEmail" permission="split-email" label="actions.split-email" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="Delete" label="actions.move-to" />
