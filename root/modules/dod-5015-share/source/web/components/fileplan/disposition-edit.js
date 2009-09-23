@@ -829,8 +829,8 @@
          var items = this.widgets.createActionButton.getMenu().getItems(),
             item,
             disabled,
-            disableAll = usedActionNames["destroy"] ? true : false, // "destroy" is in use and it MUST be the last action
-            onlyEnableCutoff = actionNames.length == 0; // No actions are in use and "cutoff MUST be the first
+            disableAll = usedActionNames["destroy"] ? true : false,  // "destroy" is in use and it MUST be the last action
+            onlyEnableCutoffRetain = (actionNames.length === 0);     // No actions in use and "cutoff" or "retain" must be first
          for (i = 0; i < items.length; i++)
          {
             item = items[i];
@@ -838,9 +838,11 @@
              * Disable item if:
              * - all items shall be disabled
              * - OR the item already is used
-             * - OR if only cutoff shall be enabled (and this isn't "cutoff")
+             * - OR if only cutoff/retain shall be enabled (and this isn't "cutoff" or "retain")
              */
-            disabled = (disableAll) || (usedActionNames[item.value] ? true : false) || (onlyEnableCutoff && item.value != "cutoff");
+            disabled = (disableAll) ||
+                       (usedActionNames[item.value] ? true : false) ||
+                       (onlyEnableCutoffRetain && (item.value !== "cutoff" && item.value !== "retain"));
             item.cfg.setProperty("disabled", disabled);
          }
       },
