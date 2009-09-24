@@ -34,12 +34,12 @@ import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAu
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
 import org.springframework.context.ApplicationContext;
@@ -58,7 +58,6 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
     private NodeService nodeService;
     private TransactionService transactionService;
     private RetryingTransactionHelper txnHelper;
-    private SearchService searchService;
     private RecordsManagementAuditService rmAuditService;
 
 
@@ -77,7 +76,6 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
  
         this.rmAuditService = (RecordsManagementAuditService) ctx.getBean("RecordsManagementAuditService");
 
-        this.searchService = serviceRegistry.getSearchService();
         this.nodeService = serviceRegistry.getNodeService();
 
 
@@ -236,7 +234,16 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         assertTrue("Should have cleared all audit entries", entries.isEmpty());
         
         // Delete the node
-        nodeService.deleteNode(chosenNodeRefFinal);
+        RunAsWork<Void> deleteRunAs = new RunAsWork<Void>()
+        {
+            public Void doWork() throws Exception
+            {
+                nodeService.deleteNode(chosenNodeRefFinal);
+                return null;
+            }
+        };
+        AuthenticationUtil.runAs(deleteRunAs, AuthenticationUtil.getSystemUserName());
+        
         entries = txnHelper.doInTransaction(nodeResultsCallback);
         assertFalse("Should have recorded node deletion", entries.isEmpty());
     }
