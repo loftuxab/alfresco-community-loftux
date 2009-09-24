@@ -118,7 +118,10 @@ var Evaluator =
       if (asset.hasAspect("rma:cutOff"))
       {
          status["cutoff"] = true;
-         permissions["undo-cutoff"] = true;
+         if (asset.hasAspect("rma:dispositionLifecycle"))
+         {
+            permissions["undo-cutoff"] = true;
+         }
       }
 
       /* Transferred status */
