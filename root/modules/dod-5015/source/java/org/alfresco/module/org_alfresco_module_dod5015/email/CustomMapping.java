@@ -1,5 +1,6 @@
 package org.alfresco.module.org_alfresco_module_dod5015.email;
 
+
 public class CustomMapping
 {
     private String from;
@@ -8,6 +9,12 @@ public class CustomMapping
     public CustomMapping() 
     {
         
+    }
+    
+    public CustomMapping(String from, String to) 
+    {
+        this.from = from;
+        this.to = to;
     }
     
     public void setFrom(String from)
@@ -41,5 +48,31 @@ public class CustomMapping
             return 1;
         }
     }
-
+    
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+     
+        final CustomMapping other = (CustomMapping) obj;
+        
+        if (!from.equals(other.getFrom()))
+        {
+            return false;
+        }
+        if (!to.equals(other.getTo()))
+        {
+            return false;
+        }
+        return true;
+    }
 }

@@ -76,67 +76,61 @@ public class CustomEmailMappingServiceImpl implements CustomEmailMappingService
      * 
      */
     public void init()
-    {
-//        RetryingTransactionHelper helper = transactionService.getRetryingTransactionHelper();
+    { 
+        CustomMapping[] rmHardCodedMappings =  {
+                    new CustomMapping("Date", "rma:dateReceived"),
+                    new CustomMapping("messageTo", "rma:address"),
+                    new CustomMapping("messageFrom", "rma:originator"),
+                    new CustomMapping("messageSent", "rma:publicationDate"),
+                    new CustomMapping("messageCc", "rma:otherAddress")
+        };     
         
-//        RetryingTransactionCallback<Integer> cb = new RetryingTransactionCallback<Integer>()
-//        {
-//           public Integer execute() throws Throwable
-//           {
-               // TODO Need to retrieve custom properties  
-               NodeRef configNode = getConfigNode();
-               if(configNode != null)
-               {
-   
-                   /**
-                    * Get any custom mappings.
-                    */
-                   customMappings = readConfig(configNode);
-                   
-                   // Get the read only existing configuration
-                   Map<String, Set<QName>> currentMapping = extracter.getCurrentMapping();
-                   
-                   Map<String, Set<QName>> newMapping = new HashMap<String, Set<QName>>(17);
-                   newMapping.putAll(currentMapping);
+        NodeRef configNode = getConfigNode();
+        if(configNode != null)
+        {   
+            /**
+             * Get any custom mappings.
+             */
+            customMappings = readConfig(configNode);
+        }
+        
+        /**
+         * ensure that the customMappings contain the RM specific mappings
+         */
+        for(CustomMapping mapping : rmHardCodedMappings)
+        {
+            if(!customMappings.contains(mapping))
+            {
+                customMappings.add(mapping);
+            }
+        }
 
-                   for(CustomMapping mapping : customMappings)
-                   {
-                       QName newQName = QName.createQName(mapping.getTo(), nspr);
-                       Set<QName> values = newMapping.get(mapping.getFrom());
-                       if(values == null)
-                       {
-                           values = new HashSet<QName>();
-                           newMapping.put(mapping.getFrom(), values);
-                       }
-                       values.add(newQName);
-                   }
-                       
-                   // Now update the metadata extracter
-                   extracter.setMapping(newMapping);       
-               }
-//                return 0;    
-//           }
-//        };
-//        helper.doInTransaction(cb);
+        // Get the read only existing configuration
+        Map<String, Set<QName>> currentMapping = extracter.getCurrentMapping();
+
+        Map<String, Set<QName>> newMapping = new HashMap<String, Set<QName>>(17);
+        newMapping.putAll(currentMapping);
+
+        for(CustomMapping mapping : customMappings)
+        {
+            QName newQName = QName.createQName(mapping.getTo(), nspr);
+            Set<QName> values = newMapping.get(mapping.getFrom());
+            if(values == null)
+            {
+                values = new HashSet<QName>();
+                newMapping.put(mapping.getFrom(), values);
+            }
+            values.add(newQName);
+        }
+
+        // Now update the metadata extracter
+        extracter.setMapping(newMapping);       
          
         // Register interest in the onContentUpdate policy
         policyComponent.bindClassBehaviour(
                 ContentServicePolicies.ON_CONTENT_UPDATE,
                 RecordsManagementModel.TYPE_EMAIL_CONFIG,
-                new JavaBehaviour(this, "onContentUpdate"));
-        
-//        // Register interest in the beforeDeleteNode policy
-//        policyComponent.bindClassBehaviour(
-//                QName.createQName(NamespaceService.ALFRESCO_URI, "beforeDeleteNode"),
-//                RecordsManagementModel.TYPE_EMAIL_CONFIG,
-//                new JavaBehaviour(this, "beforeDeleteNode"));
-//        
-//        // Register interest in the onCreateNode policy
-//        policyComponent.bindClassBehaviour(
-//                QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),
-//                RecordsManagementModel.TYPE_EMAIL_CONFIG,
-//                new JavaBehaviour(this, "onCreateNode"));
-        
+                new JavaBehaviour(this, "onContentUpdate"));        
         
     }
     
