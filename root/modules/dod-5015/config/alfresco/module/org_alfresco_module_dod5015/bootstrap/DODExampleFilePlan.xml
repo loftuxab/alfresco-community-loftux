@@ -346,7 +346,7 @@
                                         <rma:dispositionActionDefinition view:childName="rma:dispositionActionDefinition">                              
                                             <view:properties>
                                                 <rma:dispositionActionName>destroy</rma:dispositionActionName>
-                                                <rma:dispositionPeriod>immediate|0</rma:dispositionPeriod>
+                                                <rma:dispositionPeriod>immediately|0</rma:dispositionPeriod>
                                             </view:properties>                              
                                         </rma:dispositionActionDefinition>                       
                                    </rma:dispositionActionDefinitions>
