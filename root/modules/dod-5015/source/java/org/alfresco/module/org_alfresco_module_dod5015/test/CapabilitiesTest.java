@@ -890,7 +890,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
@@ -955,7 +955,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
@@ -1020,7 +1020,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
@@ -1349,7 +1349,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
@@ -1415,7 +1415,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
@@ -1481,7 +1481,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
@@ -1810,7 +1810,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
@@ -1876,7 +1876,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
@@ -1942,7 +1942,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
@@ -2011,7 +2011,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
@@ -2077,7 +2077,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
@@ -2143,7 +2143,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
@@ -2215,7 +2215,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
@@ -2278,7 +2278,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
@@ -2320,7 +2320,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
         check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
-        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
         check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
         check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
@@ -2345,7 +2345,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
@@ -2387,7 +2387,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.DENIED);
         check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
-        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
         check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
         check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
@@ -2411,7 +2411,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
@@ -2480,7 +2480,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
@@ -2546,7 +2546,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
@@ -2612,7 +2612,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
@@ -2678,7 +2678,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_EVENTS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_METADATA, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FILEPLAN_TYPES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_RECORD_TYPES, AccessStatus.ALLOWED);
@@ -2740,7 +2740,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.ALLOWED);
@@ -2782,7 +2782,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
-        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
         check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
         check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.ALLOWED);
@@ -2813,7 +2813,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
@@ -2855,7 +2855,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.PLANNING_REVIEW_CYCLES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.RE_OPEN_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.SELECT_AUDIT_METADATA, AccessStatus.DENIED);
-        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.ALLOWED);
+        check(access, RMPermissionModel.TRIGGER_AN_EVENT, AccessStatus.DENIED);
         check(access, RMPermissionModel.UNDECLARE_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.UNFREEZE, AccessStatus.DENIED);
         check(access, RMPermissionModel.UPDATE_CLASSIFICATION_DATES, AccessStatus.DENIED);
@@ -2878,7 +2878,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.ATTACH_RULES_TO_METADATA_PROPERTIES, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_ALL_TRANSFERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.AUTHORIZE_NOMINATED_TRANSFERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.UNDETERMINED);
+        check(access, RMPermissionModel.CHANGE_OR_DELETE_REFERENCES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CLOSE_FOLDERS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_AND_ASSOCIATE_SELECTION_LISTS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_CLASSIFICATION_GUIDES, AccessStatus.DENIED);
@@ -3214,12 +3214,12 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "cutoff", null);
         recordsManagementActionService.executeRecordsManagementAction(record_2, "cutoff", null);
 
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
         checkCapability(test_user, record_1, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
         checkCapability(test_user, recordFolder_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
-        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.DENIED);
+        checkCapability(test_user, record_2, RMPermissionModel.ADD_MODIFY_EVENT_DATES, AccessStatus.ALLOWED);
     }
-
+                            
     public void testApproveRecordsScheduledForCutoffCapability()
     {
         // Folder

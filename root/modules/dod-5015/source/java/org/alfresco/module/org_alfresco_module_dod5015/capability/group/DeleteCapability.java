@@ -59,12 +59,6 @@ public class DeleteCapability extends AbstractGroupCapability
     
     public int evaluate(NodeRef deletee)
     {
-        // check empty
-        if(voter.getNodeService().getChildAssocs(deletee, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL).size() > 0)
-        {
-            return AccessDecisionVoter.ACCESS_DENIED;
-        }
-        
         if (voter.getDestroyRecordsScheduledForDestructionCapability().evaluate(deletee) == AccessDecisionVoter.ACCESS_GRANTED)
         {
             return AccessDecisionVoter.ACCESS_GRANTED;

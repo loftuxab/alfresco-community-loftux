@@ -48,7 +48,7 @@ public class ChangeOrDeleteReferencesCapability extends AbstractCapability
             {
                 if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.CHANGE_OR_DELETE_REFERENCES) == AccessStatus.ALLOWED)
                 {
-                    return AccessDecisionVoter.ACCESS_GRANTED;
+                    return AccessDecisionVoter.ACCESS_ABSTAIN;
                 }
             }
 
