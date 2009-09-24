@@ -81,9 +81,6 @@
          <form id="${el}-completeEvent-form">
             <input type="hidden" id="${el}-eventName" value="" />
             <div class="section">
-               <h2>${msg("section.time")}</h2>
-            </div>
-            <div class="section">
                <label for="${el}-completedAtDate">${msg("label.completedAt")}:</label>
             </div>
             <div class="section yui-g">

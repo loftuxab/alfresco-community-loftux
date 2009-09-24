@@ -503,6 +503,15 @@
          // The panel is created from the HTML returned in the XHR request, not the container
          this.widgets.completeEventPanel = Alfresco.util.createYUIPanel("complete-event-panel");
 
+         // Make sure the completed at date picker is closed if its opened when the dialog is closed
+         this.widgets.completeEventPanel.subscribe("hide", function(p_sType, p_aArgs)
+         {
+            if(this.widgets.completedAtPicker)
+            {
+               this.widgets.completedAtPicker.hide();
+            }
+         }, null, this);
+
          // Buttons
          this.widgets.completeEventOkButton = Alfresco.util.createYUIButton(this, "completeEvent-ok-button", this.onCompleteEventOkClick);
          this.widgets.completeEventCancelButton = Alfresco.util.createYUIButton(this, "completeEvent-cancel-button", this.onCompleteEventCancelClick);
@@ -551,6 +560,7 @@
          var oCalendarMenu = new YAHOO.widget.Overlay(this.id + "-calendarmenu");
          oCalendarMenu.setBody("&#32;");
          oCalendarMenu.body.id = this.id + "-calendarcontainer";
+         this.widgets.completedAtPicker = oCalendarMenu;
 
          // Render the Overlay instance into the Button's parent element
          oCalendarMenu.render(completedAtPickerEl.parentNode);
@@ -593,15 +603,15 @@
        */
       onCompleteEventOkClick: function AddEvent_onCompleteEventOkClick(e, obj)
       {
-         // Get values and Hide panel
+         // Get completed at value and time and convert to iso format
          var completedAt = Alfresco.util.formatDate(Dom.get(this.id + "-completedAtDate").value, DATE_SHORT);
          completedAt = new Date(completedAt + " " + Dom.get(this.id + "-completedAtTime").value);
          var completedAtIso = Alfresco.util.toISO8601(completedAt);
 
+         // Get the name of the event to complete
          var eventName = Dom.get(this.id + "-eventName").value;
-         this.widgets.completeEventPanel.hide();
 
-         // Complete event and refresh events afterwards
+         // Complete the event with the completed at date and refresh events afterwards
          this._doEventAction("completeEvent",
          {
             eventName: eventName,
@@ -612,6 +622,9 @@
             }
          }, "message.completingEvent", "message.completeEventFailure");
 
+         // Hide dialog and completed at date picker
+         this.widgets.completedAtPicker.hide();
+         this.widgets.completeEventPanel.hide();
       },
 
       /**
@@ -625,6 +638,7 @@
       onCompleteEventCancelClick: function AddEvent_onCompleteEventCancelClick(e, obj)
       {
          // Hide panel
+         this.widgets.completedAtPicker.hide();
          this.widgets.completeEventPanel.hide();
       }
    });
