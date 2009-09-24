@@ -99,7 +99,7 @@
 #filters select,
 #filters input
 {
-   width:12em;
+   width:77%;
 }
 #filters .hd,
 #filters .bd
@@ -126,8 +126,52 @@
 /* audit log popup page */
 .audit-popup-log .audit-info
 {
-   margin: 1em;
+   margin: 1em 0;
+   clear:both;
 }
+#audit-popup-log h1 { 
+   margin:0.5em 0;
+   float:left;
+}
+#audit-popup-log .label { 
+   margin-right: 5px; 
+   font-weight: bold; 
+}
+#audit-popup-log .value { 
+   margin-right: 40px; 
+}
+#audit-popup-log .audit-info { 
+   background-color: #efefef; 
+   padding: 10px; 
+   margin-bottom: 4px; 
+}
+#audit-popup-log .audit-entry { 
+   border: 1px solid #bbb; 
+   margin-top: 15px; 
+}
+#audit-popup-log .audit-entry-header { 
+   background-color: #bbb; 
+   padding: 8px; 
+}
+#audit-popup-log .audit-entry-node { 
+   padding: 10px; 
+}
+#audit-popup-log .changed-values-table { 
+   margin-left: 6px; 
+   margin-bottom: 2px;
+   width: 99%; 
+}
+#audit-popup-log .changed-values-table th { 
+   text-align: left; 
+   background-color: #eee;
+   padding: 4px; 
+}
+#audit-popup-log .changed-values-table td { 
+   width: 33%; 
+   padding: 4px; 
+   border-top: 1px solid #eee; 
+}
+/*
 .audit-popup-log .auditDT
 {
    margin:0 1em;
@@ -158,9 +202,11 @@
 {
    margin-right:1em;
 }
+*/
 .audit-popup-log .auditActions 
 {
-   margin:1em;
+   float:right;
+   margin-top:1em;
 }
 .datepicker
 {

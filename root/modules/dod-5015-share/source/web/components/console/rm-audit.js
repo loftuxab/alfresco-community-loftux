@@ -151,193 +151,191 @@
               this.widgets[id]._button.className=button.className;
             }
          }
-         
-         //initialize dates in UI
-         this.widgets['status-date'] = Dom.get(this.id+'-status-date');
+         if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
+         {
+            //initialize dates in UI
+            this.widgets['status-date'] = Dom.get(this.id+'-status-date');
 
-         this.validAuditDates = (this.options.startDate!=="");
-         if (this.validAuditDates)
-         {
-            if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_COMPACT)
+            this.validAuditDates = (this.options.startDate!=="");
+            if (this.validAuditDates)
             {
-               Dom.get(this.id+'-from-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.startDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);
-               Dom.get(this.id+'-to-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.stopDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);  
-            }
-            else
+               if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_COMPACT)
+               {
+                  Dom.get(this.id+'-from-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.startDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);
+                  Dom.get(this.id+'-to-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.stopDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);  
+               }
+            }                
+            //initialise menus
+            //property menu
+            this.widgets['propertyMenu'] = new YAHOO.widget.Button(this.id + "-property",
             {
-               this.toggleUI();            
-            }  
-         }                
-         //initialise menus
-         //property menu
-         this.widgets['propertyMenu'] = new YAHOO.widget.Button(this.id + "-property",
-         {
-            type: "menu",
-            menu: this.id + "-property-menu"
-         });
-         
-         //events menu
-         this.widgets['eventMenu'] = new YAHOO.widget.Button(this.id + "-events",
-         {
-            type: "menu",
-            menu: this.id + "-events-menu"
-         });
-
-         this.widgets['propertyMenu'].on("selectedMenuItemChange", function selectedPropertyMenuItemChange(event)
-         {
-            var oMenuItem = event.newValue;
-            if (oMenuItem)
-            {
-               this.set('label', oMenuItem.cfg.getProperty('text'));
-            }
-
-            if (oMenuItem.value!="ALL")
-            {
-               me.queryParams.property=oMenuItem.value;
-            }
-            else
-            {
-               delete me.queryParams.property;
-            }
-         
-         });         
-         
-         this.widgets['eventMenu'].on("selectedMenuItemChange", function selectedEventMenuItemChange(event)
-         {
-            var oMenuItem = event.newValue;
-            if (oMenuItem)
-            {
-               this.set('label', oMenuItem.cfg.getProperty('text'));
-            }            
-            if (oMenuItem.value!="ALL")
-            {
-               me.queryParams.event=oMenuItem.value;
-            }
-            else
-            {
-               delete me.queryParams.event;
-            }
-         });
-         
-         //initialise calendar pickers
-         //fromDate calendar
-         var theDate = new Date();
-         var page = (theDate.getMonth() + 1) + "/" + theDate.getFullYear();
-         var selected = (theDate.getMonth() + 1) + "/" + theDate.getDate() + "/" + theDate.getFullYear();
-         this.widgets.fromCalendar = new YAHOO.widget.Calendar(null, this.id + "-fromDate-cal", { title: this.msg("message.select-from-date"), close: true });
-         this.widgets.fromCalendar.cfg.setProperty("pagedate", page);
-         this.widgets.fromCalendar.cfg.setProperty("selected", selected);
-         this.widgets.fromCalendar.selectEvent.subscribe(this.onDatePickerSelection,  {cal:this.widgets.fromCalendar,el:Dom.get(this.id+'-fromDate'),scope:this},true);
-
-         Event.addListener(this.id + "-fromDate-icon", "click", function () { this.widgets.toCalendar.hide();this.widgets.fromCalendar.show(); }, this, true);
-         //toDate calendar
-         this.widgets.toCalendar = new YAHOO.widget.Calendar(null, this.id + "-toDate-cal", { title: this.msg("message.select-to-date"), close: true });
-         this.widgets.toCalendar.cfg.setProperty("pagedate", page);
-         this.widgets.toCalendar.cfg.setProperty("selected", selected);
-         this.widgets.toCalendar.selectEvent.subscribe(this.onDatePickerSelection, {cal:this.widgets.toCalendar,el:Dom.get(this.id+'-toDate'),scope:this}, true );  
-
-         Event.addListener(this.id + "-toDate-icon", "click", function () { this.widgets.fromCalendar.hide();this.widgets.toCalendar.show(); }, this, true);         
-         // render the calendar control
-         this.widgets.fromCalendar.render();
-         this.widgets.toCalendar.render();             
-
-         //Sets up datatable and datasource.
-         var DS = this.widgets['auditDataSource'] = new YAHOO.util.DataSource(this.dataUri);
-         
-         DS.responseType = YAHOO.util.DataSource.TYPE_JSON;
-         DS.responseSchema = {
-            resultsList:'data.entries',
-            fields: ["timestamp","fullName","userRole","event","nodeName","nodeRef"],
-            metaFields: {
-               "enabled": "data.enabled",
-               "stopDate": "data.stopped",
-               "startDate": "data.started"
-            }
-         };
-         DS.doBeforeCallback = function ( oRequest , oFullResponse , oParsedResponse , oCallback )
-         {
-            me.options.results = oFullResponse.data.entries;
-            //enable/disable export and file record buttons
-            if (me.options.results.length===0)
-            {
-               me.widgets['export'].set('disabled',true);
-               me.widgets['declare-record'].set('disabled',true);
-            }
-            else
-            {
-               me.widgets['export'].set('disabled',false);
-               me.widgets['declare-record'].set('disabled',false);               
-            }
-            return oParsedResponse;
-         };
-         //date cell formatter
-         var renderCellDate = function RecordsResults_renderCellDate(elCell, oRecord, oColumn, oData)
-         {
-            if (oData)
-            {
-               elCell.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(oData));
-            }
-         };
-        
-         // Add the custom formatter to the shortcuts
-         YAHOO.widget.DataTable.Formatter.eventCellFormatter = function eventCellFormatter(elLiner, oRecord, oColumn, oData) {
-            var oRecordData = oRecord._oData;
-            elLiner.innerHTML = oRecordData.event + ' [<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + me.options.siteId + '/document-details?nodeRef=' + oRecordData.nodeRef + '">' + oRecordData.nodeName + '</a>]';
-            //add details button
-            var but = new YAHOO.widget.Button(
-            {
-               label:me.msg('label.button-details'),
-               //use an id that easily references the results using an array index.               
-               id:'log-' + me.recCount++,
-               container:elLiner       
+               type: "menu",
+               menu: this.id + "-property-menu"
             });
-            //need this for display
-            but.addClass('audit-details-button');
-            //and this for event handling1
-            but._button.className = 'audit-details';
-         };
          
-         this.widgets['auditDataTable'] = new YAHOO.widget.DataTable(this.id+"-auditDT",
-             [
-               {key:"timestamp", label:this.msg('label.timestamp'), formatter: renderCellDate, sortable:true, resizeable:true},
-               {key:"fullName", label:this.msg('label.user'),  sortable:true, resizeable:true},
-               {key:"userRole", label:this.msg('label.role'),  sortable:true, resizeable:true},
-               {key:"event", label:this.msg('label.event'),  formatter:"eventCellFormatter", sortable:true, resizeable:true}
-            ], 
-            DS, 
+            //events menu
+            this.widgets['eventMenu'] = new YAHOO.widget.Button(this.id + "-events",
             {
-               caption:this.msg('label.pagination','0'),
-               initialLoad : false
-            }
-         );
+               type: "menu",
+               menu: this.id + "-events-menu"
+            });
+
+            this.widgets['propertyMenu'].on("selectedMenuItemChange", function selectedPropertyMenuItemChange(event)
+            {
+               var oMenuItem = event.newValue;
+               if (oMenuItem)
+               {
+                  this.set('label', oMenuItem.cfg.getProperty('text'));
+               }
+
+               if (oMenuItem.value!="ALL")
+               {
+                  me.queryParams.property=oMenuItem.value;
+               }
+               else
+               {
+                  delete me.queryParams.property;
+               }
          
-         //we use our own internal counter as oRecord._nCount (from within eventcellformatter) 
-         //accumulates for all requests, not just the current request which is what we need. 
-         this.widgets['auditDataTable'].doBeforeLoadData = function doBeforeLoadData(sRequest , oResponse , oPayload)
-         {
-            // reset           
-            me.recCount = 0; 
-            return true;
-         };
-         //subscribe to event so we can update UI
-         this.widgets['auditDataSource'].subscribe('responseParseEvent', this.updateUI, this, true);
+            });         
          
-         // Load the People Finder component from the server
-         Alfresco.util.Ajax.request(
-         {
-            url: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/people-finder",
-            dataObj:
+            this.widgets['eventMenu'].on("selectedMenuItemChange", function selectedEventMenuItemChange(event)
             {
-               htmlid: this.id + "-peoplefinder"
-            },
-            successCallback:
+               var oMenuItem = event.newValue;
+               if (oMenuItem)
+               {
+                  this.set('label', oMenuItem.cfg.getProperty('text'));
+               }            
+               if (oMenuItem.value!="ALL")
+               {
+                  me.queryParams.event=oMenuItem.value;
+               }
+               else
+               {
+                  delete me.queryParams.event;
+               }
+            });
+         
+            //initialise calendar pickers
+            //fromDate calendar
+            var theDate = new Date();
+            var page = (theDate.getMonth() + 1) + "/" + theDate.getFullYear();
+            var selected = (theDate.getMonth() + 1) + "/" + theDate.getDate() + "/" + theDate.getFullYear();
+            this.widgets.fromCalendar = new YAHOO.widget.Calendar(null, this.id + "-fromDate-cal", { title: this.msg("message.select-from-date"), close: true });
+            this.widgets.fromCalendar.cfg.setProperty("pagedate", page);
+            this.widgets.fromCalendar.cfg.setProperty("selected", selected);
+            this.widgets.fromCalendar.selectEvent.subscribe(this.onDatePickerSelection,  {cal:this.widgets.fromCalendar,el:Dom.get(this.id+'-fromDate'),scope:this},true);
+
+            Event.addListener(this.id + "-fromDate-icon", "click", function () { this.widgets.toCalendar.hide();this.widgets.fromCalendar.show(); }, this, true);
+            //toDate calendar
+            this.widgets.toCalendar = new YAHOO.widget.Calendar(null, this.id + "-toDate-cal", { title: this.msg("message.select-to-date"), close: true });
+            this.widgets.toCalendar.cfg.setProperty("pagedate", page);
+            this.widgets.toCalendar.cfg.setProperty("selected", selected);
+            this.widgets.toCalendar.selectEvent.subscribe(this.onDatePickerSelection, {cal:this.widgets.toCalendar,el:Dom.get(this.id+'-toDate'),scope:this}, true );  
+
+            Event.addListener(this.id + "-toDate-icon", "click", function () { this.widgets.fromCalendar.hide();this.widgets.toCalendar.show(); }, this, true);         
+            // render the calendar control
+            this.widgets.fromCalendar.render();
+            this.widgets.toCalendar.render();             
+
+            //Sets up datatable and datasource.
+            var DS = this.widgets['auditDataSource'] = new YAHOO.util.DataSource(this.dataUri);
+         
+            DS.responseType = YAHOO.util.DataSource.TYPE_JSON;
+            DS.responseSchema = {
+               resultsList:'data.entries',
+               fields: ["timestamp","fullName","userRole","event","nodeName","nodeRef"],
+               metaFields: {
+                  "enabled": "data.enabled",
+                  "stopDate": "data.stopped",
+                  "startDate": "data.started"
+               }
+            };
+            DS.doBeforeCallback = function ( oRequest , oFullResponse , oParsedResponse , oCallback )
             {
-               fn: this.onPeopleFinderLoaded,
-               scope: this
-            },
-            failureMessage: "Could not load People Finder component",
-            execScripts: true
-         });
+               me.options.results = oFullResponse.data.entries;
+               //enable/disable export and file record buttons
+               if (me.options.results.length===0)
+               {
+                  me.widgets['export'].set('disabled',true);
+                  me.widgets['declare-record'].set('disabled',true);
+               }
+               else
+               {
+                  me.widgets['export'].set('disabled',false);
+                  me.widgets['declare-record'].set('disabled',false);               
+               }
+               return oParsedResponse;
+            };
+            //date cell formatter
+            var renderCellDate = function RecordsResults_renderCellDate(elCell, oRecord, oColumn, oData)
+            {
+               if (oData)
+               {
+                  elCell.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(oData));
+               }
+            };
+        
+            // Add the custom formatter to the shortcuts
+            YAHOO.widget.DataTable.Formatter.eventCellFormatter = function eventCellFormatter(elLiner, oRecord, oColumn, oData) {
+               var oRecordData = oRecord._oData;
+               elLiner.innerHTML = oRecordData.event + ' [<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + me.options.siteId + '/document-details?nodeRef=' + oRecordData.nodeRef + '">' + oRecordData.nodeName + '</a>]';
+               //add details button
+               var but = new YAHOO.widget.Button(
+               {
+                  label:me.msg('label.button-details'),
+                  //use an id that easily references the results using an array index.               
+                  id:'log-' + me.recCount++,
+                  container:elLiner       
+               });
+               //need this for display
+               but.addClass('audit-details-button');
+               //and this for event handling1
+               but._button.className = 'audit-details';
+            };
+         
+            this.widgets['auditDataTable'] = new YAHOO.widget.DataTable(this.id+"-auditDT",
+                [
+                  {key:"timestamp", label:this.msg('label.timestamp'), formatter: renderCellDate, sortable:true, resizeable:true},
+                  {key:"fullName", label:this.msg('label.user'),  sortable:true, resizeable:true},
+                  {key:"userRole", label:this.msg('label.role'),  sortable:true, resizeable:true},
+                  {key:"event", label:this.msg('label.event'),  formatter:"eventCellFormatter", sortable:true, resizeable:true}
+               ], 
+               DS, 
+               {
+                  caption:this.msg('label.pagination','0'),
+                  initialLoad : false
+               }
+            );
+         
+            //we use our own internal counter as oRecord._nCount (from within eventcellformatter) 
+            //accumulates for all requests, not just the current request which is what we need. 
+            this.widgets['auditDataTable'].doBeforeLoadData = function doBeforeLoadData(sRequest , oResponse , oPayload)
+            {
+               // reset           
+               me.recCount = 0; 
+               return true;
+            };
+            //subscribe to event so we can update UI
+            this.widgets['auditDataSource'].subscribe('responseParseEvent', this.updateUI, this, true);
+         
+            // Load the People Finder component from the server
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.URL_SERVICECONTEXT + "components/people-finder/people-finder",
+               dataObj:
+               {
+                  htmlid: this.id + "-peoplefinder"
+               },
+               successCallback:
+               {
+                  fn: this.onPeopleFinderLoaded,
+                  scope: this
+               },
+               failureMessage: "Could not load People Finder component",
+               execScripts: true
+            });
+         }   
       },
       
      /**
@@ -377,9 +375,12 @@
          //update start/stop button
          if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
          {   
-            this.widgets['toggle'].set('value',this.options.enabled);
-            this.widgets['toggle'].set('label',(this.options.enabled)? this.msg('label.button-stop') : this.msg('label.button-start'));
-            
+            this.widgets['toggle'].set('disabled',false);
+            if (!YAHOO.lang.isUndefined(this.options.enabled))
+            {
+               this.widgets['toggle'].set('value',this.options.enabled);               
+               this.widgets['toggle'].set('label',(this.options.enabled)? this.msg('label.button-stop') : this.msg('label.button-start'));
+            }
          }
 
       },
@@ -506,7 +507,6 @@
             this.modules.selectAuditRecordLocation = new Alfresco.module.SelectAuditRecordLocation(this.id + "-copyMoveFileTo");
             Alfresco.util.addMessages(Alfresco.messages.scope[this.name], "Alfresco.module.SelectAuditRecordLocation");            
          }
-
 
          this.modules.selectAuditRecordLocation.setOptions(
             {
@@ -754,7 +754,7 @@
                         noEscape: true,
                         displayTime: 1
                      });
-                     window.location.reload();
+                     this._query();
                   }
                },
                scope: this
@@ -815,14 +815,12 @@
       {
          this.activePerson = args[1].person;
          this.queryParams.user = this.activePerson.userName;
-         this._query();
       },
 
       onPersonFilterDeactivated: function RM_Audit_personFilterDeactivated(e,args)
       {
          this.activePerson = "";
          delete this.queryParams.user;  
-         this._query();       
       },
       
       /**
@@ -937,7 +935,7 @@
       _buildQuery : function RM_Audit__buildQuery()
       {
          //default to 20 if none given
-         if (YAHOO.lang.isUndefined(this.queryParams.size))
+         if ((this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT) && YAHOO.lang.isUndefined(this.queryParams.size))
          {
             this.queryParams.size=20;
          }
