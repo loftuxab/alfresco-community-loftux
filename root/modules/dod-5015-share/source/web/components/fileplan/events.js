@@ -193,7 +193,7 @@
        */
       onFolderDetailsAvailable: function Events_onFolderDetailsAvailable(layer, args)
       {
-         if (args[1].folderDetails.permissions.userAccess.TriggerAnEvent)
+         if (args[1].folderDetails.permissions.userAccess.AddModifyEventDates)
          {
             this.widgets.eventButton.set("disabled", false);
          }
