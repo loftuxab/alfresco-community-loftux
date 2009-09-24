@@ -188,7 +188,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 }
             }, AuthenticationUtil.getAdminUserName());
                         
-            // Bootstrp in the default set of roles for the newly created root node
+            // Bootstrap in the default set of roles for the newly created root node
             bootstrapDefaultRoles(rmRootNode);
         }
     }
@@ -545,13 +545,19 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         {
             public Role doWork() throws Exception
             {                
+                Role result = null;
+                
                 String roleAuthority = authorityService.getName(AuthorityType.GROUP, getFullRoleName(role, rmRootNode));
+                if (authorityService.authorityExists(roleAuthority) == true)
+                {
+                    String name = getShortRoleName(authorityService.getShortName(roleAuthority), rmRootNode);
+                    String displayLabel = authorityService.getAuthorityDisplayName(roleAuthority);                
+                    Set<String> capabilities = getCapabilities(rmRootNode, roleAuthority);
+                    
+                    result = new Role(name, displayLabel, capabilities, roleAuthority);
+                }
                 
-                String name = getShortRoleName(authorityService.getShortName(roleAuthority), rmRootNode);
-                String displayLabel = authorityService.getAuthorityDisplayName(roleAuthority);                
-                Set<String> capabilities = getCapabilities(rmRootNode, roleAuthority);
-                
-                return new Role(name, displayLabel, capabilities, roleAuthority);
+                return result;
             }
         }, AuthenticationUtil.getAdminUserName());
     }
@@ -751,7 +757,7 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 else if (recordsManagementService.isRecordFolder(nodeRef) == true)
                 {
                     setReadPermissionUp(nodeRef, authority);
-                    permissionService.setPermission(nodeRef, authority, permission, true);
+                    setPermissionImpl(nodeRef, authority, permission);
                 }
                 
                 return null;
@@ -759,20 +765,33 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         }, AuthenticationUtil.getAdminUserName());
     }
     
+    /**
+     * Helper method to set the read permission up the hierarchy
+     * 
+     * @param nodeRef
+     * @param authority
+     */
     private void setReadPermissionUp(NodeRef nodeRef, String authority)
     {
         NodeRef parent = nodeService.getPrimaryParent(nodeRef).getParentRef();
         if (parent != null &&
             nodeService.hasAspect(parent, ASPECT_RECORDS_MANAGEMENT_ROOT) == false)
         {
-            permissionService.setPermission(parent, authority, RMPermissionModel.READ_RECORDS, true);
+            setPermissionImpl(parent, authority, RMPermissionModel.READ_RECORDS);
             setReadPermissionUp(parent, authority);
         }
     }
     
+    /**
+     * Helper method to set the permission down the hierarchy
+     * 
+     * @param nodeRef
+     * @param authority
+     * @param permission
+     */
     private void setPermissionDown(NodeRef nodeRef, String authority, String permission)
     {
-        permissionService.setPermission(nodeRef, authority, permission, true);
+        setPermissionImpl(nodeRef, authority, permission);
         if (recordsManagementService.isRecordsManagementContainer(nodeRef) == true)
         {
             List<ChildAssociationRef> assocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
@@ -786,5 +805,54 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 }
             }
         }
+    }
+    
+    /**
+     * Set the permission, taking into account that filing is a superset of read
+     * 
+     * @param nodeRef
+     * @param authority
+     * @param permission
+     */
+    private void setPermissionImpl(NodeRef nodeRef, String authority, String permission)
+    {
+        if (RMPermissionModel.FILING.equals(permission) == true)
+        {
+            // Remove record read permission before adding filing permission
+            permissionService.deletePermission(nodeRef, authority, RMPermissionModel.READ_RECORDS);
+        }
+        
+        permissionService.setPermission(nodeRef, authority, permission, true);
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService#deletePermission(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.lang.String)
+     */
+    public void deletePermission(final NodeRef nodeRef, final String authority, final String permission)
+    {
+        AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
+        {
+            public Boolean doWork() throws Exception
+            { 
+                // Delete permission on this node
+                permissionService.deletePermission(nodeRef, authority, permission);
+                
+                if (recordsManagementService.isRecordsManagementContainer(nodeRef) == true)
+                {
+                    List<ChildAssociationRef> assocs = nodeService.getChildAssocs(nodeRef, ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+                    for (ChildAssociationRef assoc : assocs)
+                    {
+                        NodeRef child = assoc.getChildRef();
+                        if (recordsManagementService.isRecordsManagementContainer(child) == true ||
+                            recordsManagementService.isRecordFolder(child) == true)
+                        {
+                            deletePermission(child, authority, permission);
+                        }
+                    }
+                }
+                
+                return null;
+            }
+        }, AuthenticationUtil.getAdminUserName());        
     }
 }

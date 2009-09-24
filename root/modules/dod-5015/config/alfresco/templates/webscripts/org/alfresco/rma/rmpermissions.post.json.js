@@ -40,7 +40,7 @@ function main()
       // apply or remove permission
       if (remove)
       {
-         node.removePermission(id, authority);
+         rmService.deletePermission(node, id, authority);
       }
       else
       {
