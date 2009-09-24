@@ -12,24 +12,23 @@
   
   <div id="${htmlid}-audit" class="audit">
     <div class="yui-gc">
-   	<div class="yui-u first">
+      <div class="yui-u first">
           <div id="${htmlid}-audit-info" class="audit-info">
              <h2>${msg("label.title")}</h2>
              <p id="${htmlid}-audit-status-date" class="audit-status-date"></p>
           </div>
-   	</div>
-	   <div class="yui-u">
-		   <div id="${htmlid}-auditActions" class="auditActions">
+      </div>
+      <div class="yui-u">
+         <div id="${htmlid}-auditActions" class="auditActions">
             <button id="${htmlid}-audit-toggle" name="${htmlid}-audit-toggle" value="" class="audit-toggle"></button>
             <button id="${htmlid}-audit-view" name="audit-view" class="audit-view">${msg("label.button-view-log")}</button>
             <button id="${htmlid}-audit-clear" name="audit-clear" class="audit-clear">${msg("label.button-clear")}</button>
          </div>
-	   </div>
+      </div>
     </div>    
     <div id="filters">
       <div class="yui-gb">
          <div class="yui-g first">
-            <!-- the first child of a Grid needs the "first" class -->
             <div class="yui-u first">
                <div id="${htmlid}-entriesFilter" class="filter">
                   <div class="hd">
@@ -46,14 +45,12 @@
                      <label for="${htmlid}-audit-fromDate">${msg('label.header-from')}:</label>
                   </div>
                   <div class="bd">
-                     <!-- from Date filter -->
-                     <input type="text" name="${htmlid}-audit-fromDate" disabled value="" id="${htmlid}-audit-fromDate" />
+                     <input type="text" name="${htmlid}-audit-fromDate" value="" id="${htmlid}-audit-fromDate" />
                      <a id="${htmlid}-audit-fromDate-icon" class="datepicker-icon">
                         <img class="datepicker-icon" src="${url.context}/components/form/images/calendar.png" />
                      </a>
                      <div id="${htmlid}-audit-fromDate-cal" class="datepicker"></div>
-                     <!-- to Date filter -->
-                     <label for="${htmlid}-audit-toDate">${msg('label.header-to')}:</label><input type="text" disabled name="${htmlid}-audit-toDate" value="" id="${htmlid}-audit-toDate" />
+                     <label for="${htmlid}-audit-toDate">${msg('label.header-to')}:</label><input type="text"  name="${htmlid}-audit-toDate" value="" id="${htmlid}-audit-toDate" />
                      <a id="${htmlid}-audit-toDate-icon" class="datepicker-icon">
                         <img class="datepicker-icon" src="${url.context}/components/form/images/calendar.png" />
                      </a>
@@ -80,7 +77,7 @@
                   </div>
                </div>
             </div>
-            <div class="yui-u first">
+            <div class="yui-u">
                <div id="${htmlid}-propertyFilter" class="filter">
                   <div class="hd">
                      <label for="property_menu">${msg('label.header-property')}:</label>
@@ -140,7 +137,7 @@
                   </div>
                </div>
             </div>
-            <div class="yui-u first">
+            <div class="yui-u">
                <div class="filter">
                   <div class="hd">
                      <button id="${htmlid}-apply" class="audit-apply">${msg('label.button-apply')}</button>
@@ -151,9 +148,9 @@
       </div>
    </div>    
     <div id="${htmlid}-audit-log" class="yui-gc audit-log">
-   	<div class="yui-u">
-         <button id="${htmlid}-audit-export" name="audit-export" class="audit-export">${msg("label.button-export")}</button>
-         <button id="${htmlid}-audit-declare-record" name="audit-declare-record" class="audit-declare-record">${msg("label.button-declare-record")}</button>            
+      <div class="yui-u">
+         <button id="${htmlid}-audit-export" disabled name="audit-export" class="audit-export">${msg("label.button-export")}</button>
+         <button id="${htmlid}-audit-declare-record" disabled name="audit-declare-record" class="audit-declare-record">${msg("label.button-declare-record")}</button>            
          <div id="${htmlid}-audit-auditDT" class="auditDT">
          </div>    
       </div>
