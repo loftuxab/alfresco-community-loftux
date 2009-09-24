@@ -560,7 +560,7 @@
        */
       onActionReviewed: function RDLA_onActionReviewed(assets)
       {
-         this._dod5015Action("message.review", assets, "reviewed");
+         this._dod5015Action("message.reviewed", assets, "reviewed");
       },
 
       /**
