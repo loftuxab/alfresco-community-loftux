@@ -240,7 +240,8 @@
          // render the calendar control
          this.widgets.fromCalendar.render();
          this.widgets.toCalendar.render();             
-         //Sets up datatable.
+
+         //Sets up datatable and datasource.
          var DS = this.widgets['auditDataSource'] = new YAHOO.util.DataSource(this.dataUri);
          
          DS.responseType = YAHOO.util.DataSource.TYPE_JSON;
@@ -253,7 +254,22 @@
                "startDate": "data.started"
             }
          };
-
+         DS.doBeforeCallback = function ( oRequest , oFullResponse , oParsedResponse , oCallback )
+         {
+            me.options.results = oFullResponse.data.entries;
+            //enable/disable export and file record buttons
+            if (me.options.results.length===0)
+            {
+               me.widgets['export'].set('disabled',true);
+               me.widgets['declare-record'].set('disabled',true);
+            }
+            else
+            {
+               me.widgets['export'].set('disabled',false);
+               me.widgets['declare-record'].set('disabled',false);               
+            }
+            return oParsedResponse;
+         };
          //date cell formatter
          var renderCellDate = function RecordsResults_renderCellDate(elCell, oRecord, oColumn, oData)
          {
@@ -271,8 +287,8 @@
             var but = new YAHOO.widget.Button(
             {
                label:me.msg('label.button-details'),
-               //use an id that easily references the results using an array index.
-               id:'log-' + oRecord._nCount,
+               //use an id that easily references the results using an array index.               
+               id:'log-' + me.recCount++,
                container:elLiner       
             });
             //need this for display
@@ -290,11 +306,20 @@
             ], 
             DS, 
             {
-               caption:this.msg('label.pagination','0')
+               caption:this.msg('label.pagination','0'),
+               initialLoad : false
             }
          );
          
-         //subscribe to event so we can update UI and options metadata
+         //we use our own internal counter as oRecord._nCount (from within eventcellformatter) 
+         //accumulates for all requests, not just the current request which is what we need. 
+         this.widgets['auditDataTable'].doBeforeLoadData = function doBeforeLoadData(sRequest , oResponse , oPayload)
+         {
+            // reset           
+            me.recCount = 0; 
+            return true;
+         };
+         //subscribe to event so we can update UI
          this.widgets['auditDataSource'].subscribe('responseParseEvent', this.updateUI, this, true);
          
          // Load the People Finder component from the server
@@ -312,8 +337,9 @@
             },
             failureMessage: "Could not load People Finder component",
             execScripts: true
-         });                
+         });
       },
+      
      /**
        * Fired by YUI when parent element is available for scripting
        * @method onReady
@@ -332,11 +358,7 @@
          else {
             this.dataUri = Alfresco.constants.PROXY_URI+'api/rma/admin/rmauditlog';
          }
-         //if not in full mode, then we want to restrict to 20
-         if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
-         {
-            // this.dataUri+='?size=20';
-         }
+
          this.initWidgets();
         
       },
@@ -466,9 +488,9 @@
       onExportLog: function RM_Audit_onExportLog()
       {
          var exportUri = this.dataUri + this._buildQuery();
-         //we can't add export to this.queryParams (for buildQuery to generate query)
+         //we can't add 'export' to this.queryParams (for buildQuery to generate query)
          //since export is a reserved word. So we add it manually.
-         exportUri += (exportUri.indexOf('?')==-1) ? '?export=true' : '&export=true';
+         exportUri += (exportUri.indexOf('?')==-1) ? '?export=true&format=html' : '&export=true&format=html';
          window.location.href = exportUri;
       },
 
@@ -562,16 +584,16 @@
                },
                scope: this
             },
-            // failureMessage: me.msg("message.declare-log-fail")
             failureCallback: {
                fn: function fail_declare_record(o)
                {
-                  if (o.json.status.code==400)
+                  if (o.serverResponse.status==400)
                   {
+
                      Alfresco.util.PopupManager.displayPrompt(
                      {
                         title: me.msg('label.declare-record'),
-                        text: o.json.message,
+                        text: o.serverResponse.statusText,
                         buttons: [
                         {
                            text: me.msg('button.ok'), 
@@ -807,19 +829,124 @@
        * Displays dialog with more info about log entry
        *  
        */
-      onShowDetails: function RM_Audit__showDetails()
+      onShowDetails: function RM_Audit__showDetails(e)
       {
+         var el = Event.getTarget(e);
+         var id = el.id.match(/-([0-9]+)-/)[1];
+         var data = null;
+         if (this.options.results[id])
+         {
+            data = this.options.results[id];
+         }
+         if (!this.widgets.auditDialog)
+         {
+            // Construct the YUI Dialog that will display the message
+            this.widgets.auditDialog = new YAHOO.widget.Dialog("auditEntry",
+            {
+               visible: false,
+               close: true,
+               draggable: true,
+               modal: true,
+               fixedcenter:true,
+               zIndex: 1000
+            });
+            this.widgets.auditDialog.render(document.body);            
+         }
+
+         var body = '<table id="auditEntryDetails">'+
+            '<tr>'+
+               '<th>' + this.msg('label.event') + ':</th>'+
+               '<td>' + data.event + '</td>'+
+            '</tr>'+
+            '<tr>'+
+               '<th>' + this.msg('label.user') + ':</th>'+
+               '<td>' + data.fullName + '</td>'+
+            '</tr>'+
+            '<tr>'+
+               '<th>' + this.msg('label.timestamp') + ':</th>'+
+               '<td>' + data.timestamp + '</td>'+
+            '</tr>'+
+            '<tr>'+
+               '<th>' + this.msg('label.role') + ':</th>'+
+               '<td>' + data.userRole + '</td>'+
+            '</tr>'+            
+         '</table>';
          
+         body+='<div class="details">';
+         
+         if (data.path)
+         {
+            body+='<table id="auditEntry-nodeDetails">'+
+               '<tr>'+
+                  '<th>' + this.msg('label.identifier') + ':</th>'+
+                  '<td>' + data.identifier + '</td>'+
+               '</tr>'+
+               '<tr>'+
+                  '<th>' + this.msg('label.type') + ':</th>'+
+                  '<td>' + data.nodeType + '</td>'+
+               '</tr>'+
+               '<tr>'+
+                  '<th>' + this.msg('label.location') + ':</th>'+
+                  '<td>' + data.path + '</td>'+
+               '</tr>'+
+            '</table>';
+         }
+         
+         if (data.changedValues.length>0)
+         {
+            var changedValuesHTML = '';
+            var changedValuesHTMLTemplate = '<tr{className}>'+
+               '<td>{name}</td>'+
+               '<td>{previous}</td>'+
+               '<td>{new}</td>'+
+            '</tr>';
+            for (var i=0,len=data.changedValues.length;i<len;i++)
+            {
+               var o = data.changedValues[i];
+               o.className = (i%2===0) ? '' : ' class="odd"';
+               o.previous = o.previous || '<none>';
+               changedValuesHTML+=YAHOO.lang.substitute(changedValuesHTMLTemplate, o);
+            }
+   
+            body+='<table id="auditEntry-changedValues">'+
+               '<thead>'+
+                  '<tr>'+
+                     '<th>'+ this.msg('label.property') +'</th>'+
+                     '<th>'+ this.msg('label.previous-value') +'</th>'+
+                     '<th>'+ this.msg('label.new-value') +'</th>'+
+                  '</tr>'+
+               '</thead>'+
+               '<tbody>'+
+                     changedValuesHTML+
+               '</tbody>'+
+            '</table>';            
+         }
+
+         body +='</div>';
+         this.widgets.auditDialog.setHeader(this.msg('label.dialog-title',data.event));
+         this.widgets.auditDialog.setBody(body);
+         this.widgets.auditDialog.render();
+         this.widgets.auditDialog.center();
+         if(YAHOO.env.ua.ie==6)
+         {
+            Dom.get(Sel.query('#auditEntry .bd')[0]).style.height='25em';
+         }
+         this.widgets.auditDialog.show();         
       },
       
       _buildQuery : function RM_Audit__buildQuery()
       {
-         var qs = Alfresco.util.toQueryString(this.queryParams);
-         //if we are already using a qs parameter so we need to make it append friendly
-         if ((qs !== "") && this.dataUri.indexOf('?')!=-1)
+         //default to 20 if none given
+         if (YAHOO.lang.isUndefined(this.queryParams.size))
          {
-            qs = '&' + qs.split('?')[1];            
+            this.queryParams.size=20;
          }
+         var qs = [];
+         for (var p in this.queryParams)
+         {
+            qs.push(p+'='+this.queryParams[p]);
+         }
+         qs = '?'+qs.join('&');
          return qs;
       },
       
@@ -866,7 +993,6 @@
          this.options.enabled = response.meta.enabled;
          this.options.startDate = response.meta.startDate;
          this.options.stopDate = response.meta.stopDate;
-         this.options.results = response.results;
          if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
          {
             this.toggleUI();
@@ -874,5 +1000,6 @@
          //update caption
          this.widgets['auditDataTable']._elCaption.innerHTML = this.msg('label.pagination', response.results.length); 
       }
+      
    });
 })();

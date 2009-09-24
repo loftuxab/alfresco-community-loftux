@@ -43,27 +43,9 @@
    padding:0;
 }
 
-/*.filterActions
-{
-   float: right;
+.auditDT table {
+   width:100%;
 }
-.audit .filterActions,
-.audit .defaultActions
-{
-   display: none;
-   float: right;
-}
-.audit .filterActions .yui-button,
-.audit .defaultActions .yui-button
-{
-   vertical-align: middle;
-}
-.audit .defaultActions.active,
-.audit .filterActions.active    
-{
-   display: inline;
-}
-*/
 .audit-peoplefinder
 {
    display: none;
@@ -110,10 +92,14 @@
    height:10em;
    margin-top:1em;
 }
+#filters .yui-u.first
+{
+   margin-right:0;
+}
 #filters select,
 #filters input
 {
-   width:13em;
+   width:12em;
 }
 #filters .hd,
 #filters .bd
@@ -133,7 +119,9 @@
 }
 .auditDT
 {
-   margin-top:-2.5em;
+   position:relative;
+   left:0;
+   width:100%;
 }
 /* audit log popup page */
 .audit-popup-log .audit-info
@@ -178,7 +166,8 @@
 {
    display:none;
    position:absolute;
-   z-index:100;
+   z-index:1000;
+   left:0;
 }
 
 .datepicker-icon
@@ -197,4 +186,39 @@
 .audit-details-button
 {
    float:right;
+}
+/* dialog */
+#auditEntry
+{
+   width:40em;
+}
+#auditEntry div.details
+{
+/*   background-color:#808080;*/
+}
+#auditEntry .bd
+{
+   max-height:25em;
+   overflow-y:auto;
+}
+#auditEntry .bd table
+{
+   margin:0.5em 1em;
+   width:93%;
+}
+
+#auditEntry .bd table th
+{
+   width:6em;
+   font-weight:bold;
+}
+
+#auditEntry tr.odd
+{
+   background-color:#EDF5FF;
+}
+
+#auditEntry table#auditEntry-changedValues td
+{
+   height:1em;
 }
