@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.audit;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -648,12 +649,12 @@ public class RecordsManagementAuditServiceImpl
     {
         ParameterCheck.mandatory("params", params);
         
-        FileWriter fileWriter = null;
+        Writer fileWriter = null;
         try
         {
             File auditTrailFile = TempFileProvider.createTempFile(AUDIT_TRAIL_FILE_PREFIX, 
                 format == ReportFormat.HTML ? AUDIT_TRAIL_HTML_FILE_SUFFIX : AUDIT_TRAIL_JSON_FILE_SUFFIX);
-            fileWriter = new FileWriter(auditTrailFile);
+            fileWriter = new BufferedWriter(new FileWriter(auditTrailFile));
             // Get the results, dumping to file
             getAuditTrailImpl(params, null, fileWriter, format);
             // Done
@@ -828,6 +829,9 @@ public class RecordsManagementAuditServiceImpl
         String user = params.getUser();
         Long fromTime = (params.getDateFrom() == null ? null : new Long(params.getDateFrom().getTime()));
         Long toTime = (params.getDateTo() == null ? null : new Long(params.getDateTo().getTime()));
+        NodeRef nodeRef = params.getNodeRef();
+        String eventName = params.getEvent();
+        QName propertyQName = params.getProperty();
         int maxEntries = params.getMaxEntries();
         
         // start the audit trail report
@@ -838,7 +842,6 @@ public class RecordsManagementAuditServiceImpl
             logger.debug("RM Audit: Issuing query: " + params);
         }
         
-        NodeRef nodeRef = params.getNodeRef();
         if (nodeRef != null)
         {
             auditService.auditQuery(
