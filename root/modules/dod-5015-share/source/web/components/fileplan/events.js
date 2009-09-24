@@ -59,6 +59,7 @@
       this._dispositionScheduleAppliedToParent = false;
 
       /* Decoupled event listeners */
+      YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);
       YAHOO.Bubbling.on("metadataRefresh", this.refreshEvents, this);
 
       return this;
@@ -66,7 +67,6 @@
 
    YAHOO.extend(Alfresco.Events, Alfresco.component.Base,
    {
-
       /**
        * Makes sure a check for the parents file plan is done only once.
        *
@@ -142,7 +142,7 @@
        */
       refreshEvents: function Events_refreshEvents()
       {
-         if(!this._dispositionScheduleAppliedToParent)
+         if (!this._dispositionScheduleAppliedToParent)
          {
             Alfresco.util.Ajax.jsonGet(
             {
@@ -187,6 +187,19 @@
       },
 
       /**
+       * Event handler called when the "folderDetailsAvailable" event is received
+       *
+       * @method: onFolderDetailsAvailable
+       */
+      onFolderDetailsAvailable: function Events_onFolderDetailsAvailable(layer, args)
+      {
+         if (args[1].folderDetails.permissions.userAccess.TriggerAnEvent)
+         {
+            this.widgets.eventButton.set("disabled", false);
+         }
+      },
+
+      /**
        * Called if the nodeRef has no disposition schedule.
        * Will locate parents disposition schedule and display
        * the asOf date for the next action and a link to the parents events.
@@ -196,7 +209,7 @@
        */
       _getParentsDispositionSchedule: function Events__getParentsDispositionSchedule()
       {
-         if(this._lookForParentsDispositionSchedule)
+         if (this._lookForParentsDispositionSchedule)
          {
             // Only look once
             this._lookForParentsDispositionSchedule = false;
@@ -209,7 +222,7 @@
                {
                   fn: function (response)
                   {
-                     if(response.json.metadata && response.json.metadata.parent)
+                     if (response.json.metadata && response.json.metadata.parent)
                      {
                         // Get the parent nodeRef from the reponse and try to find its fileplan
                         var parentNodeRef = response.json.metadata.parent.nodeRef;
@@ -220,7 +233,7 @@
                            {
                               fn: function(response)
                               {
-                                 if(response.json.data)
+                                 if (response.json.data)
                                  {
                                     // File plan found
                                     this._dispositionScheduleAppliedToParent = true;
@@ -298,7 +311,8 @@
             if (ev.complete)
             {
                completedAt = Alfresco.util.fromISO8601(ev.completedAt);
-               eventEl = this._createEvent(ev, [
+               eventEl = this._createEvent(ev,
+               [
                   { "name" : ev.label },
                   { "automatic" : ev.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
                   { "completed-at" : completedAt ? Alfresco.util.formatDate(completedAt) : "" },
@@ -312,7 +326,8 @@
             else
             {
                asOf = Alfresco.util.fromISO8601(nextDispositionAction.asOf);
-               eventEl = this._createEvent(ev, [
+               eventEl = this._createEvent(ev,
+               [
                   { "name" : ev.label },
                   { "automatic" : ev.automatic ? this.msg("label.automatic") : this.msg("label.manual") },
                   { "asof" : asOf ? Alfresco.util.formatDate(asOf) : this.msg("label.none") }
@@ -371,13 +386,16 @@
          }
 
          // Create button
-         var buttonEl = Dom.getElementsByClassName(buttonClass, "span", eventEl)[0],
-            eventButton = Alfresco.util.createYUIButton(this, buttonClass, null, {}, buttonEl);
+         var buttonEl = Dom.getElementsByClassName(buttonClass, "span", eventEl)[0];
          
-         eventButton.on("click", clickHandler,
+         this.widgets.eventButton = Alfresco.util.createYUIButton(this, buttonClass, null,
+         {
+            disabled: true
+         }, buttonEl);
+         this.widgets.eventButton.on("click", clickHandler,
          {
             event: event,
-            button: eventButton
+            button: this.widgets.eventButton
          }, this);
 
          return eventEl;
@@ -418,7 +436,6 @@
          {
             eventName: obj.event.name
          }, "message.revokingEvent", "message.revokeEventFailure");
-
       },
 
       /**

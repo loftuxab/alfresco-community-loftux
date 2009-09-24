@@ -31,12 +31,12 @@
  */
 (function()
 {
-/**
+   /**
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-       Event = YAHOO.util.Event,
-       Sel = YAHOO.util.Selector;
+      Event = YAHOO.util.Event,
+      Sel = YAHOO.util.Selector;
 
    /**
     * RecordsDocumentReferences constructor.
@@ -47,16 +47,14 @@
     */
    Alfresco.RecordsDocumentReferences = function(htmlId)
    {
-      Alfresco.util.ComponentManager.register(this);
-      return Alfresco.RecordsDocumentReferences.superclass.constructor.call(this, "Alfresco.RecordsDocumentReferences",htmlId,[]);
-   }
+      return Alfresco.RecordsDocumentReferences.superclass.constructor.call(this, "Alfresco.RecordsDocumentReferences", htmlId);
+   };
    
    /**
     * Extend from Alfresco.DocumentActions
     */
    YAHOO.extend(Alfresco.RecordsDocumentReferences, Alfresco.component.Base,
    {
-      
       /**
        * Object container for initialization options
        *
@@ -66,99 +64,70 @@
       options:
       {
          /**
-          * String Id used for document picker control
+          * Fileplan nodeRef
           *
-          * @property controlId
+          * @property filePlanNodeRef
           * @type String
           */
-         controlId: "",
-         /**
-          * String Id used for document picker picker
-          *
-          * @property pickerId
-          * @type String
-          */
-         pickerId: "",
-         /**
-          * Comma separated value of selected documents (nodeRefs). 
-          *
-          * @property pickerId
-          * @type String
-          */
-         currentValue: ""
-         
-      },
-      
-      /**
-       * Initialises event listening and custom events
-       *  
-       */
-      initEvents : function RecordsDocumentReferences_initEvents()
-      {
-         Event.on(this.id,'click',this.onInteractionEvent, null, this);
-         
-         this.registerEventHandler('click','button.manageRef',{
-               handler:this.goToManageReferences,
-               scope : this
-            }
-         );
-         
-         return this;
-      },
+         filePlanNodeRef: null,
 
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function RecordsDocumentReferences_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
+         /**
+          * Document name
+          *
+          * @property docName
+          * @type String
+          */
+         docName: null
       },
       
       /**
        * Fired by YUI when parent element is available for scripting
-       * @method onReady
        * 
+       * @method onReady
        */
       onReady: function RecordsDocumentReferences_onReady()
       {
-         this.initEvents();
-         var buttons = Sel.query('#manageRef',this.id);
-         // Create widget button while reassigning classname to src element (since YUI removes classes). 
-         // We need the classname so we can identify what action to take when it is interacted with (event delegation).
-         for (var i=0, len = buttons.length; i<len; i++)
+         this.widgets.manageRefs = Alfresco.util.createYUIButton(this, "manageRefs-button", this.onManageReferences,
          {
-            var button= buttons[i];
-            var id = button.id;
-            this.widgets[id] = new YAHOO.widget.Button(id);
-            this.widgets[id]._button.className=button.className;
-         }
-         YAHOO.Bubbling.on('documentDetailsAvailable',this.onDocumentDetailsAvailable, this);
+            disabled: true
+         });
+         YAHOO.Bubbling.on('documentDetailsAvailable', this.onDocumentDetailsAvailable, this);
       },
 
+      /**
+       * Event handler for documentDetailsAvailable bubbling event
+       * 
+       * @method onDocumentDetailsAvailable
+       * @param e {object} Event
+       * @param args {object} Event arguments
+       */
       onDocumentDetailsAvailable: function RecordsDocumentReferences_onDocumentDetailsAvailable(e, args)
       {
-         this.options.parentNodeRef=args[1].metadata.filePlan.replace(':/','');
+         this.options.parentNodeRef = args[1].metadata.filePlan.replace(':/','');
          this.options.docName = args[1].documentDetails.displayName;
+         if (args[1].documentDetails.permissions.userAccess.ChangeOrDeleteReferences)
+         {
+            this.widgets.manageRefs.set("disabled", false);
+         }
       },
       
-      goToManageReferences: function RecordsDocumentReferences_goToManageReferences()
+      /**
+       * Mange References button click handler. Redirects browser to Manage References page
+       * 
+       * @method onManageReferences
+       */
+      onManageReferences: function RecordsDocumentReferences_onManageReferences()
       {
-         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/rmreferences?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}';         
-
-         var url = YAHOO.lang.substitute(uriTemplate,
-         {
-            site: encodeURIComponent(this.options.siteId),
-            nodeRef: this.options.nodeRef,
-            parentNodeRef: this.options.parentNodeRef,
-            docName:encodeURIComponent(this.options.docName)
-         });
+         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/rmreferences?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}',     
+            url = YAHOO.lang.substitute(uriTemplate,
+            {
+               site: encodeURIComponent(this.options.siteId),
+               nodeRef: this.options.nodeRef,
+               parentNodeRef: this.options.parentNodeRef,
+               docName: encodeURIComponent(this.options.docName)
+            });
 
          window.location.href = url;
       }
-      
    });
-   
 })();

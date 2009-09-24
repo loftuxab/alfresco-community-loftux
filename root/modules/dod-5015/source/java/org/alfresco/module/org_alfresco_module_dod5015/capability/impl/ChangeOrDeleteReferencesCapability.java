@@ -41,8 +41,23 @@ public class ChangeOrDeleteReferencesCapability extends AbstractCapability
     @Override
     protected int hasPermissionImpl(NodeRef nodeRef)
     {
-        // no way to know ...
-        return AccessDecisionVoter.ACCESS_ABSTAIN;
+        // Best guess based on current nodeRef
+        if (isRm(nodeRef))
+        {
+            if (checkFilingUnfrozen(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+            {
+                if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.CHANGE_OR_DELETE_REFERENCES) == AccessStatus.ALLOWED)
+                {
+                    return AccessDecisionVoter.ACCESS_GRANTED;
+                }
+            }
+
+            return AccessDecisionVoter.ACCESS_DENIED;
+        }
+        else
+        {
+            return AccessDecisionVoter.ACCESS_ABSTAIN;
+        }
     }
 
     public int evaluate(NodeRef source, NodeRef target)
