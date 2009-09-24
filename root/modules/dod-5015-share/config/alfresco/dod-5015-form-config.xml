@@ -270,6 +270,8 @@
             <field-visibility>
                <!-- explicitly hide mandatory fields we don't want in edit mode -->
                <hide id="cm:automaticUpdate" />
+               <hide id="sys:node-dbid" />
+               <hide id="size" for-mode="edit" />
                <hide id="rma:dateFiled" for-mode="edit" />
                <hide id="rma:cutOffDate" for-mode="edit" />
                <hide id="rma:frozenBy" />
@@ -318,6 +320,8 @@
             <field-visibility>
                <!-- explicitly hide mandatory fields we don't want in edit mode -->
                <hide id="cm:automaticUpdate" />
+               <hide id="sys:node-dbid" />
+               <hide id="size" for-mode="edit" />
                <hide id="rma:dateFiled" for-mode="edit" />
                <hide id="rma:cutOffDate" for-mode="edit" />
                <hide id="rma:frozenBy" />

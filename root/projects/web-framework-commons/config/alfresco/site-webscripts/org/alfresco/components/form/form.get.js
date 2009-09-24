@@ -1147,8 +1147,8 @@ function setupFieldConstraints(fieldDef, fieldConfig)
    }
    
    // setup number constraint if field is a number
-   if (fieldDef.dataType === "d:int" || fieldDef.dataType === "d:long" || 
-       fieldDef.dataType === "d:double" || fieldDef.dataType === "d:float" )
+   if (fieldDef.dataType === "int" || fieldDef.dataType === "long" || 
+       fieldDef.dataType === "double" || fieldDef.dataType === "float" )
    {
       var constraint = createFieldConstraint("NUMBER", {}, fieldDef, fieldConfig);
       
