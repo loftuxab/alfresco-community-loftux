@@ -329,6 +329,16 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         fail("Not yet impl'd.");
     }
 
+    private NodeRef createRecordCategoryNode(NodeRef parentRecordSeries)
+    {
+        NodeRef newCategory = this.nodeService.createNode(parentRecordSeries, 
+                    ContentModel.ASSOC_CONTAINS, 
+                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "Test category " + System.currentTimeMillis()),
+                    TYPE_RECORD_CATEGORY).getChildRef();
+        
+        return newCategory;
+    }
+    
     private NodeRef createRecFolderNode(NodeRef parentRecordCategory)
     {
         NodeRef newFolder = this.nodeService.createNode(parentRecordCategory,
@@ -679,15 +689,756 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 
                 rmActionService.executeRecordsManagementAction(recordFolder, "destroy", null);
                 
-                // Check that the node has been destroyed
-                assertFalse(nodeService.exists(recordFolder));
-                assertFalse(nodeService.exists(recordOne));
+                // Check that the node has been destroyed (ghosted)
+                //assertFalse(nodeService.exists(recordFolder));
+                //assertFalse(nodeService.exists(recordOne));
+                assertTrue(nodeService.hasAspect(recordFolder, ASPECT_GHOSTED));
+                assertTrue(nodeService.hasAspect(recordOne, ASPECT_GHOSTED));
                 
                 // Check the history
                 if (nodeService.exists(recordFolder) == true)
                 {
                     checkLastDispositionAction(recordFolder, "destroy", 2);
                 }
+                
+                return null;
+            }          
+        });
+    }
+    
+    /**
+     * Tests the re-scheduling of disposition lifecycles when the schedule changes 
+     */
+    public void testDispositionLifecycle_0318_reschedule_folderlevel() throws Exception
+    {
+        final NodeRef recordSeries = TestUtilities.getRecordSeries(searchService, "Reports"); 
+        setComplete();
+        endTransaction();
+        
+        // create a category
+        final NodeRef recordCategory = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordSeries);
+                assertEquals("Reports", nodeService.getProperty(recordSeries, ContentModel.PROP_NAME));
+                        
+                return createRecordCategoryNode(recordSeries);
+            }          
+        });
+        
+        // define the disposition schedule for the category (Cut off monthly, hold 1 month, then destroy)
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertNotNull(recordCategory);
+                
+                // define properties for both steps
+                Map<QName, Serializable> step1 = new HashMap<QName, Serializable>();
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "cutoff");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Cutoff after 1 month");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|1");
+                
+                Map<QName, Serializable> step2 = new HashMap<QName, Serializable>();
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "destroy");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Destroy after 1 month");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|1");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD_PROPERTY, PROP_CUT_OFF_DATE);
+                
+                // add the action definitions to the schedule
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                rmService.addDispositionActionDefinition(schedule, step1);
+                rmService.addDispositionActionDefinition(schedule, step2);
+                
+                return null;
+            }          
+        });
+        
+        // create a record folder
+        final NodeRef recordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecordFolder(recordCategory, "Folder1");
+            }          
+        });
+        
+        // make sure the disposition lifecycle is present and correct
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            @SuppressWarnings("deprecation")
+            public Object execute() throws Throwable
+            {
+                assertNotNull(recordFolder);
+                
+                assertTrue(nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);        
+                
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+                System.out.println("Disposition action id: " + nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+                assertEquals("cutoff", nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+                System.out.println("Disposition action: " + nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                System.out.println("Disposition as of: " + asOfDate);
+                
+                // make sure the as of date is a month in the future
+                Date now = new Date();
+                assertEquals(asOfDate.getMonth(), now.getMonth()+1);
+                
+                // make sure there aren't any events
+                List<ChildAssociationRef> events = nodeService.getChildAssocs(ndNodeRef, ASSOC_EVENT_EXECUTIONS,
+                            RegexQNamePattern.MATCH_ALL);
+                assertEquals(0, events.size());
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(recordFolder);
+                
+                return null;
+            }          
+        });
+        
+        // change the period on the 1st step of the disposition schedule and make sure it perculates down
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // define changes for schedule
+                Map<QName, Serializable> changes = new HashMap<QName, Serializable>();
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|3");
+                
+                // update the second dispostion action definition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                System.out.println("Adding 3 months to period for 1st step: " + actionDefs.get(0).getName());
+                rmService.updateDispositionActionDefinition(schedule, actionDefs.get(0), changes);
+                
+                return null;
+            }          
+        });
+        
+        // make sure the disposition lifecycle asOf date has been updated
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            @SuppressWarnings("deprecation")
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);        
+                
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                System.out.println("Disposition as of: " + asOfDate);
+                
+                // make sure the as of date is a month in the future
+                Date now = new Date();
+                assertEquals(asOfDate.getMonth(), now.getMonth()+3);
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(recordFolder);
+                
+                return null;
+            }          
+        });
+        
+        // change the period on the 2nd step of the disposition schedule and make sure it DOES NOT perculate down
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // define changes for schedule
+                Map<QName, Serializable> changes = new HashMap<QName, Serializable>();
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|6");
+                
+                // update the first dispostion action definition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                System.out.println("Adding 6 months to period for 2nd step: " + actionDefs.get(1).getName());
+                rmService.updateDispositionActionDefinition(schedule, actionDefs.get(1), changes);
+                
+                return null;
+            }          
+        });
+        
+        // make sure the disposition lifecycle asOf date has NOT been updated as the period was 
+        // changed for a step other than the current one
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            @SuppressWarnings("deprecation")
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);        
+                
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                System.out.println("Disposition as of: " + asOfDate);
+                
+                // make sure the as of date is a month in the future
+                Date now = new Date();
+                assertEquals("Expecting the asOf date to be unchanged", asOfDate.getMonth(), now.getMonth()+3);
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(recordFolder);
+                
+                return null;
+            }          
+        });
+        
+        // change the disposition schedule to be event based rather than time based i.e.
+        // remove the period properties and supply 2 events in its place.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // define changes for schedule
+                Map<QName, Serializable> changes = new HashMap<QName, Serializable>();
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, null);
+                List<String> events = new ArrayList<String>(2);
+                events.add("no_longer_needed");
+                events.add("case_complete");
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_EVENT, (Serializable)events);
+                
+                // update the first dispostion action definition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                System.out.println("Removing period and adding no_longer_needed and case_complete to 1st step: " + 
+                            actionDefs.get(0).getName());
+                rmService.updateDispositionActionDefinition(schedule, actionDefs.get(0), changes);
+                
+                return null;
+            }          
+        });
+        
+        // make sure the disposition lifecycle asOf date has been reset and there are now
+        // events hanging off the nextdispositionaction node
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);
+                
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                System.out.println("New disposition as of: " + asOfDate);
+                assertNull("Expecting asOfDate to be null", asOfDate);
+                
+                // make sure the 2 events are present
+                List<ChildAssociationRef> events = nodeService.getChildAssocs(ndNodeRef, ASSOC_EVENT_EXECUTIONS,
+                            RegexQNamePattern.MATCH_ALL);
+                assertEquals(2, events.size());
+                NodeRef event1 = events.get(0).getChildRef();
+                assertEquals("no_longer_needed", nodeService.getProperty(event1, PROP_EVENT_EXECUTION_NAME));
+                NodeRef event2 = events.get(1).getChildRef();
+                assertEquals("case_complete", nodeService.getProperty(event2, PROP_EVENT_EXECUTION_NAME));
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(recordFolder, false);
+                
+                return null;
+            }          
+        });
+        
+        // remove one of the events just added
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // define changes for schedule
+                Map<QName, Serializable> changes = new HashMap<QName, Serializable>();
+                List<String> events = new ArrayList<String>(2);
+                events.add("case_complete");
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_EVENT, (Serializable)events);
+                
+                // update the first dispostion action definition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                System.out.println("Removing no_longer_needed event from 1st step: " + 
+                            actionDefs.get(0).getName());
+                rmService.updateDispositionActionDefinition(schedule, actionDefs.get(0), changes);
+                
+                return null;
+            }          
+        });
+        
+        // make sure the disposition lifecycle asOf date is still null and ensure there is only one event
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(recordFolder, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);
+                
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                assertNull("Expecting asOfDate to be null", asOfDate);
+                
+                // make sure only 1 event is present
+                List<ChildAssociationRef> events = nodeService.getChildAssocs(ndNodeRef, ASSOC_EVENT_EXECUTIONS,
+                            RegexQNamePattern.MATCH_ALL);
+                assertEquals(1, events.size());
+                NodeRef event = events.get(0).getChildRef();
+                assertEquals("case_complete", nodeService.getProperty(event, PROP_EVENT_EXECUTION_NAME));
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(recordFolder, false);
+                
+                return null;
+            }          
+        });
+    }
+    
+    /**
+     * Tests the re-scheduling of disposition lifecycles when the schedule changes 
+     */
+    public void testDispositionLifecycle_0318_reschedule_recordlevel() throws Exception
+    {
+        final NodeRef recordSeries = TestUtilities.getRecordSeries(searchService, "Reports"); 
+        setComplete();
+        endTransaction();
+        
+        // create a category
+        final NodeRef recordCategory = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordSeries);
+                assertEquals("Reports", nodeService.getProperty(recordSeries, ContentModel.PROP_NAME));
+                        
+                return createRecordCategoryNode(recordSeries);
+            }          
+        });
+        
+        // define the disposition schedule for the category (Cut off monthly, hold 1 month, then destroy)
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertNotNull(recordCategory);
+                
+                // get the disposition schedule and turn on record level disposition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                nodeService.setProperty(schedule.getNodeRef(), PROP_RECORD_LEVEL_DISPOSITION, true);
+                
+                // define properties for both steps
+                Map<QName, Serializable> step1 = new HashMap<QName, Serializable>();
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "cutoff");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Cutoff after 1 month");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|1");
+                
+                Map<QName, Serializable> step2 = new HashMap<QName, Serializable>();
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "destroy");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Destroy after 1 month");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|1");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD_PROPERTY, PROP_CUT_OFF_DATE);
+                
+                // add the action definitions to the schedule
+                rmService.addDispositionActionDefinition(schedule, step1);
+                rmService.addDispositionActionDefinition(schedule, step2);
+                
+                return null;
+            }          
+        });
+        
+        // create a record folder
+        final NodeRef recordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecordFolder(recordCategory, "Folder1");
+            }          
+        });
+        
+        // create a record
+        final NodeRef record = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordFolder);
+                
+                // Create the document
+                Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+                props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+                NodeRef record = nodeService.createNode(recordFolder, 
+                                                           ContentModel.ASSOC_CONTAINS, 
+                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                           ContentModel.TYPE_CONTENT).getChildRef();
+                
+                // Set the content
+                ContentWriter writer = contentService.getWriter(record, ContentModel.PROP_CONTENT, true);
+                writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+                writer.setEncoding("UTF-8");
+                writer.putContent("There is some content in this record");
+                
+                return record;
+            }          
+        });
+        
+        // make sure the disposition lifecycle is present and correct on the record and not on the folder
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            @SuppressWarnings("deprecation")
+            public Object execute() throws Throwable
+            {
+                assertNotNull(record);
+                
+                assertFalse(nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+                assertTrue(nodeService.hasAspect(record, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(record, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);        
+                
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+                System.out.println("Disposition action id: " + nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION_ID));
+                assertEquals("cutoff", nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+                System.out.println("Disposition action: " + nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION));
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                System.out.println("Disposition as of: " + asOfDate);
+                
+                // make sure the as of date is a month in the future
+                Date now = new Date();
+                assertEquals(asOfDate.getMonth(), now.getMonth()+1);
+                
+                // make sure there aren't any events
+                List<ChildAssociationRef> events = nodeService.getChildAssocs(ndNodeRef, ASSOC_EVENT_EXECUTIONS,
+                            RegexQNamePattern.MATCH_ALL);
+                assertEquals(0, events.size());
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(record);
+                
+                return null;
+            }          
+        });
+        
+        // change the period on the 1st step of the disposition schedule and make sure it perculates down
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // define changes for schedule
+                Map<QName, Serializable> changes = new HashMap<QName, Serializable>();
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|3");
+                
+                // update the second dispostion action definition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                System.out.println("Adding 3 months to period for 1st step: " + actionDefs.get(0).getName());
+                rmService.updateDispositionActionDefinition(schedule, actionDefs.get(0), changes);
+                
+                return null;
+            }          
+        });
+        
+        // make sure the disposition lifecycle asOf date has been updated
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            @SuppressWarnings("deprecation")
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(record, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(record, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);        
+                
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                System.out.println("Disposition as of: " + asOfDate);
+                
+                // make sure the as of date is a month in the future
+                Date now = new Date();
+                assertEquals(asOfDate.getMonth(), now.getMonth()+3);
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(record);
+                
+                return null;
+            }          
+        });
+        
+        // change the period on the 2nd step of the disposition schedule and make sure it DOES NOT perculate down
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // define changes for schedule
+                Map<QName, Serializable> changes = new HashMap<QName, Serializable>();
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|6");
+                
+                // update the first dispostion action definition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                System.out.println("Adding 6 months to period for 2nd step: " + actionDefs.get(1).getName());
+                rmService.updateDispositionActionDefinition(schedule, actionDefs.get(1), changes);
+                
+                return null;
+            }          
+        });
+        
+        // make sure the disposition lifecycle asOf date has NOT been updated as the period was 
+        // changed for a step other than the current one
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            @SuppressWarnings("deprecation")
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(record, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(record, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);        
+                
+                assertNotNull(nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF));
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                System.out.println("Disposition as of: " + asOfDate);
+                
+                // make sure the as of date is a month in the future
+                Date now = new Date();
+                assertEquals("Expecting the asOf date to be unchanged", asOfDate.getMonth(), now.getMonth()+3);
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(record);
+                
+                return null;
+            }          
+        });
+        
+        // change the disposition schedule to be event based rather than time based i.e.
+        // remove the period properties and supply 2 events in its place.
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // define changes for schedule
+                Map<QName, Serializable> changes = new HashMap<QName, Serializable>();
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, null);
+                List<String> events = new ArrayList<String>(2);
+                events.add("no_longer_needed");
+                events.add("case_complete");
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_EVENT, (Serializable)events);
+                
+                // update the first dispostion action definition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                System.out.println("Removing period and adding no_longer_needed and case_complete to 1st step: " + 
+                            actionDefs.get(0).getName());
+                rmService.updateDispositionActionDefinition(schedule, actionDefs.get(0), changes);
+                
+                return null;
+            }          
+        });
+        
+        // make sure the disposition lifecycle asOf date has been reset and there are now
+        // events hanging off the nextdispositionaction node
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(record, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(record, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);
+                
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                System.out.println("New disposition as of: " + asOfDate);
+                assertNull("Expecting asOfDate to be null", asOfDate);
+                
+                // make sure the 2 events are present
+                List<ChildAssociationRef> events = nodeService.getChildAssocs(ndNodeRef, ASSOC_EVENT_EXECUTIONS,
+                            RegexQNamePattern.MATCH_ALL);
+                assertEquals(2, events.size());
+                NodeRef event1 = events.get(0).getChildRef();
+                assertEquals("no_longer_needed", nodeService.getProperty(event1, PROP_EVENT_EXECUTION_NAME));
+                NodeRef event2 = events.get(1).getChildRef();
+                assertEquals("case_complete", nodeService.getProperty(event2, PROP_EVENT_EXECUTION_NAME));
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(record, false);
+                
+                return null;
+            }          
+        });
+        
+        // remove one of the events just added
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // define changes for schedule
+                Map<QName, Serializable> changes = new HashMap<QName, Serializable>();
+                List<String> events = new ArrayList<String>(2);
+                events.add("case_complete");
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_EVENT, (Serializable)events);
+                
+                // update the first dispostion action definition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                System.out.println("Removing no_longer_needed event from 1st step: " + 
+                            actionDefs.get(0).getName());
+                rmService.updateDispositionActionDefinition(schedule, actionDefs.get(0), changes);
+                
+                return null;
+            }          
+        });
+        
+        // make sure the disposition lifecycle asOf date is still null and ensure there is only one event
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(record, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(record, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);
+                
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                assertNull("Expecting asOfDate to be null", asOfDate);
+                
+                // make sure only 1 event is present
+                List<ChildAssociationRef> events = nodeService.getChildAssocs(ndNodeRef, ASSOC_EVENT_EXECUTIONS,
+                            RegexQNamePattern.MATCH_ALL);
+                assertEquals(1, events.size());
+                NodeRef event = events.get(0).getChildRef();
+                assertEquals("case_complete", nodeService.getProperty(event, PROP_EVENT_EXECUTION_NAME));
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(record, false);
+                
+                return null;
+            }          
+        });
+    }
+    
+    public void off_testDispositionLifecycle_0318_other_usecases() throws Exception
+    {
+        // test everything above for record level disposition
+        // setup nextaction so that it is events are eligible then add a new event - ensure it is no loger eligible
+        // change the action for the current step i.e. cutoff to transfer - what should happen here?
+        //                                                                  just a property change, any other side effects?
+        // execute the first step i.e. do the cutoff then make changes to the first step of the schedule and ensure it has no effect
+        
+        // ** Advanced **
+        // remove a step from the schedule that is the current step for one or more records/folders
+        // switch between record and folder level disposition - for now this should throw exception
+        //                                                      if anything is filed or there are any
+        //                                                      folders present
+        
+    }
+    
+    /**
+     * test a dispostion schedule being setup after a record folder and record
+     */
+    public void testDispositionLifecycle_0318_existingfolders() throws Exception
+    {
+        final NodeRef recordSeries = TestUtilities.getRecordSeries(searchService, "Reports"); 
+        setComplete();
+        endTransaction();
+        
+        // create a category
+        final NodeRef recordCategory = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordSeries);
+                assertEquals("Reports", nodeService.getProperty(recordSeries, ContentModel.PROP_NAME));
+                        
+                return createRecordCategoryNode(recordSeries);
+            }          
+        });
+        
+        // create a record folder
+        final NodeRef recordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordCategory);
+                return createRecordFolder(recordCategory, "Folder1");
+            }          
+        });
+        
+        // define the disposition schedule for the category (Cut off monthly, hold 1 month, then destroy)
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertNotNull(recordFolder);
+                
+                // define properties for both steps
+                Map<QName, Serializable> step1 = new HashMap<QName, Serializable>();
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "cutoff");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Cutoff after 1 month");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|1");
+                
+                Map<QName, Serializable> step2 = new HashMap<QName, Serializable>();
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "destroy");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Destroy after 1 month");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|1");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD_PROPERTY, PROP_CUT_OFF_DATE);
+                
+                // add the action definitions to the schedule
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                rmService.addDispositionActionDefinition(schedule, step1);
+                rmService.addDispositionActionDefinition(schedule, step2);
+                
+                return null;
+            }          
+        });
+        
+        // make sure the disposition lifecycle is present and correct
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            @SuppressWarnings("deprecation")
+            public Object execute() throws Throwable
+            {
+                assertNotNull(recordFolder);
+                
+                DispositionAction da = rmService.getNextDispositionAction(recordFolder);
+                assertNotNull(da);
+                
+                assertNotNull(da.getDispositionActionDefinition());
+                assertNotNull(da.getDispositionActionDefinition().getId());
+                assertEquals("cutoff", da.getName());
+                Date asOfDate = da.getAsOfDate();
+                assertNotNull(asOfDate);
+                
+                // make sure the as of date is a month in the future
+                Date now = new Date();
+                assertEquals(asOfDate.getMonth(), now.getMonth()+1);
+                
+                // make sure there aren't any events
+                assertEquals(0, da.getEventCompletionDetails().size());
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(recordFolder);
                 
                 return null;
             }          
@@ -1354,7 +2105,12 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         });
     }
 	
-	private void checkSearchAspect(NodeRef record)
+    private void checkSearchAspect(NodeRef record)
+    {
+        checkSearchAspect(record, true);
+    }
+    
+	private void checkSearchAspect(NodeRef record, boolean isPeriodSet)
 	{
 	    DispositionAction da = rmService.getNextDispositionAction(record);
 	    if (da != null)
@@ -1381,9 +2137,18 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             DispositionActionDefinition daDef = da.getDispositionActionDefinition();
             assertNotNull(daDef);
             Period period = daDef.getPeriod();
-            assertNotNull(period);
-            assertEquals(period.getPeriodType(), nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD));
-            assertEquals(period.getExpression(), nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD_EXPRESSION));
+            if (isPeriodSet)
+            {
+                assertNotNull(period);
+                assertEquals(period.getPeriodType(), nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD));
+                assertEquals(period.getExpression(), nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD_EXPRESSION));
+            }
+            else
+            {
+                assertNull(period);
+                assertNull(nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD));
+                assertNull(nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOSITION_PERIOD_EXPRESSION));
+            }
 	    }
 	    
 	    DispositionSchedule ds = rmService.getDispositionSchedule(record);

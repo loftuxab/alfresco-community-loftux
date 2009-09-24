@@ -45,6 +45,11 @@ public interface DispositionAction
     DispositionActionDefinition getDispositionActionDefinition();
     
     /**
+     * @return the id of the action
+     */
+    String getId();
+    
+    /**
      * @return the name of the action
      */
     String getName();

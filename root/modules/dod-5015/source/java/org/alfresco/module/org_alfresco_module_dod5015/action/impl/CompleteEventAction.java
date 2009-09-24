@@ -112,45 +112,6 @@ public class CompleteEventAction extends RMActionExecuterAbstractBase
         }
         return result;
     }
-    
-    /**
-     * 
-     * @param da
-     * @param nodeRef
-     */
-    private void updateEventEligible(DispositionAction da)
-    {
-        List<EventCompletionDetails> events = da.getEventCompletionDetails();
-        
-        boolean eligible = false;
-        if (da.getDispositionActionDefinition().eligibleOnFirstCompleteEvent() == false)
-        {
-            eligible = true;
-            for (EventCompletionDetails event : events)
-            {
-                if (event.isEventComplete() == false)
-                {
-                    eligible = false;
-                    break;
-                }
-            }
-        }
-        else
-        {
-            for (EventCompletionDetails event : events)
-            {
-                if (event.isEventComplete() == true)
-                {
-                    eligible = true;
-                    break;
-                }
-            }
-        }
-        
-        // Update the property with the eligible value
-        this.nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE, eligible);
-    }
-    
 
     /**
      * @see org.alfresco.repo.action.ParameterizedItemAbstractBase#addParameterDefinitions(java.util.List)

@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
@@ -45,6 +46,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Action to implement the consequences of a change to the value of the DispositionActionDefinition
@@ -55,6 +58,9 @@ import org.alfresco.service.namespace.RegexQNamePattern;
  */
 public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionExecuterAbstractBase
 {
+    /** Logger */
+    private static Log logger = LogFactory.getLog(BroadcastDispositionActionDefinitionUpdateAction.class);
+    
     private static final String CHANGED_PROPERTIES = "changedProperties";
 
     /**
@@ -72,43 +78,42 @@ public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionEx
         
         Set<QName> changedProps = (Set<QName>)action.getParameterValue(CHANGED_PROPERTIES);
 
-        // Navigate up the containment hierarchy to get the RecordCategory grandparent.
+        // Navigate up the containment hierarchy to get the record category grandparent and schedule.
         NodeRef dispositionScheduleNode = nodeService.getPrimaryParent(actionedUponNodeRef).getParentRef();
         NodeRef recordCategoryNode = nodeService.getPrimaryParent(dispositionScheduleNode).getParentRef();
-        boolean isRecordLevelDisposition = (Boolean)nodeService.getProperty(dispositionScheduleNode, PROP_RECORD_LEVEL_DISPOSITION);
+        DispositionSchedule dispositionSchedule = recordsManagementService.getDispositionSchedule(recordCategoryNode);
+        boolean isRecordLevelDisposition = dispositionSchedule.isRecordLevelDisposition();
         
-        List<NodeRef> recordFolders = getRecordFoldersBeneath(recordCategoryNode);
+        List<NodeRef> recordFolders = getRecordFoldersForCategory(recordCategoryNode);
         for (NodeRef recordFolder : recordFolders)
         {
             if (isRecordLevelDisposition == false)
             {
-                if (changedProps.contains(PROP_DISPOSITION_PERIOD))
+                if (this.nodeService.hasAspect(recordFolder, ASPECT_DISPOSITION_LIFECYCLE))
                 {
-                    Period dispositionPeriod = (Period)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_PERIOD);
-                    persistDispositionPeriod(recordFolder, dispositionPeriod);
+                    // disposition lifecycle already exists for node so process changes
+                    processActionDefinitionChanges(actionedUponNodeRef, changedProps, recordFolder);
                 }
-                if (changedProps.contains(PROP_DISPOSITION_EVENT) || changedProps.contains(PROP_DISPOSITION_EVENT_COMBINATION))
+                else
                 {
-                    List<String> dispositionEvents = (List<String>)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_EVENT);
-                    String dispositionEventCombination = (String)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_EVENT_COMBINATION);
-                    persistEvents(recordFolder, dispositionEvents, dispositionEventCombination);
+                    // disposition lifecycle does not exist on the node so setup disposition
+                    updateNextDispositionAction(recordFolder);
                 }
             }
             else
             {
-                List<NodeRef> records = getRecordsBeneath(recordFolder);
+                List<NodeRef> records = getRecordsForFolder(recordFolder);
                 for (NodeRef nextRecord : records)
                 {
-                    if (changedProps.contains(PROP_DISPOSITION_PERIOD))
+                    if (this.nodeService.hasAspect(nextRecord, ASPECT_DISPOSITION_LIFECYCLE))
                     {
-                        Period dispositionPeriod = (Period)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_PERIOD);
-                        persistDispositionPeriod(nextRecord, dispositionPeriod);
+                        // disposition lifecycle already exists for node so process changes
+                        processActionDefinitionChanges(actionedUponNodeRef, changedProps, nextRecord);
                     }
-                    if (changedProps.contains(PROP_DISPOSITION_EVENT) || changedProps.contains(PROP_DISPOSITION_EVENT_COMBINATION))
+                    else
                     {
-                        List<String> dispositionEvents = (List<String>)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_EVENT);
-                        String dispositionEventCombination = (String)nodeService.getProperty(actionedUponNodeRef, PROP_DISPOSITION_EVENT_COMBINATION);
-                        persistEvents(nextRecord, dispositionEvents, dispositionEventCombination);
+                        // disposition lifecycle does not exist on the node so setup disposition
+                        updateNextDispositionAction(nextRecord);
                     }
                 }
             }
@@ -116,13 +121,160 @@ public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionEx
     }
 
     /**
+     * Processes all the changes applied to the given disposition
+     * action definition node for the given record or folder node.
+     * 
+     * @param dispositionActionDef The disposition action definition node
+     * @param changedProps The set of properties changed on the action definition
+     * @param recordOrFolder The record or folder the changes potentially need to be applied to
+     */
+    private void processActionDefinitionChanges(NodeRef dispositionActionDef, Set<QName> changedProps,
+                NodeRef recordOrFolder)
+    {
+        // check that the step being edited is the current step for the folder,
+        // if not, the change has no effect on the current step so ignore
+        DispositionAction nextAction = recordsManagementService.getNextDispositionAction(recordOrFolder);
+        if (doesChangedStepAffectNextAction(dispositionActionDef, nextAction))
+        {
+            // the change does effect the nextAction for this node
+            // so go ahead and determine what needs updating
+            if (changedProps.contains(PROP_DISPOSITION_PERIOD))
+            {
+                persistPeriodChanges(dispositionActionDef, nextAction);
+            }
+            
+            if (changedProps.contains(PROP_DISPOSITION_EVENT) || changedProps.contains(PROP_DISPOSITION_EVENT_COMBINATION))
+            {
+                persistEventChanges(dispositionActionDef, nextAction);
+            }
+            
+            if (changedProps.contains(PROP_DISPOSITION_ACTION))
+            {
+                // TODO: deal with the action being updated
+            }
+        }
+    }
+    
+    /**
+     * Determines whether the disposition action defintion (step) being
+     * updated has any effect on the given next action
+     *  
+     * @param dispositionActionDef The disposition action definition node
+     * @param nextAction The next disposition action 
+     * @return true if the step change affects the next action
+     */
+    private boolean doesChangedStepAffectNextAction(NodeRef dispositionActionDef, 
+                DispositionAction nextAction)
+    {
+        boolean affectsNextAction = false;
+        
+        if (dispositionActionDef != null && nextAction != null)
+        {
+            // check whether the id of the action definition node being changed
+            // is the same as the id of the next action
+            String nextActionId = nextAction.getId();
+            if (dispositionActionDef.getId().equals(nextActionId))
+            {
+                affectsNextAction = true;
+            }
+        }
+        
+        return affectsNextAction;
+    }
+    
+    /**
+     * Persists any changes made to the period on the given disposition action
+     * definition on the given next action.
+     *
+     * @param dispositionActionDef The disposition action definition node
+     * @param nextAction The next disposition action
+     */
+    private void persistPeriodChanges(NodeRef dispositionActionDef, DispositionAction nextAction)
+    {
+        Date newAsOfDate = null;
+        Period dispositionPeriod = (Period)nodeService.getProperty(dispositionActionDef, PROP_DISPOSITION_PERIOD);
+        
+        if (dispositionPeriod != null)
+        {
+            // calculate the new as of date as we have been provided a new period
+            Date now = new Date();
+            newAsOfDate = dispositionPeriod.getNextDate(now);
+        }
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Set disposition as of date for next action '" + nextAction.getName() + 
+                        "' (" + nextAction.getNodeRef() + ") to: " + newAsOfDate);
+        }
+        
+        this.nodeService.setProperty(nextAction.getNodeRef(), PROP_DISPOSITION_AS_OF, newAsOfDate);
+    }
+    
+    /**
+     * Persists any changes made to the events on the given disposition action
+     * definition on the given next action.
+     *
+     * @param dispositionActionDef The disposition action definition node
+     * @param nextAction The next disposition action
+     */
+    @SuppressWarnings("unchecked")
+    private void persistEventChanges(NodeRef dispositionActionDef, DispositionAction nextAction)
+    {
+        // go through the current events on the next action and remove any that are not present any more
+        List<String> stepEvents = (List<String>)nodeService.getProperty(dispositionActionDef, PROP_DISPOSITION_EVENT);
+        List<EventCompletionDetails> eventsList = nextAction.getEventCompletionDetails();
+        List<String> nextActionEvents = new ArrayList<String>(eventsList.size());
+        for (EventCompletionDetails event : eventsList)
+        {
+            // take note of the event names present on the next action
+            String eventName = event.getEventName();
+            nextActionEvents.add(eventName);
+            
+            // if the event has been removed delete from next action
+            if (!stepEvents.contains(event.getEventName()))
+            {
+                // remove the child association representing the event
+                nodeService.removeChild(nextAction.getNodeRef(), event.getNodeRef());
+                
+                if (logger.isDebugEnabled())
+                    logger.debug("Removed '" + eventName + "' from next action '" + nextAction.getName() + 
+                                "' (" + nextAction.getNodeRef() + ")");
+            }
+        }
+        
+        // go through the disposition action definition step events and add any new ones
+        for (String eventName : stepEvents)
+        {
+            if (!nextActionEvents.contains(eventName))
+            {
+                createEvent(recordsManagementEventService.getEvent(eventName), nextAction.getNodeRef());
+                
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Added '" + eventName + "' to next action '" + nextAction.getName() + 
+                                "' (" + nextAction.getNodeRef() + ")");
+                }
+            }
+        }
+        
+        // finally since events may have changed re-calculate the events eligible flag
+        boolean eligible = updateEventEligible(nextAction);
+        
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Set events eligible flag to '" + eligible + "' for next action '" + nextAction.getName() + 
+                        "' (" + nextAction.getNodeRef() + ")");
+        }
+    }
+    
+    /**
      * This method finds all the children contained under the specified recordCategoryNode
      * which are record folders.
      * 
      * @param recordCategoryNode
-     * @return
+     * @return List of NodeRefs representing record folders in the given record category
      */
-    private List<NodeRef> getRecordFoldersBeneath(NodeRef recordCategoryNode)
+    private List<NodeRef> getRecordFoldersForCategory(NodeRef recordCategoryNode)
     {
         List<NodeRef> result = new ArrayList<NodeRef>();
         // This recordCategory could contain 0..n RecordFolder children.
@@ -140,12 +292,12 @@ public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionEx
 
     /**
      * This method finds all the children contained under the specified recordFolderNode
-     * which are record.
+     * which are records.
      * 
-     * @param recordFolderNode
-     * @return
+     * @param recordFolderNode The record folder node to search
+     * @return List of NodeRefs representing records in the given record folder
      */
-    private List<NodeRef> getRecordsBeneath(NodeRef recordFolderNode)
+    private List<NodeRef> getRecordsForFolder(NodeRef recordFolderNode)
     {
         List<NodeRef> result = new ArrayList<NodeRef>();
         // This recordFolder could contain 0..n Record children.
@@ -159,79 +311,6 @@ public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionEx
             }
         }
         return result;
-    }
-    
-    private void persistDispositionPeriod(NodeRef nextChild, Period dispositionPeriod)
-    {
-        if (nodeService.hasAspect(nextChild, ASPECT_DISPOSITION_LIFECYCLE))
-        {
-            List<ChildAssociationRef> nextActions = nodeService.getChildAssocs(nextChild, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL);
-            // There should be 0 or 1 elements
-            if (nextActions.isEmpty() == false)
-            {
-                NodeRef nextActionNode = nextActions.get(0).getChildRef();
-                // This is a dispositionAction, with dispositionAsOf property
-
-                if (dispositionPeriod != null)
-                {
-                    Date now = new Date();
-                    Date newAsOfDate = dispositionPeriod.getNextDate(now);
-                    nodeService.setProperty(nextActionNode, PROP_DISPOSITION_AS_OF, newAsOfDate);
-                }
-                else
-                {
-                    //TODO Is this null if there are no timers?
-//                    nodeService.setProperty(nextActionNode, PROP_DISPOSITION_AS_OF, null);
-                }
-            }
-        }
-    }
-
-    private void persistEvents(NodeRef recordOrFolderNode, List<String> events, String combinator)
-    {
-        if (nodeService.hasAspect(recordOrFolderNode, ASPECT_DISPOSITION_LIFECYCLE))
-        {
-            List<ChildAssociationRef> nextActions = nodeService.getChildAssocs(recordOrFolderNode, ASSOC_NEXT_DISPOSITION_ACTION, RegexQNamePattern.MATCH_ALL);
-            // There should be 0 or 1 elements
-            if (nextActions.isEmpty() == false)
-            {
-                NodeRef nextActionNode = nextActions.get(0).getChildRef();
-
-                nodeService.setProperty(nextActionNode, PROP_DISPOSITION_EVENT, (Serializable)events);
-                nodeService.setProperty(nextActionNode, PROP_DISPOSITION_EVENT_COMBINATION, combinator);
-                
-                // Now need to recalculate PROP_DISPOSITION_EVENTS_ELIGIBLE
-                DispositionAction da = recordsManagementService.getNextDispositionAction(recordOrFolderNode);
-                List<EventCompletionDetails> eventCompletionDetails = da.getEventCompletionDetails();
-                
-                boolean eligible = false;
-                if (da.getDispositionActionDefinition().eligibleOnFirstCompleteEvent() == false)
-                {
-                    eligible = true;
-                    for (EventCompletionDetails ecd : eventCompletionDetails)
-                    {
-                        if (ecd.isEventComplete() == false)
-                        {
-                            eligible = false;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    for (EventCompletionDetails ecd : eventCompletionDetails)
-                    {
-                        if (ecd.isEventComplete() == true)
-                        {
-                            eligible = true;
-                            break;
-                        }
-                    }
-                }
-
-                this.nodeService.setProperty(da.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE, eligible);
-            }
-        }
     }
     
     /**
