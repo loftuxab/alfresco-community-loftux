@@ -120,7 +120,7 @@ public interface RecordsManagementSecurityService
      * Determines whether the given user has the RM Admin role
      * 
      * @param rmRootNode RM root node
-     * @param user Username to check
+     * @param user user name to check
      * @return true if the user has the RM Admin role, false otherwise
      */
     boolean hasRMAdminRole(NodeRef rmRootNode, String user);
@@ -165,11 +165,21 @@ public interface RecordsManagementSecurityService
     void assignRoleToAuthority(NodeRef rmRootNode, String role, String authorityName);
     
     /**
+     * Sets a permission on a RM object.  Assumes allow is true.  Cascades permission down to record folder.  
+     * Cascades ReadRecord up to file plan.
      * 
-     * @param nodeRef
-     * @param authority
-     * @param permission
-     * @param allow
+     * @param nodeRef       node reference
+     * @param authority     authority 
+     * @param permission    permission
      */
     void setPermission(NodeRef nodeRef, String authority, String permission);
+    
+    /**
+     * Deletes a permission from a RM object.  Cascades removal down to record folder.
+     * 
+     * @param nodeRef       node reference
+     * @param authority     authority 
+     * @param permission    permission
+     */
+    void deletePermission(NodeRef nodeRef, String authority, String permission);
 }

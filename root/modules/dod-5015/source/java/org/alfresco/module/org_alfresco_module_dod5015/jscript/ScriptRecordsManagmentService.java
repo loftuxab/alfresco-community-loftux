@@ -76,4 +76,17 @@ public class ScriptRecordsManagmentService extends BaseScopableProcessorExtensio
         RecordsManagementSecurityService securityService = rmServices.getRecordsManagementSecurityService();
         securityService.setPermission(node.getNodeRef(), authority, permission);
     }
+    
+    /**
+     * Delete the RM permission
+     * 
+     * @param node
+     * @param permission
+     * @param authority
+     */
+    public void deletePermission(ScriptNode node, String permission, String authority)
+    {
+        RecordsManagementSecurityService securityService = rmServices.getRecordsManagementSecurityService();
+        securityService.deletePermission(node.getNodeRef(), authority, permission);
+    }
 }
