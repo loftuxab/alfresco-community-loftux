@@ -53,6 +53,9 @@
    {
       Alfresco.Disposition.superclass.constructor.call(this, "Alfresco.Disposition", htmlId, ["button", "container"]);
 
+      /* Decoupled event listeners */
+      YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);
+
       return this;
    };
 
@@ -98,8 +101,14 @@
       onReady: function Disposition_onReady()
       {
          // Create buttons
-         this.widgets.editPropertiesButton = Alfresco.util.createYUIButton(this, "editproperties-button", this.onEditPropertiesButtonClick);
-         this.widgets.editScheduleButton = Alfresco.util.createYUIButton(this, "editschedule-button", this.onEditScheduleButtonClick);
+         this.widgets.editPropertiesButton = Alfresco.util.createYUIButton(this, "editproperties-button", this.onEditPropertiesButtonClick,
+         {
+            disabled: true
+         });
+         this.widgets.editScheduleButton = Alfresco.util.createYUIButton(this, "editschedule-button", this.onEditScheduleButtonClick,
+         {
+            disabled: true
+         });
 
          // Add listeners that displays/hides the description
          var actionsEl = Dom.get(this.id + "-actions"),
@@ -168,6 +177,20 @@
 
          // Send the user to the edit schedule page
          document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/disposition-edit?nodeRef=" + this.options.nodeRef;
+      },
+
+      /**
+       * Event handler called when the "folderDetailsAvailable" event is received
+       *
+       * @method: onFolderDetailsAvailable
+       */
+      onFolderDetailsAvailable: function Events_onFolderDetailsAvailable(layer, args)
+      {
+         if (args[1].folderDetails.permissions.userAccess.CreateModifyDestroyFileplanMetadata)
+         {
+            this.widgets.editPropertiesButton.set("disabled", false);
+            this.widgets.editScheduleButton.set("disabled", false);
+         }
       }
    });
 })();

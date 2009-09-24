@@ -54,7 +54,7 @@ public class TriggerAnEventCapability extends AbstractCapability
             {
                 if (isRecordFolder(voter.getNodeService().getType(nodeRef)) || isRecord(nodeRef))
                 {
-                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.ADD_MODIFY_EVENT_DATES) == AccessStatus.ALLOWED)
+                    if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.TRIGGER_AN_EVENT) == AccessStatus.ALLOWED)
                     {
                         return AccessDecisionVoter.ACCESS_GRANTED;
                     }

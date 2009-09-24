@@ -30,6 +30,7 @@
  * @class Alfresco.RM
  */
 Alfresco.RM = Alfresco.RM || {};
+
 /**
  * RM References component
  * 
@@ -42,100 +43,117 @@ Alfresco.RM = Alfresco.RM || {};
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-       Event = YAHOO.util.Event,
-       Sel = YAHOO.util.Selector;
+      Event = YAHOO.util.Event,
+      Sel = YAHOO.util.Selector;
 
    /**
     * Alfresco Slingshot aliases
     */
    var $html = Alfresco.util.encodeHTML,
-       $links = Alfresco.util.activateLinks;
-
+      $links = Alfresco.util.activateLinks;
 
    /**
-    * RM References componentconstructor.
+    * RM References component constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.dashlet.MyDocuments} The new component instance
+    * @return {Alfresco.RM.References} The new component instance
     * @constructor
     */
    Alfresco.RM.References = function RM_References_constructor(htmlId)
    {
-      Alfresco.RM.References.superclass.constructor.call(this, "Alfresco.RM.References", htmlId, []);
+      Alfresco.RM.References.superclass.constructor.call(this, "Alfresco.RM.References", htmlId);
      
       return this;
    };
-    
-    YAHOO.extend(Alfresco.RM.References, Alfresco.component.Base,
+   
+   /**
+    * Extend Alfresco.component.Base with class implementation
+    */
+   YAHOO.extend(Alfresco.RM.References, Alfresco.component.Base,
    {
-      
       /**
        * Initialises event listening and custom events
-       *  
+       * 
+       * @method initEvents
        */
-      initEvents : function RM_References_initEvents()
+      initEvents: function RM_References_initEvents()
       {
+         Event.on(this.id, 'click', this.onInteractionEvent, null, this);
 
-         Event.on(this.id,'click',this.onInteractionEvent, null, this);
-
-         this.registerEventHandler('click',[
+         this.registerEventHandler('click',
+         [
             {
-               rule : 'button.deleteRef',
-               o : {
-                     handler:this.onDeleteReference,
-                     scope : this
+               rule: 'button.deleteRef',
+               o:
+               {
+                  handler: this.onDeleteReference,
+                  scope: this
                }
             },
             {
-               rule : 'button.doneRef',
-               o : {
-                     handler:this.onDoneReference,
-                     scope : this
+               rule: 'button.doneRef',
+               o:
+               {
+                  handler: this.onDoneReference,
+                  scope: this
                }
             },                       
             {
-               rule : 'button.newRef',
-               o : {
-                      handler:this.onNewReference,
-                      scope:this
-                   }
+               rule: 'button.newRef',
+               o:
+               {
+                   handler:this.onNewReference,
+                   scope:this
+                }
             }
          ]);
          return this;
       },
+      
       /**
        * Handler for Done button
-       *  
+       * 
+       * @method onDoneReference
+       * @param e {object} Event
+       * @param args {object} Event arguments
        */
-      onDoneReference : function RM_References_onDoneReference(e, args)
+      onDoneReference: function RM_References_onDoneReference(e, args)
       {
-         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/document-details?nodeRef={nodeRef}';
-
-         var pageUrl = YAHOO.lang.substitute(uriTemplate,
-         {
-            site: encodeURIComponent(this.options.siteId),
-            nodeRef: this.options.nodeRef
-         });
+         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/document-details?nodeRef={nodeRef}',
+            pageUrl = YAHOO.lang.substitute(uriTemplate,
+            {
+               site: encodeURIComponent(this.options.siteId),
+               nodeRef: this.options.nodeRef
+            });
 
          window.location.href = pageUrl;
       },
+      
       /**
        * Handler for delete button
-       *  
+       * 
+       * @method onDeleteReference
+       * @param e {object} Event
+       * @param args {object} Event arguments
        */
-      onDeleteReference : function RM_References_onDeleteReference(e, args)
+      onDeleteReference: function RM_References_onDeleteReference(e, args)
       {
-         var refId = this.widgets[Event.getTarget(e).id.replace('-button','')].get('value');
-         var nodeRef = Dom.getAncestorByTagName(Event.getTarget(e),'li').getElementsByTagName('a')[0].href.split('/').pop();
+         var eTarget = Event.getTarget(e),
+            refId = this.widgets[eTarget.id.replace('-button', '')].get('value'),
+            href = Dom.getAncestorByTagName(eTarget, 'li').getElementsByTagName('a')[0].href,
+            nodeRef = new Alfresco.util.NodeRef(Alfresco.util.getQueryStringParameter("nodeRef", href)),
+            queryString = "?st=" + nodeRef.storeType + "&si=" + nodeRef.storeId + "&id=" + nodeRef.id;
 
-         var queryString = '?st=workspace&si=SpacesStore&id='+nodeRef;
          Alfresco.util.Ajax.jsonRequest(
          {
             method: Alfresco.util.Ajax.DELETE,
-            url: Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.replace(':/','')+'/customreferences'+'/'+refId+queryString,
+            url: Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.replace(':/', '') + '/customreferences' + '/' + refId + queryString,
             successCallback:
             {
-               fn: function(e) { this.onDeleteSuccess(nodeRef) },
+               fn: function(e)
+               {
+                  this.onDeleteSuccess(nodeRefId)
+               },
                scope: this
             },
             successMessage: Alfresco.util.message("message.delete.success", 'Alfresco.RM.References'),
@@ -144,61 +162,69 @@ Alfresco.RM = Alfresco.RM || {};
       },
       
       /**
-       * Handler for new reference  button 
+       * Handler for new reference  button
+       *
+       * @method onNewReference
+       * @param e {object} Event
+       * @param args {object} Event arguments
        */
-      onNewReference : function RM_References_onNewReference(e, args)
+      onNewReference: function RM_References_onNewReference(e, args)
       {
-         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/new-rmreference?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}';
-         var url = YAHOO.lang.substitute(uriTemplate,
-         {
-            site: encodeURIComponent(this.options.siteId),
-            nodeRef: this.options.nodeRef,
-            parentNodeRef: this.options.parentNodeRef,
-            docName: encodeURIComponent(this.options.docName)
-         });
+         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/new-rmreference?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}',
+            url = YAHOO.lang.substitute(uriTemplate,
+            {
+               site: encodeURIComponent(this.options.siteId),
+               nodeRef: this.options.nodeRef,
+               parentNodeRef: this.options.parentNodeRef,
+               docName: encodeURIComponent(this.options.docName)
+            });
 
          window.location.href = url; 
       },
       
       /**
        * Handler for deletion success 
-       *  
+       * 
+       * @method onDeleteSuccess
+       * @param nodeRefId {string} ID portion of nodeRef that was successfully deleted
        */
-       onDeleteSuccess : function RM_References_onDeleteSuccess(nodeRef)
+       onDeleteSuccess: function RM_References_onDeleteSuccess(nodeRefId)
        {
-          var el = Dom.get('ref-'+nodeRef);
-          var ul = el.parentNode;
-          //remove list item
+          var el = Dom.get('ref-' + nodeRefId),
+            ul = el.parentNode;
+
+          // Remove list item
           ul.removeChild(el);
-          //if no more references, remove list and display msg
-          if (ul.getElementsByTagName('li').length==0)
+
+          // If no more references, remove list and display message
+          if (ul.getElementsByTagName('li').length === 0)
           {
              ul.parentNode.removeChild(ul);
-             Dom.addClass("no-refs",'active');
+             Dom.addClass("no-refs", 'active');
           }
        },
        
       /**
        * Fired by YUI when parent element is available for scripting
-       * @method onReady
        * 
+       * @method onReady
+       * @override
        */
       onReady: function RM_References_onReady()
       {
          this.initEvents();
-         var buttons = Sel.query('button',this.id);
+         
          // Create widget button while reassigning classname to src element (since YUI removes classes). 
          // We need the classname so we can identify what action to take when it is interacted with (event delegation).
-         for (var i=0, len = buttons.length; i<len; i++)
+         var buttons = Sel.query('button', this.id),
+            button, id;
+         for (var i = 0, len = buttons.length; i < len; i++)
          {
-            var button= buttons[i];
-            var id = button.id;
+            button = buttons[i];
+            id = button.id;
             this.widgets[id] = new YAHOO.widget.Button(id);
-            this.widgets[id]._button.className=button.className;
+            this.widgets[id]._button.className = button.className;
          }
       }
-
    });
 })();
-
-

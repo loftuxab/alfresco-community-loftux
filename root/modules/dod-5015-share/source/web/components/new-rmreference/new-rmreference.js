@@ -30,6 +30,7 @@
  * @class Alfresco.RM
  */
 Alfresco.RM = Alfresco.RM || {};
+
 /**
  * RM References component
  * 
@@ -51,7 +52,6 @@ Alfresco.RM = Alfresco.RM || {};
    var $html = Alfresco.util.encodeHTML,
        $links = Alfresco.util.activateLinks;
 
-
    /**
     * RM References component constructor.
     * 
@@ -69,7 +69,6 @@ Alfresco.RM = Alfresco.RM || {};
     
    YAHOO.extend(Alfresco.RM.NewReference, Alfresco.component.Base,
    {
-      
       /**
        * Object container for initialization options
        *
@@ -85,6 +84,7 @@ Alfresco.RM = Alfresco.RM || {};
           * @type String
           */
          controlId: "",
+         
          /**
           * String Id used for document picker picker
           *
@@ -92,6 +92,7 @@ Alfresco.RM = Alfresco.RM || {};
           * @type String
           */
          pickerId: "",
+         
          /**
           * Comma separated value of selected documents (nodeRefs). 
           *
@@ -104,77 +105,86 @@ Alfresco.RM = Alfresco.RM || {};
       
       /**
        * Initialises event listening and custom events
-       *  
+       * 
+       * @method initEvents
        */
       initEvents : function RM_NewReference_initEvents()
       {
          Event.on(this.id, 'click', this.onInteractionEvent, null, this);
-         Event.on('new-ref-name','keyup',function(e) { this.checkRequiredFields(); }, null, this);
-         this.registerEventHandler('click',[
+         Event.on('new-ref-name', 'keyup', function(e)
+         {
+            this.checkRequiredFields();
+         }, null, this);
+         
+         this.registerEventHandler('click',
+         [
             {
-               rule : 'button.cancelCreate',
-               o : 
+               rule: 'button.cancelCreate',
+               o:
                {
-                  handler:this._navigateForward,
-                  scope : this
+                  handler :this._navigateForward,
+                  scope: this
                }
             },                       
             {
-               rule : 'button.submitCreate',
-               o : 
+               rule: 'button.submitCreate',
+               o:
                {
-                  
-                  handler:this.onCreate,
-                  scope:this
+                  handler: this.onCreate,
+                  scope: this
                }
             }
          ]);
          
          return this;
       },
+
       /**
        * Fired by YUI when parent element is available for scripting
-       * @method onReady
        * 
+       * @method onReady
        */
       onReady: function RM_NewReference_onReady()
       {
          this.initEvents();
-         var buttons = Sel.query('#submitCreate,#cancelCreate',this.id);
+
          // Create widget button while reassigning classname to src element (since YUI removes classes). 
          // We need the classname so we can identify what action to take when it is interacted with (event delegation).
-         for (var i=0, len = buttons.length; i<len; i++)
+         var buttons = Sel.query('#submitCreate,#cancelCreate',this.id),
+            button, id;
+
+         for (var i = 0, len = buttons.length; i < len; i++)
          {
-            var button= buttons[i];
-            var id = button.id;
+            button = buttons[i];
+            id = button.id;
             this.widgets[id] = new YAHOO.widget.Button(id);
-            this.widgets[id]._button.className=button.className;
+            this.widgets[id]._button.className = button.className;
          }
          
-         this.widgets['documentPicker'] = new Alfresco.module.DocumentPicker(this.id+'-docPicker', Alfresco.module.RM_ObjectRenderer);
+         this.widgets.documentPicker = new Alfresco.module.DocumentPicker(this.id + '-docPicker', Alfresco.module.RM_ObjectRenderer);
 
-         this.widgets['documentPicker'].setOptions({
-               controlId: this.options.controlId,
-               pickerId: this.options.pickerId,
-               disabled:false,
-               compactMode: false,
-               displaySmallAddButtonIcon:true,
-               currentValue: this.options.currentValue,
-               minSearchTermLength: "3",
-               maxSearchResults: "100",
-               multipleSelectMode: false,
-               parentNodeRef: Alfresco.util.getQueryStringParameter('parentNodeRef'),
-               itemFamily: "node",
-               showLinkToTarget: false,
-               maintainAddedRemovedItems:false,
-               mandatory:true,
-               docLibNameAlias:this.msg('label.fileplan'),
-               restrictParentNavigationToDocLib: true,     
-               params:'filterType=rma:dispositionSchedule,rma:dispositionActionDefinition,rma:dispositionAction,rma:hold,rma:transfer'
-                // params:'filterType='+encodeURIComponent('{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionSchedule,{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionActionDefinition,{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAction,{http://www.alfresco.org/model/recordsmanagement/1.0}hold','{http://www.alfresco.org/model/recordsmanagement/1.0}transfer')
-            }
-         );         
-         YAHOO.Bubbling.on('onDocumentsSelected',this.updateSelectionField, this);
+         this.widgets.documentPicker.setOptions(
+         {
+            controlId: this.options.controlId,
+            pickerId: this.options.pickerId,
+            disabled: false,
+            compactMode: false,
+            displaySmallAddButtonIcon:true,
+            currentValue: this.options.currentValue,
+            minSearchTermLength: "3",
+            maxSearchResults: "100",
+            multipleSelectMode: false,
+            parentNodeRef: Alfresco.util.getQueryStringParameter('parentNodeRef'),
+            itemFamily: "node",
+            showLinkToTarget: false,
+            maintainAddedRemovedItems:false,
+            mandatory:true,
+            docLibNameAlias:this.msg('label.fileplan'),
+            restrictParentNavigationToDocLib: true,     
+            params:'filterType=rma:dispositionSchedule,rma:dispositionActionDefinition,rma:dispositionAction,rma:hold,rma:transfer'
+         });         
+
+         YAHOO.Bubbling.on('onDocumentsSelected', this.updateSelectionField, this);
       },
       
       /**
@@ -182,26 +192,26 @@ Alfresco.RM = Alfresco.RM || {};
        * 
        * Also updates the internal value as nodeRefs, so the document picker can
        * reload the selection if user selects the picker again.
-       *  
+       * 
+       * @method updateSelectionField
+       * @param e {object} Event
+       * @param args {object} Event arguments
        */
       updateSelectionField: function RM_NewReference_updateSelectionField(e, args)
       {
-         var selectedEl = Dom.get(this.options.pickerId);
-         var selectedItems = args[1];
-         
+         var selectedEl = Dom.get(this.options.pickerId),
+            selectedItems = args[1];
 
-         if (selectedItems.length>0)
+         if (selectedItems.length > 0)
          {
-            //we only need one
-            var selectedItem = selectedItems[0];
-
-            var docUrl = Alfresco.constants.URL_CONTEXT + 'page/site/rm/document-details?nodeRef='+selectedItem.nodeRef;
-            //we only want to display the path relative to the doc lib
-            var docLibPath = selectedItem.displayPath.split('documentLibrary')[1];
+            // We only need one
+            var selectedItem = selectedItems[0],
+               docUrl = Alfresco.constants.URL_CONTEXT + 'page/site/rm/document-details?nodeRef=' + selectedItem.nodeRef,
+               docLibPath = selectedItem.displayPath.split('documentLibrary')[1];
          
             selectedEl.innerHTML = '<a href="'+ docUrl+ '" title="' + selectedItem.description + '">'+ docLibPath + '/' + selectedItem.name +'</a>';
             Dom.addClass(selectedEl,'active');
-            //note: if more than one than we must store as comma separated
+            // Note: if more than one than we must store as comma separated
             this.options.currentValue = selectedItem.nodeRef;
          }
          else
@@ -213,15 +223,20 @@ Alfresco.RM = Alfresco.RM || {};
          this.checkRequiredFields();
       },
       
+      /**
+       * Updates state of submit button based on required valued
+       * 
+       * @method checkRequiredFields
+       */
       checkRequiredFields: function()
       {
-         if (this.options.currentValue!="" && Dom.get('new-ref-name').value!="")
+         if (this.options.currentValue != "" && Dom.get('new-ref-name').value != "")
          {
-            this.widgets['submitCreate'].set('disabled',false);
+            this.widgets['submitCreate'].set('disabled', false);
          }
          else
          {
-            this.widgets['submitCreate'].set('disabled',true);
+            this.widgets['submitCreate'].set('disabled', true);
          }
       },
       
@@ -233,35 +248,44 @@ Alfresco.RM = Alfresco.RM || {};
        */
       _navigateForward: function RM_NewReference__navigateForward()
       {
-         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/rmreferences?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}';
-
-         var pageUrl = YAHOO.lang.substitute(uriTemplate,
-         {
-            site: encodeURIComponent(this.options.siteId),
-            nodeRef: this.options.nodeRef,
-            parentNodeRef: this.options.parentNodeRef,
-            docName: encodeURIComponent(this.options.docName)
-         });
+         var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/rmreferences?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}',
+            pageUrl = YAHOO.lang.substitute(uriTemplate,
+            {
+               site: encodeURIComponent(this.options.siteId),
+               nodeRef: this.options.nodeRef,
+               parentNodeRef: this.options.parentNodeRef,
+               docName: encodeURIComponent(this.options.docName)
+            });
 
          window.location.href = pageUrl;
       },
       
+      /**
+       * Create button event handler
+       *
+       * @method onCreate
+       * @params e {object} Event
+       */
       onCreate: function RM_NewReference__onCreate(e)
       {
-         var refTypeEl = document.getElementById('record-rel');
-         var referenceType = refTypeEl.options[refTypeEl.selectedIndex].value;
+         var refTypeEl = document.getElementById('record-rel'),
+            referenceType = refTypeEl.options[refTypeEl.selectedIndex].value;
          
          Alfresco.util.Ajax.jsonRequest(
          {
             method: Alfresco.util.Ajax.POST,
-            url: Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.replace(':/','')+'/customreferences',
-            dataObj: {refId:referenceType,toNode:this.options.currentValue},
+            url: Alfresco.constants.PROXY_URI + "api/node/" + this.options.nodeRef.replace(':/', '') + '/customreferences',
+            dataObj:
+            {
+               refId: referenceType,
+               toNode: this.options.currentValue
+            },
             successCallback:
             {
                fn: this._navigateForward,
                scope: this
             },
-            failureMessage: Alfresco.util.message("message.createfail", 'Alfresco.RM.NewReference')
+            failureMessage: this.msg("message.createfail")
          });
          return false;
       }

@@ -3066,8 +3066,8 @@ Alfresco.util.Ajax = function()
  */
 Alfresco.util.Cursor = function()
 {
-   return {
-
+   return (
+   {
       /**
        * Show cursor in state to indicate that the current element is draggable.
        * Styled through css selector ".draggable" in base.css
@@ -3104,7 +3104,6 @@ Alfresco.util.Cursor = function()
        */
       DROP_INVALID: "dropInvalid",
 
-
       /**
        * @method setCursorState
        * @param el {HTMLElement} Object that is dragged and who's style affects the cursor
@@ -3126,8 +3125,7 @@ Alfresco.util.Cursor = function()
             }
          }
       }
-
-   };
+   });
 }();
 
 /**
@@ -3137,8 +3135,8 @@ Alfresco.util.Cursor = function()
  */
 Alfresco.util.Anim = function()
 {
-   return {
-
+   return (
+   {
       /**
        * The default attributes for a fadeIn or fadeOut call.
        *
@@ -3291,6 +3289,7 @@ Alfresco.util.Anim = function()
          outDuration: 1.2,
          clearOnComplete: true
       },
+      
       /**
        * Pulses the background colo(u)r of an HTMLELement
        *
@@ -3359,10 +3358,41 @@ Alfresco.util.Anim = function()
             animIn.animate();
          }
       }
-
-   };
+   });
 }();
 
+/**
+ * Helper class for managing nodeRefs
+ *
+ * @class Alfresco.util.NodeRef
+ */
+(function()
+{
+   Alfresco.util.NodeRef = function(nodeRef)
+   {
+      this.nodeRef = nodeRef;
+      
+      try
+      {
+         var a = nodeRef.replace(":/", "").split("/");
+         this.storeType = a[0];
+         this.storeId = a[1];
+         this.id = a[2];
+      }
+      catch (e)
+      {
+         return null;
+      }
+   
+      return (
+      {
+         nodeRef: this.nodeRef,
+         storeType: this.storeType,
+         storeId: this.storeId,
+         id: this.id
+      });
+   }
+})();
 
 /**
  * Logging makes use of the log4javascript framework.
