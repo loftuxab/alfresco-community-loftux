@@ -14,13 +14,13 @@
     <div class="yui-gc">
       <div class="yui-u first">
           <div id="${htmlid}-audit-info" class="audit-info">
-             <h2>${msg("label.title")}</h2>
+             <h2>${msg("label.header-title")}</h2>
              <p id="${htmlid}-audit-status-date" class="audit-status-date"></p>
           </div>
       </div>
       <div class="yui-u">
          <div id="${htmlid}-auditActions" class="auditActions">
-            <button id="${htmlid}-audit-toggle" name="${htmlid}-audit-toggle" value="" class="audit-toggle"></button>
+            <button id="${htmlid}-audit-toggle" disabled name="${htmlid}-audit-toggle"  class="audit-toggle">${msg('label.button-start')}</button>
             <button id="${htmlid}-audit-view" name="audit-view" class="audit-view">${msg("label.button-view-log")}</button>
             <button id="${htmlid}-audit-clear" name="audit-clear" class="audit-clear">${msg("label.button-clear")}</button>
          </div>

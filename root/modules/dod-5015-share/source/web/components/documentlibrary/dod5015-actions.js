@@ -706,7 +706,7 @@
       {
          var openAuditLogWindow = function openAuditLogWindow()
          {
-            return window.open(Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + '/rmaudit?nodeRef=' + assets.nodeRef.replace(':/',''), 'Audit_Log', 'resizable=yes,location=no,menubar=no,scrollbars=yes,status=yes,width=400,height=400');
+            return window.open(Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + '/rmaudit?nodeName='+ encodeURIComponent(assets.displayName) + '&nodeRef=' + assets.nodeRef.replace(':/',''), 'Audit_Log', 'resizable=yes,location=no,menubar=no,scrollbars=yes,status=yes,width=700,height=500');
          };
          // haven't yet opened window yet
          if (!this.fullLogWindowReference)
