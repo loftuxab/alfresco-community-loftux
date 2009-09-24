@@ -130,6 +130,11 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
                 TYPE_DISPOSITION_ACTION, 
                 ASSOC_EVENT_EXECUTIONS,
                 new JavaBehaviour(this, "eventExecutionUpdate", NotificationFrequency.TRANSACTION_COMMIT));
+
+        this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onDeleteNode"), 
+                TYPE_EVENT_EXECUTION, 
+                new JavaBehaviour(this, "eventExecutionDelete", NotificationFrequency.TRANSACTION_COMMIT));
         
         this.policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"), 
@@ -311,6 +316,43 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
                 }
                 events.add((String)this.nodeService.getProperty(eventExecution, PROP_EVENT_EXECUTION_NAME));
                 this.nodeService.setProperty(record, PROP_RS_DISPOSITION_EVENTS, (Serializable)events);
+            }
+        }
+    }
+    
+    public void eventExecutionDelete(ChildAssociationRef childAssocRef, boolean isNodeArchived)
+    {
+        NodeRef dispositionActionNode = childAssocRef.getParentRef();
+        
+        if (this.nodeService.exists(dispositionActionNode))
+        {
+            ChildAssociationRef assoc = this.nodeService.getPrimaryParent(dispositionActionNode);
+            if (assoc.getTypeQName().equals(ASSOC_NEXT_DISPOSITION_ACTION) == true)
+            {
+                // Get the record (or record folder)
+                NodeRef record = assoc.getParentRef();
+
+                // Apply the search aspect
+                applySearchAspect(record);
+                
+                // make sure the list of events match the action definition
+                DispositionAction nextAction = recordsManagementService.getNextDispositionAction(record);
+                if (nextAction != null)
+                {
+                    List<String> eventNames = null;
+                    List<EventCompletionDetails> eventsList = nextAction.getEventCompletionDetails();
+                    if (eventsList.size() > 0)
+                    {
+                        eventNames = new ArrayList<String>(eventsList.size());
+                        for (EventCompletionDetails event : eventsList)
+                        {
+                            eventNames.add(event.getEventName());
+                        }
+                    }
+                    
+                    // set the property
+                    this.nodeService.setProperty(record, PROP_RS_DISPOSITION_EVENTS, (Serializable)eventNames);
+                }
             }
         }
     }

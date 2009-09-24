@@ -88,7 +88,7 @@ public class DispositionActionImpl implements DispositionAction,
        return this.dispositionNodeRef;
     }
     
-    /*
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getLabel()
      */
     public String getLabel()
@@ -106,7 +106,15 @@ public class DispositionActionImpl implements DispositionAction,
         return label;
     }
 
-    /*
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getId()
+     */
+    public String getId()
+    {
+        return (String)this.services.getNodeService().getProperty(this.dispositionNodeRef, PROP_DISPOSITION_ACTION_ID);
+    }
+    
+    /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.DispositionAction#getName()
      */
     public String getName()

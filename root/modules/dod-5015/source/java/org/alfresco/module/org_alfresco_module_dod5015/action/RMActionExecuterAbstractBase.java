@@ -35,8 +35,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.i18n.I18NUtil;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
+import org.alfresco.module.org_alfresco_module_dod5015.EventCompletionDetails;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
@@ -511,22 +513,76 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
                 for (RecordsManagementEvent event : events)
                 {
                     // For every event create an entry on the action
-                    Map<QName, Serializable> eventProps = new HashMap<QName, Serializable>(7);
-                    eventProps.put(PROP_EVENT_EXECUTION_NAME, event.getName());
-                    // TODO display label
-                    RecordsManagementEventType eventType = recordsManagementEventService.getEventType(event.getType());
-                    eventProps.put(PROP_EVENT_EXECUTION_AUTOMATIC, eventType.isAutomaticEvent());
-                    eventProps.put(PROP_EVENT_EXECUTION_COMPLETE, false);
-                    
-                    // Create the event execution object
-                    this.nodeService.createNode(
-                            dispositionActionNodeRef,
-                            ASSOC_EVENT_EXECUTIONS,
-                            ASSOC_EVENT_EXECUTIONS,
-                            TYPE_EVENT_EXECUTION,
-                            eventProps);
+                    createEvent(event, dispositionActionNodeRef);
                 }
             }
         }
+    }
+    
+    /**
+     * Creates the given records management event for the given 'next action'.
+     * 
+     * @param event The event to create
+     * @param nextActionNodeRef The next action node
+     * @return The created event NodeRef
+     */
+    protected NodeRef createEvent(RecordsManagementEvent event, NodeRef nextActionNodeRef)
+    {
+        NodeRef eventNodeRef = null;
+        
+        Map<QName, Serializable> eventProps = new HashMap<QName, Serializable>(7);
+        eventProps.put(PROP_EVENT_EXECUTION_NAME, event.getName());
+        // TODO display label
+        RecordsManagementEventType eventType = recordsManagementEventService.getEventType(event.getType());
+        eventProps.put(PROP_EVENT_EXECUTION_AUTOMATIC, eventType.isAutomaticEvent());
+        eventProps.put(PROP_EVENT_EXECUTION_COMPLETE, false);
+        
+        // Create the event execution object
+        this.nodeService.createNode(nextActionNodeRef, ASSOC_EVENT_EXECUTIONS,
+                ASSOC_EVENT_EXECUTIONS, TYPE_EVENT_EXECUTION, eventProps);
+        
+        return eventNodeRef;
+    }
+    
+    /**
+     * Calculates and updates the <code>rma:dispositionEventsEligible</code>
+     * property for the given next disposition action.
+     * 
+     * @param nextAction The next disposition action
+     * @return The result of calculation
+     */
+    protected boolean updateEventEligible(DispositionAction nextAction)
+    {
+        List<EventCompletionDetails> events = nextAction.getEventCompletionDetails();
+        
+        boolean eligible = false;
+        if (nextAction.getDispositionActionDefinition().eligibleOnFirstCompleteEvent() == false)
+        {
+            eligible = true;
+            for (EventCompletionDetails event : events)
+            {
+                if (event.isEventComplete() == false)
+                {
+                    eligible = false;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            for (EventCompletionDetails event : events)
+            {
+                if (event.isEventComplete() == true)
+                {
+                    eligible = true;
+                    break;
+                }
+            }
+        }
+        
+        // Update the property with the eligible value
+        this.nodeService.setProperty(nextAction.getNodeRef(), PROP_DISPOSITION_EVENTS_ELIGIBLE, eligible);
+        
+        return eligible;
     }
 }
