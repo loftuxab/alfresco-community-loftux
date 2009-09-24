@@ -41,10 +41,12 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
+import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -67,6 +69,7 @@ import org.json.JSONObject;
  */
 public class RecordsManagementSecurityServiceImpl implements RecordsManagementSecurityService, 
                                                              RecordsManagementModel
+                                                             
 {
     /** Entry voter for capability related support */
     private RMEntryVoter voter;
@@ -153,15 +156,23 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
      */
     public void init()
     {
-        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"), 
+        policyComponent.bindClassBehaviour(NodeServicePolicies.OnCreateNodePolicy.QNAME, 
                 ASPECT_RECORDS_MANAGEMENT_ROOT, 
                 new JavaBehaviour(this, "onCreateRootNode", NotificationFrequency.TRANSACTION_COMMIT));
-        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"), 
+        policyComponent.bindClassBehaviour(NodeServicePolicies.OnCreateNodePolicy.QNAME, 
                 TYPE_RECORDS_MANAGEMENT_CONTAINER, 
                 new JavaBehaviour(this, "onCreateRMContainer", NotificationFrequency.TRANSACTION_COMMIT));
-        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"), 
+        policyComponent.bindClassBehaviour(NodeServicePolicies.OnCreateNodePolicy.QNAME,  
                 TYPE_RECORD_FOLDER, 
                 new JavaBehaviour(this, "onCreateRecordFolder", NotificationFrequency.TRANSACTION_COMMIT));
+        policyComponent.bindClassBehaviour(NodeServicePolicies.BeforeDeleteNodePolicy.QNAME, 
+                ASPECT_FROZEN, 
+                new JavaBehaviour(this, "beforeDeleteFrozenNode", NotificationFrequency.TRANSACTION_COMMIT));
+    }
+    
+    public void beforeDeleteFrozenNode(NodeRef nodeRef)
+    {
+        throw new AccessDeniedException("Frozen nodes can not be deleted");
     }
     
     /**
