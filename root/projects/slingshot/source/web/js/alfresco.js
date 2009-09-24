@@ -1135,7 +1135,7 @@ Alfresco.util.createYUIPanel = function(p_el, p_params, p_custom)
          modal: true,
          constraintoviewport: true,
          draggable: true,
-         fixedcenter: true,
+         fixedcenter: "contained",
          close: true,
          visible: false
       },
