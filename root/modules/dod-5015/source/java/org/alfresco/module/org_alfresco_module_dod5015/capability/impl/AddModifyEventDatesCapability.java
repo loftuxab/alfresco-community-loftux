@@ -48,7 +48,7 @@ public class AddModifyEventDatesCapability extends AbstractCapability
     {
         if (isRm(nodeRef))
         {
-            if (checkFilingUnfrozenUncutoff(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
+            if (checkFilingUnfrozen(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
                 if (isRecordFolder(voter.getNodeService().getType(nodeRef)) || isRecord(nodeRef))
                 {
