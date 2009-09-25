@@ -1,5 +1,6 @@
 package org.alfresco.module.org_alfresco_module_dod5015.email;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class CustomEmailMappingServiceImpl implements CustomEmailMappingService
     private ContentService contentService;
     private TransactionService transactionService;
     
-    private Set<CustomMapping> customMappings = new HashSet<CustomMapping>();
+    private Set<CustomMapping> customMappings = Collections.synchronizedSet(new HashSet<CustomMapping>());
     
     private static Log logger = LogFactory.getLog(CustomEmailMappingServiceImpl.class);
     
@@ -139,7 +140,17 @@ public class CustomEmailMappingServiceImpl implements CustomEmailMappingService
         NodeRef configNode = getConfigNode();
         if(configNode != null)
         {
-            customMappings = readConfig(configNode);
+            Set<CustomMapping> newMappings = readConfig(configNode);
+            
+            customMappings.addAll(newMappings);
+            
+            for(CustomMapping mapping : customMappings)
+            {
+                if(!newMappings.contains(mapping))
+                {
+                    customMappings.remove(mapping);
+                }
+            }
         }
     }
     
@@ -222,15 +233,8 @@ public class CustomEmailMappingServiceImpl implements CustomEmailMappingService
             values.remove(oldQName);
         }
         
-        
-        for(CustomMapping mapping : customMappings)
-        {
-            //TODO need to worry about qnames comparison here
-            if(mapping.getFrom().equalsIgnoreCase(from) && mapping.getTo().equalsIgnoreCase(to))
-            {
-                customMappings.remove(mapping);
-            }
-        }
+        CustomMapping toDelete = new CustomMapping(from, to);
+        customMappings.remove(toDelete);
         
         updateOrCreateEmailConfig(customMappings);
         
