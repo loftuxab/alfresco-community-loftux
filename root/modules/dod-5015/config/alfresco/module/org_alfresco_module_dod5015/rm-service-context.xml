@@ -629,6 +629,7 @@
                 <value>{http://www.alfresco.org/model/recordsmanagement/1.0}cutOffDate</value>
                 <value>{http://www.alfresco.org/model/recordsmanagement/1.0}dispositionAsOf</value>
                 <value>{http://www.alfresco.org/model/recordsmanagement/1.0}dateFiled</value>
+                <value>{http://www.alfresco.org/model/recordsmanagement/1.0}publicationDate</value>
             </list>
         </property>
     </bean>
