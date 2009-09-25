@@ -43,6 +43,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnRemoveReference;
 import org.alfresco.module.org_alfresco_module_dod5015.caveat.RMListOfValuesConstraint;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.dictionary.IndexTokenisationMode;
 import org.alfresco.repo.dictionary.M2Aspect;
 import org.alfresco.repo.dictionary.M2Association;
 import org.alfresco.repo.dictionary.M2ChildAssociation;
@@ -241,7 +242,6 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
     public QName addCustomPropertyDefinition(QName propId, String aspectName, String label, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraint)
     {
         // title parameter is currently ignored. Intentionally.
-        
         if (propId == null)
         {
             // Generate a propId
@@ -254,7 +254,6 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         
         M2Model deserializedModel = readCustomContentModel();
         M2Aspect customPropsAspect = deserializedModel.getAspect(aspectName);
-
         
         if (customPropsAspect == null)
         {
@@ -273,6 +272,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         newProp.setName(propIdAsString);
         newProp.setType(dataType.toPrefixString(namespaceService));
         
+        // Note that the title is used to store the RM 'label'.
         newProp.setTitle(label);
         newProp.setDescription(description);
         newProp.setDefaultValue(defaultValue);
@@ -280,6 +280,11 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
         newProp.setMandatory(mandatory);
         newProp.setProtected(isProtected);
         newProp.setMultiValued(multiValued);
+        
+        newProp.setIndexed(true);
+        newProp.setIndexedAtomically(true);
+        newProp.setStoredInIndex(false);
+        newProp.setIndexTokenisationMode(IndexTokenisationMode.FALSE);
         
         if (lovConstraint != null)
         {
