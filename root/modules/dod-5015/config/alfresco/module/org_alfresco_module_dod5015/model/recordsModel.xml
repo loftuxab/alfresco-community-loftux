@@ -69,6 +69,11 @@
                <title>Disposition Authority</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>
 
             <property name="rma:dispositionInstructions">
@@ -131,6 +136,11 @@
                 <title>Disposition Location</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>
 
             <property name="rma:dispositionPeriod">
@@ -144,12 +154,22 @@
                <title>Disposition Period Property</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>
 
             <property name="rma:dispositionEvent">
                <title>Disposition Event</title>
                <type>d:text</type>
                <multiple>true</multiple>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>
 
             <property name="rma:dispositionEventCombination">
@@ -157,6 +177,11 @@
                <type>d:text</type>
                <mandatory>true</mandatory>
                <default>or</default>
+               <index enabled="true">
+			       <atomic>true</atomic>
+			       <stored>false</stored>
+			       <tokenised>false</tokenised>
+			   </index>
             </property>
 
          </properties>
@@ -214,11 +239,21 @@
                <title>Disposition Action Id</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:dispositionAction">
                <title>Disposition Action</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:dispositionAsOf">
                <title>Disposition Action Date</title>
@@ -239,6 +274,11 @@
                <title>Disposition Action Started By</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:dispositionActionCompletedAt">
                <title>Disposition Action Completed At</title>
@@ -249,6 +289,11 @@
                <title>Disposition Action Copmleted By</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
 
          </properties>
@@ -288,6 +333,11 @@
                <title>Event Name</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:eventExecutionAutomatic">
                <title>Event automatic</title>
@@ -304,6 +354,11 @@
                <title>Event completed by</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:eventExecutionCompletedAt">
                <title>Event completed at</title>
@@ -456,6 +511,11 @@
             <property name="rma:declaredBy">
                <title>Declared By</title>
                <type>d:text</type>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
          </properties>
 		 <mandatory-aspects>
@@ -470,6 +530,11 @@
                <title>Record Component Identifier</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:dbUniquenessId">
                <title>Database uniqueness id</title>
@@ -532,24 +597,44 @@
                <title>Originator</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
 
             <property name="rma:originatingOrganization">
                <title>Originating Organization</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
 
             <property name="rma:mediaType">
                <title>Media Type</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
 
             <property name="rma:format">
                <title>Format</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
 
             <property name="rma:dateReceived">
@@ -566,11 +651,21 @@
                <title>Addressee</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:otherAddress">
                <title>Other Addressee</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
 
          </properties>
@@ -591,6 +686,11 @@
                <title>Location</title>
                <type>d:text</type>
                <mandatory>false</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
 
         </properties>
@@ -715,6 +815,11 @@
                <title>Frozen By</title>
                <type>d:text</type>
                <mandatory>true</mandatory>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
          </properties>
          <mandatory-aspects>
@@ -773,15 +878,30 @@
             </property>               
             <property name="rma:recordSearchDispositionActionName">
                <type>d:text</type>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:recordSearchDispositionActionAsOf">
                <type>d:date</type>
             </property>
             <property name="rma:recordSearchDispositionPeriod">
                <type>d:text</type>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:recordSearchDispositionPeriodExpression">
                <type>d:text</type>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:recordSearchDispositionEventsEligible">
                <type>d:boolean</type>
@@ -789,12 +909,27 @@
             <property name="rma:recordSearchDispositionEvents">
                <type>d:text</type>
                <multiple>true</multiple>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:recordSearchVitalRecordReviewPeriod">
                <type>d:text</type>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
             <property name="rma:recordSearchVitalRecordReviewPeriodExpression">
                <type>d:text</type>
+               <index enabled="true">
+		          <atomic>true</atomic>
+		          <stored>false</stored>
+		          <tokenised>false</tokenised>
+		       </index>
             </property>
          </properties>
       </aspect>
