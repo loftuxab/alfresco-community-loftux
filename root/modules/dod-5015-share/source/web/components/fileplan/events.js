@@ -59,6 +59,7 @@
       this._dispositionScheduleAppliedToParent = false;
 
       /* Decoupled event listeners */
+      YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
       YAHOO.Bubbling.on("folderDetailsAvailable", this.onFolderDetailsAvailable, this);
       YAHOO.Bubbling.on("metadataRefresh", this.refreshEvents, this);
 
@@ -183,6 +184,19 @@
                   scope: this
                }
             });
+         }
+      },
+
+      /**
+       * Event handler called when the "documentDetailsAvailable" event is received
+       *
+       * @method: onDocumentDetailsAvailable
+       */
+      onDocumentDetailsAvailable: function Events_onDocumentDetailsAvailable(layer, args)
+      {
+         if (args[1].documentDetails.permissions.userAccess.AddModifyEventDates)
+         {
+            this.widgets.eventButton.set("disabled", false);
          }
       },
 
