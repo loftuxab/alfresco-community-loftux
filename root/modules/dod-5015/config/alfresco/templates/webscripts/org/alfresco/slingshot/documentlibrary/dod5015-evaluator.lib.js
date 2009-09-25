@@ -169,14 +169,24 @@ var Evaluator =
          if (actionAsOf < now)
          {
             permissions[actionName] = true;
-            return;
          }
       }
-
+      
       // Next action could become eligible based on event completion
       if (asset.properties["rma:recordSearchDispositionEventsEligible"] == true)
       {
          permissions[actionName] = true;
+      }
+
+      // Don't show transfer...
+      if (actionName == "transfer" && asset.parentAssocs["rma:transferred"] != null && asset.parentAssocs["rma:transferred"].length > 0)
+      {
+         delete permissions["transfer"];
+      }
+      // ...or accession if pending completion
+      if (actionName == "accession" && asset.parentAssocs["rma:ascended"] != null && asset.parentAssocs["rma:ascended"].length > 0)
+      {
+         delete permissions["accession"];
       }
    },
 
