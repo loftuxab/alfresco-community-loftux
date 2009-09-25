@@ -66,11 +66,21 @@
                 <title>Image Format</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>
             <property name="dod:scannedFormatVersion">
                 <title>Image Format Version</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>
             <property name="dod:resolutionX">
                 <title>Image Resolution X</title>
@@ -100,6 +110,11 @@
                 <title>Producing Application</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>         
             <property name="dod:producingApplicationVersion">
                 <title>Producing Application Version</title>
@@ -110,16 +125,31 @@
                 <title>PDF Version</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>         
             <property name="dod:creatingApplication">
                 <title>Creating Application</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>         
             <property name="dod:documentSecuritySettings">
                 <title>Document Security Settings</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>
         </properties>
         <mandatory-aspects>
@@ -139,16 +169,31 @@
                 <title>Photographer</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>         
             <property name="dod:copyright">
                 <title>Copyright</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>         
             <property name="dod:bitDepth">
                 <title>Bit Depth</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>         
             <property name="dod:imageSizeX">
                 <title>Image Size X</title>
@@ -164,21 +209,41 @@
                 <title>Image Source</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>         
             <property name="dod:compression">
                 <title>Compression</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>         
             <property name="dod:iccIcmProfile">
                 <title>ICC/ICM Profile</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>         
             <property name="dod:exifInformation">
                 <title>EXIF Information</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>
         </properties>
         <mandatory-aspects>
@@ -193,26 +258,51 @@
                 <title>Web File Name</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property> 
             <property name="dod:webPlatform">
                 <title>Web Platform</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property> 
             <property name="dod:webSiteName">
                 <title>Web Site Name</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property> 
             <property name="dod:webSiteURL">
                 <title>Web Site URL</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property> 
             <property name="dod:captureMethod">
                 <title>Capture Method</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property> 
             <property name="dod:captureDate">
                 <title>Capture Date</title>
@@ -223,11 +313,21 @@
                 <title>Contact</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property> 
             <property name="dod:contentManagementSystem">
                 <title>Content Management System</title>
                 <type>d:text</type>
                 <mandatory>false</mandatory>
+                <index enabled="true">
+			        <atomic>true</atomic>
+			        <stored>false</stored>
+			        <tokenised>false</tokenised>
+			    </index>
             </property>
         </properties>
         <mandatory-aspects>
