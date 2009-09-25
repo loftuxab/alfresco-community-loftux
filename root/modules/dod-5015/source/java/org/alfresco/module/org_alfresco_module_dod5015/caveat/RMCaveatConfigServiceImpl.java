@@ -334,11 +334,6 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                                 }
                             }
                         }
-                        else
-                        {
-                            // TODO - review warnings (& add I18N)
-                            logger.warn("Constraint does not have LOV: "+conQName);
-                        }
                     }
                     
                     // Valid, so update
