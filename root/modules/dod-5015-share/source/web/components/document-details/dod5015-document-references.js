@@ -105,7 +105,7 @@
       {
          this.options.parentNodeRef = args[1].metadata.filePlan.replace(':/','');
          this.options.docName = args[1].documentDetails.displayName;
-         if (args[1].documentDetails.permissions.userAccess.ChangeOrDeleteReferences)
+         if (args[1].documentDetails.permissions.userAccess.Create)
          {
             this.widgets.manageRefs.set("disabled", false);
          }
