@@ -827,7 +827,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             {
                var element = form.elements[i];
                var name = element.name;
-               if (name == "-" || element.disabled)
+               if (name == "-" || element.disabled || element.type === "button")
                {
                   continue;
                }

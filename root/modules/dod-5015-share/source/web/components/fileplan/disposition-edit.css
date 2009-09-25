@@ -1,7 +1,13 @@
+.disposition-edit .caption,
 .disposition-edit .disposition-form,
-.disposition-edit .caption
+.disposition-edit .main-buttons
 {
    width: 50em;
+}
+
+.disposition-edit .flow-buttons
+{
+   width: 52em;   
 }
 
 .disposition-edit .caption
@@ -181,7 +187,6 @@
 
 .disposition-edit .main-buttons
 {
-   width: 50em;
    padding:1em;
 }
 

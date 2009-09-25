@@ -6,12 +6,12 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
    siteId: "${page.url.templateArgs.site!""}",
    events: {
       <#list events as event>
-      ${event.value}: { label: "${event.label}", automatic: ${event.automatic?string} }<#if (event_has_next)>, </#if>
+      "${event.value}": { label: "${event.label}", automatic: ${event.automatic?string} }<#if (event_has_next)>, </#if>
       </#list>
    },
    actions: {
       <#list dispositionActions as action>
-      ${action.value}: { label: "${action.label}" }<#if (action_has_next)>, </#if>
+      "${action.value}": { label: "${action.label}" }<#if (action_has_next)>, </#if>
       </#list>
    }
 });
@@ -31,7 +31,7 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
       </div>
    </div>
 
-   <div id="${el}-flowButtons">
+   <div id="${el}-flowButtons" class="flow-buttons">
       <hr />
       <input id="${el}-createaction-button" class="yui-button createaction createaction-button" name="createaction-button" value="${msg("button.createaction")}" type="button" >
       <select id="${el}-createaction-menu" class="createaction-menu" name="createaction-menu">
@@ -99,7 +99,7 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                   <div class="section">
                      <input type="checkbox" class="period-enabled" checked="true" />
                      ${msg("label.after")}
-                     <input type="text" class="period-amount" />
+                     <input type="text" class="period-amount" name="-"/>
                      <select class="period-unit">
                         <#list periodTypes as periodType>
                         <option value="${periodType.value}">${periodType.label}</option>
@@ -128,8 +128,8 @@ new Alfresco.DispositionEdit("${args.htmlid}").setMessages(
                         <li id="${el}-event-template-dummy"></li>
                      </ul>
                      <div class="events-header">
-                        <input type="button" class="addevent-button" name="addevent-button" value="${msg("button.addevent")}">
-                        <select class="addevent-menu" name="addevent-menu">
+                        <button class="addevent-button">${msg("button.addevent")}</button>
+                        <select class="addevent-menu">
                            <#list events as event>
                            <option value="${event.value}">${event.label}</option>
                            </#list>                           

@@ -297,7 +297,7 @@
          Alfresco.util.setSelectedIndex(periodUnitEl, periodUnit);
 
          // Add event button
-         var addEventButtonEl = Dom.getElementsByClassName("addevent-button", "input", actionEl)[0],
+         var addEventButtonEl = Dom.getElementsByClassName("addevent-button", "button", actionEl)[0],
                addEventMenuEl = Dom.getElementsByClassName("addevent-menu", "select", actionEl)[0];
          var addEventButton = Alfresco.util.createYUIButton(this, "addevent-button", null,
          {
