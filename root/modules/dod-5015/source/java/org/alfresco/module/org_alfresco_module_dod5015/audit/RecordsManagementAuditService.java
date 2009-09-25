@@ -45,6 +45,8 @@ public interface RecordsManagementAuditService
     public static final String RM_AUDIT_EVENT_UPDATE_RM_OBJECT = "Update RM Object";
     public static final String RM_AUDIT_EVENT_CREATE_RM_OBJECT = "Create RM Object";
     public static final String RM_AUDIT_EVENT_DELETE_RM_OBJECT = "Delete RM Object";
+    public static final String RM_AUDIT_EVENT_LOGIN_SUCCESS = "Login.Success";
+    public static final String RM_AUDIT_EVENT_LOGIN_FAILURE = "Login.Failure";
     
     public static final String RM_AUDIT_APPLICATION_NAME = "DOD5015";
     public static final String RM_AUDIT_PATH_ROOT = "/DOD5015";
@@ -66,6 +68,10 @@ public interface RecordsManagementAuditService
     public static final String RM_AUDIT_DATA_NODE_NAMEPATH = "/DOD5015/event/node/namePath";
     public static final String RM_AUDIT_DATA_NODE_CHANGES_BEFORE = "/DOD5015/event/node/changes/before/value";
     public static final String RM_AUDIT_DATA_NODE_CHANGES_AFTER = "/DOD5015/event/node/changes/after/value";
+
+    public static final String RM_AUDIT_DATA_LOGIN_USERNAME = "/DOD5015/login/args/userName/value";
+    public static final String RM_AUDIT_DATA_LOGIN_FULLNAME = "/DOD5015/login/no-error/fullName";
+    public static final String RM_AUDIT_DATA_LOGIN_ERROR = "/DOD5015/login/error/value";
     
     /**
      * Starts RM auditing.

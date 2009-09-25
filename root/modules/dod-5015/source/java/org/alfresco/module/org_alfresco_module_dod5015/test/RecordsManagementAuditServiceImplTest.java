@@ -24,8 +24,11 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.test;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -33,6 +36,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditEntry;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditQueryParameters;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
+import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
@@ -40,8 +44,12 @@ import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransacti
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.PersonService;
+import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.ApplicationContextHelper;
+import org.alfresco.util.EqualsHelper;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -82,6 +90,11 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         
+        // Stop and clear the log
+        rmAuditService.stop();
+        rmAuditService.clear();
+        rmAuditService.start();
+
         RetryingTransactionCallback<Void> setUpCallback = new RetryingTransactionCallback<Void>()
         {
             public Void execute() throws Throwable
@@ -104,6 +117,14 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
     protected void tearDown()
     {
         AuthenticationUtil.clearCurrentSecurityContext();
+        try
+        {
+            rmAuditService.start();
+        }
+        catch (Throwable e)
+        {
+            // Not too important
+        }
     }
     
     /**
@@ -155,6 +176,9 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
     
     public void testQuery_UserLimited()
     {
+        // Make sure that something has been done
+        updateFilePlan();
+        
         final int limit = 1;
         final String user = AuthenticationUtil.getAdminUserName();        // The user being tested
         
@@ -283,5 +307,84 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         assertEquals(
                 "Audit entries should have been cleared",
                 0, result4.size());
+    }
+    
+    public void testAuditAuthentication()
+    {
+        AuthenticationService authenticationService = serviceRegistry.getAuthenticationService();
+        PersonService personService = serviceRegistry.getPersonService();
+        
+        // Failed login attempt ...
+        try
+        {
+            AuthenticationUtil.pushAuthentication();
+            authenticationService.authenticate("baboon", "lskdfj".toCharArray());
+            fail("Expected authentication failure");
+        }
+        catch (AuthenticationException e)
+        {
+            // Good
+        }
+        finally
+        {
+            AuthenticationUtil.popAuthentication();
+        }
+        rmAuditService.stop();
+        List<RecordsManagementAuditEntry> result1 = queryAll();
+        // Check that the username is reflected correctly in the results
+        boolean found = false;
+        for (RecordsManagementAuditEntry entry : result1)
+        {
+            String userName = entry.getUserName();
+            if (userName.equals("baboon"))
+            {
+                found = true;
+                break;
+            }
+        }
+        assertTrue("Expected to hit failed login attempt for user", found);
+        
+        // Test successful authentication
+        try
+        {
+            personService.deletePerson("cdickons");
+            authenticationService.deleteAuthentication("cdickons");
+        }
+        catch (Throwable e)
+        {
+            // Not serious
+        }
+        authenticationService.createAuthentication("cdickons", getName().toCharArray());
+        Map<QName, Serializable> personProperties = new HashMap<QName, Serializable>();
+        personProperties.put(ContentModel.PROP_USERNAME, "cdickons");
+        personProperties.put(ContentModel.PROP_FIRSTNAME, "Charles");
+        personProperties.put(ContentModel.PROP_LASTNAME, "Dickons");
+        personService.createPerson(personProperties);
+        
+        rmAuditService.clear();
+        rmAuditService.start();
+        try
+        {
+            AuthenticationUtil.pushAuthentication();
+            authenticationService.authenticate("cdickons", getName().toCharArray());
+        }
+        finally
+        {
+            AuthenticationUtil.popAuthentication();
+        }
+        rmAuditService.stop();
+        List<RecordsManagementAuditEntry> result2 = queryAll();
+        found = false;
+        for (RecordsManagementAuditEntry entry : result2)
+        {
+            String userName = entry.getUserName();
+            String fullName = entry.getFullName();
+            if (userName.equals("cdickons") && EqualsHelper.nullSafeEquals(fullName, "Charles Dickons"))
+            {
+                found = true;
+                break;
+            }
+        }
+        assertTrue("Expected to hit successful login attempt for Charles Dickons (cdickons)", found);
     }
 }

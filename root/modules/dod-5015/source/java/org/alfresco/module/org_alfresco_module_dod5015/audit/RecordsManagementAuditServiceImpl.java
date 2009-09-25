@@ -227,8 +227,10 @@ public class RecordsManagementAuditServiceImpl
                     new AuditEvent(RM_AUDIT_EVENT_CREATE_RM_OBJECT, "Created Object"));
         this.auditEvents.put(RM_AUDIT_EVENT_DELETE_RM_OBJECT, 
                     new AuditEvent(RM_AUDIT_EVENT_DELETE_RM_OBJECT, "Delete Object"));
-        this.auditEvents.put("Login", new AuditEvent("Login", "Login"));
-        this.auditEvents.put("Logout", new AuditEvent("Logout", "Logout"));
+        this.auditEvents.put(RM_AUDIT_EVENT_LOGIN_SUCCESS,
+                    new AuditEvent(RM_AUDIT_EVENT_LOGIN_SUCCESS, "Login Succeeded"));
+        this.auditEvents.put(RM_AUDIT_EVENT_LOGIN_FAILURE,
+                new AuditEvent(RM_AUDIT_EVENT_LOGIN_FAILURE, "Login Failed"));
         
         this.auditEvents.put("file", 
                     new AuditEvent("file", "Filed Record"));
@@ -718,6 +720,7 @@ public class RecordsManagementAuditServiceImpl
         {
             private boolean firstEntry = true;
             
+            @SuppressWarnings("unchecked")
             public boolean handleAuditEntry(
                     Long entryId,
                     String applicationName,
@@ -732,27 +735,64 @@ public class RecordsManagementAuditServiceImpl
                 }
                 
                 Date timestamp = new Date(time);
-                String eventName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_EVENT_NAME);
-                String fullName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_FULLNAME);
-                String userRoles = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLES);
-                NodeRef nodeRef = (NodeRef) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF);
-                String nodeName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME);
-                QName nodeTypeQname = (QName) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_TYPE);
-                String nodeIdentifier = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_IDENTIFIER);
-                String namePath = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAMEPATH);
-                @SuppressWarnings("unchecked")
-                Map<QName, Serializable> beforeProperties = (Map<QName, Serializable>) values.get(
-                        RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES_BEFORE);
-                @SuppressWarnings("unchecked")
-                Map<QName, Serializable> afterProperties = (Map<QName, Serializable>) values.get(
-                        RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES_AFTER);
-                
-                // Convert some of the values to recognizable forms
+                String eventName = null;
+                String fullName = null;
+                String userRoles = null;
+                NodeRef nodeRef = null;
+                String nodeName = null;
                 String nodeType = null;
-                if (nodeTypeQname != null)
+                String nodeIdentifier = null;
+                String namePath = null;
+                Map<QName, Serializable> beforeProperties = null;
+                Map<QName, Serializable> afterProperties = null;
+                
+                if (values.containsKey(RecordsManagementAuditService.RM_AUDIT_DATA_EVENT_NAME))
                 {
-                    TypeDefinition typeDef = dictionaryService.getType(nodeTypeQname);
-                    nodeType = (typeDef != null) ? typeDef.getTitle() : null;
+                    // This data is /DOD5015/event/...
+                    eventName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_EVENT_NAME);
+                    fullName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_FULLNAME);
+                    userRoles = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_PERSON_ROLES);
+                    nodeRef = (NodeRef) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NODEREF);
+                    nodeName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAME);
+                    QName nodeTypeQname = (QName) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_TYPE);
+                    nodeIdentifier = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_IDENTIFIER);
+                    namePath = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_NODE_NAMEPATH);
+                    beforeProperties = (Map<QName, Serializable>) values.get(
+                            RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES_BEFORE);
+                    afterProperties = (Map<QName, Serializable>) values.get(
+                            RecordsManagementAuditService.RM_AUDIT_DATA_NODE_CHANGES_AFTER);
+                    
+                    // Convert some of the values to recognizable forms
+                    nodeType = null;
+                    if (nodeTypeQname != null)
+                    {
+                        TypeDefinition typeDef = dictionaryService.getType(nodeTypeQname);
+                        nodeType = (typeDef != null) ? typeDef.getTitle() : null;
+                    }
+                }
+                else if (values.containsKey(RecordsManagementAuditService.RM_AUDIT_DATA_LOGIN_USERNAME))
+                {
+                    user = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_LOGIN_USERNAME);
+                    if (values.containsKey(RecordsManagementAuditService.RM_AUDIT_DATA_LOGIN_ERROR))
+                    {
+                        eventName = RecordsManagementAuditService.RM_AUDIT_EVENT_LOGIN_FAILURE;
+                        fullName = user;            // The user didn't log in
+                    }
+                    else
+                    {
+                        eventName = RecordsManagementAuditService.RM_AUDIT_EVENT_LOGIN_SUCCESS;
+                        fullName = (String) values.get(RecordsManagementAuditService.RM_AUDIT_DATA_LOGIN_FULLNAME);
+                    }
+                }
+                else
+                {
+                    // This is not recognisable data
+                    logger.warn(
+                            "Unable to process audit entry for RM.  Unexpected data: \n" +
+                            "   Entry: " + entryId + "\n" +
+                            "   Data:  " + values);
+                    // Skip it
+                    return true;
                 }
                 
                 // TODO: Refactor this to use the builder pattern
