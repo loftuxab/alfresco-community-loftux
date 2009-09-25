@@ -140,9 +140,11 @@ Alfresco.RM = Alfresco.RM || {};
       {
          var eTarget = Event.getTarget(e),
             refId = this.widgets[eTarget.id.replace('-button', '')].get('value'),
-            href = Dom.getAncestorByTagName(eTarget, 'li').getElementsByTagName('a')[0].href,
+            nodeRefEl = Dom.getAncestorByTagName(eTarget, 'li')
+            href = nodeRefEl.getElementsByTagName('a')[0].href,
             nodeRef = new Alfresco.util.NodeRef(Alfresco.util.getQueryStringParameter("nodeRef", href)),
-            queryString = "?st=" + nodeRef.storeType + "&si=" + nodeRef.storeId + "&id=" + nodeRef.id;
+            queryString = "?st=" + nodeRef.storeType + "&si=" + nodeRef.storeId + "&id=" + nodeRef.id,
+            type = (nodeRefEl.className.indexOf('fromRef')!=-1) ? 'from' : 'to';
 
          Alfresco.util.Ajax.jsonRequest(
          {
@@ -152,7 +154,7 @@ Alfresco.RM = Alfresco.RM || {};
             {
                fn: function(e)
                {
-                  this.onDeleteSuccess(nodeRef.id)
+                  this.onDeleteSuccess(nodeRefEl, type);
                },
                scope: this
             },
@@ -186,21 +188,21 @@ Alfresco.RM = Alfresco.RM || {};
        * Handler for deletion success 
        * 
        * @method onDeleteSuccess
-       * @param nodeRefId {string} ID portion of nodeRef that was successfully deleted
+       * @param nodeRefEl {string} ID portion of nodeRef that was successfully deleted
+       * @param type {string} Type of reference (from or to)
        */
-       onDeleteSuccess: function RM_References_onDeleteSuccess(nodeRefId)
+       onDeleteSuccess: function RM_References_onDeleteSuccess(nodeRefEl, type)
        {
-          var el = Dom.get('ref-' + nodeRefId),
-            ul = el.parentNode;
+          var ul = nodeRefEl.parentNode;
 
           // Remove list item
-          ul.removeChild(el);
+          ul.removeChild(nodeRefEl);
 
           // If no more references, remove list and display message
           if (ul.getElementsByTagName('li').length === 0)
           {
              ul.parentNode.removeChild(ul);
-             Dom.addClass("no-refs", 'active');
+             Dom.addClass(type+"-no-refs", 'active');
           }
        },
        
