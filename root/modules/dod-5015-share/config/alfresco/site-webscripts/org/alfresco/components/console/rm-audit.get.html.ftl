@@ -83,10 +83,9 @@
                      <label for="property_menu">${msg('label.header-property')}:</label>
                   </div>
                   <div class="bd">
-                     <input id="${htmlid}-audit-property" type="button" name="${htmlid}-audit-property" value="All" />
+                     <input id="${htmlid}-audit-property" type="button" name="${htmlid}-audit-property" value="${msg("label.all")}" />
                      <select name="${htmlid}-audit-property-menu" id="${htmlid}-audit-property-menu" onchange="" size="1">
                         <option value="ALL">${msg("label.all")}</option>
-                        <option value="KEYWORDS">${msg("label.keywords")}</option>
                         <option value="rma:identifier">${msg("label.identifier")}</option>
                         <option value="cm:name">${msg("label.name")}</option>
                         <option value="cm:title">${msg("label.title")}</option>
@@ -107,19 +106,11 @@
                         <option value="rma:location">${msg("label.location")}</option>
                         <option value="rma:address">${msg("label.address")}</option>
                         <option value="rmc:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
-                        <option value="rma:recordSearchDispositionEvents">${msg("label.dispositionEvents")}</option>
-                        <option value="rma:recordSearchDispositionActionName">${msg("label.dispositionActionName")}</option>
-                        <option value="rma:recordSearchDispositionActionAsOf">${msg("label.dispositionActionAsOf")}</option>
-                        <option value="rma:recordSearchDispositionEventsEligible">${msg("label.dispositionEventsEligible")}</option>
-                        <option value="rma:recordSearchDispositionPeriod">${msg("label.dispositionPeriod")}</option>
-                        <option value="rma:recordSearchVitalRecordReviewPeriod">${msg("label.vitalRecordReviewPeriod")}</option>
-                        <option value="rma:recordSearchHasDispositionSchedule">${msg("label.hasDispositionSchedule")}</option>
                         <#list meta as d>
                            <option value="${d.name}">${d.title}</option>
                         </#list>
-                     </select>                     
+                     </select>
                   </div>
-
                </div>
             </div>
          </div>
