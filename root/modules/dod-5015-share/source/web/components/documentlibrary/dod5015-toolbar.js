@@ -200,8 +200,11 @@
       {
          Alfresco.RecordsDocListToolbar.superclass.onFilterChanged.apply(this, arguments);
          
-         var holdsFolderEnabled = (this.currentFilter.filterId == "holds" && this.currentFilter.filterData !== "");
-         this.widgets.holdsFolderUp.set("disabled", !holdsFolderEnabled);
+         var upFolderEnabled = (this.currentFilter.filterId == "holds" && this.currentFilter.filterData !== "");
+         this.widgets.holdsFolderUp.set("disabled", !upFolderEnabled);
+
+         upFolderEnabled = (this.currentFilter.filterId == "transfers" && this.currentFilter.filterData !== "");
+         this.widgets.transfersFolderUp.set("disabled", !upFolderEnabled);
       },
 
       /**

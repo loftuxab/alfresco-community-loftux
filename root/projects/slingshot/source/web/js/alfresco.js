@@ -3391,7 +3391,7 @@ Alfresco.util.Anim = function()
          storeId: this.storeId,
          id: this.id
       });
-   }
+   };
 })();
 
 /**
