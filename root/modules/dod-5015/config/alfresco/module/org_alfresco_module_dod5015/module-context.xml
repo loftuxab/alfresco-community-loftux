@@ -196,9 +196,9 @@
       <property name="scheduler">
          <ref bean="schedulerFactory" />
       </property>
-      <!-- Run daily at half past 2 in the morning-->
       <property name="cronExpression">
-         <value>0 30 2 * * ?</value>
+         <!-- <value>0 30 2 * * ?</value> -->
+         <value>0 0/15 * * * ?</value> 
       </property>
    </bean>
 
@@ -232,9 +232,9 @@
       <property name="scheduler">
          <ref bean="schedulerFactory" />
       </property>
-      <!-- Run daily at half past 3 in the morning-->
       <property name="cronExpression">
-         <value>0 30 3 * * ?</value>
+         <!-- <value>0 30 3 * * ?</value> -->
+         <value>0 0/15 * * * ?</value>         
       </property>
    </bean>
     

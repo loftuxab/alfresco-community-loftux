@@ -28,6 +28,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.job;
 import java.util.List;
 
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
@@ -40,7 +41,6 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.transaction.TransactionService;
-//import org.alfresco.util.PropertyCheck;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Job;
@@ -61,13 +61,6 @@ public class DispositionLifecycleJob implements Job
 {
     private static Log logger = LogFactory.getLog(DispositionLifecycleJob.class);
 
-    // private TransactionService trxService;
-
-    // public void init()
-    // {
-    // //PropertyCheck.mandatory(this, "trxService", trxService);
-    // }
-    //    
     /**
      * @see org.quartz.Job#execute(org.quartz.JobExecutionContext)
      */
@@ -121,18 +114,25 @@ public class DispositionLifecycleJob implements Job
 
                             if (dispAction != null)
                             {
-                                if (dispAction.equalsIgnoreCase("cutoff")
-                                            || dispAction.equalsIgnoreCase("retain"))
+                                if (dispAction.equalsIgnoreCase("cutoff") ||
+                                    dispAction.equalsIgnoreCase("retain"))
                                 {
-                                    ChildAssociationRef parent = nodeService
-                                                .getPrimaryParent(currentNode);
+                                    ChildAssociationRef parent = nodeService.getPrimaryParent(currentNode);
                                     if (parent.getTypeQName().equals(RecordsManagementModel.ASSOC_NEXT_DISPOSITION_ACTION))
                                     {
-                                        rmActionService.executeRecordsManagementAction(parent
-                                                    .getParentRef(), dispAction);
-                                        if (logger.isDebugEnabled())
+                                        // Check that the action is executable
+                                        RecordsManagementAction rmAction = rmActionService.getDispositionAction(dispAction);
+                                        if (rmAction.isExecutable(parent.getParentRef(), null) == true)
                                         {
-                                            logger.debug("Processed action:" + dispAction + "on" + parent);
+                                            rmActionService.executeRecordsManagementAction(parent.getParentRef(), dispAction);
+                                            if (logger.isDebugEnabled())
+                                            {
+                                                logger.debug("Processed action: " + dispAction + "on" + parent);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            logger.debug("The disposition action " + dispAction + " is not executable.");
                                         }
                                     }
                                     return null;
