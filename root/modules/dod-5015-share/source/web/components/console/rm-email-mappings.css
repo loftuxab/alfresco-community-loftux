@@ -48,6 +48,12 @@
    visibility:hidden;
 }
 
+.emailMappings .thin-button
+{
+   height: 1.7em !important;
+   min-height: 1.7em !important;
+}
+
 #email-menu-container,
 #rm-menu-container
 {
