@@ -5,27 +5,26 @@
    <div id="${pickerId}-head" class="hd">${msg("label.document-picker-header")}</div>
 
    <div id="${pickerId}-body" class="bd">
-      <div class="yui-g">
-         <div id="${pickerId}-left" class="yui-u first panel-left">
-            <div class="picker-header">
-               <div class="folder-up"><button id="${pickerId}-folderUp"></button></div>
-               <div class="navigator">
-                  <button id="${pickerId}-navigator"></button>
-                  <div id="${pickerId}-navigatorMenu" class="yuimenu">
-                     <div class="bd">
-                        <ul id="${pickerId}-navigatorItems" class="navigator-items-list">
-                           <li>&nbsp;</li>
-                        </ul>
-                     </div>
-                  </div>
-               </div>
-            </div>
-            <div id="${pickerId}-results" class="picker-items">
-               
+      <div class="picker-header">
+         <span class="folder-up">
+            <button id="${pickerId}-folderUp">&nbsp;</button>
+         </span>
+         <span class="navigator">
+            <button id="${pickerId}-navigator" class="navigator"></button>
+         </span>
+         <div id="${pickerId}-navigatorMenu" class="yuimenu">
+            <div class="bd">
+               <ul id="${pickerId}-navigatorItems" class="navigator-items-list">
+                  <li>&nbsp;</li>
+               </ul>
             </div>
          </div>
+      </div>
+      <div class="yui-g">
+         <div id="${pickerId}-left" class="yui-u first panel-left">
+            <div id="${pickerId}-results" class="picker-items"></div>
+         </div>
          <div id="${pickerId}-right" class="yui-u panel-right">
-            <div id="${pickerId}-selectedHeader" class="picker-header"></div>
             <div id="${pickerId}-selectedItems" class="picker-items"></div>
          </div>
       </div>

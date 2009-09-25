@@ -57,14 +57,8 @@
     */
    Alfresco.module.DocumentPicker = function(htmlId, objectRendererClass)
    {
-      // Mandatory properties
-      this.name = "Alfresco.module.DocumentPicker";
-      this.id = htmlId;
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "resize", "datatable", "datasource"], this.onComponentsLoaded, this);
-      
+      Alfresco.module.DocumentPicker.superclass.constructor.call(this, "Alfresco.module.DocumentPicker", htmlId, ["button", "menu", "container", "resize", "datatable", "datasource"]);
+
       /**
        * Decoupled event listeners
        */
@@ -90,7 +84,7 @@
       return this;
    };
    
-   Alfresco.module.DocumentPicker.prototype =
+   YAHOO.extend(Alfresco.module.DocumentPicker, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -250,14 +244,6 @@
       },
 
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
        * Resizable columns
        * 
        * @property columns
@@ -299,13 +285,14 @@
        */
       setOptions: function DocumentPicker_setOptions(obj)
       {
-         this.options = YAHOO.lang.merge(this.options, obj);
+         Alfresco.module.DocumentPicker.superclass.setOptions.call(this, obj);
+
          // TODO: Do we need to filter this object literal before passing it on..?
          this.options.objectRenderer.setOptions(obj);
-         
+
          return this;
       },
-      
+
       /**
        * Set messages for this component.
        *
@@ -315,11 +302,12 @@
        */
       setMessages: function DocumentPicker_setMessages(obj)
       {
-         Alfresco.util.addMessages(obj, this.name);
+         Alfresco.module.DocumentPicker.superclass.setMessages.call(this, obj);
+
          this.options.objectRenderer.setMessages(obj);
          return this;
       },
-      
+
       /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
@@ -477,11 +465,11 @@
          //    Dom.get(this.id + "-added").value = this.getAddedItems().toString();
          //    Dom.get(this.id + "-removed").value = this.getRemovedItems().toString();
          // }
-         
+
          var selItems = this.getSelectedItems();
          //extract nodeRefs
          var selItemsAsNodeRefs = [];
-         for (item in this.selectedItems)
+         for (var item in this.selectedItems)
          {
             selItemsAsNodeRefs.push(item);
          }
@@ -489,7 +477,6 @@
          this._getCurrentValueMeta();
          //need to fire as objects
          YAHOO.Bubbling.fire("onDocumentsSelected", selItems);
-         
          // Dom.setStyle(this.pickerId, "display", "none");
          this.widgets.panel.hide();
          this.widgets.showPicker.set("disabled", false);
@@ -624,7 +611,7 @@
 
             if (items === null)
             {
-               displayValue = "<span class=\"error\">" + this._msg("label.document-picker-current.failure") + "</span>";            
+               displayValue = "<span class=\"error\">" + this.msg("label.document-picker-current.failure") + "</span>";            
             }
             else
             {
@@ -710,7 +697,7 @@
             var obj = args[1];
             if (obj && obj.label)
             {
-               this.widgets.navigationMenu.set("label", '<div><span class="item-icon"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/ajax_anim.gif" width="16" height="16" alt="' + this._msg("message.please-wait") + '"></span><span class="item-name">' + $html(obj.label) + '</span></div>');
+               this.widgets.navigationMenu.set("label", '<div><span class="item-icon"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/ajax_anim.gif" width="16" height="16" alt="' + this.msg("message.please-wait") + '"></span><span class="item-name">' + $html(obj.label) + '</span></div>');
             }
          }
       },
@@ -966,7 +953,7 @@
          var renderCellRemove = function OF__cSIC_renderCellRemove(elCell, oRecord, oColumn, oData)
          {  
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-            elCell.innerHTML = '<a href="#" class="remove-item remove-' + me.eventGroup + '" title="' + me._msg("label.document-picker-remove-item") + '"><span class="removeIcon">&nbsp;</span></a>';
+            elCell.innerHTML = '<a href="#" class="remove-item remove-' + me.eventGroup + '" title="' + me.msg("label.document-picker-remove-item") + '"><span class="removeIcon">&nbsp;</span></a>';
          };
 
          // DataTable defintion
@@ -982,7 +969,7 @@
          }];
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.pickerId + "-selectedItems", columnDefinitions, this.widgets.dataSource,
          {
-            MSG_EMPTY: this._msg("label.document-picker-selected-items-empty")
+            MSG_EMPTY: this.msg("label.document-picker-selected-items-empty")
          });
 
          // Hook remove item action click events
@@ -1020,7 +1007,7 @@
       _populateSelectedItems: function DocumentPicker__populateSelectedItems()
       {
          // Empty results table
-         this.widgets.dataTable.set("MSG_EMPTY", this._msg("label.document-picker-selected-items-empty"));
+         this.widgets.dataTable.set("MSG_EMPTY", this.msg("label.document-picker-selected-items-empty"));
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
 
          this.selectedItems = {};
@@ -1062,7 +1049,7 @@
             {
                 var w = e.width;
                 Dom.setStyle(this.columns[0], "height", "");
-                Dom.setStyle(this.columns[1], "width", (size - w - 8) + "px");
+                Dom.setStyle(this.columns[1], "width", (size - w - 10) + "px");
             }, this, true);
 
             this.widgets.resizer.fireEvent("resize",
@@ -1072,21 +1059,9 @@
                width: this.widgets.resizer.get("width")
             });
          }
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function DocumentPicker__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.module.DocumentPicker", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+      
+   });
 })();
 
 
@@ -1119,18 +1094,10 @@
     */
    Alfresco.module.ObjectRenderer = function(DocumentPicker)
    {
+      Alfresco.module.ObjectRenderer.superclass.constructor.call(this, "Alfresco.module.ObjectRenderer", DocumentPicker.pickerId, ["button", "menu", "container", "datasource", "datatable"]);
+
       this.DocumentPicker = DocumentPicker;
-      
-      // Mandatory properties
-      this.name = "Alfresco.module.ObjectRenderer";
-      this.id = DocumentPicker.pickerId;
 
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable"], this.onComponentsLoaded, this);
-      
       /**
        * Decoupled event listeners
        */
@@ -1147,8 +1114,9 @@
       return this;
    };
    
-   Alfresco.module.ObjectRenderer.prototype =
+   YAHOO.extend(Alfresco.module.ObjectRenderer, Alfresco.component.Base,
    {
+
       /**
        * Object container for initialization options
        *
@@ -1210,57 +1178,12 @@
       },
 
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-
-      /**
        * Object container for storing button instances, indexed by item id.
        * 
        * @property addItemButtons
        * @type object
        */
       addItemButtons: null,
-      
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.ObjectRenderer} returns 'this' for method chaining
-       */
-      setOptions: function ObjectRenderer_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.module.ObjectRenderer} returns 'this' for method chaining
-       */
-      setMessages: function ObjectRenderer_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function ObjectRenderer_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -1561,7 +1484,7 @@
                   var button = new YAHOO.widget.Button(
                   {
                      type: "button",
-                     label: me._msg("button.add") + " >>",
+                     label: me.msg("button.add") + " >>",
                      name: containerId + "-button",
                      container: containerId,
                      onclick:
@@ -1702,19 +1625,7 @@
             failure: failureHandler,
             scope: this
          });
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function ObjectRenderer__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.module.ObjectRenderer", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+      
+   });
 })();

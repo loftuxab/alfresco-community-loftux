@@ -196,6 +196,11 @@ hr
    border-right-color: #C4C5C5;
 }
 
+.yui-skin-default .yui-panel .bd .yui-resize .yui-resize-handle
+{
+   background-color:#F9FBFD;
+}
+
 .yui-skin-default .yui-dt-data tr.yui-dt-odd.yui-dt-highlighted,
 .yui-skin-default .yui-dt-data tr.yui-dt-even.yui-dt-highlighted
 {
