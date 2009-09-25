@@ -20,12 +20,7 @@ function getDocReferences()
 
    var nodeRef = page.url.args.nodeRef.replace(":/", "");
    var result = remote.call("/api/node/"+nodeRef+"/customreferences");
-
-   if (result.status == 200)
-   {
-      var data = eval('(' + result + ')');
-      var docrefs = data.data.customReferencesFrom;
-      
+   var processDocRefs = function(docrefs,type) {
       for (var i=0,len = docrefs.length;i<len;i++)
       {
          var ref = docrefs[i];
@@ -34,10 +29,21 @@ function getDocReferences()
          {
             ref.label = ref.target;
             ref.targetRef = ref.childRef;
+            ref.sourceRef = ref.parentRef;
          }
-         ref.domId = ref.targetRef.split('/').pop()
+
          docrefs[i]=ref;
       }      
+      return docrefs;
+   };
+   if (result.status == 200)
+   {
+      var data = eval('(' + result + ')');
+      var docrefs = {
+         from: processDocRefs(data.data.customReferencesFrom,'from'),
+         to: processDocRefs(data.data.customReferencesTo,'to')
+      };
+      
       return docrefs;
    }
    else {

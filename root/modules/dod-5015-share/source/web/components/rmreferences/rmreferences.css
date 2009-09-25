@@ -15,6 +15,12 @@
   float: left;
   font-size:118%;
 }
+.manageReferences h3
+{
+   clear:both;
+   text-align:left;
+   margin-top:0.5em;
+} 
 .manageReferences ol 
 {
   text-align: left;
@@ -50,12 +56,17 @@
    width:100%;
    text-align:center;
 }
-.manageReferences p#no-refs
+
+.manageReferences p#to-no-refs,
+.manageReferences p#from-no-refs
 {
    text-align: left;
    display:none;
+   margin-bottom:1em;
 }
-.manageReferences p#no-refs.active
+
+.manageReferences p#to-no-refs.active,
+.manageReferences p#from-no-refs.active
 {
    display:block;
 }
