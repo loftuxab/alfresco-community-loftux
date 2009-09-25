@@ -1,3 +1,8 @@
+.document-picker .bd
+{
+   width: 820px;
+}
+
 .document-picker .current-values div
 {
    float: left;
@@ -13,14 +18,6 @@
 .document-picker .show-picker
 {
    clear: left;
-}
-
-.document-picker .picker
-{
-   display: none;
-   margin-left: 2em;
-   margin-top: 0.3em;
-   width: 60em;
 }
 
 .document-picker .bd
@@ -46,16 +43,21 @@
    float: left;
 }
 
+.document-picker button .item-name
+{
+   white-space: nowrap;    
+}
+
 .document-picker .picker-header .folder-up button
 {
    background: transparent url(../../components/images/up-arrow-16.png) no-repeat 50% 50%;
 }
-.document-picker .picker-header .folder-up .yui-button-disabled button
+.document-picker .picker-header .folder-up button
 {
    background-image: url(../../components/images/up-arrow-disabled-16.png);
 }
 
-.document-picker .picker-header .navigator span.wait
+.document-picker .picker-header .navigator button span.wait
 {
    background-image: url(../../components/images/ajax_anim.gif);
    background-repeat: no-repeat;
@@ -64,7 +66,7 @@
 
 .document-picker .picker-header .navigator button span.item-icon img
 {
-   padding-right: 0.3em;
+   padding-right: 0.5em;
    vertical-align: middle;
 }
 
@@ -72,27 +74,24 @@
 {
 }
 
-.document-picker .picker-header .navigator .navigator-items-list .yuimenuitemlabel
+.document-picker .picker-header .navigator-items-list .yuimenuitemlabel
 {
    padding: 0.2em 12px;
 }
 
-.document-picker .picker-header .navigator .navigator-items-list span.item-icon img
+.document-picker .picker-header .navigator-items-list span.item-icon img
 {
    padding-right: 0.3em;
    vertical-align: middle;
 }
 
-.document-picker .picker-header .navigator .navigator-items-list span.item-name
-{
-}
-
 .document-picker .picker-items
 {
-   border: 2px solid #aaa;
+   border: 1px solid #aaa;
    height: 20em;
+   text-align: left;
    overflow-x: auto;
-   overflow-y: scroll;
+   overflow-y: auto;
 }
 
 .document-picker .picker-items .icon16
@@ -161,7 +160,7 @@
 .document-picker .panel-left,
 .document-picker .panel-right
 {
-   width:30em;
+   width: 400px;
 }
 
 
@@ -179,10 +178,6 @@
 }
 
 /* Compact Mode */
-.document-picker .picker.compact
-{
-   width: 50em;
-}
 
 .document-picker .compact .picker-items
 {

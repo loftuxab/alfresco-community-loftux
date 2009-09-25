@@ -152,7 +152,7 @@ Alfresco.RM = Alfresco.RM || {};
             {
                fn: function(e)
                {
-                  this.onDeleteSuccess(nodeRefId)
+                  this.onDeleteSuccess(nodeRef.id)
                },
                scope: this
             },
