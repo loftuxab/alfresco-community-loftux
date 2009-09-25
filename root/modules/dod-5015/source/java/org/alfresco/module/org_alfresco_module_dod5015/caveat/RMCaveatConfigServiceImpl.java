@@ -896,10 +896,10 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
     }
 
     /**
-     * Update RM Constraint.
+     * Update The allowed values for an RM Constraint.
      * 
-     * @param listName
-     * @param listTitle   The new title for the list, if null then do not update the title.
+     * @param listName  The name of the list.
+     * @param allowedValues the new alowed values
      * 
      */
     public RMConstraintInfo updateRMConstraintAllowedValues(String listName, String[] allowedValues)
@@ -914,7 +914,8 @@ public class RMCaveatConfigServiceImpl implements ContentServicePolicies.OnConte
                 allowedValueList.add(value);
             }
             
-            ConstraintDefinition con = recordsManagementAdminService.getCustomConstraintDefinition(listQName);
+            ConstraintDefinition dictionaryDef = recordsManagementAdminService.getCustomConstraintDefinition(listQName);
+            Constraint con = dictionaryDef.getConstraint();
             if (con instanceof RMListOfValuesConstraint)
             {
                 final RMListOfValuesConstraint def = (RMListOfValuesConstraint)con; 
