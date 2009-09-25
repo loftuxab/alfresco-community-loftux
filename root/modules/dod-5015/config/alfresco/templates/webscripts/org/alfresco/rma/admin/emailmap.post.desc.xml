@@ -4,27 +4,31 @@
   Update the custom email property map
   <br />
   Data is specified in JSON format as a JSONObject with two optional fields, "add" and "delete".
-  
+  <br />
   The contents of the add array are added.
-  
+  <br />
   The contents of the delete array are deleted.
-  
-  add mapping
+  <br />
+  Add mapping:
   <pre>
-  {"add":[
-       {"to":"rmc:Wibble","from":"whatever"},
-       {"to":"rmc:wobble","from":"whatever"}]
-  }
-  </pre>
-  
-  delete mapping
-   <pre>
-   {"delete":[
-      {"to":"rmc:Wibble","from":"whatever"},
-      {"to":"rmc:wobble","from":"whatever"}]
+   {
+      "add":
+      [
+         {"to":"rmc:Wibble", "from":"whatever"},
+         {"to":"rmc:wobble", "from":"whatever"}
+      ]
    }
   </pre>
- 
+  Delete mapping:
+  <pre>
+   {
+      "delete":
+      [
+         {"to":"rmc:Wibble", "from":"whatever"},
+         {"to":"rmc:wobble", "from":"whatever"}
+      ]
+   }
+  </pre>
   Returns data in the same format as the get method
   ]]>
   </description>

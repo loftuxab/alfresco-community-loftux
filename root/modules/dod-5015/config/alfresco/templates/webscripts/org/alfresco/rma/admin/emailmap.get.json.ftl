@@ -2,6 +2,7 @@
 
 <#escape x as jsonUtils.encodeJSONString(x)>
 {
-	"data": 	<@emailmapLib.emailmapJSON emailmap=emailmap />        
+	"data":
+	<@emailmapLib.emailmapJSON emailmap=emailmap />        
 }
 </#escape>
