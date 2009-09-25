@@ -55,7 +55,6 @@ import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.json.JSONArray;
@@ -205,6 +204,8 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     }
     
     /**
+     * Get all the roles by short name
+     * 
      * @param rmRootNode
      * @return
      */
@@ -664,17 +665,21 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
                 authorityService.addAuthority(allRoleGroup, roleGroup);
                 
                 // Assign the various capabilities to the group on the root records management node
-                for (Capability capability : capabilities)
+                Set<String> capStrings = new HashSet<String>(53);
+                if (capabilities != null)
                 {
-                    permissionService.setPermission(rmRootNode, roleGroup, capability.getName(), true);
+                    for (Capability capability : capabilities)
+                    {
+                        permissionService.setPermission(rmRootNode, roleGroup, capability.getName(), true);
+                    }
+                    
+                    // Create the role
+                    for (Capability capability : capabilities)
+                    {
+                        capStrings.add(capability.getName());
+                    }
                 }
                 
-                // Create the role
-                Set<String> capStrings = new HashSet<String>(capabilities.size());
-                for (Capability capability : capabilities)
-                {
-                    capStrings.add(capability.getName());
-                }
                 return new Role(role, roleDisplayLabel, capStrings, roleGroup);
             }
         }, AuthenticationUtil.getAdminUserName());
