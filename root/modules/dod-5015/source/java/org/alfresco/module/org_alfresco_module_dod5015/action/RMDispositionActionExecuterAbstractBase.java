@@ -112,13 +112,13 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
                     }
                     else
                     {
-                        throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                        throw new AlfrescoRuntimeException("Unable to execute disposition action "
                                 + getName() + ", because the record is not declared. (" + actionedUponNodeRef.toString() + ")");
                     }
                 }
                 else
                 {
-                    throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                    throw new AlfrescoRuntimeException("Unable to execute disposition action "
                             + getName() + ", because disposition is expected at the record level and this node is not a record. (" + actionedUponNodeRef.toString() + ")");
                 }
             }
@@ -145,13 +145,13 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
                     }
                     else
                     {
-                        throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                        throw new AlfrescoRuntimeException("Unable to execute disposition action "
                                 + getName() + ", because not all the records in the record are declared. (" + actionedUponNodeRef.toString() + ")");
                     }
                 }
                 else
                 {
-                    throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                    throw new AlfrescoRuntimeException("Unable to execute disposition action "
                             + getName() + ", because disposition is expected at the record folder level and this node is not a record folder. (" + actionedUponNodeRef.toString()
                             + ")");
                 }
@@ -218,7 +218,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
         {
             if (throwError)
             {
-                throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                throw new AlfrescoRuntimeException("Unable to execute disposition action "
                         + getName() + ", because node does not have a disposition lifecycle set. (" + nodeRef.toString() + ")");
             }
             else
@@ -234,7 +234,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
         {
             if (throwError)
             {
-                throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                throw new AlfrescoRuntimeException("Unable to execute disposition action "
                         + getName() + ", because the next disposition action is not set. (" + nodeRef.toString() + ")");
             }
             else
@@ -247,7 +247,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
         {
             if (throwError)
             {
-                throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                throw new AlfrescoRuntimeException("Unable to execute disposition action "
                         + getName() + ", because this is not the next disposition action for this record or record folder. (" + nodeRef.toString() + ")");
             }
             else
@@ -327,7 +327,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
                     {
                         if (throwException)
                         {
-                            throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                            throw new AlfrescoRuntimeException("Unable to execute disposition action "
                                     + getName() + ", because the record is not declared. (" + filePlanComponent.toString() + ")");
                         }
                         else
@@ -340,7 +340,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
                 {
                     if (throwException)
                     {
-                        throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                        throw new AlfrescoRuntimeException("Unable to execute disposition action "
                                 + getName() + ", because disposition is expected at the record level and this node is not a record. (" + filePlanComponent.toString() + ")");
                     }
                     else
@@ -361,7 +361,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
                     {
                         if (throwException)
                         {
-                            throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                            throw new AlfrescoRuntimeException("Unable to execute disposition action "
                                     + getName() + ", because not all the records in the record are declared. (" + filePlanComponent.toString() + ")");
                         }
                         else
@@ -374,7 +374,7 @@ public abstract class RMDispositionActionExecuterAbstractBase extends RMActionEx
                 {
                     if (throwException)
                     {
-                        throw new AlfrescoRuntimeException("Unable to execute disposition action"
+                        throw new AlfrescoRuntimeException("Unable to execute disposition action "
                                 + getName() + ", because disposition is expected at the record folder level and this node is not a record folder. (" + filePlanComponent.toString()
                                 + ")");
                     }

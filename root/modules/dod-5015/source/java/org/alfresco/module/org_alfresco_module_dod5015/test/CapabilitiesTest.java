@@ -213,6 +213,11 @@ public class CapabilitiesTest extends TestCase
         recordCategory_1 = createRecordCategory(recordSeries, "Docs", "101-1", "Docs", "Docs", "week|1", true, false);
         recordCategory_2 = createRecordCategory(recordSeries, "More Docs", "101-2", "More Docs", "More Docs", "week|1", true, true);
         recordCategory_3 = createRecordCategory(recordSeries, "No disp schedule", "101-3", "No disp schedule", "No disp schedule", "week|1", true, null);
+        
+        testTX.commit();
+        testTX = transactionService.getUserTransaction();
+        testTX.begin();
+        
         recordFolder_1 = createRecordFolder(recordCategory_1, "F1", "101-3", "title", "description", "week|1", true);
         recordFolder_2 = createRecordFolder(recordCategory_2, "F2", "102-3", "title", "description", "week|1", true);
         recordFolder_3 = createRecordFolder(recordCategory_3, "F3", "103-3", "title", "description", "week|1", true);
