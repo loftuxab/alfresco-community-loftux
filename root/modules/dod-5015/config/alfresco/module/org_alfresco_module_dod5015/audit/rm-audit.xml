@@ -10,6 +10,7 @@
 
     <DataExtractors>
        <DataExtractor name="simpleValue" registeredName="auditModel.extractor.simpleValue"/>
+       <DataExtractor name="nullValue" registeredName="auditModel.extractor.nullValue"/>
        <DataExtractor name="nodeName" registeredName="auditModel.extractor.nodeName"/>
        <DataExtractor name="nodeType" registeredName="auditModel.extractor.nodeType"/>
        <DataExtractor name="userRoles" registeredName="org_alfresco_module_dod5015_userRolesExtractor"/>
@@ -26,6 +27,7 @@
         <PathMap source="/DOD5015" target="/DOD5015"/>
         <!-- Force the fullName generator to trigger -->
         <PathMap source="/DOD5015/event/node" target="/DOD5015/event/person"/>
+        <PathMap source="/alfresco-api/post/AuthenticationService/authenticate" target="/DOD5015/login"/>
     </PathMappings>
 
     <Application name="DOD5015" key="DOD5015">
@@ -68,6 +70,19 @@
                         <RecordValue key="value" dataExtractor="simpleValue"/>
                     </AuditPath>
                 </AuditPath>
+            </AuditPath>
+        </AuditPath>
+        <AuditPath key="login">
+            <AuditPath key="args">
+                <AuditPath key="userName">
+                    <RecordValue key="value" dataExtractor="simpleValue"/>
+                </AuditPath>
+            </AuditPath>
+            <AuditPath key="no-error">
+                <GenerateValue key="fullName" dataGenerator="personFullName"/>
+            </AuditPath>
+            <AuditPath key="error">
+                <RecordValue key="value" dataExtractor="nullValue"/>
             </AuditPath>
         </AuditPath>
     </Application>
