@@ -75,8 +75,7 @@
             <@formLib.renderField field=form.fields["prop_rma_mediaType"] />
             <@formLib.renderField field=form.fields["prop_rma_format"] />
             <!-- Scanned Record Fields -->
-            <#if form.fields["prop_dod_scannedFormat"]??>
-               <@formLib.renderField field=form.fields["prop_dod_scannedFormat"] />
+            <#if form.fields["prop_dod_scannedFormatVersion"]??>
                <@formLib.renderField field=form.fields["prop_dod_scannedFormatVersion"] />
                <@formLib.renderField field=form.fields["prop_dod_resolutionX"] />
                <@formLib.renderField field=form.fields["prop_dod_resolutionY"] />
