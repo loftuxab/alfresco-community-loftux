@@ -1390,6 +1390,256 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         });
     }
     
+    /**
+     * Tests the re-scheduling of disposition lifecycles when steps from the schedule are deleted
+     */
+    public void testDispositionLifecycle_0318_reschedule_deletion() throws Exception
+    {
+        final NodeRef recordSeries = TestUtilities.getRecordSeries(searchService, "Reports"); 
+        setComplete();
+        endTransaction();
+        
+        // create a category
+        final NodeRef recordCategory = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordSeries);
+                assertEquals("Reports", nodeService.getProperty(recordSeries, ContentModel.PROP_NAME));
+                        
+                return createRecordCategoryNode(recordSeries);
+            }          
+        });
+        
+        // define the disposition schedule for the category with several steps
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertNotNull(recordCategory);
+                
+                // define properties for both steps
+                Map<QName, Serializable> step1 = new HashMap<QName, Serializable>();
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "cutoff");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Cutoff when no longer needed");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_EVENT, "no_longer_needed");
+                
+                Map<QName, Serializable> step2 = new HashMap<QName, Serializable>();
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "transfer");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Transfer after 1 month");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|1");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD_PROPERTY, PROP_DISPOSITION_AS_OF);
+                
+                Map<QName, Serializable> step3 = new HashMap<QName, Serializable>();
+                step3.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "destroy");
+                step3.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Destroy after 1 year");
+                step3.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "year|1");
+                step3.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD_PROPERTY, PROP_DISPOSITION_AS_OF);
+                
+                // add the action definitions to the schedule
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                rmService.addDispositionActionDefinition(schedule, step1);
+                rmService.addDispositionActionDefinition(schedule, step2);
+                rmService.addDispositionActionDefinition(schedule, step3);
+                
+                return null;
+            }          
+        });
+        
+        // create first record folder
+        final NodeRef recordFolder1 = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecordFolder(recordCategory, "Folder1");
+            }          
+        });
+        
+        // create second record folder
+        final NodeRef recordFolder2 = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecordFolder(recordCategory, "Folder2");
+            }          
+        });
+        
+        // make sure the disposition lifecycle is present and correct
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertNotNull(recordFolder1);
+                assertNotNull(recordFolder2);
+                
+                assertTrue(nodeService.hasAspect(recordFolder1, ASPECT_DISPOSITION_LIFECYCLE));
+                assertTrue(nodeService.hasAspect(recordFolder2, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef folder1NextAction = nodeService.getChildAssocs(recordFolder1, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(folder1NextAction);
+                NodeRef folder2NextAction = nodeService.getChildAssocs(recordFolder2, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(folder2NextAction);
+                
+                // make sure both folders are on the cutoff step
+                assertEquals("cutoff", nodeService.getProperty(folder1NextAction, PROP_DISPOSITION_ACTION));
+                assertEquals("cutoff", nodeService.getProperty(folder2NextAction, PROP_DISPOSITION_ACTION));
+                
+                // make sure both folders have 1 event
+                assertEquals(1, nodeService.getChildAssocs(folder1NextAction, ASSOC_EVENT_EXECUTIONS,
+                            RegexQNamePattern.MATCH_ALL).size());
+                assertEquals(1, nodeService.getChildAssocs(folder2NextAction, ASSOC_EVENT_EXECUTIONS,
+                            RegexQNamePattern.MATCH_ALL).size());
+                
+                // move folder 2 onto next step
+                Map<String, Serializable> params = new HashMap<String, Serializable>(3);
+                params.put(CompleteEventAction.PARAM_EVENT_NAME, "no_longer_needed");
+                params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+                params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, "gavinc");
+                
+                AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+                rmActionService.executeRecordsManagementAction(recordFolder2, "completeEvent", params);
+                rmActionService.executeRecordsManagementAction(recordFolder2, "cutoff");
+                AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
+                
+                return null;
+            }          
+        });
+        
+        // check the second folder is at step 2 and remove the first step from the schedule
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                NodeRef folder2NextAction = nodeService.getChildAssocs(recordFolder2, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(folder2NextAction);
+                assertEquals("transfer", (String)nodeService.getProperty(folder2NextAction, PROP_DISPOSITION_ACTION));
+                
+                // remove step 1 from the schedule
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(3, actionDefs.size());
+                System.out.println("Removing schedule step 1 named: " + actionDefs.get(0).getName());
+                rmService.removeDispositionActionDefinition(schedule, actionDefs.get(0));
+                
+                return null;
+            }          
+        });
+        
+        // make sure the next action for folder 1 has moved on and folder 2 is unchanged, then delete last step
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                NodeRef folder1NextAction = nodeService.getChildAssocs(recordFolder1, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(folder1NextAction);
+                NodeRef folder2NextAction = nodeService.getChildAssocs(recordFolder2, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(folder2NextAction);
+                
+                // make sure both folders are on the cutoff step
+                assertEquals("transfer", nodeService.getProperty(folder1NextAction, PROP_DISPOSITION_ACTION));
+                assertEquals("transfer", nodeService.getProperty(folder2NextAction, PROP_DISPOSITION_ACTION));
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(folder1NextAction);
+                checkSearchAspect(folder2NextAction);
+                
+                // remove the step in the last position from the schedule
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                System.out.println("Removing schedule last step named: " + actionDefs.get(1).getName());
+                rmService.removeDispositionActionDefinition(schedule, actionDefs.get(1));
+                
+                return null;
+            }          
+        });
+        
+        // check there were no changes, then remove the only remaining step
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                NodeRef folder1NextAction = nodeService.getChildAssocs(recordFolder1, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(folder1NextAction);
+                assertEquals("transfer", (String)nodeService.getProperty(folder1NextAction, PROP_DISPOSITION_ACTION));
+                
+                NodeRef folder2NextAction = nodeService.getChildAssocs(recordFolder2, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(folder2NextAction);
+                assertEquals("transfer", (String)nodeService.getProperty(folder2NextAction, PROP_DISPOSITION_ACTION));
+                
+                // remove last remaining step from the schedule
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(1, actionDefs.size());
+                System.out.println("Removing last remaining schedule step named: " + actionDefs.get(0).getName());
+                rmService.removeDispositionActionDefinition(schedule, actionDefs.get(0));
+                
+                return null;
+            }          
+        });
+        
+        // check there are no schedule steps left and that both folders no longer have the disposition lifecycle aspect,
+        // then add a new step
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertEquals(0, nodeService.getChildAssocs(recordFolder1, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).size());
+                assertEquals(0, nodeService.getChildAssocs(recordFolder2, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).size());
+                assertFalse(nodeService.hasAspect(recordFolder1, ASPECT_DISPOSITION_LIFECYCLE));
+                assertFalse(nodeService.hasAspect(recordFolder2, ASPECT_DISPOSITION_LIFECYCLE));
+                
+                // ensure schedule is empty
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(0, actionDefs.size());
+                
+                // add a new step
+                Map<QName, Serializable> step1 = new HashMap<QName, Serializable>();
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "retain");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Retain for 25 years");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "year|25");
+                rmService.addDispositionActionDefinition(schedule, step1);
+                
+                return null;
+            }          
+        });
+        
+        // check both folders now have the retain action
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                NodeRef folder1NextAction = nodeService.getChildAssocs(recordFolder1, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(folder1NextAction);
+                assertEquals("retain", (String)nodeService.getProperty(folder1NextAction, PROP_DISPOSITION_ACTION));
+                assertNotNull(nodeService.getProperty(folder1NextAction, PROP_DISPOSITION_AS_OF));
+                
+                NodeRef folder2NextAction = nodeService.getChildAssocs(recordFolder2, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(folder2NextAction);
+                assertEquals("retain", (String)nodeService.getProperty(folder2NextAction, PROP_DISPOSITION_ACTION));
+                assertNotNull(nodeService.getProperty(folder2NextAction, PROP_DISPOSITION_AS_OF));
+                
+                return null;
+            }          
+        });
+    }
+    
     public void off_testDispositionLifecycle_0318_other_usecases() throws Exception
     {
         // remove a step from the schedule that is the current step for one or more records/folders - NPE occurs in event calculation i think
@@ -1397,9 +1647,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         
         // test a schedule that uses the disposition asof date for the period property - ensure it's correct (should currently
         //                                                                               fail as 'now' will be used and not the asOf date
-
-        // setup nextaction so that it is events are eligible then add a new event - ensure it is no loger eligible (done via UI - ok)
-        // execute the first step i.e. do the cutoff then make changes to the first step of the schedule and ensure it has no effect
         
         // switch between record and folder level disposition - for now this should throw exception
         //                                                      if anything is filed or there are any
