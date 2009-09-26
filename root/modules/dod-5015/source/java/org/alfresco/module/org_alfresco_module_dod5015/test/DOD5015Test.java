@@ -1335,18 +1335,72 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 return null;
             }          
         });
+        
+        // change the action on the first step from 'cutoff' to 'retain'
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // define changes for schedule
+                Map<QName, Serializable> changes = new HashMap<QName, Serializable>();
+                changes.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "retain");
+                
+                // update the first dispostion action definition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                System.out.println("Changing action of 1st step from '" + 
+                            actionDefs.get(0).getName() + "' to 'retain'");
+                rmService.updateDispositionActionDefinition(schedule, actionDefs.get(0), changes);
+                
+                return null;
+            }          
+        });
+        
+        // make sure the disposition lifecycle asOf date is still null, ensure there is still only one event
+        // and most importantly that the action name is now 'retain'
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertTrue(nodeService.hasAspect(record, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef ndNodeRef = nodeService.getChildAssocs(record, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(ndNodeRef);
+                
+                Date asOfDate = (Date)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_AS_OF);
+                assertNull("Expecting asOfDate to be null", asOfDate);
+                
+                // make sure only 1 event is present
+                List<ChildAssociationRef> events = nodeService.getChildAssocs(ndNodeRef, ASSOC_EVENT_EXECUTIONS,
+                            RegexQNamePattern.MATCH_ALL);
+                assertEquals(1, events.size());
+                NodeRef event = events.get(0).getChildRef();
+                assertEquals("case_complete", nodeService.getProperty(event, PROP_EVENT_EXECUTION_NAME));
+                
+                String actionName = (String)nodeService.getProperty(ndNodeRef, PROP_DISPOSITION_ACTION);
+                assertEquals("retain", actionName);
+                
+                // Check for the search properties having been populated
+                checkSearchAspect(record, false);
+                
+                return null;
+            }          
+        });
     }
     
     public void off_testDispositionLifecycle_0318_other_usecases() throws Exception
     {
-        // test everything above for record level disposition
-        // setup nextaction so that it is events are eligible then add a new event - ensure it is no loger eligible
-        // change the action for the current step i.e. cutoff to transfer - what should happen here?
-        //                                                                  just a property change, any other side effects?
+        // remove a step from the schedule that is the current step for one or more records/folders - NPE occurs in event calculation i think
+        // remove all steps and start again
+        
+        // test a schedule that uses the disposition asof date for the period property - ensure it's correct (should currently
+        //                                                                               fail as 'now' will be used and not the asOf date
+
+        // setup nextaction so that it is events are eligible then add a new event - ensure it is no loger eligible (done via UI - ok)
         // execute the first step i.e. do the cutoff then make changes to the first step of the schedule and ensure it has no effect
         
-        // ** Advanced **
-        // remove a step from the schedule that is the current step for one or more records/folders
         // switch between record and folder level disposition - for now this should throw exception
         //                                                      if anything is filed or there are any
         //                                                      folders present
