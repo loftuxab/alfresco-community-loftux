@@ -106,8 +106,9 @@
                         <option value="rma:location">${msg("label.location")}</option>
                         <option value="rma:address">${msg("label.address")}</option>
                         <option value="rmc:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
+                        <!-- double ?html encoding required here due to YUI bug -->
                         <#list meta as d>
-                           <option value="${d.name}">${d.title}</option>
+                           <option value="${d.name}">${d.title?html?html}</option>
                         </#list>
                      </select>
                   </div>

@@ -35,8 +35,7 @@ function retrieveMetadataForElement(conn, meta, el)
          meta.push(
          {
             name: id,
-            title: prop.label,
-            dataType: prop.dataType
+            title: prop.label
          });
       }
    }

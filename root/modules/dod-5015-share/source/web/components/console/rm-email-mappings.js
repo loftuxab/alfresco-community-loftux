@@ -24,16 +24,16 @@ Alfresco.RM = Alfresco.RM || {};
     */
    Alfresco.RM.EmailMappings = function RM_EmailMappings_constructor(htmlId)
    {
-      Alfresco.RM.EmailMappings.superclass.constructor.call(this, "Alfresco.RM.EmailMappings", htmlId, []);
+      Alfresco.RM.EmailMappings.superclass.constructor.call(this, "Alfresco.RM.EmailMappings", htmlId, ["button", "container", "json", "menu"]);
       this.currentValues = {};
       this.dataMap = new Alfresco.RM.EmailMappings_Data();
       YAHOO.Bubbling.on("EmailMappingsLoaded", this.onDataLoad, this);
-      YAHOO.Bubbling.on("EmailMappingsSaved", this.onDataSave, this);      
+      YAHOO.Bubbling.on("EmailMappingsSaved", this.onDataSave, this);
       YAHOO.Bubbling.on("EmailMappingsChanged", this.onMappingChanged, this);
 
       return this;
    };
-    
+   
    YAHOO.extend(Alfresco.RM.EmailMappings, Alfresco.component.Base,
    {
       /**
@@ -41,8 +41,7 @@ Alfresco.RM = Alfresco.RM || {};
        */
       initEvents : function RM_EmailMappings_initEvents()
       {
-         Event.on(this.id,'click',this.onInteractionEvent,null,this);
-         //register event
+         Event.on(this.id, 'click', this.onInteractionEvent, null, this);
          this.registerEventHandler('click',[
             {
                rule : 'button#save-mappings-button',
@@ -81,18 +80,9 @@ Alfresco.RM = Alfresco.RM || {};
                   },
                   scope : this
                }
-            },
-            {
-               rule : 'button#rmProperty-but-button',
-               o : {
-                  handler : function showRmProp(e)
-                  {
-                     this.widgets['rmProperty-menu'].show();
-                  },
-                  scope : this
-               }
-            }                                           
+            }
          ]);
+         
          return this;
       },
       
@@ -167,9 +157,10 @@ Alfresco.RM = Alfresco.RM || {};
       {
          var li = Dom.getAncestorByTagName(Event.getTarget(e), 'li');
          var fromTo = li.id.split('::');
-         this.dataMap.remove({
-            from:fromTo[0],
-            to:fromTo[1]
+         this.dataMap.remove(
+         {
+            from: fromTo[0],
+            to: fromTo[1]
          });
          li.parentNode.removeChild(li);
       },
@@ -181,29 +172,30 @@ Alfresco.RM = Alfresco.RM || {};
       {
          if (this.currentValues['emailProperty'] && this.currentValues['rmProperty'])
          {
-            var oMap = {
-               from:this.currentValues['emailProperty'].value,
-               to:this.currentValues['rmProperty'].value
+            var oMap =
+            {
+               from: this.currentValues['emailProperty'].value,
+               to: this.currentValues['rmProperty'].value
             };
             
             if (this.dataMap.isValidAddition(oMap))
             {
                this.dataMap.add(oMap);
                this.renderMapping(oMap);
-               Alfresco.util.PopupManager.displayMessage({
-                     text: Alfresco.util.message('message.added', "Alfresco.RM.EmailMappings"),
-                     spanClass: 'message',
-                     modal: true,
-                     noEscape: true,
-                     displayTime: 5
-                  });
+               Alfresco.util.PopupManager.displayMessage(
+               {
+                  text: Alfresco.util.message('message.added', "Alfresco.RM.EmailMappings"),
+                  spanClass: 'message',
+                  modal: true,
+                  noEscape: true,
+                  displayTime: 5
+               });
             }
          }
       },
       
       /**
        * Discard changes by reloading page
-       *  
        */      
       _discardChanges: function RM_EmailMappings_discardChanges()
       {
@@ -213,103 +205,96 @@ Alfresco.RM = Alfresco.RM || {};
       /**
        * Fired by YUI when parent element is available for scripting
        * @method onReady
-       * 
        */
       onReady: function RM_EmailMappings_onReady()
       {
          this.initEvents();
          
          var me = this;
-         var elements = Sel.query('button',this.id).concat(Sel.query('input[type="submit"]',this.id));
+         var elements = Sel.query('button', this.id).concat(Sel.query('input[type="submit"]', this.id));
          
          // Create widget button while reassigning classname to src element (since YUI removes classes). 
          // We need the classname so we can identify what action to take when it is interacted with (event delegation).
          for (var i=0, len = elements.length; i<len; i++)
          {
-            var el= elements[i];
-            if (el.id.indexOf('-button')==-1 && el.className.indexOf('button-menu') == -1)
+            var el = elements[i];
+            if (el.id.indexOf('-button') === -1 && el.className.indexOf('button-menu') === -1)
             {
-              var id = el.id.replace(this.id+'-','');
+              var id = el.id.replace(this.id + '-', '');
               this.widgets[id] = new YAHOO.widget.Button(el.id);
-              this.widgets[id]._button.className=el.className;
+              this.widgets[id]._button.className = el.className;
             }
          }
          
          this.widgets['list'] = Sel.query('#emailMappings-list ul')[0];
          
-         //handles menu selection; sets label and stores selected values
-         var onHandleMenuSelection = function(menuItem, menuName) {
-            var menuItemText = menuItem.cfg.getConfig().text;
-
-            this.widgets[menuName + '-text'].value=menuItemText;
-            this.currentValues[menuName] = {value:menuItemText,label:menuItemText};
-            if (menuName == 'emailProperty')
-            {
-               this.updateMenu(menuItemText);
-            }
-            this.widgets['add-mapping'].set('disabled',menuItem.cfg.getProperty('disabled'));
-
-         };
-         
-         //textfields
+         // textfields
          this.widgets['emailProperty-text'] = Dom.get('emailProperty-text');
-         this.widgets['rmProperty-text'] = Dom.get('rmProperty-text');
-
          this.widgets['emailProperty-text'].value = "";
-         this.widgets['rmProperty-text'].value = "";
          
          // enable add button if textfields have entries
          var toggleAddButton = function toggleAddButton()
          {
-            var emProp = this.widgets['emailProperty-text'].value;
-            var rmProp = this.widgets['rmProperty-text'].value;
-
-            this.currentValues['emailProperty'] = {value:emProp,label:emProp};
-            this.currentValues['rmProperty'] = {value:rmProp, label:rmProp};
-
-            if ((emProp!="") && (rmProp!=""))
+            var emProp = YAHOO.lang.trim(this.widgets['emailProperty-text'].value);
+            
+            // update current value
+            this.currentValues['emailProperty'] =
             {
-               this.widgets['add-mapping'].set('disabled',false);               
-            }
-            else
-            {
-               this.widgets['add-mapping'].set('disabled',true);
-            }
+               value: emProp,
+               label: emProp
+            };
+            
+            this.widgets['add-mapping'].set('disabled', (emProp.length === 0));
          };
          Event.addListener(this.widgets['emailProperty-text'], "keyup", toggleAddButton, null, this);
-         Event.addListener(this.widgets['rmProperty-text'], "keyup", toggleAddButton, null, this);
-              
-         //create menus
-         this.widgets['emailProperty-menu'] = new YAHOO.widget.Menu("emailMappings-emailProperty-menu", {
+         
+         // create menus
+         this.widgets['emailProperty-menu'] = new YAHOO.widget.Menu("emailMappings-emailProperty-menu",
+         {
             position:'dynamic',
-            context:['emailProperty-text','tl','bl']
+            context:['emailProperty-text', 'tl', 'bl']
          });
-
+         
+         // Email property menu setup and event handler
          this.widgets['emailProperty-menu'].addItems(this.options.email);
          this.widgets['emailProperty-menu'].render('email-menu-container');
-         this.widgets['emailProperty-menu'].subscribe('click', function handleMenuSelection(e, args) {
-            var menuName = 'emailProperty';
-            return function (e, args) {
-               onHandleMenuSelection.call(this, args[1], menuName);
-               return false;
+         this.widgets['emailProperty-menu'].subscribe('click', function (e, args)
+         {
+            var menuItem = args[1];
+            var menuItemText = menuItem.cfg.getConfig().text;
+            
+            this.widgets['emailProperty-text'].value = menuItemText;
+            this.currentValues['emailProperty'] =
+            {
+               value: menuItemText,
+               label: menuItemText
             };
-         }(), this, true);
-
-         this.widgets['rmProperty-menu'] = new YAHOO.widget.Menu("emailMappings-rmProperty-menu",{
-            position:'dynamic',
-            context:['rmProperty-text','tl','bl']
+            this.updateMenu(menuItemText);
+            this.widgets['add-mapping'].set('disabled', menuItem.cfg.getProperty('disabled'));
+         }, this, true);
+         
+         // RM property menu setup and event handler
+         this.widgets.rmPropertyMenu = new YAHOO.widget.Button(this.id + "-rmproperty-button",
+         {
+            type: "menu",
+            menu: this.id + "-rmproperty-button-menu",
+            lazyloadmenu: false
          });
-         this.widgets['rmProperty-menu'].addItems(this.options.rm);
-         this.widgets['rmProperty-menu'].render('rm-menu-container');
-
-         this.widgets['rmProperty-menu'].subscribe('click', function handleMenuSelection(e, args) {
-            var menuName = 'rmProperty';
-            return function (e, args) {
-               onHandleMenuSelection.call(this, args[1], menuName);
-               return false;
+         this.widgets.rmPropertyMenu.getMenu().subscribe("click", function(e, args)
+         {
+            var menuItem = args[1];
+            
+            // update menu button label
+            this.widgets.rmPropertyMenu.set("label", menuItem.cfg.getProperty("text"));
+            
+            // set current value from rm property menu
+            this.currentValues['rmProperty'] =
+            {
+               value: menuItem.value,
+               label: menuItem.cfg.getProperty("text")
             };
-         }(), this, true);
-
+         }, this, true);
+         
          this.dataMap.load();
       },
       
@@ -320,22 +305,22 @@ Alfresco.RM = Alfresco.RM || {};
        * 
        * @param {String} menuItemValue Value of selected menu item 
        */
-      updateMenu : function RM_EmailMappings_updateMenu(menuItemValue)
+      updateMenu: function RM_EmailMappings_updateMenu(menuItemValue)
       {
          var mappedValues = this.dataMap.getSelectionByKey(menuItemValue);
-
-         var rmMenu = this.widgets['rmProperty-menu'];
-         var rmItems = rmMenu.getItems();
-
-         if (mappedValues !== '')
+         
+         var rmMenu = this.widgets.rmPropertyMenu;
+         var rmItems = rmMenu.getMenu().getItems();
+         
+         if (mappedValues.length !== 0)
          {
-            for (var i=0,len = rmItems.length; i < len; i++)
+            for (var i=0, len = rmItems.length; i < len; i++)
             {
                var menuItem = rmItems[i];
-
+               
                menuItem.cfg.setProperty('disabled', false);
                
-               if (mappedValues.indexOf(menuItem.cfg.getConfig().text) != -1)
+               if (mappedValues.indexOf(menuItem.value) !== -1)
                {
                   menuItem.cfg.setProperty('disabled', true);
                }
@@ -362,7 +347,6 @@ Alfresco.RM = Alfresco.RM || {};
       {
          this.widgets['save-mappings'].set('disabled', true);
          this.widgets['discard-mappings'].set('disabled', true);
-         this.updateMenu(this.widgets['emailProperty-text'].value);
       },
       
       /**
@@ -397,7 +381,7 @@ Alfresco.RM = Alfresco.RM || {};
       onMappingChanged : function(e, args)
       {
          var data = args[1];
-         if ((data.markedForAddition==='') && (data.markedForDeletion===''))
+         if ((data.markedForAddition.length === 0) && (data.markedForDeletion.length === 0))
          {
             this.widgets['save-mappings'].set('disabled', true);
             this.widgets['discard-mappings'].set('disabled', true);            
@@ -425,8 +409,8 @@ Alfresco.RM = Alfresco.RM || {};
     */
    Alfresco.RM.EmailMappings_Data = function RM_EmailMappings_Data_constructor()
    {
-      //data is { mappings:[{from:'fromvalue',to:'tovalue'}]}
-      //internal representation - data as loaded from server 
+      // data is { mappings:[{from: 'fromvalue', to: 'tovalue'}]}
+      // internal representation - data as loaded from server 
       this.data = null;
       this.markedForDeletion = '';
       this.markedForAddition = '';
@@ -547,28 +531,36 @@ Alfresco.RM = Alfresco.RM || {};
          {
             dataObj.add = [];
             var additions = this.markedForAddition.split(',');
-            if (additions[additions.length-1]==="")
+            if (additions[additions.length-1].length === 0)
             {
                additions.pop();
             }
             for (var i=0,len = additions.length;i<len;i++)
             {
                var map = additions[i].split('::');
-               dataObj.add.push({from:map[0],to:map[1]});
+               dataObj.add.push(
+               {
+                  from: map[0],
+                  to: map[1]
+               });
             }
          }
          if (this.markedForDeletion!=="")
          {
             dataObj["delete"] = [];
             var deletions = this.markedForDeletion.split(',');
-            if (deletions[deletions.length-1]==="")
+            if (deletions[deletions.length-1].length === 0)
             {
                deletions.pop();
             }
             for (var i=0,len = deletions.length;i<len;i++)
             {
                var map = deletions[i].split('::');
-               dataObj["delete"].push({from:map[0],to:map[1]});
+               dataObj["delete"].push(
+               {
+                  from: map[0],
+                  to: map[1]
+               });
             }
          }         
          var me = this;
@@ -619,12 +611,11 @@ Alfresco.RM = Alfresco.RM || {};
          for (var i=0, len = this.data.mappings.length;i<len;i++)
          {
             var o = this.data.mappings[i];
-            if (indexedData[o.from]===undefined)
+            if (indexedData[o.from] === undefined)
             {
                indexedData[o.from] = '';
-               
             }
-            if (indexedData[o.from]!==undefined && indexedData[o.from].indexOf(o.to) == -1)
+            else if (indexedData[o.from] !== undefined && indexedData[o.from].indexOf(o.to) === -1)
             {
                indexedData[o.from] += o.to + ',';
             }
