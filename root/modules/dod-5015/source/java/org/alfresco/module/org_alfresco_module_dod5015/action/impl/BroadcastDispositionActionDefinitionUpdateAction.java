@@ -148,9 +148,10 @@ public class BroadcastDispositionActionDefinitionUpdateAction extends RMActionEx
                 persistEventChanges(dispositionActionDef, nextAction);
             }
             
-            if (changedProps.contains(PROP_DISPOSITION_ACTION))
+            if (changedProps.contains(PROP_DISPOSITION_ACTION_NAME))
             {
-                // TODO: deal with the action being updated
+                String action = (String)nodeService.getProperty(dispositionActionDef, PROP_DISPOSITION_ACTION_NAME);
+                nodeService.setProperty(nextAction.getNodeRef(), PROP_DISPOSITION_ACTION, action);
             }
         }
     }
