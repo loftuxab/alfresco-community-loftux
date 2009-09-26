@@ -26,6 +26,25 @@
       <namespace uri="http://www.alfresco.org/model/dod5015/1.0" prefix="dod"/>
    </namespaces>
    
+   <constraints>
+      <constraint name="dod:imageFormatList" type="LIST">
+         <title>Image Formats</title>
+         <parameter name="allowedValues">
+            <list>
+               <value>Binary Image Interchange Format (BIIF)</value>
+               <value>GIF 89a</value>
+               <value>Graphic Image Format (GIF) 87a</value>
+               <value>Joint Photographic Experts Group (JPEG) (all versions)</value>
+               <value>Portable Network Graphics (PNG) 1.0</value>
+               <value>Tagged Image Interchange Format (TIFF) 4.0</value>
+               <value>TIFF 5.0</value>
+               <value>TIFF 6.0</value>
+            </list>
+         </parameter>
+         <parameter name="caseSensitive"><value>true</value></parameter>
+      </constraint>
+   </constraints>
+   
    <types>
    
       <type name="dod:filePlan">      
@@ -65,7 +84,6 @@
             <property name="dod:scannedFormat">
                 <title>Image Format</title>
                 <type>d:text</type>
-                <mandatory>true</mandatory>
                 <index enabled="true">
 			        <atomic>true</atomic>
 			        <stored>false</stored>
@@ -73,7 +91,7 @@
 			    </index>
             </property>
             <property name="dod:scannedFormatVersion">
-                <title>Image Format Version</title>
+                <title>Image Format and Version</title>
                 <type>d:text</type>
                 <mandatory>true</mandatory>
                 <index enabled="true">
@@ -81,6 +99,9 @@
 			        <stored>false</stored>
 			        <tokenised>false</tokenised>
 			    </index>
+                <constraints>
+                    <constraint ref="dod:imageFormatList" />
+                </constraints>
             </property>
             <property name="dod:resolutionX">
                 <title>Image Resolution X</title>
