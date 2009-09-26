@@ -79,8 +79,9 @@
                      <option value="rma:recordSearchDispositionPeriod">${msg("label.dispositionPeriod")}</option>
                      <option value="rma:recordSearchVitalRecordReviewPeriod">${msg("label.vitalRecordReviewPeriod")}</option>
                      <option value="rma:recordSearchHasDispositionSchedule">${msg("label.hasDispositionSchedule")}</option>
+                     <!-- double ?html encoding required here due to YUI bug -->
                      <#list meta as d>
-                     <option value="${d.name}">${d.title}</option>
+                     <option value="${d.name}">${d.title?html?html}</option>
                      </#list>
                   </select>
                </span>
