@@ -50,14 +50,15 @@
    {
       Alfresco.WebPreview.superclass.constructor.call(this, "Alfresco.WebPreview", containerId, ["button", "container", "datatable", "datasource", "uploader"]);
 
-      /* Decoupled event listeners */
-      YAHOO.Bubbling.on("metadataRefresh", this.onReady, this);
-      
+      /* Decoupled event listeners are added in setOptions */
+      YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
+
       return this;
    };
 
    YAHOO.extend(Alfresco.WebPreview, Alfresco.component.Base,
    {
+
       /**
        * Object container for initialization options
        *
@@ -73,6 +74,14 @@
           * @type string
           */
          nodeRef: "",
+
+         /**
+          * The size of the content
+          *
+          * @property size
+          * @type string
+          */
+         size: "0",
 
          /**
           * The file name representing root container
@@ -141,9 +150,65 @@
 
       /**
        * Fired by YUI when parent element is available for scripting
+       *
        * @method onReady
        */
       onReady: function WP_onReady()
+      {
+         // Setup web preview
+         this._setupWebPreview(false);
+      },
+
+      /**
+       * Called when document details has been available or changed (if the useDocumentDetailsAvailableEvent
+       * option was set to true) on the page so the web previewer can remove its old preview and
+       * display a new one if available.
+       *
+       * @method onDocumentDetailsAvailable
+       * @param p_layer The type of the event
+       * @param p_args Event information
+       */
+      onDocumentDetailsAvailable: function WP_onDocumentDetailsAvailable(p_layer, p_args)
+      {
+         // Get the new info about the node and decide if the previewer must be refreshed
+         var documentDetails = p_args[1].documentDetails,
+            refresh = false;
+
+         // Name
+         if (this.options.name != documentDetails.displayName)
+         {
+            this.options.name = documentDetails.displayName;
+            refresh = true;
+         }
+
+         // Mime type
+         if (this.options.mimeType != documentDetails.mimetype)
+         {
+            this.options.mimeType = documentDetails.mimetype;
+            refresh = true;
+         }
+
+         // Size
+         if (this.options.size != documentDetails.size)
+         {
+            this.options.size = documentDetails.size;
+            refresh = true;
+         }
+
+         // Setup previewer
+         if (refresh)
+         {
+            this._setupWebPreview();
+         }
+      },
+
+      /**
+       * Will setup the
+       *
+       * @method _setupWebPreview
+       * @private
+       */
+      _setupWebPreview: function WP__setupWebPreview()
       {
          // Save a reference to the HTMLElement displaying texts so we can alter the texts later
          this.widgets.swfPlayerMessage = Dom.get(this.id + "-swfPlayerMessage-div");
@@ -154,22 +219,52 @@
          this.widgets.titleText.innerHTML = this.options.name;
          this.widgets.titleImg.src = Alfresco.constants.URL_CONTEXT + this.options.icon.substring(1);
 
-         // nodeRef is mandatory
+         // Parameter nodeRef is mandatory
          if (this.options.nodeRef === undefined)
          {
              throw new Error("A nodeRef must be provided");
          }
 
-         if (Alfresco.util.hasRequiredFlashPlayer(9, 0, 45))
+         /**
+          * To support full window mode an extra div (realSwfDivEl) is created with absolute positioning
+          * which will have the same position and dimensions as shadowSfwDivEl.
+          * The realSwfDivEl element is to make sure the flash move is on top of all other divs and
+          * the shadowSfwDivEl element is to make sure the previewer takes the screen real estate it needs.
+          */
+         if (!this.widgets.realSwfDivEl)
          {
+            var realSwfDivEl = new Element(document.createElement("div"));
+            realSwfDivEl.set("id", this.id + "-real-swf-div");
+            realSwfDivEl.setStyle("position", "absolute");
+            realSwfDivEl.addClass("web-preview");
+            realSwfDivEl.addClass("real");            
+            realSwfDivEl.appendTo(document.body);
+            this.widgets.realSwfDivEl = realSwfDivEl;
+         }
+         this.widgets.shadowSfwDivEl = new Element(this.id + "-shadow-swf-div");
+
+         if (this.options.size == "0")
+         {
+            // Shrink the web previewers real estate and tell user that node has no content
+            this.widgets.shadowSfwDivEl.removeClass("has-content");
+            this.widgets.realSwfDivEl.addClass("no-content");
+            this.widgets.swfPlayerMessage.innerHTML = this.msg("label.noContent");
+         }
+         else if (Alfresco.util.hasRequiredFlashPlayer(9, 0, 45))
+         {
+
+            // Find the url to the preview
             var previewCtx = this._resolvePreview();
             if (previewCtx)
             {                  
+               // Make sure the web previewers real estate is big enough for displaying something
+               this.widgets.shadowSfwDivEl.addClass("has-content");
+               this.widgets.realSwfDivEl.removeClass("no-content");
+
                // Create flash web preview by using swfobject
                var swfId = "WebPreviewer_" + this.id;
-               var shadowSfwDivId = this.id + "-shadow-swf-div";
                var so = new YAHOO.deconcept.SWFObject(Alfresco.constants.URL_CONTEXT + "components/preview/WebPreviewer.swf",
-                       swfId, "100%", "100%", "9.0.45");
+                     swfId, "100%", "100%", "9.0.45");
                so.addVariable("fileName", this.options.name);
                so.addVariable("paging", previewCtx.paging);
                so.addVariable("url", previewCtx.url);
@@ -182,33 +277,17 @@
                so.addVariable("i18n_fullwindow", this.msg("preview.fullwindow"));
                so.addVariable("i18n_fullwindow_escape", this.msg("preview.fullwindowEscape"));
                so.addVariable("i18n_page", this.msg("preview.page"));
-               so.addVariable("i18n_pageOf", this.msg("preview.pageOf"));               
+               so.addVariable("i18n_pageOf", this.msg("preview.pageOf"));
                so.addVariable("show_fullscreen_button", true);
                so.addVariable("show_fullwindow_button", true);
                so.addParam("allowScriptAccess", "sameDomain");
                so.addParam("allowFullScreen", "true");
                so.addParam("wmode", "transparent");
 
-               /**
-                * To support full window mode an extra div is created with absolute positioning
-                * This is to make sure the flash move is on top of all other divs.
-                */               
-               var realSwfDiv = document.createElement("div"),
-                  realSwfDivEl = new Element(realSwfDiv);
-               
-               realSwfDivEl.set("id", this.id + "-real-swf-div");
-               realSwfDivEl.setStyle("position", "absolute");
-               this.widgets.realSwfDivEl = realSwfDivEl;
-
-               // Place the new div on top of the "shadow-sfw-div" that is there to occupy the space the previewer needs
-               this.widgets.shadowSfwDivEl = new Element(shadowSfwDivId);
-               this._positionOver(this.widgets.realSwfDivEl, this.widgets.shadowSfwDivEl);
-
-               // Add the new div to the dom
-               this.widgets.realSwfDivEl.appendTo(document.body);
-
-               // Finally create the flash web preview in the new div
-               so.write(realSwfDivEl.get("id"));
+               // Finally create (or recreate) the flash web preview in the new div
+               this.widgets.swfPlayerMessage.innerHTML = "";
+               so.write(this.widgets.realSwfDivEl.get("id"));
+               this.widgets.swfObject = so;
 
                /**
                 * FF3 and SF4 hides the browser cursor if the flashmovie uses a custom cursor
@@ -227,23 +306,30 @@
             }
             else
             {
-               // Can't find a preview
+               // Shrink the web previewers real estate and tell user that the node has nothing to display
+               this.widgets.shadowSfwDivEl.removeClass("has-content");
+               this.widgets.realSwfDivEl.addClass("no-content");
                var url = Alfresco.constants.PROXY_URI + "api/node/content/" + this.options.nodeRef.replace(":/", "") + "/" + encodeURIComponent(this.options.name) + "?a=true";
                this.widgets.swfPlayerMessage.innerHTML = this.msg("label.noPreview", url);
             }
          }
          else
          {
-            // No sufficient flash player installed
+            // Shrink the web previewers real estate and tell user that no sufficient flash player is installed
+            this.widgets.shadowSfwDivEl.removeClass("has-content");
+            this.widgets.realSwfDivEl.addClass("no-content");
             this.widgets.swfPlayerMessage.innerHTML = this.msg("label.noFlash");
          }
+
+         // Place the real flash preview div on top of the shadow div
+         this._positionOver(this.widgets.realSwfDivEl, this.widgets.shadowSfwDivEl);
       },
 
       /**
        * Helper method for deciding what preview to use, if any
        *
        * @method _resolvePreview
-       * @return the name of the preview to use or nullif none is appropriate
+       * @return the name of the preview to use or null if none is appropriate
        */
       _resolvePreview: function WP__resolvePreview(event)
       {

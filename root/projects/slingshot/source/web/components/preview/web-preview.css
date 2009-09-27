@@ -1,44 +1,58 @@
-div.web-preview
+div.web-preview.shadow
 {
    margin-left: -10px;
    border-right: 1px solid #CCCCCC;
    border-bottom: 1px solid #CCCCCC;
 }
 
-div.web-preview span,
-div.web-preview div
+div.web-preview.shadow span,
+div.web-preview.shadow div
 {
    color: #000000;
 }
 
-div.web-preview .hd
+div.web-preview.shadow .hd
 {
    background-color: #FAFAFA;    
    height: 40px;
    line-height: 40px;
 }                                     
 
-div.web-preview img,
-div.web-preview span,
-div.web-preview input
+div.web-preview.shadow img,
+div.web-preview.shadow span,
+div.web-preview.shadow input
 {
    vertical-align: middle;
 }
 
-div.web-preview .bd
+div.web-preview.shadow .bd
 {
    text-align: center;
 }
 
-div.web-preview .bd .preview-swf
+div.web-preview.shadow .bd .preview-swf
 {
+   background-color:#FAFAFA;
    width: 100%;
+   height: 100px;
+}
+
+div.web-preview.shadow .bd .preview-swf div
+{
+   padding-top: 30px;
+}
+
+div.web-preview.shadow .bd .preview-swf.has-content
+{
    height: 670px;
 }
 
-div.web-preview .bd .preview-swf div
+div.web-preview.shadow .bd .preview-swf.no-preview div
 {
-   background-color:#FAFAFA;
-   padding-bottom:430px;
-   padding-top:200px;
+   padding-top: 200px;
+}
+
+div.web-preview.real.no-content
+{
+   visibility: hidden;
 }
