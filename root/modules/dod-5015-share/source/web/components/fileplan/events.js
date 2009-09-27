@@ -637,7 +637,10 @@
          }, "message.completingEvent", "message.completeEventFailure");
 
          // Hide dialog and completed at date picker
-         this.widgets.completedAtPicker.hide();
+         if (this.widgets.completedAtPicker)
+         {
+            this.widgets.completedAtPicker.hide();
+         }
          this.widgets.completeEventPanel.hide();
       },
 
@@ -652,7 +655,10 @@
       onCompleteEventCancelClick: function AddEvent_onCompleteEventCancelClick(e, obj)
       {
          // Hide panel
-         this.widgets.completedAtPicker.hide();
+         if (this.widgets.completedAtPicker)
+         {
+            this.widgets.completedAtPicker.hide();
+         }
          this.widgets.completeEventPanel.hide();
       }
    });
