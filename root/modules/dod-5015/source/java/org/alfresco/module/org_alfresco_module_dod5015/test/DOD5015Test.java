@@ -839,8 +839,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 System.out.println("Disposition as of: " + asOfDate);
                 
                 // make sure the as of date is a month in the future
-                Date now = new Date();
-                assertEquals(asOfDate.getMonth(), now.getMonth()+3);
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.MONTH, 3);
+                assertEquals(asOfDate.getMonth(), calendar.get(Calendar.MONTH));
                 
                 // Check for the search properties having been populated
                 checkSearchAspect(recordFolder);
@@ -887,8 +888,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 System.out.println("Disposition as of: " + asOfDate);
                 
                 // make sure the as of date is a month in the future
-                Date now = new Date();
-                assertEquals("Expecting the asOf date to be unchanged", asOfDate.getMonth(), now.getMonth()+3);
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.MONTH, 3);
+                assertEquals("Expecting the asOf date to be unchanged",asOfDate.getMonth(), calendar.get(Calendar.MONTH));                
                 
                 // Check for the search properties having been populated
                 checkSearchAspect(recordFolder);
@@ -1169,8 +1171,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 System.out.println("Disposition as of: " + asOfDate);
                 
                 // make sure the as of date is a month in the future
-                Date now = new Date();
-                assertEquals(asOfDate.getMonth(), now.getMonth()+3);
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.MONTH, 3);
+                assertEquals(asOfDate.getMonth(), calendar.get(Calendar.MONTH));
                 
                 // Check for the search properties having been populated
                 checkSearchAspect(record);
@@ -1217,8 +1220,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 System.out.println("Disposition as of: " + asOfDate);
                 
                 // make sure the as of date is a month in the future
-                Date now = new Date();
-                assertEquals("Expecting the asOf date to be unchanged", asOfDate.getMonth(), now.getMonth()+3);
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.MONTH, 3);
+                assertEquals("Expecting the asOf date to be unchanged",  asOfDate.getMonth(), calendar.get(Calendar.MONTH));                
                 
                 // Check for the search properties having been populated
                 checkSearchAspect(record);

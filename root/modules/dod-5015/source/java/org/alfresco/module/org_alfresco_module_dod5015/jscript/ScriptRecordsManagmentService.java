@@ -24,12 +24,18 @@
  */
 package org.alfresco.module.org_alfresco_module_dod5015.jscript;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistry;
+import org.alfresco.module.org_alfresco_module_dod5015.notification.RecordsManagementNotificationService;
 import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
 import org.alfresco.repo.jscript.BaseScopableProcessorExtension;
 import org.alfresco.repo.jscript.ScriptNode;
 import org.alfresco.scripts.ScriptException;
+import org.alfresco.service.cmr.repository.NodeRef;
 
 /**
  * Records management service
@@ -39,13 +45,49 @@ import org.alfresco.scripts.ScriptException;
 public class ScriptRecordsManagmentService extends BaseScopableProcessorExtension
                                            implements RecordsManagementModel 
 {
+    /** Notification values */
+    private String notificationRole;
+    private String notificationSubject;
+    
+    /** Records management service registry */
     private RecordsManagementServiceRegistry rmServices;
     
+    /**
+     * Set records management service registry 
+     * 
+     * @param rmServices    records management service registry
+     */
     public void setRecordsManagementServiceRegistry(RecordsManagementServiceRegistry rmServices)
     {
         this.rmServices = rmServices;
     }
     
+    /**
+     * Sets the notification role
+     * 
+     * @param notificationRole  notification role
+     */
+    public void setNotificationRole(String notificationRole)
+    {
+        this.notificationRole = notificationRole;
+    }
+    
+    /**
+     * Sets the notification subject
+     * 
+     * @param notificationSubject   notification subject
+     */
+    public void setNotificationSubject(String notificationSubject)
+    {
+        this.notificationSubject = notificationSubject;
+    }
+    
+    /**
+     * Get records management node
+     * 
+     * @param node                          script node
+     * @return ScriptRecordsManagementNode  records management script node
+     */
     public ScriptRecordsManagmentNode getRecordsManagementNode(ScriptNode node)
     {
         ScriptRecordsManagmentNode result = null;
@@ -53,7 +95,7 @@ public class ScriptRecordsManagmentService extends BaseScopableProcessorExtensio
         if (rmServices.getNodeService().hasAspect(node.getNodeRef(), ASPECT_FILE_PLAN_COMPONENT) == true)
         {
             // TODO .. at this point determine what type of records management node is it and 
-            //         create the appropariate sub-type
+            //         create the appropriate sub-type
             result = new ScriptRecordsManagmentNode(node.getNodeRef(), rmServices);
         }
         else
@@ -88,5 +130,29 @@ public class ScriptRecordsManagmentService extends BaseScopableProcessorExtensio
     {
         RecordsManagementSecurityService securityService = rmServices.getRecordsManagementSecurityService();
         securityService.deletePermission(node.getNodeRef(), authority, permission);
+    }
+    
+    /**
+     * Sends an email notification to everyone in the notification role
+     */
+    public void sendNotification(String notificationEvent, String notificationType, ScriptNode node)
+    {
+        // Create notification data
+        Map<String, Object> notificationData = new HashMap<String, Object>();
+        notificationData.put("record", node.getNodeRef());
+        notificationData.put("subject", notificationSubject);
+        
+        // Get records management root node
+        RecordsManagementService rmService = rmServices.getRecordsManagementService();
+        NodeRef rmRootNode = rmService.getRecordsManagementRoot(node.getNodeRef());
+        
+        // Send the notification
+        RecordsManagementNotificationService rmNotification = rmServices.getRecordsManagementNotificationService();
+        rmNotification.sendNotificationToRole(
+                notificationEvent, 
+                notificationType, 
+                rmRootNode, 
+                notificationRole, 
+                notificationData);
     }
 }

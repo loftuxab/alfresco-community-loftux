@@ -1,9 +1,7 @@
-Alfresco Records Management
-
-Records due for review notification.
+The following vital records are due for review:
 
 <#list records as record>   
-     ${record.identifier!} ${record.name!}<#if record_has_next>,
+     - ${record.properties["rma:identifier"]!} ${record.properties["cm:name"]!}<#if record_has_next>,
      </#if>
 </#list>
 

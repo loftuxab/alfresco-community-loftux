@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditService;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
+import org.alfresco.module.org_alfresco_module_dod5015.notification.RecordsManagementNotificationService;
 import org.alfresco.module.org_alfresco_module_dod5015.security.RecordsManagementSecurityService;
 import org.alfresco.repo.service.ServiceDescriptorRegistry;
 
@@ -84,5 +85,13 @@ public class RecordsManagementServiceRegistryImpl extends ServiceDescriptorRegis
     public RecordsManagementAuditService getRecordsManagementAuditService()
     {
         return (RecordsManagementAuditService)getService(RECORDS_MANAGEMENT_AUDIT_SERVICE);
+    }
+    
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistry#getRecordsManagementNotificationService()
+     */
+    public RecordsManagementNotificationService getRecordsManagementNotificationService()
+    {
+        return (RecordsManagementNotificationService)getService(RECORDS_MANAGEMENT_NOTIFICATION_SERVICE);
     }
 }

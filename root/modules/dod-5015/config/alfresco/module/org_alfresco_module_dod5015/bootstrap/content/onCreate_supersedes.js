@@ -5,7 +5,11 @@
  */
 function main()
 {
-   logger.log("Record " + node.name + " has been superseded");
+   // Log debug message
+   logger.log("Record " + node.name + " has been superseded.  Sending notification");
+   
+   // Send notification
+   rmService.sendNotification("superseded", "email", node);
 }
 
 main();

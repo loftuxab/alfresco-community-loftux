@@ -12,7 +12,7 @@ function main()
     
     var capability = capabilities[0];
     test.assertNotNull(capability);
-    test.assertNotNull(capability.name);
+    test.assertNotNull(capability.name);    
 }
 
 main();

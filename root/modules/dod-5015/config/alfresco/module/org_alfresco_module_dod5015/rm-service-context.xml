@@ -681,8 +681,8 @@
     <!-- Search Behaviour -->
     
     <bean id="recordsManagementSearchBehaviour" class="org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour" init-method="init">        
-        <property name="nodeService" ref="NodeService"/>
-        <property name="recordsManagementService" ref="RecordsManagementService"/>
+        <property name="nodeService" ref="nodeService"/>
+        <property name="recordsManagementService" ref="recordsManagementService"/>
         <property name="recordsManagementServiceRegistry" ref="RecordsManagementServiceRegistry"/>
         <property name="policyComponent" ref="policyComponent"/>
     </bean>
