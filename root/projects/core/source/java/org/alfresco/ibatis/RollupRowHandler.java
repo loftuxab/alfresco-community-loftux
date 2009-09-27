@@ -57,7 +57,7 @@ import com.ibatis.sqlmap.client.event.RowHandler;
  * </code></pre>
  * Example usage:
  * <code><pre>
-        RowHandler shreddedRowHandler = new RowHandler()
+        RowHandler rowHandler = new RowHandler()
         {
             public void handleRow(Object valueObject)
             {
@@ -67,7 +67,7 @@ import com.ibatis.sqlmap.client.event.RowHandler;
         RollupRowHandler rollupRowHandler = new RollupRowHandler(
                 new String[] {"auditEntryId"},
                 "auditValues",
-                shreddedRowHandler,
+                rowHandler,
                 maxResults);
         
         if (maxResults > 0)
