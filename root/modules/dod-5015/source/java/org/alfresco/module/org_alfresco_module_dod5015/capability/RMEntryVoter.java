@@ -1644,8 +1644,13 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             QName type = getType(voter.getNodeService(), invocation, params, cad.parameters.get(1), cad.parent);
             // linkee is not null for creating secondary child assocs
             NodeRef linkee = getTestNode(voter.getNodeService(), invocation, params, cad.parameters.get(1), cad.parent);
+            QName assocType = null;
+            if(cad.parameters.size() > 2)
+            {
+                assocType = getType(voter.getNodeService(), invocation, params, cad.parameters.get(2), cad.parent);
+            }
 
-            return voter.getCreateCapability().evaluate(destination, linkee, type);
+            return voter.getCreateCapability().evaluate(destination, linkee, type, assocType);
         }
 
     }
