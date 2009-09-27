@@ -26,6 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.capability.group;
 
 import net.sf.acegisecurity.vote.AccessDecisionVoter;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.impl.AbstractCapability;
@@ -44,10 +45,10 @@ public class CreateCapability extends AbstractGroupCapability
     @Override
     protected int hasPermissionImpl(NodeRef nodeRef)
     {
-        return evaluate(nodeRef, null, null);
+        return evaluate(nodeRef, null, null, null);
     }
 
-    public int evaluate(NodeRef destination, NodeRef linkee, QName type)
+    public int evaluate(NodeRef destination, NodeRef linkee, QName type, QName assocType)
     {
         if (linkee != null)
         {
@@ -58,6 +59,30 @@ public class CreateCapability extends AbstractGroupCapability
         }
         if (isRm(destination))
         {
+            if ( ((assocType == null) || !assocType.equals(ContentModel.ASSOC_CONTAINS)))
+            {
+                if(linkee == null)
+                {
+                    if(isRecord(destination) && !isDeclared(destination))
+                    {
+                        if (voter.getPermissionService().hasPermission(destination, RMPermissionModel.FILE_RECORDS) == AccessStatus.ALLOWED)
+                        {
+                            return AccessDecisionVoter.ACCESS_GRANTED;
+                        }
+                    }   
+                }
+                else
+                {
+                    if(isRecord(linkee) && isRecord(destination) && !isDeclared(destination))
+                    {
+                        if (voter.getPermissionService().hasPermission(destination, RMPermissionModel.FILE_RECORDS) == AccessStatus.ALLOWED)
+                        {
+                            return AccessDecisionVoter.ACCESS_GRANTED;
+                        }
+                    }
+                }
+              
+            }
             if (checkFilingUnfrozenUncutoffOpen(destination) == AccessDecisionVoter.ACCESS_GRANTED)
             {
                 if (isRecordFolder(voter.getNodeService().getType(destination)))
@@ -68,7 +93,7 @@ public class CreateCapability extends AbstractGroupCapability
                     }
                 }
             }
-            else if ((checkFilingUnfrozenUncutoff(destination) == AccessDecisionVoter.ACCESS_GRANTED) && isClosed(destination))
+            if ((checkFilingUnfrozenUncutoff(destination) == AccessDecisionVoter.ACCESS_GRANTED) && isClosed(destination))
             {
                 if (isRecordFolder(voter.getNodeService().getType(destination)))
                 {
@@ -78,7 +103,7 @@ public class CreateCapability extends AbstractGroupCapability
                     }
                 }
             }
-            else if ((checkFilingUnfrozen(destination) == AccessDecisionVoter.ACCESS_GRANTED) && isCutoff(destination))
+            if ((checkFilingUnfrozen(destination) == AccessDecisionVoter.ACCESS_GRANTED) && isCutoff(destination))
             {
                 if (isRecordFolder(voter.getNodeService().getType(destination)))
                 {
@@ -102,6 +127,10 @@ public class CreateCapability extends AbstractGroupCapability
             return AccessDecisionVoter.ACCESS_GRANTED;
         }
         if (voter.createModifyDestroyFileplanMetadataCapability.evaluate(destination) == AccessDecisionVoter.ACCESS_GRANTED)
+        {
+            return AccessDecisionVoter.ACCESS_GRANTED;
+        }
+        if (voter.getChangeOrDeleteReferencesCapability().evaluate(destination, linkee) == AccessDecisionVoter.ACCESS_GRANTED)
         {
             return AccessDecisionVoter.ACCESS_GRANTED;
         }

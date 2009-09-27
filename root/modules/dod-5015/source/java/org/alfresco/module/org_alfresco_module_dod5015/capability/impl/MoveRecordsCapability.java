@@ -75,7 +75,7 @@ public class MoveRecordsCapability extends AbstractCapability
             {
                 QName type = voter.getNodeService().getType(movee);
                 // now we know the node - we can abstain for certain types and aspects (eg, rm)
-                state = voter.createCapability.evaluate(destination, movee, type);
+                state = voter.createCapability.evaluate(destination, movee, type, null);
 
                 if (state == AccessDecisionVoter.ACCESS_GRANTED)
                 {

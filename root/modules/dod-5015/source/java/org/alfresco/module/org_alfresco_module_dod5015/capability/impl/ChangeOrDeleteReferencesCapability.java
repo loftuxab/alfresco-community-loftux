@@ -64,17 +64,31 @@ public class ChangeOrDeleteReferencesCapability extends AbstractCapability
     {
         if (isRm(source))
         {
-            if (isRm(target))
+            if (target != null)
+            {
+                if (isRm(target))
+                {
+                    if (checkFilingUnfrozen(source) == AccessDecisionVoter.ACCESS_GRANTED)
+                    {
+                        if (checkFilingUnfrozen(target) == AccessDecisionVoter.ACCESS_GRANTED)
+                        {
+                            if ((voter.getPermissionService().hasPermission(getFilePlan(source), RMPermissionModel.CHANGE_OR_DELETE_REFERENCES) == AccessStatus.ALLOWED)
+                                    && (voter.getPermissionService().hasPermission(getFilePlan(target), RMPermissionModel.CHANGE_OR_DELETE_REFERENCES) == AccessStatus.ALLOWED))
+                            {
+                                return AccessDecisionVoter.ACCESS_GRANTED;
+                            }
+                        }
+                    }
+                }
+            }
+            else
             {
                 if (checkFilingUnfrozen(source) == AccessDecisionVoter.ACCESS_GRANTED)
                 {
-                    if (checkFilingUnfrozen(target) == AccessDecisionVoter.ACCESS_GRANTED)
+                    if ((voter.getPermissionService().hasPermission(getFilePlan(source), RMPermissionModel.CHANGE_OR_DELETE_REFERENCES) == AccessStatus.ALLOWED)
+                            && (voter.getPermissionService().hasPermission(getFilePlan(target), RMPermissionModel.CHANGE_OR_DELETE_REFERENCES) == AccessStatus.ALLOWED))
                     {
-                        if ((voter.getPermissionService().hasPermission(getFilePlan(source), RMPermissionModel.CHANGE_OR_DELETE_REFERENCES) == AccessStatus.ALLOWED)
-                                && (voter.getPermissionService().hasPermission(getFilePlan(target), RMPermissionModel.CHANGE_OR_DELETE_REFERENCES) == AccessStatus.ALLOWED))
-                        {
-                            return AccessDecisionVoter.ACCESS_GRANTED;
-                        }
+                        return AccessDecisionVoter.ACCESS_GRANTED;
                     }
                 }
             }
