@@ -147,6 +147,20 @@
                     </view:properties>
                     <view:associations></view:associations>
                   </cm:content>
+                  <cm:content view:childName="cm:record-superseded-email.ftl">
+	                   <view:aspects>
+	                      <cm:titled></cm:titled>
+	                   </view:aspects>
+	                   <view:properties>
+	                      <sys:store-protocol>workspace</sys:store-protocol>
+	                      <sys:store-identifier>SpacesStore</sys:store-identifier>	                      
+                  	      <sys:node-uuid>record_superseded_template</sys:node-uuid>
+	                      <cm:description>Record superseded email template.</cm:description>
+	                      <cm:content>contentUrl=classpath:alfresco/module/org_alfresco_module_dod5015/bootstrap/content/record-superseded-email.ftl|mimetype=text/plain|encoding=UTF-8</cm:content>
+	                      <cm:title>record-superseded-email.ftl</cm:title>
+	                      <cm:name>record-superseded-email.ftl</cm:name>
+	                   </view:properties>
+	               </cm:content>
                </cm:contains>
             </view:associations>
          </cm:folder>

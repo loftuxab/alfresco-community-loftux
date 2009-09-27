@@ -37,6 +37,11 @@ import org.alfresco.service.cmr.repository.NodeRef;
  */
 public interface RecordsManagementNotificationService 
 {
+    /** TODO Temporary constants */
+    public static final String NT_EMAIL = "email";
+    public static final String NE_DUE_FOR_REVIEW = "dueForReview";
+    public static final String NE_SUPERSEDED = "superseded";
+        
     /**
      * Get notification events
      * 

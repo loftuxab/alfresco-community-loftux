@@ -25,33 +25,25 @@
 
 package org.alfresco.module.org_alfresco_module_dod5015.job;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
-import org.alfresco.repo.action.executer.MailActionExecuter;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.notification.RecordsManagementNotificationService;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
-import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.action.Action;
-import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.repository.TemplateService;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -71,23 +63,13 @@ public class NotifyOfRecordsDueForReviewJob implements Job
      */
     public void execute(JobExecutionContext context) throws JobExecutionException
     {
-        final NodeService nodeService = (NodeService) context.getJobDetail().getJobDataMap().get(
-                    "nodeService");
-        final SearchService searchService = (SearchService) context.getJobDetail().getJobDataMap().get(
-                    "searchService");
-        final TransactionService trxService = (TransactionService) context.getJobDetail()
-                    .getJobDataMap().get("transactionService");
-        final ActionService actionService = (ActionService) context.getJobDetail()
-                    .getJobDataMap().get("actionService");
-        final TemplateService templateService = (TemplateService) context.getJobDetail()
-                    .getJobDataMap().get("templateService");
-        final String to = (String)context.getJobDetail()
-                    .getJobDataMap().get("to");
-        final String from = (String)context.getJobDetail()
-                    .getJobDataMap().get("from");
-        final String subject = (String)context.getJobDetail()
-                    .getJobDataMap().get("subject");
-        final String template = "/app:company_home/app:dictionary/cm:records_management/cm:records_management_email_templates/cm:notify-records-due-for-review-email.ftl";
+        final RecordsManagementService rmService = (RecordsManagementService)context.getJobDetail().getJobDataMap().get("recordsManagementService");
+        final RecordsManagementNotificationService notificaitonService = (RecordsManagementNotificationService)context.getJobDetail().getJobDataMap().get("recordsManagementNotificationService");        
+        final NodeService nodeService = (NodeService) context.getJobDetail().getJobDataMap().get("nodeService");
+        final SearchService searchService = (SearchService) context.getJobDetail().getJobDataMap().get("searchService");
+        final TransactionService trxService = (TransactionService) context.getJobDetail().getJobDataMap().get("transactionService");       
+        final String subject = (String)context.getJobDetail().getJobDataMap().get("subject");
+        final String role = (String)context.getJobDetail().getJobDataMap().get("role");
         
         if (logger.isDebugEnabled())
         {
@@ -98,91 +80,50 @@ public class NotifyOfRecordsDueForReviewJob implements Job
         {
             public Object doWork() throws Exception
             {
-                /**
-                 *  Query is for all records that are due for review and for which
-                 *  notification has not been sent.
-                 */
+                // Query is for all records that are due for review and for which
+                // notification has not been sent.
                 StringBuilder queryBuffer = new StringBuilder();
-                queryBuffer.append("+ASPECT:\"rma:vitalRecord\" ");
-                
+                queryBuffer.append("+ASPECT:\"rma:vitalRecord\" ");                
                 queryBuffer.append("+(@rma\\:reviewAsOf:[MIN TO NOW] ) ");
                 queryBuffer.append("+( ");
-                    queryBuffer.append("@rma\\:notificationIssued:false "); 
-                    queryBuffer.append("OR ISNULL:\"rma:notificationIssued\" ");
-                queryBuffer.append(") ");
+                queryBuffer.append("@rma\\:notificationIssued:false "); 
+                queryBuffer.append("OR ISNULL:\"rma:notificationIssued\" ");
+                queryBuffer.append(") ");                
                 String query = queryBuffer.toString();
 
-                ResultSet results = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
-                            SearchService.LANGUAGE_LUCENE, query);
+                ResultSet results = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, SearchService.LANGUAGE_LUCENE, query);
              
-                final List<NodeRef> resultNodes = results.getNodeRefs();
-                
-                if (logger.isDebugEnabled())
+                final List<NodeRef> resultNodes = results.getNodeRefs();                
+                if (logger.isDebugEnabled() == true)
                 {
                     logger.debug("Found " + resultNodes.size() + " nodes due for review and without notification.");
-                }
-                
-                /**
-                 * Search for the email template
-                 */
-                ResultSet templateResults = searchService.query(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE,
-                            SearchService.LANGUAGE_XPATH, template);
-                
-                final List<NodeRef> templateNodes = templateResults.getNodeRefs();
-                if(templateNodes.size() == 0)
-                {
-                    logger.error("Notify Records Job, unable to find email template:" + template);
-                }
+                }                
                     
-                /**
-                 * If we have something to do and a template to do it with
-                 */
-                if(resultNodes.size() > 0 && templateNodes.size() > 0)
+                //If we have something to do and a template to do it with
+                if(resultNodes.size() != 0)
                 {
-                    final NodeRef templateNodeRef = templateNodes.get(0);
-                    
-                    /**
-                     * Set the notification issued property
-                     */
                     RetryingTransactionHelper trn = trxService.getRetryingTransactionHelper();
                     
-                    /**
-                     * Send the email message - but we must not retry since email is not transactional
-                     */
+                    //Send the email message - but we must not retry since email is not transactional
                     RetryingTransactionCallback<Boolean> txCallbackSendEmail = new RetryingTransactionCallback<Boolean>()
                     {
                         // Set the notification issued property.
                         public Boolean execute() throws Throwable
                         {
-                            List<Map<String,Object>> arrayList = new ArrayList<Map<String,Object>>();
+                            // Find the root
+                            NodeRef root = rmService.getRecordsManagementRoot(resultNodes.get(0));
                             
+                            // Send the notification to the role specified
                             Map<String, Object> model = new HashMap<String, Object>(8, 1.0f);
-                    
-                            for (NodeRef currentNode : resultNodes)
-                            {
-                                Map<QName, Serializable> props = nodeService.getProperties(currentNode);
-                                Map<String, Object> record = new HashMap<String, Object>();
-                                for(QName key : props.keySet())
-                                {
-                                    record.put(key.toPrefixString().replace(":", "_"), props.get(key));
-                                }
-                                arrayList.add(record);
-                            }
-                    
-                            model.put("records", arrayList);
+                            model.put("records", resultNodes);   
+                            model.put("subject", subject);
+                            notificaitonService.sendNotificationToRole(
+                                    RecordsManagementNotificationService.NE_DUE_FOR_REVIEW, 
+                                    RecordsManagementNotificationService.NT_EMAIL, 
+                                    root, 
+                                    role, 
+                                    model);   
                             
-                            String emailText = templateService.processTemplate(templateNodeRef.toString(), model);  
-                            
-                            /**
-                             * Send an email for the records management notification
-                             */
-                            Action emailAction = actionService.createAction("mail");
-                            emailAction.setParameterValue(MailActionExecuter.PARAM_TO, to);
-                            emailAction.setParameterValue(MailActionExecuter.PARAM_FROM, from);
-                            emailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, subject);
-                            emailAction.setParameterValue(MailActionExecuter.PARAM_TEXT, emailText);
-                            emailAction.setExecuteAsynchronously(false);
-                            actionService.executeAction(emailAction, null);
                             return null;
                         }
                     };

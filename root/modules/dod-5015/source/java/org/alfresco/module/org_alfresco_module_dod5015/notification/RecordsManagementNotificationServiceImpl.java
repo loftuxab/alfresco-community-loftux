@@ -49,6 +49,8 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PersonService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Records management notification service implementation
@@ -57,6 +59,10 @@ import org.alfresco.service.cmr.security.PersonService;
  */
 public class RecordsManagementNotificationServiceImpl implements RecordsManagementNotificationService
 {
+    /** Log */
+    @SuppressWarnings("unused")
+    private static Log logger = LogFactory.getLog(RecordsManagementNotificationServiceImpl.class);
+    
     /** Authority service */
     private AuthorityService authorityService;
     
@@ -77,15 +83,6 @@ public class RecordsManagementNotificationServiceImpl implements RecordsManageme
     
     /** Records management security service */
     private RecordsManagementSecurityService recordsManagementSecurityService;
-    
-    // TODO the following constants should not be hard coded, but sprung together
-    
-    /** EMail notification type */
-    private static final String NT_EMAIL = "email";
-    
-    /** Notification event constants */
-    private static final String NE_DUE_FOR_REVIEW = "dueForReview";
-    private static final String NE_REFERENCE_CREATED = "referenceCreated";
     
     /** Notification events */
     private Map<String, NodeRef> notificationEvents;
@@ -207,7 +204,7 @@ public class RecordsManagementNotificationServiceImpl implements RecordsManageme
             // TODO for now manually initialise the notification events linking them to their templates
             notificationEvents = new HashMap<String, NodeRef>(2);
             notificationEvents.put(NE_DUE_FOR_REVIEW, templateNodes.get(0));
-            notificationEvents.put(NE_REFERENCE_CREATED, null);
+            notificationEvents.put(NE_SUPERSEDED, new NodeRef(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, "record_superseded_template"));
         }
         
         return notificationEvents;
@@ -292,13 +289,18 @@ public class RecordsManagementNotificationServiceImpl implements RecordsManageme
                         String subject = (String)notificationData.get("subject");  
                         String body = generateNotificationEventContent(notificationEvent, notificationData);
                         
+                        if (logger.isDebugEnabled() == true)
+                        {
+                            logger.debug("Sending notificaiton email to " + to);
+                        }
+                        
                         // Send email
                         Action emailAction = actionService.createAction("mail");
                         emailAction.setParameterValue(MailActionExecuter.PARAM_TO, to);
                         emailAction.setParameterValue(MailActionExecuter.PARAM_FROM, emailFrom);
                         emailAction.setParameterValue(MailActionExecuter.PARAM_SUBJECT, subject);
                         emailAction.setParameterValue(MailActionExecuter.PARAM_TEXT, body);
-                        emailAction.setExecuteAsynchronously(false);
+                        emailAction.setExecuteAsynchronously(true);
                         actionService.executeAction(emailAction, null);
                     }
                     // If no email address for user is found, don't send notification!
@@ -306,7 +308,7 @@ public class RecordsManagementNotificationServiceImpl implements RecordsManageme
                 else
                 {
                     throw new AlfrescoRuntimeException("The notification type " + notificationType + " is currently unsupported.");
-                }
+                }                
                 
                 return null;
             }
