@@ -89,10 +89,11 @@
             pathUrl = "/",
             folders = [];
          
-         // create an array of paths
          var path = folderData.location.path;
-         if (path.length < 2)
+         // Document Library root node
+         if (path == "/" + folderData.location.file)
          {
+            // Root node link to contain current folder highlight parameter
             pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
             {
                file: "?file=" + encodeURIComponent(folderData.fileName)
@@ -101,14 +102,10 @@
          }
          else
          {
-            // Document Library root node
             pathHtml += '<span class="path-link"><a href="' + rootLinkUrl + '">' + this.msg("path.documents") + '</a></span>';
+         }
 
-            folders = path.substring(1, path.length).split("/");
-         }   
-
-         folders.push(folderData.fileName);
-         
+         folders = path.substring(1, path.length).split("/");
          pathHtml += '<span class="separator"> &gt; </span>';
          
          for (var x = 0, y = folders.length; x < y; x++)
