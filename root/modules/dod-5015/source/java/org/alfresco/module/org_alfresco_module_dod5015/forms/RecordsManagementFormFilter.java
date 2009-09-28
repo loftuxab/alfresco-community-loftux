@@ -8,6 +8,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementServiceRegistry;
 import org.alfresco.repo.forms.FieldGroup;
 import org.alfresco.repo.forms.Form;
 import org.alfresco.repo.forms.FormData;
@@ -40,6 +41,7 @@ public abstract class RecordsManagementFormFilter<ItemType> extends AbstractFilt
 
     protected NamespaceService namespaceService;
     protected NodeService nodeService;
+    protected RecordsManagementServiceRegistry rmServiceRegistry;
     protected RecordsManagementService rmService;
     protected RecordsManagementAdminService rmAdminService;
 
@@ -63,6 +65,16 @@ public abstract class RecordsManagementFormFilter<ItemType> extends AbstractFilt
         this.nodeService = nodeService;
     }
 
+    /**
+     * Sets the RecordsManagementServiceRegistry instance
+     * 
+     * @param rmServiceRegistry The RecordsManagementServiceRegistry instance
+     */
+    public void setRecordsManagementServiceRegistry(RecordsManagementServiceRegistry rmServiceRegistry)
+    {
+        this.rmServiceRegistry = rmServiceRegistry;
+    }
+    
     /**
      * Sets the RecordsManagementService instance
      * 

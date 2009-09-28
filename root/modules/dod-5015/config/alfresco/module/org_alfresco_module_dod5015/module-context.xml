@@ -176,6 +176,7 @@
        <property name="namespaceService" ref="NamespaceService"/>
        <property name="nodeService" ref="NodeService"/>
        <property name="dictionaryService" ref="DictionaryService" />
+       <property name="recordsManagementServiceRegistry" ref="RecordsManagementServiceRegistry" />
        <property name="recordsManagementService" ref="recordsManagementService"/>
        <property name="recordsManagementAdminService" ref="recordsManagementAdminService"/>
     </bean>
@@ -185,6 +186,7 @@
        <property name="filterRegistry" ref="typeFilterRegistry" />
        <property name="namespaceService" ref="NamespaceService"/>
        <property name="nodeService" ref="NodeService"/>
+       <property name="recordsManagementServiceRegistry" ref="RecordsManagementServiceRegistry" />
        <property name="recordsManagementService" ref="recordsManagementService"/>
        <property name="recordsManagementAdminService" ref="recordsManagementAdminService"/>
     </bean>
