@@ -17,7 +17,6 @@
       initialPath: "${page.url.args["path"]!""}",
       <@initialFilter />
       usePagination: ${(args.pagination!false)?string},
-      highlightFile: "${page.url.args["file"]!""}",
       showFolders: ${(preferences.showFolders!false)?string},
       simpleView: ${(preferences.simpleView!false)?string},
       highlightFile: "${page.url.args["file"]!""}",

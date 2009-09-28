@@ -18,11 +18,6 @@
    visibility: visible;
 }
 
-.document-actions .action-set
-{
-   visibility: hidden;
-}
-
 .document-actions .doclist .action-set a,
 .document-actions .doclist .action-set a:visited
 {

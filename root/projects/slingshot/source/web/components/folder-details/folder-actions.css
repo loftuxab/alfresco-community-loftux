@@ -18,11 +18,6 @@
    visibility: visible;
 }
 
-.folder-actions .action-set
-{
-   visibility: hidden;
-}
-
 .folder-actions .doclist .action-set a,
 .folder-actions .doclist .action-set a:visited
 {

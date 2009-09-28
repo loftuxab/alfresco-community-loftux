@@ -3362,7 +3362,13 @@ Alfresco.util.Anim = function()
 }();
 
 /**
- * Helper class for managing nodeRefs
+ * Helper class for managing nodeRefs.
+ * Provides helper properties for obtaining various parts and formats of nodeRefs.
+ * <pre>
+ *    nodeRef: return nodeRef as passed-in
+ *    storeType, storeId, id: return individual nodeRef parts
+ *    uri: return nodeRef in "uri" format, i.e. without ":/" between storeType and storeId
+ * </pre>
  *
  * @class Alfresco.util.NodeRef
  */
@@ -3374,7 +3380,8 @@ Alfresco.util.Anim = function()
       
       try
       {
-         var a = nodeRef.replace(":/", "").split("/");
+         this.uri = nodeRef.replace(":/", "");
+         var a = this.uri.split("/");
          this.storeType = a[0];
          this.storeId = a[1];
          this.id = a[2];
@@ -3389,7 +3396,8 @@ Alfresco.util.Anim = function()
          nodeRef: this.nodeRef,
          storeType: this.storeType,
          storeId: this.storeId,
-         id: this.id
+         id: this.id,
+         uri: this.uri
       });
    };
 })();
