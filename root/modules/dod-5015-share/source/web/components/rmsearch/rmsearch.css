@@ -109,3 +109,9 @@
 {
    cursor: pointer;
 }
+
+.search .yuimenubaritemlabel, 
+.search .yuimenuitemlabel
+{
+   color: #000 !important;
+}

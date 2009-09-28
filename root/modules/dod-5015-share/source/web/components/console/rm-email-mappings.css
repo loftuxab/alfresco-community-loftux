@@ -39,11 +39,16 @@
 .emailMappings .yuimenubaritemlabel, 
 .emailMappings .yuimenuitemlabel
 {
-   font-size:100%;
+   font-size: 100%;
+   color: #000 !important;
 }
 
-.emailMappings .emailProperty-menu,
-.emailMappings .rmProperty-menu
+.emailMappings .yuimenuitemlabel-selected
+{
+   background-color: #6CA5CE
+}
+
+.emailMappings .emailProperty-menu
 {
    visibility:hidden;
 }

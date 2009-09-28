@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -65,6 +65,7 @@
       
       YAHOO.Bubbling.on("savedSearchAdded", this.onSavedSearchAdded, this);
       YAHOO.Bubbling.on("searchComplete", this.onSearchComplete, this);
+      YAHOO.Bubbling.on("PropertyMenuSelected", this.onPropertyMenuSelected, this);
       
       return this;
    };
@@ -115,23 +116,6 @@
                scope: this
             },
             failureMessage: me._msg("message.errorloadsearches")
-         });
-         
-         // Field insert menu
-         this.widgets.insertFieldMenu = new YAHOO.widget.Button(this.id + "-insertfield",
-         {
-            type: "menu",
-            menu: this.id + "-insertfield-menu"
-         });
-         this.widgets.insertFieldMenu.getMenu().subscribe("click", function(p_sType, p_aArgs)
-         {
-            var menuItem = p_aArgs[1];
-            if (menuItem)
-            {
-               // get the namespaced attribute name (e.g. rma:location)
-               var attribute = ' ' + menuItem.value + ':';
-               Alfresco.util.insertAtCursor(Dom.get(me.id + "-terms"), attribute);
-            }
          });
          
          // construct the date picker calendar
@@ -450,6 +434,18 @@
          input.name = "nodeRefs";
          input.value = this.resultNodeRefs.join(",");
          form.submit();
+      },
+      
+      /**
+       * Bubbling event handler called when a value from the field insert selection menu has been picked
+       */
+      onPropertyMenuSelected: function RecordsSearch_onPropertyMenuSelected(e, args)
+      {
+         var item = args[1];
+         
+         // get the namespaced attribute name (e.g. rma:location) and insert
+         var attribute = ' ' + item.value + ':';
+         Alfresco.util.insertAtCursor(Dom.get(this.id + "-terms"), attribute);
       },
       
       /**
