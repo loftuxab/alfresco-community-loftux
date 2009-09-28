@@ -270,7 +270,15 @@
         <property name="recordsManagementSecurityService" ref="RecordsManagementSecurityService"/>
     </bean>
     
+    <!-- REST impl for GET applydodcertmodelfixes -->
+    <!-- This webscript is intended for patching the RM custom model during the DoD certification process. -->
+    <!-- TODO Delete this webscript after the certification process -->
+    <bean id="webscript.org.alfresco.rma.applydodcertmodelfixes.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.ApplyDodCertModelFixesGet" parent="webscript">
+        <property name="contentService" ref="ContentService" />
+    </bean>
+
     <!-- REST impl for GET applyfixmob1573 -->
+    <!-- TODO Delete this webscript after the certification process -->
     <bean id="webscript.org.alfresco.rma.applyfixmob1573.get" class="org.alfresco.module.org_alfresco_module_dod5015.script.ApplyFixMob1573Get" parent="webscript">
         <property name="contentService" ref="ContentService" />
     </bean>
