@@ -731,12 +731,20 @@
           */
          var renderCellDescription = function DL_renderCellDescription(elCell, oRecord, oColumn, oData)
          {
-            var desc = "", description, docDetailsUrl, tags, tag, i, j;
+            var desc = "", docDetailsUrl, tags, tag, i, j;
             var record = oRecord.getData(),
                type = record.type,
                isLink = record.isLink,
-               locn = record.location;
+               locn = record.location,
+               title = "",
+               description = record.description || me.msg("details.description.none");
             
+            // Use title property if it's available
+            if (record.title && record.title !== record.fileName)
+            {
+               title = '<span class="title">(' + $html(record.title) + ')</span>';
+            }
+
             // Link handling
             if (isLink)
             {
@@ -749,7 +757,7 @@
                 * Folders
                 */
                desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '">';
-               desc += $html(record.displayName) + '</a></h3>';
+               desc += $html(record.displayName) + '</a>' + title + '</h3>';
 
                if (me.options.simpleView)
                {
@@ -766,11 +774,6 @@
                    */
                   desc += '<div class="detail"><span class="item"><em>' + me.msg("details.modified.on") + '</em> ' + Alfresco.util.formatDate(record.modifiedOn) + '</span>';
                   desc += '<span class="item"><em>' + me.msg("details.modified.by") + '</em> <a href="' + Alfresco.DocumentList.generateUserProfileUrl(record.modifiedByUser) + '">' + $html(record.modifiedBy) + '</a></span></div>';
-                  description = record.description;
-                  if (description === "")
-                  {
-                     description = me.msg("details.description.none");
-                  }
                   desc += '<div class="detail"><span class="item"><em>' + me.msg("details.description") + '</em> ' + $links($html(description)) + '</span></div>';
                   /* Tags */
                   tags = record.tags;
@@ -797,7 +800,9 @@
                 */
                docDetailsUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + me.options.siteId + "/document-details?nodeRef=" + record.nodeRef;
                 
-               desc = '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(me, oRecord) + '<span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">' + $html(record.displayName) + '</a></span></h3>';
+               desc = '<h3 class="filename">' + Alfresco.DocumentList.generateFavourite(me, oRecord) + '<span id="' + me.id + '-preview-' + oRecord.getId() + '"><a href="' + docDetailsUrl + '">';
+               desc += $html(record.displayName) + '</a></span>' + title + '</h3>';
+               
                if (me.options.simpleView)
                {
                   /**
@@ -811,12 +816,6 @@
                   /**
                    * Detailed View
                    */
-                  description = record.description;
-                  if (description === "")
-                  {
-                     description = me.msg("details.description.none");
-                  }
-
                   if (record.status.indexOf("workingCopy") != -1)
                   {
                      /**

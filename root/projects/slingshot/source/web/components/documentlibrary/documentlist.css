@@ -235,7 +235,7 @@
    padding-bottom: 0.2em;
    padding-top: 0.2em;
 }
-.doclist .documents h3.filename span.filename
+.doclist .documents h3.filename span.title
 {
    color: #606060;
    font-size: 82%;
