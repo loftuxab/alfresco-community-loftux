@@ -41,14 +41,14 @@ function main()
    var myConfig = new XML(config.script),
       prefActions = preferences.actions || {};
    
-   for each(var xmlActionSet in myConfig..actionSet)
+   for each (var xmlActionSet in myConfig..actionSet)
    {
       actionSet = [];
       actionSetId = xmlActionSet.@id.toString();
       prefActionSet = prefActions[actionSetId] || {};
       defaultOrder = 100;
       
-      for each(var xmlAction in xmlActionSet..action)
+      for each (var xmlAction in xmlActionSet..action)
       {
          defaultOrder++;
          actionId = xmlAction.@id.toString();

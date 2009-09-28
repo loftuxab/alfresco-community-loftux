@@ -159,7 +159,15 @@
          this.doclistMetadata = args[1].metadata;
          this.currentPath = this.assetData.location.path;
          
-         var actionsContainer = Dom.get(this.id + "-actionSet-document");
+         /**
+          * Copy template into active area
+          */
+         var actionsContainer = Dom.get(this.id + "-actionSet"),
+            actionSet = this.assetData.actionSet,
+            clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
+
+         actionsContainer.innerHTML = clone.innerHTML;
+         Dom.addClass(actionsContainer, this.assetData.type);
          
          /**
           * Token replacement

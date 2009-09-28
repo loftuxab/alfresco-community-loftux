@@ -13,6 +13,11 @@
    <div class="heading">${msg("heading")}</div>
 
    <div class="doclist">
+      <div id="${args.htmlid}-actionSet" class="action-set"></div>
+   </div>
+
+   <!-- Action Set Templates -->
+   <div style="display:none">
 <#list actionSets?keys as key>
    <#assign actionSet = actionSets[key]>
       <div id="${args.htmlid}-actionSet-${key}" class="action-set">

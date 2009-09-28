@@ -31,8 +31,8 @@
       </actionSet>
 
       <actionSet id="folder">
-         <action type="action-link" id="onActionDetails" permission="edit" label="actions.folder.edit-metadata" />
          <action type="simple-link" id="onActionMetadata" href="{folderDetailsUrl}" label="actions.folder.view-metadata" />
+         <action type="action-link" id="onActionDetails" permission="edit" label="actions.folder.edit-metadata" />
          <action type="action-link" id="onActionCopyTo" label="actions.folder.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="delete" label="actions.folder.move-to" />
          <action type="action-link" id="onActionDelete" permission="delete" label="actions.folder.delete" />

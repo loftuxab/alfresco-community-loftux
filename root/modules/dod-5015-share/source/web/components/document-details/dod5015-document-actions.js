@@ -62,19 +62,20 @@
        * The urls to be used when creating links in the action cell
        *
        * @method getActionUrls
+       * @override
        * @return {object} Object literal containing URLs to be substituted in action placeholders
        */
       getActionUrls: function RecordsDocumentActions_getActionUrls()
       {
          var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
-            nodeRef = this.assetData.nodeRef,
+            nodeRef = new Alfresco.util.NodeRef(this.assetData.nodeRef),
             filePlan = this.doclistMetadata.filePlan.replace(":/", "");
 
          return (
          {
             downloadUrl: Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
-            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef,
-            transfersZipUrl: Alfresco.constants.PROXY_URI + "api/node/" + filePlan + "/transfers/" + nodeRef.replace(":/", "").split("/")[2]
+            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef.nodeRef,
+            transfersZipUrl: Alfresco.constants.PROXY_URI + "api/node/" + filePlan + "/transfers/" + nodeRef.id
          });
       }
    }, true);
