@@ -179,14 +179,18 @@ var Evaluator =
       }
 
       // Don't show transfer...
-      if (actionName == "transfer" && asset.parentAssocs["rma:transferred"] != null && asset.parentAssocs["rma:transferred"].length > 0)
+      var assocs = asset.parentAssocs["rma:transferred"];
+      if (actionName == "transfer" && assocs != null && assocs.length > 0)
       {
          delete permissions["transfer"];
+         status["transfer " + assocs[0].name] = true;
       }
       // ...or accession if pending completion
-      if (actionName == "accession" && asset.parentAssocs["rma:ascended"] != null && asset.parentAssocs["rma:ascended"].length > 0)
+      var assocs = asset.parentAssocs["rma:ascended"];
+      if (actionName == "accession" && assocs != null && assocs.length > 0)
       {
          delete permissions["accession"];
+         status["accession " + assocs[0].name] = true;
       }
    },
 
