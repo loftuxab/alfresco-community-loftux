@@ -90,6 +90,7 @@
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getDispositionSchedule=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.getDispositionPeriodProperties=RM.Read.0
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.addDispositionActionDefinition=RM_ALLOW
+                org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.canDispositionActionDefinitionsBeRemoved=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.removeDispositionActionDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.updateDispositionActionDefinition=RM_ALLOW
                 org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService.isNextDispositionActionEligible=RM.Read.0

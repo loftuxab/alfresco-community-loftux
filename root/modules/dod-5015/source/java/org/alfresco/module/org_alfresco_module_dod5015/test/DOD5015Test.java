@@ -1396,8 +1396,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
     
     /**
      * Tests the re-scheduling of disposition lifecycles when steps from the schedule are deleted
+     * (when using folder level disposition)
      */
-    public void testDispositionLifecycle_0318_reschedule_deletion() throws Exception
+    public void testDispositionLifecycle_0318_reschedule_deletion_folderlevel() throws Exception
     {
         final NodeRef recordSeries = TestUtilities.getRecordSeries(searchService, "Reports"); 
         setComplete();
@@ -1511,6 +1512,78 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             }          
         });
         
+        // check the second folder is at step 2 and then attempt to remove a step from the disposition schedule
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                NodeRef folder2NextAction = nodeService.getChildAssocs(recordFolder2, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(folder2NextAction);
+                assertEquals("transfer", (String)nodeService.getProperty(folder2NextAction, PROP_DISPOSITION_ACTION));
+                
+                // check there are 3 steps to the schedule
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(3, actionDefs.size());
+                
+                // attempt to remove step 1 from the schedule
+                try
+                {
+                    rmService.removeDispositionActionDefinition(schedule, actionDefs.get(0));
+                    fail("Expecting the step deletion to be unsuccessful as record folders are present");
+                }
+                catch (AlfrescoRuntimeException are)
+                {
+                    // expected as steps are present, deletion not allowed
+                }
+                
+                return null;
+            }          
+        });
+        
+        // remove both record folders
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // remove record folders
+                nodeService.removeChild(recordCategory, recordFolder1);
+                nodeService.removeChild(recordCategory, recordFolder2);
+                return null;
+            }          
+        });
+        
+        // try removing last schedule step 
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // make sure there are 3 steps
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(3, actionDefs.size());
+                
+                // remove last step, should be successful this time
+                rmService.removeDispositionActionDefinition(schedule, actionDefs.get(2));
+                
+                // make sure there are now 2 steps
+                schedule = rmService.getDispositionSchedule(recordCategory);
+                actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                
+                return null;
+            }          
+        });
+        
+        // *** NOTE: The commented out code below is potential tests for the step deletion behaviour ***
+        // ***       we also need to add tests for deleting the step in the process where records or ***
+        // ***       folders are on the last step i.e. what state should they be in if the last step ***
+        // ***       is removed?                                                                     ***
+        
+        /*
         // check the second folder is at step 2 and remove the first step from the schedule
         transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
         {
@@ -1642,13 +1715,190 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 return null;
             }          
         });
+        */
+    }
+    
+    /**
+     * Tests the re-scheduling of disposition lifecycles when steps from the schedule are deleted
+     * (when using record level disposition)
+     */
+    public void testDispositionLifecycle_0318_reschedule_deletion_recordlevel() throws Exception
+    {
+        final NodeRef recordSeries = TestUtilities.getRecordSeries(searchService, "Reports"); 
+        setComplete();
+        endTransaction();
+        
+        // create a category
+        final NodeRef recordCategory = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordSeries);
+                assertEquals("Reports", nodeService.getProperty(recordSeries, ContentModel.PROP_NAME));
+                        
+                return createRecordCategoryNode(recordSeries);
+            }          
+        });
+        
+        // define the disposition schedule for the category with several steps
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertNotNull(recordCategory);
+                
+                // get the disposition schedule and turn on record level disposition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                nodeService.setProperty(schedule.getNodeRef(), PROP_RECORD_LEVEL_DISPOSITION, true);
+                
+                // define properties for both steps
+                Map<QName, Serializable> step1 = new HashMap<QName, Serializable>();
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "cutoff");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Cutoff when no longer needed");
+                step1.put(RecordsManagementModel.PROP_DISPOSITION_EVENT, "no_longer_needed");
+                
+                Map<QName, Serializable> step2 = new HashMap<QName, Serializable>();
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "transfer");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Transfer after 1 month");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "month|1");
+                step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD_PROPERTY, PROP_DISPOSITION_AS_OF);
+                
+                Map<QName, Serializable> step3 = new HashMap<QName, Serializable>();
+                step3.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "destroy");
+                step3.put(RecordsManagementModel.PROP_DISPOSITION_DESCRIPTION, "Destroy after 1 year");
+                step3.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD, "year|1");
+                step3.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD_PROPERTY, PROP_DISPOSITION_AS_OF);
+                
+                // add the action definitions to the schedule
+                rmService.addDispositionActionDefinition(schedule, step1);
+                rmService.addDispositionActionDefinition(schedule, step2);
+                rmService.addDispositionActionDefinition(schedule, step3);
+                
+                return null;
+            }          
+        });
+        
+        // create first record folder
+        final NodeRef recordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecordFolder(recordCategory, "Record Folder");
+            }
+        });
+        
+        // create a record
+        final NodeRef record = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordFolder);
+                
+                // Create the document
+                Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+                props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+                NodeRef record = nodeService.createNode(recordFolder, 
+                                                           ContentModel.ASSOC_CONTAINS, 
+                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                           ContentModel.TYPE_CONTENT).getChildRef();
+                
+                // Set the content
+                ContentWriter writer = contentService.getWriter(record, ContentModel.PROP_CONTENT, true);
+                writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+                writer.setEncoding("UTF-8");
+                writer.putContent("There is some content in this record");
+                
+                return record;
+            }          
+        });
+        
+        // make sure the disposition lifecycle is present and correct
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertNotNull(record);
+                
+                assertTrue(nodeService.hasAspect(record, ASPECT_DISPOSITION_LIFECYCLE));
+                NodeRef recordNextAction = nodeService.getChildAssocs(record, ASSOC_NEXT_DISPOSITION_ACTION, 
+                            RegexQNamePattern.MATCH_ALL).get(0).getChildRef();
+                assertNotNull(recordNextAction);
+                
+                // make sure the record is on the cutoff step
+                assertEquals("cutoff", nodeService.getProperty(recordNextAction, PROP_DISPOSITION_ACTION));
+                
+                // make sure the record has 1 event
+                assertEquals(1, nodeService.getChildAssocs(recordNextAction, ASSOC_EVENT_EXECUTIONS,
+                            RegexQNamePattern.MATCH_ALL).size());
+                
+                return null;
+            }          
+        });
+        
+        // check for steps in schedule then attempt to delete one
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // check there are 3 steps to the schedule
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(3, actionDefs.size());
+                
+                // attempt to remove step 1 from the schedule
+                try
+                {
+                    rmService.removeDispositionActionDefinition(schedule, actionDefs.get(0));
+                    fail("Expecting the step deletion to be unsuccessful as records are present");
+                }
+                catch (AlfrescoRuntimeException are)
+                {
+                    // expected as steps are present, deletion not allowed
+                }
+                
+                return null;
+            }          
+        });
+        
+        // remove the record (the folder can stay)
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // remove record folders
+                nodeService.removeChild(recordFolder, record);
+                return null;
+            }          
+        });
+        
+        // try removing last schedule step 
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // make sure there are 3 steps
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                List<DispositionActionDefinition> actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(3, actionDefs.size());
+                
+                // remove last step, should be successful this time
+                rmService.removeDispositionActionDefinition(schedule, actionDefs.get(2));
+                
+                // make sure there are now 2 steps
+                schedule = rmService.getDispositionSchedule(recordCategory);
+                actionDefs = schedule.getDispositionActionDefinitions();
+                assertEquals(2, actionDefs.size());
+                
+                return null;
+            }          
+        });
     }
     
     public void off_testDispositionLifecycle_0318_other_usecases() throws Exception
     {
-        // remove a step from the schedule that is the current step for one or more records/folders - NPE occurs in event calculation i think
-        // remove all steps and start again
-        
         // test a schedule that uses the disposition asof date for the period property - ensure it's correct (should currently
         //                                                                               fail as 'now' will be used and not the asOf date
         

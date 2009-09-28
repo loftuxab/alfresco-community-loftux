@@ -136,6 +136,19 @@ public interface RecordsManagementService
                 Map<QName, Serializable> actionDefinitionParams);
     
     /**
+     * Determines whether disposition action definitions can be removed from the given
+     * disposition schedule.
+     * <p>
+     * Once a record folder has been created when folder level disposition is being used or
+     * when a record has been filed when record level dispositon is being used are scenarios
+     * where removal will not be allowed.
+     * 
+     * @param schedule The DispositionSchedule to remove from
+     * @return true if action definitions can be removed, false otherwise
+     */
+    boolean canDispositionActionDefinitionsBeRemoved(DispositionSchedule schedule);
+    
+    /**
      * Removes the given disposition action definition from the given disposition
      * schedule.
      * 

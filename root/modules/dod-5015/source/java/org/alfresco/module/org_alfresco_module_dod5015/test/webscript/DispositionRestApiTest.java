@@ -147,7 +147,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         JSONObject dataObj = jsonParsedObject.getJSONObject("data");
         assertNotNull(dataObj);
         JSONObject rootDataObject = (JSONObject)dataObj;
-        assertEquals(7, rootDataObject.length());
+        assertEquals(8, rootDataObject.length());
         
         // check individual data items
         String serviceUrl = SERVICE_URL_PREFIX + requestUrl;
@@ -166,17 +166,19 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         boolean recordLevel = rootDataObject.getBoolean("recordLevelDisposition");
         assertFalse(recordLevel);
         
+        assertFalse(rootDataObject.getBoolean("canStepsBeRemoved"));
+        
         JSONArray actions = rootDataObject.getJSONArray("actions");
         assertNotNull(actions);
         assertEquals(2, actions.length());
         JSONObject action1 = (JSONObject)actions.get(0);
-        assertEquals(8, action1.length());
+        assertEquals(7, action1.length());
         assertNotNull(action1.get("id"));
         assertNotNull(action1.get("url"));
         assertEquals(0, action1.getInt("index"));
         assertEquals("cutoff", action1.getString("name"));
         assertEquals("Cutoff", action1.getString("label"));
-        assertEquals("month|1", action1.getString("period"));
+        assertEquals("monthend|1", action1.getString("period"));
         assertTrue(action1.getBoolean("eligibleOnFirstCompleteEvent"));
         
         JSONObject action2 = (JSONObject)actions.get(1);
@@ -194,6 +196,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         categoryNodeUrl = recordCategory.toString().replace("://", "/");
         requestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
         rsp = sendRequest(new GetRequest(requestUrl), expectedStatus);
+        //System.out.println("GET response: " + rsp.getContentAsString());
         assertEquals("application/json;charset=UTF-8", rsp.getContentType());
         
         // get response as JSON
@@ -204,7 +207,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         dataObj = jsonParsedObject.getJSONObject("data");
         assertNotNull(dataObj);
         rootDataObject = (JSONObject)dataObj;
-        assertEquals(7, rootDataObject.length());
+        assertEquals(8, rootDataObject.length());
         
         // check individual data items
         serviceUrl = SERVICE_URL_PREFIX + requestUrl;
@@ -219,6 +222,8 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         
         recordLevel = rootDataObject.getBoolean("recordLevelDisposition");
         assertTrue(recordLevel);
+        
+        assertTrue(rootDataObject.getBoolean("canStepsBeRemoved"));
         
         actions = rootDataObject.getJSONArray("actions");
         assertNotNull(actions);
@@ -248,6 +253,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         
         categoryNodeUrl = newRecordCategory.toString().replace("://", "/");
         requestUrl = MessageFormat.format(GET_SCHEDULE_URL_FORMAT, categoryNodeUrl);
+        //System.out.println("GET response: " + rsp.getContentAsString());
         rsp = sendRequest(new GetRequest(requestUrl), expectedStatus);
         
         // get response as JSON
@@ -258,7 +264,7 @@ public class DispositionRestApiTest extends BaseWebScriptTest implements Records
         dataObj = jsonParsedObject.getJSONObject("data");
         assertNotNull(dataObj);
         rootDataObject = (JSONObject)dataObj;
-        assertEquals(5, rootDataObject.length());
+        assertEquals(6, rootDataObject.length());
         actions = rootDataObject.getJSONArray("actions");
         assertNotNull(actions);
         assertEquals(0, actions.length());
