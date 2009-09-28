@@ -156,20 +156,6 @@
             var me = this;
 
             /**
-             * ListIcon custom datacell formatter
-             *
-             * @method renderCellListIcon
-             * @param elCell {object}
-             * @param oRecord {object}
-             * @param oColumn {object}
-             * @param oData {object|string}
-             */
-            renderCellListIcon = function ViewPanelHandler__setupListDataTable_renderCellListIcon(elCell, oRecord, oColumn, oData)
-            {
-               elCell.innerHTML = "&nbsp;";
-            };
-
-            /**
              * Description/detail custom datacell formatter
              *
              * @method renderCellList
@@ -224,9 +210,6 @@
             // ListDataTable column defintions
             var columnDefinitions =
                   [
-                     {
-                        key: "listicon", label: "Icon", sortable: false, formatter: renderCellListIcon
-                     },
                      {
                         key: "list", label: "List", sortable: false, formatter: renderCellList
                      },

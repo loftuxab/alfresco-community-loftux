@@ -62,23 +62,6 @@
    background-color:#FFFFFF;
 }
 
-.events .yui-dt-col-icon
-{
-   width: 5em;
-}
-
-.events .yui-dt table .yui-dt-col-icon div
-{
-   background-image: url(../documentlibrary/images/record-32.png);
-   background-position: center center;
-   background-repeat: no-repeat;
-   margin-bottom: 0.25em;
-   margin-top: 0.25em;
-   margin-left: 1em;
-   padding-bottom: 1em;
-   padding-top: 1em;
-}
-
 .events .yui-dt table .yui-dt-col-actions
 {
    width: 17em;
