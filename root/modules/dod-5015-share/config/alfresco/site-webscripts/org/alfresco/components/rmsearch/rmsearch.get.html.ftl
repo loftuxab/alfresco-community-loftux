@@ -1,14 +1,19 @@
+<#assign el=args.htmlid>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.RecordsSearch("${args.htmlid}").setOptions(
+   new Alfresco.RMPropertyMenu('${el}-insertfield').setOptions(
+   {
+      showSearchFields: true,
+      showIdentiferField: true,
+      updateButtonLabel: false,
+      customFields: YAHOO.lang.JSON.parse('[<#list meta as d>{"id": "${d.name}", "title": "${d.title?js_string}"}<#if d_has_next>,</#if></#list>]')
+   }).setMessages(${messages});
+   new Alfresco.RecordsSearch("${el}").setOptions(
    {
       siteId: "${page.url.templateArgs.site!""}",
       customFields: YAHOO.lang.JSON.parse('[<#list meta as d>{"id": "${d.name?substring(4)}", "title": "${d.title?js_string}", "datatype": "${d.dataType}"}<#if d_has_next>,</#if></#list>]')
-   }).setMessages(
-      ${messages}
-   );
+   }).setMessages(${messages});
 //]]></script>
 
-<#assign el=args.htmlid>
 <div id="${el}-body" class="search">
    <div class="yui-g" id="${el}-header">
       <div class="yui-u first">
@@ -50,40 +55,6 @@
                <span class="insertLabel">${msg("label.insertfield")}:</span>
                <span>
                   <input id="${el}-insertfield" type="button" name="insertfield" value="${msg("label.select")}" />
-                  <select id="${el}-insertfield-menu">
-                     <option value="KEYWORDS">${msg("label.keywords")}</option>
-                     <option value="rma:identifier">${msg("label.identifier")}</option>
-                     <option value="cm:name">${msg("label.name")}</option>
-                     <option value="cm:title">${msg("label.title")}</option>
-                     <option value="cm:description">${msg("label.description")}</option>
-                     <option value="cm:creator">${msg("label.creator")}</option>
-                     <option value="cm:created">${msg("label.created")}</option>
-                     <option value="cm:modifier">${msg("label.modifier")}</option>
-                     <option value="cm:modified">${msg("label.modified")}</option>
-                     <option value="cm:author">${msg("label.author")}</option>
-                     <option value="rma:originator">${msg("label.originator")}</option>
-                     <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
-                     <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
-                     <option value="rma:reviewAsOf">${msg("label.reviewDate")}</option>
-                     <option value="rma:originatingOrganization">${msg("label.originatingOrganization")}</option>
-                     <option value="rma:mediaType">${msg("label.mediaType")}</option>
-                     <option value="rma:format">${msg("label.format")}</option>
-                     <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
-                     <option value="rma:location">${msg("label.location")}</option>
-                     <option value="rma:address">${msg("label.address")}</option>
-                     <option value="rmc:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
-                     <option value="rma:recordSearchDispositionEvents">${msg("label.dispositionEvents")}</option>
-                     <option value="rma:recordSearchDispositionActionName">${msg("label.dispositionActionName")}</option>
-                     <option value="rma:recordSearchDispositionActionAsOf">${msg("label.dispositionActionAsOf")}</option>
-                     <option value="rma:recordSearchDispositionEventsEligible">${msg("label.dispositionEventsEligible")}</option>
-                     <option value="rma:recordSearchDispositionPeriod">${msg("label.dispositionPeriod")}</option>
-                     <option value="rma:recordSearchVitalRecordReviewPeriod">${msg("label.vitalRecordReviewPeriod")}</option>
-                     <option value="rma:recordSearchHasDispositionSchedule">${msg("label.hasDispositionSchedule")}</option>
-                     <!-- double ?html encoding required here due to YUI bug -->
-                     <#list meta as d>
-                     <option value="${d.name}">${d.title?html?html}</option>
-                     </#list>
-                  </select>
                </span>
                <span class="insertDate">${msg("label.insertdate")}:</span>
                <div id="${el}-date" class="datepicker"></div>

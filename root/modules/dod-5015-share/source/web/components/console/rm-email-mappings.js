@@ -1,3 +1,27 @@
+/**
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing
+ */
 Alfresco.RM = Alfresco.RM || {};
 
 /**
@@ -30,7 +54,8 @@ Alfresco.RM = Alfresco.RM || {};
       YAHOO.Bubbling.on("EmailMappingsLoaded", this.onDataLoad, this);
       YAHOO.Bubbling.on("EmailMappingsSaved", this.onDataSave, this);
       YAHOO.Bubbling.on("EmailMappingsChanged", this.onMappingChanged, this);
-
+      YAHOO.Bubbling.on("PropertyMenuSelected", this.onPropertyMenuSelected, this);
+      
       return this;
    };
    
@@ -248,7 +273,7 @@ Alfresco.RM = Alfresco.RM || {};
          };
          Event.addListener(this.widgets['emailProperty-text'], "keyup", toggleAddButton, null, this);
          
-         // create menus
+         // create menu
          this.widgets['emailProperty-menu'] = new YAHOO.widget.Menu("emailMappings-emailProperty-menu",
          {
             position:'dynamic',
@@ -269,63 +294,10 @@ Alfresco.RM = Alfresco.RM || {};
                value: menuItemText,
                label: menuItemText
             };
-            this.updateMenu(menuItemText);
             this.widgets['add-mapping'].set('disabled', menuItem.cfg.getProperty('disabled'));
          }, this, true);
          
-         // RM property menu setup and event handler
-         this.widgets.rmPropertyMenu = new YAHOO.widget.Button(this.id + "-rmproperty-button",
-         {
-            type: "menu",
-            menu: this.id + "-rmproperty-button-menu",
-            lazyloadmenu: false
-         });
-         this.widgets.rmPropertyMenu.getMenu().subscribe("click", function(e, args)
-         {
-            var menuItem = args[1];
-            
-            // update menu button label
-            this.widgets.rmPropertyMenu.set("label", menuItem.cfg.getProperty("text"));
-            
-            // set current value from rm property menu
-            this.currentValues['rmProperty'] =
-            {
-               value: menuItem.value,
-               label: menuItem.cfg.getProperty("text")
-            };
-         }, this, true);
-         
          this.dataMap.load();
-      },
-      
-      /**
-       * Deselects unavailable (already mapped) options depending on menu selection
-       * 
-       * @method updateMenu
-       * 
-       * @param {String} menuItemValue Value of selected menu item 
-       */
-      updateMenu: function RM_EmailMappings_updateMenu(menuItemValue)
-      {
-         var mappedValues = this.dataMap.getSelectionByKey(menuItemValue);
-         
-         var rmMenu = this.widgets.rmPropertyMenu;
-         var rmItems = rmMenu.getMenu().getItems();
-         
-         if (mappedValues.length !== 0)
-         {
-            for (var i=0, len = rmItems.length; i < len; i++)
-            {
-               var menuItem = rmItems[i];
-               
-               menuItem.cfg.setProperty('disabled', false);
-               
-               if (mappedValues.indexOf(menuItem.value) !== -1)
-               {
-                  menuItem.cfg.setProperty('disabled', true);
-               }
-            }
-         }
       },
       
       /**
@@ -391,6 +363,22 @@ Alfresco.RM = Alfresco.RM || {};
             this.widgets['save-mappings'].set('disabled', false);
             this.widgets['discard-mappings'].set('disabled', false);                        
          }
+      },
+      
+      /**
+       * Event handler called when a value from the property selection menu has been selected
+       * Updates currently stored values.
+       */
+      onPropertyMenuSelected : function(e, args)
+      {
+         var item = args[1];
+         
+         // set current value from rm property selection menu
+         this.currentValues['rmProperty'] =
+         {
+            value: item.value,
+            label: item.label
+         };
       }
    });
 })();
@@ -513,7 +501,7 @@ Alfresco.RM = Alfresco.RM || {};
                {
                   me.data = args.json.data;
                   this._index();
-                  YAHOO.Bubbling.fire('EmailMappingsLoaded',{mappings:me.data});                  
+                  YAHOO.Bubbling.fire('EmailMappingsLoaded',{mappings:me.data});
                },
                scope: this
             },
@@ -527,7 +515,7 @@ Alfresco.RM = Alfresco.RM || {};
       save: function RM_EmailMappings_Data_save()
       {
          var dataObj = {};
-         if (this.markedForAddition!=="")
+         if (this.markedForAddition.length !== 0)
          {
             dataObj.add = [];
             var additions = this.markedForAddition.split(',');
@@ -535,7 +523,7 @@ Alfresco.RM = Alfresco.RM || {};
             {
                additions.pop();
             }
-            for (var i=0,len = additions.length;i<len;i++)
+            for (var i=0, len = additions.length; i<len; i++)
             {
                var map = additions[i].split('::');
                dataObj.add.push(
@@ -545,7 +533,7 @@ Alfresco.RM = Alfresco.RM || {};
                });
             }
          }
-         if (this.markedForDeletion!=="")
+         if (this.markedForDeletion.length !== 0)
          {
             dataObj["delete"] = [];
             var deletions = this.markedForDeletion.split(',');
@@ -553,7 +541,7 @@ Alfresco.RM = Alfresco.RM || {};
             {
                deletions.pop();
             }
-            for (var i=0,len = deletions.length;i<len;i++)
+            for (var i=0, len = deletions.length; i<len; i++)
             {
                var map = deletions[i].split('::');
                dataObj["delete"].push(
