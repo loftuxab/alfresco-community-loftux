@@ -2541,7 +2541,22 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         {
             public NodeRef execute() throws Throwable
             {
-                return createRecord(recordFolder, "three.txt");
+                // Create the document
+                Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+                props.put(ContentModel.PROP_NAME, "three.pdf");
+                NodeRef recordThree = nodeService.createNode(recordFolder, 
+                                                                ContentModel.ASSOC_CONTAINS, 
+                                                                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "three.pdf"), 
+                                                                ContentModel.TYPE_CONTENT,
+                                                                props).getChildRef();
+                
+                // Set the content
+                ContentWriter writer = contentService.getWriter(recordOne, ContentModel.PROP_CONTENT, true);
+                writer.setMimetype(MimetypeMap.MIMETYPE_PDF);
+                writer.setEncoding("UTF-8");
+                writer.putContent("asdas");
+                
+                return recordThree;
             }          
         });
 
@@ -2607,7 +2622,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertFalse(nodeService.hasAspect(recordTwo, ASPECT_TRANSFERRED));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_TRANSFERRED));
                 
-                // Check that the next disposition action is stil in the correct state
+                // Check that the next disposition action is still in the correct state
                 DispositionAction da = rmService.getNextDispositionAction(recordFolder);
                 assertNotNull(da);
                 assertEquals("transfer", da.getName());
@@ -2625,6 +2640,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertEquals(1, assocs.size());
                 NodeRef transferNodeRef = assocs.get(0).getChildRef();
                 assertEquals(TYPE_TRANSFER, nodeService.getType(transferNodeRef));
+                assertTrue(((Boolean)nodeService.getProperty(transferNodeRef, PROP_TRANSFER_PDF_INDICATOR)).booleanValue());
                 List<ChildAssociationRef> children = nodeService.getChildAssocs(transferNodeRef, ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
                 assertNotNull(children);
                 assertEquals(1, children.size());
