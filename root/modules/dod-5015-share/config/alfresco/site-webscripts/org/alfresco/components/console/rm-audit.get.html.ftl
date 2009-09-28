@@ -1,14 +1,21 @@
 <#if !hasAccess>
    <#include "./rm-console-access.ftl">
 <#else>
-  <script type="text/javascript" charset="utf-8">    
-    new Alfresco.RM_Audit('${htmlid}-audit').setOptions({
-       'siteId': "${page.url.templateArgs.site!"rm"}",
-       'containerId': "${template.properties.container!"documentLibrary"}",
-       'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT,
-       'auditEvents': ${eventsStr}
-    }).setMessages(${messages});
-  </script>
+<script type="text/javascript">//<![CDATA[
+   new Alfresco.RMPropertyMenu('${htmlid}-audit-property').setOptions(
+   {
+      showIdentiferField: true,
+      showAllField: true,
+      customFields: YAHOO.lang.JSON.parse('[<#list meta as d>{"id": "${d.name}", "title": "${d.title?js_string}"}<#if d_has_next>,</#if></#list>]')
+   });
+   new Alfresco.RM_Audit('${htmlid}-audit').setOptions(
+   {
+      'siteId': "${page.url.templateArgs.site!"rm"}",
+      'containerId': "${template.properties.container!"documentLibrary"}",
+      'viewMode':Alfresco.RM_Audit.VIEW_MODE_DEFAULT,
+      'auditEvents': ${eventsStr}
+   }).setMessages(${messages});
+//]]</script>
   
   <div id="${htmlid}-audit" class="audit">
     <div class="yui-gc">
@@ -84,33 +91,6 @@
                   </div>
                   <div class="bd">
                      <input id="${htmlid}-audit-property" type="button" name="${htmlid}-audit-property" value="${msg("label.all")}" />
-                     <select name="${htmlid}-audit-property-menu" id="${htmlid}-audit-property-menu" onchange="" size="1">
-                        <option value="ALL">${msg("label.all")}</option>
-                        <option value="rma:identifier">${msg("label.identifier")}</option>
-                        <option value="cm:name">${msg("label.name")}</option>
-                        <option value="cm:title">${msg("label.title")}</option>
-                        <option value="cm:description">${msg("label.description")}</option>
-                        <option value="cm:creator">${msg("label.creator")}</option>
-                        <option value="cm:created">${msg("label.created")}</option>
-                        <option value="cm:modifier">${msg("label.modifier")}</option>
-                        <option value="cm:modified">${msg("label.modified")}</option>
-                        <option value="cm:author">${msg("label.author")}</option>
-                        <option value="rma:originator">${msg("label.originator")}</option>
-                        <option value="rma:dateFiled">${msg("label.dateFiled")}</option>
-                        <option value="rma:publicationDate">${msg("label.publicationDate")}</option>
-                        <option value="rma:reviewAsOf">${msg("label.reviewDate")}</option>
-                        <option value="rma:originatingOrganization">${msg("label.originatingOrganization")}</option>
-                        <option value="rma:mediaType">${msg("label.mediaType")}</option>
-                        <option value="rma:format">${msg("label.format")}</option>
-                        <option value="rma:dateReceived">${msg("label.dateReceived")}</option>
-                        <option value="rma:location">${msg("label.location")}</option>
-                        <option value="rma:address">${msg("label.address")}</option>
-                        <option value="rmc:supplementalMarkingList">${msg("label.supplementalMarkingList")}</option>
-                        <!-- double ?html encoding required here due to YUI bug -->
-                        <#list meta as d>
-                           <option value="${d.name}">${d.title?html?html}</option>
-                        </#list>
-                     </select>
                   </div>
                </div>
             </div>
