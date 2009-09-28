@@ -1,4 +1,29 @@
 /**
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing
+ */
+ 
+/**
  * RM Audit component
  * 
  * @namespace Alfresco
@@ -15,7 +40,6 @@
        formatDate = Alfresco.util.formatDate,
        fromISO8601 = Alfresco.util.fromISO8601;
 
-
    /**
     * RM Audit componentconstructor.
     * 
@@ -27,11 +51,15 @@
    {
       Alfresco.RM_Audit.superclass.constructor.call(this, "Alfresco.RM_Audit", htmlId,["button", "container", "datasource", "datatable", "paginator", "json", "calendar"]);
       Alfresco.util.ComponentManager.register(this);
+      
+      YAHOO.Bubbling.on("PropertyMenuSelected", this.onPropertyMenuSelected, this);
+      
       this.showingFilter = false;
       //search filter person
       this.activePerson = "";
       //query parameters for datasource
       this.queryParams = {};
+      
       return this;
    };
 
@@ -43,16 +71,14 @@
       
    YAHOO.extend(Alfresco.RM_Audit, Alfresco.component.Base,
    {
-      
       /**
        * Initialises event listening and custom events
-       *  
        */
       initEvents : function RM_Audit_initEvents()
       {
-         Event.on(this.id,'click',this.onInteractionEvent,null,this);
+         Event.on(this.id, 'click', this.onInteractionEvent, null, this);
          //register event
-         if (this.options.viewMode==Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
+         if (this.options.viewMode === Alfresco.RM_Audit.VIEW_MODE_DEFAULT)
          {
             this.registerEventHandler('click',[
                {
@@ -164,41 +190,16 @@
                   Dom.get(this.id+'-from-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.startDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);
                   Dom.get(this.id+'-to-date').innerHTML += ' ' + formatDate(fromISO8601(this.options.stopDate),   Alfresco.thirdparty.dateFormat.masks.fullDatetime);  
                }
-            }                
+            }
+            
             //initialise menus
-            //property menu
-            this.widgets['propertyMenu'] = new YAHOO.widget.Button(this.id + "-property",
-            {
-               type: "menu",
-               menu: this.id + "-property-menu"
-            });
-         
             //events menu
             this.widgets['eventMenu'] = new YAHOO.widget.Button(this.id + "-events",
             {
                type: "menu",
                menu: this.id + "-events-menu"
             });
-
-            this.widgets['propertyMenu'].on("selectedMenuItemChange", function selectedPropertyMenuItemChange(event)
-            {
-               var oMenuItem = event.newValue;
-               if (oMenuItem)
-               {
-                  this.set('label', oMenuItem.cfg.getProperty('text'));
-               }
-
-               if (oMenuItem.value!="ALL")
-               {
-                  me.queryParams.property=oMenuItem.value;
-               }
-               else
-               {
-                  delete me.queryParams.property;
-               }
-         
-            });         
-         
+            
             this.widgets['eventMenu'].on("selectedMenuItemChange", function selectedEventMenuItemChange(event)
             {
                var oMenuItem = event.newValue;
@@ -206,7 +207,7 @@
                {
                   this.set('label', oMenuItem.cfg.getProperty('text'));
                }            
-               if (oMenuItem.value!="ALL")
+               if (oMenuItem.value !== "ALL")
                {
                   me.queryParams.event=oMenuItem.value;
                }
@@ -215,7 +216,7 @@
                   delete me.queryParams.event;
                }
             });
-         
+            
             //initialise calendar pickers
             //fromDate calendar
             var theDate = new Date();
@@ -267,6 +268,7 @@
                }
                return oParsedResponse;
             };
+            
             //date cell formatter
             var renderCellDate = function RecordsResults_renderCellDate(elCell, oRecord, oColumn, oData)
             {
@@ -277,7 +279,8 @@
             };
         
             // Add the custom formatter to the shortcuts
-            YAHOO.widget.DataTable.Formatter.eventCellFormatter = function eventCellFormatter(elLiner, oRecord, oColumn, oData) {
+            YAHOO.widget.DataTable.Formatter.eventCellFormatter = function eventCellFormatter(elLiner, oRecord, oColumn, oData)
+            {
                var oRecordData = oRecord._oData;
                elLiner.innerHTML = oRecordData.event + ' [<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + me.options.siteId + '/document-details?nodeRef=' + oRecordData.nodeRef + '">' + oRecordData.nodeName + '</a>]';
                //add details button
@@ -293,7 +296,7 @@
                //and this for event handling1
                but._button.className = 'audit-details';
             };
-         
+            
             this.widgets['auditDataTable'] = new YAHOO.widget.DataTable(this.id+"-auditDT",
                 [
                   {key:"timestamp", label:this.msg('label.timestamp'), formatter: renderCellDate, sortable:true, resizeable:true},
@@ -338,10 +341,9 @@
          }   
       },
       
-     /**
+      /**
        * Fired by YUI when parent element is available for scripting
        * @method onReady
-       * 
        */
       onReady: function RM_Audit_onReady()
       {
@@ -358,12 +360,10 @@
          }
 
          this.initWidgets();
-        
       },
       
       /**
        * Updates the UI to show status of UI and start/stop buttons
-       *  
        */
       toggleUI: function toggleUI()
       {
@@ -382,11 +382,10 @@
                this.widgets['toggle'].set('label',(this.options.enabled)? this.msg('label.button-stop') : this.msg('label.button-start'));
             }
          }
-
       },
+      
       /**
        * Handler for start/stop log button
-       *  
        */      
       onToggleLog: function onToggleLog()
       {
@@ -419,7 +418,6 @@
       
       /**
        * Handler for clear log button.
-       *  
        */
       onClearLog: function RM_Audit_onClearLog()
       {
@@ -452,11 +450,9 @@
       
       /**
        * Handler for view log button. Displays log in new window
-       *  
        */      
       onViewLog: function RM_Audit_onViewLog()
       {
-         
          var openAuditLogWindow = function openAuditLogWindow()
          {
             return window.open(Alfresco.constants.URL_CONTEXT+'page/site/' + this.options.siteId + '/rmaudit', 'Audit_Log', 'resizable=yes,location=no,menubar=no,scrollbars=yes,status=yes,width=400,height=400');
@@ -484,7 +480,6 @@
       
       /**
        * Handler for export log button. Exports log
-       *  
        */      
       onExportLog: function RM_Audit_onExportLog()
       {
@@ -497,7 +492,6 @@
 
       /**
        * Handler for declare as record log button. Declares log as record
-       *  
        */      
       onDeclareRecord: function RM_Audit_onDeclareRecord()
       {  
@@ -516,9 +510,8 @@
                path: '',
                files: {}
             }).showDialog();
-            
       }, 
-  
+      
       onAuditRecordLocationSelected : function RM_Audit_AuditRecordLocationSelected(e, args)
       {
          var me = this;
@@ -659,7 +652,6 @@
             
       /**
        * Handler for when a person is selected
-       *  
        */
       onPersonSelected: function RM_Audit_onPersonSelected(e, args)
       {
@@ -682,7 +674,6 @@
          var el = Sel.query('.personFilter span',this.id)[0];
          el.innerHTML = (text !== "") ? text : this.msg('label.default-filter');
       },
-      
       
       /**
        * Handler for when people finder has finished loading 
@@ -765,7 +756,6 @@
       
       /**
        * toggles logs via ajax call and gives user feedback
-       *  
        */
       _toggleLog: function RM_Audit_toggleLog()
       {
@@ -824,8 +814,24 @@
       },
       
       /**
+       * Bubbling event handler called when a value from the property selection menu has been picked
+       */
+      onPropertyMenuSelected: function RM_Audit_onPropertyMenuSelected(e, args)
+      {
+         var item = args[1];
+         
+         if (item.value !== "ALL")
+         {
+            this.queryParams.property = item.value;
+         }
+         else
+         {
+            delete this.queryParams.property;
+         }
+      },
+      
+      /**
        * Displays dialog with more info about log entry
-       *  
        */
       onShowDetails: function RM_Audit__showDetails(e)
       {
@@ -998,6 +1004,5 @@
          //update caption
          this.widgets['auditDataTable']._elCaption.innerHTML = this.msg('label.pagination', response.results.length); 
       }
-      
    });
 })();

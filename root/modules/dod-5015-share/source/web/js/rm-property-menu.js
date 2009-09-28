@@ -98,6 +98,14 @@
          showIdentiferField: false,
          
          /**
+          * Flag indicating whether special 'All' field is visible or not.
+          * 
+          * @property showAllField
+          * @type boolean
+          */
+         showAllField: false,
+         
+         /**
           * Flag passed to YUI menu constructor whether to wait for first display to render menu.
           * 
           * @property lazyLoadMenu
@@ -172,6 +180,15 @@
                }
             }
          ];
+         
+         if (this.options.showAllField)
+         {
+            items.splice(0, 0,
+            {
+               text: this.msg("label.all"),
+               value: "ALL"
+            });
+         }
          
          if (this.options.showIdentiferField)
          {
@@ -248,7 +265,6 @@
                   itemdata:
                   [ 
                      [
-                     { text: this.msg("label.dod.scannedFormat"), value: "dod:scannedFormat" },
                      { text: this.msg("label.dod.scannedFormatVersion"), value: "dod:scannedFormatVersion" },
                      { text: this.msg("label.dod.resolutionX"), value: "dod:resolutionX" },
                      { text: this.msg("label.dod.resolutionY"), value: "dod:resolutionY" },
