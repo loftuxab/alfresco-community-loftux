@@ -187,6 +187,7 @@
                         for (var i = 0, ii = actions.length; i < ii; i++)
                         {
                            action = actions[i];
+                           action.deleteable = schedule.canStepsBeRemoved;
                            actionEl = this._createAction(action);
                            actionEl = this.widgets.actionListEl.appendChild(actionEl);
                            this._setupActionForm(action, actionEl);
@@ -375,7 +376,14 @@
          }, this);
 
          var deleteEl = Dom.getElementsByClassName("delete", "span", actionEl)[0];
-         Event.addListener(deleteEl, "click", this.onDeleteActionClick, actionEl, this);
+         if(action.deleteable)
+         {
+            Event.addListener(deleteEl, "click", this.onDeleteActionClick, actionEl, this);
+         }
+         else
+         {
+            Dom.addClass(deleteEl, "hidden");
+         }
 
          // Add events
          var eventListEl = Dom.getElementsByClassName("events-list", "ul", actionEl)[0];
@@ -1054,6 +1062,7 @@
             periodProperty: (noOfActions == 0 ? "rma:dateFiled": "rma:cutOffDate"),
             description: "",
             eligibleOnFirstCompleteEvent: true,
+            deleteable: true,
             events: []
          };
          var newActionEl = this._createAction(action),
