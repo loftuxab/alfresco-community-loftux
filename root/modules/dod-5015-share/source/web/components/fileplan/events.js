@@ -174,11 +174,9 @@
                         // Could not find file plan for node (record) try parent's (folder's)
                         this._getParentsDispositionSchedule();
                      }
-                     else{
-                        Alfresco.util.PopupManager.displayPrompt(
-                        {
-                           text: this.msg("message.getEventFailure")
-                        });
+                     else
+                     {
+                        this._displayMessage(this.msg("label.loadFailure"));
                      }
                   },
                   scope: this
@@ -520,7 +518,7 @@
          // Make sure the completed at date picker is closed if its opened when the dialog is closed
          this.widgets.completeEventPanel.subscribe("hide", function(p_sType, p_aArgs)
          {
-            if(this.widgets.completedAtPicker)
+            if (this.widgets.completedAtPicker)
             {
                this.widgets.completedAtPicker.hide();
             }
@@ -636,11 +634,7 @@
             }
          }, "message.completingEvent", "message.completeEventFailure");
 
-         // Hide dialog and completed at date picker
-         if (this.widgets.completedAtPicker)
-         {
-            this.widgets.completedAtPicker.hide();
-         }
+         // Hide panel
          this.widgets.completeEventPanel.hide();
       },
 
@@ -655,10 +649,6 @@
       onCompleteEventCancelClick: function AddEvent_onCompleteEventCancelClick(e, obj)
       {
          // Hide panel
-         if (this.widgets.completedAtPicker)
-         {
-            this.widgets.completedAtPicker.hide();
-         }
          this.widgets.completeEventPanel.hide();
       }
    });
