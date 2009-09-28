@@ -99,9 +99,6 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         {
             public Void execute() throws Throwable
             {
-                // Ensure that auditing is on
-                rmAuditService.start();
-                
                 if (filePlan == null)
                 {
                     filePlan = TestUtilities.loadFilePlanData(ctx);
@@ -311,9 +308,23 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
     
     public void testAuditAuthentication()
     {
+        rmAuditService.stop();
+        rmAuditService.clear();
+        rmAuditService.start();
+
         AuthenticationService authenticationService = serviceRegistry.getAuthenticationService();
         PersonService personService = serviceRegistry.getPersonService();
         
+        try
+        {
+            personService.deletePerson("baboon");
+            authenticationService.deleteAuthentication("baboon");
+        }
+        catch (Throwable e)
+        {
+            // Not serious
+        }
+
         // Failed login attempt ...
         try
         {
@@ -332,6 +343,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         rmAuditService.stop();
         List<RecordsManagementAuditEntry> result1 = queryAll();
         // Check that the username is reflected correctly in the results
+        assertFalse("No audit results were generated for the failed login.", result1.isEmpty());
         boolean found = false;
         for (RecordsManagementAuditEntry entry : result1)
         {
