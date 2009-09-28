@@ -530,12 +530,12 @@
             dataObj : dataObj,
             successCallback:
             {
-               fn: function(serverResponse)
+               fn: function RM_Audit_DeclareRecord_success(serverResponse)
                {
                   // apply current property values to form
                   if (serverResponse.json)
                   {
-                     var data = serverResponse.json.data;
+                     var data = serverResponse.json;
 
                      if (data.success)
                      {
@@ -549,7 +549,7 @@
                               text: this.msg('button.view-record'),
                               handler: function viewRecordHandler()
                               {
-                                 window.location.href = Alfresco.constants.URL_PAGECONTEXT+'site/' +  me.options.siteId + '/documentlibrary?nodeRef='+data.nodeRef;
+                                 window.location.href = Alfresco.constants.URL_PAGECONTEXT+'site/' +  me.options.siteId + '/document-details?nodeRef=' + data.record;
                               }
                            },
                            {
@@ -908,7 +908,7 @@
             {
                var o = data.changedValues[i];
                o.className = (i%2===0) ? '' : ' class="odd"';
-               o.previous = o.previous || '<none>';
+               o.previous = o.previous || '&lt;none&gt;';
                changedValuesHTML+=YAHOO.lang.substitute(changedValuesHTMLTemplate, o);
             }
    
