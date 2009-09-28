@@ -52,7 +52,7 @@
 
             <!-- Label -->
             <div>
-               <span class="crud-label">${msg("label.label")}:</span>
+               <span class="crud-label">${msg("label.label")}: *</span>
             </div>
             <div>
                <input class="crud-input" id="${el}-eventDisplayLabel" name="eventDisplayLabel" type="text"/>
@@ -60,7 +60,7 @@
 
             <!-- Type -->
             <div>
-               <span class="crud-label">${msg("label.type")}:</span>
+               <span class="crud-label">${msg("label.type")}: *</span>
             </div>
             <div>
                <select class="crud-input type" id="${el}-eventType" name="eventType">
