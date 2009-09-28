@@ -90,8 +90,8 @@
             baseLinkUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/documentlibrary{file}#path=",
             pathUrl = "/";
          
-         // create an array of paths
          var path = docData.location.path;
+         // Document Library root node
          if (path.length < 2)
          {
             pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
