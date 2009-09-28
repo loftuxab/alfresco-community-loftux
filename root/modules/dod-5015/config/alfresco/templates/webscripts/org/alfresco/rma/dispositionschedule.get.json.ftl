@@ -12,6 +12,7 @@
 		<#if schedule.authority??>"authority": "${schedule.authority}",</#if>
 		<#if schedule.instructions??>"instructions": "${schedule.instructions}",</#if>
 		"recordLevelDisposition": ${schedule.recordLevelDisposition?string},
+		"canStepsBeRemoved": ${schedule.canStepsBeRemoved?string},
 		"actionsUrl": "${schedule.actionsUrl}",
 		"actions": 
 		[

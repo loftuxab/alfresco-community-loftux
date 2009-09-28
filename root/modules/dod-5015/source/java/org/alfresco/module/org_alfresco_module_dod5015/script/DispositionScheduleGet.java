@@ -62,6 +62,8 @@ public class DispositionScheduleGet extends DispositionAbstractBase
         scheduleModel.put("actionsUrl", actionsUrl);
         scheduleModel.put("nodeRef", schedule.getNodeRef().toString());
         scheduleModel.put("recordLevelDisposition", schedule.isRecordLevelDisposition());
+        scheduleModel.put("canStepsBeRemoved", 
+                    this.rmService.canDispositionActionDefinitionsBeRemoved(schedule));
         
         if (schedule.getDispositionAuthority() != null)
         {

@@ -643,11 +643,68 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
     }
 
     /*
+     * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#canDispositionActionDefinitionsBeRemoved(org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule)
+     */
+    public boolean canDispositionActionDefinitionsBeRemoved(DispositionSchedule schedule)
+    {
+        NodeRef scheduleNode = schedule.getNodeRef();
+        NodeRef recordCategoryNode = nodeService.getPrimaryParent(scheduleNode).getParentRef();
+        if (schedule.isRecordLevelDisposition())
+        {
+            // if we are using record level disposition ensure there are no records under any
+            // of the record folders for the category the given schedule is for.
+            List<ChildAssociationRef> folderAssocs = nodeService.getChildAssocs(recordCategoryNode, 
+                        ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+            for (ChildAssociationRef folderAssoc : folderAssocs)
+            {
+                NodeRef folder = folderAssoc.getChildRef();
+                if (isRecordFolder(folder))
+                {
+                    List<ChildAssociationRef> recordAssocs = nodeService.getChildAssocs(folder, 
+                                ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+                    for (ChildAssociationRef recordAssoc : recordAssocs)
+                    {
+                        NodeRef record = recordAssoc.getChildRef();
+                        if (isRecord(record))
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // if we are using folder level disposition ensure there are no record folder under
+            // the category the given schedule is for.
+            List<ChildAssociationRef> folderAssocs = nodeService.getChildAssocs(recordCategoryNode, 
+                        ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+            for (ChildAssociationRef folderAssoc : folderAssocs)
+            {
+                NodeRef folder = folderAssoc.getChildRef();
+                if (isRecordFolder(folder))
+                {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    /*
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService#removeDispositionActionDefinition(org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule, org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition)
      */
     public void removeDispositionActionDefinition(DispositionSchedule schedule,
                 DispositionActionDefinition actionDefinition)
     {
+        // check first whether action definitions can be removed
+        if (!canDispositionActionDefinitionsBeRemoved(schedule))
+        {
+            throw new AlfrescoRuntimeException("Can not remove action definitions from schedule '" + 
+                        schedule.getNodeRef() + "' as one or more record or record folders are present.");
+        }
+        
         // remove the child node representing the action definition
         this.nodeService.removeChild(schedule.getNodeRef(), actionDefinition.getNodeRef());
     }
