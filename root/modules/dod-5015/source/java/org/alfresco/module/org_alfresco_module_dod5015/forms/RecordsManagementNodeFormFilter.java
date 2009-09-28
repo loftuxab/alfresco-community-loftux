@@ -7,7 +7,9 @@ import java.util.Map;
 import org.alfresco.model.ImapModel;
 import org.alfresco.module.org_alfresco_module_dod5015.CustomisableRmElement;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionScheduleImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.repo.forms.FieldDefinition;
 import org.alfresco.repo.forms.Form;
 import org.alfresco.repo.forms.PropertyFieldDefinition;
@@ -142,6 +144,17 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
                     
                     // force the "supplementalMarkingList" property to be present
                     forceSupplementalMarkingListProperty(form, nodeRef);
+                }
+                else if (TYPE_DISPOSITION_SCHEDULE.equals(type))
+                {
+                    // use the same mechanism used to determine whether steps can be removed from the
+                    // schedule to determine whether the disposition level can be changed i.e. record 
+                    // level or folder level.
+                    DispositionSchedule schedule = new DispositionScheduleImpl(this.rmServiceRegistry, nodeRef);
+                    if (schedule != null && !rmService.canDispositionActionDefinitionsBeRemoved(schedule))
+                    {
+                        protectRecordLevelDispositionPropertyField(form);
+                    }
                 }
             }
         }
@@ -364,6 +377,29 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
         
         if (logger.isDebugEnabled())
             logger.debug("Set email related fields to be protected");
+    }
+    
+    /**
+     * Marks the recordLevelDisposition property as protected to disable editing
+     * 
+     * @param form The Form instance
+     */
+    protected void protectRecordLevelDispositionPropertyField(Form form)
+    {
+        // iterate round existing fields and set email fields as protected
+        List<FieldDefinition> fieldDefs = form.getFieldDefinitions();
+        for (FieldDefinition fieldDef : fieldDefs)
+        {
+            if (fieldDef.getName().equals(RecordsManagementModel.PROP_RECORD_LEVEL_DISPOSITION.toPrefixString(
+                        this.namespaceService)))
+            {
+                fieldDef.setProtectedField(true);
+                break;
+            }
+        }
+        
+        if (logger.isDebugEnabled())
+            logger.debug("Set 'rma:recordLevelDisposition' field to be protected as record folders or records are present");
     }
     
     /**
