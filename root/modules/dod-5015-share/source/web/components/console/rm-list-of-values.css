@@ -130,23 +130,6 @@
    color: #000000;
 }
 
-.listofvalues .yui-dt-col-listicon
-{
-   width: 5em;
-}
-
-.listofvalues .yui-dt table .yui-dt-col-listicon div
-{
-   background-image: url(../documentlibrary/images/record-32.png);
-   background-position: center center;
-   background-repeat: no-repeat;
-   margin-bottom: 0.25em;
-   margin-top: 0.25em;
-   margin-left: 1em;
-   padding-bottom: 1em;
-   padding-top: 1em;
-}
-
 .listofvalues .yui-dt-col-accessicon
 {
    width: 3em;

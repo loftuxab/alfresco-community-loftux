@@ -164,20 +164,6 @@
             var me = this;
 
             /**
-             * Icon custom datacell formatter
-             *
-             * @method renderCellIcon
-             * @param elCell {object}
-             * @param oRecord {object}
-             * @param oColumn {object}
-             * @param oData {object|string}
-             */
-            renderCellIcon = function ViewPanelHandler__setupDataTable_renderCellIcon(elCell, oRecord, oColumn, oData)
-            {
-               elCell.innerHTML = "&nbsp;";
-            };
-
-            /**
              * Description/detail custom datacell formatter
              *
              * @method renderCellDetails
@@ -236,9 +222,6 @@
             // DataTable column defintions
             var columnDefinitions =
                   [
-                     {
-                        key: "icon", label: "Icon", sortable: false, formatter: renderCellIcon
-                     },
                      {
                         key: "event", label: "Event", sortable: false, formatter: renderCellDetails
                      },
