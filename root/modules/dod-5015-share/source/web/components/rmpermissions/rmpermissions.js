@@ -510,8 +510,13 @@
          else
          {
             // go back to the appropriate details page for the node
-            var pageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId +
-               "/" + this.options.nodeType + "-details?nodeRef=" + this.options.nodeRef;
+            var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + "site/{site}/{nodeType}-details?nodeRef={nodeRef}";
+            var pageUrl = YAHOO.lang.substitute(uriTemplate,
+            {
+               site: encodeURIComponent(this.options.siteId),
+               nodeRef: this.options.nodeRef,
+               nodeType: (this.options.nodeType !== "record" ? this.options.nodeType : "document")
+            });
             
             window.location.href = pageUrl;
          }
