@@ -32,9 +32,11 @@ import java.util.Map;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
+import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
+import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -49,7 +51,7 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
     /** Transfer node reference key */
     public static final String KEY_TRANSFER_NODEREF = "transferNodeRef";
     
-    /** Indictates whether the transfer is an accession or not */
+    /** Indicates whether the transfer is an accession or not */
     private boolean isAccession = false;
     
     /**
@@ -92,14 +94,14 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
     }
     
     /**
-     * Create the transfer node and link the dispositoin lifecycle node beneth it
+     * Create the transfer node and link the disposition lifecycle node beneath it
      * 
-     * @param dispositionLifeCycleNodRef        disposition lifecycle node
+     * @param dispositionLifeCycleNodeRef        disposition lifecycle node
      */
-    private void doTransfer(NodeRef dispositionLifeCycleNodRef)
+    private void doTransfer(NodeRef dispositionLifeCycleNodeRef)
     {
         // Get the root rm node
-        NodeRef root = this.recordsManagementService.getRecordsManagementRoot(dispositionLifeCycleNodRef);
+        NodeRef root = this.recordsManagementService.getRecordsManagementRoot(dispositionLifeCycleNodeRef);
         
         // Get the hold object
         NodeRef transferNodeRef = (NodeRef)AlfrescoTransactionSupport.getResource(KEY_TRANSFER_NODEREF);            
@@ -107,7 +109,7 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
         {
             // Calculate a transfer name
             QName nodeDbid = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "node-dbid");
-            Long dbId = (Long)this.nodeService.getProperty(dispositionLifeCycleNodRef, nodeDbid);
+            Long dbId = (Long)this.nodeService.getProperty(dispositionLifeCycleNodeRef, nodeDbid);
             String transferName = padString(dbId.toString(), 10);
             
             // Create the transfer object
@@ -126,12 +128,45 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
         
         // Link the record to the hold
         this.nodeService.addChild(transferNodeRef, 
-                                  dispositionLifeCycleNodRef, 
+                                  dispositionLifeCycleNodeRef, 
                                   ASSOC_TRANSFERRED, 
                                   ASSOC_TRANSFERRED);
+        
+        // Set PDF indicator flag
+        setPDFIndicationFlag(transferNodeRef, dispositionLifeCycleNodeRef);
+    }
+    
+    /**
+     * 
+     * @param transferNodeRef
+     * @param dispositionLifeCycleNodeRef
+     */
+    private void setPDFIndicationFlag(NodeRef transferNodeRef, NodeRef dispositionLifeCycleNodeRef)
+    {
+       if (recordsManagementService.isRecordFolder(dispositionLifeCycleNodeRef) == true)
+       {
+           List<NodeRef> records = recordsManagementService.getRecords(dispositionLifeCycleNodeRef);
+           for (NodeRef record : records)
+           {
+               setPDFIndicationFlag(transferNodeRef, record);
+           }
+       }
+       else
+       {
+           ContentData contentData = (ContentData)nodeService.getProperty(dispositionLifeCycleNodeRef, ContentModel.PROP_CONTENT);
+           if (contentData != null &&
+               MimetypeMap.MIMETYPE_PDF.equals(contentData.getMimetype()) == true)
+           {
+               // Set the property indicator
+               nodeService.setProperty(transferNodeRef, PROP_TRANSFER_PDF_INDICATOR, true);
+           }           
+       }
     }
 
-    @Override
+    /**
+     * @see org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase#isExecutableImpl(org.alfresco.service.cmr.repository.NodeRef, java.util.Map, boolean)
+     */
+    @Override    
     protected boolean isExecutableImpl(NodeRef filePlanComponent, Map<String, Serializable> parameters, boolean throwException)
     {
       
