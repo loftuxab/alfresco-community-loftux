@@ -1017,18 +1017,14 @@ public class RecordsManagementAuditServiceImpl
             
             writer.write("<span class=\"label\">From:</span>");
             writer.write("<span class=\"value\">");
-            // if there's no filtered date use the date the log was started
             Date from = params.getDateFrom();
-            writer.write(from == null ? StringEscapeUtils.escapeHtml(this.getDateLastStarted().toString()) : 
-                StringEscapeUtils.escapeHtml(from.toString()));
+            writer.write(from == null ? "&lt;Not Set&gt;" : StringEscapeUtils.escapeHtml(from.toString()));
             writer.write("</span>");
             
             writer.write("<span class=\"label\">To:</span>");
             writer.write("<span class=\"value\">");
-            // if there's no filtered date use the date the log was stopped
             Date to = params.getDateTo();
-            writer.write(to == null ? StringEscapeUtils.escapeHtml(this.getDateLastStopped().toString()) : 
-                StringEscapeUtils.escapeHtml(to.toString()));
+            writer.write(to == null ? "&lt;Not Set&gt;" : StringEscapeUtils.escapeHtml(to.toString()));
             writer.write("</span>");
             
             writer.write("<span class=\"label\">Property:</span>");
