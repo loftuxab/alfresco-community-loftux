@@ -48,22 +48,11 @@ public class DispositionSelectionStrategy implements RecordsManagementModel
     /** Logger */
     private static Log logger = LogFactory.getLog(DispositionSelectionStrategy.class);
 
-    /** Service registry */
-    private RecordsManagementServiceRegistry serviceRegistry;
-
     /** Node service */
     private NodeService nodeService;
 
-    /**
-     * Set the service registry service
-     * 
-     * @param serviceRegistry   service registry
-     */
-    public void setRecordsManagementServiceRegistry(RecordsManagementServiceRegistry serviceRegistry)
-    {
-        // Internal ops use the unprotected services from the voter (e.g. nodeService)
-        this.serviceRegistry = serviceRegistry;
-    }
+    /** RecordsManagementService **/
+    private RecordsManagementService recordsManagementService; 
     
     /**
      * Set node service
@@ -72,6 +61,11 @@ public class DispositionSelectionStrategy implements RecordsManagementModel
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
+    }
+    
+    public void setRecordsManagementService(RecordsManagementService recordsManagementService)
+    {
+        this.recordsManagementService = recordsManagementService;
     }
     
     public NodeRef selectDispositionScheduleFrom(List<NodeRef> recordFolders)
@@ -95,7 +89,7 @@ public class DispositionSelectionStrategy implements RecordsManagementModel
             {
                 sortedFolders.add(f);
             }
-            DispositionSchedule dispSchedule = serviceRegistry.getRecordsManagementService().getDispositionSchedule(sortedFolders.first());
+            DispositionSchedule dispSchedule = recordsManagementService.getDispositionSchedule(sortedFolders.first());
             
             if (logger.isDebugEnabled())
             {
@@ -118,8 +112,8 @@ public class DispositionSelectionStrategy implements RecordsManagementModel
         {
             //TODO Check the nodeRefs have the correct aspect
             
-            DispositionAction da1 = serviceRegistry.getRecordsManagementService().getNextDispositionAction(f1);
-            DispositionAction da2 = serviceRegistry.getRecordsManagementService().getNextDispositionAction(f2);
+            DispositionAction da1 = recordsManagementService.getNextDispositionAction(f1);
+            DispositionAction da2 = recordsManagementService.getNextDispositionAction(f2);
             
             if (da1 != null && da2 != null)
             {

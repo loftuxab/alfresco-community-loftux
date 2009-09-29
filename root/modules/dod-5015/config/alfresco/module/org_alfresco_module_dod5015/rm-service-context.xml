@@ -10,7 +10,7 @@
     <!-- Disposition selection strategy -->
     <bean id="org_alfresco_module_dod5015_dispositionSelectionStrategy"
           class="org.alfresco.module.org_alfresco_module_dod5015.DispositionSelectionStrategy" >        
-        <property name="recordsManagementServiceRegistry" ref="RecordsManagementServiceRegistry"/>
+        <property name="recordsManagementService" ref="recordsManagementService"/>
         <property name="nodeService" ref="nodeService"/>
     </bean>
 
