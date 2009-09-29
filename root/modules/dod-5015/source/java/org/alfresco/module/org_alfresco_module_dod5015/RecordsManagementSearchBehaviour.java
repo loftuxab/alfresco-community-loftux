@@ -36,7 +36,6 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
-import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -67,6 +66,7 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
     public static final QName PROP_RS_HAS_DISPOITION_SCHEDULE = QName.createQName(RM_URI, "recordSearchHasDispositionSchedule");
     public static final QName PROP_RS_DISPOITION_INSTRUCTIONS = QName.createQName(RM_URI, "recordSearchDispositionInstructions");
     public static final QName PROP_RS_DISPOITION_AUTHORITY = QName.createQName(RM_URI, "recordSearchDispositionAuthority");
+    public static final QName PROP_RS_HOLD_REASON = QName.createQName(RM_URI, "recordSearchHoldReason");
     
     /** Policy component */
     private PolicyComponent policyComponent;
@@ -170,6 +170,17 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"), 
                 ASPECT_VITAL_RECORD_DEFINITION, 
                 new JavaBehaviour(this, "vitalRecordDefintionUpdateProperties", NotificationFrequency.TRANSACTION_COMMIT));
+        
+        // Hold reason rollup
+        this.policyComponent.bindClassBehaviour(
+                    QName.createQName(NamespaceService.ALFRESCO_URI, "onRemoveAspect"), 
+                    ASPECT_FROZEN, 
+                    new JavaBehaviour(this, "onRemoveFrozenAspect", NotificationFrequency.TRANSACTION_COMMIT));
+        
+        this.policyComponent.bindClassBehaviour(
+                    QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"), 
+                    TYPE_HOLD, 
+                    new JavaBehaviour(this, "frozenAspectUpdateProperties", NotificationFrequency.TRANSACTION_COMMIT));
     }
 
     /**
@@ -427,6 +438,36 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
             // Set the property values
             nodeService.setProperty(nodeRef, PROP_RS_VITAL_RECORD_REVIEW_PERIOD, vrd.getReviewPeriod().getPeriodType());
             nodeService.setProperty(nodeRef, PROP_RS_VITAL_RECORD_REVIEW_PERIOD_EXPRESSION, vrd.getReviewPeriod().getExpression());
+        }
+    }
+    
+    public void onRemoveFrozenAspect(NodeRef nodeRef, QName aspectTypeQName)
+    {
+        if (nodeService.exists(nodeRef) == true &&
+            nodeService.hasAspect(nodeRef, ASPECT_RM_SEARCH))
+        {
+            nodeService.setProperty(nodeRef, PROP_RS_HOLD_REASON, null);
+        }
+    }
+    
+    public void frozenAspectUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after)
+    {
+        if (nodeService.exists(nodeRef))
+        {
+            // get the changed hold reason
+            String holdReason = (String)nodeService.getProperty(nodeRef, PROP_HOLD_REASON);
+            
+            // get all the frozen items the hold node has and change the hold reason
+            List<ChildAssociationRef> holdAssocs = this.nodeService.getChildAssocs(
+                        nodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
+            for (ChildAssociationRef assoc : holdAssocs)
+            {
+                NodeRef frozenItem = assoc.getChildRef();
+                
+                // ensure the search aspect is applied and set the hold reason
+                applySearchAspect(frozenItem);
+                nodeService.setProperty(frozenItem, PROP_RS_HOLD_REASON, holdReason);
+            }
         }
     }
     
