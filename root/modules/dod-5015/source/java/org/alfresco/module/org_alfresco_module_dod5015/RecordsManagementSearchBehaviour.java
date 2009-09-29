@@ -483,7 +483,7 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
         if (this.nodeService.exists(nodeRef) == true)
         {
             // create the schedule object and get the record category for it
-            DispositionSchedule schedule = new DispositionScheduleImpl(this.recordsManagementServiceRegistry, nodeRef);
+            DispositionSchedule schedule = new DispositionScheduleImpl(this.recordsManagementServiceRegistry, this.nodeService, nodeRef);
             NodeRef recordCategoryNode = this.nodeService.getPrimaryParent(schedule.getNodeRef()).getParentRef();
             
             if (schedule.isRecordLevelDisposition())
