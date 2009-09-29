@@ -176,10 +176,14 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
             if (fieldDef.getName().startsWith(RM_CUSTOM_PREFIX) &&
                 !fieldDef.getName().equals(PROP_SUPPLEMENTAL_MARKING_LIST.toPrefixString(this.namespaceService)))
             {
-                fieldDef.setGroup(CUSTOM_RM_FIELD_GROUP);
+                // only add custom RM properties, not associations/references
+                if (fieldDef instanceof PropertyFieldDefinition)
+                {
+                    fieldDef.setGroup(CUSTOM_RM_FIELD_GROUP);
 
-                if (logger.isDebugEnabled())
-                    logger.debug("Added \"" + fieldDef.getName() + "\" to RM custom field group");
+                    if (logger.isDebugEnabled())
+                        logger.debug("Added \"" + fieldDef.getName() + "\" to RM custom field group");
+                }
             }
         }
     }
