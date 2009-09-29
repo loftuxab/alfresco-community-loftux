@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.RegexQNamePattern;
 
 /**
@@ -41,18 +42,19 @@ import org.alfresco.service.namespace.RegexQNamePattern;
 public class DispositionScheduleImpl implements DispositionSchedule,
                                                 RecordsManagementModel
 {
+    private NodeService nodeService;
     private RecordsManagementServiceRegistry services;
-    
     private NodeRef dispositionDefinitionNodeRef;
     
     private List<DispositionActionDefinition> actions;
     private Map<String, DispositionActionDefinition> actionsById;
     
-    public DispositionScheduleImpl(RecordsManagementServiceRegistry services,  NodeRef nodeRef)
+    public DispositionScheduleImpl(RecordsManagementServiceRegistry services, NodeService nodeService,  NodeRef nodeRef)
     {
         // TODO check that we have a disposition definition node reference
         
         this.dispositionDefinitionNodeRef = nodeRef;
+        this.nodeService = nodeService;
         this.services = services;
     }
 
@@ -69,7 +71,7 @@ public class DispositionScheduleImpl implements DispositionSchedule,
      */
     public String getDispositionAuthority()
     {
-        return (String)this.services.getNodeService().getProperty(this.dispositionDefinitionNodeRef, PROP_DISPOSITION_AUTHORITY);
+        return (String)this.nodeService.getProperty(this.dispositionDefinitionNodeRef, PROP_DISPOSITION_AUTHORITY);
     }
 
     /**
@@ -77,7 +79,7 @@ public class DispositionScheduleImpl implements DispositionSchedule,
      */
     public String getDispositionInstructions()
     {
-        return (String)this.services.getNodeService().getProperty(this.dispositionDefinitionNodeRef, PROP_DISPOSITION_INSTRUCTIONS);
+        return (String)this.nodeService.getProperty(this.dispositionDefinitionNodeRef, PROP_DISPOSITION_INSTRUCTIONS);
     }
 
     /**
@@ -86,7 +88,7 @@ public class DispositionScheduleImpl implements DispositionSchedule,
     public boolean isRecordLevelDisposition()
     {
         boolean result = false;
-        Boolean value = (Boolean)this.services.getNodeService().getProperty(this.dispositionDefinitionNodeRef, PROP_RECORD_LEVEL_DISPOSITION);
+        Boolean value = (Boolean)this.nodeService.getProperty(this.dispositionDefinitionNodeRef, PROP_RECORD_LEVEL_DISPOSITION);
         if (value != null)
         {
             result = value.booleanValue();
@@ -116,7 +118,7 @@ public class DispositionScheduleImpl implements DispositionSchedule,
     
     private void getDispositionActionsImpl()
     {
-        List<ChildAssociationRef> assocs = this.services.getNodeService().getChildAssocs(
+        List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(
                                                       this.dispositionDefinitionNodeRef, 
                                                       ASSOC_DISPOSITION_ACTION_DEFINITIONS, 
                                                       RegexQNamePattern.MATCH_ALL);

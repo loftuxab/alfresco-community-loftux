@@ -150,7 +150,7 @@ public class RecordsManagementNodeFormFilter extends RecordsManagementFormFilter
                     // use the same mechanism used to determine whether steps can be removed from the
                     // schedule to determine whether the disposition level can be changed i.e. record 
                     // level or folder level.
-                    DispositionSchedule schedule = new DispositionScheduleImpl(this.rmServiceRegistry, nodeRef);
+                    DispositionSchedule schedule = new DispositionScheduleImpl(this.rmServiceRegistry, this.nodeService, nodeRef);
                     if (schedule != null && !rmService.canDispositionActionDefinitionsBeRemoved(schedule))
                     {
                         protectRecordLevelDispositionPropertyField(form);

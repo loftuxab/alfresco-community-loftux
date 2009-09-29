@@ -174,7 +174,7 @@
           class="org.alfresco.module.org_alfresco_module_dod5015.forms.RecordsManagementNodeFormFilter">
        <property name="filterRegistry" ref="nodeFilterRegistry" />
        <property name="namespaceService" ref="NamespaceService"/>
-       <property name="nodeService" ref="NodeService"/>
+       <property name="nodeService" ref="nodeService"/>
        <property name="dictionaryService" ref="DictionaryService" />
        <property name="recordsManagementServiceRegistry" ref="RecordsManagementServiceRegistry" />
        <property name="recordsManagementService" ref="recordsManagementService"/>

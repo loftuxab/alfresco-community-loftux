@@ -608,7 +608,7 @@ public class RecordsManagementServiceImpl implements RecordsManagementService,
         
         if (diNodeRef != null)
         {
-            di = new DispositionScheduleImpl(serviceRegistry, diNodeRef);
+            di = new DispositionScheduleImpl(serviceRegistry, nodeService, diNodeRef);
         }
         
         return di;
