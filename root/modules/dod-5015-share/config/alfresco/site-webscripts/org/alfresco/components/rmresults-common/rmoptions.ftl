@@ -12,6 +12,7 @@
                      <input type="checkbox" id="${el}-metadata-identifier" checked="checked" />
                      <label for="${el}-metadata-identifier">${msg("label.identifier")}</label>
                   </li>
+                  <li class="metadata-header">${msg("label.menu.content")}</li>
                   <li>
                      <input type="checkbox" id="${el}-metadata-name" checked="checked" />
                      <label for="${el}-metadata-name">${msg("label.name")}</label>
@@ -48,6 +49,7 @@
                      <input type="checkbox" id="${el}-metadata-author" />
                      <label for="${el}-metadata-author">${msg("label.author")}</label>
                   </li>
+                  <li class="metadata-header">${msg("label.menu.records")}</li>
                   <li>
                      <input type="checkbox" id="${el}-metadata-originator" checked="checked" />
                      <label for="${el}-metadata-originator">${msg("label.originator")}</label>
@@ -93,13 +95,152 @@
                      <label for="${el}-metadata-address">${msg("label.address")}</label>
                   </li>
                   <li>
+                     <input type="checkbox" id="${el}-metadata-otherAddress" />
+                     <label for="${el}-metadata-otherAddress">${msg("label.otherAddress")}</label>
+                  </li>
+                  <li>
                      <input type="checkbox" id="${el}-metadata-supplementalMarkingList" />
                      <label for="${el}-metadata-supplementalMarkingList">${msg("label.supplementalMarkingList")}</label>
+                  </li>
+                  <li class="metadata-header">${msg("label.menu.disposition")}</li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-dispositionEvents" />
+                     <label for="${el}-metadata-dispositionEvents">${msg("label.dispositionEvents")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-dispositionActionName" />
+                     <label for="${el}-metadata-dispositionActionName">${msg("label.dispositionActionName")}</label>
                   </li>
                   <li>
                      <input type="checkbox" id="${el}-metadata-dispositionActionAsOf" />
                      <label for="${el}-metadata-dispositionActionAsOf">${msg("label.dispositionActionAsOf")}</label>
                   </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-dispositionEventsEligible" />
+                     <label for="${el}-metadata-dispositionEventsEligible">${msg("label.dispositionEventsEligible")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-dispositionPeriod" />
+                     <label for="${el}-metadata-dispositionPeriod">${msg("label.dispositionPeriod")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-hasDispositionSchedule" />
+                     <label for="${el}-metadata-hasDispositionSchedule">${msg("label.hasDispositionSchedule")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-vitalRecordReviewPeriod" />
+                     <label for="${el}-metadata-vitalRecordReviewPeriod">${msg("label.vitalRecordReviewPeriod")}</label>
+                  </li>
+                  <li class="metadata-header">${msg("label.menu.specialtypes")}</li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-scannedFormatVersion" />
+                     <label for="${el}-metadata-scannedFormatVersion">${msg("label.dod.scannedFormatVersion")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-resolutionX" />
+                     <label for="${el}-metadata-resolutionX">${msg("label.dod.resolutionX")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-resolutionY" />
+                     <label for="${el}-metadata-resolutionY">${msg("label.dod.resolutionY")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-scannedBitDepth" />
+                     <label for="${el}-metadata-scannedBitDepth">${msg("label.dod.scannedBitDepth")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-producingApplication" />
+                     <label for="${el}-metadata-producingApplication">${msg("label.dod.producingApplication")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-producingApplicationVersion" />
+                     <label for="${el}-metadata-producingApplicationVersion">${msg("label.dod.producingApplicationVersion")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-pdfVersion" />
+                     <label for="${el}-metadata-pdfVersion">${msg("label.dod.pdfVersion")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-creatingApplication" />
+                     <label for="${el}-metadata-creatingApplication">${msg("label.dod.creatingApplication")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-documentSecuritySettings" />
+                     <label for="${el}-metadata-documentSecuritySettings">${msg("label.dod.documentSecuritySettings")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-caption" />
+                     <label for="${el}-metadata-caption">${msg("label.dod.caption")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-photographer" />
+                     <label for="${el}-metadata-photographer">${msg("label.dod.photographer")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-copyright" />
+                     <label for="${el}-metadata-copyright">${msg("label.dod.copyright")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-bitDepth" />
+                     <label for="${el}-metadata-bitDepth">${msg("label.dod.bitDepth")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-imageSizeX" />
+                     <label for="${el}-metadata-imageSizeX">${msg("label.dod.imageSizeX")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-imageSizeY" />
+                     <label for="${el}-metadata-imageSizeY">${msg("label.dod.imageSizeY")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-imageSource" />
+                     <label for="${el}-metadata-imageSource">${msg("label.dod.imageSource")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-compression" />
+                     <label for="${el}-metadata-compression">${msg("label.dod.compression")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-iccIcmProfile" />
+                     <label for="${el}-metadata-iccIcmProfile">${msg("label.dod.iccIcmProfile")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-exifInformation" />
+                     <label for="${el}-metadata-exifInformation">${msg("label.dod.exifInformation")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-webFileName" />
+                     <label for="${el}-metadata-webFileName">${msg("label.dod.webFileName")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-webPlatform" />
+                     <label for="${el}-metadata-webPlatform">${msg("label.dod.webPlatform")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-webSiteName" />
+                     <label for="${el}-metadata-webSiteName">${msg("label.dod.webSiteName")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-webSiteURL" />
+                     <label for="${el}-metadata-webSiteURL">${msg("label.dod.webSiteURL")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-captureMethod" />
+                     <label for="${el}-metadata-captureMethod">${msg("label.dod.captureMethod")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-captureDate" />
+                     <label for="${el}-metadata-captureDate">${msg("label.dod.captureDate")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-contact" />
+                     <label for="${el}-metadata-contact">${msg("label.dod.contact")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-contentManagementSystem" />
+                     <label for="${el}-metadata-contentManagementSystem">${msg("label.dod.contentManagementSystem")}</label>
+                  </li>
+                  <li class="metadata-header">${msg("label.menu.custom")}</li>
                   <#list meta as d>
                   <#assign prop=d.name?substring(4)>
                   <li>
