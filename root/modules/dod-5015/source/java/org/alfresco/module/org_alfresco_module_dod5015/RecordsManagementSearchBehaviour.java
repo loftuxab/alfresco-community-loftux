@@ -32,15 +32,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.Period;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 
 /**
  * Search Behaviour class.
@@ -62,6 +65,8 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
     public static final QName PROP_RS_DISPOSITION_PERIOD = QName.createQName(RM_URI, "recordSearchDispositionPeriod");
     public static final QName PROP_RS_DISPOSITION_PERIOD_EXPRESSION = QName.createQName(RM_URI, "recordSearchDispositionPeriodExpression");
     public static final QName PROP_RS_HAS_DISPOITION_SCHEDULE = QName.createQName(RM_URI, "recordSearchHasDispositionSchedule");
+    public static final QName PROP_RS_DISPOITION_INSTRUCTIONS = QName.createQName(RM_URI, "recordSearchDispositionInstructions");
+    public static final QName PROP_RS_DISPOITION_AUTHORITY = QName.createQName(RM_URI, "recordSearchDispositionAuthority");
     
     /** Policy component */
     private PolicyComponent policyComponent;
@@ -82,7 +87,7 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
     {
         this.nodeService = nodeService;
     }
-
+    
     /**
      * @param policyComponent the policyComponent to set
      */
@@ -125,6 +130,11 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
                 TYPE_DISPOSITION_ACTION, 
                 new JavaBehaviour(this, "dispositionActionPropertiesUpdate", NotificationFrequency.TRANSACTION_COMMIT));
 
+        this.policyComponent.bindClassBehaviour(
+                    QName.createQName(NamespaceService.ALFRESCO_URI, "onUpdateProperties"), 
+                    TYPE_DISPOSITION_SCHEDULE, 
+                    new JavaBehaviour(this, "dispositionSchedulePropertiesUpdate", NotificationFrequency.TRANSACTION_COMMIT));
+        
         this.policyComponent.bindAssociationBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateChildAssociation"), 
                 TYPE_DISPOSITION_ACTION, 
@@ -163,6 +173,7 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
     }
 
     /**
+     * Updates the disposition action properties
      * 
      * @param nodeRef
      * @param before
@@ -216,7 +227,8 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
             }
             else
             {
-                nodeService.setProperty(nodeRef, PROP_RS_HAS_DISPOITION_SCHEDULE, true);                
+                nodeService.setProperty(nodeRef, PROP_RS_HAS_DISPOITION_SCHEDULE, true);
+                setDispositionScheduleProperties(nodeRef, ds);
             }
         }
     }
@@ -235,7 +247,8 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
             }
             else
             {
-                nodeService.setProperty(nodeRef, PROP_RS_HAS_DISPOITION_SCHEDULE, true);                
+                nodeService.setProperty(nodeRef, PROP_RS_HAS_DISPOITION_SCHEDULE, true);
+                setDispositionScheduleProperties(nodeRef, ds);
             }
         }
        
@@ -418,6 +431,52 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
     }
     
     /**
+     * Updates the disposition schedule properties
+     * 
+     * @param nodeRef
+     * @param before
+     * @param after
+     */
+    public void dispositionSchedulePropertiesUpdate(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after)
+    {
+        if (this.nodeService.exists(nodeRef) == true)
+        {
+            // create the schedule object and get the record category for it
+            DispositionSchedule schedule = new DispositionScheduleImpl(this.recordsManagementServiceRegistry, nodeRef);
+            NodeRef recordCategoryNode = this.nodeService.getPrimaryParent(schedule.getNodeRef()).getParentRef();
+            
+            if (schedule.isRecordLevelDisposition())
+            {
+                for (NodeRef recordFolder : this.getRecordFolders(recordCategoryNode))
+                {
+                    for (NodeRef record : this.recordsManagementService.getRecords(recordFolder))
+                    {
+                        applySearchAspect(record);
+                        setDispositionScheduleProperties(record, schedule);
+                    }
+                }
+            }
+            else
+            {
+                for (NodeRef recordFolder : this.getRecordFolders(recordCategoryNode))
+                {
+                    applySearchAspect(recordFolder);
+                    setDispositionScheduleProperties(recordFolder, schedule);
+                }
+            }
+        }
+    }
+    
+    private void setDispositionScheduleProperties(NodeRef recordOrFolder, DispositionSchedule schedule)
+    {
+        if (schedule != null)
+        {
+            this.nodeService.setProperty(recordOrFolder, PROP_RS_DISPOITION_AUTHORITY, schedule.getDispositionAuthority());
+            this.nodeService.setProperty(recordOrFolder, PROP_RS_DISPOITION_INSTRUCTIONS, schedule.getDispositionInstructions());
+        }
+    }
+    
+    /**
      * This method compares the oldProps map against the newProps map and returns
      * a set of QNames of the properties that have changed. Changed here means one of
      * <ul>
@@ -446,5 +505,23 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
         }
         
         return result;
+    }
+    
+    private List<NodeRef> getRecordFolders(NodeRef recordCategoryNode)
+    {
+        List<NodeRef> results = new ArrayList<NodeRef>(8);
+        
+        List<ChildAssociationRef> folderAssocs = nodeService.getChildAssocs(recordCategoryNode, 
+                    ContentModel.ASSOC_CONTAINS, RegexQNamePattern.MATCH_ALL);
+        for (ChildAssociationRef folderAssoc : folderAssocs)
+        {
+            NodeRef folder = folderAssoc.getChildRef();
+            if (this.recordsManagementService.isRecordFolder(folder))
+            {
+                results.add(folder);
+            }
+        }
+        
+        return results;
     }
 }
