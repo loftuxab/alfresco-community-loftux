@@ -2362,6 +2362,11 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertFalse(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
                 
+                // check the records have the hold reason reflected on the search aspect
+                assertEquals("reason1", nodeService.getProperty(recordOne, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
+                assertNull(nodeService.getProperty(recordTwo, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
+                assertNull(nodeService.getProperty(recordThree, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
+                
                 // Update the freeze reason
                 Map<String, Serializable> params = new HashMap<String, Serializable>(1);
                 params.put(FreezeAction.PARAM_REASON, "reason1changed");
@@ -2371,8 +2376,21 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 String updatedHoldReason = (String)nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON);
                 assertEquals("reason1changed", updatedHoldReason);
                 
+                return null;
+            }
+        });
+           
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // check the search fields on the records have also been updated 
+                assertEquals("reason1changed", nodeService.getProperty(recordOne, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
+                assertNull(nodeService.getProperty(recordTwo, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
+                assertNull(nodeService.getProperty(recordThree, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
+                
                 // Freeze a number of records
-                params = new HashMap<String, Serializable>(1);
+                Map<String, Serializable> params = new HashMap<String, Serializable>(1);
                 params.put(FreezeAction.PARAM_REASON, "reason2");
                 List<NodeRef> records = new ArrayList<NodeRef>(2);
                 records.add(recordOne);
@@ -2416,13 +2434,22 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                     assertTrue(nodeService.hasAspect(nr, ASPECT_FROZEN));
                     assertNotNull(nodeService.getProperty(nr, PROP_FROZEN_AT));
                     assertNotNull(nodeService.getProperty(nr, PROP_FROZEN_BY));
+                    assertNotNull(nodeService.getProperty(nr, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 }
                 
                 // Unfreeze a node
                 rmActionService.executeRecordsManagementAction(recordThree, "unfreeze");
                 
+                return null;
+            }
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
                 // Check the holds
-                holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                List<ChildAssociationRef> holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
                 assertNotNull(holdAssocs);
                 assertEquals(2, holdAssocs.size());
                 for (ChildAssociationRef holdAssoc : holdAssocs)
@@ -2446,10 +2473,13 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertTrue(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
                 assertNotNull(nodeService.getProperty(recordOne, PROP_FROZEN_AT));
                 assertNotNull(nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertEquals("reason2", nodeService.getProperty(recordOne, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
                 assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_AT));
                 assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_BY));
+                assertEquals("reason2", nodeService.getProperty(recordTwo, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+                assertNull(nodeService.getProperty(recordThree, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 
                 // Relinquish the first hold
                 NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
@@ -2467,47 +2497,85 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertNotNull(freezeAssocs);
                 assertEquals(2, freezeAssocs.size());
                 
+                return null;
+            }
+        });
+                
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
                 // Check the nodes are frozen
                 assertTrue(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
                 assertNotNull(nodeService.getProperty(recordOne, PROP_FROZEN_AT));
                 assertNotNull(nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                // TODO: record one is still linked to a hold so should have the original hold reason 
+                //       on the search aspect but we're presuming just one hold for now so the search hold
+                //       reason will remain unchanged
+                assertEquals("reason2", nodeService.getProperty(recordOne, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
                 assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_AT));
                 assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_BY));
+                assertEquals("reason2", nodeService.getProperty(recordTwo, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+                assertNull(nodeService.getProperty(recordThree, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 
                 // Unfreeze
                 rmActionService.executeRecordsManagementAction(recordOne, "unfreeze");
                 
+                return null;
+            }
+        });
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
                 // Check the holds
-                holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                List<ChildAssociationRef> holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
                 assertNotNull(holdAssocs);
                 assertEquals(1, holdAssocs.size());
-                holdNodeRef = holdAssocs.get(0).getChildRef();
+                NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
                 assertEquals("reason2", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
-                freezeAssocs = nodeService.getChildAssocs(holdNodeRef);
+                List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdNodeRef);
                 assertNotNull(freezeAssocs);
                 assertEquals(1, freezeAssocs.size());
                 
                 // Check the nodes are frozen
                 assertFalse(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
+                assertNull(nodeService.getProperty(recordOne, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
                 assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_AT));
                 assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_BY));
+                assertEquals("reason2", nodeService.getProperty(recordTwo, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+                assertNull(nodeService.getProperty(recordThree, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 
                 // Unfreeze
                 rmActionService.executeRecordsManagementAction(recordTwo, "unfreeze");
                 
+                return null;
+            }
+        });
+                
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
                 // Check the holds
-                holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                List<ChildAssociationRef> holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
                 assertNotNull(holdAssocs);
                 assertEquals(0, holdAssocs.size());
                 
-                // Check the nodes are frozen
+                // Check the nodes are unfrozen
                 assertFalse(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
                 assertFalse(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
+                
+                // check the search hold reason is null on all records
+                assertNull(nodeService.getProperty(recordOne, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
+                assertNull(nodeService.getProperty(recordTwo, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
+                assertNull(nodeService.getProperty(recordThree, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 
                 return null;
             }          
