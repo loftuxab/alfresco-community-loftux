@@ -51,6 +51,7 @@ import org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy;
 import org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.repo.transaction.TransactionListenerAdapter;
@@ -66,6 +67,7 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
@@ -118,6 +120,8 @@ public class RecordsManagementAuditServiceImpl
     private RecordsManagementActionService rmActionService;
     
     private boolean shutdown = false;
+    private boolean siteDeleted = false;
+    
     private RMAuditTxnListener txnListener;
     private Map<String, AuditEvent> auditEvents;
     
@@ -305,7 +309,15 @@ public class RecordsManagementAuditServiceImpl
         policyComponent.bindClassBehaviour(
                 BeforeDeleteNodePolicy.QNAME,
                 RecordsManagementModel.ASPECT_RECORD_COMPONENT_ID,
-                new JavaBehaviour(this, "beforeDeleteNode"));   
+                new JavaBehaviour(this, "beforeDeleteNode"));     
+        policyComponent.bindClassBehaviour(
+                BeforeDeleteNodePolicy.QNAME,
+                RecordsManagementModel.ASPECT_RECORDS_MANAGEMENT_ROOT,
+                new JavaBehaviour(this, "beforeDeleteRootNode"));  
+        policyComponent.bindClassBehaviour(
+                OnCreateNodePolicy.QNAME,
+                RecordsManagementModel.ASPECT_RECORDS_MANAGEMENT_ROOT,
+                new JavaBehaviour(this, "onCreateRootNode")); 
     }
 
     @Override
@@ -432,6 +444,50 @@ public class RecordsManagementAuditServiceImpl
     {
         auditRMEvent(nodeRef, RM_AUDIT_EVENT_DELETE_RM_OBJECT, null, null);
     }
+    
+    public void onCreateRootNode(ChildAssociationRef childAssocRef)
+    {
+       NodeRef nodeRef = childAssocRef.getChildRef();
+       StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+       if(!nodeRef.getStoreRef().equals(storeRef))
+       {
+            // This is not the spaces store - probably the archive store
+            return;
+       }
+
+       logger.debug("on create root node " + nodeRef);
+       if(siteDeleted)
+       {
+           siteDeleted = false;
+           if(!isEnabled())
+           {
+               start();
+           }
+       }
+    }
+    
+    public void beforeDeleteRootNode(NodeRef nodeRef)
+    {
+        StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+        if(!nodeRef.getStoreRef().equals(storeRef))
+        {
+             // This is not the spaces store - probably the archive store
+             return;
+        }
+        
+        logger.debug("before delete root node " + nodeRef);
+
+        if(isEnabled())
+        {
+           /**
+            * Turn off auditing and remeber that this was because we deleted the RM site.
+            */
+           siteDeleted = true;
+           stop();
+        }
+    }
+    
+
 
     public void onCreateNode(ChildAssociationRef childAssocRef)
     {
