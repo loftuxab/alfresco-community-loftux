@@ -440,10 +440,19 @@
             var dataType = Dom.get(parent.id + "-create-type").value;
             var mandatory = Dom.get(parent.id + "-create-mandatory").checked;
             
+            // generate valid qname string
+            var propId = "";
+            var prop = label.replace(/\s/g, "_")
+            for (var i=0, j=prop.length, c; i<j; i++)
+            {
+               // encode non-alphanumeric
+               c = prop.charAt(i);
+               propId += (/\W/.test(c) ? escape(c).substring(1) : c);
+            }
+            
             var obj =
             {
-               // strip whitespace, encode as URL and finally replace all '%' with '_' to make valid qname
-               propId: encodeURIComponent(label.replace(/\s/g, "")).replace(/%/g, "_"),
+               propId: propId,
                dataType: dataType,
                mandatory: mandatory,
                label: label
