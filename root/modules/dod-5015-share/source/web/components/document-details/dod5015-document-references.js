@@ -105,7 +105,9 @@
       {
          this.options.parentNodeRef = args[1].metadata.filePlan.replace(':/','');
          this.options.docName = args[1].documentDetails.displayName;
-         if (args[1].documentDetails.permissions.userAccess.Create)
+
+         var docDetails = args[1].documentDetails;
+         if (docDetails.permissions.userAccess.Create && docDetails.type !== "metadata-stub")
          {
             this.widgets.manageRefs.set("disabled", false);
          }

@@ -39,6 +39,16 @@
          <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />         
       </actionSet>
 
-      <actionSet id="metadataStub"></actionSet>
+      <actionSet id="metadataStubFolder">
+         <action type="simple-link" id="onActionViewDetails" href="{recordFolderDetailsUrl}" label="actions.view-details" />
+         <action type="action-link" id="onActionManagePermissions" permission="ManageAccessRights" label="actions.manage-permissions" />
+         <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
+         <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />
+      </actionSet>
+
+      <actionSet id="metadataStub">
+         <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
+         <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />
+      </actionSet>
    </actionSets>
 </documentList>

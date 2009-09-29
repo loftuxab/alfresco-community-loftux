@@ -199,7 +199,6 @@
    Alfresco.DocumentList.generateFavourite = function DL_generateFavourite(scope, record)
    {
       var id = scope.id + "-fav-" + record.getId(),
-         nodeRef = record.getData("nodeRef"),
          isFavourite = record.getData("isFavourite");
 
       return '<a id="' + id + '" class="favourite-document' + (isFavourite ? ' enabled' : '') + '" title="' + scope.msg("tip.favourite-document." + (isFavourite ? 'remove' : 'add')) + '">&nbsp;</a>';
@@ -902,7 +901,7 @@
              */
             if (me.doclistMetadata.onlineEditing && (record.mimetype in me.options.onlineEditMimetypes))
             {
-               var loc = record.location, path;
+               var loc = record.location;
                oRecord.setData("onlineEditUrl", window.location.protocol + "//" + window.location.hostname + ":" + me.options.vtiServer.port + "/" + $combine("alfresco", loc.site, loc.container, loc.path, loc.file));
             }
          };
@@ -1036,9 +1035,6 @@
        */
       _setupHistoryManagers: function DL__setupHistoryManagers()
       {
-         // Reference to self used by inline functions
-         var me = this;
-
          /**
           * YUI History - path
           */
@@ -2035,7 +2031,7 @@
        */
       onDeactivateAllControls: function DL_onDeactivateAllControls(layer, args)
       {
-         var index, widget, fnDisable = Alfresco.util.disableYUIButton;
+         var index, fnDisable = Alfresco.util.disableYUIButton;
          for (index in this.widgets)
          {
             if (this.widgets.hasOwnProperty(index))

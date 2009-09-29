@@ -254,6 +254,7 @@
                   case "record-series":
                   case "record-category":
                   case "record-folder":
+                  case "metadata-stub-folder":
                   case "transfer-container":
                   case "hold-container":
                      elCell.innerHTML = '<span class="folder-small">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + type + '-32.png" /></a>';
@@ -298,6 +299,7 @@
                   case "record-series":
                   case "record-category":
                   case "record-folder":
+                  case "metadata-stub-folder":
                   case "transfer-container":
                   case "hold-container":
                      elCell.innerHTML = '<span class="folder">' + (isLink ? '<span class="link"></span>' : '') + '<a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + type + '-48.png" /></a>';
@@ -437,6 +439,7 @@
                 * Record Folder
                 */
                case "record-folder":
+               case "metadata-stub-folder":
                   desc = '<h3 class="filename"><a href="#" class="filter-change" rel="' + Alfresco.DocumentList.generatePathMarkup(locn) + '" title="' + $html(fileName) + '">';
                   desc += $html(record.displayName) + '</a>' + title + '</h3>';
 
