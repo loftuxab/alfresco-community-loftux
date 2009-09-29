@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -37,6 +37,8 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Relinquish Hold Action
@@ -45,6 +47,9 @@ import org.alfresco.service.namespace.RegexQNamePattern;
  */
 public class RelinquishHoldAction extends RMActionExecuterAbstractBase
 {
+    /** Logger */
+    private static Log logger = LogFactory.getLog(RelinquishHoldAction.class);
+
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action, org.alfresco.service.cmr.repository.NodeRef)
      */
@@ -54,25 +59,49 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
         QName nodeType = this.nodeService.getType(actionedUponNodeRef);
         if (this.dictionaryService.isSubClass(nodeType, TYPE_HOLD) == true)
         {
-            List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(actionedUponNodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
-            for (ChildAssociationRef assoc : assocs)
+            final NodeRef holdNodeRef = actionedUponNodeRef;
+            List<ChildAssociationRef> frozenNodeAssocs = this.nodeService.getChildAssocs(holdNodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
+            
+            if (logger.isDebugEnabled())
             {
-                // Remove the freeze if this is the only hold that references the node
-                removeFreeze(assoc.getChildRef(), 1);
+                StringBuilder msg = new StringBuilder();
+                msg.append("Relinquishing hold ").append(holdNodeRef)
+                    .append(" which has ").append(frozenNodeAssocs.size()).append(" frozen node(s).");
+                logger.debug(msg.toString());
+            }
+            
+            for (ChildAssociationRef assoc : frozenNodeAssocs)
+            {
+                final NodeRef nextFrozenNode = assoc.getChildRef();
                 
-                // Remove the freeze's on the child records as long as there is no other hold referencing them
-                if (this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
+                // Remove the freeze if this is the only hold that references the node
+                removeFreeze(nextFrozenNode, 1);
+                
+                // Remove the freezes on the child records as long as there is no other hold referencing them
+                if (this.recordsManagementService.isRecordFolder(nextFrozenNode) == true)
                 {
-                    List<NodeRef> records = this.recordsManagementService.getRecords(actionedUponNodeRef);
-                    for (NodeRef record : records)
+                    if (logger.isDebugEnabled())
                     {
-                        removeFreeze(record, 0);
+                        StringBuilder msg = new StringBuilder();
+                        msg.append(nextFrozenNode).append(" is a record folder");
+                        logger.debug(msg.toString());
+                    }
+                    for (NodeRef record : recordsManagementService.getRecords(holdNodeRef))
+                    {
+                        removeFreeze(record, 0); //TODO 0?
                     }
                 }
             }
             
+            if (logger.isDebugEnabled())
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Deleting hold object ").append(holdNodeRef);
+                logger.debug(msg.toString());
+            }
+            
             // Delete the hold node
-            this.nodeService.deleteNode(actionedUponNodeRef);
+            this.nodeService.deleteNode(holdNodeRef);
         }
         else
         {
@@ -90,8 +119,24 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
     {
         // Get all the holds and remove this node from them
         List<ChildAssociationRef> assocs = this.nodeService.getParentAssocs(nodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
+        
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("Removing freeze from ").append(nodeRef).append(" which has ")
+                .append(assocs.size()).append(" holds.").append(" count=").append(count);
+            logger.debug(msg.toString());
+        }
+
         if (assocs.size() == count)
         {
+            if (logger.isDebugEnabled())
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Removing frozen aspect from ").append(nodeRef);
+                logger.debug(msg.toString());
+            }
+
             // Remove the aspect
             this.nodeService.removeAspect(nodeRef, ASPECT_FROZEN);
         }

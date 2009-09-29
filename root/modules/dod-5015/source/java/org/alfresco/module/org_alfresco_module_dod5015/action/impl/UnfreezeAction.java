@@ -36,6 +36,8 @@ import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Unfreeze Action
@@ -44,6 +46,9 @@ import org.alfresco.service.namespace.RegexQNamePattern;
  */
 public class UnfreezeAction extends RMActionExecuterAbstractBase
 {
+    /** Logger */
+    private static Log logger = LogFactory.getLog(UnfreezeAction.class);
+
     /**
      * @see org.alfresco.repo.action.executer.ActionExecuterAbstractBase#executeImpl(org.alfresco.service.cmr.action.Action,
      *      org.alfresco.service.cmr.repository.NodeRef)
@@ -53,11 +58,24 @@ public class UnfreezeAction extends RMActionExecuterAbstractBase
     {
         if (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_FROZEN) == true)
         {
+            final boolean isFolder = this.recordsManagementService.isRecordFolder(actionedUponNodeRef);
+
+            if (logger.isDebugEnabled())
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Unfreezing node ").append(actionedUponNodeRef);
+                if (isFolder)
+                {
+                    msg.append(" (folder)");
+                }
+                logger.debug(msg.toString());
+            }
+
             // Remove freeze from node
             removeFreeze(actionedUponNodeRef);
 
             // Remove freeze from records if a record folder
-            if (this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
+            if (isFolder)
             {
                 List<NodeRef> records = this.recordsManagementService.getRecords(actionedUponNodeRef);
                 for (NodeRef record : records)
@@ -78,16 +96,39 @@ public class UnfreezeAction extends RMActionExecuterAbstractBase
     {
         // Get all the holds and remove this node from them
         List<ChildAssociationRef> assocs = this.nodeService.getParentAssocs(nodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
+
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("Removing freeze from node ").append(nodeRef)
+                .append("which has ").append(assocs.size()).append(" holds");
+            logger.debug(msg.toString());
+        }
+
         for (ChildAssociationRef assoc : assocs)
         {
             // Remove the frozen node as a child
             NodeRef holdNodeRef = assoc.getParentRef();
             this.nodeService.removeChild(holdNodeRef, nodeRef);
 
+            if (logger.isDebugEnabled())
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Removed frozen node from hold ").append(holdNodeRef);
+                logger.debug(msg.toString());
+            }
+
             // Check to see if we should delete the hold
             List<ChildAssociationRef> holdAssocs = this.nodeService.getChildAssocs(holdNodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
             if (holdAssocs.size() == 0)
             {
+                if (logger.isDebugEnabled())
+                {
+                    StringBuilder msg = new StringBuilder();
+                    msg.append("Hold node ").append(holdNodeRef).append(" has no frozen nodes. Hence deleting it.");
+                    logger.debug(msg.toString());
+                }
+                
                 // Delete the hold object
                 this.nodeService.deleteNode(holdNodeRef);
             }
@@ -95,6 +136,13 @@ public class UnfreezeAction extends RMActionExecuterAbstractBase
 
         // Remove the aspect
         this.nodeService.removeAspect(nodeRef, ASPECT_FROZEN);
+
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("Removed frozen aspect from ").append(nodeRef);
+            logger.debug(msg.toString());
+        }
     }
 
     @Override
