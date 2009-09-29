@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -125,7 +126,9 @@ public class UnfreezeAction extends RMActionExecuterAbstractBase
                 if (logger.isDebugEnabled())
                 {
                     StringBuilder msg = new StringBuilder();
-                    msg.append("Hold node ").append(holdNodeRef).append(" has no frozen nodes. Hence deleting it.");
+                    msg.append("Hold node ").append(holdNodeRef)
+                        .append(" with name ").append(nodeService.getProperty(holdNodeRef, ContentModel.PROP_NAME))
+                        .append(" has no frozen nodes. Hence deleting it.");
                     logger.debug(msg.toString());
                 }
                 

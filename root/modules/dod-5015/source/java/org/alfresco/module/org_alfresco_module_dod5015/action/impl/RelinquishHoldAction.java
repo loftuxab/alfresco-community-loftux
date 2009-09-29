@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMActionExecuterAbstractBase;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
@@ -96,7 +97,8 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
             if (logger.isDebugEnabled())
             {
                 StringBuilder msg = new StringBuilder();
-                msg.append("Deleting hold object ").append(holdNodeRef);
+                msg.append("Deleting hold object ").append(holdNodeRef)
+                    .append(" with name ").append(nodeService.getProperty(holdNodeRef, ContentModel.PROP_NAME));
                 logger.debug(msg.toString());
             }
             
