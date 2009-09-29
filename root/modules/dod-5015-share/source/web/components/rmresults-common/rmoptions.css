@@ -15,6 +15,13 @@
    overflow-x: hidden;
 }
 
+.rmoptions .metadata-header
+{
+   border-bottom: 1px solid lightgrey;
+   font-weight: bold;
+   margin-bottom: 4px;
+}
+
 .rmoptions label
 {
    padding-left: 4px;

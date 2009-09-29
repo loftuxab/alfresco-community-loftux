@@ -57,6 +57,17 @@
    background-color: #AAAAAA !important;
 }
 
+.yui-skin-default .yui-dt th,
+.yui-skin-default .yui-dt td
+{
+   border-style: none !important;
+}
+
+.yui-skin-default .yui-dt-liner
+{
+   padding: 2px 6px !important;
+}
+
 .search textarea
 {
    width: 60em;

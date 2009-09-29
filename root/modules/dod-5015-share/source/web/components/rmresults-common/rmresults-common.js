@@ -250,12 +250,26 @@
          this.widgets.dataSource = new YAHOO.util.DataSource(uriSearchResults);
          this.widgets.dataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.widgets.dataSource.connXhrMode = "queueRequests";
-         // add the well known 'cm' fields and 'rma' namespace
-         var fields = ["nodeRef", "type", "name", "title", "description", "modifiedOn", "modifiedByUser", "modifiedBy",
-                       "createdOn", "createdByUser", "createdBy", "author", "size", "browseUrl", "parentFolder",
-                       "properties.rma_identifier", "properties.rma_dateFiled", "properties.rma_publicationDate", "properties.rma_dateReceived",
-                       "properties.rma_originator", "properties.rma_originatingOrganization", "properties.rma_mediaType", "properties.rma_format", "properties.rma_location",
-                       "properties.rma_address", "properties.rmc_supplementalMarkingList", "properties.rma_reviewAsOf", "properties.rma_recordSearchDispositionActionAsOf"];
+         // add the well known 'cm', 'rma' and 'dod' namespace fields
+         var fields =
+         [
+            "nodeRef", "type", "name", "title", "description", "modifiedOn", "modifiedByUser", "modifiedBy",
+            "createdOn", "createdByUser", "createdBy", "author", "size", "browseUrl", "parentFolder",
+            "properties.rma_identifier", "properties.rma_dateFiled", "properties.rma_publicationDate", "properties.rma_dateReceived",
+            "properties.rma_originator", "properties.rma_originatingOrganization", "properties.rma_mediaType", "properties.rma_format", "properties.rma_location",
+            "properties.rma_address", "properties.rma_otherAddress", "properties.rmc_supplementalMarkingList", "properties.rma_reviewAsOf",
+            "properties.rma_recordSearchDispositionEvents", "properties.rma_recordSearchHasDispositionSchedule", 
+            "properties.rma_recordSearchDispositionActionName", "properties.rma_recordSearchDispositionActionAsOf",
+            "properties.rma_recordSearchDispositionPeriod", "properties.rma_recordSearchDispositionEventsEligible",
+            "properties.rma_recordSearchVitalRecordReviewPeriod",
+            "properties.dod_scannedFormatVersion", "properties.dod_resolutionX", "properties.dod_resolutionY", "properties.dod_scannedBitDepth",
+            "properties.dod_producingApplication", "properties.dod_producingApplicationVersion", "properties.dod_pdfVersion", "properties.dod_creatingApplication", 
+            "properties.dod_documentSecuritySettings", "properties.dod_caption", "properties.dod_photographer", "properties.dod_copyright", 
+            "properties.dod_bitDepth", "properties.dod_imageSizeX", "properties.dod_imageSizeY", "properties.dod_imageSource", 
+            "properties.dod_compression", "properties.dod_iccIcmProfile", "properties.dod_exifInformation", "properties.dod_webFileName", 
+            "properties.dod_webPlatform", "properties.dod_webSiteName", "properties.dod_webSiteURL", "properties.dod_captureMethod", 
+            "properties.dod_captureDate", "properties.dod_contact", "properties.dod_contentManagementSystem"
+         ];
          // add the custom meta fields - 'rmc' namespace
          for (var i=0, j=this.options.customFields.length; i<j; i++)
          {
@@ -425,6 +439,7 @@
          [
             { key: "image", label: me._msg("label.type"), sortable: false, field: "type", sortable: true, formatter: renderCellImage, width: "64px" },
             { key: "identifier", label: me._msg("label.identifier"), sortable: true, sortOptions: {sortFunction: sortCellURI}, resizeable: true, formatter: renderCellURI },
+            
             { key: "name", label: me._msg("label.name"), field: "name", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
             { key: "title", label: me._msg("label.title"), field: "title", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
             { key: "description", label: me._msg("label.description"), field: "description", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
@@ -434,19 +449,56 @@
             { key: "modifier", label: me._msg("label.modifier"), field: "modifiedBy", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
             { key: "modified", label: me._msg("label.modified"), field: "modifiedOn", sortable: true, resizeable: true, formatter: renderCellDate },
             { key: "author", label: me._msg("label.author"), field: "author", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            
             { key: "originator", label: me._msg("label.originator"), field: "properties.rma_originator", sortable: true, resizeable: true, formatter: renderCellSafeHTML },
             { key: "dateFiled", label: me._msg("label.dateFiled"), field: "properties.rma_dateFiled", sortable: true, resizeable: true, formatter: renderCellDate },
             { key: "publicationDate", label: me._msg("label.publicationDate"), field: "properties.rma_publicationDate", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true },
             { key: "reviewDate", label: me._msg("label.reviewDate"), field: "properties.rma_reviewAsOf", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true },
             { key: "vitalRecord", label: me._msg("label.vitalRecord"), sortable: true, sortOptions: {sortFunction: sortCellVitalRecord}, resizeable: false, formatter: renderCellVitalRecord },
             { key: "originatingOrganization", label: me._msg("label.originatingOrganization"), field: "properties.rma_originatingOrganization", sortable: true, resizeable: true, hidden: true },
-            { key: "mediaType", label: me._msg("label.mediaType"), field: "properties.rma_mediaType", sortable: true, resizeable: true, hidden: true },
-            { key: "format", label: me._msg("label.format"), field: "properties.rma_format", sortable: true, resizeable: true, hidden: true },
+            { key: "mediaType", label: me._msg("label.mediaType"), field: "properties.rma_mediaType", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "format", label: me._msg("label.format"), field: "properties.rma_format", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
             { key: "dateReceived", label: me._msg("label.dateReceived"), field: "properties.rma_dateReceived", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true },
-            { key: "location", label: me._msg("label.location"), field: "properties.rma_location", sortable: true, resizeable: true, hidden: true },
-            { key: "address", label: me._msg("label.address"), field: "properties.rma_address", sortable: true, resizeable: true, hidden: true },
+            { key: "location", label: me._msg("label.location"), field: "properties.rma_location", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "address", label: me._msg("label.address"), field: "properties.rma_address", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "otherAddress", label: me._msg("label.otherAddress"), field: "properties.rma_otherAddress", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
             { key: "supplementalMarkingList", label: me._msg("label.supplementalMarkingList"), field: "properties.rmc_supplementalMarkingList", sortable: true, resizeable: true, hidden: true },
-            { key: "dispositionActionAsOf", label: me._msg("label.dispositionActionAsOf"), field: "properties.rma_recordSearchDispositionActionAsOf", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true }
+            
+            { key: "dispositionEvents", label: me._msg("label.dispositionEvents"), field: "properties.rma_recordSearchDispositionEvents", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "dispositionActionName", label: me._msg("label.dispositionActionName"), field: "properties.rma_recordSearchDispositionActionName", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "dispositionActionAsOf", label: me._msg("label.dispositionActionAsOf"), field: "properties.rma_recordSearchDispositionActionAsOf", sortable: true, resizeable: true, formatter: renderCellDate, hidden: true },
+            { key: "dispositionEventsEligible", label: me._msg("label.dispositionEventsEligible"), field: "properties.rma_recordSearchDispositionEventsEligible", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "dispositionPeriod", label: me._msg("label.dispositionPeriod"), field: "properties.rma_recordSearchDispositionPeriod", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "hasDispositionSchedule", label: me._msg("label.hasDispositionSchedule"), field: "properties.rma_recordSearchHasDispositionSchedule", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "vitalRecordReviewPeriod", label: me._msg("label.vitalRecordReviewPeriod"), field: "properties.rma_recordSearchVitalRecordReviewPeriod", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            
+            { key: "scannedFormatVersion", label: me._msg("label.dod.scannedFormatVersion"), field: "properties.dod_scannedFormatVersion", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "resolutionX", label: me._msg("label.dod.resolutionX"), field: "properties.dod_resolutionX", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "resolutionY", label: me._msg("label.dod.resolutionY"), field: "properties.dod_resolutionY", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "scannedBitDepth", label: me._msg("label.dod.scannedBitDepth"), field: "properties.dod_scannedBitDepth", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "producingApplication", label: me._msg("label.dod.producingApplication"), field: "properties.dod_producingApplication", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "producingApplicationVersion", label: me._msg("label.dod.producingApplicationVersion"), field: "properties.dod_producingApplicationVersion", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "pdfVersion", label: me._msg("label.dod.pdfVersion"), field: "properties.dod_pdfVersion", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "creatingApplication", label: me._msg("label.dod.creatingApplication"), field: "properties.dod_creatingApplication", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "documentSecuritySettings", label: me._msg("label.dod.documentSecuritySettings"), field: "properties.dod_documentSecuritySettings", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "caption", label: me._msg("label.dod.caption"), field: "properties.dod_caption", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "photographer", label: me._msg("label.dod.photographer"), field: "properties.dod_photographer", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "copyright", label: me._msg("label.dod.copyright"), field: "properties.dod_copyright", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "bitDepth", label: me._msg("label.dod.bitDepth"), field: "properties.dod_bitDepth", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "imageSizeX", label: me._msg("label.dod.imageSizeX"), field: "properties.dod_imageSizeX", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "imageSizeY", label: me._msg("label.dod.imageSizeY"), field: "properties.dod_imageSizeY", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "imageSource", label: me._msg("label.dod.imageSource"), field: "properties.dod_imageSource", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "compression", label: me._msg("label.dod.compression"), field: "properties.dod_compression", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "iccIcmProfile", label: me._msg("label.dod.iccIcmProfile"), field: "properties.dod_iccIcmProfile", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "exifInformation", label: me._msg("label.dod.exifInformation"), field: "properties.dod_exifInformation", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "webFileName", label: me._msg("label.dod.webFileName"), field: "properties.dod_webFileName", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "webPlatform", label: me._msg("label.dod.webPlatform"), field: "properties.dod_webPlatform", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "webSiteName", label: me._msg("label.dod.webSiteName"), field: "properties.dod_webSiteName", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "webSiteURL", label: me._msg("label.dod.webSiteURL"), field: "properties.dod_webSiteURL", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "captureMethod", label: me._msg("label.dod.captureMethod"), field: "properties.dod_captureMethod", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "captureDate", label: me._msg("label.dod.captureDate"), field: "properties.dod_captureDate", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "contact", label: me._msg("label.dod.contact"), field: "properties.dod_contact", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "contentManagementSystem", label: me._msg("label.dod.contentManagementSystem"), field: "properties.dod_contentManagementSystem", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true }
          ];
          
          // Add the custom metadata columns
