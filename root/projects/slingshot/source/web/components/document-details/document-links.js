@@ -52,25 +52,15 @@
     */
    Alfresco.DocumentLinks = function(htmlId)
    {
-      this.name = "Alfresco.DocumentLinks";
-      this.id = htmlId;
+      Alfresco.DocumentLinks.superclass.constructor.call(this, "Alfresco.DocumentLinks", htmlId, ["button"]);
       
-      // initialise prototype properties
-      this.widgets = {};
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button"], this.onComponentsLoaded, this);
-   
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
       
       return this;
    }
    
-   Alfresco.DocumentLinks.prototype =
+   YAHOO.extend(Alfresco.DocumentLinks, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -90,104 +80,66 @@
       },
       
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: {},
-      
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setOptions: function DocumentLinks_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Search} returns 'this' for method chaining
-       */
-      setMessages: function DocumentLinks_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function DocumentLinks_onComponentsLoaded()
-      {
-         // don't need to do anything we will be informed via an event when data is ready
-      },
-            
-      /**
        * Event handler called when the "documentDetailsAvailable" event is received
        *
        * @method: onDocumentDetailsAvailable
        */
       onDocumentDetailsAvailable: function DocumentLinks_onDocumentDetailsAvailable(layer, args)
       {
-         var docData = args[1].documentDetails;
+         var docData = args[1].documentDetails,
+            hasClipboard = window.clipboardData && clipboardData.setData;
          
-         // construct the base content URL
-         var contentUrl = (this.options.externalAuth ? Alfresco.constants.PROXY_URI : Alfresco.constants.PROXY_FEED_URI) + docData.contentUrl;
-         
-         // populate the text field with the download url
-         var downloadUrl = contentUrl + "?a=true";
-         Dom.get(this.id + "-download-url").value = downloadUrl;
-         
-         var clipboard = (window.clipboardData && clipboardData.setData);
-         
-         // create YUI button for download copy button
-         if (clipboard)
+         // Construct the content-based URLs if the document actually has content (size > 0)
+         if (parseInt(docData.size, 10) > 0)
          {
-            this.widgets.downloadCopyButton = Alfresco.util.createYUIButton(this, "download-button", null,
+            // Show UI controls
+            Dom.setStyle(this.id + "-download", "display", "block");
+            Dom.setStyle(this.id + "-view", "display", "block");
+            
+            var contentUrl = (this.options.externalAuth ? Alfresco.constants.PROXY_URI : Alfresco.constants.PROXY_FEED_URI) + docData.contentUrl;
+
+            // Populate the text fields with the appropriate URLs
+            Dom.get(this.id + "-download-url").value = contentUrl + "?a=true";
+            Dom.get(this.id + "-view-url").value = contentUrl;
+            
+            // Create YUI buttons for copy if clipboard functions available
+            if (hasClipboard)
             {
-               onclick:
+               this.widgets.downloadCopyButton = Alfresco.util.createYUIButton(this, "download-button", null,
                {
-                  fn: this._handleCopyClick,
-                  obj: "-download-url",
-                  scope: this
-               }
-            });
+                  onclick:
+                  {
+                     fn: this._handleCopyClick,
+                     obj: "-download-url",
+                     scope: this
+                  }
+               });
+
+               this.widgets.viewCopyButton = Alfresco.util.createYUIButton(this, "view-button", null,
+               {
+                  onclick:
+                  {
+                     fn: this._handleCopyClick,
+                     obj: "-view-url",
+                     scope: this
+                  }
+               });
+            }
+
+            // Add focus event handlers to fields        
+            Event.addListener(Dom.get(this.id + "-download-url"), "focus", this._handleFocus, "-download-url", this);
+            Event.addListener(Dom.get(this.id + "-view-url"), "focus", this._handleFocus, "-view-url", this);
          }
-         
-         // populate the text field with the view url
-         Dom.get(this.id + "-view-url").value = contentUrl;
-         
-         // create YUI button for view copy button
-         if (clipboard)
+         else
          {
-            this.widgets.viewCopyButton = Alfresco.util.createYUIButton(this, "view-button", null,
-            {
-               onclick:
-               {
-                  fn: this._handleCopyClick,
-                  obj: "-view-url",
-                  scope: this
-               }
-            });
+            // Hide UI controls
+            Dom.setStyle(this.id + "-download", "display", "none");
+            Dom.setStyle(this.id + "-view", "display", "none");
          }
-         
-         // populate the text field with the page url
+
+         // Page link URL and copy button if possible
          Dom.get(this.id + "-page-url").value = window.location.href;
-         
-         // create YUI button for page copy button
-         if (clipboard)
+         if (hasClipboard)
          {
             this.widgets.pageCopyButton = Alfresco.util.createYUIButton(this, "page-button", null,
             {
@@ -199,10 +151,7 @@
                }
             });
          }
- 
-         // add focus event handlers to fields        
-         Event.addListener(Dom.get(this.id + "-download-url"), "focus", this._handleFocus, "-download-url", this);
-         Event.addListener(Dom.get(this.id + "-view-url"), "focus", this._handleFocus, "-view-url", this);
+         
          Event.addListener(Dom.get(this.id + "-page-url"), "focus", this._handleFocus, "-page-url", this);
       },
       
@@ -235,5 +184,5 @@
             fieldObj.select();
          }
       }
-   };
+   });
 })();

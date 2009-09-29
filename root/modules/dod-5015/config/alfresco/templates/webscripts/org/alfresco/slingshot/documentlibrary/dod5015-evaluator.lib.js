@@ -20,6 +20,10 @@ var Evaluator =
             break;
          case "rma:recordFolder":
             assetType = "record-folder";
+            if (asset.hasAspect("dod:ghosted"))
+            {
+               assetType = "metadata-stub-folder";
+            }
             break;
          case "rma:nonElectronicDocument":
             // Fall-through
@@ -38,9 +42,6 @@ var Evaluator =
             }
             break;
          case "rma:transfer":
-            /**
-             * TODO: Determine whether this is a "transfer" or "accession" container (metadata?)
-             */
             assetType = "transfer-container";
             break;
          case "rma:hold":
@@ -256,7 +257,7 @@ var Evaluator =
 
       /**
        * Basic permissions - start from entire capabiltiies list
-       * TODO: Filter-out the ones non relevant to DocLib
+       * TODO: Filter-out the ones not relevant to DocLib UI.
        */
       permissions = capabilities;
 
@@ -348,7 +349,6 @@ var Evaluator =
                   permissions["close-folder"] = true;
                }
             }
-
             break;
 
 
@@ -386,7 +386,17 @@ var Evaluator =
             {
                permissions["undeclare"] = true;
             }
-            
+            break;
+
+
+         /**
+          * SPECIFIC TO: GHOSTED RECORD FOLDER (Metadata Stub Folder)
+          */
+         case "metadata-stub-folder":
+            actionSet = "metadataStubFolder";
+
+            /* Destroyed status */
+            status["destroyed"] = true;
             break;
 
 
@@ -396,8 +406,8 @@ var Evaluator =
          case "metadata-stub":
             actionSet = "metadataStub";
 
-            /* Record and Record Folder common evaluator */
-            Evaluator.recordAndRecordFolder(asset, permissions, status);
+            /* Destroyed status */
+            status["destroyed"] = true;
 
             /* Record Type evaluator */
             recordType = Evaluator.recordType(asset);
