@@ -1,4 +1,3 @@
-<#macro dateFormat date>${date?string("dd MMM yyyy HH:mm:ss 'GMT'Z '('zzz')'")}</#macro>
 <#escape x as jsonUtils.encodeJSONString(x)>
 {
 	"items":
@@ -10,10 +9,10 @@
 			"name": "${item.name}",
 			"title": "${item.title!''}",
 			"description": "${item.description!''}",
-			"modifiedOn": "<@dateFormat item.modifiedOn />",
+			"modifiedOn": "${xmldate(item.modifiedOn)}",
 			"modifiedByUser": "${item.modifiedByUser}",
 			"modifiedBy": "${item.modifiedBy}",
-			"createdOn": "<@dateFormat item.createdOn />",
+			"createdOn": "${xmldate(item.createdOn)}",
 			"createdByUser": "${item.createdByUser}",
 			"createdBy": "${item.createdBy}",
 			"author": "${item.author!''}",
