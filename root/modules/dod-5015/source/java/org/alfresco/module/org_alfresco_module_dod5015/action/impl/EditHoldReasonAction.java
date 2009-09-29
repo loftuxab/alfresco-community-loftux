@@ -67,7 +67,7 @@ public class EditHoldReasonAction extends RMActionExecuterAbstractBase
         }
         else
         {
-            throw new AlfrescoRuntimeException("Can not relinquish a hold on a node that is not of type " + TYPE_HOLD.toString() + 
+            throw new AlfrescoRuntimeException("Can not edit a hold reason on a node that is not of type " + TYPE_HOLD.toString() + 
                                                "(" + actionedUponNodeRef.toString() + ")");
         }                
     }
