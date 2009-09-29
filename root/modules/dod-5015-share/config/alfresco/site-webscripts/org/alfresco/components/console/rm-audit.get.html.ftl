@@ -22,7 +22,7 @@
       <div class="yui-u first">
           <div id="${htmlid}-audit-info" class="audit-info">
              <h2>${msg("label.header-title")}</h2>
-             <p id="${htmlid}-audit-status-date" class="audit-status-date"></p>
+             <p id="${htmlid}-audit-status-date" class="audit-status-date">${msg('label.default-message')}</p>
           </div>
       </div>
       <div class="yui-u">
@@ -122,7 +122,7 @@
     <div id="${htmlid}-audit-log" class="yui-gc audit-log">
       <div class="yui-u">
          <button id="${htmlid}-audit-export" disabled name="audit-export" class="audit-export">${msg("label.button-export")}</button>
-         <button id="${htmlid}-audit-declare-record" disabled name="audit-declare-record" class="audit-declare-record">${msg("label.button-declare-record")}</button>            
+         <button id="${htmlid}-audit-file-record" disabled name="audit-file-record" class="audit-file-record">${msg("label.button-file-record")}</button>            
          <div id="${htmlid}-audit-auditDT" class="auditDT">
          </div>    
       </div>

@@ -19,7 +19,7 @@
    </#if>
    <div class="auditActions">
       <button id="${htmlid}-audit-export" name="audit-export" class="audit-export">${msg("label.button-export")}</button>
-      <button id="${htmlid}-audit-declare-record" name="audit-declare-record" class="audit-declare-record">${msg("label.button-declare-record")}</button>            
+      <button id="${htmlid}-audit-file-record" name="audit-file-record" class="audit-file-record">${msg("label.button-file-record")}</button>            
    </div>
    <div class="audit-info">
       <span class="label">${msg('label.from')}:</span>
