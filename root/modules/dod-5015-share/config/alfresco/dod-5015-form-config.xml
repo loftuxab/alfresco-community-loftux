@@ -230,6 +230,8 @@
                <hide id="rma:recordSearchHasDispositionSchedule" />
                <hide id="rma:recordSearchDispositionPeriod" />
                <hide id="rma:recordSearchDispositionPeriodExpression" />
+               <hide id="rma:recordSearchDispositionAuthority" />
+               <hide id="rma:recordSearchDispositionInstructions" />
                <hide id="rma:recordSearchVitalRecordReviewPeriod" />
                <hide id="rma:recordSearchVitalRecordReviewPeriodExpression" />
                <hide id="rma:recordSearchDispositionActionAsOf" for-mode="edit" />
