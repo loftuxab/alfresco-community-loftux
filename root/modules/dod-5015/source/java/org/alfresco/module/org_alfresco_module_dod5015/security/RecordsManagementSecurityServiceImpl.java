@@ -38,6 +38,7 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
+import org.alfresco.module.org_alfresco_module_dod5015.audit.RecordsManagementAuditServiceImpl;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.Capability;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMEntryVoter;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
@@ -50,6 +51,7 @@ import org.alfresco.repo.security.permissions.AccessDeniedException;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.security.AccessPermission;
 import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.cmr.security.AuthorityService;
@@ -57,6 +59,8 @@ import org.alfresco.service.cmr.security.AuthorityType;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -89,6 +93,9 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
     
     /** Records management role zone */
     public static final String RM_ROLE_ZONE_PREFIX = "rmRoleZone";
+    
+    /** Logger */
+    private static Log logger = LogFactory.getLog(RecordsManagementSecurityServiceImpl.class);
     
     /**
      * Set the RMEntryVoter
@@ -164,6 +171,9 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
         policyComponent.bindClassBehaviour(NodeServicePolicies.OnCreateNodePolicy.QNAME,  
                 TYPE_RECORD_FOLDER, 
                 new JavaBehaviour(this, "onCreateRecordFolder", NotificationFrequency.TRANSACTION_COMMIT));
+        policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "beforeDeleteNode"), 
+                ASPECT_RECORDS_MANAGEMENT_ROOT, 
+                new JavaBehaviour(this, "onDeleteRootNode", NotificationFrequency.EVERY_EVENT));
         policyComponent.bindClassBehaviour(NodeServicePolicies.BeforeDeleteNodePolicy.QNAME, 
                 ASPECT_FROZEN, 
                 new JavaBehaviour(this, "beforeDeleteFrozenNode", NotificationFrequency.TRANSACTION_COMMIT));
@@ -180,8 +190,16 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
      * @param childAssocRef
      */
     public void onCreateRootNode(ChildAssociationRef childAssocRef)
-    {
+    {       
         final NodeRef rmRootNode = childAssocRef.getChildRef();
+        
+        StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+        if(!rmRootNode.getStoreRef().equals(storeRef))
+        {
+            // This is not the spaces store - probably the archive store
+            return;
+        }
+        
         if (nodeService.exists(rmRootNode) == true)
         {
             AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
@@ -201,6 +219,16 @@ public class RecordsManagementSecurityServiceImpl implements RecordsManagementSe
             // Bootstrap in the default set of roles for the newly created root node
             bootstrapDefaultRoles(rmRootNode);
         }
+    }
+    
+    /**
+     * Delete root node behaviour
+     * 
+     * @param childAssocRef
+     */
+    public void onDeleteRootNode(NodeRef rmRootNode)
+    {
+        logger.debug("onDeleteRootNode called");
     }
     
     /**
