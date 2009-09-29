@@ -260,6 +260,7 @@
             "properties.rma_address", "properties.rma_otherAddress", "properties.rmc_supplementalMarkingList", "properties.rma_reviewAsOf",
             "properties.rma_recordSearchDispositionEvents", "properties.rma_recordSearchHasDispositionSchedule", 
             "properties.rma_recordSearchDispositionActionName", "properties.rma_recordSearchDispositionActionAsOf",
+            "properties.rma_recordSearchDispositionInstructions", "properties.rma_recordSearchDispositionAuthority",
             "properties.rma_recordSearchDispositionPeriod", "properties.rma_recordSearchDispositionEventsEligible",
             "properties.rma_recordSearchVitalRecordReviewPeriod",
             "properties.dod_scannedFormatVersion", "properties.dod_resolutionX", "properties.dod_resolutionY", "properties.dod_scannedBitDepth",
@@ -470,6 +471,8 @@
             { key: "dispositionEventsEligible", label: me._msg("label.dispositionEventsEligible"), field: "properties.rma_recordSearchDispositionEventsEligible", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
             { key: "dispositionPeriod", label: me._msg("label.dispositionPeriod"), field: "properties.rma_recordSearchDispositionPeriod", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
             { key: "hasDispositionSchedule", label: me._msg("label.hasDispositionSchedule"), field: "properties.rma_recordSearchHasDispositionSchedule", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "dispositionInstructions", label: me._msg("label.dispositionInstructions"), field: "properties.rma_recordSearchDispositionInstructions", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
+            { key: "dispositionAuthority", label: me._msg("label.dispositionAuthority"), field: "properties.rma_recordSearchDispositionAuthority", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
             { key: "vitalRecordReviewPeriod", label: me._msg("label.vitalRecordReviewPeriod"), field: "properties.rma_recordSearchVitalRecordReviewPeriod", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
             
             { key: "scannedFormatVersion", label: me._msg("label.dod.scannedFormatVersion"), field: "properties.dod_scannedFormatVersion", sortable: true, resizeable: true, formatter: renderCellSafeHTML, hidden: true },
@@ -641,6 +644,17 @@
       },
       
       /**
+       * Clears results before a search is performed
+       *
+       * @method _clearSearchResults
+       */
+      _clearSearchResults: function RecordsResults__clearSearchResults()
+      {
+         // empty results table
+         this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
+      },
+
+      /**
        * Updates document list by calling data webscript with current site and path
        * 
        * @method _performSearch
@@ -649,8 +663,8 @@
       _performSearch: function RecordsResults__performSearch(query)
       {
          // empty results table
-         this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
-          
+         this._clearSearchResults();
+         
          // update the ui to show that a search is on-going
          this.widgets.dataTable.render();
          

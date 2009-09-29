@@ -128,6 +128,14 @@
                      <label for="${el}-metadata-hasDispositionSchedule">${msg("label.hasDispositionSchedule")}</label>
                   </li>
                   <li>
+                     <input type="checkbox" id="${el}-metadata-dispositionInstructions" />
+                     <label for="${el}-metadata-dispositionInstructions">${msg("label.dispositionInstructions")}</label>
+                  </li>
+                  <li>
+                     <input type="checkbox" id="${el}-metadata-dispositionAuthority" />
+                     <label for="${el}-metadata-dispositionAuthority">${msg("label.dispositionAuthority")}</label>
+                  </li>
+                  <li>
                      <input type="checkbox" id="${el}-metadata-vitalRecordReviewPeriod" />
                      <label for="${el}-metadata-vitalRecordReviewPeriod">${msg("label.vitalRecordReviewPeriod")}</label>
                   </li>

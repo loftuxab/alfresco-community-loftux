@@ -227,6 +227,7 @@
       onSearchClick: function RecordsSearch_onSearchClick(e, args)
       {
          // switch to results tab
+         this._clearSearchResults();
          this.widgets.tabs.selectTab(1);
          
          // execute the search and populate the results
