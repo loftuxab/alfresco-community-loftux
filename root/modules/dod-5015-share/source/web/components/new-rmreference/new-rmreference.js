@@ -181,7 +181,7 @@ Alfresco.RM = Alfresco.RM || {};
             mandatory:true,
             docLibNameAlias:this.msg('label.fileplan'),
             restrictParentNavigationToDocLib: true,     
-            params:'filterType=rma:dispositionSchedule,rma:dispositionActionDefinition,rma:dispositionAction,rma:hold,rma:transfer'
+            params:'filterType=rma:dispositionSchedule,rma:dispositionActionDefinition,rma:dispositionAction,rma:hold,rma:transfer,cm:thumbnail'
          });         
 
          YAHOO.Bubbling.on('onDocumentsSelected', this.updateSelectionField, this);
