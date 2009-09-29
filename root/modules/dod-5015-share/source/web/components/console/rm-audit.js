@@ -142,9 +142,9 @@
                }
             },
             {
-               rule : 'button.audit-declare-record',
+               rule : 'button.audit-file-record',
                o : {
-                  handler: this.onDeclareRecord,
+                  handler: this.onFileRecord,
                   scope : this
                }
             }                     
@@ -259,12 +259,12 @@
                if (me.options.results.length===0)
                {
                   me.widgets['export'].set('disabled',true);
-                  me.widgets['declare-record'].set('disabled',true);
+                  me.widgets['file-record'].set('disabled',true);
                }
                else
                {
                   me.widgets['export'].set('disabled',false);
-                  me.widgets['declare-record'].set('disabled',false);               
+                  me.widgets['file-record'].set('disabled',false);               
                }
                return oParsedResponse;
             };
@@ -491,9 +491,9 @@
       },
 
       /**
-       * Handler for declare as record log button. Declares log as record
+       * Handler for file as record log button. Files log as record
        */      
-      onDeclareRecord: function RM_Audit_onDeclareRecord()
+      onFileRecord: function RM_Audit_onFileRecord()
       {  
          //show location dialog
          if (!this.modules.selectAuditRecordLocation)
@@ -530,7 +530,7 @@
             dataObj : dataObj,
             successCallback:
             {
-               fn: function RM_Audit_DeclareRecord_success(serverResponse)
+               fn: function RM_Audit_FileRecord_success(serverResponse)
                {
                   // apply current property values to form
                   if (serverResponse.json)
@@ -541,8 +541,8 @@
                      {
                         Alfresco.util.PopupManager.displayPrompt(
                         {
-                           title: this.msg('label.declare-record'),
-                           text: this.msg("label.declared-log-message"),
+                           title: this.msg('label.file-record'),
+                           text: this.msg("label.filed-log-message"),
                            noEscape: true,
                            buttons: [
                            {
@@ -566,7 +566,7 @@
                      else
                      {
                         Alfresco.util.PopupManager.displayMessage({
-                           text: this.msg('message.declare-log-fail'),
+                           text: this.msg('message.file-log-fail'),
                            spanClass: 'message',
                            modal: true,
                            noEscape: true,
@@ -578,14 +578,14 @@
                scope: this
             },
             failureCallback: {
-               fn: function fail_declare_record(o)
+               fn: function fail_file_record(o)
                {
                   if (o.serverResponse.status==400)
                   {
 
                      Alfresco.util.PopupManager.displayPrompt(
                      {
-                        title: me.msg('label.declare-record'),
+                        title: me.msg('label.file-record'),
                         text: o.serverResponse.statusText,
                         buttons: [
                         {
