@@ -1251,7 +1251,7 @@ public class RMEntryVoter implements AccessDecisionVoter, InitializingBean
             }
         }
 
-        throw new ACLEntryVoterException("Unknown type");
+        return null;
     }
 
     private static QName getQName(MethodInvocation invocation, Class[] params, int position)
