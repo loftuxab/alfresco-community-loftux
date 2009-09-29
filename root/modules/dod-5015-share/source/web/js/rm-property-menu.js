@@ -175,7 +175,8 @@
                      { text: this.msg("label.dateReceived"), value: "rma:dateReceived" },
                      { text: this.msg("label.location"), value: "rma:location" },
                      { text: this.msg("label.address"), value: "rma:address" },
-                     { text: this.msg("label.otherAddress"), value: "rma:otherAddress" }
+                     { text: this.msg("label.otherAddress"), value: "rma:otherAddress" },
+                     { text: this.msg("label.supplementalMarkingList"), value: "rmc:supplementalMarkingList" }
                   ]
                }
             }
