@@ -923,6 +923,21 @@
 		          <tokenised>false</tokenised>
 		       </index>
             </property>
+            <property name="rma:recordSearchDispositionAuthority">
+               <title>Disposition Authority</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+                <index enabled="true">
+                    <atomic>true</atomic>
+                    <stored>false</stored>
+                    <tokenised>false</tokenised>
+                </index>
+            </property>
+            <property name="rma:recordSearchDispositionInstructions">
+               <title>Disposition Instructions</title>
+               <type>d:text</type>
+               <mandatory>true</mandatory>
+            </property>
             <property name="rma:recordSearchVitalRecordReviewPeriod">
                <type>d:text</type>
                <index enabled="true">

@@ -735,6 +735,11 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             {
                 assertNotNull(recordCategory);
                 
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_INSTRUCTIONS, "Cutoff after 1 month then destroy after 1 month");
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_AUTHORITY, "Alfresco");
+                
                 // define properties for both steps
                 Map<QName, Serializable> step1 = new HashMap<QName, Serializable>();
                 step1.put(RecordsManagementModel.PROP_DISPOSITION_ACTION_NAME, "cutoff");
@@ -748,8 +753,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 step2.put(RecordsManagementModel.PROP_DISPOSITION_PERIOD_PROPERTY, PROP_CUT_OFF_DATE);
                 
                 // add the action definitions to the schedule
-                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
-                assertNotNull(schedule);
                 rmService.addDispositionActionDefinition(schedule, step1);
                 rmService.addDispositionActionDefinition(schedule, step2);
                 
@@ -1041,6 +1044,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 // get the disposition schedule and turn on record level disposition
                 DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
                 assertNotNull(schedule);
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_INSTRUCTIONS, "Cutoff after 1 month then destroy after 1 month");
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_AUTHORITY, "Alfresco");
                 nodeService.setProperty(schedule.getNodeRef(), PROP_RECORD_LEVEL_DISPOSITION, true);
                 
                 // define properties for both steps
@@ -1898,17 +1903,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         });
     }
     
-    public void off_testDispositionLifecycle_0318_other_usecases() throws Exception
-    {
-        // test a schedule that uses the disposition asof date for the period property - ensure it's correct (should currently
-        //                                                                               fail as 'now' will be used and not the asOf date
-        
-        // switch between record and folder level disposition - for now this should throw exception
-        //                                                      if anything is filed or there are any
-        //                                                      folders present
-        
-    }
-    
     /**
      * test a dispostion schedule being setup after a record folder and record
      */
@@ -1995,6 +1989,190 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 
                 // Check for the search properties having been populated
                 checkSearchAspect(recordFolder);
+                
+                return null;
+            }          
+        });
+    }
+    
+    /**
+     * Test the updating of a disposition schedule using folder level disposition
+     */
+    public void testFolderLevelDispositionScheduleUpdate() throws Exception
+    {
+        final NodeRef recordSeries = TestUtilities.getRecordSeries(searchService, "Reports"); 
+        setComplete();
+        endTransaction();
+        
+        // create a category
+        final NodeRef recordCategory = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordSeries);
+                assertEquals("Reports", nodeService.getProperty(recordSeries, ContentModel.PROP_NAME));
+                        
+                return createRecordCategoryNode(recordSeries);
+            }          
+        });
+        
+        // define the disposition schedule for the category (Cut off monthly, hold 1 month, then destroy)
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertNotNull(recordCategory);
+                
+                // get the disposition schedule and turn on record level disposition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_INSTRUCTIONS, "Cutoff after 1 month then destroy after 1 month");
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_AUTHORITY, "Alfresco");
+                
+                return null;
+            }          
+        });
+        
+        // create a record folder
+        final NodeRef recordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecordFolder(recordCategory, "Folder1");
+            }          
+        });
+        
+        // check the created folder has the correctly populated search aspect, then update the schedule
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // check the folder has the search aspect
+                assertNotNull(recordFolder);
+                checkSearchAspect(recordFolder, false);
+                
+                // update the disposition schedule
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_INSTRUCTIONS, "Cutoff immediately when case is closed then destroy after 1 year");
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_AUTHORITY, "DoD");
+                
+                return null;
+            }          
+        });
+        
+        // check the search aspect has been kept in sync
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // check the folder has the search aspect
+                checkSearchAspect(recordFolder, false);
+                
+                return null;
+            }          
+        });
+    }
+    
+    /**
+     * Test the updating of a disposition schedule using record level disposition
+     */
+    public void testRecordLevelDispositionScheduleUpdate() throws Exception
+    {
+        final NodeRef recordSeries = TestUtilities.getRecordSeries(searchService, "Reports"); 
+        setComplete();
+        endTransaction();
+        
+        // create a category
+        final NodeRef recordCategory = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordSeries);
+                assertEquals("Reports", nodeService.getProperty(recordSeries, ContentModel.PROP_NAME));
+                        
+                return createRecordCategoryNode(recordSeries);
+            }          
+        });
+        
+        // define the disposition schedule for the category (Cut off monthly, hold 1 month, then destroy)
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                assertNotNull(recordCategory);
+                
+                // get the disposition schedule and turn on record level disposition
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_INSTRUCTIONS, "Cutoff after 1 month then destroy after 1 month");
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_AUTHORITY, "Alfresco");
+                nodeService.setProperty(schedule.getNodeRef(), PROP_RECORD_LEVEL_DISPOSITION, true);
+                
+                return null;
+            }          
+        });
+        
+        // create a record folder
+        final NodeRef recordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                return createRecordFolder(recordCategory, "Folder1");
+            }          
+        });
+        
+        // create a record
+        final NodeRef record = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                assertNotNull(recordFolder);
+                
+                // Create the document
+                Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+                props.put(ContentModel.PROP_NAME, "MyRecord.txt");
+                NodeRef record = nodeService.createNode(recordFolder, 
+                                                           ContentModel.ASSOC_CONTAINS, 
+                                                           QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "MyRecord.txt"), 
+                                                           ContentModel.TYPE_CONTENT).getChildRef();
+                
+                // Set the content
+                ContentWriter writer = contentService.getWriter(record, ContentModel.PROP_CONTENT, true);
+                writer.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+                writer.setEncoding("UTF-8");
+                writer.putContent("There is some content in this record");
+                
+                return record;
+            }          
+        });
+        
+        // check the created folder has the correctly populated search aspect, then update the schedule
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // check the record has the search aspect
+                assertNotNull(record);
+                checkSearchAspect(record, false);
+                
+                // update the disposition schedule
+                DispositionSchedule schedule = rmService.getDispositionSchedule(recordCategory);
+                assertNotNull(schedule);
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_INSTRUCTIONS, "Cutoff immediately when case is closed then destroy after 1 year");
+                nodeService.setProperty(schedule.getNodeRef(), PROP_DISPOSITION_AUTHORITY, "DoD");
+                
+                return null;
+            }          
+        });
+        
+        // check the search aspect has been kept in sync
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        {
+            public Object execute() throws Throwable
+            {
+                // check the record has the search aspect
+                checkSearchAspect(record, false);
                 
                 return null;
             }          
@@ -2723,9 +2901,13 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
 	    
 	    DispositionSchedule ds = rmService.getDispositionSchedule(record);
 	    Boolean value = (Boolean)nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_HAS_DISPOITION_SCHEDULE);
+	    String dsInstructions = (String)nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOITION_INSTRUCTIONS);
+	    String dsAuthority = (String)nodeService.getProperty(record, RecordsManagementSearchBehaviour.PROP_RS_DISPOITION_AUTHORITY);
 	    if (ds != null)
 	    {
 	        assertTrue(value);
+	        assertEquals(ds.getDispositionInstructions(), dsInstructions);
+	        assertEquals(ds.getDispositionAuthority(), dsAuthority);
 	    }
 	    else
 	    {
