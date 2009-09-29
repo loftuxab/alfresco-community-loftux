@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -41,6 +41,8 @@ import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Freeze Action
@@ -49,6 +51,9 @@ import org.alfresco.service.namespace.QName;
  */
 public class FreezeAction extends RMActionExecuterAbstractBase
 {
+    /** Logger */
+    private static Log logger = LogFactory.getLog(FreezeAction.class);
+
     /** Parameter names */
     public static final String PARAM_REASON = "reason";
     
@@ -61,8 +66,10 @@ public class FreezeAction extends RMActionExecuterAbstractBase
     @Override
     protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
     {
-        if (this.recordsManagementService.isRecord(actionedUponNodeRef) == true ||
-            this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
+        final boolean isRecord = recordsManagementService.isRecord(actionedUponNodeRef);
+        final boolean isFolder = this.recordsManagementService.isRecordFolder(actionedUponNodeRef);
+        
+        if (isRecord || isFolder)
         {
             // Get the property values
             String reason = (String)action.getParameterValue(PARAM_REASON);
@@ -71,27 +78,49 @@ public class FreezeAction extends RMActionExecuterAbstractBase
                 throw new AlfrescoRuntimeException("Can not freeze a record without a reason.");
             }
             
+            if (logger.isDebugEnabled())
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Freezing node ").append(actionedUponNodeRef);
+                if (isFolder)
+                {
+                    msg.append(" (folder)");
+                }
+                msg.append(" with reason '").append(reason).append("'");
+                logger.debug(msg.toString());
+            }
+
             // Get the root rm node
             NodeRef root = this.recordsManagementService.getRecordsManagementRoot(actionedUponNodeRef);
             
             // Get the hold object
-            NodeRef holdNodeRef = (NodeRef)AlfrescoTransactionSupport.getResource(KEY_HOLD_NODEREF);            
+            NodeRef holdNodeRef = (NodeRef)AlfrescoTransactionSupport.getResource(KEY_HOLD_NODEREF);
+            
             if (holdNodeRef == null)
             {
                 // Calculate a transfer name
                 QName nodeDbid = QName.createQName(NamespaceService.SYSTEM_MODEL_1_0_URI, "node-dbid");
                 Long dbId = (Long)this.nodeService.getProperty(actionedUponNodeRef, nodeDbid);
                 String transferName = padString(dbId.toString(), 10);
-                
+
                 // Create the hold object
                 Map<QName, Serializable> holdProps = new HashMap<QName, Serializable>(2);
                 holdProps.put(ContentModel.PROP_NAME, transferName);
                 holdProps.put(PROP_HOLD_REASON, reason);
+                final QName transferQName = QName.createQName(RM_URI, transferName);
                 holdNodeRef = this.nodeService.createNode(root, 
-                                                          ASSOC_HOLDS, 
-                                                          QName.createQName(RM_URI, transferName), 
+                                                          ASSOC_HOLDS,
+                                                          transferQName, 
                                                           TYPE_HOLD,
                                                           holdProps).getChildRef();
+                
+                if (logger.isDebugEnabled())
+                {
+                    StringBuilder msg = new StringBuilder();
+                    msg.append("Created hold object ").append(holdNodeRef)
+                        .append(" with transfer name ").append(transferQName);
+                    logger.debug(msg.toString());
+                }
                 
                 // Bind the hold node reference to the transaction
                 AlfrescoTransactionSupport.bindResource(KEY_HOLD_NODEREF, holdNodeRef);
@@ -102,20 +131,35 @@ public class FreezeAction extends RMActionExecuterAbstractBase
                                         actionedUponNodeRef, 
                                         ASSOC_FROZEN_RECORDS, 
                                         ASSOC_FROZEN_RECORDS);
-            
+
             // Apply the freeze aspect
             Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
             props.put(PROP_FROZEN_AT, new Date());
             props.put(PROP_FROZEN_BY, AuthenticationUtil.getFullyAuthenticatedUser());
             this.nodeService.addAspect(actionedUponNodeRef, ASPECT_FROZEN, props);
+            
+            if (logger.isDebugEnabled())
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append("Frozen aspect applied to ").append(actionedUponNodeRef);
+                logger.debug(msg.toString());
+            }
+
                         
             // Mark all the folders contents as frozen
-            if (this.recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
+            if (isFolder)
             {
                 List<NodeRef> records = this.recordsManagementService.getRecords(actionedUponNodeRef);
                 for (NodeRef record : records)
                 {
                     this.nodeService.addAspect(record, ASPECT_FROZEN, props);
+
+                    if (logger.isDebugEnabled())
+                    {
+                        StringBuilder msg = new StringBuilder();
+                        msg.append("Frozen aspect applied to ").append(record);
+                        logger.debug(msg.toString());
+                    }
                 }
             }
         }
@@ -138,6 +182,7 @@ public class FreezeAction extends RMActionExecuterAbstractBase
     {
         HashSet<QName> qnames = new HashSet<QName>();
         qnames.add(PROP_HOLD_REASON);
+        //TODO Add prop frozen at/by?
         return qnames;
     }
 
