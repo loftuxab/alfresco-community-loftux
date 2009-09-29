@@ -3,6 +3,6 @@
   <description>RM Saved Searches - dod5015 POST data webscript</description>
   <url>/slingshot/rmsavedsearches/site/{site}</url>
   <format default="json">argument</format>
-  <authentication>user</authentication>
+  <authentication runas="admin">user</authentication>
   <transaction>required</transaction>
 </webscript>
