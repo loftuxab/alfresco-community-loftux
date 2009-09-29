@@ -594,6 +594,11 @@
                            Dom.get(parent.id + "-parentchild-source").value = (ref.referenceType == "parentchild" && ref.source) ? ref.source: "";
                            Dom.get(parent.id + "-parentchild-target").value = (ref.referenceType == "parentchild" && ref.target) ? ref.target : "";
                            this._disableTextInputs();
+
+                           // Hide the type that isn't used for this reference
+                           Dom.addClass(parent.id + "-bidirectional-section", "hidden");
+                           Dom.addClass(parent.id + "-parentchild-section", "hidden");
+                           Dom.removeClass(parent.id + "-" + ref.referenceType + "-section", "hidden");                           
                         }
                      },
                      scope: this
@@ -609,11 +614,14 @@
                Dom.removeClass(parent.id + "-create-title", "hidden");
                Dom.addClass(parent.id + "-edit-title", "hidden");
                Dom.get(parent.id + "-type-bidirectional").checked = true;
-               //Dom.get(parent.id + "-refId").value = "";
                Dom.get(parent.id + "-bidirectional-label").value = "";
                Dom.get(parent.id + "-parentchild-source").value = "";
                Dom.get(parent.id + "-parentchild-target").value = "";
                this._disableTextInputs();
+
+               // Show both type sections
+               Dom.removeClass(parent.id + "-bidirectional-section", "hidden");
+               Dom.removeClass(parent.id + "-parentchild-section", "hidden");
             }
          },
 
@@ -709,31 +717,6 @@
        * @type object
        */
       refresh: true,
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function RecordsReferences_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-
-      /**
-       * Fired by YUI when parent element is available for scripting.
-       * Component initialisation, including instantiation of YUI widgets and event listener binding.
-       *
-       * @method onReady
-       */
-      onReady: function RecordsReferences_onReady()
-      {
-         // Call super-class onReady() method
-         Alfresco.RecordsReferences.superclass.onReady.call(this);
-      },
-
-
 
       /**
        * YUI WIDGET EVENT HANDLERS

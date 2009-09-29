@@ -49,35 +49,39 @@
             </div>
             
             <!-- Bi-directional -->
-            <div class="field-row">
-               <input id="${el}-type-bidirectional" name="referenceType" type="radio" value="bidirectional"/>
-               ${msg("label.bidirectional")}
-            </div>
-            <div>
-               <span class="crud-label">${msg("label.label")}:</span>
-            </div>
-            <div>
-               <input class="crud-input" id="${el}-bidirectional-label" name="label" type="text"/>
+            <div id="${el}-bidirectional-section">
+               <div class="field-row">
+                  <input id="${el}-type-bidirectional" name="referenceType" type="radio" value="bidirectional"/>
+                  <label for="${el}-type-bidirectional">${msg("label.bidirectional")}</label>
+               </div>
+               <div>
+                  <span class="crud-label">${msg("label.label")}:</span>
+               </div>
+               <div>
+                  <input class="crud-input" id="${el}-bidirectional-label" name="label" type="text"/>
+               </div>
             </div>
 
             <!-- Parent / Child -->
-            <div class="field-row">
-               <input id="${el}-type-parentchild" name="referenceType" type="radio" value="parentchild"/>
-               ${msg("label.parentchild")}
+            <div id="${el}-parentchild-section">
+               <div class="field-row">
+                  <input id="${el}-type-parentchild" name="referenceType" type="radio" value="parentchild"/>
+                  <label for="${el}-type-parentchild">${msg("label.parentchild")}</label>
+               </div>
+               <div>
+                  <span class="crud-label">${msg("label.source")}:</span>
+               </div>
+               <div>
+                  <input class="crud-input" id="${el}-parentchild-source" name="source" type="text"/>
+               </div>
+               <div>
+                  <span class="crud-label">${msg("label.target")}:</span>
+               </div>
+               <div>
+                  <input class="crud-input" id="${el}-parentchild-target" name="target" type="text"/>
+               </div>
             </div>
-            <div>
-               <span class="crud-label">${msg("label.source")}:</span>
-            </div>
-            <div>
-               <input class="crud-input" id="${el}-parentchild-source" name="source" type="text"/>
-            </div>
-            <div>
-               <span class="crud-label">${msg("label.target")}:</span>
-            </div>
-            <div>
-               <input class="crud-input" id="${el}-parentchild-target" name="target" type="text"/>
-            </div>
-
+            
          </div>
 
          <!-- Buttons -->
