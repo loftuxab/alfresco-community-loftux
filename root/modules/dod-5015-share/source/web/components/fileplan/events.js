@@ -57,6 +57,7 @@
       Alfresco.Events.superclass.constructor.call(this, "Alfresco.Events", htmlId, ["button", "container"]);
       this._lookForParentsDispositionSchedule = true;
       this._dispositionScheduleAppliedToParent = false;
+      this.eventButtons = {};
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("documentDetailsAvailable", this.onDocumentDetailsAvailable, this);
@@ -75,7 +76,7 @@
        * @type {boolean}
        * @private
        */
-      _lookForParentsDispositionSchedule: true,
+      _lookForParentsDispositionSchedule: null,
 
        /**
        * True if the disposition schedule is applied to the parent
@@ -83,7 +84,15 @@
        * @property dispositionScheduleAppliedToParent
        * @type {boolean}
        */
-      _dispositionScheduleAppliedToParent: false,
+      _dispositionScheduleAppliedToParent: null,
+
+      /**
+       * Object container for event complete / undo buttons
+       *
+       * @property eventButtons
+       * @type {object}
+       */
+      eventButtons: null,
 
       /**
        * Object container for initialization options
@@ -186,6 +195,24 @@
       },
 
       /**
+       * Enables event buttons. Called after document/folder details received and permission check.
+       *
+       * @method: _enableEventButtons
+       * @private
+       */
+      _enableEventButtons: function Events__enableEventButtons()
+      {
+         for (var index in this.eventButtons)
+         {
+            if (this.eventButtons.hasOwnProperty(index))
+            {
+               this.eventButtons[index].set("disabled", false);
+            }
+         }
+      },
+
+
+      /**
        * Event handler called when the "documentDetailsAvailable" event is received
        *
        * @method: onDocumentDetailsAvailable
@@ -194,7 +221,7 @@
       {
          if (args[1].documentDetails.permissions.userAccess.AddModifyEventDates)
          {
-            this.widgets.eventButton.set("disabled", false);
+            this._enableEventButtons();
          }
       },
 
@@ -207,7 +234,7 @@
       {
          if (args[1].folderDetails.permissions.userAccess.AddModifyEventDates)
          {
-            this.widgets.eventButton.set("disabled", false);
+            this._enableEventButtons();
          }
       },
 
@@ -285,11 +312,11 @@
       /**
        * Called when the events information has been loaded
        *
-       * @method _onEventsLoaded
-       * @param msg THe message to display
+       * @method _displayMessage
+       * @param msg {string} THe message to display
        * @private
        */
-      _displayMessage: function Events__onEventsLoaded(msg)
+      _displayMessage: function Events__displayMessage(msg)
       {
          Dom.removeClass(this.widgets.messageEl, "hidden");
          this.widgets.messageEl.innerHTML = msg;
@@ -301,6 +328,7 @@
        * Called when the events information has been loaded
        *
        * @method _onEventsLoaded
+       * @param nextDispositionAction {object} Object literal containing Next Disposition Action details
        * @private
        */
       _onEventsLoaded: function Events__onEventsLoaded(nextDispositionAction)
@@ -310,6 +338,18 @@
             this.widgets.feedbackMessage.destroy();
             this.widgets.feedbackMessage = null;
          }
+         
+         // Destroy any existing YUI buttons
+         var index;
+         for (index in this.eventButtons)
+         {
+            if (this.eventButtons.hasOwnProperty(index) && YAHOO.lang.isFunction(this.eventButtons[index].destroy))
+            {
+               this.eventButtons[index].destroy();
+               delete this.eventButtons[index];
+            }
+         }
+         
          this.widgets.completedEventsEl.innerHTML = "";
          this.widgets.incompleteEventsEl.innerHTML = "";
          var events = nextDispositionAction.events ? nextDispositionAction.events : [],
@@ -398,18 +438,19 @@
          }
 
          // Create button
-         var buttonEl = Dom.getElementsByClassName(buttonClass, "span", eventEl)[0];
-         
-         this.widgets.eventButton = Alfresco.util.createYUIButton(this, buttonClass, null,
-         {
-            disabled: true
-         }, buttonEl);
-         this.widgets.eventButton.on("click", clickHandler,
+         var buttonEl = Dom.getElementsByClassName(buttonClass, "span", eventEl)[0],
+            eventButton = Alfresco.util.createYUIButton(this, buttonClass, null,
+            {
+               disabled: true
+            }, buttonEl);
+
+         eventButton.on("click", clickHandler,
          {
             event: event,
-            button: this.widgets.eventButton
+            button: eventButton
          }, this);
 
+         this.eventButtons[event.name] = eventButton;
          return eventEl;
       },
 
