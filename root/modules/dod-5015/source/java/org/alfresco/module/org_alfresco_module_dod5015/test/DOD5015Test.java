@@ -27,6 +27,7 @@ package org.alfresco.module.org_alfresco_module_dod5015.test;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -2124,8 +2125,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         setComplete();
         endTransaction();
         
-        //createRecord(recordFolder);
-        
         final NodeRef recordOne = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
         {
             public NodeRef execute() throws Throwable
@@ -2147,7 +2146,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 return createRecord(recordFolder, "three.txt");
             }          
         });
-        
+
         transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
         {
             public Object execute() throws Throwable
@@ -2157,7 +2156,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 
                 // Freeze the record
                 Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-                params.put(FreezeAction.PARAM_REASON, "one");
+                params.put(FreezeAction.PARAM_REASON, "reason1");
                 rmActionService.executeRecordsManagementAction(recordOne, "freeze", params);
                 
                 return null;
@@ -2173,30 +2172,30 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertNotNull(holdAssocs);
                 assertEquals(1, holdAssocs.size());        
                 NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
-                assertEquals("one", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+                assertEquals("reason1", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
                 List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdNodeRef);
                 assertNotNull(freezeAssocs);
                 assertEquals(1, freezeAssocs.size());
                 
                 // Check the nodes are frozen
                 assertTrue(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
-              //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-              //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertNotNull(nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+                assertNotNull(nodeService.getProperty(recordOne, PROP_FROZEN_BY));
                 assertFalse(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
                 
                 // Update the freeze reason
                 Map<String, Serializable> params = new HashMap<String, Serializable>(1);
-                params.put(FreezeAction.PARAM_REASON, "changed");
+                params.put(FreezeAction.PARAM_REASON, "reason1changed");
                 rmActionService.executeRecordsManagementAction(holdNodeRef, "editHoldReason", params);
                 
                 // Check the hold has been updated
                 String updatedHoldReason = (String)nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON);
-                assertEquals("changed", updatedHoldReason);
+                assertEquals("reason1changed", updatedHoldReason);
                 
                 // Freeze a number of records
                 params = new HashMap<String, Serializable>(1);
-                params.put(FreezeAction.PARAM_REASON, "two");
+                params.put(FreezeAction.PARAM_REASON, "reason2");
                 List<NodeRef> records = new ArrayList<NodeRef>(2);
                 records.add(recordOne);
                 records.add(recordTwo);
@@ -2218,13 +2217,13 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 for (ChildAssociationRef holdAssoc : holdAssocs)
                 {
                     String reason = (String)nodeService.getProperty(holdAssoc.getChildRef(), PROP_HOLD_REASON);
-                    if (reason.equals("two") == true)
+                    if (reason.equals("reason2") == true)
                     {
                         List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdAssoc.getChildRef());
                         assertNotNull(freezeAssocs);
                         assertEquals(3, freezeAssocs.size());
                     }
-                    else if (reason.equals("one") == true)
+                    else if (reason.equals("reason1changed") == true)
                     {
                         List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdAssoc.getChildRef());
                         assertNotNull(freezeAssocs);
@@ -2233,15 +2232,13 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 }
                 
                 // Check the nodes are frozen
-                assertTrue(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-                assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-                //assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
-                assertTrue(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                final List<NodeRef> testRecords = Arrays.asList(new NodeRef[]{recordOne, recordTwo, recordThree});
+                for (NodeRef nr : testRecords)
+                {
+                    assertTrue(nodeService.hasAspect(nr, ASPECT_FROZEN));
+                    assertNotNull(nodeService.getProperty(nr, PROP_FROZEN_AT));
+                    assertNotNull(nodeService.getProperty(nr, PROP_FROZEN_BY));
+                }
                 
                 // Unfreeze a node
                 rmActionService.executeRecordsManagementAction(recordThree, "unfreeze");
@@ -2253,13 +2250,13 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 for (ChildAssociationRef holdAssoc : holdAssocs)
                 {
                     String reason = (String)nodeService.getProperty(holdAssoc.getChildRef(), PROP_HOLD_REASON);
-                    if (reason.equals("two") == true)
+                    if (reason.equals("reason2") == true)
                     {
                         List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdAssoc.getChildRef());
                         assertNotNull(freezeAssocs);
                         assertEquals(2, freezeAssocs.size());
                     }
-                    else if (reason.equals("one") == true)
+                    else if (reason.equals("reason1changed") == true)
                     {
                         List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdAssoc.getChildRef());
                         assertNotNull(freezeAssocs);
@@ -2269,15 +2266,17 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 
                 // Check the nodes are frozen
                 assertTrue(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertNotNull(nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+                assertNotNull(nodeService.getProperty(recordOne, PROP_FROZEN_BY));
                 assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-              //  assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_AT));
+                assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_BY));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
                 
                 // Relinquish the first hold
                 NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
+                assertEquals("reason1changed", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+                
                 rmActionService.executeRecordsManagementAction(holdNodeRef, "relinquishHold");
                 
                 // Check the holds
@@ -2285,18 +2284,18 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertNotNull(holdAssocs);
                 assertEquals(1, holdAssocs.size());
                 holdNodeRef = holdAssocs.get(0).getChildRef();
-                assertEquals("two", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+                assertEquals("reason2", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
                 List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdNodeRef);
                 assertNotNull(freezeAssocs);
                 assertEquals(2, freezeAssocs.size());
                 
                 // Check the nodes are frozen
                 assertTrue(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertNotNull(nodeService.getProperty(recordOne, PROP_FROZEN_AT));
+                assertNotNull(nodeService.getProperty(recordOne, PROP_FROZEN_BY));
                 assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_AT));
+                assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_BY));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
                 
                 // Unfreeze
@@ -2307,7 +2306,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertNotNull(holdAssocs);
                 assertEquals(1, holdAssocs.size());
                 holdNodeRef = holdAssocs.get(0).getChildRef();
-                assertEquals("two", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+                assertEquals("reason2", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
                 freezeAssocs = nodeService.getChildAssocs(holdNodeRef);
                 assertNotNull(freezeAssocs);
                 assertEquals(1, freezeAssocs.size());
@@ -2315,8 +2314,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 // Check the nodes are frozen
                 assertFalse(nodeService.hasAspect(recordOne, ASPECT_FROZEN));
                 assertTrue(nodeService.hasAspect(recordTwo, ASPECT_FROZEN));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_AT));
-               // assertNotNull(this.nodeService.getProperty(recordOne, PROP_FROZEN_BY));
+                assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_AT));
+                assertNotNull(nodeService.getProperty(recordTwo, PROP_FROZEN_BY));
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
                 
                 // Unfreeze
