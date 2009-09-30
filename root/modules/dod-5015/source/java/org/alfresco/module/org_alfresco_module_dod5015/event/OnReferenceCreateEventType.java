@@ -45,8 +45,6 @@ import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
-import sun.security.action.GetBooleanAction;
-
 /**
  * On reference create event type
  * 
