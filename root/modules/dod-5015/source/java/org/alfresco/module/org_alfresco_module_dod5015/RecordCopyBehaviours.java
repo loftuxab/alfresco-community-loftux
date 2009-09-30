@@ -26,7 +26,7 @@ package org.alfresco.module.org_alfresco_module_dod5015;
 
 import org.alfresco.repo.copy.CopyBehaviourCallback;
 import org.alfresco.repo.copy.CopyDetails;
-import org.alfresco.repo.copy.DefaultCopyBehaviourCallback;
+import org.alfresco.repo.copy.DoNothingCopyBehaviourCallback;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
@@ -74,18 +74,29 @@ public class RecordCopyBehaviours implements RecordsManagementModel
      */
     public void init()
     {
+        // Do not copy any of the Alfresco-internal 'state' aspects
         this.policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "getCopyCallback"),
                 RecordsManagementModel.ASPECT_VITAL_RECORD,
-                new JavaBehaviour(this, "getVitalRecordCopyCallback", NotificationFrequency.TRANSACTION_COMMIT));
+                new JavaBehaviour(this, "getDoNothingCopyCallback"));
+
+        this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "getCopyCallback"),
+                RecordsManagementModel.ASPECT_DISPOSITION_LIFECYCLE,
+                new JavaBehaviour(this, "getDoNothingCopyCallback"));
 
         this.policyComponent.bindClassBehaviour(
                 QName.createQName(NamespaceService.ALFRESCO_URI, "getCopyCallback"),
                 RecordsManagementSearchBehaviour.ASPECT_RM_SEARCH,
-                new JavaBehaviour(this, "getRecordSearchCopyCallback", NotificationFrequency.TRANSACTION_COMMIT));
+                new JavaBehaviour(this, "getDoNothingCopyCallback"));
+
+        //TODO rma:versionedRecord?
         
+        // Move behaviour 
         this.policyComponent.bindClassBehaviour(QName.createQName(NamespaceService.ALFRESCO_URI, "onMoveNode"),
-                RecordsManagementModel.ASPECT_VITAL_RECORD, new JavaBehaviour(this, "onMoveNode", NotificationFrequency.TRANSACTION_COMMIT));
+                RecordsManagementModel.ASPECT_VITAL_RECORD, new JavaBehaviour(this, "onMoveNode"));
+        
+        //TODO May need to trigger setupFolder stuff on move. Do not move any aspects.
     }
     
     public void onMoveNode(ChildAssociationRef oldChildAssocRef, ChildAssociationRef newChildAssocRef)
@@ -106,50 +117,8 @@ public class RecordCopyBehaviours implements RecordsManagementModel
         }
     }
     
-    /**
-     * @return          Returns the {@link VitalRecordAspectCopyBehaviourCallback}
-     */
-    public CopyBehaviourCallback getVitalRecordCopyCallback(QName classRef, CopyDetails copyDetails)
+    public CopyBehaviourCallback getDoNothingCopyCallback(QName classRef, CopyDetails copyDetails)
     {
-        return new VitalRecordAspectCopyBehaviourCallback();
-    }
-
-    /**
-     * @return          Returns the {@link RecordSearchAspectCopyBehaviourCallback}
-     */
-    public CopyBehaviourCallback getRecordSearchCopyCallback(QName classRef, CopyDetails copyDetails)
-    {
-        return new RecordSearchAspectCopyBehaviourCallback();
-    }
-
-    /**
-     * Copy behaviour for the <b>rma:vitalRecord</b> aspect
-     */
-    private class VitalRecordAspectCopyBehaviourCallback extends DefaultCopyBehaviourCallback
-    {
-        @Override
-        public boolean getMustCopy(QName classQName, CopyDetails copyDetails)
-        {
-            // The rma:vitalRecord aspect should only be copied if the target copy would be
-            // a vital record itself.
-            NodeRef targetParentNodeRef = copyDetails.getTargetParentNodeRef();
-            VitalRecordDefinition vrd = rmServiceRegistry.getRecordsManagementService().getVitalRecordDefinition(targetParentNodeRef);
-            
-            boolean targetNodeIsVital = (vrd != null && vrd.isVitalRecord());
-            
-            return targetNodeIsVital;
-        }
-    }
-    
-    /**
-     * Copy behaviour for the <b>rma:recordSearch</b> aspect
-     */
-    private class RecordSearchAspectCopyBehaviourCallback extends DefaultCopyBehaviourCallback
-    {
-        @Override
-        public boolean getMustCopy(QName classQName, CopyDetails copyDetails)
-        {
-            return false;
-        }
+        return new DoNothingCopyBehaviourCallback();
     }
 }

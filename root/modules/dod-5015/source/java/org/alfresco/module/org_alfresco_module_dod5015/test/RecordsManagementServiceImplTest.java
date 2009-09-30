@@ -30,7 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.transaction.UserTransaction;
 
@@ -532,7 +531,7 @@ public class RecordsManagementServiceImplTest extends BaseSpringTest implements 
                 });
     }
    
-    public void off_testCopyRecordWithinFileplan()
+    public void testCopyRecordWithinFileplan()
     {
         setComplete();
         endTransaction();
