@@ -38,6 +38,7 @@ import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 import org.springframework.beans.factory.InitializingBean;
@@ -99,6 +100,18 @@ public class DestroyAction extends RMDispositionActionExecuterAbstractBase imple
             // Remove the thumbnailed aspect (and its properties and associations) if it is present
             if (this.nodeService.hasAspect(record, ContentModel.ASPECT_THUMBNAILED))
             {
+                // Add the ghosted aspect to all the thumbnailed children, so that they will not be archived when the
+                // thumbnailed aspect is removed
+                Set<QName> childAssocTypes = this.dictionaryService.getAspect(ContentModel.ASPECT_THUMBNAILED)
+                        .getChildAssociations().keySet();
+                for (ChildAssociationRef child : this.nodeService.getChildAssocs(record))
+                {
+                    if (childAssocTypes.contains(child.getTypeQName()))
+                    {
+                        this.nodeService.addAspect(child.getChildRef(), DOD5015Model.ASPECT_GHOSTED, Collections
+                                .<QName, Serializable> emptyMap());
+                    }
+                }
                 this.nodeService.removeAspect(record, ContentModel.ASPECT_THUMBNAILED);
             }
             
