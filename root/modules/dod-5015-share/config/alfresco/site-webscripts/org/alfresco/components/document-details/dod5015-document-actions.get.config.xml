@@ -9,10 +9,10 @@
          <action type="action-link" id="onActionEditReviewAsOf" permission="PlanningReviewCycles,review-as-of" label="actions.edit-review-as-of-date" />
          <action type="action-link" id="onActionUndeclare" permission="UndeclareRecords,undeclare" label="actions.undeclare" />
          <action type="action-link" id="onActionCutoff" permission="ApproveRecordsScheduledForCutoff,cutoff" label="actions.cutoff" />
-         <action type="action-link" id="onActionUndoCutoff" permission="CreateModifyRecordsInCutoffFolders,undo-cutoff" label="actions.undo-cutoff" />
          <action type="action-link" id="onActionDestroy" permission="DestroyRecordsScheduledForDestruction,destroy" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="AuthorizeAllTransfers,transfer" label="actions.transfer" />
          <action type="action-link" id="onActionAccession" permission="AuthorizeNominatedTransfers,accession" label="actions.accession" />
+         <action type="action-link" id="onActionUndoCutoff" permission="CreateModifyRecordsInCutoffFolders,undo-cutoff" label="actions.undo-cutoff" />
          <action type="action-link" id="onActionEditDispositionAsOf" permission="ManuallyChangeDispositionDates,disposition-as-of" label="actions.edit-disposition-as-of-date" />
          <action type="action-link" id="onActionFreeze" permission="freeze" label="actions.freeze" />
          <action type="action-link" id="onActionUnfreeze" permission="unfreeze" label="actions.unfreeze" />

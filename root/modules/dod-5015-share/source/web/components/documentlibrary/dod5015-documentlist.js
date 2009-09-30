@@ -196,7 +196,7 @@
             
             if (dataStatus.length > 0)
             {
-               var statuses = dataStatus.split(","),
+               var statuses = dataStatus.split(",").sort(),
                   status, s, SPACE = " ", meta,
                   tip = "",
                   desc = "";

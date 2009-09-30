@@ -26,11 +26,12 @@
          <action type="simple-link" id="onActionEditDetails" permission="UpdateProperties" href="{editMetadataUrl}" label="actions.edit-details" />
          <action type="action-link" id="onActionCloseFolder" permission="close-folder" label="actions.close-folder" />
          <action type="action-link" id="onActionOpenFolder" permission="open-folder" label="actions.open-folder" />
+         <action type="action-link" id="onActionReviewAll" permission="CycleVitalRecords" label="actions.review-all" />
          <action type="action-link" id="onActionCutoff" permission="ApproveRecordsScheduledForCutoff,cutoff" label="actions.cutoff" />
-         <action type="action-link" id="onActionUndoCutoff" permission="CreateModifyRecordsInCutoffFolders,undo-cutoff" label="actions.undo-cutoff" />
          <action type="action-link" id="onActionDestroy" permission="DestroyRecordsScheduledForDestruction,destroy" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="AuthorizeAllTransfers,transfer" label="actions.transfer" />
          <action type="action-link" id="onActionAccession" permission="AuthorizeNominatedTransfers,accession" label="actions.accession" />
+         <action type="action-link" id="onActionUndoCutoff" permission="CreateModifyRecordsInCutoffFolders,undo-cutoff" label="actions.undo-cutoff" />
          <action type="action-link" id="onActionEditDispositionAsOf" permission="ManuallyChangeDispositionDates,disposition-as-of" label="actions.edit-disposition-as-of-date" />
          <action type="action-link" id="onActionFreeze" permission="freeze" label="actions.freeze" />
          <action type="action-link" id="onActionUnfreeze" permission="unfreeze" label="actions.unfreeze" />
@@ -49,10 +50,10 @@
          <action type="action-link" id="onActionEditReviewAsOf" permission="PlanningReviewCycles,review-as-of" label="actions.edit-review-as-of-date" />
          <action type="action-link" id="onActionUndeclare" permission="UndeclareRecords,undeclare" label="actions.undeclare" />
          <action type="action-link" id="onActionCutoff" permission="ApproveRecordsScheduledForCutoff,cutoff" label="actions.cutoff" />
-         <action type="action-link" id="onActionUndoCutoff" permission="CreateModifyRecordsInCutoffFolders,undo-cutoff" label="actions.undo-cutoff" />
          <action type="action-link" id="onActionDestroy" permission="DestroyRecordsScheduledForDestruction,destroy" label="actions.destroy" />
          <action type="action-link" id="onActionTransfer" permission="AuthorizeAllTransfers,transfer" label="actions.transfer" />
          <action type="action-link" id="onActionAccession" permission="AuthorizeNominatedTransfers,accession" label="actions.accession" />
+         <action type="action-link" id="onActionUndoCutoff" permission="CreateModifyRecordsInCutoffFolders,undo-cutoff" label="actions.undo-cutoff" />
          <action type="action-link" id="onActionEditDispositionAsOf" permission="ManuallyChangeDispositionDates,disposition-as-of" label="actions.edit-disposition-as-of-date" />
          <action type="action-link" id="onActionFreeze" permission="freeze" label="actions.freeze" />
          <action type="action-link" id="onActionUnfreeze" permission="unfreeze" label="actions.unfreeze" />
@@ -78,7 +79,17 @@
          <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />         
       </actionSet>
 
-      <actionSet id="metadataStub"></actionSet>
+      <actionSet id="metadataStubFolder">
+         <action type="simple-link" id="onActionViewDetails" href="{recordFolderDetailsUrl}" label="actions.view-details" />
+         <action type="action-link" id="onActionManagePermissions" permission="ManageAccessRights" label="actions.manage-permissions" />
+         <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
+         <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />
+      </actionSet>
+
+      <actionSet id="metadataStub">
+         <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
+         <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />
+      </actionSet>
 
       <actionSet id="transferContainer">
          <action type="simple-link" id="onActionDownloadZip" permission="AuthorizeAllTransfers" href="{transfersZipUrl}" label="actions.download-zip" />
