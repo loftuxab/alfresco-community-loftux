@@ -60,13 +60,13 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
         QName nodeType = this.nodeService.getType(actionedUponNodeRef);
         if (this.dictionaryService.isSubClass(nodeType, TYPE_HOLD) == true)
         {
-            final NodeRef holdNodeRef = actionedUponNodeRef;
-            List<ChildAssociationRef> frozenNodeAssocs = this.nodeService.getChildAssocs(holdNodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
+            final NodeRef holdBeingRelinquished = actionedUponNodeRef;
+            List<ChildAssociationRef> frozenNodeAssocs = nodeService.getChildAssocs(holdBeingRelinquished, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
             
             if (logger.isDebugEnabled())
             {
                 StringBuilder msg = new StringBuilder();
-                msg.append("Relinquishing hold ").append(holdNodeRef)
+                msg.append("Relinquishing hold ").append(holdBeingRelinquished)
                     .append(" which has ").append(frozenNodeAssocs.size()).append(" frozen node(s).");
                 logger.debug(msg.toString());
             }
@@ -76,19 +76,19 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
                 final NodeRef nextFrozenNode = assoc.getChildRef();
                 
                 // Remove the freeze if this is the only hold that references the node
-                removeFreeze(nextFrozenNode, holdNodeRef);
+                removeFreeze(nextFrozenNode, holdBeingRelinquished);
             }
             
             if (logger.isDebugEnabled())
             {
                 StringBuilder msg = new StringBuilder();
-                msg.append("Deleting hold object ").append(holdNodeRef)
-                    .append(" with name ").append(nodeService.getProperty(holdNodeRef, ContentModel.PROP_NAME));
+                msg.append("Deleting hold object ").append(holdBeingRelinquished)
+                    .append(" with name ").append(nodeService.getProperty(holdBeingRelinquished, ContentModel.PROP_NAME));
                 logger.debug(msg.toString());
             }
             
             // Delete the hold node
-            this.nodeService.deleteNode(holdNodeRef);
+            this.nodeService.deleteNode(holdBeingRelinquished);
         }
         else
         {
@@ -104,20 +104,34 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
      */
     private void removeFreeze(NodeRef nodeRef, NodeRef holdBeingRelinquished)
     {
-        // Get all the holds and remove this node from them
-        List<ChildAssociationRef> assocs = this.nodeService.getParentAssocs(nodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
+        // We should only remove the frozen aspect if there are no other 'holds' in effect for this node.
+        // One complication to consider is that holds can be placed on records or on folders.
+        // Therefore if the nodeRef here is a record, we need to go up the containment hierarchy looking
+        // for holds at each level.
+
+        // Get all the holds and remove this node from them.
+        List<ChildAssociationRef> parentAssocs = this.nodeService.getParentAssocs(nodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
+        // If the nodeRef is a record, there could also be applicable holds as parents of the folder(s).
+        if (recordsManagementService.isRecord(nodeRef))
+        {
+            List<NodeRef> parentFolders = recordsManagementService.getRecordFolders(nodeRef);
+            for (NodeRef folder : parentFolders)
+            {
+                List<ChildAssociationRef> moreAssocs = nodeService.getParentAssocs(folder, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
+                parentAssocs.addAll(moreAssocs);
+            }
+        }
         
         if (logger.isDebugEnabled())
         {
             StringBuilder msg = new StringBuilder();
             msg.append("Removing freeze from ").append(nodeRef).append(" which has ")
-                .append(assocs.size()).append(" holds");
+                .append(parentAssocs.size()).append(" holds");
             logger.debug(msg.toString());
         }
 
-        // We should only remove the frozen aspect if there are no other 'holds' in effect for this node.
         boolean otherHoldsAreInEffect = false;
-        for (ChildAssociationRef chAssRef : assocs)
+        for (ChildAssociationRef chAssRef : parentAssocs)
         {
             if (!chAssRef.getParentRef().equals(holdBeingRelinquished))
             {
