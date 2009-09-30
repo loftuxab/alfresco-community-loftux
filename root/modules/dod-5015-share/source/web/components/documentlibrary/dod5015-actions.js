@@ -451,6 +451,9 @@
                {
                   // Set the hidden nodeRefs field to a comma-separated list of nodeRefs
                   Dom.get(this.id + "-exportDialog-nodeRefs").value = p_obj.join(",");
+                  var failure = "window.parent.Alfresco.util.ComponentManager.get('" + this.id + "')";
+                  Dom.get(this.id + "-exportDialog-failureCallbackFunction").value = failure + ".onExportFailure";
+                  Dom.get(this.id + "-exportDialog-failureCallbackScope").value = failure;
                },
                obj: nodeRefs,
                scope: this
@@ -458,6 +461,26 @@
          });
 
          this.modules.exportDialog.show();
+      },
+
+
+      /**
+       * Called from the hidden ifram if the Export action fails.
+       *
+       * @method onExportFailure
+       * @param error {object} Object literal describing the error
+       * @param error.status.code {string} The http status code
+       * @param error.status.name {string} The error name
+       * @param error.status.description {string} A description of the error status
+       * @param error.message {string} An error message describing the error
+       */
+      onExportFailure: function RDLA_onExportFailure(error)
+      {
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            title: this.msg("message.failure"),
+            text: error.message
+         });
       },
 
       /**

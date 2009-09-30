@@ -26,6 +26,8 @@ package org.alfresco.module.org_alfresco_module_dod5015.script;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.PrintWriter;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
@@ -128,6 +130,17 @@ public class ExportPost extends StreamACP
         {
             throw new WebScriptException(Status.STATUS_BAD_REQUEST,
                         "Could not parse JSON from req.", je);
+        }
+        catch(Throwable e)
+        {
+            if (logger.isDebugEnabled())
+            {
+                StringWriter stack = new StringWriter();
+                e.printStackTrace(new PrintWriter(stack));
+                logger.debug("Caught exception; decorating with appropriate status template : " + stack.toString());
+            }
+
+            throw createStatusException(e, req, res);
         }
         finally
         {
