@@ -245,7 +245,7 @@
             DS.responseType = YAHOO.util.DataSource.TYPE_JSON;
             DS.responseSchema = {
                resultsList:'data.entries',
-               fields: ["timestamp","fullName","userRole","event","nodeName","nodeRef"],
+               fields: ["timestamp","fullName","userRole","event","nodeName","nodeRef","path"],
                metaFields: {
                   "enabled": "data.enabled",
                   "stopDate": "data.stopped",
@@ -282,14 +282,13 @@
             YAHOO.widget.DataTable.Formatter.eventCellFormatter = function eventCellFormatter(elLiner, oRecord, oColumn, oData)
             {
                var oRecordData = oRecord._oData;
-               
                if (oData!='Delete Object')
                {
                   elLiner.innerHTML = oRecordData.event + ' [<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + me.options.siteId + '/document-details?nodeRef=' + oRecordData.nodeRef + '">' + oRecordData.nodeName + '</a>]';
                }
                else
                {
-                  elLiner.innerHTML = oRecordData.event + ' [' + oRecordData.nodeName + ']';
+                  elLiner.innerHTML = oRecordData.event + ' [' + oRecordData.path.replace('/documentLibrary','') + ']';
                }
                
                //add details button
