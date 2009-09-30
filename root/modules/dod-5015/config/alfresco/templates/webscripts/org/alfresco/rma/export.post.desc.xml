@@ -9,7 +9,7 @@
   ]]>
   </description>
   <url>/api/rma/admin/export</url>
-  <format default="">argument</format>
+  <format default="html">argument</format>
   <authentication>user</authentication>
   <transaction>required</transaction>
   <lifecycle>internal</lifecycle>

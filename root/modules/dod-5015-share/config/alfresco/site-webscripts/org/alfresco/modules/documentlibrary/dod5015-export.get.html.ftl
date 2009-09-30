@@ -4,6 +4,9 @@
    <div class="bd">
       <form id="${el}-form" action="" method="POST" enctype="multipart/form-data" accept-charset="utf-8">
          <input id="${el}-nodeRefs" type="hidden" name="nodeRefs" value=""/>
+         <input type="hidden" name="format" value="html"/>
+         <input id="${el}-failureCallbackFunction" type="hidden" name="failureCallbackFunction" value=""/>
+         <input id="${el}-failureCallbackScope" type="hidden" name="failureCallbackScope" value=""/>
          <div class="yui-gd">
             <div class="yui-u">${msg("label.transferFormat")}</div>
          </div>
