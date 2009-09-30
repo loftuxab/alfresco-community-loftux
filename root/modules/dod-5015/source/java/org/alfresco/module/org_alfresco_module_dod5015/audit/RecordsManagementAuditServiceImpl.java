@@ -775,6 +775,15 @@ public class RecordsManagementAuditServiceImpl
         AuditQueryCallback callback = new AuditQueryCallback()
         {
             private boolean firstEntry = true;
+
+            /**
+             * Just log the error, but continue
+             */
+            public boolean handleAuditEntryError(Long entryId, String errorMsg, Throwable error)
+            {
+                logger.warn(errorMsg, error);
+                return true;
+            }
             
             @SuppressWarnings("unchecked")
             public boolean handleAuditEntry(
@@ -929,6 +938,7 @@ public class RecordsManagementAuditServiceImpl
         String eventName = params.getEvent();
         QName propertyQName = params.getProperty();
         int maxEntries = params.getMaxEntries();
+        boolean forward = maxEntries > 0 ? false : true;        // Reverse order if the results are limited
         
         // start the audit trail report
         writeAuditTrailHeader(writer, params, reportFormat);
@@ -942,6 +952,7 @@ public class RecordsManagementAuditServiceImpl
         {
             auditService.auditQuery(
                     callback,
+                    forward,
                     RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
                     user,
                     fromTime,
@@ -953,6 +964,7 @@ public class RecordsManagementAuditServiceImpl
         {
             auditService.auditQuery(
                     callback,
+                    forward,
                     RecordsManagementAuditService.RM_AUDIT_APPLICATION_NAME,
                     user,
                     fromTime,
