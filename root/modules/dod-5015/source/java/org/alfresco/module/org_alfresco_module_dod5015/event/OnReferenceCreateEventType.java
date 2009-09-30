@@ -134,7 +134,7 @@ public class OnReferenceCreateEventType extends SimpleRecordsManagementEventType
         // Check whether it is the reference type we care about
         if (reference.equals(this.reference) == true)
         {
-            DispositionAction da = recordsManagementService.getNextDispositionAction(fromNodeRef);
+            DispositionAction da = recordsManagementService.getNextDispositionAction(toNodeRef);
             if (da != null)
             {
                 List<EventCompletionDetails> events = da.getEventCompletionDetails();
@@ -149,7 +149,7 @@ public class OnReferenceCreateEventType extends SimpleRecordsManagementEventType
                         params.put(CompleteEventAction.PARAM_EVENT_NAME, event.getEventName());
                         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, AuthenticationUtil.getFullyAuthenticatedUser());
                         params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
-                        recordsManagementActionService.executeRecordsManagementAction(fromNodeRef, "completeEvent", params);
+                        recordsManagementActionService.executeRecordsManagementAction(toNodeRef, "completeEvent", params);
                         
                         break;
                     }

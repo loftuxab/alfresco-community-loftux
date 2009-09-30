@@ -2672,7 +2672,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
             public NodeRef execute() throws Throwable
             {
                 
-                DispositionAction da = rmService.getNextDispositionAction(recordOne);
+                DispositionAction da = rmService.getNextDispositionAction(recordTwo);
                 assertNotNull(da);
                 assertEquals("cutoff", da.getName());
                 assertFalse(da.isEventsEligible());
@@ -2695,7 +2695,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         {
             public NodeRef execute() throws Throwable
             {
-                DispositionAction da = rmService.getNextDispositionAction(recordOne);
+                DispositionAction da = rmService.getNextDispositionAction(recordTwo);
                 assertNotNull(da);
                 assertEquals("cutoff", da.getName());
                 assertTrue(da.isEventsEligible());
