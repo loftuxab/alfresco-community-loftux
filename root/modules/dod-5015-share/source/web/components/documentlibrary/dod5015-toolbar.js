@@ -523,7 +523,7 @@
             importDestination: this.modules.docList.doclistMetadata.parent.nodeRef,
             filter: [
             {
-               description: this.msg("import.filetype.description"),
+               description: this.msg("label.filter-description.import"),
                extensions: "*.acp"
             }]
          });
