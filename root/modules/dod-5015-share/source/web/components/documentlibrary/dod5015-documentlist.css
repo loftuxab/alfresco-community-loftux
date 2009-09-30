@@ -237,6 +237,11 @@
    background-image: url(images/record-folder-open-16.png);
 }
 
+.doclist .record-folder .onActionReviewAll a
+{
+   background-image: url(images/reviewed-record-16.png);
+}
+
 .doclist .record-folder .onActionTransfer a
 {
    background-image: url(images/transfer-16.png);

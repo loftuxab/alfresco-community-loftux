@@ -42,13 +42,14 @@
     */
    var Dom = YAHOO.util.Dom;
 
-   /**
-    * Alfresco Slingshot aliases
-    */
-   var $combine = Alfresco.util.combinePaths;
-   
    Alfresco.doclib.RecordsActions.prototype =
    {
+      /**
+       * Public Action implementations.
+       *
+       * NOTE: Actions are defined in alphabetical order by convention.
+       */
+      
       /**
        * Accession action.
        *
@@ -57,7 +58,21 @@
        */
       onActionAccession: function RDLA_onActionAccession(assets)
       {
-         this._dod5015Action("message.accession", assets, "accession");
+         this._dod5015Action("message.accession", assets, "accession", null,
+         {
+            success:
+            {
+               callback:
+               {
+                  fn: this._transferAccessionComplete,
+                  obj:
+                  {
+                     displayName: YAHOO.lang.isArray(assets) ? displayName = this.msg("message.multi-select", assets.length) : assets.displayName
+                  },
+                  scope: this
+               }
+            }
+         });
       },
 
       /**
@@ -104,42 +119,6 @@
          this._copyMoveFileTo("move", assets);
       },
       
-      /**
-       * Copy/Move/File To implementation.
-       *
-       * @method _copyMoveFileTo
-       * @param mode {String} Operation mode: copy|file|move
-       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
-       * @private
-       */
-      _copyMoveFileTo: function RDLA__copyMoveFileTo(mode, assets)
-      {
-         // Check mode is an allowed one
-         if (!mode in
-            {
-               copy: true,
-               file: true,
-               move: true
-            })
-         {
-            throw new Error("'" + mode + "' is not a valid Copy/Move/File to mode.");
-         }
-
-         if (!this.modules.copyMoveFileTo)
-         {
-            this.modules.copyMoveFileTo = new Alfresco.module.RecordsCopyMoveFileTo(this.id + "-copyMoveFileTo");
-         }
-
-         this.modules.copyMoveFileTo.setOptions(
-         {
-            mode: mode,
-            siteId: this.options.siteId,
-            containerId: this.options.containerId,
-            path: this.currentPath,
-            files: assets
-         }).showDialog();
-      },
-
       /**
        * Close Record Folder action.
        *
@@ -220,11 +199,12 @@
        */
       onActionDestroy: function RDLA_onActionDestroy(assets)
       {
-         // If "Destroy" was triggered form the documentlist assets contain an object instead of an array
+         // If "Destroy" was triggered from the documentlist assets contain an object instead of an array
          var me = this,
             noOfAssets = YAHOO.lang.isArray(assets) ? assets.length : 1,
             text;
-         if(noOfAssets == 1)
+         
+         if (noOfAssets == 1)
          {
             text = this.msg("message.confirm.destroy", (YAHOO.lang.isArray(assets) ? assets[0].displayName : assets.displayName));
          }
@@ -253,26 +233,26 @@
                      title: me.msg("message.confirm2.destroy.title"),
                      text: text,
                      buttons: [
+                     {
+                        text: me.msg("button.ok"),
+                        handler: function RDLA_onActionDestroy_confirm2_ok()
                         {
-                           text: me.msg("button.ok"),
-                           handler: function RDLA_onActionDestroy_confirm2_ok()
-                           {
-                              // Hide the second confirmation dialog
-                              this.destroy();
+                           // Hide the second confirmation dialog
+                           this.destroy();
 
-                              // Call the destroy action
-                              me._dod5015Action("message.destroy", assets, "destroy");
-                           },
-                           isDefault: true
+                           // Call the destroy action
+                           me._dod5015Action("message.destroy", assets, "destroy");
                         },
+                        isDefault: true
+                     },
+                     {
+                        text: me.msg("button.cancel"),
+                        handler: function RDLA_onActionDestroy_confirm2_cancel()
                         {
-                           text: me.msg("button.cancel"),
-                           handler: function RDLA_onActionDestroy_confirm2_cancel()
-                           {
-                              // Hide the second confirmation dialog
-                              this.destroy();
-                           }
-                        }]
+                           // Hide the second confirmation dialog
+                           this.destroy();
+                        }
+                     }]
                   });
 
                },
@@ -531,6 +511,21 @@
       },
 
       /**
+       * Manage Permissions
+       *
+       * @method onActionManagePermissions
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       */
+      onActionManagePermissions: function RDLA_onActionManagePermissions(assets)
+      {
+         var pageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
+               "/rmpermissions?nodeRef=" + assets.nodeRef + "&itemName=" + encodeURIComponent(assets.displayName) +
+               "&nodeType=" + assets.type;
+         
+         window.location.href = pageUrl;
+      },
+
+      /**
        * Open Record Folder action.
        *
        * @method onActionOpenFolder
@@ -550,6 +545,18 @@
       onActionRelinquish: function RDLA_onActionRelinquish(assets)
       {
          this._dod5015Action("message.relinquish", assets, "relinquishHold");
+      },
+
+      /**
+       * Review All action.
+       * Reviews all records with the given Record Folder.
+       *
+       * @method onActionReviewAll
+       * @param assets {object} Object literal representing parent Record Folder
+       */
+      onActionReviewAll: function RDLA_onActionReviewAll(assets)
+      {
+         this._dod5015Action("message.review-all", assets, "reviewed");
       },
 
       /**
@@ -623,7 +630,21 @@
        */
       onActionTransfer: function RDLA_onActionTransfer(assets)
       {
-         this._dod5015Action("message.transfer", assets, "transfer");
+         this._dod5015Action("message.transfer", assets, "transfer", null,
+         {
+            success:
+            {
+               callback:
+               {
+                  fn: this._transferAccessionComplete,
+                  obj:
+                  {
+                     displayName: YAHOO.lang.isArray(assets) ? displayName = this.msg("message.multi-select", assets.length) : assets.displayName
+                  },
+                  scope: this
+               }
+            }
+         });
       },
 
       /**
@@ -682,21 +703,6 @@
       },
 
       /**
-       * Manage Permissions
-       *
-       * @method onActionManagePermissions
-       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
-       */
-      onActionManagePermissions: function RDLA_onActionManagePermissions(assets)
-      {
-         var pageUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + 
-               "/rmpermissions?nodeRef=" + assets.nodeRef + "&itemName=" + encodeURIComponent(assets.displayName) +
-               "&nodeType=" + assets.type;
-         
-         window.location.href = pageUrl;
-      },
-
-      /**
        * View Audit log
        *
        * @method onActionViewAuditLog
@@ -729,7 +735,182 @@
          }
       },
 
-      
+
+      /**
+       * Private action helper functions
+       */
+
+      /**
+       * Copy/Move/File To implementation.
+       *
+       * @method _copyMoveFileTo
+       * @param mode {String} Operation mode: copy|file|move
+       * @param assets {object} Object literal representing one or more file(s) or folder(s) to be actioned
+       * @private
+       */
+      _copyMoveFileTo: function RDLA__copyMoveFileTo(mode, assets)
+      {
+         // Check mode is an allowed one
+         if (!mode in
+            {
+               copy: true,
+               file: true,
+               move: true
+            })
+         {
+            throw new Error("'" + mode + "' is not a valid Copy/Move/File to mode.");
+         }
+
+         if (!this.modules.copyMoveFileTo)
+         {
+            this.modules.copyMoveFileTo = new Alfresco.module.RecordsCopyMoveFileTo(this.id + "-copyMoveFileTo");
+         }
+
+         this.modules.copyMoveFileTo.setOptions(
+         {
+            mode: mode,
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: this.currentPath,
+            files: assets
+         }).showDialog();
+      },
+
+      /**
+       * Transfer and Accession action result processing.
+       *
+       * @method _transferAccessionComplete
+       * @param data {object} Object literal containing ajax request and response
+       * @param obj {object} Caller-supplied object
+       *    <pre>
+       *       obj.displayName {string} Filename or number of files submitted to the action.
+       *    </pre>
+       * @private
+       */
+      _transferAccessionComplete: function RDLA__transferAccession(data, obj)
+      {
+         var displayName = obj.displayName;
+         
+         /**
+          * Transfer / Accession container query success callback.
+          *
+          * @method fnTransferQuerySuccess
+          * @param data {object} Object literal containing ajax request and response
+          * @param obj {object} Caller-supplied object
+          */
+         var fnTransferQuerySuccess = function RDLA_onActionTransfer_fnTransferQuerySuccess(data, obj)
+         {
+            // Check the transfer details to optionally show the PDF warning
+            if (data.json && data.json.transfer)
+            {
+               var transfer = data.json.transfer,
+                  nodeRef = transfer.nodeRef,
+                  fileName = transfer.name,
+                  accessionIndicator = transfer["rma:transferAccessionIndicator"],
+                  pdfIndicator = transfer["rma:transferPDFIndicator"];
+
+               // If we're a Document Library, then swap to the transfers filter and highlight the newly-created transfer
+               if (this.name === "Alfresco.DocumentList")
+               {
+                  var fnAfterUpdate = function RDLA_onActionTransfer_fnTransferQuerySuccess_fnAfterUpdate()
+                  {
+                     YAHOO.Bubbling.fire("highlightFile",
+                     {
+                        fileName: fileName
+                     });
+
+                     if (pdfIndicator)
+                     {
+                        Alfresco.util.PopupManager.displayPrompt(
+                        {
+                           title: this.msg("message.pdf-record-fonts.title"),
+                           text: this.msg(accessionIndicator ? "message.pdf-record-fonts.accession" : "message.pdf-record-fonts.transfer"),
+                           icon: YAHOO.widget.SimpleDialog.ICON_WARN
+                        });
+                     }
+                     else
+                     {
+                        Alfresco.util.PopupManager.displayMessage(
+                        {
+                           text: this.msg("message.transfer.success", displayName)
+                        });
+                     }
+                  };
+                  this.afterDocListUpdate.push(fnAfterUpdate);
+                  YAHOO.Bubbling.fire("filterChanged",
+                  {
+                     filterOwner: "Alfresco.DocListFilePlan",
+                     filterId: "transfers"
+                  });
+               }
+               // Otherwise, use the metadataRefresh event
+               else
+               {
+                  YAHOO.Bubbling.fire("metadataRefresh");
+                  
+                  if (pdfIndicator)
+                  {
+                     Alfresco.util.PopupManager.displayPrompt(
+                     {
+                        title: this.msg("message.pdf-record-fonts.title"),
+                        text: this.msg(accessionIndicator ? "message.pdf-record-fonts.accession" : "message.pdf-record-fonts.transfer"),
+                        icon: YAHOO.widget.SimpleDialog.ICON_WARN
+                     });
+                  }
+                  else
+                  {
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this.msg("message.transfer.success", displayName)
+                     });
+                  }
+               }
+            }
+         };
+         
+         /**
+          * Transfer / Accession container query failure callback.
+          *
+          * @method fnTransferQueryFailure
+          * @param data {object} Object literal containing ajax request and response
+          * @param obj {object} Caller-supplied object
+          */
+         var fnTransferQueryFailure = function RDLA_onActionTransfer_fnTransferQueryFailure(data, obj)
+         {
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               title: this.msg("message.pdf-record-fonts.title"),
+               text: this.msg("message.pdf-record-fonts.unknown"),
+               icon: YAHOO.widget.SimpleDialog.ICON_WARN
+            });
+         };
+
+         // Extract the transfer container nodeRef to query it's properties
+         if (data.json && data.json.results)
+         {
+            // Grab the resulting transfer container nodeRef
+            var dataObj = data.config.dataObj,
+               nodeRef = YAHOO.lang.isArray(dataObj.nodeRefs) ? dataObj.nodeRefs[0] : dataObj.nodeRef,
+               transfer = new Alfresco.util.NodeRef(data.json.results[nodeRef]);
+            
+            // Now query the transfer nodeRef, looking for the rma:transferPDFIndicator flag
+            Alfresco.util.Ajax.jsonGet(
+            {
+               url: Alfresco.constants.PROXY_URI + "slingshot/doclib/dod5015/transfer/node/" + transfer.uri,
+               successCallback:
+               {
+                  fn: fnTransferQuerySuccess,
+                  scope: this
+               },
+               failureCallback:
+               {
+                  fn: fnTransferQueryFailure,
+                  scope: this
+               }
+            });
+         }
+      },
+
       /**
        * DOD5015 action.
        *
@@ -751,7 +932,7 @@
 
          if (YAHOO.lang.isArray(assets))
          {
-            displayName = assets.length;
+            displayName = this.msg("message.multi-select", assets.length);
             dataObj.nodeRefs = [];
             for (var i = 0, ii = assets.length; i < ii; i++)
             {

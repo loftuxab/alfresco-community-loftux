@@ -32,6 +32,7 @@ import java.util.Map;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
+import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.repo.action.executer.ActionExecuter;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
@@ -159,7 +160,7 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
        {
            ContentData contentData = (ContentData)nodeService.getProperty(dispositionLifeCycleNodeRef, ContentModel.PROP_CONTENT);
            if (contentData != null &&
-               MimetypeMap.MIMETYPE_PDF.equals(contentData.getMimetype()) == true)
+               (MimetypeMap.MIMETYPE_PDF.equals(contentData.getMimetype()) == true || nodeService.hasAspect(dispositionLifeCycleNodeRef, DOD5015Model.ASPECT_PDF_RECORD)))
            {
                // Set the property indicator
                nodeService.setProperty(transferNodeRef, PROP_TRANSFER_PDF_INDICATOR, true);
