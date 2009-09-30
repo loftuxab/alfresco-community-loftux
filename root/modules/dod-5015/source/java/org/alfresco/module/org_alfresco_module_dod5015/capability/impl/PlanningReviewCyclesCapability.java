@@ -50,7 +50,7 @@ public class PlanningReviewCyclesCapability extends AbstractCapability
         {
             if (checkFilingUnfrozenUncutoff(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (isVitalRecord(nodeRef))
+                if (isVitalRecord(nodeRef) || isVitalRecordFolder(nodeRef))
                 {
                     if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.PLANNING_REVIEW_CYCLES) == AccessStatus.ALLOWED)
                     {

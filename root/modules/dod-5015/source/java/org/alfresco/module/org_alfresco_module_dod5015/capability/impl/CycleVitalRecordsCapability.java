@@ -50,7 +50,7 @@ public class CycleVitalRecordsCapability extends AbstractCapability
         {
             if (checkFilingUnfrozenUncutoff(nodeRef) == AccessDecisionVoter.ACCESS_GRANTED)
             {
-                if (isVitalRecord(nodeRef))
+                if (isVitalRecord(nodeRef) || isVitalRecordFolder(nodeRef))
                 {
                     if (voter.getPermissionService().hasPermission(getFilePlan(nodeRef), RMPermissionModel.CYCLE_VITAL_RECORDS) == AccessStatus.ALLOWED)
                     {

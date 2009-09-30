@@ -323,7 +323,7 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAction#execute(org.alfresco.service.cmr.repository.NodeRef, java.util.Map)
      */
-    public void execute(NodeRef filePlanComponent, Map<String, Serializable> parameters)
+    public RecordsManagementActionResult execute(NodeRef filePlanComponent, Map<String, Serializable> parameters)
     {
         isExecutableImpl(filePlanComponent, parameters, true);
         
@@ -335,6 +335,10 @@ public abstract class RMActionExecuterAbstractBase  extends ActionExecuterAbstra
         
         // Execute the action
         this.actionService.executeAction(action, filePlanComponent);          
+        
+        // Get the result
+        Object value = action.getParameterValue(ActionExecuterAbstractBase.PARAM_RESULT);
+        return new RecordsManagementActionResult(value);
     }
     
     /**

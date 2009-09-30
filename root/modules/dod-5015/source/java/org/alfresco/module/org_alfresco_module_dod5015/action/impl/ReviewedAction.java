@@ -56,31 +56,43 @@ public class ReviewedAction extends RMActionExecuterAbstractBase
 	@Override
 	protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
 	{
-	    if (recordsManagementService.isRecord(actionedUponNodeRef) == true)
-	    {
-	        VitalRecordDefinition vrDef = this.recordsManagementService.getVitalRecordDefinition(actionedUponNodeRef);
-	        if (vrDef != null && vrDef.isVitalRecord() == true)
-	        {
-	            // Calculate the next review date
-	            Date reviewAsOf = vrDef.getNextReviewDate();
-	            if (reviewAsOf != null)
-	            {
-	                // Log
-	                if (logger.isDebugEnabled())
-                    {
-	                    StringBuilder msg = new StringBuilder();
-	                        msg.append("Setting new reviewAsOf property [")
-	                           .append(reviewAsOf)
-	                           .append("] on ")
-	                           .append(actionedUponNodeRef);
-	                     logger.debug(msg.toString());
-                    }
-	                
-	                this.nodeService.setProperty(actionedUponNodeRef, PROP_REVIEW_AS_OF, reviewAsOf);
-	                //TODO And record previous review date, time, user
-	            }
+	    VitalRecordDefinition vrDef = this.recordsManagementService.getVitalRecordDefinition(actionedUponNodeRef);
+        if (vrDef != null && vrDef.isVitalRecord() == true)
+        {
+    	    if (recordsManagementService.isRecord(actionedUponNodeRef) == true)
+    	    {
+    	        reviewRecord(actionedUponNodeRef, vrDef);
 	        }
+    	    else if (recordsManagementService.isRecordFolder(actionedUponNodeRef) == true)
+    	    {
+    	        for (NodeRef record : recordsManagementService.getRecords(actionedUponNodeRef))
+                {
+                    reviewRecord(record, vrDef);
+                }
+    	    }
 	    }
+	}
+	
+	private void reviewRecord(NodeRef nodeRef, VitalRecordDefinition vrDef)
+	{
+        // Calculate the next review date
+        Date reviewAsOf = vrDef.getNextReviewDate();
+        if (reviewAsOf != null)
+        {
+            // Log
+            if (logger.isDebugEnabled())
+            {
+                StringBuilder msg = new StringBuilder();
+                    msg.append("Setting new reviewAsOf property [")
+                       .append(reviewAsOf)
+                       .append("] on ")
+                       .append(nodeRef);
+                 logger.debug(msg.toString());
+            }
+            
+            this.nodeService.setProperty(nodeRef, PROP_REVIEW_AS_OF, reviewAsOf);
+            //TODO And record previous review date, time, user
+        }
 	}
 
 	/**

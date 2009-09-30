@@ -51,6 +51,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.VitalRecordDefinition;
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionResult;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.CompleteEventAction;
 import org.alfresco.module.org_alfresco_module_dod5015.action.impl.EditDispositionActionAsOfDateAction;
@@ -2840,7 +2841,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.SECOND, 0);
         
-        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+        final Object actionResult = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
         {
             public Object execute() throws Throwable
             {        
@@ -2852,9 +2853,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 rmActionService.executeRecordsManagementAction(recordFolder, "editDispositionActionAsOfDate", params);
                 assertTrue(nowDate.equals(nodeService.getProperty(da.getNodeRef(), PROP_DISPOSITION_AS_OF)));    
                 
-                rmActionService.executeRecordsManagementAction(recordFolder, "transfer", null);
-                
-                return null;
+                return rmActionService.executeRecordsManagementAction(recordFolder, "transfer", null);
             }          
         });
         
@@ -2886,9 +2885,12 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 NodeRef transferNodeRef = assocs.get(0).getChildRef();
                 assertEquals(TYPE_TRANSFER, nodeService.getType(transferNodeRef));
                 assertTrue(((Boolean)nodeService.getProperty(transferNodeRef, PROP_TRANSFER_PDF_INDICATOR)).booleanValue());
+                assertNotNull(actionResult);
+                assertEquals(transferNodeRef, ((RecordsManagementActionResult)actionResult).getValue());
                 List<ChildAssociationRef> children = nodeService.getChildAssocs(transferNodeRef, ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
                 assertNotNull(children);
                 assertEquals(1, children.size());
+                
                 
                 // Complete the transfer
                 rmActionService.executeRecordsManagementAction(assocs.get(0).getChildRef(), "transferComplete");

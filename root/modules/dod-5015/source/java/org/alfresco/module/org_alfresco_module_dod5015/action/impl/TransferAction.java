@@ -32,6 +32,7 @@ import java.util.Map;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
+import org.alfresco.repo.action.executer.ActionExecuter;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
 import org.alfresco.service.cmr.action.Action;
@@ -81,7 +82,7 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
     @Override
     protected void executeRecordFolderLevelDisposition(Action action, NodeRef recordFolder)
     {
-        doTransfer(recordFolder);
+        doTransfer(action, recordFolder);
     }
 
     /**
@@ -90,7 +91,7 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
     @Override
     protected void executeRecordLevelDisposition(Action action, NodeRef record)
     {
-        doTransfer(record);
+        doTransfer(action, record);
     }
     
     /**
@@ -98,7 +99,7 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
      * 
      * @param dispositionLifeCycleNodeRef        disposition lifecycle node
      */
-    private void doTransfer(NodeRef dispositionLifeCycleNodeRef)
+    private void doTransfer(Action action, NodeRef dispositionLifeCycleNodeRef)
     {
         // Get the root rm node
         NodeRef root = this.recordsManagementService.getRecordsManagementRoot(dispositionLifeCycleNodeRef);
@@ -134,6 +135,9 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
         
         // Set PDF indicator flag
         setPDFIndicationFlag(transferNodeRef, dispositionLifeCycleNodeRef);
+        
+        // Set the return value of the action
+        action.setParameterValue(ActionExecuter.PARAM_RESULT, transferNodeRef);
     }
     
     /**
