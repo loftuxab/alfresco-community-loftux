@@ -532,7 +532,8 @@ public abstract class AbstractCapability implements Capability
                 DispositionAction nextDispositionAction = voter.getRecordsManagementService().getNextDispositionAction(nodeRef);
                 if (nextDispositionAction != null)
                 {
-                    if (nextDispositionAction.getDispositionActionDefinition().getName().equals("destroy"))
+                    DispositionActionDefinition def = nextDispositionAction.getDispositionActionDefinition();
+                    if (def != null && def.getName().equals("destroy"))
                     {
                         if (voter.getRecordsManagementService().isNextDispositionActionEligible(nodeRef))
                         {
