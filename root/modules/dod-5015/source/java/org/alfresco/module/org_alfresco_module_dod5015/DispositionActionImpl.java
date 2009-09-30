@@ -70,10 +70,16 @@ public class DispositionActionImpl implements DispositionAction,
             
             // Get the disposition instructions for the owning node
             NodeRef recordNodeRef = this.services.getNodeService().getPrimaryParent(this.dispositionNodeRef).getParentRef();
-            DispositionSchedule ds = this.services.getRecordsManagementService().getDispositionSchedule(recordNodeRef);
+            if (recordNodeRef != null)
+            {
+                DispositionSchedule ds = this.services.getRecordsManagementService().getDispositionSchedule(recordNodeRef);
             
-            // Get the disposition action definition
-            this.dispositionActionDefinition = ds.getDispositionActionDefinition(id);
+                if (ds != null)
+                {
+                    // Get the disposition action definition
+                    this.dispositionActionDefinition = ds.getDispositionActionDefinition(id);
+                }
+            }
         }
         
         return this.dispositionActionDefinition;
