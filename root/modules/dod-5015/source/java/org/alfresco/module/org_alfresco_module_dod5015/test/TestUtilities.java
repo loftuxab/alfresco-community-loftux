@@ -38,6 +38,7 @@ import junit.framework.Assert;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.script.BootstrapTestDataGet;
@@ -83,6 +84,7 @@ public class TestUtilities implements DOD5015Model
         RecordsManagementService recordsManagementService = (RecordsManagementService)applicationContext.getBean("RecordsManagementService");
         RecordsManagementActionService recordsManagementActionService = (RecordsManagementActionService)applicationContext.getBean("RecordsManagementActionService");
         RecordsManagementSecurityService recordsManagementSecurityService = (RecordsManagementSecurityService)applicationContext.getBean("RecordsManagementSecurityService");
+        RecordsManagementSearchBehaviour recordsManagementSearchBehaviour = (RecordsManagementSearchBehaviour)applicationContext.getBean("recordsManagementSearchBehaviour");
         
         NodeRef filePlan = null;
         NodeRef rootNode = nodeService.getRootNode(SPACES_STORE);
@@ -118,7 +120,8 @@ public class TestUtilities implements DOD5015Model
             // Tempory call out to patch data after AMP
             BootstrapTestDataGet.patchLoadedData(searchService, nodeService, recordsManagementService, 
                     recordsManagementActionService, permissionService, 
-                    authorityService, recordsManagementSecurityService);
+                    authorityService, recordsManagementSecurityService,
+                    recordsManagementSearchBehaviour);
         }
 
         return filePlan;

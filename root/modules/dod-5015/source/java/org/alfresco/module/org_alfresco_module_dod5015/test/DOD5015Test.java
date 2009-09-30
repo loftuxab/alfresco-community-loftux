@@ -189,6 +189,30 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         rmAdminService.changeCustomConstraintValues(RecordsManagementCustomModel.CONSTRAINT_CUSTOM_SMLIST, newValues);
 	}
 
+	/**
+	 * Tests that the test data has been loaded correctly
+	 */
+	public void testTestData() throws Exception
+	{
+	    // make sure the folders that should have disposition schedules do so
+	    NodeRef janAuditRecordsFolder = TestUtilities.getRecordFolder(searchService, "Reports", "AIS Audit Records", "January AIS Audit Records");
+	    assertNotNull(janAuditRecordsFolder);
+	    
+	    // ensure the folder has the disposition lifecycle aspect
+	    assertTrue("Expected 'January AIS Audit Records' folder to have disposition lifecycle aspect applied", 
+	                nodeService.hasAspect(janAuditRecordsFolder, ASPECT_DISPOSITION_LIFECYCLE));
+	    
+	    // ensure the folder has the correctly setup search aspect
+	    checkSearchAspect(janAuditRecordsFolder);
+	    
+	    // check another folder that has events as part of the disposition schedule
+	    NodeRef equalOppCoordFolder = TestUtilities.getRecordFolder(searchService, "Military Files", "Personnel Security Program Records", "Equal Opportunity Coordinator");
+	    assertNotNull(equalOppCoordFolder);
+	    assertTrue("Expected 'Equal Opportunity Coordinator' folder to have disposition lifecycle aspect applied", 
+                    nodeService.hasAspect(equalOppCoordFolder, ASPECT_DISPOSITION_LIFECYCLE));
+	    checkSearchAspect(equalOppCoordFolder);
+	}
+	
     /**
      * This test method creates a non-vital record and then moves it to a vital folder
      * (triggering a refile) and then moves it a second time to another vital record
