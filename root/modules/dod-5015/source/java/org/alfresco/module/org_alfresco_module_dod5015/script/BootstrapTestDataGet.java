@@ -36,6 +36,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
 import org.alfresco.module.org_alfresco_module_dod5015.DispositionSchedule;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
+import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementSearchBehaviour;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.module.org_alfresco_module_dod5015.capability.RMPermissionModel;
@@ -85,6 +86,7 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
     private PermissionService permissionService;
     private RecordsManagementSecurityService recordsManagementSecurityService;
     private AuthorityService authorityService;
+    private RecordsManagementSearchBehaviour recordsManagementSearchBehaviour;
         
     public void setNodeService(NodeService nodeService)
     {
@@ -129,6 +131,11 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
     public void setRecordsManagementSecurityService(RecordsManagementSecurityService recordsManagementSecurityService)
     {
         this.recordsManagementSecurityService = recordsManagementSecurityService;
+    }
+    
+    public void setRecordsManagementSearchBehaviour(RecordsManagementSearchBehaviour searchBehaviour)
+    {
+        this.recordsManagementSearchBehaviour = searchBehaviour;
     }
     
     @Override
@@ -178,7 +185,8 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
         // Patch data
         BootstrapTestDataGet.patchLoadedData(searchService, nodeService, recordsManagementService, 
                                              recordsManagementActionService, permissionService,
-                                             authorityService, recordsManagementSecurityService);
+                                             authorityService, recordsManagementSecurityService,
+                                             recordsManagementSearchBehaviour);
         
         Map<String, Object> model = new HashMap<String, Object>(1, 1.0f);
     	model.put("success", true);
@@ -200,7 +208,8 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
                                         final RecordsManagementActionService recordsManagementActionService,
                                         final PermissionService permissionService,
                                         final AuthorityService authorityService,
-                                        final RecordsManagementSecurityService recordsManagementSecurityService)
+                                        final RecordsManagementSecurityService recordsManagementSecurityService,
+                                        final RecordsManagementSearchBehaviour recordManagementSearchBehaviour)
     {
         AuthenticationUtil.RunAsWork<Object> runAsWork = new AuthenticationUtil.RunAsWork<Object>()
         {
@@ -212,7 +221,7 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
                 {
                     if (permissionService.getInheritParentPermissions(rmRoot) == true)
                     {
-                        logger.info("Updating permissions for rm root " + rmRoot);
+                        logger.info("Updating permissions for rm root: " + rmRoot);
                         permissionService.setInheritParentPermissions(rmRoot, false);
                     }
                     
@@ -221,7 +230,7 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
                     
                     if (authorityService.authorityExists(allRoleGroupName) == false)
                     {       
-                        logger.info("Creating all roles group for root node " + rmRoot.toString());
+                        logger.info("Creating all roles group for root node: " + rmRoot.toString());
                         
                         // Create "all" role group for root node
                         String allRoles = authorityService.createAuthority(AuthorityType.GROUP, 
@@ -255,7 +264,7 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
                         // Set permissions
                         if (permissionService.getInheritParentPermissions(container) == true)
                         {
-                            logger.info("Updating permissions for record container " + containerName);
+                            logger.info("Updating permissions for record container: " + containerName);
                             permissionService.setInheritParentPermissions(container, false);
                         }
                     }
@@ -278,7 +287,7 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
                         // Set permissions
                         if (permissionService.getInheritParentPermissions(recordFolder) == true)
                         {
-                            logger.info("Updating permissions for record folder " + folderName);
+                            logger.info("Updating permissions for record folder: " + folderName);
                             permissionService.setInheritParentPermissions(recordFolder, false);
                         }
                         
@@ -289,10 +298,14 @@ public class BootstrapTestDataGet extends DeclarativeWebScript
                             if (ds != null)
                             {
                                 // Fire action to "set-up" the folder correctly
-                                logger.info("Setting up bootstraped record folder " + folderName);
+                                logger.info("Setting up bootstraped record folder: " + folderName);
                                 recordsManagementActionService.executeRecordsManagementAction(recordFolder, "setupRecordFolder");
                             }
                         }
+                        
+                        // fixup the search behaviour aspect for the record folder
+                        logger.info("Setting up search aspect for record folder: " + folderName);
+                        recordManagementSearchBehaviour.fixupSearchAspect(recordFolder);
                     }
                 }
                 finally
