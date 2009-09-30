@@ -245,7 +245,7 @@
             },
             failure:
             {
-               message: this._msg("message.delete.failure", displayName)
+               message: this.msg("message.delete.failure", displayName)
             },
             webscript:
             {

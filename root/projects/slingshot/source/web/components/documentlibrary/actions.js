@@ -439,7 +439,7 @@
                   });
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: this._msg("message.change-type.success", displayName)
+                     text: this.msg("message.change-type.success", displayName)
                   });
                },
                scope: this
@@ -450,7 +450,7 @@
                {
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: this._msg("message.change-type.failure", displayName)
+                     text: this.msg("message.change-type.failure", displayName)
                   });
                },
                scope: this

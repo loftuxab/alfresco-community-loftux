@@ -39,7 +39,8 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML;
+   var $html = Alfresco.util.encodeHTML,
+      $combine = Alfresco.util.combinePaths;
    
    /**
     * FolderPath constructor.
@@ -90,8 +91,9 @@
             folders = [];
          
          var path = folderData.location.path;
+         
          // Document Library root node
-         if (path == "/" + folderData.location.file)
+         if (path == "/")
          {
             // Root node link to contain current folder highlight parameter
             pathHtml += '<span class="path-link"><a href="' + YAHOO.lang.substitute(baseLinkUrl,
@@ -105,6 +107,7 @@
             pathHtml += '<span class="path-link"><a href="' + rootLinkUrl + '">' + this.msg("path.documents") + '</a></span>';
          }
 
+         path = $combine(path, folderData.fileName);
          folders = path.substring(1, path.length).split("/");
          pathHtml += '<span class="separator"> &gt; </span>';
          
