@@ -227,6 +227,7 @@
                      { text: this.msg("label.hasDispositionSchedule"), value: "rma:recordSearchHasDispositionSchedule" },
                      { text: this.msg("label.dispositionInstructions"), value: "rma:recordSearchDispositionInstructions" },
                      { text: this.msg("label.dispositionAuthority"), value: "rma:recordSearchDispositionAuthority" },
+                     { text: this.msg("label.holdReason"), value: "rma:recordSearchHoldReason" },
                      { text: this.msg("label.vitalRecordReviewPeriod"), value: "rma:recordSearchVitalRecordReviewPeriod" }
                   ]
                }
