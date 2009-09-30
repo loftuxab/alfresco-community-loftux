@@ -47,12 +47,6 @@ Alfresco.RM = Alfresco.RM || {};
       Sel = YAHOO.util.Selector;
 
    /**
-    * Alfresco Slingshot aliases
-    */
-   var $html = Alfresco.util.encodeHTML,
-      $links = Alfresco.util.activateLinks;
-
-   /**
     * RM References component constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
@@ -140,7 +134,7 @@ Alfresco.RM = Alfresco.RM || {};
       {
          var eTarget = Event.getTarget(e),
             refId = this.widgets[eTarget.id.replace('-button', '')].get('value'),
-            nodeRefEl = Dom.getAncestorByTagName(eTarget, 'li')
+            nodeRefEl = Dom.getAncestorByTagName(eTarget, 'li'),
             href = nodeRefEl.getElementsByTagName('a')[0].href,
             nodeRef = new Alfresco.util.NodeRef(Alfresco.util.getQueryStringParameter("nodeRef", href)),
             queryString = "?st=" + nodeRef.storeType + "&si=" + nodeRef.storeId + "&id=" + nodeRef.id,
