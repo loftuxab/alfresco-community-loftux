@@ -76,7 +76,7 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
                 final NodeRef nextFrozenNode = assoc.getChildRef();
                 
                 // Remove the freeze if this is the only hold that references the node
-                removeFreeze(nextFrozenNode);
+                removeFreeze(nextFrozenNode, holdNodeRef);
             }
             
             if (logger.isDebugEnabled())
@@ -102,7 +102,7 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
      * 
      * @param nodeRef   node reference
      */
-    private void removeFreeze(NodeRef nodeRef)
+    private void removeFreeze(NodeRef nodeRef, NodeRef holdBeingRelinquished)
     {
         // Get all the holds and remove this node from them
         List<ChildAssociationRef> assocs = this.nodeService.getParentAssocs(nodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
@@ -115,12 +115,19 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
             logger.debug(msg.toString());
         }
 
-        if (assocs.size() == 1 || assocs.isEmpty())
+        // We should only remove the frozen aspect if there are no other 'holds' in effect for this node.
+        boolean otherHoldsAreInEffect = false;
+        for (ChildAssociationRef chAssRef : assocs)
         {
-            // We should only remove the frozen aspect from this node if the current hold is the last
-            // one which applies to this node.
-            // The assocs.size() will be 1 if the current hold is the last one. But it may also be 0
-            // if we are deleting child records of a frozen folder in this method.
+            if (!chAssRef.getParentRef().equals(holdBeingRelinquished))
+            {
+                otherHoldsAreInEffect = true;
+                break;
+            }
+        }
+        
+        if (!otherHoldsAreInEffect)
+        {
             if (logger.isDebugEnabled())
             {
                 StringBuilder msg = new StringBuilder();
@@ -143,7 +150,7 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
             }
             for (NodeRef record : recordsManagementService.getRecords(nodeRef))
             {
-                removeFreeze(record); 
+                removeFreeze(record, holdBeingRelinquished);
             }
         }
 
