@@ -83,7 +83,7 @@ public class DispositionLifecycleJob implements Job
             {
                 StringBuilder sb = new StringBuilder();
                 sb.append("+TYPE:\"rma:dispositionAction\" ");
-                sb.append("+(@rma\\:dispositionAction:(\"cutOff\" OR \"retain\"))");
+                sb.append("+(@rma\\:dispositionAction:(\"cutoff\" OR \"retain\"))");
                 sb.append("+ISNULL:\"rma:dispositionActionCompletedAt\" ");
                 sb.append("+( ");
                 sb.append("@rma\\:dispositionEventsEligible:true "); 
