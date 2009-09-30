@@ -358,6 +358,7 @@
 
       <aspect name="dod:ghosted">
          <title>Ghosted Record</title>         
+         <archive>false</archive>
          <properties>                
          </properties>
       </aspect> 
