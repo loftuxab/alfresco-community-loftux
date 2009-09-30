@@ -247,8 +247,11 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
         
         // Execute action
         invokeBeforeRMActionExecution(nodeRef, name, parameters);
-        RecordsManagementActionResult result = rmAction.execute(nodeRef, parameters);
-        invokeOnRMActionExecution(nodeRef, name, parameters);
+        RecordsManagementActionResult result = rmAction.execute(nodeRef, parameters);        
+        if (nodeService.exists(nodeRef) == true)
+        {
+            invokeOnRMActionExecution(nodeRef, name, parameters);
+        }
         
         return result;
     }
