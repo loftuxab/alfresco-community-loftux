@@ -476,6 +476,10 @@ public class RecordsManagementSearchBehaviour implements RecordsManagementModel
     
     private void updateVitalRecordDefinitionValues(NodeRef nodeRef)
     {
+        // ensure the folder itself reflects the correct details
+        applySearchAspect(nodeRef);
+        setVitalRecordDefintionDetails(nodeRef);
+        
         List<NodeRef> records = recordsManagementService.getRecords(nodeRef);
         for (NodeRef record : records)
         {
