@@ -2506,26 +2506,39 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 assertFalse(nodeService.hasAspect(recordThree, ASPECT_FROZEN));
                 assertNull(nodeService.getProperty(recordThree, RecordsManagementSearchBehaviour.PROP_RS_HOLD_REASON));
                 
-                // Relinquish the first hold
-                NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
-                assertEquals("reason1changed", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
-                
-                rmActionService.executeRecordsManagementAction(holdNodeRef, "relinquishHold");
-                
-                // Check the holds
-                holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
-                assertNotNull(holdAssocs);
-                assertEquals(1, holdAssocs.size());
-                holdNodeRef = holdAssocs.get(0).getChildRef();
-                assertEquals("reason2", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
-                List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdNodeRef);
-                assertNotNull(freezeAssocs);
-                assertEquals(2, freezeAssocs.size());
-                
                 return null;
             }
         });
-                
+
+        // Put the relinquish hold request into its own transaction
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+                {
+                    public Object execute() throws Throwable
+                    {
+                        // Check the holds
+                        List<ChildAssociationRef> holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                        assertNotNull(holdAssocs);
+                        assertEquals(2, holdAssocs.size());
+                        // Relinquish the first hold
+                        NodeRef holdNodeRef = holdAssocs.get(0).getChildRef();
+                        assertEquals("reason1changed", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+                        
+                        rmActionService.executeRecordsManagementAction(holdNodeRef, "relinquishHold");
+                        
+                        // Check the holds
+                        holdAssocs = nodeService.getChildAssocs(rootNode, ASSOC_HOLDS, RegexQNamePattern.MATCH_ALL);
+                        assertNotNull(holdAssocs);
+                        assertEquals(1, holdAssocs.size());
+                        holdNodeRef = holdAssocs.get(0).getChildRef();
+                        assertEquals("reason2", nodeService.getProperty(holdNodeRef, PROP_HOLD_REASON));
+                        List<ChildAssociationRef> freezeAssocs = nodeService.getChildAssocs(holdNodeRef);
+                        assertNotNull(freezeAssocs);
+                        assertEquals(2, freezeAssocs.size());
+                        
+                        return null;
+                    }
+                });
+
         transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Object>()
         {
             public Object execute() throws Throwable

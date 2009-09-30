@@ -77,21 +77,6 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
                 
                 // Remove the freeze if this is the only hold that references the node
                 removeFreeze(nextFrozenNode);
-                
-                // Remove the freezes on the child records as long as there is no other hold referencing them
-                if (this.recordsManagementService.isRecordFolder(nextFrozenNode) == true)
-                {
-                    if (logger.isDebugEnabled())
-                    {
-                        StringBuilder msg = new StringBuilder();
-                        msg.append(nextFrozenNode).append(" is a record folder");
-                        logger.debug(msg.toString());
-                    }
-                    for (NodeRef record : recordsManagementService.getRecords(holdNodeRef))
-                    {
-                        removeFreeze(record); 
-                    }
-                }
             }
             
             if (logger.isDebugEnabled())
@@ -130,8 +115,12 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
             logger.debug(msg.toString());
         }
 
-        if (assocs.size() == 1)
+        if (assocs.size() == 1 || assocs.isEmpty())
         {
+            // We should only remove the frozen aspect from this node if the current hold is the last
+            // one which applies to this node.
+            // The assocs.size() will be 1 if the current hold is the last one. But it may also be 0
+            // if we are deleting child records of a frozen folder in this method.
             if (logger.isDebugEnabled())
             {
                 StringBuilder msg = new StringBuilder();
@@ -142,6 +131,22 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
             // Remove the aspect
             this.nodeService.removeAspect(nodeRef, ASPECT_FROZEN);
         }
+        
+        // Remove the freezes on the child records as long as there is no other hold referencing them
+        if (this.recordsManagementService.isRecordFolder(nodeRef) == true)
+        {
+            if (logger.isDebugEnabled())
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.append(nodeRef).append(" is a record folder");
+                logger.debug(msg.toString());
+            }
+            for (NodeRef record : recordsManagementService.getRecords(nodeRef))
+            {
+                removeFreeze(record); 
+            }
+        }
+
     }
     
     @Override
