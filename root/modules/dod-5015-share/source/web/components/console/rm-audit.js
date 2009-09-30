@@ -282,7 +282,16 @@
             YAHOO.widget.DataTable.Formatter.eventCellFormatter = function eventCellFormatter(elLiner, oRecord, oColumn, oData)
             {
                var oRecordData = oRecord._oData;
-               elLiner.innerHTML = oRecordData.event + ' [<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + me.options.siteId + '/document-details?nodeRef=' + oRecordData.nodeRef + '">' + oRecordData.nodeName + '</a>]';
+               
+               if (oData!='Delete Object')
+               {
+                  elLiner.innerHTML = oRecordData.event + ' [<a href="' + Alfresco.constants.URL_PAGECONTEXT + 'site/' + me.options.siteId + '/document-details?nodeRef=' + oRecordData.nodeRef + '">' + oRecordData.nodeName + '</a>]';
+               }
+               else
+               {
+                  elLiner.innerHTML = oRecordData.event + ' [' + oRecordData.nodeName + ']';
+               }
+               
                //add details button
                var but = new YAHOO.widget.Button(
                {
