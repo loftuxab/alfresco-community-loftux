@@ -1012,7 +1012,6 @@
                });
                if (j > 1)
                {
-                  eIcon.addClass("last");
                   this.lastCrumbId = Alfresco.util.generateDomId(eFolder.get("element"));
                }
                else

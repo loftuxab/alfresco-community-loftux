@@ -267,7 +267,7 @@
          // Reload the node's metadata
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/all/node/" + this.options.file.nodeRef.replace(":/", "") + "?filter=node",
+            url: Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist/node/" + this.options.file.nodeRef.replace(":/", "") + "?filter=node",
             successCallback:
             {
                fn: this.onMetadataSuccess,
