@@ -73,7 +73,7 @@ public interface RecordsManagementAction
      * @param filePlanComponent     file plan component the action is executed upon
      * @param parameters            action parameters
      */
-    public void execute(NodeRef filePlanComponent, Map<String, Serializable> parameters);
+    public RecordsManagementActionResult execute(NodeRef filePlanComponent, Map<String, Serializable> parameters);
     
     
     /**

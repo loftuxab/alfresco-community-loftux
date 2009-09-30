@@ -75,7 +75,7 @@ public interface RecordsManagementActionService
      * @param nodeRef     node reference to a rm container, rm folder or record
      * @param name        action name
      */
-    void executeRecordsManagementAction(NodeRef nodeRef, String name);
+    RecordsManagementActionResult executeRecordsManagementAction(NodeRef nodeRef, String name);
     
     /**
      * Execute a records management action against several nodes
@@ -83,7 +83,7 @@ public interface RecordsManagementActionService
      * @param nodeRefs  node references to rm containers, rm folders or records
      * @param name      action name
      */
-    void executeRecordsManagementAction(List<NodeRef> nodeRefs, String name);
+    Map<NodeRef, RecordsManagementActionResult> executeRecordsManagementAction(List<NodeRef> nodeRefs, String name);
     
     /**
      * Execute a records management action
@@ -92,7 +92,7 @@ public interface RecordsManagementActionService
      * @param name        action name
      * @param parameters  action parameters
      */
-    void executeRecordsManagementAction(NodeRef nodeRef, String name, Map<String, Serializable> parameters);
+    RecordsManagementActionResult executeRecordsManagementAction(NodeRef nodeRef, String name, Map<String, Serializable> parameters);
 
     /**
      * Execute a records management action against several nodes
@@ -101,7 +101,7 @@ public interface RecordsManagementActionService
      * @param name          action name
      * @param parameters    action parameters
      */
-    void executeRecordsManagementAction(List<NodeRef> nodeRefs, String name, Map<String, Serializable> parameters);
+    Map<NodeRef, RecordsManagementActionResult> executeRecordsManagementAction(List<NodeRef> nodeRefs, String name, Map<String, Serializable> parameters);
     
     /**
      * Execute a records management action. The nodeRef against which the action is to be
@@ -110,7 +110,7 @@ public interface RecordsManagementActionService
      * @param name        action name
      * @param parameters  action parameters
      */
-    void executeRecordsManagementAction(String name, Map<String, Serializable> parameters);
+    RecordsManagementActionResult executeRecordsManagementAction(String name, Map<String, Serializable> parameters);
 
     /**
      * Register records management action

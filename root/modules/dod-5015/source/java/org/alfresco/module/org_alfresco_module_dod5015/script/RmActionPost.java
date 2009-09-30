@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionResult;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -138,16 +139,30 @@ public class RmActionPost extends DeclarativeWebScript
             logger.debug(msg.toString());
         }
         
+        Map<String, Object> model = new HashMap<String, Object>();        
         if (this.targetNodeRefs.isEmpty())
         {
-            this.rmActionService.executeRecordsManagementAction(actionName, actionParams);
+            RecordsManagementActionResult result = this.rmActionService.executeRecordsManagementAction(actionName, actionParams);
+            if (result.getValue() != null)
+            {
+                model.put("result", result.getValue().toString());
+            }
         }
         else
         {
-            this.rmActionService.executeRecordsManagementAction(targetNodeRefs, actionName, actionParams);
+            Map<NodeRef, RecordsManagementActionResult> resultMap = this.rmActionService.executeRecordsManagementAction(targetNodeRefs, actionName, actionParams);
+            Map<String, String> results = new HashMap<String, String>(resultMap.size());
+            for (NodeRef nodeRef : resultMap.keySet())
+            {
+                Object value = resultMap.get(nodeRef).getValue();
+                if (value != null)
+                {
+                    results.put(nodeRef.toString(), resultMap.get(nodeRef).getValue().toString());
+                }
+            }
+            model.put("results", results);
         }
         
-        Map<String, Object> model = new HashMap<String, Object>();
         model.put("message", "Successfully queued action [" + actionName + "] on " + targetNodeRefsString.toString());
 
         return model;

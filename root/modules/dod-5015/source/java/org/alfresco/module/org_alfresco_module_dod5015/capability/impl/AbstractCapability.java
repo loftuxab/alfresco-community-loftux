@@ -583,6 +583,21 @@ public abstract class AbstractCapability implements Capability
     {
         return isRecord(nodeRef) && voter.getNodeService().hasAspect(nodeRef, RecordsManagementModel.ASPECT_VITAL_RECORD);
     }
+    
+    public boolean isVitalRecordFolder(NodeRef nodeRef)
+    {
+        boolean result = false;
+        QName type = voter.getNodeService().getType(nodeRef);
+        if (isRecordFolder(type) == true)
+        {
+            Boolean value = (Boolean)voter.getNodeService().getProperty(nodeRef, RecordsManagementModel.PROP_VITAL_RECORD_INDICATOR);
+            if (value != null)
+            {
+                result = value.booleanValue();
+            }
+        }
+        return result;
+    }
 
     public boolean isRecordFolder(QName type)
     {

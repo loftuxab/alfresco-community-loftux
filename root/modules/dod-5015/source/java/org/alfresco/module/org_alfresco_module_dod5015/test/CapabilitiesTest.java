@@ -2025,7 +2025,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
@@ -2091,7 +2091,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
@@ -2157,7 +2157,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
@@ -2229,7 +2229,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.ALLOWED);
-        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
@@ -2297,7 +2297,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
         check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
@@ -2364,7 +2364,7 @@ public class CapabilitiesTest extends TestCase
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_TIMEFRAMES, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_DESTROY_USERS_AND_GROUPS, AccessStatus.DENIED);
         check(access, RMPermissionModel.CREATE_MODIFY_RECORDS_IN_CUTOFF_FOLDERS, AccessStatus.DENIED);
-        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        check(access, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         check(access, RMPermissionModel.DECLARE_AUDIT_AS_RECORD, AccessStatus.DENIED);
         check(access, RMPermissionModel.DECLARE_RECORDS, AccessStatus.DENIED);
         check(access, RMPermissionModel.DECLARE_RECORDS_IN_CLOSED_FOLDERS, AccessStatus.DENIED);
@@ -5374,11 +5374,11 @@ public class CapabilitiesTest extends TestCase
 
         // folder level
 
-        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(rm_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
@@ -5390,11 +5390,11 @@ public class CapabilitiesTest extends TestCase
 
         // record level
 
-        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(AuthenticationUtil.getSystemUserName(), recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_administrator, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_records_manager, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_security_officer, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
+        checkCapability(rm_power_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(rm_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
 
         checkCapability(AuthenticationUtil.getSystemUserName(), record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
@@ -5434,23 +5434,23 @@ public class CapabilitiesTest extends TestCase
 
         permissionService.setPermission(filePlan, testers, RMPermissionModel.CYCLE_VITAL_RECORDS, true);
 
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
 
         permissionService.deletePermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS);
 
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
 
         permissionService.setPermission(filePlan, testers, RMPermissionModel.DECLARE_RECORDS, true);
 
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
 
         permissionService.deletePermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS);
@@ -5462,9 +5462,9 @@ public class CapabilitiesTest extends TestCase
 
         permissionService.setPermission(filePlan, testers, RMPermissionModel.VIEW_RECORDS, true);
 
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
 
         permissionService.deletePermission(recordFolder_1, testers, RMPermissionModel.FILING);
@@ -5478,9 +5478,9 @@ public class CapabilitiesTest extends TestCase
         permissionService.setPermission(recordFolder_1, testers, RMPermissionModel.FILING, true);
         permissionService.setPermission(recordFolder_2, testers, RMPermissionModel.FILING, true);
 
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
 
         // check frozen
@@ -5492,7 +5492,7 @@ public class CapabilitiesTest extends TestCase
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
@@ -5502,16 +5502,16 @@ public class CapabilitiesTest extends TestCase
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "unfreeze");
         recordsManagementActionService.executeRecordsManagementAction(record_2, "unfreeze");
 
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
 
         // Check closed
@@ -5520,18 +5520,18 @@ public class CapabilitiesTest extends TestCase
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "closeRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "closeRecordFolder");
 
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
 
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_1, "openRecordFolder");
         recordsManagementActionService.executeRecordsManagementAction(recordFolder_2, "openRecordFolder");
 
-        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
 
         // try and cycle
@@ -5571,7 +5571,7 @@ public class CapabilitiesTest extends TestCase
 
         checkCapability(test_user, recordFolder_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
         checkCapability(test_user, record_1, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
-        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
+        checkCapability(test_user, recordFolder_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.ALLOWED);
         checkCapability(test_user, record_2, RMPermissionModel.CYCLE_VITAL_RECORDS, AccessStatus.DENIED);
 
         try

@@ -206,23 +206,23 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#executeRecordsManagementAction(org.alfresco.service.cmr.repository.NodeRef, java.lang.String)
      */
-    public void executeRecordsManagementAction(NodeRef nodeRef, String name)
+    public RecordsManagementActionResult executeRecordsManagementAction(NodeRef nodeRef, String name)
     {
-        executeRecordsManagementAction(nodeRef, name, null);
+        return executeRecordsManagementAction(nodeRef, name, null);
     }
 
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#executeRecordsManagementAction(java.util.List, java.lang.String)
      */
-    public void executeRecordsManagementAction(List<NodeRef> nodeRefs, String name)
+    public Map<NodeRef, RecordsManagementActionResult> executeRecordsManagementAction(List<NodeRef> nodeRefs, String name)
     {
-        executeRecordsManagementAction(nodeRefs, name, null);
+        return executeRecordsManagementAction(nodeRefs, name, null);
     }
     
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#executeRecordsManagementAction(org.alfresco.service.cmr.repository.NodeRef, java.lang.String, java.util.Map)
      */
-    public void executeRecordsManagementAction(NodeRef nodeRef, String name, Map<String, Serializable> parameters)
+    public RecordsManagementActionResult executeRecordsManagementAction(NodeRef nodeRef, String name, Map<String, Serializable> parameters)
     {
         if (logger.isDebugEnabled())
         {
@@ -247,14 +247,16 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
         
         // Execute action
         invokeBeforeRMActionExecution(nodeRef, name, parameters);
-        rmAction.execute(nodeRef, parameters);
+        RecordsManagementActionResult result = rmAction.execute(nodeRef, parameters);
         invokeOnRMActionExecution(nodeRef, name, parameters);
+        
+        return result;
     }
 
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#executeRecordsManagementAction(java.lang.String, java.util.Map)
      */
-    public void executeRecordsManagementAction(String name, Map<String, Serializable> parameters)
+    public RecordsManagementActionResult executeRecordsManagementAction(String name, Map<String, Serializable> parameters)
     {
         RecordsManagementAction rmAction = rmActions.get(name);
         
@@ -273,19 +275,23 @@ public class RecordsManagementActionServiceImpl implements RecordsManagementActi
         }
         else
         {
-            this.executeRecordsManagementAction(implicitTargetNode, name, parameters);
+            return this.executeRecordsManagementAction(implicitTargetNode, name, parameters);
         }
     }
 
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementActionService#executeRecordsManagementAction(java.util.List, java.lang.String, java.util.Map)
      */
-    public void executeRecordsManagementAction(List<NodeRef> nodeRefs, String name, Map<String, Serializable> parameters)
+    public Map<NodeRef, RecordsManagementActionResult> executeRecordsManagementAction(List<NodeRef> nodeRefs, String name, Map<String, Serializable> parameters)
     {
         // Execute the action on each node in the list
+        Map<NodeRef, RecordsManagementActionResult> results = new HashMap<NodeRef, RecordsManagementActionResult>(nodeRefs.size());
         for (NodeRef nodeRef : nodeRefs)
         {
-            executeRecordsManagementAction(nodeRef, name, parameters);
+            RecordsManagementActionResult result = executeRecordsManagementAction(nodeRef, name, parameters);
+            results.put(nodeRef, result);
         }
+        
+        return results;
     }
 }
