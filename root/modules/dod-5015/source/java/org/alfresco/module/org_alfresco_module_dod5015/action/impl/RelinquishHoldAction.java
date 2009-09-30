@@ -76,7 +76,7 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
                 final NodeRef nextFrozenNode = assoc.getChildRef();
                 
                 // Remove the freeze if this is the only hold that references the node
-                removeFreeze(nextFrozenNode, 1);
+                removeFreeze(nextFrozenNode);
                 
                 // Remove the freezes on the child records as long as there is no other hold referencing them
                 if (this.recordsManagementService.isRecordFolder(nextFrozenNode) == true)
@@ -89,7 +89,7 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
                     }
                     for (NodeRef record : recordsManagementService.getRecords(holdNodeRef))
                     {
-                        removeFreeze(record, 0); //TODO 0?
+                        removeFreeze(record); 
                     }
                 }
             }
@@ -117,7 +117,7 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
      * 
      * @param nodeRef   node reference
      */
-    private void removeFreeze(NodeRef nodeRef, int count)
+    private void removeFreeze(NodeRef nodeRef)
     {
         // Get all the holds and remove this node from them
         List<ChildAssociationRef> assocs = this.nodeService.getParentAssocs(nodeRef, ASSOC_FROZEN_RECORDS, RegexQNamePattern.MATCH_ALL);
@@ -126,11 +126,11 @@ public class RelinquishHoldAction extends RMActionExecuterAbstractBase
         {
             StringBuilder msg = new StringBuilder();
             msg.append("Removing freeze from ").append(nodeRef).append(" which has ")
-                .append(assocs.size()).append(" holds.").append(" count=").append(count);
+                .append(assocs.size()).append(" holds");
             logger.debug(msg.toString());
         }
 
-        if (assocs.size() == count)
+        if (assocs.size() == 1)
         {
             if (logger.isDebugEnabled())
             {
