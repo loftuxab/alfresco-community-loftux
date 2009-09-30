@@ -519,7 +519,8 @@
          {
             renderLoopSize: 32,
             draggableColumns: true,
-            initialLoad: false
+            initialLoad: false,
+            MSG_EMPTY: me._msg("message.empty")
          });
          
          // show initial message
@@ -596,7 +597,7 @@
        */
       _setDefaultDataTableErrors: function RecordsResults__setDefaultDataTableErrors(dataTable)
       {
-         dataTable.set("MSG_EMPTY", "");
+         dataTable.set("MSG_EMPTY", Alfresco.util.message("message.empty", "Alfresco.RecordsResults"));
          dataTable.set("MSG_ERROR", Alfresco.util.message("message.error", "Alfresco.RecordsResults"));
       },
       
@@ -652,6 +653,7 @@
       _clearSearchResults: function RecordsResults__clearSearchResults()
       {
          // empty results table
+         this.widgets.dataTable.set("MSG_EMPTY", this._msg("message.loading"));
          this.widgets.dataTable.deleteRows(0, this.widgets.dataTable.getRecordSet().getLength());
       },
 
