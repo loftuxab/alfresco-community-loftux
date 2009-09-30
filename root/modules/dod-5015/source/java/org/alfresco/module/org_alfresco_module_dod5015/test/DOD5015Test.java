@@ -3545,6 +3545,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         		vitalRecFolderDefinition.getReviewPeriod(),
                 vitalRecCatDefinition.getReviewPeriod());
         
+        // check the search aspect for both the category and folder
+        checkSearchAspect(vitalRecFolder);
+        
         // Create a vital record
         NodeRef vitalRecord = this.nodeService.createNode(vitalRecFolder, 
                                                         ContentModel.ASSOC_CONTAINS, 
@@ -3573,6 +3576,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         Date vitalRecordAsOfDate = (Date)this.nodeService.getProperty(vitalRecord, PROP_REVIEW_AS_OF);
         assertNotNull("vitalRecord should have a reviewAsOf date.", vitalRecordAsOfDate);
         
+        // check the search aspect for the vital record
+        checkSearchAspect(vitalRecord);
+        
         //
         // Create a record folder under a "non-vital" category
         //
@@ -3595,7 +3601,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertEquals("The Vital Record reviewPeriod in the folder did not match its parent category",
                 rmService.getVitalRecordDefinition(nonVitalFolder).getReviewPeriod(),
                 rmService.getVitalRecordDefinition(nonVitalRecordCategory).getReviewPeriod());
-
         
         // Create a record
         NodeRef nonVitalRecord = this.nodeService.createNode(nonVitalFolder, 
@@ -3617,8 +3622,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         txn4.begin();
         
         // Check the review schedule
-        assertTrue(this.nodeService.hasAspect(nonVitalRecord, ASPECT_VITAL_RECORD) == false);
-        
+        assertFalse(this.nodeService.hasAspect(nonVitalRecord, ASPECT_VITAL_RECORD));
         assertFalse(rmService.getVitalRecordDefinition(nonVitalRecord).isVitalRecord());
         assertEquals("The Vital Record reviewPeriod did not match its parent category",
                 rmService.getVitalRecordDefinition(nonVitalRecord).getReviewPeriod(),
@@ -3661,6 +3665,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         UserTransaction txn5 = transactionService.getUserTransaction(false);
         txn5.begin();
         
+        // check the folder search aspect
+        checkSearchAspect(nonVitalFolder);
+        
         NodeRef formerlyNonVitalRecord = nonVitalRecord;
 
         assertTrue("Expected VitalRecord aspect not present", nodeService.hasAspect(formerlyNonVitalRecord, ASPECT_VITAL_RECORD));
@@ -3672,6 +3679,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertNotNull("formerlyNonVitalRecord should now have a reviewAsOf date.",
                       nodeService.getProperty(formerlyNonVitalRecord, PROP_REVIEW_AS_OF));
 
+        // check search aspect for the new vital record
+        checkSearchAspect(formerlyNonVitalRecord);
 
         // 2. Switch parent folder from vital to non-vital.
         this.nodeService.setProperty(vitalRecFolder, PROP_VITAL_RECORD_INDICATOR, false);
@@ -3690,7 +3699,6 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertNull("formerlyVitalRecord should now not have a reviewAsOf date.",
                 nodeService.getProperty(formerlyVitalRecord, PROP_REVIEW_AS_OF));
         
-
         // 3. override the VitalRecordDefinition between Category, Folder, Record and ensure
         // the overrides work
         
@@ -3700,7 +3708,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         txn6.commit();
         UserTransaction txn7 = transactionService.getUserTransaction(false);
         txn7.begin();
-        
+
         assertTrue("Unexpected VitalRecord aspect present",
                 nodeService.hasAspect(vitalRecord, ASPECT_VITAL_RECORD));
 
@@ -3723,6 +3731,8 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertEquals(new Period("day|1"), rmService.getVitalRecordDefinition(vitalRecCategory).getReviewPeriod());
         assertEquals(new Period("day|1"), rmService.getVitalRecordDefinition(vitalRecFolder).getReviewPeriod());
 
+        // check the search aspect of the folder after period change
+        checkSearchAspect(vitalRecFolder);
         
         // Change some of the VitalRecordDefinition in Record Folder
         Map<QName, Serializable> folderProps = this.nodeService.getProperties(vitalRecFolder);
@@ -3736,6 +3746,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertEquals(new Period("day|1"), rmService.getVitalRecordDefinition(vitalRecCategory).getReviewPeriod());
         assertEquals(new Period("month|1"), rmService.getVitalRecordDefinition(vitalRecFolder).getReviewPeriod());
 
+        // check the search aspect of the folder after period change
+        checkSearchAspect(vitalRecFolder);
+        
         // Need to commit the transaction to trigger the behaviour that handles changes to VitalRecord Definition.
         txn9.commit();
         UserTransaction txn10 = transactionService.getUserTransaction(false);
@@ -3745,6 +3758,9 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
         assertNotNull("record should have a reviewAsOf date.", initialReviewAsOfDate);
         assertTrue("reviewAsOfDate should have changed.",
                 initialReviewAsOfDate.toString().equals(newReviewAsOfDate.toString()) == false);
+        
+        // check the search aspect of the record after period change
+        checkSearchAspect(vitalRecord);
         
         // Now clean up after this test.
         nodeService.deleteNode(vitalRecord);
