@@ -127,32 +127,43 @@ public class OnReferenceCreateEventType extends SimpleRecordsManagementEventType
     /**
      * @see org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference#onCreateReference(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
      */
-    public void onCreateReference(NodeRef fromNodeRef, NodeRef toNodeRef, QName reference)
+    public void onCreateReference(final NodeRef fromNodeRef, final NodeRef toNodeRef, final QName reference)
     {
-        // Check whether it is the reference type we care about
-        if (reference.equals(this.reference) == true)
+        AuthenticationUtil.RunAsWork<Object> work = new AuthenticationUtil.RunAsWork<Object>()
         {
-            DispositionAction da = recordsManagementService.getNextDispositionAction(toNodeRef);
-            if (da != null)
+            public Object doWork() throws Exception
             {
-                List<EventCompletionDetails> events = da.getEventCompletionDetails();
-                for (EventCompletionDetails event : events)
+                // Check whether it is the reference type we care about
+                if (reference.equals(OnReferenceCreateEventType.this.reference) == true)
                 {
-                    RecordsManagementEvent rmEvent = recordsManagementEventService.getEvent(event.getEventName());
-                    if (event.isEventComplete() == false &&
-                        rmEvent.getType().equals(getName()) == true)
+                    DispositionAction da = recordsManagementService.getNextDispositionAction(toNodeRef);
+                    if (da != null)
                     {
-                        // Complete the event
-                        Map<String, Serializable> params = new HashMap<String, Serializable>(3);
-                        params.put(CompleteEventAction.PARAM_EVENT_NAME, event.getEventName());
-                        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, AuthenticationUtil.getFullyAuthenticatedUser());
-                        params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
-                        recordsManagementActionService.executeRecordsManagementAction(toNodeRef, "completeEvent", params);
-                        
-                        break;
+                        List<EventCompletionDetails> events = da.getEventCompletionDetails();
+                        for (EventCompletionDetails event : events)
+                        {
+                            RecordsManagementEvent rmEvent = recordsManagementEventService.getEvent(event.getEventName());
+                            if (event.isEventComplete() == false &&
+                                rmEvent.getType().equals(getName()) == true)
+                            {
+                                // Complete the event
+                                Map<String, Serializable> params = new HashMap<String, Serializable>(3);
+                                params.put(CompleteEventAction.PARAM_EVENT_NAME, event.getEventName());
+                                params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_BY, AuthenticationUtil.getFullyAuthenticatedUser());
+                                params.put(CompleteEventAction.PARAM_EVENT_COMPLETED_AT, new Date());
+                                recordsManagementActionService.executeRecordsManagementAction(toNodeRef, "completeEvent", params);
+                                
+                                break;
+                            }
+                        }
                     }
                 }
-            }
-        }
+                
+                return null;
+            }           
+        };
+        
+        AuthenticationUtil.runAs(work, AuthenticationUtil.getAdminUserName());
+        
     }
 }
