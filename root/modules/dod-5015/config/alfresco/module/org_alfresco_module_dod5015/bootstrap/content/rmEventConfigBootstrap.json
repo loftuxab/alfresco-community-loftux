@@ -37,7 +37,7 @@
          "eventDisplayLabel" : "Training Complete"
       },
       {
-         "eventType" : "rmEventType.simple",
+         "eventType" : "rmEventType.crossReferencedRecordTransfered",
          "eventName" : "related_record_trasfered_inactive_storage",
          "eventDisplayLabel" : "Related Record Transfered To Inactive Storage"
       },
