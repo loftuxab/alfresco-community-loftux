@@ -1064,7 +1064,7 @@
          }
          
          // If filterDisplay is provided, then use that instead (e.g. for cases where filterData is a nodeRef)
-         filterDisplay = typeof this.currentFilter.filterDisplay !== "undefined" ? this.currentFilter.filterDisplay : this.currentFilter.filterData;
+         filterDisplay = typeof this.currentFilter.filterDisplay !== "undefined" ? this.currentFilter.filterDisplay : (this.currentFilter.filterData || "");
          
          eDescMsg = new Element(document.createElement("div"),
          {

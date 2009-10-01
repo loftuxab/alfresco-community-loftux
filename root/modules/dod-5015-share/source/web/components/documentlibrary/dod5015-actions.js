@@ -67,7 +67,7 @@
                   fn: this._transferAccessionComplete,
                   obj:
                   {
-                     displayName: YAHOO.lang.isArray(assets) ? displayName = this.msg("message.multi-select", assets.length) : assets.displayName
+                     displayName: YAHOO.lang.isArray(assets) ? this.msg("message.multi-select", assets.length) : assets.displayName
                   },
                   scope: this
                }
@@ -662,7 +662,7 @@
                   fn: this._transferAccessionComplete,
                   obj:
                   {
-                     displayName: YAHOO.lang.isArray(assets) ? displayName = this.msg("message.multi-select", assets.length) : assets.displayName
+                     displayName: YAHOO.lang.isArray(assets) ? this.msg("message.multi-select", assets.length) : assets.displayName
                   },
                   scope: this
                }
@@ -827,7 +827,6 @@
             if (data.json && data.json.transfer)
             {
                var transfer = data.json.transfer,
-                  nodeRef = transfer.nodeRef,
                   fileName = transfer.name,
                   accessionIndicator = transfer["rma:transferAccessionIndicator"],
                   pdfIndicator = transfer["rma:transferPDFIndicator"];
