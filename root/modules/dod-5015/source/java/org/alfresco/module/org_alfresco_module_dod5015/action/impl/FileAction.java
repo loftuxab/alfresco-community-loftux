@@ -62,11 +62,9 @@ public class FileAction extends RMActionExecuterAbstractBase
         // check that the folder we are filing into is not closed
         
         // if this is a declared record already, it's a re-file.
-        final boolean isRefile = recordsManagementService.isRecord(actionedUponNodeRef) &&
-                recordsManagementService.isRecordDeclared(actionedUponNodeRef);
-        
+        final boolean isRefile = recordsManagementService.isRecord(actionedUponNodeRef); 
 
-        if (!isRefile)
+        if (isRefile == false)
         {
             // Add the record and undeclared aspect
             nodeService.addAspect(actionedUponNodeRef, RecordsManagementModel.ASPECT_RECORD, null);

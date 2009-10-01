@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -46,25 +47,31 @@ public class RecordsManagementPoliciesUtil
      * @return Returns a set of qualified names containing the node type and all
      *         the node aspects, or null if the node no longer exists
      */
-    public static Set<QName> getTypeAndAspectQNames(NodeService nodeService, NodeRef nodeRef)
+    public static Set<QName> getTypeAndAspectQNames(final NodeService nodeService, final NodeRef nodeRef)
     {
-        Set<QName> qnames = null;
-        try
+        return AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Set<QName>>()
         {
-            Set<QName> aspectQNames = nodeService.getAspects(nodeRef);
-            
-            QName typeQName = nodeService.getType(nodeRef);
-            
-            qnames = new HashSet<QName>(aspectQNames.size() + 1);
-            qnames.addAll(aspectQNames);
-            qnames.add(typeQName);
-        }
-        catch (InvalidNodeRefException e)
-        {
-            qnames = Collections.emptySet();
-        }
-        // done
-        return qnames;
+            public Set<QName> doWork() throws Exception
+            {
+                Set<QName> qnames = null;
+                try
+                {            
+                    Set<QName> aspectQNames = nodeService.getAspects(nodeRef);
+                    
+                    QName typeQName = nodeService.getType(nodeRef);
+                    
+                    qnames = new HashSet<QName>(aspectQNames.size() + 1);
+                    qnames.addAll(aspectQNames);
+                    qnames.add(typeQName);
+                }
+                catch (InvalidNodeRefException e)
+                {
+                    qnames = Collections.emptySet();
+                }
+                // done
+                return qnames;
+            }
+        }, AuthenticationUtil.getAdminUserName());   
     }
 
 }
