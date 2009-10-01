@@ -81,7 +81,7 @@
       onReady: function RMRoles_onReady()
       {
          this.initEvents();
-         var buttons = Sel.query('button', this.id).concat(Sel.query('input[type=submit]', this.id)),
+         var buttons = Sel.query('button', this.id),
             button, id;
          
          // Create widget button while reassigning classname to src element (since YUI removes classes). 
@@ -93,6 +93,8 @@
             this.widgets[id] = new YAHOO.widget.Button(button.id);
             this.widgets[id]._button.className = button.className;
          }
+         
+         Event.addListener("submit", "click", this.onSubmit, this, true);
          
          // Form definition
          var form = new Alfresco.forms.Form("roleForm");
@@ -142,14 +144,7 @@
       initEvents: function RMRoles_initEvents()
       {
          // Requires EventProvider
-         Event.on(this.id, 'submit', this.onInteractionEvent, null, this);
          Event.on(this.id, 'click', this.onInteractionEvent, null, this);         
-         
-         this.registerEventHandler('submit', 'form#roleForm',
-         {
-            handler: this.onSubmit,
-            scope: this
-         });
          
          this.registerEventHandler('click', '.cancel',
          {
@@ -413,12 +408,6 @@
       {
          Event.on(this.id, 'click', this.onInteractionEvent, null, this);
          
-         this.registerEventHandler('submit','form#roleForm',
-         {
-            handler: this.onSubmit,
-            scope: this
-         });
-
          this.registerEventHandler('click','button#newRole-button',
          {
             handler: this.onNewRole,
