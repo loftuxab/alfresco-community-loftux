@@ -3435,60 +3435,85 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
      */
     public void testFileNonElectronicRecord() throws Exception
     {
-        // Get the relevant RecordCategory and create a RecordFolder underneath it.
-        NodeRef recordCategory = TestUtilities.getRecordCategory(this.searchService, "Reports", "AIS Audit Records");    
-                
-        NodeRef recordFolder = createRecordFolder(recordCategory, "March AIS Audit Records");
-        
         setComplete();
         endTransaction();
         
-        UserTransaction txn1 = transactionService.getUserTransaction(false);
-        txn1.begin();
+        // Create a record folder
+        final NodeRef recordFolder = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                // Get the relevant RecordCategory and create a RecordFolder underneath it.
+                NodeRef recordCategory = TestUtilities.getRecordCategory(searchService, "Reports", "AIS Audit Records");
+                NodeRef result = createRecordFolder(recordCategory, "March AIS Audit Records" + System.currentTimeMillis());
+                
+                return result;
+            }          
+        });
         
-        // Create the document
-        NodeRef testRecord = this.nodeService.createNode(recordFolder,
-                                    ContentModel.ASSOC_CONTAINS,
-                                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "Non-electronic Record"),
-                                    RecordsManagementModel.TYPE_NON_ELECTRONIC_DOCUMENT).getChildRef();
+        // Create a non-electronic record
+        final NodeRef nonElectronicTestRecord = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+        {
+            public NodeRef execute() throws Throwable
+            {
+                // Create the document
+                NodeRef result = nodeService.createNode(recordFolder,
+                                            ContentModel.ASSOC_CONTAINS,
+                                            QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "Non-electronic Record" + System.currentTimeMillis()),
+                                            RecordsManagementModel.TYPE_NON_ELECTRONIC_DOCUMENT).getChildRef();
 
-        // There is no content on a non-electronic record.
+                // There is no content on a non-electronic record.
 
-        // These properties are required in order to declare the record.
-        Map<QName, Serializable> props = nodeService.getProperties(testRecord);
-        props.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "alfresco");
-        props.put(RecordsManagementModel.PROP_ORIGINATOR, "admin");
-        props.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
-        nodeService.setProperties(testRecord, props);
-        
-        txn1.commit();
-        UserTransaction txn2 = transactionService.getUserTransaction(false);
-        txn2.begin();
-        
-        assertTrue("Expected non-electronic record to be a record.", rmService.isRecord(testRecord));
-        assertFalse("Expected non-electronic record not to be declared yet.", rmService.isRecordDeclared(testRecord));
-        
-        rmActionService.executeRecordsManagementAction(testRecord, "file");
-        rmActionService.executeRecordsManagementAction(testRecord, "declareRecord");
-        
-        assertTrue("Non-electronic record should now be declared.", rmService.isRecordDeclared(testRecord));
-        
-        // These properties are added automatically when the record is filed
-        assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_IDENTIFIER));
-        assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_DATE_FILED));
-        
-//      assertNotNull(nodeService.getProperty(testRecord, ContentModel.PROP_TITLE));
-//      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST));
-//      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_MEDIA_TYPE));
-//      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_FORMAT));
-//      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_DATE_RECEIVED));
-//      assertEquals("foo", nodeService.getProperty(testRecord, RecordsManagementModel.PROP_ADDRESS));
-//      assertEquals("foo", nodeService.getProperty(testRecord, RecordsManagementModel.PROP_OTHER_ADDRESS));
-//      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_LOCATION));
-//      assertEquals("foo", nodeService.getProperty(testRecord, RecordsManagementModel.PROP_PROJECT_NAME));
-        
-        //TODO Add links to other records as per test doc.
-        txn2.commit();
+                // These properties are required in order to declare the record.
+                Map<QName, Serializable> props = nodeService.getProperties(result);
+                props.put(RecordsManagementModel.PROP_ORIGINATING_ORGANIZATION, "alfresco");
+                props.put(RecordsManagementModel.PROP_ORIGINATOR, "admin");
+                props.put(RecordsManagementModel.PROP_PUBLICATION_DATE, new Date());
+                
+                Calendar fileCalendar = Calendar.getInstance();
+                String year = Integer.toString(fileCalendar.get(Calendar.YEAR));
+                props.put(RecordsManagementModel.PROP_DATE_FILED, fileCalendar.getTime());
+
+                String recordId = year + "-" + nodeService.getProperty(result, ContentModel.PROP_NODE_DBID).toString();
+                props.put(RecordsManagementModel.PROP_IDENTIFIER, recordId);             
+
+                
+                nodeService.setProperties(result, props);
+                
+                return result;
+            }          
+        });
+
+        // File and declare the record
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+        {
+            public Void execute() throws Throwable
+            {
+                assertTrue("Expected non-electronic record to be a record.", rmService.isRecord(nonElectronicTestRecord));
+                assertFalse("Expected non-electronic record not to be declared yet.", rmService.isRecordDeclared(nonElectronicTestRecord));
+                
+                rmActionService.executeRecordsManagementAction(nonElectronicTestRecord, "declareRecord");
+                
+                assertTrue("Non-electronic record should now be declared.", rmService.isRecordDeclared(nonElectronicTestRecord));
+                
+                // These properties are added automatically when the record is filed
+                assertNotNull(nodeService.getProperty(nonElectronicTestRecord, RecordsManagementModel.PROP_IDENTIFIER));
+                assertNotNull(nodeService.getProperty(nonElectronicTestRecord, RecordsManagementModel.PROP_DATE_FILED));
+                
+//                      assertNotNull(nodeService.getProperty(testRecord, ContentModel.PROP_TITLE));
+//                      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_SUPPLEMENTAL_MARKING_LIST));
+//                      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_MEDIA_TYPE));
+//                      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_FORMAT));
+//                      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_DATE_RECEIVED));
+//                      assertEquals("foo", nodeService.getProperty(testRecord, RecordsManagementModel.PROP_ADDRESS));
+//                      assertEquals("foo", nodeService.getProperty(testRecord, RecordsManagementModel.PROP_OTHER_ADDRESS));
+//                      assertNotNull(nodeService.getProperty(testRecord, RecordsManagementModel.PROP_LOCATION));
+//                      assertEquals("foo", nodeService.getProperty(testRecord, RecordsManagementModel.PROP_PROJECT_NAME));
+                
+                //TODO Add links to other records as per test doc.
+                return null;
+            }          
+        });
     }
 
     private NodeRef createRecordFolder(NodeRef recordCategory, String folderName)
