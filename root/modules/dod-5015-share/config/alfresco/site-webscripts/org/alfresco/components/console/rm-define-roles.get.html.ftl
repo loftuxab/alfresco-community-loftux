@@ -198,7 +198,7 @@
       </div>
       
       <div>
-         <input type="submit" name="submit" id="submit" value="<#if (action='new')>${msg('label.create')}<#else>${msg('label.save')}</#if>" />
+         <button name="submit" value="submit" id="submit"><#if (action='new')>${msg('label.create')}<#else>${msg('label.save')}</#if></button>
          <button name="submitCancel" value="Cancel" id="submitCancel" class="cancel">${msg('label.cancel')}</button>
       </div>
    </form>
