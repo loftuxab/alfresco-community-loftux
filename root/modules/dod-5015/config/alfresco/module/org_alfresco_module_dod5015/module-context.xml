@@ -149,6 +149,16 @@
         <property name="policyComponent" ref="policyComponent"/>    
     </bean>
     
+    <bean id="rmEventType.crossReferencedRecordTransfered" class="org.alfresco.module.org_alfresco_module_dod5015.event.OnReferencedRecordActionedUpon" parent="rmEventType">
+        <property name="referenceName" value="{http://www.alfresco.org/model/rmcustom/1.0}crossreference"/>
+        <property name="actionName" value="transferComplete"/>
+        <property name="nodeService" ref="nodeService"/>
+        <property name="recordsManagementService" ref="recordsManagementService"/>
+        <property name="recordsManagementAdminService" ref="recordsManagementAdminService"/>
+        <property name="recordsManagementActionService" ref="recordsManagementActionService"/>
+        <property name="policyComponent" ref="policyComponent"/>    
+    </bean>
+    
     <!--  Job context -->
     <import resource="classpath:alfresco/module/org_alfresco_module_dod5015/rm-job-context.xml"/>
     
