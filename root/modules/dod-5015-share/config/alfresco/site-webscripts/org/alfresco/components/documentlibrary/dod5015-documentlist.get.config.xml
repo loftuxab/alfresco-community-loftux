@@ -5,7 +5,7 @@
       <actionSet id="recordSeries">
          <action type="simple-link" id="onActionViewDetails" href="{recordSeriesDetailsUrl}" label="actions.view-details" />
          <action type="simple-link" id="onActionEditDetails" permission="UpdateProperties" href="{editMetadataUrl}" label="actions.edit-details" />
-         <action type="action-link" id="onActionManagePermissions" permission="ManageAccessRights" label="actions.manage-permissions" />
+         <action type="simple-link" id="onActionManagePermissions" permission="ManageAccessRights" href="{managePermissionsUrl}" label="actions.manage-permissions" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
          <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />         
@@ -14,7 +14,7 @@
       <actionSet id="recordCategory">
          <action type="simple-link" id="onActionViewDetails" href="{recordCategoryDetailsUrl}" label="actions.view-details" />
          <action type="simple-link" id="onActionEditDetails" permission="UpdateProperties" href="{editMetadataUrl}" label="actions.edit-details" />
-         <action type="action-link" id="onActionManagePermissions" permission="ManageAccessRights" label="actions.manage-permissions" />
+         <action type="simple-link" id="onActionManagePermissions" permission="ManageAccessRights" href="{managePermissionsUrl}" label="actions.manage-permissions" />
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="Delete" label="actions.move-to" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
@@ -38,7 +38,7 @@
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="Delete" label="actions.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
-         <action type="action-link" id="onActionManagePermissions" permission="ManageAccessRights" label="actions.manage-permissions" />
+         <action type="simple-link" id="onActionManagePermissions" permission="ManageAccessRights" href="{managePermissionsUrl}" label="actions.manage-permissions" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
          <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />         
       </actionSet>
@@ -60,7 +60,7 @@
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="Delete" label="actions.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
-         <action type="action-link" id="onActionManagePermissions" permission="ManageAccessRights" label="actions.manage-permissions" />
+         <action type="simple-link" id="onActionManagePermissions" permission="ManageAccessRights" href="{managePermissionsUrl}" label="actions.manage-permissions" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
          <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />
       </actionSet>
@@ -74,14 +74,14 @@
          <action type="action-link" id="onActionCopyTo" permission="" label="actions.copy-to" />
          <action type="action-link" id="onActionMoveTo" permission="Delete" label="actions.move-to" />
          <action type="action-link" id="onActionFileTo" permission="" label="actions.file-to" />
-         <action type="action-link" id="onActionManagePermissions" permission="ManageAccessRights" label="actions.manage-permissions" />
+         <action type="simple-link" id="onActionManagePermissions" permission="ManageAccessRights" href="{managePermissionsUrl}" label="actions.manage-permissions" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
          <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />         
       </actionSet>
 
       <actionSet id="metadataStubFolder">
          <action type="simple-link" id="onActionViewDetails" href="{recordFolderDetailsUrl}" label="actions.view-details" />
-         <action type="action-link" id="onActionManagePermissions" permission="ManageAccessRights" label="actions.manage-permissions" />
+         <action type="simple-link" id="onActionManagePermissions" permission="ManageAccessRights" href="{managePermissionsUrl}" label="actions.manage-permissions" />
          <action type="action-link" id="onActionDelete" permission="Delete" label="actions.delete" />
          <action type="action-link" id="onActionViewAuditLog" permission="AccessAudit" label="actions.view-audit-log" />
       </actionSet>

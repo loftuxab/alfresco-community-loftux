@@ -199,7 +199,8 @@
                var statuses = dataStatus.split(",").sort(),
                   status, s, SPACE = " ", meta,
                   tip = "",
-                  desc = "";
+                  desc = "",
+                  i18n, i18nMeta;
 
                for (var i = 0, j = statuses.length; i < j; i++)
                {
@@ -212,7 +213,13 @@
                      status = status.substring(0, s);
                   }
                   
-                  tip = me.msg("tip." + status, meta);
+                  i18n = "tip." + status;
+                  i18nMeta = i18n + ".meta";
+                  if (meta && me.msg(i18nMeta) !== i18nMeta)
+                  {
+                     i18n = i18nMeta;
+                  }
+                  tip = me.msg(i18n, meta);
                   desc += '<div class="status"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + status + '-indicator-16.png" title="' + tip + '" alt="' + status + '" /></div>';
                }
 
@@ -478,7 +485,14 @@
                         filterDisplay: transferTitle
                      };
 
-                  desc = '<h3 class="filename"><a class="filter-change" href="#" rel="' + Alfresco.DocumentList.generateFilterMarkup(filterObj) + '">' + $html(transferTitle) + '</a></h3>';
+                  // Transfer location if available
+                  title = "";
+                  if (dod5015["rma:transferLocation"])
+                  {
+                     title = '<span class="title">(' + $html(dod5015["rma:transferLocation"]) + ')</span>';
+                  }
+                  desc = '<h3 class="filename"><a class="filter-change" href="#" rel="' + Alfresco.DocumentList.generateFilterMarkup(filterObj) + '">';
+                  desc += $html(transferTitle) + '</a>' + title + '</h3>';
 
                   if (me.options.simpleView)
                   {
@@ -951,20 +965,22 @@
        */
       getActionUrls: function DL_getActionUrls(record)
       {
-         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
-            nodeRef = record.getData("nodeRef"),
+         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/",
+            recordData = record.getData(),
+            nodeRef = recordData.nodeRef,
             filePlan = this.doclistMetadata.filePlan.replace(":/", "");
 
          return (
          {
-            downloadUrl: Alfresco.constants.PROXY_URI + record.getData("contentUrl") + "?a=true",
-            documentDetailsUrl: urlContextSite + "/document-details?nodeRef=" + nodeRef,
-            folderDetailsUrl: urlContextSite + "/folder-details?nodeRef=" + nodeRef,
-            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef,
-            recordSeriesDetailsUrl: urlContextSite + "/record-series-details?nodeRef=" + nodeRef,
-            recordCategoryDetailsUrl: urlContextSite + "/record-category-details?nodeRef=" + nodeRef,
-            recordFolderDetailsUrl: urlContextSite + "/record-folder-details?nodeRef=" + nodeRef,
-            transfersZipUrl: Alfresco.constants.PROXY_URI + "api/node/" + filePlan + "/transfers/" + nodeRef.replace(":/", "").split("/")[2]
+            downloadUrl: Alfresco.constants.PROXY_URI + recordData.contentUrl + "?a=true",
+            documentDetailsUrl: urlContextSite + "document-details?nodeRef=" + nodeRef,
+            folderDetailsUrl: urlContextSite + "folder-details?nodeRef=" + nodeRef,
+            editMetadataUrl: urlContextSite + "edit-metadata?nodeRef=" + nodeRef,
+            recordSeriesDetailsUrl: urlContextSite + "record-series-details?nodeRef=" + nodeRef,
+            recordCategoryDetailsUrl: urlContextSite + "record-category-details?nodeRef=" + nodeRef,
+            recordFolderDetailsUrl: urlContextSite + "record-folder-details?nodeRef=" + nodeRef,
+            transfersZipUrl: Alfresco.constants.PROXY_URI + "api/node/" + filePlan + "/transfers/" + nodeRef.replace(":/", "").split("/")[2],
+            managePermissionsUrl: urlContextSite + "rmpermissions?nodeRef=" + nodeRef + "&itemName=" + encodeURIComponent(recordData.displayName) + "&nodeType=" + recordData.type
          });
       }
    }, true);
