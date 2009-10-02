@@ -33,6 +33,8 @@ import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RMDispositionActionExecuterAbstractBase;
 import org.alfresco.module.org_alfresco_module_dod5015.DOD5015Model;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionAction;
+import org.alfresco.module.org_alfresco_module_dod5015.DispositionActionDefinition;
 import org.alfresco.repo.action.executer.ActionExecuter;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.transaction.AlfrescoTransactionSupport;
@@ -118,6 +120,18 @@ public class TransferAction extends RMDispositionActionExecuterAbstractBase
             Map<QName, Serializable> transferProps = new HashMap<QName, Serializable>(2);
             transferProps.put(ContentModel.PROP_NAME, transferName);
             transferProps.put(PROP_TRANSFER_ACCESSION_INDICATOR, this.isAccession);
+            
+            // setup location property from disposition schedule
+            DispositionAction da = recordsManagementService.getNextDispositionAction(dispositionLifeCycleNodeRef);
+            if (da != null)
+            {
+                DispositionActionDefinition actionDef = da.getDispositionActionDefinition();
+                if (actionDef != null)
+                {
+                    transferProps.put(PROP_TRANSFER_LOCATION, actionDef.getLocation());
+                }
+            }
+            
             transferNodeRef = this.nodeService.createNode(root, 
                                                       ASSOC_TRANSFERS, 
                                                       QName.createQName(RM_URI, transferName), 

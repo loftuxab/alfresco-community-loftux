@@ -260,6 +260,10 @@ public class TransferReportPost extends BaseTransferWebScript
             Date transferDate = (Date)this.nodeService.getProperty(transferNode, ContentModel.PROP_CREATED);
             writer.write(StringEscapeUtils.escapeHtml(transferDate.toString()));
             writer.write("</td></tr>");
+            writer.write("<tr><td class=\"label\">Transfer Location:</td><td>");
+            writer.write(StringEscapeUtils.escapeHtml((String)this.nodeService.getProperty(transferNode, 
+                        RecordsManagementModel.PROP_TRANSFER_LOCATION)));
+            writer.write("</td></tr>");
             writer.write("<tr><td class=\"label\">Performed By:</td><td>");
             writer.write(StringEscapeUtils.escapeHtml((String)this.nodeService.getProperty(transferNode, 
                         ContentModel.PROP_CREATOR)));

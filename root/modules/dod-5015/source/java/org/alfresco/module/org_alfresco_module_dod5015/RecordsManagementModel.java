@@ -178,6 +178,7 @@ public interface RecordsManagementModel extends RecordsManagementCustomModel
 	public static QName TYPE_TRANSFER = QName.createQName(RM_URI, "transfer");
 	public static QName PROP_TRANSFER_ACCESSION_INDICATOR = QName.createQName(RM_URI, "transferAccessionIndicator");
 	public static QName PROP_TRANSFER_PDF_INDICATOR = QName.createQName(RM_URI, "transferPDFIndicator");
+	public static QName PROP_TRANSFER_LOCATION = QName.createQName(RM_URI, "transferLocation");
     public static QName ASSOC_TRANSFERRED = QName.createQName(RM_URI, "transferred");
     
     // Versioned record aspect

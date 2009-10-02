@@ -427,12 +427,18 @@
                <default>true</default>
             </property>
             
-             <property name="rma:transferPDFIndicator">
+            <property name="rma:transferPDFIndicator">
                <title>Transfer PDF Indicator</title>
                <description>Indicates that transfer includes PDF</description>
                <type>d:boolean</type>
                <mandatory>true</mandatory>
                <default>false</default>
+            </property>
+            
+            <property name="rma:transferLocation">
+               <title>Transfer PDF Indicator</title>
+               <description>Transfer Location</description>
+               <type>d:text</type>
             </property>
 
          </properties>
