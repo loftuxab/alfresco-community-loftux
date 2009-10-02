@@ -82,12 +82,14 @@
          "permissions":
          {
             "inherited": ${d.inheritsPermissions?string},
+         <#if !item.suppressRoles>
             "roles":
             [
             <#list d.permissions as permission>
                "${permission?string}"<#if permission_has_next>,</#if>
             </#list>
             ],
+         </#if>
             "userAccess":
             {
             <#list item.actionPermissions?keys as actionPerm>

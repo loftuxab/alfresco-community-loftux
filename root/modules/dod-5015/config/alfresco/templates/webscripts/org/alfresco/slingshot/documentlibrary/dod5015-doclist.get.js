@@ -211,6 +211,7 @@ function main()
          status: assetEvaluator.status,
          actionSet: assetEvaluator.actionSet,
          actionPermissions: assetEvaluator.permissions,
+         suppressRoles: assetEvaluator.suppressRoles,
          dod5015: jsonUtils.toJSONString(assetEvaluator.metadata),
          tags: asset.tags,
          location: location
