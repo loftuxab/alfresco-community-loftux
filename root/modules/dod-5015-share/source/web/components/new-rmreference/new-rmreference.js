@@ -182,8 +182,7 @@ Alfresco.RM = Alfresco.RM || {};
             docLibNameAlias:this.msg('label.fileplan'),
             restrictParentNavigationToDocLib: true,     
             params:'filterType=rma:dispositionSchedule,rma:dispositionActionDefinition,rma:dispositionAction,rma:hold,rma:transfer,cm:thumbnail'
-         });         
-
+         });
          YAHOO.Bubbling.on('onDocumentsSelected', this.updateSelectionField, this);
       },
       
@@ -200,15 +199,13 @@ Alfresco.RM = Alfresco.RM || {};
       updateSelectionField: function RM_NewReference_updateSelectionField(e, args)
       {
          var selectedEl = Dom.get(this.options.pickerId),
-            selectedItems = args[1];
-
+            selectedItems = args[1].items;
          if (selectedItems.length > 0)
          {
             // We only need one
             var selectedItem = selectedItems[0],
                docUrl = Alfresco.constants.URL_CONTEXT + 'page/site/rm/document-details?nodeRef=' + selectedItem.nodeRef,
                docLibPath = selectedItem.displayPath.split('documentLibrary')[1];
-         
             selectedEl.innerHTML = '<a href="'+ docUrl+ '" title="' + selectedItem.description + '">'+ docLibPath + '/' + selectedItem.name +'</a>';
             Dom.addClass(selectedEl,'active');
             // Note: if more than one than we must store as comma separated
@@ -248,6 +245,7 @@ Alfresco.RM = Alfresco.RM || {};
        */
       _navigateForward: function RM_NewReference__navigateForward()
       {
+         this.widgets.documentPicker.resetSelection();
          var uriTemplate = Alfresco.constants.URL_PAGECONTEXT + 'site/{site}/rmreferences?nodeRef={nodeRef}&parentNodeRef={parentNodeRef}&docName={docName}',
             pageUrl = YAHOO.lang.substitute(uriTemplate,
             {

@@ -77,7 +77,7 @@
       this.selectedItems = [];
 
       //use specifed object renderer or default to default object renderer
-      var objectRendererClass =  objectRendererClass || Alfresco.module.ObjectRenderer
+      var objectRendererClass =  objectRendererClass || Alfresco.module.ObjectRenderer;
 
       this.options.objectRenderer = new objectRendererClass(this);
 
@@ -334,7 +334,7 @@
             },
             execScripts: true,
             failureMessage: "Could not load create site template"
-         });         
+         });
       },
 
       /**
@@ -365,6 +365,7 @@
             failureMessage: "Could not load create site template"
          });
       },
+      
       /**
        * Called when the DocumentPicker html template has been returned from the server.
        * Creates the YUI gui objects such as buttons and a panel and shows it.
@@ -404,6 +405,7 @@
             Dom.get(this.id + "-showPicker-button-button").name = "-";
             Dom.get(this.id + "-cntrl-ok-button").name = "-";
             Dom.get(this.id + "-cntrl-cancel-button").name = "-";
+            this._getSavedItems();
          }
       },  
           
@@ -420,9 +422,9 @@
 
          this.widgets.panel.show();
          this._createResizer();
-         this._populateSelectedItems();
+         this._populateSelectedItems();         
          this.options.objectRenderer.onPickerShow();
-         this.widgets.ok.set('disabled',true);
+         this.widgets.ok.set('disabled', (this.currentValueMeta.length==0) ? false : true);
 
          YAHOO.Bubbling.fire("refreshItemList",
          {
@@ -460,11 +462,6 @@
        */
       onOK: function DocumentPicker_onOK(e, p_obj)
       {
-         // if (this.options.maintainAddedRemovedItems)
-         // {
-         //    Dom.get(this.id + "-added").value = this.getAddedItems().toString();
-         //    Dom.get(this.id + "-removed").value = this.getRemovedItems().toString();
-         // }
 
          var selItems = this.getSelectedItems();
          //extract nodeRefs
@@ -473,11 +470,13 @@
          {
             selItemsAsNodeRefs.push(item);
          }
+         
          this.options.currentValue = selItemsAsNodeRefs.join(',');
          this._getCurrentValueMeta();
          //need to fire as objects
-         YAHOO.Bubbling.fire("onDocumentsSelected", selItems);
-         // Dom.setStyle(this.pickerId, "display", "none");
+         YAHOO.Bubbling.fire("onDocumentsSelected", {items:selItems});
+         Alfresco.util.setVar('DocumentPickerSelection', selItems);
+         
          this.widgets.panel.hide();
          this.widgets.showPicker.set("disabled", false);
          Event.preventDefault(e);
@@ -492,13 +491,21 @@
        */
       onCancel: function DocumentPicker_onCancel(e, p_obj)
       {
-         // Dom.setStyle(this.pickerId, "display", "none");
          this.widgets.panel.hide();
          this.widgets.showPicker.set("disabled", false);
+         
          Event.preventDefault(e);
       },
 
-
+      /**
+       * Resets selection so that reload of page doesn't repopulate picker
+       *  
+       * @method resetSelection
+       */
+      resetSelection: function DocumentPicker_resetSelection()
+      {
+         Alfresco.util.setVar('DocumentPickerSelection',[]);
+      },
       /**
        * PUBLIC INTERFACE
        */
@@ -648,15 +655,20 @@
             var obj = args[1];
             if (obj && obj.item)
             {
-               // Add the item to the selected list
-               this.widgets.dataTable.addRow(obj.item);
-               this.selectedItems[obj.item.nodeRef] = obj.item;
-               this.singleSelectedItem = obj.item;
-               this.widgets.ok.set('disabled',false);
+               this.addItem(obj.item);
             }
          }
       },
-
+      
+      addItem: function(item)
+      {
+         // Add the item to the selected list
+         this.widgets.dataTable.addRow(item);
+         this.selectedItems[item.nodeRef] = item;
+         this.singleSelectedItem = item;
+         this.widgets.ok.set('disabled',false);
+      },
+      
       /**
        * Selected Item Removed event handler
        *
@@ -681,6 +693,7 @@
             }
          }
       },
+      
       
       /**
        * Parent changed event handler
@@ -1012,6 +1025,8 @@
 
          this.selectedItems = {};
 
+         this.currentValueMeta = this._getSavedItems();
+         
          for (var item in this.currentValueMeta)
          {
             if (this.currentValueMeta.hasOwnProperty(item))
@@ -1059,8 +1074,22 @@
                width: this.widgets.resizer.get("width")
             });
          }
-      }
+      },
       
+      /**
+       * Retrieves any saved selections (for use between page navigations).
+       * Also fires event so UI can be updated
+       *  
+       * @method _getSavedItems
+       * @@returns {Array} array of items
+       */
+      _getSavedItems: function DocumentPicker__getSavedItems()
+      {
+         var savedSelections = Alfresco.util.getVar('DocumentPickerSelection');
+
+         YAHOO.Bubbling.fire("onDocumentsSelected", {items:savedSelections});
+         return savedSelections;
+      }
    });
 })();
 
