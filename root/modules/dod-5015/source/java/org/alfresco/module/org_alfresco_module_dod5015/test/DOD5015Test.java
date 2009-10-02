@@ -2922,6 +2922,7 @@ public class DOD5015Test extends BaseSpringTest implements DOD5015Model
                 NodeRef transferNodeRef = assocs.get(0).getChildRef();
                 assertEquals(TYPE_TRANSFER, nodeService.getType(transferNodeRef));
                 assertTrue(((Boolean)nodeService.getProperty(transferNodeRef, PROP_TRANSFER_PDF_INDICATOR)).booleanValue());
+                assertEquals("Offline Storage", (String)nodeService.getProperty(transferNodeRef, PROP_TRANSFER_LOCATION));
                 assertNotNull(actionResult);
                 assertEquals(transferNodeRef, ((RecordsManagementActionResult)actionResult).getValue());
                 List<ChildAssociationRef> children = nodeService.getChildAssocs(transferNodeRef, ASSOC_TRANSFERRED, RegexQNamePattern.MATCH_ALL);
