@@ -94,10 +94,130 @@ var Evaluator =
    },
 
    /**
+    * Previous disposition action
+    */
+   getPreviousDispositionAction: function Evaluator_getPreviousDispositionAction(asset)
+   {
+      var history = asset.childAssocs["rma:dispositionActionHistory"],
+         previous = null,
+         fnSortByCompletionDateReverse = function sortByCompletionDateReverse(a, b)
+         {
+            // Sort the results by Disposition Action Completed At date property
+            return (b.properties["rma:dispositionActionCompletedAt"] > a.properties["rma:dispositionActionCompletedAt"] ? 1 : -1);
+         };
+      
+      if (history != null)
+      {
+         history.sort(fnSortByCompletionDateReverse);
+         previous = history[0];
+      }
+      
+      return previous;
+   },
+
+   /**
     * Record and Record Folder common evaluators
     */
    recordAndRecordFolder: function Evaluator_recordAndRecordFolder(asset, permissions, status)
    {
+      var actionName = asset.properties["rma:recordSearchDispositionActionName"],
+         actionAsOf = asset.properties["rma:recordSearchDispositionActionAsOf"],
+         hasNextAction = asset.childAssocs["rma:nextDispositionAction"] != null,
+         recentHistory = Evaluator.getPreviousDispositionAction(asset),
+         previousAction = null,
+         now = new Date();
+
+      /* Next Disposition Action */
+      // Next action could become eligible based on asOf date
+      if (actionAsOf != null)
+      {
+         if (hasNextAction)
+         {
+            permissions["disposition-as-of"] = true;
+         }
+         
+         // Check if action asOf date has passed
+         if (actionAsOf < now)
+         {
+            permissions[actionName] = true;
+         }
+      }
+      // Next action could also become eligible based on event completion
+      if (asset.properties["rma:recordSearchDispositionEventsEligible"] == true)
+      {
+         permissions[actionName] = true;
+      }
+      
+      /* Previous Disposition Action */
+      if (recentHistory != null)
+      {
+         previousAction = recentHistory.properties["rma:dispositionAction"];
+      }
+
+      /* Cut Off status */
+      if (asset.hasAspect("rma:cutOff"))
+      {
+         status["cutoff"] = true;
+         if (asset.hasAspect("rma:dispositionLifecycle"))
+         {
+            if (previousAction == "cutoff")
+            {
+               permissions["undo-cutoff"] = true;
+            }
+         }
+      }
+      
+      /* Transfer or Accession Pending Completion */
+      // Don't show transfer or accession if either is pending completion
+      var assocs = asset.parentAssocs["rma:transferred"];
+      if (actionName == "transfer" && assocs != null && assocs.length > 0)
+      {
+         delete permissions["transfer"];
+         delete permissions["undo-cutoff"];
+         delete permissions["disposition-as-of"];
+         status["transfer " + assocs[0].name] = true;
+      }
+      assocs = asset.parentAssocs["rma:ascended"];
+      if (actionName == "accession" && assocs != null && assocs.length > 0)
+      {
+         delete permissions["accession"];
+         delete permissions["undo-cutoff"];
+         delete permissions["disposition-as-of"];
+         status["accession " + assocs[0].name] = true;
+      }
+
+      /* Transferred status */
+      if (asset.hasAspect("rma:transferred"))
+      {
+         var transferLocation = "";
+         if (previousAction == "transfer")
+         {
+            var actionId = recentHistory.properties["rma:dispositionActionId"],
+               actionNode = search.findNode("workspace://SpacesStore/" + actionId);
+            
+            if (actionNode != null && actionNode.properties["rma:dispositionLocation"])
+            {
+               transferLocation = " " + actionNode.properties["rma:dispositionLocation"];
+            }
+         }
+         status["transferred" + transferLocation] = true;
+      }
+      
+      /* Accessioned status */
+      if (asset.hasAspect("rma:ascended"))
+      {
+         status["accessioned NARA"] = true;
+      }
+      
+      /* Review As Of Date */
+      if (asset.hasAspect("rma:vitalRecord"))
+      {
+         if (asset.properties["rma:reviewAsOf"] != null)
+         {
+            permissions["review-as-of"] = true;
+         }
+      }
+
       /* Frozen/Unfrozen */
       if (asset.hasAspect("rma:frozen"))
       {
@@ -113,85 +233,6 @@ var Evaluator =
          {
             permissions["freeze"] = true;
          }
-      }
-
-      /* Cut Off status */
-      if (asset.hasAspect("rma:cutOff"))
-      {
-         status["cutoff"] = true;
-         if (asset.hasAspect("rma:dispositionLifecycle"))
-         {
-            permissions["undo-cutoff"] = true;
-         }
-      }
-
-      /* Transferred status */
-      if (asset.hasAspect("rma:transferred"))
-      {
-         status["transferred"] = true;
-      }
-      
-      /* Accessioned status */
-      if (asset.hasAspect("rma:ascended"))
-      {
-         status["accessioned"] = true;
-      }
-      
-      /* Review As Of Date */
-      if (asset.hasAspect("rma:vitalRecord"))
-      {
-         if (asset.properties["rma:reviewAsOf"] != null)
-         {
-            permissions["review-as-of"] = true;
-         }
-      }
-   },
-
-   /**
-    * Disposition evaluator
-    */
-   nextDispositionAction: function Evaluator_nextDispositionAction(asset, permissions, status)
-   {
-      // Does the asset have a disposition lifecycle?
-      if (!asset.hasAspect("rma:dispositionLifecycle"))
-      {
-         return;
-      }
-      
-      var actionName = asset.properties["rma:recordSearchDispositionActionName"],
-         actionAsOf = asset.properties["rma:recordSearchDispositionActionAsOf"],
-         now = new Date();
-
-      if (actionAsOf != null)
-      {
-         permissions["disposition-as-of"] = true;
-         
-         // Check if action asOf date has passed
-         if (actionAsOf < now)
-         {
-            permissions[actionName] = true;
-         }
-      }
-      
-      // Next action could become eligible based on event completion
-      if (asset.properties["rma:recordSearchDispositionEventsEligible"] == true)
-      {
-         permissions[actionName] = true;
-      }
-
-      // Don't show transfer...
-      var assocs = asset.parentAssocs["rma:transferred"];
-      if (actionName == "transfer" && assocs != null && assocs.length > 0)
-      {
-         delete permissions["transfer"];
-         status["transfer " + assocs[0].name] = true;
-      }
-      // ...or accession if pending completion
-      var assocs = asset.parentAssocs["rma:ascended"];
-      if (actionName == "accession" && assocs != null && assocs.length > 0)
-      {
-         delete permissions["accession"];
-         status["accession " + assocs[0].name] = true;
       }
    },
 
@@ -234,7 +275,8 @@ var Evaluator =
          actions = {},
          actionSet = "empty",
          permissions = {},
-         status = {};
+         status = {},
+         suppressRoles = false;
 
       var now = new Date();
 
@@ -312,9 +354,6 @@ var Evaluator =
          case "record-folder":
             actionSet = "recordFolder";
 
-            /* Disposition Actions */
-            Evaluator.nextDispositionAction(asset, permissions, status);
-
             /* Record and Record Folder common evaluator */
             Evaluator.recordAndRecordFolder(asset, permissions, status);
 
@@ -357,9 +396,6 @@ var Evaluator =
           */
          case "record":
             actionSet = "record";
-
-            /* Disposition Actions */
-            Evaluator.nextDispositionAction(asset, permissions, status);
 
             /* Record and Record Folder common evaluator */
             Evaluator.recordAndRecordFolder(asset, permissions, status);
@@ -452,6 +488,7 @@ var Evaluator =
           */
          case "transfer-container":
             actionSet = "transferContainer";
+            suppressRoles = true;
             break;
 
 
@@ -460,6 +497,7 @@ var Evaluator =
           */
          case "accession-container":
             actionSet = "accessionContainer";
+            suppressRoles = true;
             break;
 
 
@@ -470,6 +508,7 @@ var Evaluator =
             actionSet = "holdContainer";
             permissions["Unfreeze"] = true;
             permissions["ViewUpdateReasonsForFreeze"] = true;
+            suppressRoles = true;
             break;
 
 
@@ -487,7 +526,8 @@ var Evaluator =
          actionSet: actionSet,
          permissions: permissions,
          status: status,
-         metadata: Evaluator.getMetadata(asset, assetType)
+         metadata: Evaluator.getMetadata(asset, assetType),
+         suppressRoles: suppressRoles
       });
    }
 };
