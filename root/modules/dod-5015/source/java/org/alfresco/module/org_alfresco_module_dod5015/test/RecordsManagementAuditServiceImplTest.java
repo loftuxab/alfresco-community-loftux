@@ -171,7 +171,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         queryAll();
     }
     
-    public void xtestQuery_UserLimited()
+    public void testQuery_UserLimited()
     {
         // Make sure that something has been done
         updateFilePlan();
@@ -196,7 +196,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         assertEquals("Expected results to be limited", limit, entries.size());
     }
     
-    public void xtestQuery_Node()
+    public void testQuery_Node()
     {
         RetryingTransactionCallback<List<RecordsManagementAuditEntry>> allResultsCallback =
             new RetryingTransactionCallback<List<RecordsManagementAuditEntry>>()
@@ -269,7 +269,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
         assertFalse("Should have recorded node deletion", entries.isEmpty());
     }
     
-    public void xtestStartStopDelete()
+    public void testStartStopDelete()
     {
         // Stop the audit
         rmAuditService.stop();
@@ -306,7 +306,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
                 0, result4.size());
     }
     
-    public void xtestAuditAuthentication()
+    public void testAuditAuthentication()
     {
         rmAuditService.stop();
         rmAuditService.clear();

@@ -475,7 +475,8 @@
       <!-- Security uses it as a key to determine which implementation to use -->
 
       <aspect name="rma:filePlanComponent">
-          <title>File Plan Component</title>
+         <title>File Plan Component</title>
+         <archive>false</archive>
       </aspect>
 
       <aspect name="rma:recordsManagementRoot">
