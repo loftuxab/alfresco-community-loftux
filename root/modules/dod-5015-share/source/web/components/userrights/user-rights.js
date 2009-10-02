@@ -78,16 +78,23 @@ Alfresco.RM = Alfresco.RM || {};
             var responseDataRoles = oFullResponse.data.roles;
             var responseDataGroups = oFullResponse.data.groups;
             var data = [];
+
             //massage data into a format that datatable likes
-            for (var key in responseDataUsers)
-            {
-               var userObject = responseDataUsers[key];
-               userObject.name = userObject.firstName + ' ' + userObject.lastName;
-               //create a label so we can use it in the roles and groups renderer
-               responseDataUsers[key].label = userObject.name;
-               data.push(userObject);
-            }
-            
+               for (var key in responseDataUsers)
+               {
+                  var userObject = responseDataUsers[key];
+                  userObject.name = userObject.firstName + ' ' + userObject.lastName;
+                  //create a label so we can use it in the roles and groups renderer
+                  responseDataUsers[key].label = userObject.name;
+                  //convert groups to use label and not name
+                  var grps = [];
+                  for (var i=0,len=userObject.groups.length;i<len;i++)
+                  {
+                     grps.push(responseDataGroups[userObject.groups[i]].label);
+                  }
+                  userObject.groups=grps;
+                  data.push(userObject);
+               }
             //User Rights components needs access to roles and groups data
             //so let's give it some data
             YAHOO.Bubbling.fire('UserRights_DataLoad', {users:responseDataUsers,roles:responseDataRoles,groups:responseDataGroups});
@@ -102,13 +109,20 @@ Alfresco.RM = Alfresco.RM || {};
            elLiner.innerHTML = oData.join(', ');
         };
 
+        /**
+         * Custom formatter to add a space between each role
+         *  
+         */   
+        YAHOO.widget.DataTable.Formatter.groups = function rolesFormatter(elLiner, oRecord, oColumn, oData) {
+           elLiner.innerHTML = oData.join(', ');
+        };
          
          var DT = this.widgets['datasource'] = new YAHOO.widget.DataTable("userrightsDT",
              [
                {key:"name", label:this.msg('label.name'), sortable:true, resizeable:true},
                {key:"userName", label:this.msg('label.userid'),  sortable:true, resizeable:true},
                {key:"roles", label:this.msg('label.roles'),  formatter:"roles", sortable:true, resizeable:true},
-               {key:"groups", label:this.msg('label.groups'),  sortable:true, resizeable:true}
+               {key:"groups", label:this.msg('label.groups'),  formatter:"groups", sortable:true, resizeable:true}
             ],DS);
       },
       
