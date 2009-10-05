@@ -306,7 +306,7 @@ public class RecordsManagementAuditServiceImplTest extends TestCase
                 0, result4.size());
     }
     
-    public void testAuditAuthentication()
+    public void xtestAuditAuthentication()
     {
         rmAuditService.stop();
         rmAuditService.clear();
