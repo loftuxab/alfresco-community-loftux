@@ -267,6 +267,7 @@ InstallComponent A5C014A8-4626-47DA-BE89-A7EEBB81D2E2 -setup Install -type actio
 InstallComponent 5AFD4DC5-F821-4122-BBDA-536710322F62 -setup Install -type action -title {Execute External Program} -component ExecuteExternalProgram -active Yes -parent A5C014A8-4626-47DA-BE89-A7EEBB81D2E2
 InstallComponent 9567CCCB-7349-4B7A-95B5-D11B7B997C91 -setup Install -type action -title {Execute External Program} -component ExecuteExternalProgram -active Yes -parent A5C014A8-4626-47DA-BE89-A7EEBB81D2E2
 InstallComponent 0EB18C57-85CA-4541-B173-15DF0DF81EFA -setup Install -type action -title {Delete Temp} -component DeleteFile -active Yes -parent A5C014A8-4626-47DA-BE89-A7EEBB81D2E2
+InstallComponent 728B22FE-CDD9-44BA-B3FC-45E563A02DAE -setup Install -type action -title {Write Text To Global Props} -component WriteTextToFile -active Yes -parent A5C014A8-4626-47DA-BE89-A7EEBB81D2E2
 
 array set Properties {
 01472B6B-51CF-4489-8D7B-930E4CC4DA03,Conditions
@@ -492,6 +493,18 @@ disabled
 Yes
 
 69EE36EA-C6CA-4847-ACFF-8CC579D350F1,StatusMessage,subst
+1
+
+728B22FE-CDD9-44BA-B3FC-45E563A02DAE,Conditions
+{0 conditions}
+
+728B22FE-CDD9-44BA-B3FC-45E563A02DAE,FileOpenAction
+{Append to file}
+
+728B22FE-CDD9-44BA-B3FC-45E563A02DAE,Files
+<%InstallDir%>/tomcat/shared/classes/alfresco-global.properties
+
+728B22FE-CDD9-44BA-B3FC-45E563A02DAE,TextToWrite,subst
 1
 
 76737D66-740C-407E-848A-1CCCADF7D84C,BackButton,subst
@@ -1350,6 +1363,15 @@ C0127B2B-279D-41E9-B5BF-E8C61362F845,Message
 
 60993F14-4B6A-4F15-AD0D-F2419D5D27D0,Text
 <%ViewReadmeText%>
+
+728B22FE-CDD9-44BA-B3FC-45E563A02DAE,TextToWrite
+{
+#
+# IMAP RM exclusion
+#-------------
+imap.ignore.extraction=rmSite
+imap.ignore.extraction.value.rmSite.store=${spaces.store}
+imap.ignore.extraction.value.rmSite.rootPath=/${spaces.company_home.childname}/st:sites/cm:rm}
 
 840E153B-F29E-4184-8941-3C26F456EB0D,Description
 <%CustomInstallDescription%>

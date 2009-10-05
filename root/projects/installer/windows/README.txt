@@ -1,5 +1,5 @@
-Alfresco Community Edition 3.2
-==============================
+Alfresco Community Edition 3.2r
+===============================
 
 For information on what is included in this release, refer to:
 http://wiki.alfresco.com/wiki/Alfresco_Community_Edition_3.2

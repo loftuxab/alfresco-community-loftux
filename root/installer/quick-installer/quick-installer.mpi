@@ -230,6 +230,9 @@ Version
 ViewReadme
 Yes
 
+WEBSTUDIO
+false
+
 WizardHeight
 365
 
@@ -2882,7 +2885,7 @@ File ::2F0DE958-728D-47ED-BAA2-E94074D0DD67 -name W:/HEAD/root/projects/installe
 File ::1342AA2D-1979-41D0-9C0D-7FBB6B566B0F -name W:/HEAD/root/projects/installer/linux/installer/virtual_start.sh -location ../../projects/installer/linux/installer -parent 6120050F-B3AE-4857-9845-470CBD79B31E
 FileGroup ::07D6DE98-FC0F-4F51-AE10-75314D0B4651 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name SPP -parent FileGroups
 File ::699A5FFE-B464-48B4-8306-9EAC58BE79B0 -directory <%InstallDir%>/amps -name W:/V3.1/root/modules/sharepoint/amp/build/dist/vti-module.amp -location ../../modules/sharepoint/amp/build/dist -parent 07D6DE98-FC0F-4F51-AE10-75314D0B4651
-FileGroup ::358434D8-B48E-4ED5-AFF0-84AF8C0976AB -setup Install -alias studio -active No -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name WebStudio -parent FileGroups
+FileGroup ::358434D8-B48E-4ED5-AFF0-84AF8C0976AB -setup Install -alias studio -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive ZipArchive} -name WebStudio -parent FileGroups
 File ::31F50A24-E83F-4961-980D-72DB3FF39E29 -directory <%InstallDir%>/tomcat/webapps -name W:/HEAD/root/projects/web-studio/build/dist/studio.war -location ../../projects/web-studio/build/dist -parent 358434D8-B48E-4ED5-AFF0-84AF8C0976AB
 FileGroup ::CF2D52FA-E09F-40E5-A8EA-F3A21E70515C -setup Install -active Yes -platforms {Windows ZipArchive} -name {DB Embed Win} -parent FileGroups
 File ::79932394-8B10-4B52-A580-A364C53D3410 -type dir -name W:/HEAD/root/projects/installer/windows/alf_data -location ../../projects/installer/windows/alf_data -parent CF2D52FA-E09F-40E5-A8EA-F3A21E70515C
@@ -3902,12 +3905,12 @@ InstallComponent A7CCD851-05EF-4236-8321-7766DF06A256 -setup Install -type actio
 InstallComponent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -setup Install -type action -conditions 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -title {Delete File} -component DeleteFile -command insert -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
 Condition 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D -active Yes -parent 36A8B144-D246-4AD7-8299-C14C811E3BF9 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2FE77286-AD86-4ACB-BF32-A2CCB2D1D57D
 InstallComponent 7F2F989E-9F6C-4CAC-AFF2-A925549A20D2 -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 5F506AD3-8848-43DA-893B-80EA1DF9BCAC
-InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane -conditions {238C7BD9-0EDF-4953-BC37-C32F5C2D089D E95B44DE-53E1-4944-AEE6-C2D89CCA323B} -title {Connect MySQL} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
+InstallComponent AAD9798A-56FA-4C12-882C-DD66829420CE -setup Install -type pane -conditions {238C7BD9-0EDF-4953-BC37-C32F5C2D089D E95B44DE-53E1-4944-AEE6-C2D89CCA323B} -title {Connect MySQL} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 238C7BD9-0EDF-4953-BC37-C32F5C2D089D -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 238C7BD9-0EDF-4953-BC37-C32F5C2D089D
 Condition E95B44DE-53E1-4944-AEE6-C2D89CCA323B -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE -title {Execute Script Condition} -component ExecuteScriptCondition -TreeObject::id E95B44DE-53E1-4944-AEE6-C2D89CCA323B
 InstallComponent 702B15CC-0F7B-4BF0-9498-7C1BE3A26C18 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE
 InstallComponent E230D053-6033-4990-B404-368AAA25BE36 -setup Install -type action -title {Create Checkbutton} -component AddWidget -command reorder -active Yes -parent AAD9798A-56FA-4C12-882C-DD66829420CE
-InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 3907E462-D52C-48BA-A959-7B629D58FF6F} -title {Check DB Port} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
+InstallComponent 3D88EE52-1868-4E40-8C75-4A27EF566021 -setup Install -type pane -conditions {6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 3907E462-D52C-48BA-A959-7B629D58FF6F} -title {Check DB Port} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 6B2E5421-A73B-48D2-BCF8-C718F9EFCFE8
 Condition 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631 -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Port Test Condition} -component PortTestCondition -TreeObject::id 4C8910B5-A5FB-41E9-918E-A1DB1C3DE631
 Condition 3907E462-D52C-48BA-A959-7B629D58FF6F -active Yes -parent 3D88EE52-1868-4E40-8C75-4A27EF566021 -title {Port Test Condition} -component PortTestCondition -TreeObject::id 3907E462-D52C-48BA-A959-7B629D58FF6F
@@ -3925,6 +3928,11 @@ InstallComponent 7D9FC8F7-16CA-44AE-B746-BF47219B7B58 -setup Install -type pane 
 Condition A7E44A74-C32A-48FF-AC7E-1EDB9C4E7F14 -active Yes -parent 7D9FC8F7-16CA-44AE-B746-BF47219B7B58 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id A7E44A74-C32A-48FF-AC7E-1EDB9C4E7F14
 InstallComponent 6E045DB2-884F-4DD3-97F6-D91941695011 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -active Yes -parent 7D9FC8F7-16CA-44AE-B746-BF47219B7B58
 InstallComponent 6DCB6ABE-1A00-43C8-8C0A-5D9CA6E3E16E -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 7D9FC8F7-16CA-44AE-B746-BF47219B7B58
+InstallComponent D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC -setup Install -type pane -conditions 3CB2FE1A-A0EB-4C44-9FDF-64740C6AB634 -title {Disable Webstudio} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
+Condition 3CB2FE1A-A0EB-4C44-9FDF-64740C6AB634 -active Yes -parent D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 3CB2FE1A-A0EB-4C44-9FDF-64740C6AB634
+InstallComponent D7EEA242-339D-49FC-A5B1-7787B21BA759 -setup Install -type action -title {Enable Checkbutton} -component AddWidget -command reorder -active Yes -parent D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC
+InstallComponent F6753748-08B5-4021-979F-15AD34D090B1 -setup Install -type action -conditions E3EF7B71-D579-43D0-A4C7-0615EA70CCD7 -title {Rename File} -component RenameFile -command reorder -active Yes -parent D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC
+Condition E3EF7B71-D579-43D0-A4C7-0615EA70CCD7 -active Yes -parent F6753748-08B5-4021-979F-15AD34D090B1 -title {String Is Condition} -component StringIsCondition -TreeObject::id E3EF7B71-D579-43D0-A4C7-0615EA70CCD7
 InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane -conditions {2F0CB899-1C48-4F91-9AD0-327063548555 44CBB169-887F-46E0-9A5B-A0F5C14E5088} -title {Adding Samples} -component CustomBlankPane1 -command insert -active No -parent StandardInstall
 Condition 2F0CB899-1C48-4F91-9AD0-327063548555 -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 Condition 44CBB169-887F-46E0-9A5B-A0F5C14E5088 -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 44CBB169-887F-46E0-9A5B-A0F5C14E5088
@@ -4463,9 +4471,6 @@ Yes
 350E9DA1-539D-4270-834E-96641B5D4D3B,VirtualText
 ALF_OO
 
-358434D8-B48E-4ED5-AFF0-84AF8C0976AB,Active
-No
-
 358434D8-B48E-4ED5-AFF0-84AF8C0976AB,Alias
 studio
 
@@ -4628,6 +4633,9 @@ disabled
 
 3C792AD2-7426-4EB0-B6EB-BBE13E8C56F1,Widget
 {Back Button;Next Button}
+
+3CB2FE1A-A0EB-4C44-9FDF-64740C6AB634,Filename
+<%InstallDir%>/tomcat/webapps/studio.war
 
 3D88EE52-1868-4E40-8C75-4A27EF566021,Active
 Yes
@@ -6138,6 +6146,33 @@ CF2D52FA-E09F-40E5-A8EA-F3A21E70515C,FileSize
 CF2D52FA-E09F-40E5-A8EA-F3A21E70515C,Name
 {DB Embed Win}
 
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Active
+Yes
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,BackButton,subst
+1
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,CancelButton,subst
+1
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Caption,subst
+1
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Conditions
+{1 condition}
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Message,subst
+1
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,NextButton,subst
+1
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Subtitle,subst
+1
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Title,subst
+1
+
 D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,Conditions
 {2 conditions}
 
@@ -6189,6 +6224,30 @@ D7B8133E-4105-4082-AE9A-59F7B2F9C303,Text,subst
 D7B8133E-4105-4082-AE9A-59F7B2F9C303,Title,subst
 1
 
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Conditions
+{0 conditions}
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,OffValue
+false
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,OnValue
+true
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text,subst
+1
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Type
+checkbutton
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,VirtualText
+WEBSTUDIO
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,X
+185
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Y
+160
+
 E181E06B-BC95-4065-80E8-8614EE6074B7,Alias
 {OpenOffice File}
 
@@ -6230,6 +6289,15 @@ false
 
 E35F2477-2025-4C48-BE4A-BC2DB58EFD16,String
 <%UpgradeInstall%>
+
+E3EF7B71-D579-43D0-A4C7-0615EA70CCD7,CheckCondition
+{Before Action is Executed}
+
+E3EF7B71-D579-43D0-A4C7-0615EA70CCD7,Operator
+false
+
+E3EF7B71-D579-43D0-A4C7-0615EA70CCD7,String
+<%WEBSTUDIO%>
 
 E81B8A81-D03D-498A-9FEB-EDA61D16E117,Active
 Yes
@@ -6392,6 +6460,18 @@ F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9,Message,subst
 
 F46DC4B3-6BAD-44A8-A5F0-088F716D9ED9,NextButton,subst
 1
+
+F6753748-08B5-4021-979F-15AD34D090B1,Conditions
+{1 condition}
+
+F6753748-08B5-4021-979F-15AD34D090B1,Destination
+<%InstallDir%>/tomcat/webapps/studio.war.off
+
+F6753748-08B5-4021-979F-15AD34D090B1,ExecuteAction
+{Before Next Pane is Displayed}
+
+F6753748-08B5-4021-979F-15AD34D090B1,Source
+<%InstallDir%>/tomcat/webapps/studio.war
 
 F70BEDD4-EA20-4A55-BBEB-FB0A605C8F89,Background
 white
@@ -6957,6 +7037,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 {}
 
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text
+{}
+
 E230D053-6033-4990-B404-368AAA25BE36,Text
 {}
 
@@ -7221,6 +7304,21 @@ CD047B45-9E60-4E0B-B9DD-2AD2CAB8772C,Message
 CE9BD412-8B2C-422C-A23F-5572EB5F6410,Description
 <%CustomInstallDescription%>
 
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Caption
+{Web Studio is not enabled by default}
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Message
+{Enabing Web Studio provides a visual tool for working with Surf sites, however, it will result in slower start-up time for the Alfresco server.  You can manually enable Web Studio at a later time by renaming the webstudio.war.off file.}
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Subtitle
+{Choose if to enable Web Studio}
+
+D009E3DF-9FD8-4C7E-B16B-D39DDAE237AC,Title
+{Choose if you wish Web Studio to be enabled for WCM}
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text
+{Enable Web Studio}
+
 E230D053-6033-4990-B404-368AAA25BE36,Text
 {Connect to database server and create new database}
 
@@ -7312,6 +7410,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 {}
 
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text
+{}
+
 E230D053-6033-4990-B404-368AAA25BE36,Text
 {}
 
@@ -7378,6 +7479,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
+{}
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text
 {}
 
 E230D053-6033-4990-B404-368AAA25BE36,Text
@@ -7448,6 +7552,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 {}
 
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text
+{}
+
 E230D053-6033-4990-B404-368AAA25BE36,Text
 {}
 
@@ -7514,6 +7621,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
+{}
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text
 {}
 
 E230D053-6033-4990-B404-368AAA25BE36,Text
@@ -7584,6 +7694,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 {}
 
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text
+{}
+
 E230D053-6033-4990-B404-368AAA25BE36,Text
 {}
 
@@ -7650,6 +7763,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
+{}
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text
 {}
 
 E230D053-6033-4990-B404-368AAA25BE36,Text
@@ -7720,6 +7836,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
 {}
 
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text
+{}
+
 E230D053-6033-4990-B404-368AAA25BE36,Text
 {}
 
@@ -7786,6 +7905,9 @@ BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Message
 {}
 
 BFE9EF55-8DDE-4A48-A848-02EB9F58FE38,Title
+{}
+
+D7EEA242-339D-49FC-A5B1-7787B21BA759,Text
 {}
 
 E230D053-6033-4990-B404-368AAA25BE36,Text
