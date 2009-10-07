@@ -233,6 +233,9 @@ Version
 ViewReadme
 Yes
 
+WEBSTUDIO
+false
+
 WizardHeight
 365
 
@@ -569,6 +572,10 @@ File ::4E613007-2F5C-4DAB-AFC1-EEDEB866913B -type dir -name web-extension -paren
 File ::677C4666-AE68-4D82-9480-02F7D98648D4 -name custom-slingshot-application-context.xml.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
 File ::84D3AF6F-A1C0-4AC3-84F8-B89EAB693A82 -name webscript-framework-config-custom.xml.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
 File ::7E4B2E0F-52DD-4866-9FC4-8DB025FEDC55 -name web-framework-config-custom.xml.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
+File ::4A517517-6578-4387-8DD1-4AD97C4366BF -name 2-column-edit-form.ftl.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
+File ::197275B8-381E-463F-BDC4-A71B75B20FC6 -name custom-set-dublincore.ftl.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
+File ::930D2DDF-411F-4EBB-B1BE-FC68984FCAD6 -name ttl-forms-32-share.zip.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
+File ::F760FACB-9A1E-4DED-B9A2-76FEB4CA928A -name ttl-forms-32.amp.sample -parent 4E613007-2F5C-4DAB-AFC1-EEDEB866913B
 File ::ADE57421-6B2C-48EF-9D4F-593E23160C40 -name alfresco-global.properties -parent 464CC019-6E39-4D10-A983-02C03DFFDC70
 File ::E7E6D08D-C1A9-4546-BAE8-45ADF62B1B63 -type dir -name bootstrap -parent 464CC019-6E39-4D10-A983-02C03DFFDC70
 File ::11DB2BB3-936F-4991-B346-532290B76162 -type dir -name temp -parent B9703F34-1F9E-4A75-808C-352C234CA924
@@ -2842,6 +2849,9 @@ File ::65AD1DE2-B85B-424A-B896-BF32CFEDB784 -name servlet-api.jar -parent 4A5547
 File ::0F5F9478-C294-40DD-8DB3-7781222357AC -name alfresco-core-3.2_dev.jar -parent 4A5547BF-3763-4A2D-9FD2-030BA2F99434
 File ::4E32687C-4D32-4F55-BD26-484790AD9894 -name alfresco-jndi-client-3.2_dev.jar -parent 4A5547BF-3763-4A2D-9FD2-030BA2F99434
 File ::6AC2A4F5-17BC-4804-A165-4ED2962A1B17 -name alfresco-repository-3.2_dev.jar -parent 4A5547BF-3763-4A2D-9FD2-030BA2F99434
+File ::69BD8456-ABED-4B07-9F21-7D453D1A8F2B -name alfresco-core-3.2r.jar -parent 4A5547BF-3763-4A2D-9FD2-030BA2F99434
+File ::57A091AF-2057-49B1-A477-40E29F49DA32 -name alfresco-jndi-client-3.2r.jar -parent 4A5547BF-3763-4A2D-9FD2-030BA2F99434
+File ::2525ABF3-AC17-40C5-9568-81FF4B9F6826 -name alfresco-repository-3.2r.jar -parent 4A5547BF-3763-4A2D-9FD2-030BA2F99434
 File ::2BD7461A-D05F-406A-AACE-8807DC50C7D4 -type dir -name conf -parent 31F21AEC-3CFF-45BD-82A2-A40A39D9B2A4
 File ::5D2B98B9-7A59-466D-B6D0-C7D2845A36B2 -name alfresco-jmxrmi.access -parent 2BD7461A-D05F-406A-AACE-8807DC50C7D4
 File ::30522710-745F-4EC1-A1BB-ED3AEA7F3330 -name alfresco-jmxrmi.password -parent 2BD7461A-D05F-406A-AACE-8807DC50C7D4
@@ -3267,6 +3277,12 @@ InstallComponent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -setup Install -type pane 
 Condition 2F0CB899-1C48-4F91-9AD0-327063548555 -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7 -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 InstallComponent 6167A49E-551C-4CF3-944D-1FDBDD9C0106 -setup Install -type action -title {Execute AMPs} -component ExecuteExternalProgram -command reorder -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
 InstallComponent CD057CD8-68CA-4230-8D9E-F84606DC3EFD -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent A2841CF3-EEB2-479E-9284-330E06D1E1A7
+InstallComponent 675F1AF3-A349-498E-8815-C08427B7BC0E -setup Install -type pane -conditions BE587B64-F450-46EC-8376-1E98292A3C18 -title {Disable Webstudio} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+Condition BE587B64-F450-46EC-8376-1E98292A3C18 -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E -title {File Exists Condition} -component FileExistsCondition -TreeObject::id BE587B64-F450-46EC-8376-1E98292A3C18
+InstallComponent A16AE261-F193-431D-87A3-15475394A2F8 -setup Install -type action -conditions 791611F8-7C63-43E7-8B71-C174C7010D46 -title {Enable Checkbutton} -component AddWidget -command insert -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E
+Condition 791611F8-7C63-43E7-8B71-C174C7010D46 -active Yes -parent A16AE261-F193-431D-87A3-15475394A2F8 -title {String Is Condition} -component StringIsCondition -TreeObject::id 791611F8-7C63-43E7-8B71-C174C7010D46
+InstallComponent B561EA20-6FDF-4178-B9D7-BDD7F3C3777E -setup Install -type action -conditions D2FB7E47-AAAA-485D-97D9-BE687D1A7AED -title {Rename File} -component RenameFile -command reorder -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E
+Condition D2FB7E47-AAAA-485D-97D9-BE687D1A7AED -active Yes -parent B561EA20-6FDF-4178-B9D7-BDD7F3C3777E -title {String Is Condition} -component StringIsCondition -TreeObject::id D2FB7E47-AAAA-485D-97D9-BE687D1A7AED
 InstallComponent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -setup Install -type pane -conditions {6654B212-DC2E-4B87-87A4-A6651D834356 5D3CD088-B812-4912-A7BA-38C26DBAEA7B} -title {Adding Samples} -component CustomBlankPane1 -command insert -active No -parent StandardInstall
 Condition 6654B212-DC2E-4B87-87A4-A6651D834356 -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
 Condition 5D3CD088-B812-4912-A7BA-38C26DBAEA7B -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 5D3CD088-B812-4912-A7BA-38C26DBAEA7B
@@ -3443,7 +3459,7 @@ No
 <%InstallDir%>
 
 0DE76EF1-695C-4B07-9358-EA57EE8315EC,FileSize
-890608
+890669
 
 0DE76EF1-695C-4B07-9358-EA57EE8315EC,Name
 SPP
@@ -3692,7 +3708,7 @@ Windows
 <%InstallDir%>
 
 33087B4E-DFD2-42AB-A812-338D015C210B,FileSize
-24403329
+43419479
 
 33087B4E-DFD2-42AB-A812-338D015C210B,Name
 WCM
@@ -3942,7 +3958,7 @@ Yes
 <%InstallDir%>
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,FileSize
-117598708
+117183277
 
 44D20E51-7275-41FD-BF5C-790496A2FDB2,Name
 {Program Files}
@@ -4293,6 +4309,33 @@ ViewReadme
 66C9CA4C-4EC7-46BF-9F36-F153A72E6127,Y
 140
 
+675F1AF3-A349-498E-8815-C08427B7BC0E,Active
+Yes
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,BackButton,subst
+1
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,CancelButton,subst
+1
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,Caption,subst
+1
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,Conditions
+{1 condition}
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,Message,subst
+1
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,NextButton,subst
+1
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,Subtitle,subst
+1
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,Title,subst
+1
+
 68676750-381F-4FAA-B0FD-1FB8359065F6,Active
 No
 
@@ -4565,6 +4608,15 @@ OpenOffice
 77D3BEF2-4EDE-4DF6-81BC-A7697E516AC5,ObjectID
 3599937E-10E1-4029-8ACB-CCE5D85D306D
 
+791611F8-7C63-43E7-8B71-C174C7010D46,CheckCondition
+{Before Action is Executed}
+
+791611F8-7C63-43E7-8B71-C174C7010D46,Operator
+false
+
+791611F8-7C63-43E7-8B71-C174C7010D46,String
+<%WEBSTUDIO%>
+
 7A903A54-A58E-414B-8E67-5EF0F1364ABC,Message,subst
 1
 
@@ -4806,7 +4858,7 @@ ALF_DATA
 <%InstallDir%>
 
 8F9CD740-BE57-45DF-B176-5C11E746846B,FileSize
-2326
+2365
 
 8F9CD740-BE57-45DF-B176-5C11E746846B,Name
 {Program Files Linux}
@@ -4924,6 +4976,30 @@ false
 
 9CFFBAFC-77AA-4E0D-B353-0C5564295B08,ExitType
 Finish
+
+A16AE261-F193-431D-87A3-15475394A2F8,Conditions
+{1 condition}
+
+A16AE261-F193-431D-87A3-15475394A2F8,OffValue
+false
+
+A16AE261-F193-431D-87A3-15475394A2F8,OnValue
+true
+
+A16AE261-F193-431D-87A3-15475394A2F8,Text,subst
+1
+
+A16AE261-F193-431D-87A3-15475394A2F8,Type
+checkbutton
+
+A16AE261-F193-431D-87A3-15475394A2F8,VirtualText
+WEBSTUDIO
+
+A16AE261-F193-431D-87A3-15475394A2F8,X
+185
+
+A16AE261-F193-431D-87A3-15475394A2F8,Y
+160
 
 A1AF4F54-A600-430D-AA51-39C5EA26D457,ObjectID
 Java
@@ -5234,6 +5310,18 @@ B4542FD2-3F94-E787-C87C-253FEECEB594,FailureMessage
 B4542FD2-3F94-E787-C87C-253FEECEB594,Filename
 {<%Dir <%ALF_OO%>/OpenOffice.org.app/Contents/program/soffice.bin %>}
 
+B561EA20-6FDF-4178-B9D7-BDD7F3C3777E,Conditions
+{1 condition}
+
+B561EA20-6FDF-4178-B9D7-BDD7F3C3777E,Destination
+<%InstallDir%>/tomcat/webapps/studio.war.off
+
+B561EA20-6FDF-4178-B9D7-BDD7F3C3777E,ExecuteAction
+{Before Next Pane is Displayed}
+
+B561EA20-6FDF-4178-B9D7-BDD7F3C3777E,Source
+<%InstallDir%>/tomcat/webapps/studio.war
+
 B612D657-48C1-421E-A810-D1FF82C768E2,CheckCondition
 {Before Action is Executed}
 
@@ -5314,6 +5402,9 @@ BC2BF52A-C539-4EDD-B3EA-02C5190C4DF0,TargetFileName
 
 BC2BF52A-C539-4EDD-B3EA-02C5190C4DF0,WorkingDirectory
 <%InstallDir%>
+
+BE587B64-F450-46EC-8376-1E98292A3C18,Filename
+<%InstallDir%>/tomcat/webapps/studio.war
 
 BFC32834-5F85-416C-BFA6-75B86B3A0CE3,Prompt
 <%ConsoleSelectDestinationText%>
@@ -5422,6 +5513,15 @@ D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,Conditions
 
 D2B9FF3F-0E68-4CCA-99DD-AB8DCC576731,URL
 http://wiki.alfresco.com/wiki/Alfresco_<%Codeline%>_Edition_<%Version%>
+
+D2FB7E47-AAAA-485D-97D9-BE687D1A7AED,CheckCondition
+{Before Action is Executed}
+
+D2FB7E47-AAAA-485D-97D9-BE687D1A7AED,Operator
+false
+
+D2FB7E47-AAAA-485D-97D9-BE687D1A7AED,String
+<%WEBSTUDIO%>
 
 D4214F77-DED2-48E0-8CD0-0B88FE9B0E63,Active
 Yes
@@ -6333,6 +6433,18 @@ Test
 66C9CA4C-4EC7-46BF-9F36-F153A72E6127,Text
 <%ViewReadmeText%>
 
+675F1AF3-A349-498E-8815-C08427B7BC0E,Caption
+{Web Studio is not enabled by default}
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,Message
+{Enabing Web Studio provides a visual tool for working with Surf sites, however, it will result in slower start-up time for the Alfresco server.  You can manually enable Web Studio at a later time by renaming the webstudio.war.off file.}
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,Subtitle
+{Choose if to enable Web Studio}
+
+675F1AF3-A349-498E-8815-C08427B7BC0E,Title
+{Choose if you wish Web Studio to be enabled for WCM}
+
 68676750-381F-4FAA-B0FD-1FB8359065F6,Text
 <%CreateQuickLaunchShortcutText%>
 
@@ -6397,6 +6509,9 @@ It is recommended that you close all other applications before  continuing.
 
 Click Next to continue or Cancel to exit Setup.}
 
+A16AE261-F193-431D-87A3-15475394A2F8,Text
+{Enable Web Studio}
+
 A2841CF3-EEB2-479E-9284-330E06D1E1A7,Caption
 {SharePoint Protocol Installation}
 
@@ -6440,6 +6555,18 @@ CD047B45-9E60-4E0B-B9DD-2AD2CAB8772C,Message
 
 CE9BD412-8B2C-422C-A23F-5572EB5F6410,Description
 <%CustomInstallDescription%>
+
+D4214F77-DED2-48E0-8CD0-0B88FE9B0E63,Caption
+{Please give a password to use for the Alfresco administrator account. }
+
+D4214F77-DED2-48E0-8CD0-0B88FE9B0E63,Message
+{This password will be used for the administrator account for Alfresco.  You will need this password to access and configure Alfresco.}
+
+D4214F77-DED2-48E0-8CD0-0B88FE9B0E63,Subtitle
+{Enter a password for the Alfresco administrator account}
+
+D4214F77-DED2-48E0-8CD0-0B88FE9B0E63,Title
+{Alfresco Administrator Account}
 
 EEE35F50-1F9E-44C8-9E0D-1F865FAAA301,Description
 {Java JDK}
