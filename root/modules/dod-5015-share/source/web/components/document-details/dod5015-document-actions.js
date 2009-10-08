@@ -67,15 +67,17 @@
        */
       getActionUrls: function RecordsDocumentActions_getActionUrls()
       {
-         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId,
-            nodeRef = new Alfresco.util.NodeRef(this.assetData.nodeRef),
+         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/",
+            recordData = this.assetData,
+            nodeRef = new Alfresco.util.NodeRef(recordData.nodeRef),
             filePlan = this.doclistMetadata.filePlan.replace(":/", "");
 
          return (
          {
-            downloadUrl: Alfresco.constants.PROXY_URI + this.assetData.contentUrl + "?a=true",
-            editMetadataUrl: urlContextSite + "/edit-metadata?nodeRef=" + nodeRef.nodeRef,
-            transfersZipUrl: Alfresco.constants.PROXY_URI + "api/node/" + filePlan + "/transfers/" + nodeRef.id
+            downloadUrl: Alfresco.constants.PROXY_URI + recordData.contentUrl + "?a=true",
+            editMetadataUrl: urlContextSite + "edit-metadata?nodeRef=" + nodeRef.nodeRef,
+            transfersZipUrl: Alfresco.constants.PROXY_URI + "api/node/" + filePlan + "/transfers/" + nodeRef.id,
+            managePermissionsUrl: urlContextSite + "rmpermissions?nodeRef=" + nodeRef.nodeRef + "&itemName=" + encodeURIComponent(recordData.displayName) + "&nodeType=" + recordData.type
          });
       }
    }, true);
