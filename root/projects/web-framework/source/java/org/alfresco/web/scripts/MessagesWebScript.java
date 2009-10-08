@@ -119,7 +119,7 @@ public class MessagesWebScript extends AbstractWebScript
                 final int schemaIndex = serverPath.indexOf(':');
                 writer.write("window.setTimeout(function(){(document.getElementById('alfresco-yuiloader')||document.createElement('div')).innerHTML = '<img src=\"");
                 writer.write(serverPath.substring(0, schemaIndex));
-                writer.write("://www.alfresco.com/assets/images/logos/community-edition-3.2.png\" alt=\"*\" style=\"display:none\"/>\'}, 100);\r\n");
+                writer.write("://www.alfresco.com/assets/images/logos/community-edition-3.2r-share.png\" alt=\"*\" style=\"display:none\"/>\'}, 100);\r\n");
                 
                 // retrieve result from the writer and cache for this locale
                 result = writer.toString();
