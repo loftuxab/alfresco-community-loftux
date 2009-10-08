@@ -6,7 +6,31 @@ var Filters =
       "folders": '+TYPE:"{http://www.alfresco.org/model/content/1.0}folder"',
       "images": "-TYPE:\"{http://www.alfresco.org/model/content/1.0}thumbnail\" +@cm\\:content.mimetype:image/*"
    },
-
+   
+   QUERY_TEMPLATES:
+   [
+      {field: "keywords", template: "%(cm:name cm:title cm:description TEXT)"},
+      {field: "name", template: "%(cm:name)"},
+      {field: "title", template: "%(cm:title)"},
+      {field: "description", template: "%(cm:description)"},
+      {field: "creator", template: "%(cm:creator)"},
+      {field: "created", template: "%(cm:created)"},
+      {field: "modifier", template: "%(cm:modifier)"},
+      {field: "modified", template: "%(cm:modified)"},
+      {field: "author", template: "%(cm:author)"},
+      {field: "markings", template: "%(rmc:supplementalMarkingList)"},
+      {field: "dispositionEvents", template: "%(rma:recordSearchDispositionEvents)"},
+      {field: "dispositionActionName", template: "%(rma:recordSearchDispositionActionName)"},
+      {field: "dispositionActionAsOf", template: "%(rma:recordSearchDispositionActionAsOf)"},
+      {field: "dispositionEventsEligible", template: "%(rma:recordSearchDispositionEventsEligible)"},
+      {field: "dispositionPeriod", template: "%(rma:recordSearchDispositionPeriod)"},
+      {field: "hasDispositionSchedule", template: "%(rma:recordSearchHasDispositionSchedule)"},
+      {field: "dispositionInstructions", template: "%(rma:recordSearchDispositionInstructions)"},
+      {field: "dispositionAuthority", template: "%(rma:recordSearchDispositionAuthority)"},
+      {field: "holdReason", template: "%(rma:recordSearchHoldReason)"},
+      {field: "vitalRecordReviewPeriod", template: "%(rma:recordSearchVitalRecordReviewPeriod)"}
+   ],
+   
    getFilterParams: function Filter_getFilterParams(filter, parsedArgs, favourites)
    {
       var filterParams =
@@ -69,12 +93,9 @@ var Filters =
                   // Wrap the query so that only valid items within the filePlan are returned
                   filterParams.variablePath = true;
                   filterParams.query = 'PATH:"' + parsedArgs.rootNode.qnamePath + '//*" AND (' + filterQuery + ')';
-                  filterParams.templates = [
-                  {
-                     field: "KEYWORDS",
-                     template: "%(cm:name cm:title cm:description TEXT)"
-                  }];
+                  filterParams.templates = Filters.QUERY_TEMPLATES;
                   filterParams.language = "fts-alfresco";
+                  filterParams.namespace = "http://www.alfresco.org/model/recordsmanagement/1.0";
                   // gather up the sort by fields
                   // they are encoded as "property/dir" i.e. "cm:name/asc"
                   if (ssJson.sort && ssJson.sort.length != 0)

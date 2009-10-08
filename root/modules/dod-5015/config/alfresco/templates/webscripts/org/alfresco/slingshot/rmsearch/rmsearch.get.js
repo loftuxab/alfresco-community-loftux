@@ -15,7 +15,28 @@
 
 const DEFAULT_MAX_RESULTS = 500;
 const SITES_SPACE_QNAME_PATH = "/app:company_home/st:sites/";
-const QUERY_TEMPLATES = {field: "KEYWORDS", template: "%(cm:name cm:title cm:description TEXT)"};
+const QUERY_TEMPLATES = [
+   {field: "keywords", template: "%(cm:name cm:title cm:description TEXT)"},
+   {field: "name", template: "%(cm:name)"},
+   {field: "title", template: "%(cm:title)"},
+   {field: "description", template: "%(cm:description)"},
+   {field: "creator", template: "%(cm:creator)"},
+   {field: "created", template: "%(cm:created)"},
+   {field: "modifier", template: "%(cm:modifier)"},
+   {field: "modified", template: "%(cm:modified)"},
+   {field: "author", template: "%(cm:author)"},
+   {field: "markings", template: "%(rmc:supplementalMarkingList)"},
+   {field: "dispositionEvents", template: "%(rma:recordSearchDispositionEvents)"},
+   {field: "dispositionActionName", template: "%(rma:recordSearchDispositionActionName)"},
+   {field: "dispositionActionAsOf", template: "%(rma:recordSearchDispositionActionAsOf)"},
+   {field: "dispositionEventsEligible", template: "%(rma:recordSearchDispositionEventsEligible)"},
+   {field: "dispositionPeriod", template: "%(rma:recordSearchDispositionPeriod)"},
+   {field: "hasDispositionSchedule", template: "%(rma:recordSearchHasDispositionSchedule)"},
+   {field: "dispositionInstructions", template: "%(rma:recordSearchDispositionInstructions)"},
+   {field: "dispositionAuthority", template: "%(rma:recordSearchDispositionAuthority)"},
+   {field: "holdReason", template: "%(rma:recordSearchHoldReason)"},
+   {field: "vitalRecordReviewPeriod", template: "%(rma:recordSearchVitalRecordReviewPeriod)"}
+];
 
 /**
  * Returns person display name string as returned to the user.
@@ -172,7 +193,8 @@ function getSearchResults(query, sort, maxResults, siteId)
       language: "fts-alfresco",
       page: {maxItems: maxResults},
       sort: sorts,
-      templates: [ QUERY_TEMPLATES ]
+      templates: QUERY_TEMPLATES,
+      namespace: "http://www.alfresco.org/model/recordsmanagement/1.0"
    };
    nodes = search.query(queryDef);
    

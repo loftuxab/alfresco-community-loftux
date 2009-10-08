@@ -161,7 +161,7 @@
          this.widgets.calendar.hide();
          
          // convert to query date format and insert
-         var date = YAHOO.lang.substitute("{year}\\-{month}\\-{day}T00\\:00\\:00",
+         var date = YAHOO.lang.substitute("{year}\\-{month}\\-{day}",
          {
             year: selected[0],
             month: Alfresco.util.pad(selected[1], 2),
