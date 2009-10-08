@@ -573,6 +573,7 @@
                   if (me.resultsCount === 0)
                   {
                      el.innerHTML = me._msg("message.empty");
+                     me.widgets.dataTable.set("MSG_EMPTY", "");
                   }
                   else
                   {

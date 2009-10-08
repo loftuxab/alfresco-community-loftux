@@ -63,7 +63,8 @@ function main()
             maxItems: (filterParams.limitResults ? parseInt(filterParams.limitResults, 10) : 0)
          },
          sort: filterParams.sort,
-         templates: filterParams.templates
+         templates: filterParams.templates,
+         namespace: (filterParams.namespace ? filterParams.namespace : null)
       });
    }
 

@@ -136,9 +136,60 @@
        */
       onReady: function RMPropertyMenu_onReady()
       {
-         var items =
-         [
+         var items = [];
+         
+         if (this.options.showSearchFields)
+         {
             // add content fields
+            items.push(
+            {
+               text: this.msg("label.menu.content"),
+               submenu:
+               { 
+                  id: this.id + "_content",
+                  itemdata:
+                  [ 
+                     { text: this.msg("label.name"), value: "name" },
+                     { text: this.msg("label.title"), value: "title" },
+                     { text: this.msg("label.description"), value: "description" },
+                     { text: this.msg("label.creator"), value: "creator" },
+                     { text: this.msg("label.created"), value: "created" },
+                     { text: this.msg("label.modifier"), value: "modifier" },
+                     { text: this.msg("label.modified"), value: "modified" },
+                     { text: this.msg("label.author"), value: "author" }
+                  ]
+               }
+            });
+            
+            // add record fields
+            items.push(
+            {
+               text: this.msg("label.menu.records"),
+               submenu:
+               { 
+                  id: this.id + "_records",
+                  itemdata:
+                  [ 
+                     { text: this.msg("label.originator"), value: "originator" },
+                     { text: this.msg("label.dateFiled"), value: "dateFiled" },
+                     { text: this.msg("label.publicationDate"), value: "publicationDate" },
+                     { text: this.msg("label.reviewDate"), value: "reviewDate" },
+                     { text: this.msg("label.originatingOrganization"), value: "originatingOrganization" },
+                     { text: this.msg("label.mediaType"), value: "mediaType" },
+                     { text: this.msg("label.format"), value: "format" },
+                     { text: this.msg("label.dateReceived"), value: "dateReceived" },
+                     { text: this.msg("label.location"), value: "location" },
+                     { text: this.msg("label.address"), value: "address" },
+                     { text: this.msg("label.otherAddress"), value: "otherAddress" },
+                     { text: this.msg("label.supplementalMarkingList"), value: "markings" }
+                  ]
+               }
+            });
+         }
+         else
+         {
+            // add content fields
+            items.push(
             {
                text: this.msg("label.menu.content"),
                submenu:
@@ -156,8 +207,10 @@
                      { text: this.msg("label.author"), value: "cm:author" }
                   ]
                }
-            },
+            });
+            
             // add record fields
+            items.push(
             {
                text: this.msg("label.menu.records"),
                submenu:
@@ -179,8 +232,8 @@
                      { text: this.msg("label.supplementalMarkingList"), value: "rmc:supplementalMarkingList" }
                   ]
                }
-            }
-         ];
+            });
+         }
          
          if (this.options.showAllField)
          {
@@ -207,7 +260,7 @@
             items[0].submenu.itemdata.splice(0, 0,
             {
                text: this.msg("label.keywords"),
-               value: "KEYWORDS"
+               value: "keywords"
             });
             
             // insert search roll-up special field menu
@@ -219,16 +272,16 @@
                   id: this.id + "_disposition",
                   itemdata:
                   [ 
-                     { text: this.msg("label.dispositionEvents"), value: "rma:recordSearchDispositionEvents" },
-                     { text: this.msg("label.dispositionActionName"), value: "rma:recordSearchDispositionActionName" },
-                     { text: this.msg("label.dispositionActionAsOf"), value: "rma:recordSearchDispositionActionAsOf" },
-                     { text: this.msg("label.dispositionEventsEligible"), value: "rma:recordSearchDispositionEventsEligible" },
-                     { text: this.msg("label.dispositionPeriod"), value: "rma:recordSearchDispositionPeriod" },
-                     { text: this.msg("label.hasDispositionSchedule"), value: "rma:recordSearchHasDispositionSchedule" },
-                     { text: this.msg("label.dispositionInstructions"), value: "rma:recordSearchDispositionInstructions" },
-                     { text: this.msg("label.dispositionAuthority"), value: "rma:recordSearchDispositionAuthority" },
-                     { text: this.msg("label.holdReason"), value: "rma:recordSearchHoldReason" },
-                     { text: this.msg("label.vitalRecordReviewPeriod"), value: "rma:recordSearchVitalRecordReviewPeriod" }
+                     { text: this.msg("label.dispositionEvents"), value: "dispositionEvents" },
+                     { text: this.msg("label.dispositionActionName"), value: "dispositionActionName" },
+                     { text: this.msg("label.dispositionActionAsOf"), value: "dispositionActionAsOf" },
+                     { text: this.msg("label.dispositionEventsEligible"), value: "dispositionEventsEligible" },
+                     { text: this.msg("label.dispositionPeriod"), value: "dispositionPeriod" },
+                     { text: this.msg("label.hasDispositionSchedule"), value: "hasDispositionSchedule" },
+                     { text: this.msg("label.dispositionInstructions"), value: "dispositionInstructions" },
+                     { text: this.msg("label.dispositionAuthority"), value: "dispositionAuthority" },
+                     { text: this.msg("label.holdReason"), value: "holdReason" },
+                     { text: this.msg("label.vitalRecordReviewPeriod"), value: "vitalRecordReviewPeriod" }
                   ]
                }
             });
