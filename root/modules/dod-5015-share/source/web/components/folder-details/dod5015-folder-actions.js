@@ -52,4 +52,30 @@
     * Augment prototype with RecordActions module, ensuring overwrite is enabled
     */
    YAHOO.lang.augmentProto(Alfresco.RecordsFolderActions, Alfresco.doclib.RecordsActions, true);
+
+   /**
+    * Augment prototype with main class implementation, ensuring overwrite is enabled
+    */
+   YAHOO.lang.augmentObject(Alfresco.RecordsFolderActions.prototype,
+   {
+      /**
+       * The urls to be used when creating links in the action cell
+       *
+       * @method getActionUrls
+       * @override
+       * @return {object} Object literal containing URLs to be substituted in action placeholders
+       */
+      getActionUrls: function RecordsFolderActions_getActionUrls()
+      {
+         var urlContextSite = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/",
+            recordData = this.assetData,
+            nodeRef = new Alfresco.util.NodeRef(recordData.nodeRef);
+
+         return (
+         {
+            editMetadataUrl: urlContextSite + "edit-metadata?nodeRef=" + nodeRef.nodeRef,
+            managePermissionsUrl: urlContextSite + "rmpermissions?nodeRef=" + nodeRef.nodeRef + "&itemName=" + encodeURIComponent(recordData.displayName) + "&nodeType=" + recordData.type
+         });
+      }
+   }, true);
 })();
