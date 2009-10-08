@@ -28,7 +28,6 @@ namespace AlfrescoWord2003
       private void ThisAddIn_Startup(object sender, System.EventArgs e)
       {
          m_DefaultTemplate = Properties.Settings.Default.DefaultTemplate.ToString(System.Globalization.CultureInfo.InvariantCulture);
-         MessageBox.Show(m_DefaultTemplate, "m_DefaultTemplate");
 
          // Register event interest with the Word Application
          Application.WindowActivate += new Microsoft.Office.Interop.Word.ApplicationEvents4_WindowActivateEventHandler(Application_WindowActivate);
