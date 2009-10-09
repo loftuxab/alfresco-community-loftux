@@ -365,7 +365,7 @@
       <copy todir="${dir.continuous.dist}">
          <fileset dir="${dir.module.php.dist}"                  includes="${file.name.amp.php}" />
          <fileset dir="${dir.module.mediawiki.dist}"            includes="${file.name.amp.mediawiki}" />
-         <fileset dir="${dir.module.rm.dist}"                   includes="${file.name.amp.rm}" />
+<!--         <fileset dir="${dir.module.rm.dist}"                   includes="${file.name.amp.rm}" /> -->
          <fileset dir="${dir.module.truncatemalformedxml.dist}" includes="${file.name.amp.truncatemalformedxml}" />
          <fileset dir="${dir.module.fb.doclib.dist}"            includes="${file.name.amp.fb.doclib}" />
          <fileset dir="${dir.module.gg.dist}"                   includes="${file.name.zip.gg}" />
