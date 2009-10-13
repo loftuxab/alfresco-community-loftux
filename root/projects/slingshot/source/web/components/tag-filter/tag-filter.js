@@ -149,7 +149,11 @@
 					fn: this.onTagRefresh_success,
 					scope: this
 				},
-				failureMessage: this.msg("message.refresh.failure")
+				failureCallback:
+				{
+					fn: this.onTagRefresh_failure,
+					scope: this
+				}
 			});
       },
       
@@ -172,6 +176,17 @@
             
             Dom.get(this.id + "-tags").innerHTML = html;
          }
+      },
+
+      /**
+       * Event handler for when the tag data fails to load.
+       *
+       * @method onTagRefresh_failure
+       * @param response {object} Server response object
+       */ 
+      onTagRefresh_failure: function TagFilter_onTagRefresh_failure(response)
+      {
+         Dom.get(this.id + "-tags").innerHTML = '<span class="error-alt">' + this.msg("message.refresh.failure") + '</span>';
       },
       
 

@@ -67,7 +67,11 @@
                fn: this._getDataSuccess, 
                scope: this 
             },
-            failureMessage: "Failed to load data for document details"
+            failureCallback: 
+            { 
+               fn: this._getDataFailure, 
+               scope: this 
+            }
          };
          Alfresco.util.Ajax.request(config);
       }
