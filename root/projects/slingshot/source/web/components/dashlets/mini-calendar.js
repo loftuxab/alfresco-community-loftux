@@ -133,7 +133,7 @@
             var title = Alfresco.util.formatDate(date, "ddd, d mmm yyyy");
             var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/calendar?view=day&date=" + theDate;
             html += '<div class="detail-list-item">';
-            html += '<div class="icon"><img src="' + Alfresco.constants.URL_CONTEXT + '/components/calendar/images/calendar-16.png" alt="day" /></div>';
+            html += '<div class="icon"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/calendar/images/calendar-16.png" alt="day" /></div>';
             html += '<div class="details2"><h4><a href="'+url+'" class="theme-color-1">' + title + '</a></h4>';
             for (var i = 0, ii = events.length; i < ii; i++)
             {
