@@ -29,11 +29,6 @@
    text-align: right;
 }
 
-.users .hidden
-{
-   display: none;
-}
-
 .users .separator
 {
    margin-bottom: 0.8em;

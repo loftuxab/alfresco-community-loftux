@@ -39,6 +39,11 @@
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event;
 
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
    Alfresco.module.TagLibrary = function(htmlId)
    {
       Alfresco.module.TagLibrary.superclass.constructor.call(this, "Alfresco.module.TagLibrary", htmlId + "-tagLibrary", ["button"]);
@@ -57,6 +62,8 @@
          tags: {}
       };
       this.currentTags = [];
+      
+      this.setTags([]);
       
       return this;
    };
@@ -140,7 +147,7 @@
                   args[1].stop = true;
                }
             }
-      		 
+
             return true;
          };
          YAHOO.Bubbling.addDefaultAction("taglibrary-action", fnActionHandlerDiv);
@@ -258,13 +265,21 @@
       setTags: function TagLibrary_setTags(tags)
       {
          // first make sure that there are no previous tags available
-         Dom.get(this.id + '-current-tags').innerHTML = '';
-         this.currentTags = [];
-         
-         // add each tag to the list, also generating the html
-         for (var x = 0, xx = tags.length; x < xx; x++)
+         var elTags = Dom.get(this.id + '-current-tags');
+         if (elTags !== null)
          {
-            this._addTagImpl(tags[x]);
+            elTags.innerHTML = '';
+            this.currentTags = [];
+
+            // add each tag to the list, also generating the html
+            for (var i = 0, ii = tags.length; i < ii; i++)
+            {
+               this._addTagImpl(tags[i]);
+            }
+
+            // Show the popular tags load link
+            Dom.setStyle(this.id + "-load-popular-tags-link", "display", "inline");
+            Dom.get(this.id + "-popular-tags").innerHTML = "<li></li>";
          }
       },
 
@@ -409,16 +424,23 @@
 
          // add all tags to the ui
          var popularTagsElem = Dom.get(this.id + "-popular-tags"),
-            elem, elemId;
-         
-         for (var x = 0, xx = tags.length; x < xx; x++)
+            current = Alfresco.util.arrayToObject(this.currentTags),
+            tagName, elem, elemId;
+
+         popularTagsElem.innerHTML = "";
+
+         for (var i = 0, ii = tags.length; i < ii; i++)
          {
-            elem = document.createElement('li');
-            elemId = this.generateTagId(this, tags[x].name, 'onAddTag');
-            elem.setAttribute('id', elemId);
-            elem.setAttribute('class', 'onAddTag');
-            elem.innerHTML = '<a href="#" class="taglibrary-action"><span>' + tags[x].name + '</span><span class="add">&nbsp;</span></a>';
-            popularTagsElem.appendChild(elem);
+            tagName = tags[i].name;
+            if (!(tagName in current))
+            {
+               elem = document.createElement('li');
+               elemId = this.generateTagId(this, tagName, 'onAddTag');
+               elem.setAttribute('id', elemId);
+               elem.setAttribute('class', 'onAddTag');
+               elem.innerHTML = '<a href="#" class="taglibrary-action"><span>' + $html(tagName) + '</span><span class="add">&nbsp;</span></a>';
+               popularTagsElem.appendChild(elem);
+            }
          }
       },
 
@@ -491,7 +513,7 @@
          
          elem.setAttribute('id', elemId);
          elem.setAttribute('class', 'onRemoveTag');
-         elem.innerHTML = '<a href="#" class="taglibrary-action"><span>' + tagName + '</span><span class="remove">&nbsp;</span></a>';
+         elem.innerHTML = '<a href="#" class="taglibrary-action"><span>' + $html(tagName) + '</span><span class="remove">&nbsp;</span></a>';
          currentTagsElem.appendChild(elem);
 
          // inform interested parties about change

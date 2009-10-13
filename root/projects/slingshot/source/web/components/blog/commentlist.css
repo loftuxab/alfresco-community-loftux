@@ -32,11 +32,6 @@ html>body .comment
    margin: 0;
 }
 
-.comment-list .hidden
-{
-   display: none;
-}
-
 .comment-list .align-right
 {
    text-align: right;

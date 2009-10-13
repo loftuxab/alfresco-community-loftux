@@ -110,12 +110,6 @@
    display: none;
 }
 
-.links-body .edit-link.hidden,
-.links-body .delete-link.hidden
-{
-   display: none;
-}
-
 .links-body .delete-link-over
 {
    background-color: #FFF;

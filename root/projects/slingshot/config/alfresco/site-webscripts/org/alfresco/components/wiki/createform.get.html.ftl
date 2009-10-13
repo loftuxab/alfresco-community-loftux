@@ -8,30 +8,51 @@
       ${messages}
    );
 //]]></script>
-<div id="${args.htmlid}-pagecreate" class="wikipage">
+<div class="page-form-header">
    <h1>${msg("header.create")}</h1>
    <hr/>
-      <#-- The "action" attribute is set dynamically upon form submission -->
-      <form id="${args.htmlid}-form" action="" method="post">
+</div>
+
+<div class="page-form-body">
+   <#-- The "action" attribute is set dynamically upon form submission -->
+   <form id="${args.htmlid}-form" action="" method="post">
+      <fieldset>
          <input type="hidden" id="${args.htmlid}-page" name="page" value="wiki-page" />
-         <div class="leftcolumn">
-            <span class="label"><label for="${args.htmlid}-title">${msg("label.title")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="75" id="${args.htmlid}-title" name="pageTitle"/></span>
+         <div class="yui-gd">
+            <div class="yui-u first">
+               <label for="${args.htmlid}-title">${msg("label.title")}:</label>
+            </div>
+            <div class="yui-u">
+               <input type="text" maxlength="256" size="75" id="${args.htmlid}-title" name="pageTitle"/>
+            </div>
          </div>
-      
-         <span class="label" for="${args.htmlid}-content">${msg("label.text")}:</span>
-         <textarea class="yuieditor" name="pagecontent" id="${args.htmlid}-content" cols="180" rows="10"></textarea>
-      
-      <!-- tags -->
-         <span class="label"><label for="${htmlid}-tag-input-field">${msg("label.tags")}:</label></span>
-         <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
-         
-         <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
-         <!-- end tags -->
-      
-      <div class="formAction">
-         <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
-         <a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki" id="${args.htmlid}-cancel-button">${msg("button.cancel")}</a>
-      </div>
-      </form>
+   
+         <div class="yui-gd">
+            <div class="yui-u first">
+               <label for="${args.htmlid}-content">${msg("label.text")}:</label>
+            </div>
+            <div class="yui-u">
+               <textarea class="yuieditor" name="pagecontent" id="${args.htmlid}-content" cols="180" rows="10"></textarea>
+            </div>
+         </div>
+   
+         <div class="yui-gd">
+            <div class="yui-u first">
+               <label for="${htmlid}-tag-input-field">${msg("label.tags")}:</label>
+            </div>
+            <div class="yui-u">
+               <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
+               <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
+            </div>
+         </div>
+   
+         <div class="yui-gd">
+            <div class="yui-u first">&nbsp;</div>
+            <div class="yui-u">
+               <input type="submit" id="${args.htmlid}-save-button" value="${msg("button.save")}" />
+               <a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki" id="${args.htmlid}-cancel-button">${msg("button.cancel")}</a>
+            </div>
+         </div>
+      </fieldset>
+   </form>
 </div>

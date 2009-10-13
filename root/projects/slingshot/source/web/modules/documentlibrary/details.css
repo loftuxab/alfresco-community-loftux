@@ -9,11 +9,6 @@
    width: 26.5em;
 }
 
-.details .hidden
-{
-   display: none;
-}
-
 .details .yui-gd .yui-u
 {
    width: 70% !important;
@@ -28,9 +23,4 @@
 {
    background: transparent url(images/edit-metadata-16.png) no-repeat 12px 4px;
    padding-left: 32px;
-}
-
-.taglibrary .title
-{
-   display: none !important;
 }

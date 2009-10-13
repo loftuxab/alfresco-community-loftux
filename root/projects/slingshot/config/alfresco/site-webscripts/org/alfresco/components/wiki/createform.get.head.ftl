@@ -6,5 +6,4 @@
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/modules/taglibrary/taglibrary.css" />
 <@script type="text/javascript" src="${page.url.context}/modules/taglibrary/taglibrary.js"></@script>
 <!-- Wiki Create -->
-<@link rel="stylesheet" type="text/css" href="${page.url.context}/components/wiki/createform.css" />
 <@script type="text/javascript" src="${page.url.context}/components/wiki/createform.js"></@script>

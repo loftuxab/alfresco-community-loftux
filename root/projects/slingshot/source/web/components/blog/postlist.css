@@ -1,28 +1,21 @@
-/* header */
-
-.postlist-header
+.postlist-infobar
 {
+   border-bottom: thin solid #C6C6C6;
+   height: 3em;
    margin: 0 -10px;
+   padding-right: 10px;
+   padding-top: 0.5em;
+   width: auto;
 }
 
-.postlist-header .align-right
-{
-   text-align: right;
-}
-
-.postlist-header div.hideable
+.postlist-infobar div.hideable
 {
    float: left;
 }
 
-/* infobar */
-
-.postlist-header .postlist-infobar
+.postlist-infobar .hidden
 {
-   width: auto;
-   height: 30px;
-   border-bottom: thin solid #C6C6C6;
-   padding: 0.1em 0.5em;
+   display: none;
 }
 
 .postlist-infobar .listTitle
@@ -37,7 +30,7 @@
 .postlist-infobar .paginator
 {
    float: left;
-   text-align: right;
+   text-align: center;
 }
 
 .postlist-infobar .simple-view

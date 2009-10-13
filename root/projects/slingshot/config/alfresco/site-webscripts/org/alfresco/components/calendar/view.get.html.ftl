@@ -1,23 +1,22 @@
 
 <script type="text/javascript">//<![CDATA[
-  new Alfresco.CalendarView('${args.htmlid}Container').setOptions(
-       {
-           siteId: "${page.url.templateArgs.site!""}",
-           //view type
-           view : '${viewArgs.viewType}',
-           id : '${args.htmlid}View',
-          /*
-           * The start date of the week/month if week or month
-           * a Date object or a ISO string
-           **/
-           startDate : Alfresco.util.fromISO8601('${viewArgs.view.startDate}'),
-           endDate : Alfresco.util.fromISO8601('${viewArgs.view.endDate}'),
-           titleDate : Alfresco.util.fromISO8601('${viewArgs.view.titleDate}'),
-           permitToCreateEvents : '${viewArgs.permitToCreateEvents}'
-        }
-       ).setMessages(
-            ${messages}
-        );
+   new Alfresco.CalendarView('${args.htmlid}Container').setOptions(
+   {
+      siteId: "${page.url.templateArgs.site!""}",
+      //view type
+      view : '${viewArgs.viewType}',
+      id : '${args.htmlid}View',
+      /*
+      * The start date of the week/month if week or month
+      * a Date object or a ISO string
+      **/
+      startDate : Alfresco.util.fromISO8601('${viewArgs.view.startDate}'),
+      endDate : Alfresco.util.fromISO8601('${viewArgs.view.endDate}'),
+      titleDate : Alfresco.util.fromISO8601('${viewArgs.view.titleDate}'),
+      permitToCreateEvents : '${viewArgs.permitToCreateEvents}'
+   }).setMessages(
+      ${messages}
+   );
 //]]></script>
 
 <#if (viewArgs.viewType=='month')>    

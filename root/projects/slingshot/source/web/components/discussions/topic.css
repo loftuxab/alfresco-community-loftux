@@ -239,9 +239,6 @@ html>body .node, .reply, .comment {
 /***********
  * GENERAL *
 ************/
-.hidden {
-  display: none !important;
-}
 .spacer {
   margin: 0 7px;
   color: #ccc;
