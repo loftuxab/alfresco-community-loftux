@@ -47,7 +47,7 @@
          </div>
          <!-- tags -->
          <div class="yui-gd">
-            <div class="yui-u first"><span class="label">${msg("label.tags")}:</span></div>
+            <div class="yui-u first">${msg("label.tags")}:</div>
             <div class="yui-u overflow">
               <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
                <div class="taglibrary">
@@ -55,7 +55,6 @@
                      <ul id="${args.htmlid}-current-tags">
                      </ul>
                   </div>
-                  <div class="title">${msg("taglibrary.typetag")}&nbsp;</div>
                   <#assign tags = ''>
                   <#if event.tags?? && event.tags?size &gt; 0>
                      <#list event.tags as tag>

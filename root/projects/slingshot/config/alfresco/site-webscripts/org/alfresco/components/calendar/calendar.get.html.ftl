@@ -1,9 +1,7 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.Calendar("${args.htmlid}").setSiteId(
-	"${page.url.templateArgs.site!""}"
-	).setMessages(
-		${messages}
-	);
+   new Alfresco.Calendar("${args.htmlid}").setSiteId("${page.url.templateArgs.site!""}").setMessages(
+      ${messages}
+   );
 //]]></script>
 
 <div id="${args.htmlid}-body">

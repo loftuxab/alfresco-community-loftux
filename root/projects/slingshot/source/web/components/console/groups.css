@@ -23,12 +23,6 @@
    margin: 0;
 }
 
-.groups .hidden,
-.groups.remove-dialog .hidden
-{
-   display: none;
-}
-
 .groups .title
 {
    color: #515D6B;

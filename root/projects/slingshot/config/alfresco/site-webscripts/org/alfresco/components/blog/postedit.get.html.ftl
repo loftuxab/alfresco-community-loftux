@@ -28,42 +28,59 @@
    );
 //]]></script>
 
-<div class="editBlogPostForm">
+<div class="page-form-header">
 <#if page.url.args.postId??>
    <h1>${msg("editPost")}</h1>
 <#else>
    <h1>${msg("createPost")}</h1>
 </#if>
-<hr/>
+   <hr/>
 </div>
-<div id="${args.htmlid}-div" class="editBlogPostForm hidden">
+<div id="${args.htmlid}-div" class="page-form-body hidden">
    <form id="${args.htmlid}-form" method="post" action="">
-      <div>
+      <fieldset>
          <input type="hidden" id="${args.htmlid}-site" name="site" value="" />
          <input type="hidden" id="${args.htmlid}-container" name="container" value="" />
          <input type="hidden" id="${args.htmlid}-page" name="page" value="blog-postview" />
          <input type="hidden" id="${args.htmlid}-draft" name="draft" value=""/>
-               
-         <!-- title -->
-         <label for="${args.htmlid}-title">${msg("title")}:</label>
-         <input type="text" id="${args.htmlid}-title" name="title" value="" />
 
-         <!-- content -->
-         <label for="${args.htmlid}-content">${msg("text")}:</label>
-         <textarea rows="8" id="${args.htmlid}-content" name="content" cols="180" class="yuieditor"></textarea> 
-      
-         <!-- tags -->
-         <label for="${htmlid}-tag-input-field">${msg("tags")}:</label>
-         <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
-         <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
-         <!-- end tags -->
+         <div class="yui-gd">
+            <div class="yui-u first">
+               <label for="${args.htmlid}-title">${msg("title")}:</label>
+            </div>
+            <div class="yui-u">
+               <input class="wide" type="text" id="${args.htmlid}-title" name="title" value="" />
+            </div>
+         </div>
 
-      </div>
-      <div class="nodeFormAction">
-         <input type="submit" id="${args.htmlid}-save-button" value="" />         
-         <input type="button" id="${args.htmlid}-publish-button" value="${msg('action.publish')}" class="hidden" />
-         <input type="button" id="${args.htmlid}-publishexternal-button" value="" />
-         <input type="reset" id="${args.htmlid}-cancel-button" value="${msg('action.cancel')}" />
-      </div>
+         <div class="yui-gd">
+            <div class="yui-u first">
+               <label for="${args.htmlid}-content">${msg("text")}:</label>
+            </div>
+            <div class="yui-u">
+               <textarea rows="8" id="${args.htmlid}-content" name="content" cols="180" class="yuieditor"></textarea> 
+            </div>
+         </div>
+
+         <div class="yui-gd">
+            <div class="yui-u first">
+               <label for="${htmlid}-tag-input-field">${msg("tags")}:</label>
+            </div>
+            <div class="yui-u">
+               <#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
+               <@taglibraryLib.renderTagLibraryHTML htmlid=args.htmlid />
+            </div>
+         </div>
+
+         <div class="yui-gd">
+            <div class="yui-u first">&nbsp;</div>
+            <div class="yui-u">
+               <input type="submit" id="${args.htmlid}-save-button" value="" />         
+               <input type="button" id="${args.htmlid}-publish-button" value="${msg('action.publish')}" class="hidden" />
+               <input type="button" id="${args.htmlid}-publishexternal-button" value="" />
+               <input type="reset" id="${args.htmlid}-cancel-button" value="${msg('action.cancel')}" />
+            </div>
+         </div>
+      </fieldset>
    </form>
 </div>

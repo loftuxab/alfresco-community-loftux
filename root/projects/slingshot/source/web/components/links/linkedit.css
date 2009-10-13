@@ -1,70 +1,8 @@
-/********
- * FORM *
-*********/
-
-.editLinkForm
-{
-   background-color: #FAFAFA;
-   border: thin solid #000;
-   margin: 4px;
-   padding: 4px;
-}
-
-.editLinkForm label
-{
-   clear: left;
-   float: left;
-   margin: 5px 15px 7px 0;
-   text-align: right;
-   width: 100px;
-}
-
-.editLinkForm input, .editLinkForm textarea
-{
-   margin-bottom: 15px;
-}
-
-.editLinkForm .internal
-{
-   float: left;
-   margin-top: 6px;
-   margin-bottom: 0px;
-}
-
-.editLinkForm .nodeFormAction
-{
-   margin: 0 0 10px 115px;
-}
-
-/* Tag lib */
-
-.editLinkForm .taglibrary
-{
-   margin-bottom: 0px;
-   margin-left: 115px;
-}
-
-.hidden
-{
-   display: none;
-}
-
 .help
 {
    font-size: 81%;
    margin-left: 5px;
    margin-top: 8px;
-}
-
-.lbl
-{
-   float: left;
-}
-
-input.lbl,
-textarea.lbl
-{
-   width: 30em;
 }
 
 .dot

@@ -36,7 +36,6 @@
       </ul>
    </div>
    <div class="clear"></div>
-   <div class="title rel_left">${msg("taglibrary.typetag")}:&nbsp;</div>
    <input type="text" size="30" class="rel_left" id="${htmlid}-tag-input-field" name="-" />
    <input type="button" id="${htmlid}-add-tag-button" value="${msg("button.add")}" />
    <div class="clear"></div>

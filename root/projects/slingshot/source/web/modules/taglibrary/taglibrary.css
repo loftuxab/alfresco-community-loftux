@@ -20,7 +20,11 @@
    margin-top: 0px;
 }
 
-.taglibrary .top_taglist,
+.taglibrary .top_taglist
+{
+
+}
+
 .taglibrary .bottom_taglist
 {
    margin-top: 0.5em;
@@ -28,20 +32,25 @@
 
 .tags_box ul
 {
+   max-height: 10em;
+   overflow-y: auto;
    padding-left: 0px;
 }
 
 .tags_box li
 {
    float: left;
-   margin-bottom: 10px;
+   margin-bottom: 5px;
+   margin-top: 5px;
    padding: 0 3px 0 0;
    position: relative;
 }
 
 .tags_box li a
 {
-   background: #fff url(images/tag-16.png) no-repeat 2px 4px;
+   background-image: url(images/tag-16.png);
+   background-position: 2px 4px;
+   background-repeat: no-repeat;
    margin: 1px;
    padding: 4px 0px 4px 22px;
    text-decoration: none;

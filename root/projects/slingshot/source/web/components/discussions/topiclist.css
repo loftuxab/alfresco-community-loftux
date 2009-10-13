@@ -1,23 +1,16 @@
-/* Topic list header */
+.topiclist-infobar
+{
+   border-bottom: thin solid #C6C6C6;
+   height: 3em;
+   margin: 0 -10px;
+   padding-right: 10px;
+   padding-top: 0.5em;
+   width: auto;
+}
 
 .topiclist-infobar div.hideable
 {
    float: left;
-}
-
-.topiclist-infobar .hidden
-{
-   display: none;
-}
-
-.topiclist-infobar
-{
-   width: auto;
-   height: 30px;
-   border-bottom: thin solid #C6C6C6;
-   margin: 0 -10px;
-   padding-right: 10px;
-   padding-top: 0.1em;
 }
 
 .topiclist-infobar .align-right

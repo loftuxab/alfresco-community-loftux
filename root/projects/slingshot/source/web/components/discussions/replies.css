@@ -265,6 +265,3 @@ html>body .node, .reply, .comment {
 .indented {
 	margin-left: 30px;
 }
-.hidden {
-  display: none !important;
-}

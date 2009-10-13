@@ -8,11 +8,6 @@
    width: 26.5em;
 }
 
-.permissions .hidden
-{
-   display: none;
-}
-
 .permissions .yui-gd
 {
    padding: 0.2em !important;

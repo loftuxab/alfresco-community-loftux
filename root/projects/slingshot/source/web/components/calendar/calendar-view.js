@@ -1397,8 +1397,11 @@
             this.eventDialog.id = this.id+ "-addEvent";
             if (this.eventDialog.tagLibrary == undefined)
             {
-               this.eventDialog.tagLibrary = new Alfresco.module.TagLibrary( this.eventDialog.id);
-               this.eventDialog.tagLibrary.setOptions({ siteId: this.options.siteId });
+               this.eventDialog.tagLibrary = new Alfresco.module.TagLibrary(this.eventDialog.id);
+               this.eventDialog.tagLibrary.setOptions(
+               {
+                  siteId: this.options.siteId
+               });
             }
          }
          var options = 

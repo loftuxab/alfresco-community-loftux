@@ -1,4 +1,5 @@
 /* Sticky Footer */
+
 *
 {
    margin: 0;
@@ -43,12 +44,17 @@ html, body
 
 .clear
 {
-    clear: both;
-    display: block;
-    height: 1px;
-    overflow: hidden;
-    margin: 0;
-    padding: 0;
+   clear: both;
+   display: block;
+   height: 1px;
+   overflow: hidden;
+   margin: 0;
+   padding: 0;
+}
+
+.hidden
+{
+   display: none !important;
 }
 
 p
@@ -86,11 +92,12 @@ hr
 {
    float: left;
 }
+
 .page-title div.links
 {
    float: right;
-   min-width:36em;
-   text-align:right;
+   min-width: 36em;
+   text-align: right;
 }
 
 .page-title h1
@@ -119,11 +126,11 @@ span.navigation-item-alt
 span.navigation-item,
 span.navigation-item-alt
 {
-   padding:0 0 0 6px;
+   padding: 0 0 0 6px;
 }
 
 span.navigation-item a,
-span.navigation-item a:visited   
+span.navigation-item a:visited
 {
    padding: 3px 4px;
 }
@@ -156,9 +163,34 @@ span.navigation-separator-alt
    padding: 2px 0 0 4px;
 }
 
+/* Fixed Form-Based Pages */
+
+.page-form-header
+{
+   margin: 4px;
+   padding: 4px;
+}
+
+.page-form-body .yui-gd
+{
+   padding: 0.3em 0.3em 0.7em 0;
+}
+
+.page-form-body .yui-gd .yui-u
+{
+   width: 90% !important;
+}
+
+.page-form-body .yui-gd .first
+{
+   text-align: right;
+   width: 5% !important;
+}
+
 /**
  * Replace default styles for HTML content
  */
+
 .rich-content sub
 {
    vertical-align: sub;
@@ -178,13 +210,13 @@ span.navigation-separator-alt
 .rich-content ul > li
 {
    list-style-type: disc;
-   list-style-position:inside;
+   list-style-position: inside;
 }
 
 .rich-content ol > li
 {
    list-style-type: decimal;
-   list-style-position:inside;
+   list-style-position: inside;
 }
 
 .rich-content th,
@@ -213,7 +245,6 @@ span.navigation-separator-alt
    cursor: pointer;
 }
 
-
 select,
 input[type="text"],
 input[type="password"],
@@ -223,14 +254,22 @@ textarea
    width: 15em;
 }
 
+select.wide,
+input[type="text"].wide,
+input[type="password"].wide,
+textarea.wide
+{
+   width: 30em;
+}
 
 /* Richtext Editor Plug-ins */
+
 .yui-toolbar-container .yui-toolbar-alfresco-imagelib span.yui-toolbar-icon
 {
    left: 6px;
 }
 
-/* DASHLETS */
+/* Dashlets */
 
 .dashlet
 {
@@ -258,6 +297,7 @@ textarea
    top: -22px;
    width: 16px;
 }
+
 .dashlet .feed a,
 .dashlet .feed a:active,
 .dashlet .feed a:hover
@@ -275,7 +315,7 @@ textarea
 
 .dashlet .body
 {
-	overflow-x: hidden;
+   overflow-x: hidden;
 }
 
 .dashlet .body a,
@@ -293,16 +333,16 @@ textarea
 
 .dashlet .scrollableList
 {
-    height: 208px;
-    padding: 8px 0px;
-    overflow: auto;
+   height: 208px;
+   padding: 8px 0px;
+   overflow: auto;
 }
 
 .dashlet .scrollablePanel
 {
-    height: 208px;
-    overflow: auto;
-    margin-right: 1px;
+   height: 208px;
+   overflow: auto;
+   margin-right: 1px;
 }
 
 .dashlet .body>div
@@ -334,10 +374,12 @@ div.dashlet div.detail-list-item.first-item
    padding-top: 0;
 }
 
-div.dashlet div.hdr {
-   margin-bottom:5px;
-   padding-top:3px;
+div.dashlet div.hdr
+{
+   margin-bottom: 5px;
+   padding-top: 3px;
 }
+
 .dashlet .detail-list-item.last-item
 {
    border-bottom: none;
@@ -365,7 +407,6 @@ div.dashlet div.hdr {
    padding-left: 20px;
 }
 
-
 .yui-g.grid,
 .yui-gb.grid,
 .yui-gc.grid,
@@ -373,7 +414,6 @@ div.dashlet div.hdr {
 {
    margin: 0 10px;
 }
-
 
 /* 3 column layout */
 
@@ -389,13 +429,14 @@ div.dashlet div.hdr {
 }
 
 /* 4 column layout */
+
 .yui-g.grid .yui-g .yui-u
 {
    width: 48%;
 }
 
-
 /* Twisters */
+
 .alfresco-twister
 {
    cursor: pointer;
@@ -403,6 +444,7 @@ div.dashlet div.hdr {
 }
 
 /* Filters */
+
 .tag
 {
    white-space: nowrap;
