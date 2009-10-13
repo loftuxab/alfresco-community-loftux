@@ -104,6 +104,11 @@ public class DeploymentReceiverEngineImpl implements
     private long pollDelay = 5000;
     
     /**
+     * Is the keep alive thead a demon thread, or does it need to stop shutdown?
+     */
+    private boolean isDaemonThread = false;
+    
+    /**
      * Map of targetName, DeploymentTarget
      */
     private Map<String, DeploymentTarget> targetByName = new HashMap<String, DeploymentTarget>();
@@ -126,6 +131,7 @@ public class DeploymentReceiverEngineImpl implements
         
         fThread = new Thread(this);
         fThread.setName("Deployment Receiver Engine Keep Alive");
+        fThread.setDaemon(isDaemonThread);
         fThread.start();   
     }
     
@@ -685,6 +691,16 @@ public class DeploymentReceiverEngineImpl implements
 	{
 		return readerManagement;
 	}
+
+    public void setDaemonThread(boolean isDemonThread)
+    {
+        this.isDaemonThread = isDemonThread;
+    }
+
+    public boolean isDaemonThread()
+    {
+        return isDaemonThread;
+    }
 	   
 //	@Override
 //	public TargetStatus[] getTargetStatus(String user, String password) 
