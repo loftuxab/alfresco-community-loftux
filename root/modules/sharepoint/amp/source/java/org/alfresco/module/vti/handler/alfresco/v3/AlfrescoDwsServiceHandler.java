@@ -208,7 +208,9 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
      */
     public void doRemoveDwsUser(FileInfo dwsFileInfo, String authority)
     {
-        siteService.removeMembership(dwsFileInfo.getName(), authority);
+        NodeRef personNodeRef = new NodeRef(authority); 
+        String username = (String)nodeService.getProperty(personNodeRef, ContentModel.PROP_USERNAME); 
+        siteService.removeMembership(dwsFileInfo.getName(), username);
     }
 
     /**

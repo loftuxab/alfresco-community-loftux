@@ -1456,7 +1456,7 @@ File ::D8F8A07A-77E6-40EA-B4C5-C2227F7499DD -type dir -name tmp -parent 05945FDF
 File ::1A1CE54A-A1E3-44F8-9C2E-DEF22ED95D27 -type dir -name prop-base -parent D8F8A07A-77E6-40EA-B4C5-C2227F7499DD
 File ::B5B798A7-4C2D-4B64-A1DC-FB4DDE422751 -type dir -name props -parent D8F8A07A-77E6-40EA-B4C5-C2227F7499DD
 File ::064CF832-7814-4900-A00B-F1BE42A94F19 -type dir -name text-base -parent D8F8A07A-77E6-40EA-B4C5-C2227F7499DD
-File ::0996CA9C-803B-4009-ACBD-1F0C0DE9386C -directory <%InstallDir%>/tomcat/webapps -name W:/HEAD/root/projects/web-studio/build/dist/studio.war -location ../../projects/web-studio/build/dist -parent 33087B4E-DFD2-42AB-A812-338D015C210B
+File ::0996CA9C-803B-4009-ACBD-1F0C0DE9386C -directory <%InstallDir%>/tomcat/webapps -name W:/HEAD/root/projects/web-studio/build/dist/studio.war -location ../../projects/web-studio/build/dist -active 0 -parent 33087B4E-DFD2-42AB-A812-338D015C210B
 File ::31F21AEC-3CFF-45BD-82A2-A40A39D9B2A4 -type dir -name W:/V3.1/root/build/assemble/virtual-tomcat -location ../../build/assemble/virtual-tomcat -parent 33087B4E-DFD2-42AB-A812-338D015C210B
 File ::9A34ACD7-2055-44CF-9AD4-2E794453AB14 -type dir -name bin -parent 31F21AEC-3CFF-45BD-82A2-A40A39D9B2A4
 File ::13F74934-939D-4007-A781-FF590A4F535A -name bootstrap.jar -parent 9A34ACD7-2055-44CF-9AD4-2E794453AB14
@@ -3183,7 +3183,7 @@ File ::DF7F5AD4-DA79-A584-1002-E2BC0A88ADA5 -type dir -name prop-base -parent 16
 File ::EC3D2AE4-5F12-031D-F4C7-6D55BA8BBC7C -type dir -name props -parent 1634B0D4-94B0-8A3F-BDE1-2A52C4AA4E17
 File ::A30E5395-B9FE-661C-B09D-5D5EA7166E86 -type dir -name text-base -parent 1634B0D4-94B0-8A3F-BDE1-2A52C4AA4E17
 File ::ADC3422F-03E5-4389-8B90-E279694AAA4F -name W:/ALF-BINARIES/installer/osx/ImageMagick.tar.gz -location ../../../../ALF-BINARIES/installer/osx -parent 666422B8-43C2-EAB3-8AA3-C7EECE0E23B7
-FileGroup ::88FE9BA7-8A37-9E99-01FE-9F2E781B1FB0 -setup Install -active Yes -platforms {MacOS-X MacOS-X} -name {OpenOffice OSX} -parent FileGroups
+FileGroup ::88FE9BA7-8A37-9E99-01FE-9F2E781B1FB0 -setup Install -alias {OpenOffice File} -active Yes -platforms {MacOS-X MacOS-X} -name {OpenOffice OSX} -parent FileGroups
 File ::34094D64-08EC-3A9D-2F31-2A26D4DB2C94 -name /Users/paulholmes-higgin/SVN/ALF-BINARIES/installer/osx/OpenOfficeInstallFiles.tar.gz -location ../../../../ALF-BINARIES/installer/osx -parent 88FE9BA7-8A37-9E99-01FE-9F2E781B1FB0
 FileGroup ::0DE76EF1-695C-4B07-9358-EA57EE8315EC -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 MacOS-X Solaris-sparc Windows TarArchive ZipArchive MacOS-X} -name SPP -parent FileGroups
 File ::090A2806-27CF-44A4-8F50-4752ADC8A715 -directory <%InstallDir%>/amps -name W:/V3.1/root/modules/sharepoint/amp/build/dist/vti-module.amp -location ../../modules/sharepoint/amp/build/dist -parent 0DE76EF1-695C-4B07-9358-EA57EE8315EC
@@ -4793,6 +4793,9 @@ JavaHome
 
 887B6B37-97DD-4CFB-AA40-3852EDD8F1F2,NextButton,subst
 1
+
+88FE9BA7-8A37-9E99-01FE-9F2E781B1FB0,Alias
+{OpenOffice File}
 
 88FE9BA7-8A37-9E99-01FE-9F2E781B1FB0,Destination
 <%InstallDir%>
