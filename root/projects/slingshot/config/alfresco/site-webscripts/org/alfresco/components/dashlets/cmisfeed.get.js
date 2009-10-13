@@ -14,4 +14,6 @@ model.uri = uri;
 model.limit = args.limit || 999;
 model.target = args.target || "_self";
 
-model.items = getRSSFeed(uri);
+var feed = getRSSFeed(uri);
+model.title = feed.title;
+model.items = feed.items;

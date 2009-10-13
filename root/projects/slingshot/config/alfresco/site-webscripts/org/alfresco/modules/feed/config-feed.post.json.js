@@ -12,7 +12,10 @@ if (uri !== "")
    }
    
    c.properties["feedurl"] = uri;
-   model.items = getRSSFeed(uri);
+
+   var feed = getRSSFeed(uri);
+   model.title = feed.title;
+   model.items = feed.items;
 }
 
 var target;
