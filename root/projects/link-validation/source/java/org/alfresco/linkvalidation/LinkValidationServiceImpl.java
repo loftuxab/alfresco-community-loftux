@@ -228,10 +228,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     Thread validation_update_thread_;
     
-    // SysAdmin cache - used to cluster certain JMX operations
-    private SimpleCache<String, Object> sysAdminCache;
-    private final static String KEY_SYSADMIN_LINKVALIDATION_DISABLED = "sysAdminCache.linkValidationDisabled"; // Boolean
-    
     private RepoServerMgmt repoServerMgmt;
     
     
@@ -240,7 +236,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     public void setAuthenticationContext( AuthenticationContext authenticationContext)
     { 
-        authenticationContext = authenticationContext;
+        this.authenticationContext = authenticationContext;
     }
 
     public void setAttributeService(AttributeService svc) { attr_ = svc; }
@@ -257,11 +253,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     	this.repoServerMgmt = repoServerMgmt;
     }
     
-    public void setSysAdminCache(SimpleCache<String, Object> sysAdminCache)
-    {
-        this.sysAdminCache = sysAdminCache;
-    }
-
     public void setExcludePathMatcher(NameMatcher matcher)
     {
         path_excluder_ = matcher;
@@ -360,11 +351,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         purge_all_validation_data_on_bootstrap_ = tf;
     }
 
-    public void setLinkValidationDisabled(boolean disabled)
-    {
-    	sysAdminCache.put(KEY_SYSADMIN_LINKVALIDATION_DISABLED, new Boolean(disabled));
-    }
-    
     /**
      * Detects whether link validation is disabled viz:
      *      1. poll_interval_ <= 0
