@@ -363,7 +363,7 @@
                desc += ' ' + Alfresco.util.formatFileSize(oRecord.getData("size"));
             }
             desc += ' ' + me._msg("message.modifiedby");
-            desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + '/user/' + encodeURI(oRecord.getData("modifiedByUser")) + '/profile">' + $html(oRecord.getData("modifiedBy")) + '</a> ';
+            desc += ' <a href="' + Alfresco.constants.URL_PAGECONTEXT + 'user/' + encodeURI(oRecord.getData("modifiedByUser")) + '/profile">' + $html(oRecord.getData("modifiedBy")) + '</a> ';
             desc += me._msg("message.modifiedon");
             desc += ' ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"));
             desc += '</div>';

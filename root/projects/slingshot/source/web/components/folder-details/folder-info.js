@@ -124,7 +124,7 @@
          {
             for (var x = 0; x < tags.length; x++)
             {
-               tagsHtml += '<div class="tag"><img src="' + Alfresco.constants.URL_CONTEXT + '/components/images/tag-16.png" />';
+               tagsHtml += '<div class="tag"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/images/tag-16.png" />';
                tagsHtml += $html(tags[x]) + '</div>';
             }
          }
