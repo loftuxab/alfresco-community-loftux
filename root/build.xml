@@ -141,7 +141,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/jbpm/jbpm-identity-3.3.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/jbpm/jbpm-jpdl-3.3.1.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/jbpm/springmodules-jbpm31.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/jgroups/jgroups-2.6.2.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/jgroups/jgroups-2.8.0-b2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/jibx/jibx-bind.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/jibx/jibx-run.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/jmagick/JMagick.jar" />
