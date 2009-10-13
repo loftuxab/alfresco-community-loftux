@@ -106,7 +106,11 @@
                fn: this._getDataSuccess, 
                scope: this 
             },
-            failureMessage: "Failed to load data for document details"
+            failureCallback: 
+            { 
+               fn: this._getDataFailure, 
+               scope: this 
+            }
          };
          Alfresco.util.Ajax.request(config);
       },
@@ -143,6 +147,18 @@
                }
             });
          }
+      },
+
+      /**
+       * Failure handler called when the AJAX call to the doclist web script fails
+       *
+       * @method _getDataFailure
+       * @param response {object} The response object
+       * @private
+       */
+      _getDataFailure: function DocumentDetails__getDataFailure(response)
+      {
+         YAHOO.Bubbling.fire("documentDetailsFailure");
       }
    });
 })();
