@@ -14,7 +14,7 @@
          </table>
          <br/>
          <table>
-            <tr><td>The Web Script <a href="${url.full}">${url.service}</a> has responded with a status of ${status.code} - ${status.codeName}.</td></tr>
+            <tr><td>The Web Script <a href="${url.full?url}">${url.service?html}</a> has responded with a status of ${status.code} - ${status.codeName}.</td></tr>
          </table>
          <br/>
          <table>
