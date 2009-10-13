@@ -19,7 +19,7 @@
    
    <div id="${args.htmlid}-linksBar" class="links-toolbar flat-button theme-bg-2">
       <div>
-         <div id="${args.htmlid}-create-link-container" class="hidden createLink">
+         <div id="${args.htmlid}-create-link-container" class="createLink">
             <div style="float:left"><button id="${args.htmlid}-create-link-button" name="linklist-create-link-button">${msg("header.createLink")}</button></div>
             <div class="separator hideable"> </div>
          </div>
