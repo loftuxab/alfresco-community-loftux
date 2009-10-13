@@ -12,4 +12,7 @@
 ::BuilderAPI::ModifyObject -object "Java File" -active No
 ::BuilderAPI::ModifyObject -object "Java" -active No
 
-source labs.ijs
+if {[info exists ::info(Codeline)] && $::info(Codeline) eq
+"Community"} {
+     source community.ijs
+}

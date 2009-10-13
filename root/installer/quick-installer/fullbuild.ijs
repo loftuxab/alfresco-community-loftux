@@ -11,6 +11,8 @@
 ::BuilderAPI::ModifyObject -object "OpenOffice File" -active Yes
 ::BuilderAPI::ModifyObject -object "Java" -active Yes
 ::BuilderAPI::ModifyObject -object "OpenOffice" -active Yes
-::BuilderAPI::ModifyObject -object "OOLocation" -active No
 
-source labs.ijs
+if {[info exists ::info(Codeline)] && $::info(Codeline) eq
+"Community"} {
+     source community.ijs
+}
