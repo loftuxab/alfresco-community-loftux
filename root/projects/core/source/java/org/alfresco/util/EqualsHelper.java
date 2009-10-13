@@ -24,6 +24,8 @@
  */
 package org.alfresco.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,14 +43,15 @@ public class EqualsHelper
      * @param right the Object appearing in the right side of an <code>equals</code> statement
      * @return Return true or false even if one or both of the objects are null
      */
-	public static boolean nullSafeEquals(Object left, Object right)
+    public static boolean nullSafeEquals(Object left, Object right)
     {
         return (left == right) || (left != null && right != null && left.equals(right));
     }
-	/**
-	 * Performs an case-sensitive or case-insensitive equality check after checking for null values
-	 * @param ignoreCase           <tt>true</tt> to ignore case
-	 */
+
+    /**
+     * Performs an case-sensitive or case-insensitive equality check after checking for null values
+     * @param ignoreCase           <tt>true</tt> to ignore case
+     */
     public static boolean nullSafeEquals(String left, String right, boolean ignoreCase)
     {
         if (ignoreCase)
@@ -58,6 +61,57 @@ public class EqualsHelper
         else
         {
             return (left == right) || (left != null && right != null && left.equals(right));
+        }
+    }
+    
+    private static final int BUFFER_SIZE = 1024;
+    /**
+     * 
+     * @param left         the left stream.  This is closed at the end of the operation.
+     * @param right        an right stream.  This is closed at the end of the operation.
+     * @return             Returns <tt>true</tt> if the streams are identical to the last byte
+     */
+    public static boolean binaryStreamEquals(InputStream left, InputStream right) throws IOException
+    {
+        try
+        {
+            if (left == right)
+            {
+                // The same stream!  This is pretty pointless, but they are equal, nevertheless.
+                return true;
+            }
+            
+            byte[] leftBuffer = new byte[BUFFER_SIZE];
+            byte[] rightBuffer = new byte[BUFFER_SIZE];
+            while (true)
+            {
+                int leftReadCount = left.read(leftBuffer);
+                int rightReadCount = right.read(rightBuffer);
+                if (leftReadCount != rightReadCount)
+                {
+                    // One stream ended before the other
+                    return false;
+                }
+                else if (leftReadCount == -1)
+                {
+                    // Both streams ended without any differences found
+                    return true;
+                }
+                for (int i = 0; i < leftReadCount; i++)
+                {
+                    if (leftBuffer[i] != rightBuffer[i])
+                    {
+                        // We found a byte difference
+                        return false;
+                    }
+                }
+            }
+            // The only exits with 'return' statements, so there is no need for any code here
+        }
+        finally
+        {
+            try { left.close(); } catch (Throwable e) {}
+            try { right.close(); } catch (Throwable e) {}
         }
     }
     
