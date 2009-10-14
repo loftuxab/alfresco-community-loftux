@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
    <head> 
       <title>${page.title}</title> 
@@ -10,14 +11,14 @@
          <div class="login-logo"></div>
          <form accept-charset="UTF-8" method="post" action="${url.context}/login">
             <fieldset>
-               <div style="padding-top:96px">
-                  <span id="txt-username"></span>
+               <div style="padding-top:16px">
+                  <span id="txt-username">Username:</span>
                </div>
                <div style="padding-top:4px">
                   <input type="text" id="username" name="username" maxlength="256" style="width:200px"/>
                </div>
                <div style="padding-top:12px">
-                  <span id="txt-password"></span>
+                  <span id="txt-password">Password:</span>
                </div>
                <div style="padding-top:4px">
                   <input type="password" id="password" name="password" maxlength="256" style="width:200px"/>
@@ -31,7 +32,7 @@
                   </span>
                </div>
                <input type="hidden" id="success" name="success" value="${successUrl}"/>
-               <input type="hidden" name="failure" value="<#assign link><@link pageType='login'/></#assign>${url.servletContext}${link?html}&amp;error=true"/>
+               <input type="hidden" name="failure" value="<#assign link><@pagelink pageType='login'/></#assign>${url.servletContext}${link?html}&amp;error=true"/>
             </fieldset>
          </form>
       </div>
