@@ -35,8 +35,7 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom,
-       Event = YAHOO.util.Event;
+   var Dom = YAHOO.util.Dom;
    
    /**
     * ConsoleTool constructor.
@@ -327,27 +326,32 @@
          if (this.currentPanelId !== panelId)
          {
             this.currentPanelId = panelId;
-            var newPanel = null;
-            for (var index in this.panels)
+            var newPanel = null,
+               panel, index;
+            
+            for (index in this.panels)
             {
-               var panel = this.panels[index];
+               panel = this.panels[index];
                if (panel.id === panelId)
                {
                   newPanel = panel;
                }
                else
                {
-                  Dom.setStyle(this.id + "-" + panel.id, "display", "none");
+                  Dom.addClass(this.id + "-" + panel.id, "hidden");
                   
                   // Fire the onHide() panel lifecycle event
                   panel.onHide();
                }
             }
             
-            if (newPanel != null)
+            if (newPanel !== null)
             {
                // Fire the onBeforeShow() panel lifecycle event
                newPanel.onBeforeShow();
+
+               Dom.removeClass(this.id + "-" + panelId, "hidden");
+               Dom.setStyle(this.id + "-" + panelId, "display", "none");
                
                // Display the specified panel to the user
                Alfresco.util.Anim.fadeIn(this.id + "-" + panelId);
