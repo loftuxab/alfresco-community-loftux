@@ -70,7 +70,7 @@ public abstract class UserFactory
     {
         if (this.guestUser == null)
         {
-            User user = new User(USER_GUEST);
+            User user = new User(USER_GUEST, false, true);
             user.setFirstName("Guest");
             
             this.guestUser = user;

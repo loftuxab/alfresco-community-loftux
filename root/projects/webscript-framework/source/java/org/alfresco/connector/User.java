@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
  * As a special exception to the terms and conditions of version 2.0 of 
  * the GPL, you may redistribute this Program in connection with Free/Libre 
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
+ * FLOSS exception.  You should have received a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
@@ -59,6 +59,7 @@ public class User implements java.security.Principal, Serializable
     
     protected String fullName = null;
     protected boolean isAdmin = false;
+    protected boolean isGuest = false;
     protected Map<String, Serializable> map = null;
     
     /**
@@ -75,13 +76,18 @@ public class User implements java.security.Principal, Serializable
     /**
      * Instantiates a new user.
      * 
-     * @param id the id
-     * @param isAdmin the is admin
+     * @param id
+     *            the id
+     * @param isAdmin
+     *            is this an admin user?
+     * @param isGuest
+     *            is this a guest user?
      */
-    public User(String id, boolean isAdmin)
+    public User(String id, boolean isAdmin, boolean isGuest)
     {
         this(id);
         this.isAdmin = isAdmin;
+        this.isGuest = isGuest;
     }
 
     /* (non-Javadoc)
@@ -540,6 +546,16 @@ public class User implements java.security.Principal, Serializable
     public boolean isAdmin()
     {
         return this.isAdmin;
+    }
+
+    /**
+     * Returns <code>true</code> if this user is a guest user
+     * 
+     * @return <code>true</code> if this user is a guest user
+     */
+    public boolean isGuest()
+    {
+        return this.isGuest;
     }
 
     /* (non-Javadoc)

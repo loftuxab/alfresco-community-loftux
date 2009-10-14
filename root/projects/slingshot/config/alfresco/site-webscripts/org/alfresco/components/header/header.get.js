@@ -17,13 +17,17 @@ function main()
    
    // Call the repo for the user's favourite sites
    // TODO: Clean-up old favourites here?
-   var result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
-   if (result.status == 200)
+
+   if (!user.isGuest)
    {
-      prefs = eval('(' + result + ')');
-      
-      // Populate the favourites object literal for easy look-up later
-      favourites = eval('try{(prefs.' + PREF_FAVOURITE_SITES + ')}catch(e){}');
+      var result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_FAVOURITE_SITES);
+      if (result.status == 200)
+      {
+         prefs = eval('(' + result + ')');
+         
+         // Populate the favourites object literal for easy look-up later
+         favourites = eval('try{(prefs.' + PREF_FAVOURITE_SITES + ')}catch(e){}');
+      }
    }
 
    if (typeof favourites != "object")
@@ -33,78 +37,82 @@ function main()
    
    // Call the repo to return a specific list of site metadata i.e. those in the fav list
    // and ensure the current user is a member of each before adding to fav list
-   var query =
+   if (!user.isGuest)
    {
-      shortName:
+      var query =
       {
-         match: "exact",
-         values: []
-      }
-   };
-   var currentSite = page.url.templateArgs.site || "",
-      ignoreCurrentSite = false,
-      shortName;
-   
-   for (shortName in favourites)
-   {
-      if (favourites[shortName])
-      {
-         query.shortName.values.push(shortName);
-      }
-   }
-   
-   // Also tack the current site onto the query, so we can pass the Site Title to header.js
-   if (currentSite !== "" && !favourites[currentSite])
-   {
-      query.shortName.values.push(currentSite);
-      ignoreCurrentSite = true;
-   }
-   
-   var connector = remote.connect("alfresco");
-   result = connector.post("/api/sites/query", jsonUtils.toJSONString(query), "application/json");
-   
-   if (result.status == 200)
-   {
-      var i, ii;
-      
-      // Create javascript objects from the server response
-      // Each item is a favourite site that the user is a member of
-      var sites = eval('(' + result + ')'), site;
-      
-      if (sites.length != 0)
-      {
-         // Sort the sites by title
-         sites.sort(sortByTitle);
-         
-         for (i = 0, ii = sites.length; i < ii; i++)
+         shortName:
          {
-            site = sites[i];
-            if (site.shortName == currentSite)
-            {
-               siteTitle = site.title;
-               if (ignoreCurrentSite)
-               {
-                  // The current site was piggy-backing the query call; it's not a favourite
-                  continue;
-               }
-               currentSiteIsFav = true;
-            }
-            favouriteSites.push(site);
+            match: "exact",
+            values: []
+         }
+      };
+      var currentSite = page.url.templateArgs.site || "",
+         ignoreCurrentSite = false,
+         shortName;
+      
+      for (shortName in favourites)
+      {
+         if (favourites[shortName])
+         {
+            query.shortName.values.push(shortName);
          }
       }
-   }
-   
-   // Call the repo for the user's filter states
-   result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_COLLAPSED_TWISTERS);
-   if (result.status == 200 && result != "{}")
-   {
-      prefs = eval('(' + result + ')');
       
-      collapsedTwisters = eval('try{(prefs.' + PREF_COLLAPSED_TWISTERS + ')}catch(e){}');
-      if (typeof collapsedTwisters != "string")
+      // Also tack the current site onto the query, so we can pass the Site Title to header.js
+      if (currentSite !== "" && !favourites[currentSite])
       {
-         collapsedTwisters = "";
+         query.shortName.values.push(currentSite);
+         ignoreCurrentSite = true;
       }
+      
+      var connector = remote.connect("alfresco");
+      result = connector.post("/api/sites/query", jsonUtils.toJSONString(query), "application/json");
+      
+      if (result.status == 200)
+      {
+         var i, ii;
+         
+         // Create javascript objects from the server response
+         // Each item is a favourite site that the user is a member of
+         var sites = eval('(' + result + ')'), site;
+         
+         if (sites.length != 0)
+         {
+            // Sort the sites by title
+            sites.sort(sortByTitle);
+            
+            for (i = 0, ii = sites.length; i < ii; i++)
+            {
+               site = sites[i];
+               if (site.shortName == currentSite)
+               {
+                  siteTitle = site.title;
+                  if (ignoreCurrentSite)
+                  {
+                     // The current site was piggy-backing the query call; it's not a favourite
+                     continue;
+                  }
+                  currentSiteIsFav = true;
+               }
+               favouriteSites.push(site);
+            }
+         }
+      }
+   
+      // Call the repo for the user's filter states
+      result = remote.call("/api/people/" + stringUtils.urlEncode(user.name) + "/preferences?pf=" + PREF_COLLAPSED_TWISTERS);
+      if (result.status == 200 && result != "{}")
+      {
+         prefs = eval('(' + result + ')');
+         
+         collapsedTwisters = eval('try{(prefs.' + PREF_COLLAPSED_TWISTERS + ')}catch(e){}');
+      }
+   }
+
+   if (typeof collapsedTwisters != "string")
+   {
+      collapsedTwisters = "";
    }
    
    // Prepare the model for the template
