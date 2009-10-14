@@ -744,7 +744,8 @@
          fileInfo.progressInfo.innerHTML = fileInfo.progressInfo.innerHTML.replace(oldFileName, fileInfo.fileName) + " " + this.msg("label.success");
 
          // Change the style of the progress bar
-         fileInfo.progress.setAttribute("class", "fileupload-progressFinished-span");
+         Dom.removeClass(fileInfo.progress, "fileupload-progressSuccess-span");
+         Dom.addClass(fileInfo.progress, "fileupload-progressFinished-span");
 
          // Move the progress bar to "full" progress
          Dom.setStyle(fileInfo.progress, "left", 0 + "px");
@@ -785,11 +786,19 @@
          {
             fileInfo.state = this.STATE_FAILURE;
 
-            // Add the label "Failure" to the filename
-            fileInfo.progressInfo.innerHTML = fileInfo.progressInfo.innerHTML + " " + this.msg("label.failure");
+            // Add the failure label to the filename & and as a title attribute
+            var key = "label.failure." + event.status,
+               msg = Alfresco.util.message(key, this.name);
+            if(msg == key)
+            {
+               msg = Alfresco.util.message("label.failure", this.name);
+            }
+            fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] + " " + msg;
+            fileInfo.progressInfoCell.setAttribute("title", msg);
 
             // Change the style of the progress bar
-            fileInfo.progress.setAttribute("class", "fileupload-progressFailure-span");
+            Dom.removeClass(fileInfo.progress, "fileupload-progressSuccess-span");
+            Dom.addClass(fileInfo.progress, "fileupload-progressFailure-span");
 
             // Set the progress bar to "full" progress
             Dom.setStyle(fileInfo.progress, "left", 0 + "px");
@@ -1239,8 +1248,10 @@
                progressInfo = progressInfo[0];
                this.fileStore[flashId].progressInfo = progressInfo;
                this.fileStore[flashId].progressInfo.innerHTML = fileInfoStr;
-            }
 
+               // Save the cell element
+               this.fileStore[flashId].progressInfoCell = el;
+            }
 
             // Save a reference to the contentType dropdown so we can find each file's contentType before upload.            
             var contentType = Dom.getElementsByClassName("fileupload-contentType-select", "select", templateInstance);

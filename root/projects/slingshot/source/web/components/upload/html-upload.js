@@ -316,10 +316,17 @@
          // Hide the current message display
          this.widgets.feedbackMessage.destroy();
 
-         // Inform user that upload was successful
-         Alfresco.util.PopupManager.displayMessage(
+         // Inform user that the upload failed
+         var key = "message.failure." + event.status.code,
+            text = Alfresco.util.message(key, this.name);
+         if(text == key)
          {
-            text: Alfresco.util.message("message.success", this.name)
+            text = event.status.code ? event.status.code : Alfresco.util.message("message.failure", this.name);
+         }
+         Alfresco.util.PopupManager.displayPrompt(
+         {
+            title: Alfresco.util.message("message.failure", this.name),
+            text: text
          });
       },
 

@@ -222,17 +222,17 @@
    width: 400px;
 }
 
-.fileupload-progressSuccess-span
+.fileupload-center-div .fileupload-progressSuccess-span
 {
    background-color: #9AC68C;
 }
 
-.fileupload-progressFinished-span
+.fileupload-center-div .fileupload-progressFinished-span
 {
    background-color: #DCECCC;
 }
 
-.fileupload-progressFailure-span
+.fileupload-center-div .fileupload-progressFailure-span
 {
    background-color: #E98B3C;
 }
