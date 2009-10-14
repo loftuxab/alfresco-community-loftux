@@ -23,7 +23,7 @@ if (!height)
 }
 
 var connector = remote.connect("http");
-var re = /^http:\/\//;
+var re = /^(http|https):\/\//;
 if (!isDefault && !re.test(uri))
 {
    uri = "http://" + uri;

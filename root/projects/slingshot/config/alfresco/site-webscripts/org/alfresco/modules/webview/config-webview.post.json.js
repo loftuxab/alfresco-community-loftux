@@ -11,7 +11,7 @@ model.height = (height == "") ? null : height;
 
 if (uri !== "")
 {
-   var re = /^http:\/\//;
+   var re = /^(http|https):\/\//;
    if (!re.test(uri))
    {
       uri = "http://" + uri;
