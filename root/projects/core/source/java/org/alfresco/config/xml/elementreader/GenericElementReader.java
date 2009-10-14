@@ -31,7 +31,6 @@ import org.alfresco.config.element.GenericConfigElement;
 import org.alfresco.config.xml.XMLConfigService.PropertyConfigurer;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 
 /**
  * Implementation of a generic element reader. This class can be used to 
@@ -79,7 +78,7 @@ public class GenericElementReader implements ConfigElementReader
     * @param parentConfig
     */
    @SuppressWarnings("unchecked")
-   private void processChildren(Element element, GenericConfigElement parentConfig)
+   protected void processChildren(Element element, GenericConfigElement parentConfig)
    {
       // get the list of children for the given element
       Iterator<Element> children = element.elementIterator();
@@ -101,7 +100,7 @@ public class GenericElementReader implements ConfigElementReader
     * @return The GenericConfigElement representation of the given element
     */
    @SuppressWarnings("unchecked")
-   private GenericConfigElement createConfigElement(Element element)
+   protected GenericConfigElement createConfigElement(Element element)
    {
       // get the name and value of the given element
       String name = element.getName();
