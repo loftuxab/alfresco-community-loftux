@@ -36,6 +36,11 @@ import org.alfresco.web.ui.common.StringUtils;
  */
 public class ScriptableUtils
 {
+    public String stripEncodeUnsafeHTML(String s)
+    {
+        return StringUtils.stripUnsafeHTMLTags(s, true);
+    }
+    
     public String stripUnsafeHTML(String s)
     {
         return StringUtils.stripUnsafeHTMLTags(s, false);

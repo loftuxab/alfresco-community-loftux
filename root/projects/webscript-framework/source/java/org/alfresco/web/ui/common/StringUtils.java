@@ -29,9 +29,18 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.htmlparser.Attribute;
+import org.htmlparser.Node;
+import org.htmlparser.Parser;
+import org.htmlparser.PrototypicalNodeFactory;
+import org.htmlparser.Tag;
+import org.htmlparser.Text;
+import org.htmlparser.util.NodeIterator;
+import org.htmlparser.util.ParserException;
 
 /**
  * Class containing misc helper methods for managing Strings.
@@ -43,66 +52,45 @@ import org.apache.commons.logging.LogFactory;
 public class StringUtils
 {
     private static final Log logger = LogFactory.getLog(StringUtils.class);
-
+    
+    private static final String ATTR_STYLE = "STYLE";
+    private static final String ATTR_ON_PREFIX = "ON";
+    
     private static final Set<String> safeTags = new HashSet<String>();
     static
     {
-        safeTags.add("em");
-        safeTags.add("/em");
-        safeTags.add("strong");
-        safeTags.add("/strong");
-        safeTags.add("sup");
-        safeTags.add("/sup");
-        safeTags.add("sub");
-        safeTags.add("/sub");
-        safeTags.add("p");
-        safeTags.add("/p");
-        safeTags.add("b");
-        safeTags.add("/b");
-        safeTags.add("i");
-        safeTags.add("/i");
-        safeTags.add("br");
-        safeTags.add("br/");
-        safeTags.add("ul");
-        safeTags.add("/ul");
-        safeTags.add("ol");
-        safeTags.add("/ol");
-        safeTags.add("li");
-        safeTags.add("/li");
-        safeTags.add("h1");
-        safeTags.add("/h1");
-        safeTags.add("h2");
-        safeTags.add("/h2");
-        safeTags.add("h3");
-        safeTags.add("/h3");
-        safeTags.add("h4");
-        safeTags.add("/h4");
-        safeTags.add("h5");
-        safeTags.add("/h5");
-        safeTags.add("h6");
-        safeTags.add("/h6");
-        safeTags.add("span");
-        safeTags.add("/span");
-        safeTags.add("div");
-        safeTags.add("/div");
-        safeTags.add("a");
-        safeTags.add("/a");
-        safeTags.add("img");
-        safeTags.add("font");
-        safeTags.add("/font");
-        safeTags.add("table");
-        safeTags.add("/table");
-        safeTags.add("thead");
-        safeTags.add("/thead");
-        safeTags.add("tbody");
-        safeTags.add("/tbody");
-        safeTags.add("tr");
-        safeTags.add("/tr");
-        safeTags.add("th");
-        safeTags.add("/th");
-        safeTags.add("td");
-        safeTags.add("/td");
-        safeTags.add("hr");
+        safeTags.add("EM");
+        safeTags.add("STRONG");
+        safeTags.add("SUP");
+        safeTags.add("SUB");
+        safeTags.add("P");
+        safeTags.add("B");
+        safeTags.add("I");
+        safeTags.add("BR");
+        safeTags.add("UL");
+        safeTags.add("OL");
+        safeTags.add("LI");
+        safeTags.add("H1");
+        safeTags.add("H2");
+        safeTags.add("H3");
+        safeTags.add("H4");
+        safeTags.add("H5");
+        safeTags.add("H6");
+        safeTags.add("SPAN");
+        safeTags.add("DIV");
+        safeTags.add("A");
+        safeTags.add("IMG");
+        safeTags.add("FONT");
+        safeTags.add("TABLE");
+        safeTags.add("THEAD");
+        safeTags.add("TBODY");
+        safeTags.add("TR");
+        safeTags.add("TH");
+        safeTags.add("TD");
+        safeTags.add("HR");
+        safeTags.add("DT");
+        safeTags.add("DL");
+        safeTags.add("DT");
     }
 
     /**
@@ -263,83 +251,110 @@ public class StringUtils
      */
     public static String stripUnsafeHTMLTags(String s, boolean encode)
     {
-        s = s.replace("onclick", "$");
-        s = s.replace("onmouseover", "$");
-        s = s.replace("onmouseout", "$");
-        s = s.replace("onmousemove", "$");
-        s = s.replace("onfocus", "$");
-        s = s.replace("onblur", "$");
         StringBuilder buf = new StringBuilder(s.length());
-        char[] chars = s.toCharArray();
-        for (int i=0; i<chars.length; i++)
+        
+        Parser parser = Parser.createParser(s, "UTF-8");
+        PrototypicalNodeFactory factory = new PrototypicalNodeFactory();
+        parser.setNodeFactory(factory);
+        try
         {
-            if (chars[i] == '<')
-            {
-                // found a tag?
-                int endMatchIndex = -1;
-                int endTagIndex = -1;
-                if (i < chars.length - 2)
-                {
-                    for (int x=(i + 1); x<chars.length; x++)
-                    {
-                        if (chars[x] == ' ' && endMatchIndex == -1)
-                        {
-                            // keep track of the match point for comparing tags in the safeTags set
-                            endMatchIndex = x;
-                        }
-                        else if (chars[x] == '>')
-                        {
-                            endTagIndex = x;
-                            break;
-                        }
-                        else if (chars[x] == '<')
-                        {
-                            // found another angle bracket - not a tag def so we can safely output to here
-                            break;
-                        }
-                    }
-                }
-                if (endTagIndex != -1)
-                {
-                    // found end of the tag to match
-                    String tag = s.substring(i + 1, endTagIndex);
-                    String matchTag = tag;
-                    if (endMatchIndex != -1)
-                    {
-                        matchTag = s.substring(i + 1, endMatchIndex);
-                    }
-                    if (safeTags.contains(matchTag.toLowerCase()))
-                    {
-                        // safe tag - append to buffer
-                        buf.append('<').append(tag).append('>');
-                    }
-                    // inc counter to skip past whole tag
-                    i = endTagIndex;
-                    continue;
-                }
-            }
-            String enc = null;
-            if (encode)
-            {
-                switch (chars[i])
-                {
-                    case '"': enc = "&quot;"; break;
-                    case '&': enc = "&amp;"; break;
-                    case '<': enc = "&lt;"; break;
-                    case '>': enc = "&gt;"; break;
-
-                    default:
-                        if (((int)chars[i]) >= 0x80)
-                        {
-                            //encode all non basic latin characters
-                            enc = "&#" + ((int)chars[i]) + ";";
-                        }
-                    break;
-                }
-            }
-            buf.append(enc == null ? chars[i] : enc);
+            NodeIterator itr = parser.elements();
+            processNodes(buf, itr, encode);
         }
+        catch (ParserException e)
+        {
+            // return the only safe value if this occurs
+            return "";
+        }
+        
         return buf.toString();
+    }
+
+    /**
+     * Recursively process HTML nodes to strip unsafe HTML.
+     * 
+     * @param buf       Buffer to write to
+     * @param itr       Node iterator to process
+     * @param encode    True to HTML encode characters within text nodes
+     * 
+     * @throws ParserException
+     */
+    private static void processNodes(StringBuilder buf, NodeIterator itr, boolean encode) throws ParserException
+    {
+        while (itr.hasMoreNodes())
+        {
+            Node node = itr.nextNode();
+            if (node instanceof Tag)
+            {
+                // get the tag and process it and its attributes
+                Tag tag = (Tag)node;
+                
+                // get the tag name - automatically converted to upper case
+                String tagname = tag.getTagName();
+                
+                // only allow a whitelist of safe tags i.e. remove SCRIPT etc.
+                if (safeTags.contains(tagname))
+                {
+                    // process each attribute name - removing:
+                    // all "on*" javascript event handlers
+                    // all "style" attributes - as could contain 'expression' javascript for IE
+                    Vector<Attribute> attrs = tag.getAttributesEx();
+                    
+                    // tag attributes contain the tag name at a minimum
+                    if (attrs.size() > 1)
+                    {
+                        buf.append('<').append(tagname);
+                        for (Attribute attr : attrs)
+                        {
+                            String name = attr.getName();
+                            if (name != null)
+                            {
+                                String nameUpper = name.toUpperCase();
+                                if (!tagname.equals(nameUpper))
+                                {
+                                    // found a tag attribute for output
+                                    // test for known attributes to remove
+                                    if (!nameUpper.startsWith(ATTR_ON_PREFIX) && !nameUpper.equals(ATTR_STYLE))
+                                    {
+                                        buf.append(' ').append(name).append('=')
+                                           .append(attr.getRawValue());
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // close the tag after attribute output and before child output
+                        buf.append('>');
+                        
+                        // process children if they exist, else end tag will be processed in next iteration
+                        if (tag.getChildren() != null)
+                        {
+                            processNodes(buf, tag.getChildren().elements(), encode);
+                            buf.append(tag.getEndTag().toHtml());
+                        }
+                    }
+                    else
+                    {
+                        // process children if they exist - or output end tag if not empty
+                        if (tag.getChildren() != null)
+                        {
+                            buf.append('<').append(tagname).append('>');
+                            processNodes(buf, tag.getChildren().elements(), encode);
+                            buf.append(tag.getEndTag().toHtml());
+                        }
+                        else
+                        {
+                            buf.append(tag.toHtml());
+                        }
+                    }
+                }
+            }
+            else if (node instanceof Text)
+            {
+                String txt = ((Text)node).toPlainTextString();
+                buf.append(encode ? encode(txt): txt);
+            }
+        }
     }
 
     /**

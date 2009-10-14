@@ -325,7 +325,7 @@
          }
          html += '</div>';
       
-         html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>';
+         html += '<div class="content yuieditor">' + data.content + '</div>';
          html += '</div></div>';
          return html;
       },

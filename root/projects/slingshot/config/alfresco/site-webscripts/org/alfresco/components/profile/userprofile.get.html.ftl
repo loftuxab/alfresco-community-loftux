@@ -155,7 +155,7 @@
       -->
       <div class="row">
          <span class="label"><label for="${el}-input-bio">${msg("label.bio")}:</label></span>
-         <span class="input"><textarea id="${el}-input-bio" name="${el}-text-biography" rows="5" cols="60">${profile.biography!""}</textarea></span>
+         <span class="input"><textarea id="${el}-input-bio" name="${el}-text-biography" rows="5" cols="60">${(profile.biography!"")?html}</textarea></span>
       </div>
       
       <div class="header-bar">${msg("label.photo")}</div>

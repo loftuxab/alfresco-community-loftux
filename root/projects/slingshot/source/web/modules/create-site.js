@@ -294,6 +294,7 @@
          }
          Alfresco.util.PopupManager.displayPrompt(
          {
+            title: Alfresco.util.message("message.failure", this.name), 
             text: text
          });
       },

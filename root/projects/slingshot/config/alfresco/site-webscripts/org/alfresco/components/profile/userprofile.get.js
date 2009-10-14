@@ -24,10 +24,9 @@ else
    model.profile = user;
 }
 
-
-// convert and strip down the biography text to safe HTML with line breaks
+// convert biography text to use <br/> line breaks
 var bio = model.profile.biography;
 if (bio != null)
 {
-   model.biohtml = stringUtils.replaceLineBreaks(stringUtils.stripUnsafeHTML(bio));
+   model.biohtml = stringUtils.replaceLineBreaks(bio);
 }

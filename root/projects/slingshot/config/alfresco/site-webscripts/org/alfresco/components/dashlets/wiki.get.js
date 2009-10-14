@@ -10,7 +10,7 @@ if (wikipage)
    
    if (result.status == status.STATUS_OK)
    {
-      model.wikipage = myConfig.allowUnfilteredHTML == true ? result.response : stringUtils.stripUnsafeHTML(result.response);
+      model.wikipage = myConfig.allowUnfilteredHTML == true ? result.response : stringUtils.stripEncodeUnsafeHTML(result.response);
    }
    
    model.wikiLink = String(wikipage);

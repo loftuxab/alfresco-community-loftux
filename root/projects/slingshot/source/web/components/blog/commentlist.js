@@ -587,7 +587,7 @@
          Dom.get(formId + "-itemTitle").setAttribute("value", this.options.activityTitle);
          Dom.get(formId + "-page").setAttribute("value", this.options.activityPage);
          Dom.get(formId + "-pageParams").setAttribute("value", YAHOO.lang.JSON.stringify(this.options.activityPageParams));
-         Dom.get(formId + "-content").value = Alfresco.util.stripUnsafeHTMLTags(data.content);
+         Dom.get(formId + "-content").value = data.content;
          
          // show the form and hide the view
          Dom.addClass(viewDiv, "hidden");
@@ -778,7 +778,7 @@
             html += '<span class="theme-color-2 nodeStatus">(' + this._msg("comment.updated") + ')</span>';
          }
          html += '</div>';
-         html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>';
+         html += '<div class="content yuieditor">' + data.content + '</div>';
          html += '</div>';
 
          // footer

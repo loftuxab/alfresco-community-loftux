@@ -28,6 +28,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.web.ui.common.StringUtils;
+
 /**
  * Default user profile object.
  * 
@@ -269,6 +271,10 @@ public class User implements java.security.Principal, Serializable
      */
     public void setBiography(String value)
     {
+        if (value != null)
+        {
+            value = StringUtils.stripUnsafeHTMLTags(value);
+        }
         setProperty(PROP_BIOGRAPHY, value);
     }
 
