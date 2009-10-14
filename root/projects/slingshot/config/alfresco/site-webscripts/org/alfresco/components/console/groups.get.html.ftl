@@ -122,7 +122,7 @@
    </div>
 
    <!-- Create Group panel -->
-   <div id="${el}-create" class="hidden">
+   <div id="${el}-create">
       <div class="yui-g separator">
          <div class="yui-u first">
             <div class="title">${msg("label.title-create")}</div>
@@ -172,7 +172,7 @@
    
 
    <!-- Update Group panel -->
-   <div id="${el}-update" class="hidden">
+   <div id="${el}-update">
       <div class="yui-g separator">
          <div class="yui-u first">
             <div class="title">${msg("label.title-update")}: <span id="${el}-update-title"></span></div>
