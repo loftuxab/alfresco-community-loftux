@@ -339,9 +339,9 @@
             argsNoCache = "?c=force&noCacheToken=" + new Date().getTime(),
             preview, url;
          
-         if (this.options.mimeType.match(/^image\/\w+/))
+         if (this.options.mimeType.match(/^image\/jpeg$|^image\/png$|^image\/gif$/))         
          {
-            /* Matched an image mimetype */
+            /* The content matches an image mimetype that the web-previewer can handle without a preview */
             url = Alfresco.constants.PROXY_URI + "api/node/" + nodeRefAsLink + "/content" + argsNoCache;
             return (
             {
