@@ -68,7 +68,7 @@
                <show id="cm:modified" for-mode="view" />
                
                <!-- tags and categories -->
-               <show id="cm:taggable" for-mode="edit" />
+               <show id="cm:taggable" for-mode="edit" force="true" />
                <show id="cm:categories" />
                
                <!-- cm:dublincore aspect -->
