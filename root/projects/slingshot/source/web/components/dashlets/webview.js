@@ -45,21 +45,21 @@
    
    Alfresco.WebView = function(htmlId)
    {
-      this.name = "Alfresco.WebView";
-      this.id = htmlId;
+      Alfresco.WebView.superclass.constructor.call(this, "Alfresco.WebView", htmlId, []);
 
+      // Initialise prototype properties
       this.configDialog = null;
 
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
+      /**
+       * Decoupled event listeners
+       */
+      YAHOO.Bubbling.on("showPanel", this.onShowPanel, this);
+      YAHOO.Bubbling.on("hidePanel", this.onHidePanel, this);
 
       return this;
    };
 
-   Alfresco.WebView.prototype = 
+   YAHOO.extend(Alfresco.WebView, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -85,29 +85,6 @@
       configDialog: null,
 
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       */
-      setOptions: function WebView_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function WebView_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Initialises components, including YUI widgets.
        *
@@ -117,6 +94,12 @@
       {
          var configWebViewLink = Dom.get(this.id + "-configWebView-link");
          Event.addListener(configWebViewLink, "click", this.onConfigWebViewClick, this, true);
+
+         /**
+          * Save reference to iframe wrapper so we can hide and show it depending
+          * on how well the browser handles flash movies.
+          */
+         this.widgets.iframeWrapper = Dom.get(this.id + "-iframeWrapper");
       },
 
       /**
@@ -215,6 +198,52 @@
          }
          this.configDialog.show();
          Event.stopEvent(event);
+      },
+
+      /**
+       * Called when any Panel in share created with createYUIPanel is shown.
+       * Will hide the content for browsers that can't handle a flash movies properly,
+       * since the flash movie could hide parts of the the panel.
+       *
+       * @method onShowPanel
+       * @param p_layer {object} Event fired (unused)
+       * @param p_args {array} Event parameters (unused)
+       */
+      onShowPanel: function WW_onShowPanel(p_layer, p_args)
+      {
+         if (this._browserDestroysPanel())
+         {
+            Dom.setStyle(this.widgets.iframeWrapper, "visibility", "hidden");
+         }
+      },
+
+      /**
+       * Called when any Panel in share created with createYUIPanel is hidden.
+       * Will display the content again if it was hidden before.
+       *
+       * @method onHidePanel
+       * @param p_layer {object} Event fired (unused)
+       * @param p_args {array} Event parameters (unused)
+       */
+      onHidePanel: function WW_onHidePanel(p_layer, p_args)
+      {
+         if (this._browserDestroysPanel())
+         {
+            Dom.setStyle(this.widgets.iframeWrapper, "visibility", "visible");
+         }
+      },
+
+      /**
+       * Returns true if browser will make flash movie hide parts of a panel
+       *
+       * @method _browserDestroysPanel
+       * @return {boolean} True if browser will let flash movie mess up panel
+       */
+      _browserDestroysPanel: function WW__browserDestroysPanel()
+      {
+         // Bad browsers are IE and FF below 3
+         return (YAHOO.env.ua.ie > 0 || (YAHOO.env.ua.gecko > 0 && YAHOO.env.ua.gecko < 1.9));
       }
-   };
+
+   });
 })();

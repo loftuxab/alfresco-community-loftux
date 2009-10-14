@@ -1163,7 +1163,23 @@ Alfresco.util.createYUIPanel = function(p_el, p_params, p_custom)
    {
       panel.render(document.body);
    }
-   
+
+   // Let other components react to when a panel is shown or hidden
+   panel.subscribe("show", function (p_event, p_args)
+   {
+      YAHOO.Bubbling.fire("showPanel",
+      {
+         panel: this
+      });
+   });
+   panel.subscribe("hide", function (p_event, p_args)
+   {
+      YAHOO.Bubbling.fire("hidePanel",
+      {
+         panel: this
+      });
+   });
+
    return panel;
 };
 
