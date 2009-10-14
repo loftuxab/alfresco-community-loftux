@@ -135,6 +135,8 @@
          YAHOO.Bubbling.on("prevNav", this.onNav, this);
          YAHOO.Bubbling.on("viewChanged", this.onViewChanged, this);
          YAHOO.Bubbling.on("dateChanged",this.onCalSelect,this);
+         YAHOO.Bubbling.on("formValidationError", this.onFormValidationError,this);         
+         
          this.calendarView = this.options.view;
          this.startDate = (YAHOO.lang.isString(this.options.startDate)) ? Alfresco.util.fromISO8601(this.options.startDate): this.options.startDate;
          this.container = Dom.get(this.id);
@@ -1086,7 +1088,7 @@
           {
             data.allday = 'true';
             var vEventEl = Alfresco.CalendarHelper.renderTemplate('vevent',data);
-            this.renderAllDayEvents(vEventEl,data);
+            vEventEl = this.renderAllDayEvents(vEventEl,data);
             this.calEventConfig.draggable = YAHOO.util.Dom.hasClass(vEventEl,'allday') ? false : true;
             this.calEventConfig.resizable = (Dom.hasClass(vEventEl,'allday')) ? false : true;
             var newCalEvent = new Alfresco.calendarEvent(vEventEl, this.dragGroup,YAHOO.lang.merge(this.calEventConfig,{performRender:false}));
@@ -1837,10 +1839,13 @@
        * @param e {object} Event object
        * @param args {object} Value object referencing elements that are invalid
        */
-      onFormValidationError : function(e,args)
+      onFormValidationError : function onFormValidationError(e,args)
       {
         var args = args[1];
-        // YAHOO.util.Dom.addClass(args.field,'error');
+        Alfresco.util.PopupManager.displayMessage(
+        {
+           text: args.msg
+        });
       },
       
       /**
@@ -2664,7 +2669,7 @@ Alfresco.util.DialogManager = ( function () {
                     Dom.get(this.id + "-tag-input-field").disabled=false;
                     Dom.get(this.id + "-tag-input-field").tabIndex = 8;
                     Dom.get(this.id + "-add-tag-button").tabIndex = 9;
-                    form.errorContainer=null;     
+                    form.errorContainer=null;   
                     //hide mini-cal
                     this.dialog.hideEvent.subscribe(function() {
                      Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView').oCalendar.hide();
@@ -2677,8 +2682,27 @@ Alfresco.util.DialogManager = ( function () {
               fn: function (form)
               {
                    var Dom = YAHOO.util.Dom;
-                   form.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
-                   form.addValidation(this.id + "-title", Alfresco.forms.validation.nodeName, null, "keyup");
+                   var cal = Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView');
+                   
+                   //validate text fields
+                   var validateTextRegExp = {pattern:/({|})/, match:false };
+                   var textElements = [this.id+"-title", this.id+"-location", this.id+"-description"];
+                   form.addValidation(textElements[0], Alfresco.forms.validation.mandatory, null, "blur");
+                   form.addValidation(textElements[0], Alfresco.forms.validation.mandatory, null, "keyup");
+
+                   for (var i=0; i < textElements.length; i++)
+                   {
+                      form.addValidation(textElements[i],Alfresco.forms.validation.regexMatch, validateTextRegExp, "blur");
+                      form.addValidation(textElements[i],Alfresco.forms.validation.regexMatch, validateTextRegExp, "keyup");
+                   }
+                   //validate time fields
+                   var validateTimeRegExp = {pattern:/^\d{1,2}:\d{2}/, match:true};
+                   var timeElements = [this.id + "-start", this.id + "-end"];
+                   for (var i=0; i < timeElements.length; i++)
+                   {
+                      form.addValidation(timeElements[i],Alfresco.forms.validation.regexMatch, validateTimeRegExp, "blur",cal._msg('message.invalid-time'));
+                   }
+
                    form.addValidation(this.id + "-tag-input-field", Alfresco.module.event.validation.tags, null, "keyup");
 
                    this.tagLibrary.initialize(form);
@@ -2693,7 +2717,7 @@ Alfresco.util.DialogManager = ( function () {
                    form.addValidation("td", this.options._onDateValidation, { "obj": this }, "focus");
                    form.addValidation("fd", this.options._onDateValidation, { "obj": this }, "focus");
 
-                   // form.setShowSubmitStateDynamically(true);
+                   form.setShowSubmitStateDynamically(true, true);
                    form.setSubmitElements(this.okButton);
                    
                    /**
@@ -2836,7 +2860,7 @@ Alfresco.util.DialogManager = ( function () {
              o.oCalendar.show();
              return false;
          },
-           _onDateValidation: function(field, args, event, form, silent)
+           _onDateValidation: function _onDateValidation(field, args, event, form, silent)
              {
                 var Dom = YAHOO.util.Dom;
                 var fromHours = Dom.get(args.obj.id + "-start").value.split(':');
@@ -2844,13 +2868,13 @@ Alfresco.util.DialogManager = ( function () {
                 
                 // Check that the end date is after the start date
                 var startDate = Alfresco.CalendarHelper.getDateFromField(Dom.get("fd").value, "yyyy/mm/dd");
-                startDate.setHours(1);
-                startDate.setMinutes(0);
+                startDate.setHours(fromHours[0]);
+                startDate.setMinutes(fromHours[1]);
                 
                 var toDate = Alfresco.CalendarHelper.getDateFromField(Dom.get("td").value, "yyyy/mm/dd");
-                toDate.setHours(2);
-                toDate.setMinutes(0);
-                
+                toDate.setHours(toHours[0]);
+                toDate.setMinutes(toHours[1]);
+
                 //allday events; the date and time can be exactly the same so test for this too
                 if (startDate.getTime()===toDate.getTime())
                 {
@@ -2867,7 +2891,7 @@ Alfresco.util.DialogManager = ( function () {
 
                 if (!after && !silent)
                 {
-                   form.addError(form.getFieldLabel(field.id) + " cannot be before the start date.", field);
+                   form.addError(Alfresco.util.message('message.invalid-date', 'Alfresco.CalendarView'), field);
                 }
                 return after;
              }
