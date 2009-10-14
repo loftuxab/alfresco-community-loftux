@@ -11,10 +11,10 @@
 <div class="dashlet site-links">
    <div class="title">${msg("header.links")}</div>
    <div class="toolbar">
-      <a id="${args.htmlid}-createLink-button" class="create-link" >${msg("link.createLink")}</a>
+      <a id="${args.htmlid}-createLink-button" class="theme-color-1" href="#">${msg("link.createLink")}</a>
    </div>
    <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if>>
-<#if numLinks!=0>
+<#if numLinks?? && numLinks!=0>
    <#list links as link>
       <#assign linkUrl=link.url >
       <div id="${args.htmlid}-link-div-${link.name}" class="detail-list-item <#if link_index = 0>first-item<#elseif !link_has_next>last-item</#if>">
