@@ -482,7 +482,7 @@
                var contentElem = Dom.getElementsByClassName("content", "div", elCell);
                if (contentElem.length == 1)
                {
-                  contentElem[0].innerHTML = Alfresco.util.stripUnsafeHTMLTags(data.content);
+                  contentElem[0].innerHTML = data.content;
                }
             }
             

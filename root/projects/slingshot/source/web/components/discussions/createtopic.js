@@ -275,7 +275,7 @@
          // content
          if (this.options.editMode)
          {
-            content = Alfresco.util.stripUnsafeHTMLTags(this.discussionsTopicData.content);
+            content = this.discussionsTopicData.content;
          }
          Dom.get(this.id + '-content').value = content;
 

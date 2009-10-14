@@ -173,7 +173,7 @@
          var description = '';
          if (this.options.editMode)
          {
-            description = Alfresco.util.stripUnsafeHTMLTags(this.linkData.description);
+            description = $html(this.linkData.description);
          }
          Dom.get(this.id + '-description').value = description;
 
@@ -181,7 +181,7 @@
          var url = '';
          if (this.options.editMode)
          {
-            url = Alfresco.util.stripUnsafeHTMLTags(this.linkData.url);
+            url = $html(this.linkData.url);
          }
          Dom.get(this.id + '-url').value = url;
 

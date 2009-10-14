@@ -33,5 +33,6 @@
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/abdera/abdera-parser-0.4.0-incubating.jar" sourcepath="/3rd Party/src/apache-abdera-0.4.0-incubating-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/abdera/abdera-client-0.4.0-incubating.jar" sourcepath="/3rd Party/src/apache-abdera-0.4.0-incubating-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="/3rd Party/lib/htmlparser-1.6.jar" sourcepath="/3rd Party/src/htmlparser-1.6-src.zip"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

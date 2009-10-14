@@ -278,7 +278,7 @@
          // content
          if (this.options.editMode)
          {
-            content = Alfresco.util.stripUnsafeHTMLTags(this.blogPostData.content);
+            content = this.blogPostData.content;
          }
          Dom.get(this.id + '-content').value = content;
          

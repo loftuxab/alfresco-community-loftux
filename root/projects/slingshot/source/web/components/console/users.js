@@ -473,7 +473,7 @@
                fnSetter("-view-organization", person.organization);
                // biography is a special html field
                var bio = person.persondescription ? person.persondescription : "";
-               Dom.get(parent.id + "-view-bio").innerHTML = Alfresco.util.stripUnsafeHTMLTags(bio).replace(/\n/g, "<br/>");
+               Dom.get(parent.id + "-view-bio").innerHTML = bio.replace(/\n/g, "<br/>");
                
                // Contact section fields
                fnSetter("-view-location", person.location);

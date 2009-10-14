@@ -322,7 +322,7 @@
          html += '</div>';
              
          html += '<div class="userLink">' + Alfresco.util.people.generateUserLink(data.author) + ' ' + this._msg("said") + ':</div>';
-         html += '<div class="content yuieditor">' + Alfresco.util.stripUnsafeHTMLTags(data.content) + '</div>';
+         html += '<div class="content yuieditor">' + data.content + '</div>';
          html += '</div>'
          // end view
 
@@ -537,7 +537,7 @@
          Dom.get(formId + "-site").setAttribute("value", this.options.siteId);
          Dom.get(formId + "-container").setAttribute("value", this.options.containerId);
          Dom.get(formId + "-title").setAttribute("value", data.title);
-         Dom.get(formId + "-content").value = Alfresco.util.stripUnsafeHTMLTags(data.content);
+         Dom.get(formId + "-content").value = data.content;
 
          // and finally register the form handling
          this._registerEditTopicForm(data, formId);
