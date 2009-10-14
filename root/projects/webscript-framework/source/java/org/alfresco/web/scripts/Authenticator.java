@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,4 +42,12 @@ public interface Authenticator
     * @return true if authorised to execute the script, false otherwise
     */
    public boolean authenticate(RequiredAuthentication required, boolean isGuest);
+   
+   /**
+    * Are credentials set in the request ?
+    * 
+    * @return true if credentials are empty
+    * @since 3.2
+    */
+   public boolean emptyCredentials();
 }

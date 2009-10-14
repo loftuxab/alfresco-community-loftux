@@ -70,8 +70,6 @@ public class AuthenticatingConnector implements Connector
     protected Connector connector = null;
     protected Authenticator authenticator = null;
     
-    private static final String GUEST_MODE = "guest=true";
-    
     /**
      * Instantiates a new authenticating connector.
      * 
@@ -115,7 +113,7 @@ public class AuthenticatingConnector implements Connector
         
         if (handshake)
         {
-            uri = handshakeOrGuest(uri);
+            handshake(); // ignore result
             
             // now that we've authenticated, try again
             response = this.connector.call(uri);
@@ -159,7 +157,7 @@ public class AuthenticatingConnector implements Connector
         
         if (handshake)
         {
-            uri = handshakeOrGuest(uri);
+            handshake(); // ignore result
             
             // now that we've authenticated, try again
             response = this.connector.call(uri, context);
@@ -203,8 +201,8 @@ public class AuthenticatingConnector implements Connector
         
         if (handshake)
         {
-            uri = handshakeOrGuest(uri);
-
+            handshake(); // ignore result
+            
             // now that we've authenticated, try again
             if (in.markSupported())
             {
@@ -258,7 +256,7 @@ public class AuthenticatingConnector implements Connector
         
         if (handshake)
         {
-            uri = handshakeOrGuest(uri);
+            handshake(); // ignore result
             
             // now that we've authenticated, try again
             if (in.markSupported())
@@ -313,7 +311,7 @@ public class AuthenticatingConnector implements Connector
         
         if (handshake)
         {
-            uri = handshakeOrGuest(uri);
+            handshake(); // ignore result
             
             // now that we've authenticated, try again
             response = this.connector.call(uri, context, req, res);
@@ -324,25 +322,6 @@ public class AuthenticatingConnector implements Connector
         }
         
         return response;
-    }
-    
-    private String handshakeOrGuest(String uri)
-    {
-        boolean hResult = handshake();
-        if (! hResult)
-        {
-            StringBuilder guestUri = new StringBuilder(uri);
-            if (uri.lastIndexOf('?') != -1)
-            {
-                guestUri.append('&').append(GUEST_MODE);
-            }
-            else
-            {
-                guestUri.append('?').append(GUEST_MODE);
-            }
-            return guestUri.toString();
-        }
-        return uri;
     }
     
     /* (non-Javadoc)

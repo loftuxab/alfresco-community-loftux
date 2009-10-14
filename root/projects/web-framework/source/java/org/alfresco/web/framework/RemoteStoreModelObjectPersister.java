@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2009 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -100,6 +100,19 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
         ModelObjectCache cache = this.objectCache;
         
         String storeId = (String)context.getValue(ModelPersistenceContext.REPO_STOREID);
+
+        if (storeId == null)
+        {
+            String userId = context.getUserId();
+            int idx = userId.indexOf('@');
+            if (idx != -1)
+            {
+                // assume MT Share so partition by user domain
+                // TODO alternatively Share could pass "alfStoreId" in each request
+                storeId = userId.substring(idx);
+            }
+        }
+        
         if (storeId != null)
         {
             // need to lookup a store specific object cache

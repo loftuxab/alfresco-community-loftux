@@ -112,13 +112,29 @@ public abstract class AbstractRuntime implements Runtime
                 if (logger.isDebugEnabled())
                     logger.debug("(Runtime=" + getName() + ", Container=" + container.getName() + ") Container requires pre-auth: "+containerRequiredAuth);
                 
-                if (! container.authenticate(auth, containerRequiredAuth))
+                boolean preAuth = true;
+                
+                if (auth.emptyCredentials())
                 {
-                    return; // will prompt for un/pw
+                    // check default (unauthenticated) domain
+                    match = container.getRegistry().findWebScript(method, scriptUrl);
+                    if ((match != null) && (match.getWebScript().getDescription().getRequiredAuthentication().equals(RequiredAuthentication.none)))
+                    {
+                        preAuth = false;
+                    }
+                }
+                
+                if (preAuth && (! container.authenticate(auth, containerRequiredAuth)))
+                {
+                    return; // return response (eg. prompt for un/pw if status is 401 or redirect)
                 }
             }
             
-            match = container.getRegistry().findWebScript(method, scriptUrl);
+            if (match == null)
+            {
+                match = container.getRegistry().findWebScript(method, scriptUrl);
+            }
+            
             if (match == null || match.getKind() == Match.Kind.URI)
             {
                 if (match == null)
@@ -136,17 +152,12 @@ public abstract class AbstractRuntime implements Runtime
                     throw new WebScriptException(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
                 }
             }
-
+            
             // create web script request & response
             scriptReq = createRequest(match);
             scriptRes = createResponse();
             
-            if (! containerRequiredAuth.equals(RequiredAuthentication.none))
-            {
-                // pre-authenticated (before matching web script)
-                auth = null; 
-            }
-            else
+            if (auth == null)
             {
                 // not pre-authenticated
                 auth = createAuthenticator();
