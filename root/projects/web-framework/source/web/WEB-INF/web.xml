@@ -72,6 +72,28 @@
       <servlet-class>org.alfresco.web.site.servlet.ComponentDispatcherServlet</servlet-class>
    </servlet>
    
+   <!--Login servlet -->
+   <servlet>
+      <servlet-name>loginServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.LoginServlet</servlet-class>
+   </servlet> 
+   
+   <servlet-mapping>
+      <servlet-name>loginServlet</servlet-name>
+      <url-pattern>/login/*</url-pattern>
+   </servlet-mapping>
+   
+   <!--Logout servlet -->
+   <servlet>
+      <servlet-name>logoutServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.LogoutServlet</servlet-class>
+   </servlet> 
+
+   <servlet-mapping>
+      <servlet-name>logoutServlet</servlet-name>
+      <url-pattern>/logout</url-pattern>
+   </servlet-mapping>
+   
    <!-- Virtualized Content Retrieval Servlet -->
    <servlet>
       <servlet-name>virtualizedContentRetrievalServlet</servlet-name>
