@@ -50,7 +50,7 @@
 
       Alfresco.util.ComponentManager.register(this);
 
-      Alfresco.util.YUILoaderHelper.require(["button", "container"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["container"], this.onComponentsLoaded, this);
 
       return this;
    };
@@ -71,7 +71,6 @@
           * */
          siteId : ""
       },
-
 
       /**
        * Set multiple initialization options at once.
@@ -102,15 +101,15 @@
        */
       onReady: function SL_onReady()
       {
-         Alfresco.util.createYUIButton(this, "createLink-button", this.onCreateLinkButtonClick);
+         Event.on(this.id + "-createLink-button", "click", this.onCreateLinkClick, null, this);
       },
 
       /**
-       * Fired by YUI Link when the "Create link" label is clicked
-       * @method onCreateLinkButtonClick
+       * Fired by YUI Link when the "Create link" link is clicked
+       * @method onCreateLinkClick
        * @param event {domEvent} DOM event
        */
-      onCreateLinkButtonClick: function SL_onCreateLinkButtonClick(e)
+      onCreateLinkClick: function SL_onCreateLinkButtonClick(e)
       {
          Event.stopEvent(e);
          var url = YAHOO.lang.substitute(Alfresco.constants.URL_CONTEXT + "page/site/{site}/links-linkedit",
