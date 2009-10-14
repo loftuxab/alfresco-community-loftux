@@ -16,7 +16,7 @@
 <div id="${el}-body" class="groups">
 
    <!-- Search panel -->
-   <div id="${el}-search">
+   <div id="${el}-search" class="hidden">
       <div class="yui-g">
          <div class="yui-u first">
             <div class="title"><label for="${el}-search-text">${msg("label.title-browse")}</label></div>
@@ -122,7 +122,7 @@
    </div>
 
    <!-- Create Group panel -->
-   <div id="${el}-create">
+   <div id="${el}-create" class="hidden">
       <div class="yui-g separator">
          <div class="yui-u first">
             <div class="title">${msg("label.title-create")}</div>
@@ -172,7 +172,7 @@
    
 
    <!-- Update Group panel -->
-   <div id="${el}-update">
+   <div id="${el}-update" class="hidden">
       <div class="yui-g separator">
          <div class="yui-u first">
             <div class="title">${msg("label.title-update")}: <span id="${el}-update-title"></span></div>
