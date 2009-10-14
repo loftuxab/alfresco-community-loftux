@@ -654,7 +654,7 @@ Alfresco.util.decodeHTML = function(html)
    {
       return "";
    }
-   return html.split("&lt;").join("<").split("&gt;").join(">").split("&amp;").join("&");
+   return html.split("&lt;").join("<").split("&gt;").join(">").split("&amp;").join("&").split("&quot;").join('"');
 };
 
 /**
@@ -681,7 +681,7 @@ Alfresco.util.encodeHTML = function(text)
    }
    var me = arguments.callee;
    me.text.data = text;
-   return me.div.innerHTML.replace(/\n/g, "<br />&nbsp;&nbsp;&nbsp;");
+   return me.div.innerHTML.replace(/\n/g, "<br />&nbsp;&nbsp;&nbsp;").replace('"','&quot;');
 };
 Alfresco.util.encodeHTML.div = document.createElement("div");
 Alfresco.util.encodeHTML.text = document.createTextNode("");

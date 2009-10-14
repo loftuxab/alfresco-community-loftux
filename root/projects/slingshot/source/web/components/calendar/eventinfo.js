@@ -31,7 +31,8 @@
    /**
     * YUI Library aliases
     */
-   var Dom = YAHOO.util.Dom;
+   var Dom = YAHOO.util.Dom,
+       Selector = YAHOO.util.Selector;
 
    Alfresco.EventInfo = function(containerId)
    {
@@ -179,7 +180,21 @@
          {
             var dateTextEl = Dom.get(dateElIds[i]);
             var textvalue = dateTextEl.innerHTML.split(' ');
-            dateTextEl.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(textvalue[0]), "dddd, d mmmm yyyy") + ' ' + textvalue[1] + ' ' + textvalue[2];
+            //only show date for allday events otherwise show time too
+            if (textvalue.length>1)
+            {
+               dateTextEl.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(textvalue[0]), "dddd, d mmmm yyyy") + ' ' + textvalue[1] + ' ' + textvalue[2];               
+            }
+            else 
+            {
+               dateTextEl.innerHTML = Alfresco.util.formatDate(Alfresco.util.fromISO8601(textvalue[0]), "dddd, d mmmm yyyy");
+            }
+         }
+         //decode html for text values of event
+         var textData = Selector.query('.yui-gd .yui-u', div);
+         for (var i=1;i<6;i+=2)
+         {
+            textData[i].innerHTML = Alfresco.util.decodeHTML(textData[i].innerHTML);
          }
          // Display the panel
          this.panel.show();
@@ -304,7 +319,97 @@
             {
                fn: function (form)
                {
-                  this.tagLibrary.initialize(form);
+                   var Dom = YAHOO.util.Dom;
+                   var cal = Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView');
+                   
+                   //validate text fields
+                   var validateTextRegExp = {pattern:/({|})/, match:false };
+                   var textElements = [this.id+"-title", this.id+"-location", this.id+"-description"];
+
+                   form.addValidation(textElements[0], Alfresco.forms.validation.mandatory, null, "blur");
+                   form.addValidation(textElements[0], Alfresco.forms.validation.mandatory, null, "keyup");
+
+                   for (var i=0; i < textElements.length; i++)
+                   {
+                      form.addValidation(textElements[i],Alfresco.forms.validation.regexMatch, validateTextRegExp, "blur");
+                      form.addValidation(textElements[i],Alfresco.forms.validation.regexMatch, validateTextRegExp, "keyup");
+                   }
+                   //validate time fields
+                   var validateTimeRegExp = {pattern:/^\d{1,2}:\d{2}/, match:true};
+                   var timeElements = [this.id + "-start", this.id + "-end"];
+                   for (var i=0; i < timeElements.length; i++)
+                   {
+                      form.addValidation(timeElements[i],Alfresco.forms.validation.regexMatch, validateTimeRegExp, "blur",cal._msg('message.invalid-time'));
+                   }
+
+                   form.addValidation(this.id + "-tag-input-field", Alfresco.module.event.validation.tags, null, "keyup");
+
+                   this.tagLibrary.initialize(form);
+
+                   var dateElements = ["td", "fd", this.id + "-start", this.id + "-end"];
+                   for (var i=0; i < dateElements.length; i++)
+                   {
+                      form.addValidation(dateElements[i],this.options._onDateValidation, { "obj": this }, "blur");
+                   }
+
+                   // Setup date validation
+                   form.addValidation("td", this.options._onDateValidation, { "obj": this }, "focus");
+                   form.addValidation("fd", this.options._onDateValidation, { "obj": this }, "focus");
+
+                   form.setShowSubmitStateDynamically(true, true);
+                   form.setSubmitElements(this.okButton);
+                   
+                   /**
+                    * keyboard handler for popup calendar button. Requried as YUI button's click
+                    * event doesn't fire in firefox
+                    */
+                   var buttonKeypressHandler = function()
+                   {
+                     var dialogObject = Alfresco.util.DialogManager.getDialog('CalendarView.addEvent');
+                     return function(e)
+                     {
+                       if (e.keyCode===YAHOO.util.KeyListener.KEY['ENTER'])
+                       {
+                         dialogObject.options.onDateSelectButton.apply(this,arguments);
+                         return false;
+                       }
+                     };
+                   }();
+
+                   /**
+                     * Button declarations that, when clicked, display
+                     * the calendar date picker widget.
+                     */
+                    if (!this.startButton)
+                    {
+                       this.startButton = new YAHOO.widget.Button(
+                       {
+                           type: "link",
+                           id: "calendarpicker",
+                           label:'',
+                           href:'',
+                           tabindex:4,                        
+                           container: this.id + "-startdate"
+                       });
+                    
+                       this.startButton.on("click", this.options.onDateSelectButton);
+                       this.startButton.on("keypress", buttonKeypressHandler);                       
+                    }
+                    if (!this.endButton)
+                    {
+                       this.endButton = new YAHOO.widget.Button(
+                       {
+                          type: "link",                       
+                          id: "calendarendpicker",
+                          label:'',
+                          href:'test',
+                          tabindex:6,     
+                          container: this.id + "-enddate"
+                       });
+                    
+                       this.endButton.on("click", this.options.onDateSelectButton);
+                       this.endButton.on("keypress", buttonKeypressHandler);                       
+                    }
                },
                scope: this.eventDialog
             },
