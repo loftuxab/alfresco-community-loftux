@@ -2737,35 +2737,40 @@ Alfresco.util.DialogManager = ( function () {
                      }
                    }();
 
-                   /**
+                  /**
                      * Button declarations that, when clicked, display
                      * the calendar date picker widget.
                      */
-                    var startButton = new YAHOO.widget.Button(
+                    if (!this.startButton)
                     {
-                        type: "link",
-                        id: "calendarpicker",
-                        label:'',
-                        href:'',
-                        tabindex:4,                        
-                        container: this.id + "-startdate"
-                    });
+                       this.startButton = new YAHOO.widget.Button(
+                       {
+                           type: "link",
+                           id: "calendarpicker",
+                           label:'',
+                           href:'',
+                           tabindex:4,                        
+                           container: this.id + "-startdate"
+                       });
                     
-                    startButton.on("click", this.options.onDateSelectButton);
-                    startButton.on("keypress", buttonKeypressHandler);
-
-                    var endButton = new YAHOO.widget.Button(
+                       this.startButton.on("click", this.options.onDateSelectButton);
+                       this.startButton.on("keypress", buttonKeypressHandler);                       
+                    }
+                    if (!this.endButton)
                     {
-                       type: "link",                       
-                       id: "calendarendpicker",
-                       label:'',
-                       href:'test',
-                       tabindex:6,     
-                       container: this.id + "-enddate"
-                    });
+                       this.endButton = new YAHOO.widget.Button(
+                       {
+                          type: "link",                       
+                          id: "calendarendpicker",
+                          label:'',
+                          href:'test',
+                          tabindex:6,     
+                          container: this.id + "-enddate"
+                       });
                     
-                    endButton.on("click", this.options.onDateSelectButton);
-                    endButton.on("keypress", buttonKeypressHandler);
+                       this.endButton.on("click", this.options.onDateSelectButton);
+                       this.endButton.on("keypress", buttonKeypressHandler);                       
+                    }
                     YAHOO.Bubbling.on('formValidationError',Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView').onFormValidationError,this);
               },
                scope: Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView')
