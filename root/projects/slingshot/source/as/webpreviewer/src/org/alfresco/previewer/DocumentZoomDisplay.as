@@ -367,7 +367,8 @@ package org.alfresco.previewer
 	    	    else if (event.target.actionScriptVersion == 2)
 		    	{
 		    		contentType = AVM1_MOVIE;
-		    		var am1:AVM1Movie = AVM1Movie(loader.content);
+		    		var avm1:AVM1Movie = AVM1Movie(loader.content);
+		    		content = avm1;
 	    	    }
 	    	    else
 	    	    {
