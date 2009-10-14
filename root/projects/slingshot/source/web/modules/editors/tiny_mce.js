@@ -11,6 +11,7 @@ Alfresco.util.RichEditorManager.addEditor('tinyMCE', function(id,config)
       init: function RichEditorManager_tinyMCE_init(id, config)
       {
          config.mode = 'exact';
+         config.relative_urls = false;
          config.elements = id;
          config.plugins = (config.plugins && config.plugins != '') ? config.plugins + ', safari': 'safari';
          if (!config.init_instance_callback) 
