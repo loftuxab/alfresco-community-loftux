@@ -297,6 +297,11 @@ public final class ScriptUser extends ScriptBase
         return this.user.isAdmin();
     }
         
+    public boolean getIsGuest()
+    {
+        return this.user.isGuest();
+    }
+
     /**
      * Persist user changes
      */

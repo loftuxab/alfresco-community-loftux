@@ -1,8 +1,7 @@
 <#assign helpPages = config.scoped["HelpPages"]["help-pages"]>
 <#assign helpLink = helpPages.getChildValue("share-help")!"">
 <#assign siteActive><#if page.url.templateArgs.site??>true<#else>false</#if></#assign>
-<#assign isGuest = (user.name=='guest') />
-<#if !isGuest>
+<#if !user.isGuest>
 <script type="text/javascript">//<![CDATA[
    var thisHeader = new Alfresco.Header("${args.htmlid}").setOptions(
    {
@@ -24,7 +23,7 @@
    </div>
 
    <div class="menu-wrapper">
-      <#if !isGuest>
+      <#if !user.isGuest>
       <div class="personal-menu">   
          <span class="menu-item-icon my-dashboard"><a href="${url.context}/page/user/${user.name?url}/dashboard">${msg("link.myDashboard")}</a></span>
          <span class="menu-item-icon my-profile"><a href="${url.context}/page/user/${user.name?url}/profile">${msg("link.myProfile")}</a></span>
@@ -42,7 +41,7 @@
          <span class="menu-item-separator">&nbsp;</span>
          </#if>
          <span class="menu-item"><a href="${helpLink}" rel="_blank">${msg("link.help")}</a></span>
-         <#if !isGuest>
+         <#if !user.isGuest>
          <span class="menu-item-separator">&nbsp;</span>
          <#if !context.externalAuthentication>
          <span class="menu-item"><a href="${url.context}/logout" title="${msg("link.logout.tooltip", user.name?html)}">${msg("link.logout")}</a></span>
@@ -80,12 +79,12 @@
                <a href="#" onclick="thisHeader.addAsFavourite(); return false;">${msg("link.add-favourite", siteTitle?html)}</a>
             </li>
          </ul>
-         <ul class="site-finder-menuitem<#if !isGuest> separator</#if>">
+         <ul class="site-finder-menuitem<#if !user.isGuest> separator</#if>">
             <li>
                <a href="${url.context}/page/site-finder">${msg("header.sites.findSites")}</a>
             </li>
          </ul>
-         <#if !isGuest>
+         <#if !user.isGuest>
          <ul class="create-site-menuitem">
             <li>
                <a href="#" onclick="thisHeader.showCreateSite(); return false;">${msg("header.sites.createSite")}</a>
@@ -95,7 +94,7 @@
       </div>
    </div>
 
-   <#if !isGuest>
+   <#if !user.isGuest>
    <div id="${args.htmlid}-searchtogglemenu" class="hidden">
       <div class="bd">
          <ul class="last">
