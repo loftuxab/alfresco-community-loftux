@@ -141,7 +141,7 @@
                root: parent._msg("label.breadcrumb.root")
             });
 
-            // Close search button            
+            // Close search button
             var closeSearchButton = new YAHOO.widget.Button(parent.id + "-closesearch-button", {});
             closeSearchButton.on("click", this.onCloseSearchClick, closeSearchButton, this);
 
@@ -154,7 +154,7 @@
                fields:
                [
                   "shortName", "displayName"
-               ],                                  
+               ],
                metaFields:
                {
                   recordOffset: "startIndex",
@@ -264,10 +264,10 @@
             // Add event listeners to buttons
             this.widgets.deleteGroupCancelButton = new YAHOO.widget.Button(parent.id + "-cancel-button", {});
             this.widgets.deleteGroupCancelButton.on("click", function()
-            {               
+            {
                this.widgets.deleteGroupPanel.hide();
             }, null, this);
-            
+
             this.widgets.deleteGroupOkButton = Alfresco.util.createYUIButton(parent, "remove-button", null);
          },
 
@@ -1072,7 +1072,7 @@
             ];
             if (itemInfo)
             {
-               // Only add the following button for NON root columns               
+               // Only add the following button for NON root columns
                headerButtons.push({
                   title: parent._msg("button.addgroup"),
                   cssClass: "groups-addgroup-button",
@@ -1102,7 +1102,7 @@
          _setupDataTable: function ConsoleGroups_SearchPanelHandler__setupDataTable()
          {
             var me = this;
-            
+
             /**
              * DataTable Cell Renderers
              *
@@ -1248,6 +1248,14 @@
          _visible: false,
 
          /**
+          * Keeps track if this panel shall request the view panel to refresh after a cancel click
+          *
+          * @property _refresh
+          * @type Boolean
+          */
+         _refresh: false,
+
+         /**
           * PANEL LIFECYCLE CALLBACKS
           */
 
@@ -1330,7 +1338,7 @@
          clear: function clear()
          {
             Dom.get(parent.id + "-create-shortname").value = "";
-            Dom.get(parent.id + "-create-displayname").value = "";            
+            Dom.get(parent.id + "-create-displayname").value = "";
             if (this.forms.createForm !== null)
             {
                this.forms.createForm.init();
@@ -1345,6 +1353,7 @@
          onShow: function ConsoleGroups_CreatePanelHandler_onShow()
          {
             this._visible = true;
+            this._refresh = false;
             window.scrollTo(0, 0);
 
             // Make main panel area visible
@@ -1384,7 +1393,11 @@
                {
                   text: parent._msg("message.create-success")
                });
-               parent.refreshUIState({"panel": "search","refresh": "true"});
+               parent.refreshUIState(
+               {
+                  "panel": "search",
+                  "refresh": "true"
+               });
             };
             this._createGroup(successHandler);
          },
@@ -1398,7 +1411,11 @@
           */
          onCreateGroupCancelClick: function ConsoleGroups_CreatePanelHandler_onCreateGroupCancelClick(e, args)
          {
-            parent.refreshUIState({"panel": "search"});
+            parent.refreshUIState(
+            {
+               "panel": "search",
+               "refresh": this._refresh ? "true" : "false"
+            });
          },
 
          /**
@@ -1409,7 +1426,7 @@
           * @param args Event parameters (depends on event type)
           */
          onCreateGroupAnotherClick: function ConsoleGroups_CreatePanelHandler_onCreateGroupAnotherClick(e, args)
-         {            
+         {
             var successHandler = function(response)
             {
                // Scroll to top and notify user
@@ -1418,6 +1435,9 @@
                {
                   text: parent._msg("message.create-success")
                });
+
+               // Make sure we refresh view panel if cancel is clicked
+               this._refresh = true;
 
                // Clear old values so new ones can be entered
                this.clear();
@@ -1534,7 +1554,7 @@
                       * update the display name.
                       */
                      groupObj.displayName = displayName;
-                     parent.panelHandlers.updatePanelHandler.updateGroupRequest(shortName, groupObj, 
+                     parent.panelHandlers.updatePanelHandler.updateGroupRequest(shortName, groupObj,
                      {
                         fn: successHandler,
                         scope: this
@@ -1641,7 +1661,7 @@
                max: 255,
                crop: true,
                includeWhitespace: false
-            }, "keyup");            
+            }, "keyup");
 
             // Initialise the form
             form.init();
@@ -1733,7 +1753,7 @@
           * @param args Event parameters (depends on event type)
           */
          onUpdateGroupOKClick: function ConsoleGroups_UpdatePanelHandler_onUpdateGroupOKClick(e, args)
-         {            
+         {
             var handler = function(res)
             {
                window.scrollTo(0, 0);
@@ -1835,6 +1855,45 @@
 
    YAHOO.extend(Alfresco.ConsoleGroups, Alfresco.ConsoleTool,
    {
+
+      /* STATES */
+
+      /**
+       * The query to use in a search in the panel
+       *
+       * @property query
+       * @type string
+       * @default null
+       */
+      query: null,
+
+      /**
+       * Decides if panels data needs to be refreshed
+       *
+       * @property refresh
+       * @type boolean
+       * @default false
+       */
+      refresh: false,
+
+      /**
+       * The current group
+       *
+       * @property group
+       * @type string
+       * @default null
+       */
+      group: null,
+
+      /**
+       * The display name for the current group
+       *
+       * @property groupDisplayName
+       * @type string
+       * @default null
+       */
+      groupDisplayName: null,
+
       /**
        * Object container for initialization options
        *
@@ -1912,7 +1971,7 @@
          }
          if (state.refresh)
          {
-            this.refresh = state.refresh;
+            this.refresh = state.refresh == "true" ? true : false;
          }
          if (state.group)
          {
@@ -1950,7 +2009,11 @@
       onNewGroup: function ConsoleGroups_onNewGroup(e, args)
       {
          var parentGroup = args[1].group;
-         this.refreshUIState({"panel": "create", "group": parentGroup});
+         this.refreshUIState(
+         {
+            "panel": "create",
+            "group": parentGroup
+         });
       },
 
       /**
@@ -1964,7 +2027,10 @@
       {
          var group = args[1].group;
          var query = args[1].query;
-         var state = {"panel": "update", "group": group};
+         var state = {
+            "panel": "update",
+            "group": group
+         };
          // Remember query if cancel is clicked
          if (query)
          {
@@ -1998,7 +2064,7 @@
          }
          if (obj.group)
          {
-            state += state.length > 0 ? "&" : "";            
+            state += state.length > 0 ? "&" : "";
             state += "group=" + encodeURIComponent(obj.group);
          }
          if (obj.query)
