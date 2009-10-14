@@ -350,7 +350,7 @@ public class RemoteStore implements Store
         {
             throw new IOException("Unable to test document path: " + documentPath +
                     " in remote store: " + this.getEndpoint() +
-                    " due to error: " + res.getStatus().getMessage());
+                    " due to error: " + res.getStatus().getCode() + " " + res.getStatus().getMessage());
         }
         
         if (logger.isDebugEnabled())
@@ -385,7 +385,7 @@ public class RemoteStore implements Store
         {
             throw new IOException("Unable to get lastModified date of document path: " + documentPath +
                     " in remote store: " + this.getEndpoint() +
-                    " due to error: " + res.getStatus().getMessage());
+                    " due to error: " + res.getStatus().getCode() + " " + res.getStatus().getMessage());
         }
     }
 
@@ -404,7 +404,7 @@ public class RemoteStore implements Store
         {
             throw new IOException("Unable to update document path: " + documentPath +
                     " in remote store: " + this.getEndpoint() +
-                    " due to error: " + res.getStatus().getMessage());
+                    " due to error: " + res.getStatus().getCode() + " " + res.getStatus().getMessage());
         }
     }
 
@@ -415,11 +415,12 @@ public class RemoteStore implements Store
     {
         Response res = callDelete(buildEncodeCall(API_DELETE, documentPath));
         
-        if (logger.isDebugEnabled())
-            logger.debug("RemoteStore.removeDocument() " + documentPath + " = " +
-                         (Status.STATUS_OK == res.getStatus().getCode()));
+        boolean removed = (Status.STATUS_OK == res.getStatus().getCode());
         
-        return (Status.STATUS_OK == res.getStatus().getCode());
+        if (logger.isDebugEnabled())
+            logger.debug("RemoteStore.removeDocument() " + documentPath + " = " + res.getStatus().getCode() + " (removed = "+removed+")");
+        
+        return removed;
     }
 
     /* (non-Javadoc)
@@ -437,7 +438,7 @@ public class RemoteStore implements Store
         {
             throw new IOException("Unable to create document path: " + documentPath +
                     " in remote store: " + this.getEndpoint() +
-                    " due to error: " + res.getStatus().getMessage());
+                    " due to error: " + res.getStatus().getCode() + " " + res.getStatus().getMessage());
         }
     }
 
@@ -465,7 +466,7 @@ public class RemoteStore implements Store
         {
             throw new IOException("Unable to retrieve document path: " + path +
                     " in remote store: " + this.getEndpoint() +
-                    " due to error: " + res.getStatus().getMessage());
+                    " due to error: " + res.getStatus().getCode() + " " + res.getStatus().getMessage());
         }
     }
 
