@@ -15,6 +15,10 @@ echo Error: JAVA_HOME '%JAVA_HOME%' does not contain a valid Java installation.
 goto End
 
 :StartServer
+
+rem Set the ext dirs to the location of the JRE or JDK extension folders
+if exist "%JAVA_HOME%\jre\lib\ext" ( set JAVA_EXT_DIR="%JAVA_HOME%\jre\lib\ext" ) else ( set JAVA_EXT_DIR="%JAVA_HOME%\lib\ext" )
+
 rem Set RMI_LISTEN_HOSTNAME to the hostname you wish the deployment server to listen on.
 rem See http://www.springframework.org/docs/api/org/springframework/remoting/rmi/RmiServiceExporter.html
 rem for more details.
@@ -28,11 +32,11 @@ if "%RMI_LISTEN_HOSTNAME%"=="" goto StartServerWithoutRMIHostname
 goto StartServerWithRMIHostname
 
 :StartServerWithoutRMIHostname
-start /min "Deployment Server" "%JAVA_HOME%\bin\java" -server -classpath . -Djava.ext.dirs=. org.alfresco.deployment.Main application-context.xml 
+start /min "Deployment Server" "%JAVA_HOME%\bin\java" -server -classpath . -Djava.ext.dirs=.;%JAVA_EXT_DIR% org.alfresco.deployment.Main application-context.xml 
 goto End
 
 :StartServerWithRMIHostname
-start /min "Deployment Server" "%JAVA_HOME%\bin\java" -server -classpath . -Djava.ext.dirs=. -Djava.rmi.server.hostname=%RMI_LISTEN_HOSTNAME% org.alfresco.deployment.Main application-context.xml 
+start /min "Deployment Server" "%JAVA_HOME%\bin\java" -server -classpath . -Djava.ext.dirs=.;%JAVA_EXT_DIR% -Djava.rmi.server.hostname=%RMI_LISTEN_HOSTNAME% org.alfresco.deployment.Main application-context.xml 
 goto End
 
 :End

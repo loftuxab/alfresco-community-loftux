@@ -116,7 +116,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer.jar" sourcepath="src/PDFRenderer-2009-09-27-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0.jar" sourcepath="src/tm-extractors-1.0.zip"/>
+<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0-patched.jar" sourcepath="src/tm-extractors-1.0-patched.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.1.jar" sourcepath="src/poi-3.0.2-src.zip"/>
 	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.2.jar" sourcepath="src/commons-dbcp-1.2.2-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/optional/log4j-1.2.15.jar"/>
