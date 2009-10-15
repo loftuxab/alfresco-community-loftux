@@ -31,7 +31,7 @@
                 </#list>
             </tr>
         </thead>
-
+        
         <tbody>
              <#list 0..5 as row><#-- ROW -->
               <tr>
@@ -43,7 +43,7 @@
                     </#if>
                     <td id="cal-${viewArgs.view.dates[id].id}" ${tdclass} style="width: 12.5%">
                        <#if (tdclass != '')>
-                        <div class="day theme-bg-color-3">                       
+                        <div class="day disabled theme-bg-color-3">                       
                        <#else>
                         <div class="day">
                        </#if>
@@ -59,7 +59,7 @@
                                              <p class="dates"> <span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
                                              - <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
                                              <span class="location">${event.location}</span>
-                                             <span class="duration" title="PT1H">1h</span>
+                                             <span class="duration" title="${event.duration}">1h</span>
                                              <span class="category" >${event.tags}</span> 
                                         </div>
                                     </div>
@@ -81,7 +81,7 @@
                                                <p class="dates"><span class="dtstart" title="${event.dtstart}">${event.dtstartText}</span>
                                                - <span class="dtend" title="${event.dtend}">${event.dtendText}</span></p>                                
                                                <span class="location">${event.location}</span>
-                                               <span class="duration" title="PT1H">1h</span>
+                                               <span class="duration" title="${event.duration}">1h</span>
                                                <span class="category" >${event.tags}</span>
                                              </li>
                                          <#assign numEvents=numEvents + 1>    
@@ -124,14 +124,15 @@
                <th scope="row" style="width: 105px"><h2>${msg("label.all-day")}</h2></th>
               
                <#list 0..6 as day>
-                 <#assign tdclass = ''>
+                <#assign id = (day?number)>
+                <#assign tdclass = ''>
                 <#if (viewArgs.view.dayOfWeek == day)>
                     <#assign tdclass = 'current'>
                 </#if>
                 <#if (day==6)>
                     <#assign tdclass = tdclass + ' last'>
                 </#if> 
-                <td class="${tdclass}"><div class="target" > </div></td>
+                <td class="${tdclass}"><div id="cal-${viewArgs.view.dates[id].id}" class="target" width="12.5%"> </div></td>
                </#list>
             </tr>
             <tr id="collapseTrigger">

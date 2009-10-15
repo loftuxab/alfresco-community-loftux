@@ -370,7 +370,8 @@ height:100%;
 }
 .calendar td a.dayLabel {
 text-align:right;
-float:right;
+/*float:right;*/
+display:block;
 margin:0.7em 0.7em 0 0;
 font-size:85%;
 color:#000;
@@ -726,6 +727,11 @@ div.vevent {
    filter:alpha(opacity=80); 
    opacity:.80; 
 }
+.weekview .alldayRow div.vevent{
+   -moz-opacity:1.0; 
+   filter:alpha(opacity=100); 
+   opacity:1.0; 
+}
 
 .weekview div.vevent div {
    margin:0 0.5em;
@@ -779,8 +785,13 @@ div.vevent.allday {
    font-size:100%;
    border-left:0;
 }
-div.vevent.allday div{
+div.vevent.allday div {
   padding:5px;
+}
+
+div.allday, div.multipleAllDay {
+   border:1px solid white;
+   border-width:1px 0 0 0;
 }
 div.hourSegment .vevent {
    position:absolute;
@@ -1026,4 +1037,7 @@ tr.early {
 {
    background-color:transparent;
 }
-
+/* multiple day proxy elements */
+.multipleAllDay {
+   height:26px;
+}

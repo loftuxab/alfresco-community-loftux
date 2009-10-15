@@ -31,7 +31,7 @@ var CalendarScriptHelper  = ( function()
     // "end" : "13:00",
     // "site" : "testSite"
     // }
-    var convertToIcalFormat = function(event,eventDate)
+    var convertToIcalFormat = function(event,eventDate,endDate)
     {
         var convertedEvent = {};
         convertedEvent.location = event.where;
@@ -39,14 +39,15 @@ var CalendarScriptHelper  = ( function()
         convertedEvent.dtstart = toISOString(eventDate).split('+')[0];
         convertedEvent.dtstartText = zeroPad(eventDate.getHours())+':'+zeroPad(eventDate.getMinutes());
         eventDate.setHours(new String(event.end).split(':')[0]);
-        convertedEvent.dtend = toISOString(eventDate).split('+')[0];
-        convertedEvent.dtendText = zeroPad(eventDate.getHours())+':'+zeroPad(eventDate.getMinutes());
+        convertedEvent.dtend = toISOString(endDate).split('+')[0];
+        convertedEvent.dtendText = zeroPad(endDate.getHours())+':'+zeroPad(endDate.getMinutes());
         convertedEvent.summary = event.title;
         // convertedEvent.url = event.url;
         convertedEvent.description = event.description || event.title;
         convertedEvent.location = event.where;
         convertedEvent.name = event.name;
         convertedEvent.tags = event.tags;
+        convertedEvent.duration = event.duration;
         
         if (event.start === event.end)
         {
@@ -330,7 +331,7 @@ var CalendarScriptHelper  = ( function()
             		new Date(startDate.getTime())
             	);
             	viewArgs.dates.push({
-            	    id:toISOString(startDate,{selector:'date'})
+            	    id:toISOString(startDate,{selector:'date'}).split('T')[0]
             	});
             	startDate.setTime(startDate.getTime() + DAY);
             }
@@ -349,6 +350,7 @@ var CalendarScriptHelper  = ( function()
 
             //the first day in month as a Date object - actually first day to render in view (so could be a day in the previous month)
             var firstDayOfMonth = new Date(d.getTime() - ((d.getDate()-1) * DAY));
+            var actualFirstDayOfMonth = new Date(d.getFullYear(),d.getMonth(),1);
             //number of days in month
             var num_daysInMonth = daysInMonth(d.getMonth(),d.getFullYear());
             var lastDayOfMonth = new Date(((firstDayOfMonth.getTime() + (DAY*num_daysInMonth))));
@@ -370,22 +372,25 @@ var CalendarScriptHelper  = ( function()
             viewArgs.startDate = toISOString(new Date(d.getTime() - ((d.getDate()-1) * DAY)),{selector:'date'});
             viewArgs.titleDate = viewArgs.startDate;
             viewArgs.endDate = toISOString(lastDayOfMonth,{selector:'date'});
+            
             var events = this.getUserEvents(firstDayOfMonth,{selector:'date'});
             if (events!==undefined)
             {
                 for (var i=0;i<events.length;i++)
                 {
                     var eventDate=  new Date();
+                    var endDate = new Date();
                     var ev = events[i];
                     eventDate.setTime(fromISOString(ev.when));
-                    if ((eventDate.getTime() >= firstDayOfMonth.getTime()) && (eventDate.getTime() < lastDayOfMonth.getTime()))
+                    endDate.setTime(fromISOString(ev.endDate))
+                    if ((eventDate.getTime() >= actualFirstDayOfMonth.getTime()) && (eventDate.getTime() < lastDayOfMonth.getTime()))
                     {
                       var key = 'ev_'+eventDate.getDate();
                       if (viewArgs.viewEvents[key]===undefined)
                       {
                           viewArgs.viewEvents[key] = [];
                       }
-                      viewArgs.viewEvents[key].push(convertToIcalFormat(ev,eventDate));                      
+                      viewArgs.viewEvents[key].push(convertToIcalFormat(ev,eventDate,endDate));
                     }
                 }
             }
