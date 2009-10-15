@@ -40,7 +40,6 @@ import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementAdminSer
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementCustomModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementModel;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies;
-import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementService;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.BeforeCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.RecordsManagementPolicies.OnCreateReference;
 import org.alfresco.module.org_alfresco_module_dod5015.action.RecordsManagementActionService;
@@ -51,6 +50,7 @@ import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
 import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.dictionary.AspectDefinition;
 import org.alfresco.service.cmr.dictionary.AssociationDefinition;
 import org.alfresco.service.cmr.dictionary.Constraint;
@@ -66,8 +66,6 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
-import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.cmr.view.ImporterService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -88,17 +86,14 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
     
     private ContentService contentService;
     private DictionaryService dictionaryService;
-    private ImporterService importService;
     private NamespaceService namespaceService;
     private NodeService nodeService;
     private SearchService searchService;
     private RecordsManagementActionService rmActionService;
     private RecordsManagementAdminService rmAdminService;
-    private RecordsManagementService rmService;
+    private RetryingTransactionHelper transactionHelper;
     private TransactionService transactionService;
     private PolicyComponent policyComponent;
-    
-    private PermissionService permissionService;
     
     private final static long testRunID = System.currentTimeMillis();
     
@@ -109,16 +104,14 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         
         this.dictionaryService = (DictionaryService)this.applicationContext.getBean("DictionaryService");
         this.contentService = (ContentService)this.applicationContext.getBean("ContentService");
-        this.importService = (ImporterService)this.applicationContext.getBean("importerComponent");
         this.namespaceService = (NamespaceService)this.applicationContext.getBean("NamespaceService");
         this.nodeService = (NodeService)this.applicationContext.getBean("NodeService");
-        this.permissionService = (PermissionService)this.applicationContext.getBean("PermissionService");
         this.rmActionService = (RecordsManagementActionService)this.applicationContext.getBean("RecordsManagementActionService");
         this.rmAdminService = (RecordsManagementAdminService)this.applicationContext.getBean("RecordsManagementAdminService");
         this.searchService = (SearchService)this.applicationContext.getBean("SearchService");
+        this.transactionHelper = (RetryingTransactionHelper)this.applicationContext.getBean("retryingTransactionHelper");
         this.transactionService = (TransactionService)this.applicationContext.getBean("TransactionService");
         this.policyComponent = (PolicyComponent)this.applicationContext.getBean("policyComponent");
-        this.rmService = (RecordsManagementService)applicationContext.getBean("RecordsManagementService");
         
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -251,112 +244,135 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
     	createAndUseCustomReference(CustomReferenceType.BIDIRECTIONAL, "supporting" + now, null, null);
     }
     
-	private void createAndUseCustomReference(CustomReferenceType refType, String label, String source, String target) throws Exception
+	private void createAndUseCustomReference(final CustomReferenceType refType, final String label, final String source, final String target) throws Exception
 	{
 		// Create the necessary test objects in the db: two records.
-        NodeRef recordFolder = retrievePreexistingRecordFolder();
-        NodeRef testRecord1 = createRecord(recordFolder, "testRecordA" + System.currentTimeMillis());
-        NodeRef testRecord2 = createRecord(recordFolder, "testRecordB" + System.currentTimeMillis());
-        
+        final NodeRef recordFolder = retrievePreexistingRecordFolder();
         setComplete();
         endTransaction();
-        
-        UserTransaction txn1 = transactionService.getUserTransaction(false);
-        txn1.begin();
 
-        declareRecord(testRecord1);
-        declareRecord(testRecord2);
+        final NodeRef testRecord1 = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        NodeRef result = createRecord(recordFolder, "testRecordA" + System.currentTimeMillis());
+                        return result;
+                    }          
+                });        
+        final NodeRef testRecord2 = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        NodeRef result = createRecord(recordFolder, "testRecordB" + System.currentTimeMillis());
+                        return result;
+                    }          
+                });        
 
-        Map <String, Serializable> params = new HashMap<String, Serializable>();
-        params.put("referenceType", refType.toString());
-        if (label != null) params.put("label", label);
-        if (source != null) params.put("source", source);
-        if (target != null) params.put("target", target);
+        final QName generatedQName = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<QName>()
+                {
+                    public QName execute() throws Throwable
+                    {
+                        declareRecord(testRecord1);
+                        declareRecord(testRecord2);
 
-        // Create the reference definition.
-        QName generatedQName;
-        if (label != null)
-        {
-            // A bidirectional reference
-            generatedQName = rmAdminService.addCustomAssocDefinition(label);
-        }
-        else
-        {
-            // A parent/child reference
-            generatedQName = rmAdminService.addCustomChildAssocDefinition(source, target);
-        }
-        System.out.println("Creating new " + refType + " reference definition: " + generatedQName);
-        System.out.println("  params- label: '" + label + "' source: '" + source + "' target: '" + target + "'");
-        
-        // We need to commit the transaction to trigger behaviour that should reload the data dictionary model.
-        txn1.commit();
-        
-        UserTransaction txn2 = transactionService.getUserTransaction(false);
-        txn2.begin();
+                        Map <String, Serializable> params = new HashMap<String, Serializable>();
+                        params.put("referenceType", refType.toString());
+                        if (label != null) params.put("label", label);
+                        if (source != null) params.put("source", source);
+                        if (target != null) params.put("target", target);
 
+                        // Create the reference definition.
+                        QName qNameResult;
+                        if (label != null)
+                        {
+                            // A bidirectional reference
+                            qNameResult = rmAdminService.addCustomAssocDefinition(label);
+                        }
+                        else
+                        {
+                            // A parent/child reference
+                            qNameResult = rmAdminService.addCustomChildAssocDefinition(source, target);
+                        }
+                        System.out.println("Creating new " + refType + " reference definition: " + qNameResult);
+                        System.out.println("  params- label: '" + label + "' source: '" + source + "' target: '" + target + "'");
+                        
+                        return qNameResult;
+                    }          
+                });        
         
-        // Confirm the custom reference is included in the list from rmAdminService.
-        Map<QName, AssociationDefinition> customRefDefinitions = rmAdminService.getCustomReferenceDefinitions();
-        AssociationDefinition retrievedRefDefn = customRefDefinitions.get(generatedQName);
-        assertNotNull("Custom reference definition from rmAdminService was null.", retrievedRefDefn);
-        assertEquals(generatedQName, retrievedRefDefn.getName());
-        assertEquals(refType.equals(CustomReferenceType.PARENT_CHILD), retrievedRefDefn.isChild());
-        
-        // Now we need to use the custom reference.
-        // So we apply the aspect containing it to our test records.
-        nodeService.addAspect(testRecord1, ASPECT_CUSTOM_ASSOCIATIONS, null);
-        
-        QName assocsAspectQName = QName.createQName("rmc:customAssocs", namespaceService);
-        nodeService.addAspect(testRecord1, assocsAspectQName, null);
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        // Confirm the custom reference is included in the list from rmAdminService.
+                        Map<QName, AssociationDefinition> customRefDefinitions = rmAdminService.getCustomReferenceDefinitions();
+                        AssociationDefinition retrievedRefDefn = customRefDefinitions.get(generatedQName);
+                        assertNotNull("Custom reference definition from rmAdminService was null.", retrievedRefDefn);
+                        assertEquals(generatedQName, retrievedRefDefn.getName());
+                        assertEquals(refType.equals(CustomReferenceType.PARENT_CHILD), retrievedRefDefn.isChild());
+                        
+                        // Now we need to use the custom reference.
+                        // So we apply the aspect containing it to our test records.
+                        nodeService.addAspect(testRecord1, ASPECT_CUSTOM_ASSOCIATIONS, null);
+                        
+                        QName assocsAspectQName = QName.createQName("rmc:customAssocs", namespaceService);
+                        nodeService.addAspect(testRecord1, assocsAspectQName, null);
 
-		if (CustomReferenceType.PARENT_CHILD.equals(refType))
-		{
-            nodeService.addChild(testRecord1, testRecord2, generatedQName, generatedQName);
-		}
-		else
-		{
-            nodeService.createAssociation(testRecord1, testRecord2, generatedQName);
-		}
+                        if (CustomReferenceType.PARENT_CHILD.equals(refType))
+                        {
+                            nodeService.addChild(testRecord1, testRecord2, generatedQName, generatedQName);
+                        }
+                        else
+                        {
+                            nodeService.createAssociation(testRecord1, testRecord2, generatedQName);
+                        }
+                        return null;
+                    }          
+                });        
         
-        txn2.commit();
-        
-        // Read back the reference value to make sure it was correctly applied.
-        transactionService.getUserTransaction(true);
-    	List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(testRecord1);
-    	List<AssociationRef> retrievedAssocs = nodeService.getTargetAssocs(testRecord1, RegexQNamePattern.MATCH_ALL);
-    	
-    	Object newlyAddedRef = null;
-		if (CustomReferenceType.PARENT_CHILD.equals(refType))
-    	{
-    		for (ChildAssociationRef caRef : childAssocs)
-    		{
-    			QName refInstanceQName = caRef.getQName();
-                if (generatedQName.equals(refInstanceQName)) newlyAddedRef = caRef;
-    		}
-    	}
-    	else
-    	{
-    		for (AssociationRef aRef : retrievedAssocs)
-    		{
-    			QName refQName = aRef.getTypeQName();
-                if (generatedQName.equals(refQName)) newlyAddedRef = aRef;
-    		}
-    	}
-    	assertNotNull("newlyAddedRef was null.", newlyAddedRef);
-        
-        // Check that the reference has appeared in the data dictionary
-        AspectDefinition customAssocsAspect = dictionaryService.getAspect(ASPECT_CUSTOM_ASSOCIATIONS);
-        assertNotNull(customAssocsAspect);
-		if (CustomReferenceType.PARENT_CHILD.equals(refType))
-        {
-        	assertNotNull("The customReference is not returned from the dictionaryService.",
-                    customAssocsAspect.getChildAssociations().get(generatedQName));
-        }
-        else
-        {
-        	assertNotNull("The customReference is not returned from the dictionaryService.",
-        			customAssocsAspect.getAssociations().get(generatedQName));
-        }
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        // Read back the reference value to make sure it was correctly applied.
+                        List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(testRecord1);
+                        List<AssociationRef> retrievedAssocs = nodeService.getTargetAssocs(testRecord1, RegexQNamePattern.MATCH_ALL);
+                        
+                        Object newlyAddedRef = null;
+                        if (CustomReferenceType.PARENT_CHILD.equals(refType))
+                        {
+                            for (ChildAssociationRef caRef : childAssocs)
+                            {
+                                QName refInstanceQName = caRef.getQName();
+                                if (generatedQName.equals(refInstanceQName)) newlyAddedRef = caRef;
+                            }
+                        }
+                        else
+                        {
+                            for (AssociationRef aRef : retrievedAssocs)
+                            {
+                                QName refQName = aRef.getTypeQName();
+                                if (generatedQName.equals(refQName)) newlyAddedRef = aRef;
+                            }
+                        }
+                        assertNotNull("newlyAddedRef was null.", newlyAddedRef);
+                        
+                        // Check that the reference has appeared in the data dictionary
+                        AspectDefinition customAssocsAspect = dictionaryService.getAspect(ASPECT_CUSTOM_ASSOCIATIONS);
+                        assertNotNull(customAssocsAspect);
+                        if (CustomReferenceType.PARENT_CHILD.equals(refType))
+                        {
+                            assertNotNull("The customReference is not returned from the dictionaryService.",
+                                    customAssocsAspect.getChildAssociations().get(generatedQName));
+                        }
+                        else
+                        {
+                            assertNotNull("The customReference is not returned from the dictionaryService.",
+                                    customAssocsAspect.getAssociations().get(generatedQName));
+                        }
+                        return null;
+                    }          
+                });        
 	}
 	
     public void testGetAllProperties()
