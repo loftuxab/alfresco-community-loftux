@@ -301,7 +301,7 @@
 					</td>
 					<td width="100%"></td>
 					<td nowrap>
-						<table id="button-delete" cellpadding="0" cellspacing="0" class="btn"><tr><td><div class="i"> </div></td><td><div class="button-delete"> </div></td><td><div class="i"> </div></td></table>
+						<table id="button-delete" cellpadding="0" cellspacing="0" class="btn"><tr><td><div class="i"> </div></td><td><div class="button-delete"> </div></td><td><div class="i"> </div></td></tr></table>
 					</td>
 				</tr>
 			</table>

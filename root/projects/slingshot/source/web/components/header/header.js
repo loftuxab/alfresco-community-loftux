@@ -469,7 +469,8 @@
          {
             shortName: this.options.siteId,
             title: this.options.siteTitle
-         };
+         },
+            me = this;
 
          var responseConfig =
          {
