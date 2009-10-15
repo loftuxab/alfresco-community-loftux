@@ -857,7 +857,7 @@
       {
          return new YAHOO.widget.TextNode(
          {
-            label: p_oData.name,
+            label: $html(p_oData.name),
             path: p_oData.path,
             nodeRef: p_oData.nodeRef,
             description: p_oData.description
@@ -872,7 +872,7 @@
        */
        _buildTreeNodeUrl: function DLT__buildTreeNodeUrl(path)
        {
-          var uriTemplate ="slingshot/doclib/treenode/site/" + $combine(encodeURIComponent(this.options.siteId), encodeURIComponent(this.options.containerId), encodeURI(path));
+          var uriTemplate ="slingshot/doclib/treenode/site/" + $combine(encodeURIComponent(this.options.siteId), encodeURIComponent(this.options.containerId), Alfresco.util.encodeURIPath(path));
           return  Alfresco.constants.PROXY_URI + uriTemplate;
        }
    });

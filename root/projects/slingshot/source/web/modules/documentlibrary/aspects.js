@@ -200,7 +200,7 @@
       doBeforeDialogShow: function DA_doBeforeDialogShow(p_form, p_this, p_obj)
       {
          // Dialog title
-         var fileSpan = '<span class="light">' + this.options.file.displayName + '</span>';
+         var fileSpan = '<span class="light">' + $html(this.options.file.displayName) + '</span>';
          Dom.get(this.id + "-title").innerHTML = this.msg("title", fileSpan);
 
          // DocLib Actions module

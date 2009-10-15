@@ -468,7 +468,7 @@
          }
          else
          {
-            var fileSpan = '<span class="light">' + this.options.files.displayName + '</span>';
+            var fileSpan = '<span class="light">' + $html(this.options.files.displayName) + '</span>';
             titleDiv.innerHTML = this._msg("title.single", fileSpan);
             // Convert to array
             this.options.files = [this.options.files];
