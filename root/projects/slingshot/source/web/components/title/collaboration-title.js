@@ -375,7 +375,7 @@
          // make ajax call to site service to join user
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + user,
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site + "/memberships/" + encodeURIComponent(user),
             method: "DELETE",
             successCallback:
             {
@@ -385,7 +385,7 @@
             failureCallback:
             {
                fn: this._failureCallback,
-               obj: Alfresco.util.message("message.leave-failure", this.name, encodeURIComponent(this.options.user), this.options.site),
+               obj: Alfresco.util.message("message.leave-failure", this.name, Alfresco.util.encodeHTML(this.options.user), this.options.site),
                scope: this
             }
          });
@@ -393,7 +393,7 @@
          // Let the user know something is happening
          this.widgets.feedbackMessage = Alfresco.util.PopupManager.displayMessage(
          {
-            text: Alfresco.util.message("message.leaving", this.name, user, site),
+            text: Alfresco.util.message("message.leaving", this.name, Alfresco.util.encodeHTML(user), site),
             spanClass: "wait",
             displayTime: 0
          });

@@ -525,14 +525,14 @@
             // make an ajax call to get user details
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.PROXY_URI + "api/people/" + parent.currentUserId + "?groups=true",
+               url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(parent.currentUserId) + "?groups=true",
                method: Alfresco.util.Ajax.GET,
                successCallback:
                {
                   fn: success,
                   scope: parent
                },
-               failureMessage: parent._msg("message.getuser-failure", parent.currentUserId)   
+               failureMessage: parent._msg("message.getuser-failure", $html(parent.currentUserId))   
             });
          }
       });
@@ -1089,14 +1089,14 @@
             // make an ajax call to get user details
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.PROXY_URI + "api/people/" + parent.currentUserId + "?groups=true",
+               url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(parent.currentUserId) + "?groups=true",
                method: Alfresco.util.Ajax.GET,
                successCallback:
                {
                   fn: success,
                   scope: parent
                },
-               failureMessage: parent._msg("message.getuser-failure", parent.currentUserId)   
+               failureMessage: parent._msg("message.getuser-failure", $html(parent.currentUserId))
             });
          }
       });
@@ -1360,7 +1360,7 @@
          Alfresco.util.Ajax.request(
          {
             method: Alfresco.util.Ajax.DELETE,
-            url: Alfresco.constants.PROXY_URI + "api/people/" + this.currentUserId,
+            url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(this.currentUserId),
             successCallback:
             {
                fn: this.onDeletedUser,
@@ -1681,7 +1681,7 @@
                   // update the password for the user
                   Alfresco.util.Ajax.request(
                   {
-                     url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + me.currentUserId,
+                     url: Alfresco.constants.PROXY_URI + "api/person/changepassword/" + encodeURIComponent(me.currentUserId),
                      method: Alfresco.util.Ajax.POST,
                      dataObj: passwordObj,
                      requestContentType: Alfresco.util.Ajax.JSON,
@@ -1703,7 +1703,7 @@
             {
                Alfresco.util.Ajax.request(
                {
-                  url: Alfresco.constants.PROXY_URI + "slingshot/profile/resetavatar/" + this.currentUserId,
+                  url: Alfresco.constants.PROXY_URI + "slingshot/profile/resetavatar/" + encodeURIComponent(this.currentUserId),
                   method: Alfresco.util.Ajax.PUT,
                   requestContentType: Alfresco.util.Ajax.JSON,
                   successCallback:
@@ -1785,7 +1785,7 @@
          
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/people/" + this.currentUserId,
+            url: Alfresco.constants.PROXY_URI + "api/people/" + encodeURIComponent(this.currentUserId),
             method: Alfresco.util.Ajax.PUT,
             dataObj: personObj,
             requestContentType: Alfresco.util.Ajax.JSON,

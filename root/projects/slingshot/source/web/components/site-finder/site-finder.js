@@ -711,7 +711,7 @@
          // make ajax call to site service to join user
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + site.shortName + "/memberships/" + user,
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + site.shortName + "/memberships/" + encodeURIComponent(user),
             method: "DELETE",
             successCallback:
             {

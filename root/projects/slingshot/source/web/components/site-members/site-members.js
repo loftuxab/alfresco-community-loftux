@@ -668,7 +668,7 @@
          // make ajax call to site service to remove user
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + user,
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + encodeURIComponent(user),
             method: "DELETE",
             successCallback:
             {

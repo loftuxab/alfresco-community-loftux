@@ -506,7 +506,7 @@
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/version/{site}/{title}/{version}",
          {
             site: this.options.siteId,
-            title: this.options.pageTitle,
+            title: encodeURIComponent(this.options.pageTitle),
             version: versionId
          });
          
@@ -525,7 +525,6 @@
             },
             failureMessage: "Could not retrieve version information"
          });
-         
       },
 
       /**

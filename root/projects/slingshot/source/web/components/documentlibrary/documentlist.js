@@ -1789,7 +1789,14 @@
                webscript:
                {
                   method: Alfresco.util.Ajax.POST,
-                  name: $combine("checkout/site", this.options.siteId, this.options.containerId, path, fileName)
+                  name: "checkout/site/{site}/{container}{path}/{file}",
+                  params:
+                  {
+                     site: this.options.siteId,
+                     container: this.options.containerId,
+                     path: Alfresco.util.encodeURIPath(path),
+                     file: encodeURIComponent(fileName)
+                  }
                }
             });
          }

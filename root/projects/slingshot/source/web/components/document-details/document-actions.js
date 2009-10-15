@@ -278,8 +278,8 @@
                {
                   site: this.options.siteId,
                   container: this.options.containerId,
-                  path: path,
-                  file: fileName
+                  path: Alfresco.util.encodeURIPath(path),
+                  file: encodeURIComponent(fileName)
                }
             }
          });
