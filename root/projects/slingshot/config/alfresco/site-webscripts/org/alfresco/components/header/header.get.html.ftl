@@ -67,11 +67,13 @@
             </li>
          </ul>
          <ul id="${args.htmlid}-favouriteSites" class="favourite-sites-list separator" style="display: ${favDisplay}">
+         <#if favouriteSites?size!=0>
          <#list favouriteSites as site>
             <li>
                <a href="${url.context}/page/site/${site.shortName}/dashboard">${site.title?html}</a>
             </li>
          </#list>
+         <#else><li></li></#if>
          </ul>
          <#assign addFavDisplay><#if (page.url.templateArgs.site?? && !currentSiteIsFav)>block<#else>none</#if></#assign>
          <ul id="${args.htmlid}-addFavourite" class="add-favourite-menuitem separator" style="display: ${addFavDisplay}">
