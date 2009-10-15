@@ -22,10 +22,12 @@
 
       <div class="yui-g">
          <div class="yui-g first">
+            <#if (config.scoped['DocumentDetails']['document-details'].getChildValue('display-web-preview') == "true")>
             <@region id=doclibType + "web-preview" scope="template" protected=true />
-         <#if doclibType?starts_with("dod5015")>
+            </#if>
+            <#if doclibType?starts_with("dod5015")>
             <@region id=doclibType + "events" scope="template" protected=true />
-         <#else>
+            <#else>
             <div class="document-details-comments">
                <@region id=doclibType + "comments" scope="template" protected=true />
                <@region id=doclibType + "createcomment" scope="template" protected=true />
@@ -45,7 +47,6 @@
                <#if doclibType?starts_with("dod5015")>
                   <@region id=doclibType + "document-references" scope="template" protected=true />                                 
                </#if>
-
             </div>
          </div>
       </div>

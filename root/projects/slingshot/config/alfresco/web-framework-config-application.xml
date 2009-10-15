@@ -228,4 +228,11 @@
       </users>
    </config>
 
+   <config evaluator="string-compare" condition="DocumentDetails" replace="true">
+      <document-details>
+         <!-- display web previewer on document details page -->
+         <display-web-preview>true</display-web-preview>
+      </document-details>
+   </config>
+
 </alfresco-config>
