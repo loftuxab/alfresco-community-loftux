@@ -140,7 +140,7 @@
             <span class="crud-label">${msg("label.shortname")}:&nbsp;*&nbsp;${msg("label.shortname.warning")}</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-create-shortname" type="text" maxlength="255" />
+            <input class="crud-input" id="${el}-create-shortname" type="text" maxlength="100" />
          </div>
          <div class="field-row">
             <span class="crud-label">${msg("label.displayname")}:&nbsp;*</span>

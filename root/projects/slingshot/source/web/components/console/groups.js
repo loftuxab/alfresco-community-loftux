@@ -1298,7 +1298,7 @@
             form.addValidation(parent.id + "-create-shortname", Alfresco.forms.validation.length,
             {
                min: 3,
-               max: 255,
+               max: 100,
                crop: true,
                includeWhitespace: false
             }, "keyup");
