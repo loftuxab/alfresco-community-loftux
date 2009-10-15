@@ -2488,7 +2488,7 @@ Alfresco.util.Ajax = function()
        */
       defaultRequestConfig:
       {
-         method: "GET",        // GET, POST and hopefully PUT or DELETE if ot works...
+         method: "GET",        // GET, POST, PUT or DELETE
          url: null,            // Must be set by user
          dataObj: null,        // Will be encoded to parameters (key1=value1&key2=value2)
                                // or a json string if contentType is set to JSON
@@ -2614,7 +2614,7 @@ Alfresco.util.Ajax = function()
                if (c.method.toUpperCase() === this.GET)
                {
                   // Encode the dataObj and put it in the url
-                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this.jsonToParamString(c.dataObj, false);
+                  c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this.jsonToParamString(c.dataObj, true);
                }
                else
                {
@@ -2645,9 +2645,6 @@ Alfresco.util.Ajax = function()
             }
          };
 
-         // Encode url to make sure it is transfered correctly
-         c.url = encodeURI(c.url);
-         
          // Do we need to tunnel the HTTP method if the client can't support it (Adobe AIR)
          if (YAHOO.env.ua.air !== 0)
          {

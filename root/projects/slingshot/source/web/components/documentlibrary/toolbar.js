@@ -256,7 +256,7 @@
        */
       onNewFolder: function DLTB_onNewFolder(e, p_obj)
       {
-         var actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/action/folder/site", this.options.siteId, this.options.containerId, this.currentPath);
+         var actionUrl = Alfresco.constants.PROXY_URI + $combine("slingshot/doclib/action/folder/site", this.options.siteId, this.options.containerId, Alfresco.util.encodeURIPath(this.currentPath));
 
          var doSetupFormsValidation = function DLTB_oNF_doSetupFormsValidation(p_form)
          {

@@ -948,7 +948,7 @@
                });
                return;
             }
-            var url = Alfresco.constants.PROXY_URI + "api/groups/" + parentShortName +"/children/" + fullName;
+            var url = Alfresco.constants.PROXY_URI + "api/groups/" + encodeURIComponent(parentShortName) + "/children/" + encodeURIComponent(fullName);
             this._doDeleteCall(url, displayName);
          },
 
@@ -998,7 +998,7 @@
             var name = userDisplayName;
             Alfresco.util.Ajax.jsonDelete(
             {
-               url: Alfresco.constants.PROXY_URI + "api/groups/" + groupId + "/children/" + userId,
+               url: Alfresco.constants.PROXY_URI + "api/groups/" + encodeURIComponent(groupId) + "/children/" + encodeURIComponent(userId),
                successCallback:
                {
                   fn: function(o)
@@ -1031,7 +1031,7 @@
          {
             Alfresco.util.Ajax.jsonPost(
             {
-               url: Alfresco.constants.PROXY_URI + "api/groups/" + parentGroupShortName + "/children/" + objectId,
+               url: Alfresco.constants.PROXY_URI + "api/groups/" + encodeURIComponent(parentGroupShortName) + "/children/" + encodeURIComponent(objectId),
                successCallback:
                {
                   fn: function(o)
@@ -1543,7 +1543,7 @@
             var sh = successHandler;
             if (parent.group && parent.group.length > 0)
             {
-               url += "groups/" + parent.group + "/children/GROUP_" + shortName;
+               url += "groups/" + encodeURIComponent(parent.group) + "/children/GROUP_" + encodeURIComponent(shortName);
                sh = function(response)
                {
                   if (displayName && shortName != displayName)
@@ -1568,7 +1568,7 @@
             }
             else
             {
-               url += "rootgroups/" + shortName;
+               url += "rootgroups/" + encodeURIComponent(shortName);
                if (displayName)
                {
                   groupObj.displayName = displayName;
@@ -1731,13 +1731,13 @@
             // make an ajax call to get group details
             Alfresco.util.Ajax.jsonGet(
             {
-               url: Alfresco.constants.PROXY_URI + "api/groups/" + parent.group,
+               url: Alfresco.constants.PROXY_URI + "api/groups/" + encodeURIComponent(parent.group),
                successCallback:
                {
                   fn: success,
                   scope: this
                },
-               failureMessage: parent._msg("message.getgroup-failure", parent.group)
+               failureMessage: parent._msg("message.getgroup-failure", $html(parent.group))
             });
          },
 
@@ -1806,7 +1806,7 @@
          {
             Alfresco.util.Ajax.jsonPut(
             {
-               url: Alfresco.constants.PROXY_URI + "api/groups/" + shortName,
+               url: Alfresco.constants.PROXY_URI + "api/groups/" + encodeURIComponent(shortName),
                dataObj: groupObj,
                successCallback: successCallback,
                failureCallback:
@@ -2092,7 +2092,7 @@
       {
          Alfresco.util.Ajax.jsonGet(
          {
-            url:  Alfresco.constants.PROXY_URI + "api/groups/" + shortName + "/parents?level=ALL",
+            url:  Alfresco.constants.PROXY_URI + "api/groups/" + encodeURIComponent(shortName) + "/parents?level=ALL",
             successCallback:
             {
                fn: function(o)

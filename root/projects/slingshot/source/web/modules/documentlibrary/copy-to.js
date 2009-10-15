@@ -648,7 +648,7 @@
             {
                site: this.options.siteId,
                container: this.options.containerId,
-               path: this.selectedNode.data.path
+               path: Alfresco.util.encodeURIPath(this.selectedNode.data.path)
             }
          }
          else
@@ -658,7 +658,7 @@
             params =
             {
                nodeRef: this.options.nodeRef.replace(":/", ""),
-               path: this.selectedNode.data.path
+               path: Alfresco.util.encodeURIPath(this.selectedNode.data.path)
             }
          }
          

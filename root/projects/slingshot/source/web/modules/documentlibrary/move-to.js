@@ -490,7 +490,7 @@
             {
                method: Alfresco.util.Ajax.POST,
                stem: this.options.dataWebScriptStem,
-               name: $combine(this.options.dataWebScript, this.options.siteId, this.options.containerId, this.selectedNode.data.path)
+               name: $combine(this.options.dataWebScript, this.options.siteId, this.options.containerId, Alfresco.util.encodeURIPath(this.selectedNode.data.path))
             },
             wait:
             {
@@ -576,7 +576,6 @@
          }
          return false;
       },
-
       
       /**
        * Update tree when the path has changed

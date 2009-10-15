@@ -142,7 +142,14 @@
             webscript:
             {
                method: Alfresco.util.Ajax.DELETE,
-               name: $combine("file/site", this.options.siteId, this.options.containerId, path, fileName)
+               name: "file/site/{site}/{container}{path}/{file}",
+               params:
+               {
+                  site: this.options.siteId,
+                  container: this.options.containerId,
+                  path: Alfresco.util.encodeURIPath(path),
+                  file: encodeURIComponent(fileName)
+               }
             }
          });
       },

@@ -205,7 +205,7 @@
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/version/{site}/{title}/{version}",
          {
             site: this.showConfig.siteId,
-            title: this.showConfig.pageTitle,
+            title: encodeURIComponent(this.showConfig.pageTitle),
             version: this.showConfig.versionId
          });
 
@@ -246,7 +246,7 @@
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/page/{site}/{title}",
          {
             site: this.showConfig.siteId,
-            title: this.showConfig.pageTitle
+            title: encodeURIComponent(this.showConfig.pageTitle)
          });
 
 		   var content = event.serverResponse.responseText;

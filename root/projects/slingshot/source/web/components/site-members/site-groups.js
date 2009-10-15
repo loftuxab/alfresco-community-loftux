@@ -624,7 +624,7 @@
          // make ajax call to site service to remove group
          Alfresco.util.Ajax.request(
          {
-            url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + group.fullName,
+            url: Alfresco.constants.PROXY_URI + "api/sites/" + this.options.siteId + "/memberships/" + encodeURIComponent(group.fullName),
             method: "DELETE",
             successCallback:
             {
