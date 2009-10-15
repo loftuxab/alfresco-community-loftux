@@ -145,7 +145,7 @@
           {
              site: encodeURIComponent(this.options.siteId),
              container: encodeURIComponent(this.options.containerId),
-             path: encodeURI(path)
+             path: Alfresco.util.encodeURIPath(path)
           });
 
           return url;
