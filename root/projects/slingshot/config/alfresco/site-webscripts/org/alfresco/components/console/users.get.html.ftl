@@ -209,19 +209,19 @@
             <span class="crud-label">${msg("label.username")}:&nbsp;*</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-create-username" type="text" maxlength="255" />
+            <input class="crud-input" id="${el}-create-username" type="text" maxlength="100" />
          </div>
          <div class="field-row">
             <span class="crud-label">${msg("label.password")}:&nbsp;*</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-create-password" type="password" maxlength="255" />
+            <input class="crud-input" id="${el}-create-password" type="password" maxlength="100" />
          </div>
          <div class="field-row">
             <span class="crud-label">${msg("label.verifypassword")}:&nbsp;*</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-create-verifypassword" type="password" maxlength="255" />
+            <input class="crud-input" id="${el}-create-verifypassword" type="password" maxlength="100" />
          </div>
          <div class="field-row">
             <span class="crud-label">${msg("label.groups")}:</span>
@@ -329,7 +329,7 @@
             <span class="crud-label">${msg("label.newpassword")}:</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-update-password" type="password" maxlength="255" />
+            <input class="crud-input" id="${el}-update-password" type="password" maxlength="100" />
             <br/>
             <span class="small">${msg("label.leaveblank")}</span>
          </div>
@@ -337,7 +337,7 @@
             <span class="crud-label">${msg("label.verifypassword")}:</span>
          </div>
          <div class="field-row">
-            <input class="crud-input" id="${el}-update-verifypassword" type="password" maxlength="255" />
+            <input class="crud-input" id="${el}-update-verifypassword" type="password" maxlength="100" />
          </div>
 
          <div class="field-row">

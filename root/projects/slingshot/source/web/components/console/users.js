@@ -278,12 +278,22 @@
              */
             var renderCellFullName = function renderCellFullName(elCell, oRecord, oColumn, oData)
             {
-               var firstName = oRecord.getData("firstName");
-               var lastName = oRecord.getData("lastName");
-               var name = firstName + ' ' + (lastName ? lastName : "");
-               
+               // Create view userlink
+               var firstName = oRecord.getData("firstName"),
+                  lastName = oRecord.getData("lastName"),
+                  name = firstName + ' ' + (lastName ? lastName : ""),
+                  viewUserLink = document.createElement("a");
+               viewUserLink.innerHTML = $html(name);
+
                // fire the 'viewUserClick' event when the selected user in the list has changed
-               elCell.innerHTML = "<a href='#' onclick=\"YAHOO.Bubbling.fire('viewUserClick', {username: '" + oRecord.getData("userName") + "'}); return false;\">" + $html(name) + "</a>";
+               YAHOO.util.Event.addListener(viewUserLink, "click", function(e)
+               {
+                  YAHOO.Bubbling.fire('viewUserClick',
+                  {
+                     username: oRecord.getData("userName")
+                  });
+               }, null, parent);
+               elCell.appendChild(viewUserLink);
             };
             
             /**
@@ -567,19 +577,19 @@
             form.addValidation(parent.id + "-create-username", Alfresco.forms.validation.length,
             {
                min: parent.options.minUsernameLength,
-               max: 255,
+               max: 100,
                crop: true
             }, "keyup");
             form.addValidation(parent.id + "-create-password", Alfresco.forms.validation.length,
             {
                min: parent.options.minPasswordLength,
-               max: 255,
+               max: 100,
                crop: true
             }, "keyup");
             form.addValidation(parent.id + "-create-verifypassword", Alfresco.forms.validation.length,
             {
                min: parent.options.minPasswordLength,
-               max: 255,
+               max: 100,
                crop: true
             }, "keyup");
             
