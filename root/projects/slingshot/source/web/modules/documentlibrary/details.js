@@ -32,11 +32,17 @@
 (function()
 {
    /**
-   * YUI Library aliases
-   */
+    * YUI Library aliases
+    */
    var Dom = YAHOO.util.Dom,
       Event = YAHOO.util.Event,
       Element = YAHOO.util.Element;
+      
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
 
    Alfresco.module.DoclibDetails = function(htmlId)
    {
@@ -393,7 +399,7 @@
          
          // Dialog title
          var titleDiv = Dom.get(this.id + "-title");
-         var fileSpan = '<span class="light">' + file.displayName + '</span>';
+         var fileSpan = '<span class="light">' + $html(file.displayName) + '</span>';
          titleDiv.innerHTML = this.msg("title", fileSpan);
 
          // Item details

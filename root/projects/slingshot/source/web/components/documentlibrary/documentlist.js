@@ -2266,7 +2266,7 @@
             type: encodeURIComponent(obj.type),
             site: encodeURIComponent(obj.site),
             container: encodeURIComponent(obj.container),
-            path: $combine("/", encodeURI(obj.path))
+            path: $combine("/", Alfresco.util.encodeURIPath(obj.path))
          });
 
          // Filter parameters

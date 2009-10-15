@@ -253,7 +253,7 @@
                         var item = results.items[i];
                         var tempNode = new YAHOO.widget.TextNode(
                         {
-                           label: item.name,
+                           label: $html(item.name),
                            path: $combine(nodePath, item.name),
                            nodeRef: item.nodeRef,
                            description: item.description,
@@ -346,7 +346,7 @@
          }
          else
          {
-            var fileSpan = '<span class="light">' + this.options.files.displayName + '</span>';
+            var fileSpan = '<span class="light">' + $html(this.options.files.displayName) + '</span>';
             titleDiv.innerHTML = this.msg("title.single", fileSpan)
          }
 
@@ -731,7 +731,7 @@
           {
              site: encodeURIComponent(this.options.siteId),
              container: encodeURIComponent(this.options.containerId),
-             path: encodeURI(path)
+             path: Alfresco.util.encodeURIPath(path)
           });
 
           return url;

@@ -185,7 +185,7 @@
          }
          
          // Finally show the main component body here to prevent UI artifacts on YUI button decoration
-         Dom.setStyle(this.id + "-readview", "display", "block");
+         Dom.removeClass(this.id + "-readview", "hidden");
       },
       
       /**
@@ -197,8 +197,8 @@
        */
       onEditProfile: function UP_onEditProfile(e, p_obj)
       {
-         Dom.setStyle(this.id + "-readview", "display", "none");
-         Dom.setStyle(this.id + "-editview", "display", "block");   
+         Dom.addClass(this.id + "-readview", "hidden");
+         Dom.removeClass(this.id + "-editview", "hidden");
       },
 
 
@@ -303,8 +303,8 @@
        */
       onCancel: function UP_onCancel(e, p_obj)
       {
-         Dom.setStyle(this.id + "-editview", "display", "none"); 
-         Dom.setStyle(this.id + "-readview", "display", "block");
+         Dom.addClass(this.id + "-editview", "hidden");
+         Dom.removeClass(this.id + "-readview", "hidden");
       }
    };
 })();

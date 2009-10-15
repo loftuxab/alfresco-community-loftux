@@ -688,6 +688,22 @@ Alfresco.util.encodeHTML.text = document.createTextNode("");
 Alfresco.util.encodeHTML.div.appendChild(Alfresco.util.encodeHTML.text);
 
 /**
+ * Encodes a folder path string for use in a REST URI.
+ * First performs a encodeURI() pass so that the '/' character is maintained
+ * as the path must be intact as URI elements. Then encodes further characters
+ * on the path that would cause problems in URLs, such as '&', '=' and '#'.
+ *
+ * @method Alfresco.util.encodeURIPath
+ * @param text {string} The string to be encoded
+ * @return {string} Encoded path URI string.
+ * @static
+ */
+Alfresco.util.encodeURIPath = function(text)
+{
+   return encodeURI(text).replace(/#/g, "%23").replace(/&/g, "%26").replace(/=/g, "%3D");
+};
+
+/**
  * Scans a text string for links and injects HTML mark-up to activate them.
  * NOTE: If used in conjunction with encodeHTML, this function must be called last.
  *

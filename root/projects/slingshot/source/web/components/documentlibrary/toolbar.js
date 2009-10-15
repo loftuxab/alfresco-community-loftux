@@ -435,7 +435,7 @@
          
          for (var i = 0, j = assets.length; i < j; i++)
          {
-            fileNames.push("<span class=\"" + assets[i].type + "\">" + assets[i].displayName + "</span>");
+            fileNames.push("<span class=\"" + assets[i].type + "\">" + $html(assets[i].displayName) + "</span>");
          }
          
          var confirmTitle = this.msg("title.multiple-delete.confirm"),
@@ -1008,7 +1008,7 @@
             {
                eFolder = new Element(document.createElement("span"),
                {
-                  innerHTML: displayPaths[i]
+                  innerHTML: $html(displayPaths[i])
                });
                if (j > 1)
                {
@@ -1027,7 +1027,7 @@
                eFolder = new Element(document.createElement("a"),
                {
                   href: "",
-                  innerHTML: displayPaths[i]
+                  innerHTML: $html(displayPaths[i])
                });
                eFolder.addClass("folder");
                eFolder.on("click", fnBreadcrumbClick, newPath);
@@ -1107,7 +1107,7 @@
                type: this.modules.docList.options.showFolders ? "all" : "documents",
                site: encodeURIComponent(this.options.siteId),
                container: encodeURIComponent(this.options.containerId),
-               path: encodeURI(this.currentPath)
+               path: Alfresco.util.encodeURIPath(this.currentPath)
             });
 
             params += "?filter=" + encodeURIComponent(this.currentFilter.filterId);
