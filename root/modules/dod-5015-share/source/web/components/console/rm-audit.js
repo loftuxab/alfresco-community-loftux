@@ -35,8 +35,13 @@
     * YUI Library aliases
     */
    var Dom = YAHOO.util.Dom,
-       Event = YAHOO.util.Event,
-       Sel = YAHOO.util.Selector,
+      Event = YAHOO.util.Event,
+      Sel = YAHOO.util.Selector;
+
+    /**
+     * Alfresco Slingshot aliases
+     */
+    var $html = Alfresco.util.encodeHTML,
        formatDate = Alfresco.util.formatDate,
        fromISO8601 = Alfresco.util.fromISO8601;
 
@@ -916,8 +921,11 @@
             {
                var o = data.changedValues[i];
                o.className = (i%2===0) ? '' : ' class="odd"';
-               o.previous = o.previous || '&lt;none&gt;';
-               changedValuesHTML+=YAHOO.lang.substitute(changedValuesHTMLTemplate, o);
+               o.previous = $html(o.previous) || '&lt;none&gt;';
+               changedValuesHTML += YAHOO.lang.substitute(changedValuesHTMLTemplate, o, function(p_key, p_value, p_meta)
+               {
+                  return $html(p_value);
+               });
             }
    
             body+='<table id="auditEntry-changedValues">'+

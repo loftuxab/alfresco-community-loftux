@@ -477,7 +477,7 @@
                 * Transfer Container
                 */
                case "transfer-container":
-                  var transferTitle = me.msg("details.transfer-container.title", record.displayName),
+                  var transferTitle = me.msg("details.transfer-container.title", $html(record.displayName)),
                      filterObj =
                      {
                         filterId: "transfers",
@@ -526,7 +526,7 @@
                 */
                case "hold-container":
                   var holdDate = record.createdOn,
-                     holdReason = dod5015["rma:holdReason"] || me.msg("details.hold-container.reason.none"),
+                     holdReason = $html(dod5015["rma:holdReason"]) || me.msg("details.hold-container.reason.none"),
                      holdTitle = me.msg("details.hold-container.title", Alfresco.util.formatDate(holdDate, "dd mmmm yyyy"), Alfresco.util.formatDate(holdDate, "HH:MM:ss")),
                      filterObj =
                      {

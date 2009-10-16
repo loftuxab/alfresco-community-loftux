@@ -137,8 +137,7 @@
       var filterObj = Alfresco.util.cleanBubblingObject(filter),
          markup = YAHOO.lang.substitute("{filterOwner}|{filterId}|{filterData}|{filterDisplay}", filterObj, function(p_key, p_value, p_meta)
          {
-            p_value = typeof p_value == "undefined" ? "" : p_value;
-   			return encodeURI(p_value);
+            return typeof p_value == "undefined" ? "" : $html(p_value);
          });
       
       return markup;

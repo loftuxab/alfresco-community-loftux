@@ -206,7 +206,7 @@ Alfresco.RM = Alfresco.RM || {};
             var selectedItem = selectedItems[0],
                docUrl = Alfresco.constants.URL_CONTEXT + 'page/site/rm/document-details?nodeRef=' + selectedItem.nodeRef,
                docLibPath = selectedItem.displayPath.split('documentLibrary')[1];
-            selectedEl.innerHTML = '<a href="'+ docUrl+ '" title="' + selectedItem.description + '">'+ docLibPath + '/' + selectedItem.name +'</a>';
+            selectedEl.innerHTML = '<a href="'+ docUrl+ '" title="' + $html(selectedItem.description) + '">'+ $html(docLibPath + '/' + selectedItem.name) +'</a>';
             Dom.addClass(selectedEl,'active');
             // Note: if more than one than we must store as comma separated
             this.options.currentValue = selectedItem.nodeRef;

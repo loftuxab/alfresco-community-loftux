@@ -42,6 +42,11 @@
     */
    var Dom = YAHOO.util.Dom;
 
+   /**
+    * Alfresco Slingshot aliases
+    */
+   var $html = Alfresco.util.encodeHTML;
+
    Alfresco.doclib.RecordsActions.prototype =
    {
       /**
@@ -67,7 +72,7 @@
                   fn: this._transferAccessionComplete,
                   obj:
                   {
-                     displayName: YAHOO.lang.isArray(assets) ? this.msg("message.multi-select", assets.length) : assets.displayName
+                     displayName: YAHOO.lang.isArray(assets) ? this.msg("message.multi-select", assets.length) : $html(assets.displayName)
                   },
                   scope: this
                }
@@ -150,7 +155,7 @@
        */
       onActionDeclare: function RDLA_onActionDeclare(assets)
       {
-         var displayName = assets.displayName,
+         var displayName = $html(assets.displayName),
             editMetadataUrl = Alfresco.constants.URL_PAGECONTEXT + "site/" + this.options.siteId + "/edit-metadata?nodeRef=" + assets.nodeRef;
 
          this._dod5015Action("message.declare", assets, "declareRecord", null,
@@ -206,7 +211,7 @@
          
          if (noOfAssets == 1)
          {
-            text = this.msg("message.confirm.destroy", (YAHOO.lang.isArray(assets) ? assets[0].displayName : assets.displayName));
+            text = this.msg("message.confirm.destroy", $html((YAHOO.lang.isArray(assets) ? assets[0].displayName : assets.displayName)));
          }
          else
          {
@@ -647,7 +652,7 @@
                   fn: this._transferAccessionComplete,
                   obj:
                   {
-                     displayName: YAHOO.lang.isArray(assets) ? this.msg("message.multi-select", assets.length) : assets.displayName
+                     displayName: YAHOO.lang.isArray(assets) ? this.msg("message.multi-select", assets.length) : $html(assets.displayName)
                   },
                   scope: this
                }

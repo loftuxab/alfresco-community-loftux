@@ -424,7 +424,7 @@
          this._createResizer();
          this._populateSelectedItems();         
          this.options.objectRenderer.onPickerShow();
-         this.widgets.ok.set('disabled', (this.currentValueMeta.length==0) ? false : true);
+         this.widgets.ok.set('disabled', (this.currentValueMeta && this.currentValueMeta.length == 0) ? false : true);
 
          YAHOO.Bubbling.fire("refreshItemList",
          {
@@ -474,7 +474,10 @@
          this.options.currentValue = selItemsAsNodeRefs.join(',');
          this._getCurrentValueMeta();
          //need to fire as objects
-         YAHOO.Bubbling.fire("onDocumentsSelected", {items:selItems});
+         YAHOO.Bubbling.fire("onDocumentsSelected",
+         {
+            items:selItems
+         });
          Alfresco.util.setVar('DocumentPickerSelection', selItems);
          
          this.widgets.panel.hide();
@@ -636,7 +639,11 @@
                }
             }
 
-            Dom.get(this.id + "-currentValueDisplay").innerHTML = displayValue;
+            var cvd = Dom.get(this.id + "-currentValueDisplay");
+            if (cvd)
+            {
+               cvd.innerHTML = displayValue;
+            }
          }
       },
 
@@ -1085,7 +1092,7 @@
        */
       _getSavedItems: function DocumentPicker__getSavedItems()
       {
-         var savedSelections = Alfresco.util.getVar('DocumentPickerSelection');
+         var savedSelections = Alfresco.util.getVar('DocumentPickerSelection') || [];
 
          YAHOO.Bubbling.fire("onDocumentsSelected", {items:savedSelections});
          return savedSelections;
