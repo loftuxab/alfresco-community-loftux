@@ -300,7 +300,15 @@ public class FileSystemDeploymentTarget implements Serializable, DeploymentTarge
                     }
                     catch (Throwable t)
                     {
-                    	throw new DeploymentException("Error thrown in prepare", t);
+                        String msg = "Error thrown in prepare; rolled back";
+                        
+                        if(t.getCause() != null)
+                        {
+                           msg = msg + " :" + t.getCause().getMessage(); 
+                        }
+                        logger.error(msg, t);
+               
+                        throw new DeploymentException(msg, t);
                     }
                 }
             }
