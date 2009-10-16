@@ -18,13 +18,18 @@
    height:19px;
    line-height:19px;
    margin-right:-10px;
-   padding:10px 0 20px;
+   padding: 10px 0 20px;
 }
 
 .header span.menu-item-separator
 {
    border-right: 1px solid #a1a1a1;
    padding: 0 0 0 0.2em;
+}
+
+.header .search-container span.menu-item-separator
+{
+   padding: 0;
 }
 
 .header span.menu-item
@@ -41,7 +46,7 @@
 
 .header span.menu-item-icon
 {
-   padding: 3px 5px 0; 
+   padding: 3px 5px 0;
    vertical-align: top;
 }
 
@@ -54,7 +59,7 @@
 {
    background-position: 0px 50%;
    background-repeat: no-repeat;
-   padding: 1px 0px 1px 20px;
+   padding: 0 0px 1px 20px;
 }
 
 .header span.my-dashboard a
@@ -107,32 +112,21 @@
 
 .header .search-tinput
 {
-	background-image: url(../images/search-16.png);
-   background-position: 2px 50%;
-	background-repeat: no-repeat;
 	color: default;
-	padding-left: 20px;
 	width: 12em;
 }
 
 .header .search-tinput.gray
 {
-	background-image: url(../images/search-16-gray.png);
 	color: #999;
 }
 
-.header .search-site-icon
+.header .search-icon
 {
-   background-image: url(../images/select_arrow.gif);
-   background-position: left bottom;
+   background-image: url(../images/search-16-gray.png);
+   padding: 0.1em 0.2em 0 0.8em;
    background-repeat: no-repeat;
-   cursor: pointer;
-   left: -2px;
-   padding-left: 12px;
-   padding-top: 4px;
-   position: relative;
-   top: 2px;
-}                  
+}
 
 .header .sites-menu-icon
 {
@@ -198,7 +192,7 @@
    font-weight: bold;
    padding: 4px 15px;
    cursor: default;
-   color: #515D6B;   
+   color: #515D6B;
    background-color: #FFFFFF;
 }
 
