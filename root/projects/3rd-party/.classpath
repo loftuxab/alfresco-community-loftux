@@ -61,7 +61,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2.6-patched.jar" sourcepath="src/hibernate-3.2.6-patched-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/quartz-1.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/cglib-nodep-2.2_beta1.jar"/>
-	<classpathentry kind="lib" path="lib/fontbox-0.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/truezip.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xalan-2.7.0/xalan.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlsec-1.4.1.jar"/>
@@ -116,8 +115,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer.jar" sourcepath="src/PDFRenderer-2009-09-27-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
-    <classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0-patched.jar" sourcepath="src/tm-extractors-1.0-patched.zip"/>
-    <classpathentry exported="true" kind="lib" path="lib/poi-3.5-FINAL-20090928.jar" sourcepath="src/poi-3.5-FINAL-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0-patched.jar" sourcepath="src/tm-extractors-1.0-patched.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/poi-3.5-FINAL-20090928.jar" sourcepath="src/poi-3.5-FINAL-src.zip"/>
 	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.2.jar" sourcepath="src/commons-dbcp-1.2.2-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/optional/log4j-1.2.15.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-analyzers-2.4.1.jar"/>
@@ -136,5 +135,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/mockito-all-1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/abdera/stax-api-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pdfbox-0.8.0-incubating.jar" sourcepath="src/pdfbox-0.8.0-incubating-src.jar"/>
+	<classpathentry kind="lib" path="lib/fontbox-0.8.0-incubating.jar" sourcepath="src/fontbox-0.8.0-incubating-src.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
