@@ -2,10 +2,10 @@ package
 {
 	import flash.external.ExternalInterface;
 	
-	import mx.controls.Alert;
 	import mx.core.Application;
 	import mx.events.FlexEvent;
 	
+	import org.alfresco.core.Logger;
 	import org.alfresco.core.ui.Cursors;
 	import org.alfresco.previewer.DocumentZoomDisplayEvent;
 	import org.alfresco.previewer.Previewer;
@@ -48,6 +48,14 @@ package
 		 */
 		public function onApplicationComplete(event:FlexEvent):void
 		{
+			// Get javascript callbacks and logging instructions
+			jsCallback = Application.application.parameters.jsCallback;
+			var jsLogger:String = Application.application.parameters.jsLogger;
+			if (jsLogger)
+			{
+				Logger.enableJavaScriptLogging(jsLogger);								
+			}
+						
 			// Add mouse wheel scroll support for browsers on mac.
 			ExternalMouseWheelSupport.getInstance(stage);
 			
@@ -58,14 +66,13 @@ package
 			// Make sure we can notify the html/javascript environment when we enter and leaves full window mode.
 			previewer.addEventListener(PreviewerEvent.FULL_WINDOW_BUTTON_CLICK, onFullWindowClick);
 			previewer.addEventListener(PreviewerEvent.FULL_WINDOW_ESCAPE, onFullWindowEscape);
-			
+					
 			// Get variables from the embed/object tag
 			var url:String = Application.application.parameters.url;							
 			var paging:String = Application.application.parameters.paging;
 			var fileName:String = Application.application.parameters.fileName;
 			var showFullScreenButton:String = Application.application.parameters.show_fullscreen_button;
 			var showFullWindowButton:String = Application.application.parameters.show_fullwindow_button;			
-			jsCallback = Application.application.parameters.jsCallback;
 			
 			// i18n labels
 			var i18n:Object = new Object();
@@ -85,15 +92,12 @@ package
 			previewer.showFullScreenButton = showFullScreenButton != null && showFullScreenButton.toLowerCase() == "true";
 			previewer.showFullWindowButton = showFullWindowButton != null && showFullWindowButton.toLowerCase() == "true";
 			previewer.i18nLabels = i18n;
-			
-			/**
-			 * Respomnd to javascript callbacks for cursor handling.
-
-			 */
+						
+			// Respond to javascript callbacks for cursor handling.
 			ExternalInterface.addCallback("setMode", onSetMode);
-			
+
 			// Start the loading the content in to the previewer				
-			previewer.url = url; 			
+			previewer.url = url;			
 		}
 		
 		/**
@@ -127,7 +131,7 @@ package
 			var code:String = "error";
 			code = event.type == DocumentZoomDisplayEvent.DOCUMENT_LOAD_ERROR ? "io" : code;
 			code = event.type == DocumentZoomDisplayEvent.DOCUMENT_CONTENT_TYPE_ERROR ? "content" : code;
-			dispatchJavascriptEvent({ error: { code: code } });			
+			dispatchJavascriptEvent({ error: { code: code } });
 		}
 		
 		/**
