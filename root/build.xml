@@ -175,7 +175,7 @@
          <pathelement location="${dir.project.3rdparty.lib}/ehcache-1.4.1-patched.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/facebook_070716.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/FastInfoset-1.2.2.jar" />
-         <pathelement location="${dir.project.3rdparty.lib}/fontbox-0.1.0.jar" />
+         <pathelement location="${dir.project.3rdparty.lib}/fontbox-0.8.0-incubating.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/freemarker-2.3.13.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/geronimo-activation_1.1_spec-1.0.2.jar" />
          <pathelement location="${dir.project.3rdparty.lib}/geronimo-annotation_1.0_spec-1.1.1.jar" />
