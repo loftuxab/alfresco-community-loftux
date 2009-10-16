@@ -181,7 +181,11 @@
          searchMenu.owner = this;
          searchMenu.subscribe("show", searchMenu.focus);
 
-         Event.addListener(this.id + "-search-tbutton", "click", this.openToggleSearchMenu, null, searchMenu);
+         var searchButton = new YAHOO.widget.Button(this.id + "-search-tbutton",
+         {
+            type: "menu"
+         });
+         searchButton.subscribe("click", this.openToggleSearchMenu, null, searchMenu);
          Dom.removeClass(this.id + "-searchtogglemenu", "hidden");
 
          var sitesMenu = new YAHOO.widget.Menu(this.id + "-sites-menu");
