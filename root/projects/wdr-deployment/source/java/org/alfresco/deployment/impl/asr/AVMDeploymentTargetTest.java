@@ -27,7 +27,9 @@ package org.alfresco.deployment.impl.asr;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +50,7 @@ import org.alfresco.service.cmr.avm.deploy.DeploymentEvent;
 import org.alfresco.service.cmr.avm.deploy.DeploymentReport;
 import org.alfresco.service.cmr.avm.deploy.DeploymentReportCallback;
 import org.alfresco.service.cmr.avm.deploy.DeploymentService;
+import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.repository.ContentData;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.security.AuthenticationService;
@@ -409,12 +412,25 @@ public class AVMDeploymentTargetTest extends TestCase
         
         String dirSubject = "The scooby gang";
         String fileSubject = "Willow ";
-
+        
+        List<String> colours = new ArrayList<String>();
+        colours.add("Red");
+        colours.add("Blue");
+        colours.add("Green");
+        
+        QName tempQName = QName.createQName("cm:colours");
 
         avmService.setNodeProperty(storeName + ":/scooby", ContentModel.PROP_SUBJECT, new PropertyValue(null, dirSubject)); 
+        
+        /**
+         * Set various properties of type string, ml_text, boolean, date
+         */
         avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_SUBJECT, new PropertyValue(null, fileSubject));
-        avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_TITLE, new PropertyValue(null, "title"));
+        avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_TITLE, new PropertyValue(DataTypeDefinition.MLTEXT, "title"));
         avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_DESCRIPTION, new PropertyValue(null, "description"));
+        avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_MODEL_PUBLISHED_DATE, new PropertyValue(null, new Date()));
+        avmService.setNodeProperty(storeName + ":/scooby/willow", ContentModel.PROP_MODEL_ACTIVE, new PropertyValue(null, Boolean.TRUE));
+        avmService.setNodeProperty(storeName + ":/scooby/willow", tempQName, new PropertyValue(DataTypeDefinition.ANY, (Serializable)colours));
         
         service.deployDifferenceFS(-1, storeName + ":/", "default", "localhost", 50500, TEST_USER, TEST_PASSWORD, TEST_TARGET, matcher, false, false, false, callbacks);
         
@@ -431,6 +447,14 @@ public class AVMDeploymentTargetTest extends TestCase
     		assertEquals("Willow guids mismatch", srcWillowFile.getGuid(), destWillowFile.getGuid());
     		assertTrue("Title is missing", willowProps.containsKey(ContentModel.PROP_TITLE)); 
     		assertTrue("Description is missing", willowProps.containsKey(ContentModel.PROP_DESCRIPTION)); 
+            assertTrue("Active Property is missing", willowProps.containsKey(ContentModel.PROP_MODEL_ACTIVE)); 
+            assertTrue("Published Date property is missing", willowProps.containsKey(ContentModel.PROP_MODEL_PUBLISHED_DATE)); 
+            assertEquals(willowProps.get(ContentModel.PROP_TITLE).getActualTypeString(), "MLTEXT");
+            assertEquals(willowProps.get(ContentModel.PROP_MODEL_ACTIVE).getActualTypeString(), "BOOLEAN");
+            assertEquals(willowProps.get(ContentModel.PROP_MODEL_PUBLISHED_DATE).getActualTypeString(), "DATE");
+            assertEquals(willowProps.get(tempQName).getActualTypeString(), "SERIALIZABLE");
+    		
+    		
     		
     		AVMNodeDescriptor srcScoobyDir = avmService.lookup(-1, storeName  +":/scooby"); 
         	AVMNodeDescriptor destScoobyDir = avmService.lookup(-1, getDestPath(storeName, "/scooby"));  
