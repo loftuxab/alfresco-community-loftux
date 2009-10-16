@@ -113,7 +113,21 @@ public class NIOCIFSThreadRequest implements ThreadRequest {
 				}
 			}
 			catch ( Throwable ex) {
-				Debug.println( ex);
+
+				// DEBUG
+				
+				if ( Debug.EnableInfo && m_sess.hasDebug( SMBSrvSession.DBG_SOCKET))
+					Debug.println("Error during packet receive, closing session sess=" + m_sess.getUniqueId() + ", addr=" + m_sess.getRemoteAddress().getHostAddress() + " ex=" + ex.getMessage());
+				
+				// Close the session
+				
+				m_sess.hangupSession( "Client closed socket");
+				m_sess.processPacket( null);
+				
+				// Cancel the selection key
+				
+				m_selectionKey.cancel();
+				m_selectionKey.selector().wakeup();
 			}
 			finally {
 				

@@ -114,7 +114,7 @@ public class CifsOnlyXMLServerConfiguration extends ServerConfiguration {
 
 	private static final String m_sessDbgStr[] = { "NETBIOS", "STATE", "RXDATA", "TXDATA", "DUMPDATA", "NEGOTIATE", "TREE",
 			"SEARCH", "INFO", "FILE", "FILEIO", "TRANSACT", "ECHO", "ERROR", "IPC", "LOCK", "PKTTYPE", "DCERPC", "STATECACHE",
-			"TIMING", "NOTIFY", "STREAMS", "SOCKET", "PKTPOOL", "PKTSTATS", "THREADPOOL", "BENCHMARK" };
+			"TIMING", "NOTIFY", "STREAMS", "SOCKET", "PKTPOOL", "PKTSTATS", "THREADPOOL", "BENCHMARK", "OPLOCK" };
 
 	// Default session debug flags, if enabled
 
@@ -132,7 +132,7 @@ public class CifsOnlyXMLServerConfiguration extends ServerConfiguration {
 	
 	// Default memory pool settings
 	
-	private static final int[] DefaultMemoryPoolBufSizes  = { 256, 4096, 16384, 65536 };
+	private static final int[] DefaultMemoryPoolBufSizes  = { 256, 4096, 16384, 66000 };
 	private static final int[] DefaultMemoryPoolInitAlloc = {  20,   20,     5,     5 };
 	private static final int[] DefaultMemoryPoolMaxAlloc  = { 100,   50,    50,    50 };
 	
@@ -1852,10 +1852,7 @@ public class CifsOnlyXMLServerConfiguration extends ServerConfiguration {
 						// parameter list
 
 						Node attr = attrs.item(j);
-						GenericConfigElement childElem = new GenericConfigElement(attr.getNodeName());
-						childElem.setValue(attr.getNodeValue());
-
-						params.addChild(childElem);
+						params.addAttribute( attr.getNodeName(), attr.getNodeValue());
 					}
 
 					try {

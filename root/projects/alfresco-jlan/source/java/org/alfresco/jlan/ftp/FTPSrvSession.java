@@ -823,10 +823,6 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 
 				if ( Debug.EnableInfo && hasDebug(DBG_STATE))
 					debugPrintln("User " + getClientInformation().getUserName() + ", logon failed");
-
-				// Close the connection
-
-				closeSession();
 			}
 		}
 
@@ -848,7 +844,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -919,7 +915,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -973,7 +969,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -999,7 +995,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -1044,7 +1040,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -1088,7 +1084,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -1277,7 +1273,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -1477,7 +1473,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -1693,7 +1689,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -1736,7 +1732,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -1975,7 +1971,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -2243,7 +2239,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -2337,7 +2333,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -2429,7 +2425,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -2543,7 +2539,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -2640,7 +2636,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -2742,7 +2738,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "Not logged in");
+			sendFTPResponse(530, "Not logged in");
 			return;
 		}
 
@@ -2824,7 +2820,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -2986,7 +2982,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -3197,7 +3193,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -3267,7 +3263,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -3394,7 +3390,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
@@ -3444,14 +3440,14 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		// Check if the user is logged in
 
 		if ( isLoggedOn() == false) {
-			sendFTPResponse(500, "");
+			sendFTPNotLoggedOnResponse();
 			return;
 		}
 
 		// Create a passive data session
 
 		try {
-			m_dataSess = getFTPServer().allocatePassiveDataSession(this, getLocalAddress());
+			m_dataSess = getFTPServer().allocatePassiveDataSession(this, m_sock.getLocalAddress());
 		}
 		catch (IOException ex) {
 			m_dataSess = null;
@@ -3576,17 +3572,14 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 				
 				Inet6Address ip6addr = (Inet6Address) addr;
 				
-				if ( m_sock.getInetAddress() instanceof Inet6Address) {
+				if ( ip6addr.getScopeId() == 0 && m_sock.getInetAddress() instanceof Inet6Address) {
 					
 					// Check the client socket scope-id
 
 					Inet6Address clientAddr = (Inet6Address) m_sock.getInetAddress();
-					Inet6Address localAddr  = null;
+					Inet6Address localAddr  = (Inet6Address) m_sock.getLocalAddress();
 					
-					if ( m_sock.getLocalAddress() instanceof Inet6Address)
-						localAddr = (Inet6Address) m_sock.getLocalAddress();
-					
-					if ( clientAddr.getScopeId() != 0 && localAddr != null) {
+					if ( clientAddr.getScopeId() != 0) {
 				
 						// Create a client data socket address with a scope-id, to make sure the socket connection
 						// gets routed back to the client correctly
@@ -4060,43 +4053,13 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 	}
 	
 	/**
-	 * Return the local address for the session socket
+	 * Return a not logged status
 	 * 
-	 * @return InetAddress
+	 * @throws IOException
 	 */
-	private final InetAddress getLocalAddress() {
-		
-		// Check if the session socket is valid
-		
-		if ( m_sock == null || m_sock.isClosed())
-			return null;
-		
-		// Get the local address from the session socket
-		
-		InetAddress addr = m_sock.getLocalAddress();
-		
-		// If the local address indicates a global bind address it may be returned as an IPv4 address
-		
-		if ( addr != null && addr.isAnyLocalAddress() && addr instanceof Inet4Address) {
-			
-			// Check if an IPv6 connection is being used
-		
-			if ( m_sock.getInetAddress() instanceof Inet6Address) {
-				
-				try {
-					
-					// Convert the global bind address to an IPv6 global bind address
-					
-					addr = InetAddress.getByName( "::");
-				}
-				catch ( UnknownHostException ex) {
-				}
-			}
-		}
-		
-		// Return the local address
-		
-		return addr;
+	protected final void sendFTPNotLoggedOnResponse()
+		throws IOException {
+		sendFTPResponse(530, "Not logged on");
 	}
 	
 	/**

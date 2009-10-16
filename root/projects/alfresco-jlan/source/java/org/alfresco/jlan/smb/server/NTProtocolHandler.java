@@ -3267,7 +3267,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 			if ( Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_SEARCH))
 				m_sess.debugPrintln("Start trans search [" + searchId + "] - " + srchPath + ", attr=0x"
 						+ Integer.toHexString(srchAttr) + ", maxFiles=" + maxFiles + ", maxLen=" + maxLen + ", infoLevel="
-						+ infoLevl + ", flags=0x" + Integer.toHexString(srchFlag));
+						+ infoLevl + ", flags=0x" + Integer.toHexString(srchFlag) + ",dotFiles=" + ctx.hasDotFiles());
 
 			// Loop until we have filled the return buffer or there are no more files to return
 
@@ -3297,8 +3297,14 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 				}
 
 				lastNameOff = dataBuf.getPosition();
+				
+				// Check if the search has the '.' file entry details
+				
 				FileInfo dotInfo = new FileInfo(".", 0, FileAttribute.Directory);
 				dotInfo.setFileId(dotInfo.getFileName().hashCode());
+				
+				if ( ctx.hasDotFiles())
+					ctx.getDotInfo( dotInfo);
 
 				packLen = FindInfoPacker.packInfo(dotInfo, dataBuf, infoLevl, tbuf.isUnicode());
 
@@ -3315,12 +3321,22 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 				}
 
 				lastNameOff = dataBuf.getPosition();
-				dotInfo.setFileName("..");
-				dotInfo.setFileId(dotInfo.getFileName().hashCode());
-				dotInfo.setCreationDateTime(DotFileDateTime);
-				dotInfo.setModifyDateTime(DotFileDateTime);
-				dotInfo.setAccessDateTime(DotFileDateTime);
-
+				
+				// Check if the search has the '..' file entry details
+				
+				if ( ctx.hasDotFiles())
+					ctx.getDotDotInfo( dotInfo);
+				else {
+					
+					// Set dummy details for the '..' file entry
+				
+					dotInfo.setFileName("..");
+					dotInfo.setFileId(dotInfo.getFileName().hashCode());
+					dotInfo.setCreationDateTime(DotFileDateTime);
+					dotInfo.setModifyDateTime(DotFileDateTime);
+					dotInfo.setAccessDateTime(DotFileDateTime);
+				}
+				
 				packLen = FindInfoPacker.packInfo(dotInfo, dataBuf, infoLevl, tbuf.isUnicode());
 
 				// Update the file count for this packet, update the remaining buffer length

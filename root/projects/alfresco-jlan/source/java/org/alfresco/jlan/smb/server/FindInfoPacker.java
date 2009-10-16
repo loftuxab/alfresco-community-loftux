@@ -50,26 +50,26 @@ class FindInfoPacker {
   
   //	File information levels
 
-  public static final int InfoStandard 				= 1;
-  public static final int InfoQueryEASize 		= 2;
+  public static final int InfoStandard 		  = 1;
+  public static final int InfoQueryEASize 	  = 2;
   public static final int InfoQueryEAFromList = 3;
-  public static final int InfoDirectory 			= 0x101;
-  public static final int InfoFullDirectory 	= 0x102;
-  public static final int InfoNames 					= 0x103;
-  public static final int InfoDirectoryBoth 	= 0x104;
+  public static final int InfoDirectory 	  = 0x101;
+  public static final int InfoFullDirectory   = 0x102;
+  public static final int InfoNames 		  = 0x103;
+  public static final int InfoDirectoryBoth   = 0x104;
   public static final int InfoFullDirectoryId = 0x105;
   public static final int InfoDirectoryBothId = 0x106;
-	public static final int InfoMacHfsInfo			= 0x302;
+  public static final int InfoMacHfsInfo	  = 0x302;
 
   //	File information fixed lengths, includes nulls on strings.
 
-  public static final int InfoStandardLen 			= 24;
-  public static final int InfoQueryEASizeLen 		= 28;
-  public static final int InfoDirectoryLen			= 64;
+  public static final int InfoStandardLen 	    = 24;
+  public static final int InfoQueryEASizeLen    = 28;
+  public static final int InfoDirectoryLen		= 64;
   public static final int InfoFullDirectoryLen	= 68;
-  public static final int InfoNamesLen					= 12;
+  public static final int InfoNamesLen			= 12;
   public static final int InfoDirectoryBothLen	= 94;
-	public static final int InfoMacHfsLen					= 120;
+  public static final int InfoMacHfsLen			= 120;
   public static final int InfoFullDirectoryIdLen= 76;
   
   /**
@@ -126,11 +126,17 @@ class FindInfoPacker {
       	packInfoDirectoryBoth(info, buf, uni);
       	break;
       	
-			//	Pack Macintosh format file information
+      //	Full file/directory information with short name and file id
+        
+      case InfoDirectoryBothId:
+      	packInfoDirectoryBothId(info, buf, uni);
+      	break;
+      	
+      //	Pack Macintosh format file information
       
-			case InfoMacHfsInfo:
-				packInfoMacHfs(info, buf, uni);
-				break;
+      case InfoMacHfsInfo:
+		packInfoMacHfs(info, buf, uni);
+		break;
     }
 
     //  Check if we packed any data
@@ -393,7 +399,8 @@ class FindInfoPacker {
     //  Pack the EA size, always 4.
 
     if (EAflag)
-    	buf.putInt(4);
+//    	buf.putInt(4);
+		buf.putInt(0);
 
 		//	Pack the file name
 
@@ -622,7 +629,8 @@ class FindInfoPacker {
 		
 		//	Pack the EA size, should always be 4.
 
-		buf.putInt(4);		
+//		buf.putInt(4);		
+		buf.putInt(0);		
 		
 		//	Pack the long file name string
 
@@ -717,7 +725,8 @@ class FindInfoPacker {
 		
 		//	Pack the EA size, should always be 4.
 
-		buf.putInt(4);
+//		buf.putInt(4);
+		buf.putInt(0);
 		
 		//	Pack the short file name length (8.3 name)
 
@@ -737,6 +746,115 @@ class FindInfoPacker {
 		buf.setPosition(curPos);
   }
 
+  /**
+   * Pack the full file/directory id information
+   *
+   * @param info  File information to be packed.
+   * @param buf   Buffer to pack the data into.
+   * @param uni	  Pack Unicode strings if true, else pack ASCII strings
+   */
+  protected final static void packInfoDirectoryBothId(FileInfo info, DataBuffer buf, boolean uni) {
+  	
+  	//	Information format :-
+  	//		ULONG	NextEntryOffset
+  	//		ULONG	FileIndex
+  	//		LARGE_INTEGER CreationTime
+  	//		LARGE_INTEGER LastAccessTime
+  	//		LARGE_INTEGER LastWriteTime
+  	//		LARGE_INTEGER ChangeTime
+  	//		LARGE_INTEGER EndOfFile
+  	//		LARGE_INTEGER AllocationSize
+  	//		ULONG FileAttributes
+  	//		ULONG FileNameLength
+  	//		ULONG EaSize
+  	//		UCHAR ShortNameLength
+  	//		WCHAR ShortName[12]
+	//      USHORT Reserved
+	//      LARGE_INTEGER FileId
+  	//		STRING FileName
+
+	//	Pack the file id
+
+	int startPos = buf.getPosition();
+	buf.putZeros(4);
+	buf.putZeros(4);
+		  	
+    //  Pack the creation date/time
+
+    if (info.hasCreationDateTime()) {
+      buf.putLong(NTTime.toNTTime(info.getCreationDateTime()));
+    }
+    else
+    	buf.putZeros(8);
+
+    //  Pack the last access date/time
+
+    if (info.hasAccessDateTime()) {
+      buf.putLong(NTTime.toNTTime(info.getAccessDateTime()));
+    }
+    else
+    	buf.putZeros(8);
+
+    //  Pack the last write date/time and change time
+
+    if (info.hasModifyDateTime()) {
+      buf.putLong(NTTime.toNTTime(info.getModifyDateTime()));
+      buf.putLong(NTTime.toNTTime(info.getModifyDateTime()));
+    }
+    else
+    	buf.putZeros(16);
+
+    //  Pack the file size and allocation size
+
+	buf.putLong(info.getSize());
+
+    if (info.getAllocationSize() < info.getSize())
+    	buf.putLong(info.getSize());
+    else
+    	buf.putLong(info.getAllocationSize());
+
+    //  Pack the file attributes
+
+	buf.putInt(info.getFileAttributes());
+
+	//	Pack the file name length
+
+	int nameLen = info.getFileName().length();
+	if ( uni)
+		nameLen *= 2;
+			
+	buf.putInt(nameLen);		
+		
+	//	Pack the EA size, should always be 4 ?.
+
+//	buf.putInt(4);
+	buf.putInt(0);
+		
+	//	Pack the short file name length (8.3 name)
+
+	pack8Dot3Name(buf, info.getFileName(), uni);
+
+	// Pack reserved field
+	
+	buf.putShort( 0);
+	
+	// Pack the file id
+	
+	buf.putLong( info.getFileIdLong());
+	
+	//	Pack the long file name string
+
+	buf.putString(info.getFileName(), uni, false);		
+		
+	//	Align the buffer pointer and set the offset to the next file information entry
+		
+	buf.longwordAlign();
+
+	int curPos = buf.getPosition();
+	buf.setPosition(startPos)		;
+	buf.putInt(curPos - startPos);
+	buf.setPosition(curPos);
+  }
 
 	/**
 	 * Pack the Macintosh format file/directory information

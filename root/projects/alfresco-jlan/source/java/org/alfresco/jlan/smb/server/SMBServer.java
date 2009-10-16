@@ -247,40 +247,6 @@ public class SMBServer extends NetworkFileServer implements Runnable, Configurat
 	}
 
 	/**
-	 * Close the device contexts
-	 */
-	protected final void closeDevices() {
-
-		// Enumerate the shares and close each device to release resources
-
-		Enumeration<SharedDevice> enm = getFullShareList(getServerName(), null).enumerateShares();
-
-		while (enm.hasMoreElements()) {
-
-			// Get the current shared device
-
-			SharedDevice share = enm.nextElement();
-			DeviceContext context = share.getContext();
-
-			if ( context != null) {
-
-				// Close the current device
-
-				context.CloseContext();
-
-				// Debug
-
-				if ( Debug.EnableInfo && hasDebug())
-					Debug.println("[SMB] Closed device " + share.toString());
-			}
-		}
-
-		// Close the share mapper
-
-		// TODO: getConfiguration().getShareMapper().closeMapper();
-	}
-
-	/**
 	 * Delete temporary shares created by the share mapper for the specified session
 	 * 
 	 * @param sess SMBSrvSession
@@ -561,9 +527,8 @@ public class SMBServer extends NetworkFileServer implements Runnable, Configurat
 		if ( Debug.EnableInfo && hasDebug())
 			Debug.println("[SMB] SMB Server shutting down ...");
 
-		// Close the shared devices, host announcer and session handlers
+		// Close the host announcer and session handlers
 
-		closeDevices();
 		m_connectionsHandler.stopHandler();
 
 		// Shutdown the Win32 NetBIOS LANA monitor, if enabled

@@ -734,7 +734,7 @@ public class NotifyChangeHandler implements Runnable {
 			//	DEBUG
 
 			if ( Debug.EnableInfo && hasDebug())
-			  Debug.println("  Notify evtPath=" + evt.getFileName()  + ", reqPath=" + req.getWatchPath() + ", relative=" + relName);
+			  Debug.println("  Notify evtPath=" + evt.getFileName() + ", MID=" + req.getMultiplexId() + ", reqPath=" + req.getWatchPath() + ", relative=" + relName);
 			
 			//	Pack the notification structure
 			
@@ -780,6 +780,7 @@ public class NotifyChangeHandler implements Runnable {
 			ntpkt.setNTParameter(6, ntpkt.getPosition() - 4);
 													//	data block offset
 			ntpkt.setByteCount();
+			int bytCnt = ntpkt.getByteCount();
 
 			ntpkt.setCommand(PacketType.NTTransact);
 			ntpkt.setLongErrorCode(0);
@@ -815,7 +816,14 @@ public class NotifyChangeHandler implements Runnable {
 						//	Asynchronous request was queued, clone the request packet
 						
 						ntpkt = new NTTransPacket(ntpkt);
+
+						//	DEBUG
+						
+						if ( Debug.EnableInfo && req.getSession().hasDebug(SMBSrvSession.DBG_NOTIFY))
+							req.getSession().debugPrintln("  Notification request was queued, sess=" + req.getSession().getSessionId() + ", MID=" + req.getMultiplexId());
 					}
+					else if ( Debug.EnableInfo && req.getSession().hasDebug(SMBSrvSession.DBG_NOTIFY))
+						req.getSession().debugPrintln("  Notification request was sent, sess=" + req.getSession().getSessionId() + ", MID=" + req.getMultiplexId());
 				}
 				catch (Exception ex) {
 				  Debug.println( ex);
