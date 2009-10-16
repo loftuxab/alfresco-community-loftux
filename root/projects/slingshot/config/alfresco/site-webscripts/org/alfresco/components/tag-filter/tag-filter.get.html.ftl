@@ -5,7 +5,7 @@
       containerId: "${template.properties.container!""}"
    }).setMessages(
       ${messages}
-   );
+   ).setFilterIds(["tag"]);
 //]]></script>
 <div class="filter">
 	<h2>${msg("header.title")}</h2>

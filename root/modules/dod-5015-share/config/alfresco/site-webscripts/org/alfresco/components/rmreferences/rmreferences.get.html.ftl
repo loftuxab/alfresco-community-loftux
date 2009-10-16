@@ -7,7 +7,7 @@
  }).setMessages(${messages});
 </script>
 <div id="${args.htmlid}" class="manageReferences">
-   <h2 class="title">${msg("label.title",'${page.url.args.docName!""}')}</h2>
+   <h2 class="title">${msg("label.title",'${page.url.args.docName!""}')?html}</h2>
    <button type="button" id="manageReferences-newReference" name="manageReferences-newReference" value="newRef" class="newRef">${msg('label.new-reference')}</button>
 
        <h3 class="subtitle">${msg('label.references-to')}</h3>

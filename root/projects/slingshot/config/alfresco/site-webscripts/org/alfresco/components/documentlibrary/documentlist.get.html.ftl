@@ -2,7 +2,8 @@
    <#assign filterId = page.url.args["filter"]!"path">
       initialFilter:
       {
-         filterId: "${filterId}"
+         filterId: "${filterId}",
+         filterData: "${page.url.args["filterData"]!""}"
       },
 </#macro>
 <!--[if IE]>
