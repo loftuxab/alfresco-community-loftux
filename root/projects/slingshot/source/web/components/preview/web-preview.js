@@ -269,6 +269,7 @@
                so.addVariable("paging", previewCtx.paging);
                so.addVariable("url", previewCtx.url);
                so.addVariable("jsCallback", "Alfresco.util.ComponentManager.get('" + this.id + "').onWebPreviewerEvent");
+               so.addVariable("jsLogger", "Alfresco.util.ComponentManager.get('" + this.id + "').onWebPreviewerLogging");
                so.addVariable("i18n_actualSize", this.msg("preview.actualSize"));
                so.addVariable("i18n_fitPage", this.msg("preview.fitPage"));
                so.addVariable("i18n_fitWidth", this.msg("preview.fitWidth"));
@@ -371,6 +372,21 @@
                });
             }
             return null;
+         }
+      },
+
+      /**
+       * Called from the WebPreviewer when a log message has been logged.
+       *
+       * @method onWebPreviewerLogging
+       * @param msg {string} The log message
+       * @param level {string} The log level
+       */
+      onWebPreviewerLogging: function WP_onWebPreviewerLogging(msg, level)
+      {
+         if(YAHOO.lang.isFunction(Alfresco.logger[level]))
+         {
+            Alfresco.logger[level].call(Alfresco.logger, "WebPreviewer: " + msg)
          }
       },
 

@@ -40,6 +40,7 @@ package org.alfresco.previewer
 	import mx.core.MovieClipAsset;
 	import mx.events.ResizeEvent;
 	
+	import org.alfresco.core.Logger;
 	import org.alfresco.core.ui.SpriteZoomDisplay;
 	import org.alfresco.core.ui.SpriteZoomDisplayContext;
 	
@@ -168,7 +169,10 @@ package org.alfresco.previewer
 		 * @param url THe url to the content to display.
 		 */
 		public function set url(url:String):void
-		{
+		{			
+			// Log the content url
+			Logger.log("Load content for url: " + url);
+			
 			// Remember the url
 			this._url = url;
 			
@@ -177,7 +181,7 @@ package org.alfresco.previewer
 			fitToHeight = 0;
 			fitToScreen = 0;
 			
-			// Load the content
+			// Load the content			
 			request = new URLRequest(_url);
 			loader = new Loader();			 
 			loader.load(request);
@@ -285,12 +289,13 @@ package org.alfresco.previewer
 		 * 
 		 * @param event Describes the error that occured.
 		 */
- 		private function onLoaderError(event:Event):void
+ 		private function onLoaderError(event:IOErrorEvent):void
 		{
 			sprite = null;
 			var e:DocumentZoomDisplayEvent = new DocumentZoomDisplayEvent(DocumentZoomDisplayEvent.DOCUMENT_LOAD_ERROR);
 			e.errorCode = event.type;
-			dispatchEvent(e);			 
+			dispatchEvent(e);
+			Logger.log("Error occured while loading content: '" + event.type + "' " + event.text, Logger.ERROR);						 
 		}
 
 		/**
@@ -300,6 +305,9 @@ package org.alfresco.previewer
 		 */
 		private function onLoaderComplete(event:Event):void 
 		{	
+			// Log loading success
+			Logger.log("Content was successfully loaded, now examine it.");			
+			
 			// Reset the pages	
 			pages = null;
 			pmclm = null;
@@ -307,6 +315,9 @@ package org.alfresco.previewer
 	    	var p:Page;			
     	    if (loader.content is MovieClip && paging)
     	    {   
+    	    	// Log content examination result
+    	    	Logger.log("Content is of type MovieClip and paging is used");
+    	    	
 				// Create the document with padding around and between the pages 		
 				doc = new Document();
 				doc.addEventListener(DocumentEvent.DOCUMENT_PAGE_CLICK, onDocumentPageClick);
@@ -344,8 +355,10 @@ package org.alfresco.previewer
     	    	 */
  				pmclm = new DocumentPageController(doc, this);
     	    	pmclm.addPageMovieClip(mmc);
-    	    	
-				createMultiPageDocument(Math.min(10, mmc.totalFrames - 1));	
+    	    	    	    	
+    	    	var noOfInstances:int = 10;
+				Logger.log("Create " + noOfInstances + " copies of the content");
+    	    	createMultiPageDocument(Math.min(noOfInstances, mmc.totalFrames - 1));	
     	    }
     	    else
     	    {
@@ -354,24 +367,36 @@ package org.alfresco.previewer
     	    	// Find out what we have loaded and add it as page to the single paged document
 		    	if (loader.content is MovieClip)
 	    	    {    
+	    	    	// Log content examination result
+	    	    	Logger.log("Content is of type MovieClip but will be displayed as a single page");
+
 	    	    	contentType = MOVIE_CLIP;
 	    	    	var mc:MovieClip = MovieClip(loader.content);
 	    	    	content = mc;
 	    	    }
 	    	    else if (event.currentTarget.loader.content is flash.display.Bitmap)
 	    	    {    
+	    	    	// Log content examination result
+	    	    	Logger.log("Content is of type Image");
+
 	        		contentType = IMAGE;
 	        		var img:Bitmap = Bitmap(loader.content);
 	        		content = img;
 	    	    }
 	    	    else if (event.target.actionScriptVersion == 2)
 		    	{
+	    	    	// Log content examination result
+	    	    	Logger.log("Content is of type MovieClip (but in an old AVM1-format)");
+
 		    		contentType = AVM1_MOVIE;
 		    		var avm1:AVM1Movie = AVM1Movie(loader.content);
 		    		content = avm1;
 	    	    }
 	    	    else
 	    	    {
+	    	    	// Log content examination result
+	    	    	Logger.log("Content is of unknown type that can't be displayed");
+
 	    	    	// Can't display url because loaded content is not a bitmap or movieclip.
     	    		sprite = null;
 					var e:DocumentZoomDisplayEvent = new DocumentZoomDisplayEvent(DocumentZoomDisplayEvent.DOCUMENT_CONTENT_TYPE_ERROR);					
@@ -418,11 +443,13 @@ package org.alfresco.previewer
 					if (obj.yetToCreate > 0)
 					{
 						// Create more instances/frames/pages 
+						Logger.log("Created a copy, " + obj.yetToCreate + " more to go");					
 						createMultiPageDocument(obj.yetToCreate);
 					}	
 					else
 					{							
 						// All instances have been created
+						Logger.log("All copies created.");					
 						var p:Page, 
 							pmc:MovieClip;
 						var pmcs:Array = pmclm.getPageMovieClips();
@@ -482,6 +509,9 @@ package org.alfresco.previewer
 		 */
 		private function documentComplete():void
 		{
+			// Log that document is complete
+			Logger.log("Document is completed and will be displayed.");					
+			
 			// Calculate the snapoints and dispatch them as an event
 			dispatchSnapPoints();				
 			if (!addedEventListeners)
