@@ -246,7 +246,8 @@ public class QueryInfoPacker {
     //  Pack the EA size, always 4.
 
     if (eaFlag == true)
-    	buf.putInt(4);
+//    	buf.putInt(4);
+    	buf.putInt(0);
 	}
 	
 	/**
@@ -453,9 +454,10 @@ public class QueryInfoPacker {
 		buf.putByte(info.isDirectory() ? 1 : 0);
 		buf.putShort(0);		//	Alignment
 
-		//	EA list size, always 4
+		//	EA list size, always 4 ?
 		
-		buf.putInt(4);
+//		buf.putInt(4);
+		buf.putInt(0);
 		
 		//	Access mask
 

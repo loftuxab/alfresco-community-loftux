@@ -74,7 +74,7 @@ public class IpAddressAccessControlParser extends AccessControlParser {
 			if ( val.length() == 0 || IPAddress.isNumericAddress(val) == false)
 				throw new ACLParseException("Invalid IP address, " + val);
 				
-			if ( params.getChildCount() != 2)
+			if ( params.getAttributeCount() != 2)
 				throw new ACLParseException("Invalid parameter(s) specified for address");
 				
 			//	Create a single TCP/IP address access control rule
@@ -89,22 +89,22 @@ public class IpAddressAccessControlParser extends AccessControlParser {
 			
 			//	Get the network mask parameter
 			
-			ConfigElement maskVal = params.getChild("mask");
+			String maskVal = params.getAttribute("mask");
 			
 			//	Validate the parameters
 			
-			if ( val.length() == 0 || maskVal == null || maskVal.getValue().length() == 0)
+			if ( maskVal.length() == 0 || maskVal == null)
 				throw new ACLParseException("Invalid subnet/mask parameter");
 				
 			if ( IPAddress.isNumericAddress(val) == false)
 				throw new ACLParseException("Invalid subnet parameter, " + val);
 				
-			if ( IPAddress.isNumericAddress(maskVal.getValue()) == false)
-				throw new ACLParseException("Invalid mask parameter, " + maskVal.getValue());
+			if ( IPAddress.isNumericAddress(maskVal) == false)
+				throw new ACLParseException("Invalid mask parameter, " + maskVal);
 				
 			//	Create a subnet address access control rule
 			
-			return new IpAddressAccessControl(val, maskVal.getValue(), getType(), access);
+			return new IpAddressAccessControl(val, maskVal, getType(), access);
 		}
 		
 		//	Invalid parameters

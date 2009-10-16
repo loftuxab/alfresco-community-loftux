@@ -201,6 +201,35 @@ public abstract class SearchContext {
   }
 
   /**
+   * Wildcard searches return entries for the '.' and '..' pseudo entries
+   * 
+   * @return boolean
+   */
+  public boolean hasDotFiles() {
+	  return false;
+  }
+  
+  /**
+   * Return the '.' pseudo entry details
+   * 
+   * @param finfo FileInfo
+   * @return boolean
+   */
+  public boolean getDotInfo(FileInfo finfo) {
+	  return false;
+  }
+  
+  /**
+   * Return the '..' pseudo entry details
+   * 
+   * @param finfo FileInfo
+   * @return boolean
+   */
+  public boolean getDotDotInfo(FileInfo finfo) {
+	  return false;
+  }
+  
+  /**
    * Return the search context as a string.
    *
    * @return java.lang.String
@@ -214,6 +243,8 @@ public abstract class SearchContext {
     str.append(",");
     str.append("0x");
     str.append(Integer.toHexString(getFlags()));
+    if ( hasDotFiles())
+    	str.append(",DotFiles");
     str.append("]");
 
     return str.toString();

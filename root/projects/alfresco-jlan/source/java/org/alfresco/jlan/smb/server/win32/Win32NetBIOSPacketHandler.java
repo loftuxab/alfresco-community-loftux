@@ -28,9 +28,9 @@ package org.alfresco.jlan.smb.server.win32;
 import java.io.IOException;
 
 import org.alfresco.jlan.debug.Debug;
-import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
 import org.alfresco.jlan.netbios.win32.NetBIOS;
 import org.alfresco.jlan.netbios.win32.Win32NetBIOS;
+import org.alfresco.jlan.server.core.NoPooledMemoryException;
 import org.alfresco.jlan.smb.server.CIFSPacketPool;
 import org.alfresco.jlan.smb.server.PacketHandler;
 import org.alfresco.jlan.smb.server.SMBSrvPacket;
@@ -140,32 +140,50 @@ public class Win32NetBIOSPacketHandler extends PacketHandler {
 
 			if ( sts == NetBIOS.NRC_Incomp) {
 
-				// TODO: Cannot allocate another buffer as we already have the largest available
-				
 				// DEBUG
 
-				 Debug.println("Win32NetBIOSPacketHandle: readPacket() NRC_Incomp error");
-/**				
+				if ( hasDebug())
+					Debug.println("Win32NetBIOSPacketHandle: readPacket() NRC_Incomp error");
+				
 				// Check if the packet buffer is already at the maximum size (we assume the maximum
 				// size is the maximum that RFC NetBIOS can send which is 17bits)
 
-				if ( pkt.getBuffer().length < RFCNetBIOSProtocol.MaxPacketSize) {
+				if ( pkt.getBuffer().length < getPacketPool().getMaximumOverSizedAllocation()) {
 
 					// Allocate a new buffer
 
-					byte[] newbuf = new byte[RFCNetBIOSProtocol.MaxPacketSize];
+                    SMBSrvPacket pkt2 = null;
+                    
+                    try {
+                        
+                        // Allocate the maximum over sized packet available, usually 128K
+                        
+                        pkt2 = getPacketPool().allocatePacket( getPacketPool().getMaximumOverSizedAllocation());
+                    }
+                    catch ( NoPooledMemoryException ex) {
+                        
+                        // Release the original buffer back to the pool
+                        
+                        getPacketPool().releasePacket( pkt);
+                        
+                        // Rethrow the pooled memory exception
+                        
+                        throw ex;
+                    }
 
 					// Copy the first part of the received data to the new buffer
 
-					System.arraycopy(pkt.getBuffer(), 4, newbuf, 4, pktLen - 4);
+					System.arraycopy(pkt.getBuffer(), 4, pkt2.getBuffer(), 4, pktLen - 4);
 
-					// Move the new buffer in as the main packet buffer
-
-					pkt.setBuffer(newbuf);
+					// Move the new buffer in as the main packet buffer, release the original buffer
+                    
+                    getPacketPool().releasePacket( pkt);
+                    pkt = pkt2;
 
 					// DEBUG
 
-					// Debug.println("readPacket() extended buffer to " + pkt.getBuffer().length);
+                    if ( hasDebug())
+                    	Debug.println("readPacket() extended buffer to " + pkt.getBuffer().length);
 				}
 
 				// Set the original receive size
@@ -187,8 +205,8 @@ public class Win32NetBIOSPacketHandler extends PacketHandler {
 
 				// DEBUG
 
-				// Debug.println("readPacket() rxlen2=" + rxLen2 + ", total read len = " + (rxLen +
-				// rxLen2));
+				if ( hasDebug())
+					Debug.println("readPacket() rxlen2=" + rxLen2 + ", total read len = " + (rxLen + rxLen2));
 
 				// Set the total received data length
 
@@ -196,11 +214,13 @@ public class Win32NetBIOSPacketHandler extends PacketHandler {
 			}
 			else {
 
+                // Release the packet buffer back to the pool
+                
+                getPacketPool().releasePacket( pkt);
+                
 				// Indicate that the session has closed
 
 				return null;
-			}
-***/
 			}
 		}
 		

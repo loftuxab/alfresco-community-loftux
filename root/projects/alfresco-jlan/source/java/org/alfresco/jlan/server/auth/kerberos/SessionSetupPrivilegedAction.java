@@ -27,6 +27,7 @@ package org.alfresco.jlan.server.auth.kerberos;
 
 import java.security.PrivilegedAction;
 
+import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.server.auth.spnego.OID;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
@@ -111,8 +112,7 @@ public class SessionSetupPrivilegedAction implements PrivilegedAction {
       krbDetails = new KerberosDetails(serverGSSContext.getSrcName(), serverGSSContext.getTargName(), respBlob);
     }
     catch (GSSException ex) {
-      System.out.println("GSSException: " + ex.getMajorString());
-      System.out.println("  " + ex.getMessage());
+      Debug.println(ex);
     }
 
     // Return the Kerberos response
