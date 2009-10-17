@@ -190,3 +190,6 @@ Now: by query name
 34) ADDED: cmisra:relativePathSegment
 
 CMIS-505
+
+35) REMOVED: cmis:id from workspace
+
