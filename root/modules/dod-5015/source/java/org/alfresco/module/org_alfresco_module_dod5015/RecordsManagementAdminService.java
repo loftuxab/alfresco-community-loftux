@@ -36,7 +36,8 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.QName;
 
 /**
- * Records management custom model service interface.
+ * Records management custom model service interface. Implementations of this class are responsible
+ * for the creation and maintenance of RM-related custom properties and custom associations.
  * 
  * @author Neil McErlean, janv
  */
@@ -45,13 +46,15 @@ public interface RecordsManagementAdminService
     /**
      * This method returns the custom properties that have been defined for the specified
      * customisable RM element.
+     * <P/>
      * Note: the custom property definitions are retrieved from the dictionaryService
      * which is notified of any newly created definitions on transaction commit.
      * Therefore custom properties created in the current transaction will not appear
-     * in the results.
+     * in the result of this method.
      * 
      * @param customisedElement
      * @return
+     * @see CustomisableRmElement
      */
     public Map<QName, PropertyDefinition> getCustomPropertyDefinitions(CustomisableRmElement customisedElement);
     
@@ -61,7 +64,10 @@ public interface RecordsManagementAdminService
      * Note: the custom property definitions are retrieved from the dictionaryService
      * which is notified of any newly created definitions on transaction commit.
      * Therefore custom properties created in the current transaction will not appear
-     * in the results.
+     * in the result of this method.
+     * 
+     * @return
+     * @see CustomisableRmElement
      */
     public Map<QName, PropertyDefinition> getCustomPropertyDefinitions();
     
@@ -74,13 +80,15 @@ public interface RecordsManagementAdminService
      *                 within URLs and in QNames. Therefore it must contain URL/QName-valid characters
      *                 only. It must also be unique.
      *                 If a null value is passed, an id will be generated.
-     * @param aspectName - mandatory
+     * @param aspectName - mandatory. The aspect within which the property is to be defined.
+     *                   This must be one of the CustomisableRmElements.
      * @param label - mandatory
      * @param dataType - mandatory
      * @param title - optional
      * @param description - optional
      * 
      * @return the propId, whether supplied as a parameter or generated.
+     * @see CustomisableRmElement#getCorrespondingAspect()
      */
     public QName addCustomPropertyDefinition(QName propId, String aspectName, String label, QName dataType, String title, String description);
     
@@ -91,7 +99,8 @@ public interface RecordsManagementAdminService
      *                 within URLs and in QNames. Therefore it must contain URL/QName-valid characters
      *                 only. It must also be unique.
      *                 If a null value is passed, an id will be generated.
-     * @param aspectName - mandatory
+     * @param aspectName - mandatory. The aspect within which the property is to be defined.
+     *                   This must be one of the CustomisableRmElements.
      * @param label - mandatory
      * @param dataType - mandatory
      * @param title - optional
@@ -103,6 +112,7 @@ public interface RecordsManagementAdminService
      * @param lovConstraintQName - optional custom constraint
      * 
      * @return the propId, whether supplied as a parameter or generated.
+     * @see CustomisableRmElement#getCorrespondingAspect()
      */
     public QName addCustomPropertyDefinition(QName propId, String aspectName, String label, QName dataType, String title, String description, String defaultValue, boolean multiValued, boolean mandatory, boolean isProtected, QName lovConstraintQName);
     
