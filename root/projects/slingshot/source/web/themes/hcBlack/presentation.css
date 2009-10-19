@@ -324,7 +324,12 @@ span.navigation-separator-alt
    border-right: 1px solid #4f4f4f;  
 }
 
-/* Standard toolbar separator */
+/* Standard toolbar */
+
+.toolbar
+{
+   border-bottom: 1px solid #C7CCCE;
+}
 
 .toolbar .separator
 {
@@ -751,7 +756,7 @@ div.theme-bg-color-5
 
 .theme-bg-2
 {
-
+   background-color:#E3EAEC;
 }
 
 /* Theme border type/colors */

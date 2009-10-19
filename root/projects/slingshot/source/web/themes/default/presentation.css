@@ -645,6 +645,13 @@ body.yui-skin-default .treeview .selected div.ygtvchildren table .ygtvlabel:hove
    background-image: url(./images/navigation-bg.png);
 }
 
+/* Standard toolbar */
+
+.toolbar
+{
+   border-bottom: 1px solid #C7CCCE;
+}
+
 .toolbar .action-bar
 {
    border-right: 1px solid #9eb0b7;
@@ -759,6 +766,7 @@ div.theme-bg-color-5
 
 .theme-bg-2
 {
+   background-color: #E3EAEC;   
    /* background-image: url(images/navbar-bg-2.png); */
 }
 

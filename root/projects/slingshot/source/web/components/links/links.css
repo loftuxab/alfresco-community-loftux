@@ -167,7 +167,6 @@
 .links-header .links-toolbar
 {
    background-color: #E3EAEC;
-   border-bottom: 2px solid #F0F3F4;
    clear: both;
    height: 2em;
    padding: 0.5em;
@@ -240,7 +239,7 @@
 .links-header .links-titlebar
 {
    background-color: #E9EDEF;
-   border-bottom: 2px solid #C7CCCE;
+   border-bottom: 1px solid #C7CCCE;
    height: 2em;
    padding: 0.5em;
 }
