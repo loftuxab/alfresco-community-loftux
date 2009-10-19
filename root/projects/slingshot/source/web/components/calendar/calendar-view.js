@@ -2867,8 +2867,8 @@ Alfresco.util.DialogManager = ( function () {
                    form.addValidation("td", this.options._onDateValidation, { "obj": this }, "focus");
                    form.addValidation("fd", this.options._onDateValidation, { "obj": this }, "focus");
 
-                   form.setShowSubmitStateDynamically(true, true);
-                   form.setSubmitElements(this.okButton);
+                   form.setShowSubmitStateDynamically(true, false);
+                   form.setSubmitElements(this.widgets.okButton);
                    
                    /**
                     * keyboard handler for popup calendar button. Requried as YUI button's click
