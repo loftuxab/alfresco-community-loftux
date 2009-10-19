@@ -3,7 +3,7 @@
       "${page.url.templateArgs["site"]!""}"
    );
 //]]></script>
-<div id="${args.htmlid}-body" class="toolbar calendar-toolbar ">
+<div id="${args.htmlid}-body" class="toolbar calendar-toolbar theme-bg-2">
    <div class="yui-ge calendar-bar">
       <div class="yui-u first theme-bg-1">
          <button id="${args.htmlid}-today-button">${msg("button.today")}</button>
