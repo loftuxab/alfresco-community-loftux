@@ -451,6 +451,12 @@ textarea
 .topiclist .yui-dt-liner {
    padding:0;
 }
+
+.yui-skin-greenTheme .yui-dt-message
+{
+   background-color:inherit;
+}
+
 /* blog/wiki action items links */
 body.yui-skin-greenTheme .wikipage .editPage a:hover,
 body.yui-skin-greenTheme .wikipage .deletePage a:hover,
@@ -524,10 +530,14 @@ body.yui-skin-greenTheme .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-la
 /* end doclist */
 
 /* invite page */
-.inviteusersbyemail .byemailbody,
+.inviteusersbyemail .byemailbody
+{
+   background-color: #fbfbfb;
+}
+
 .people-finder .results
 {
-   background-color: #F6FEF5;
+   background-color: #f9fcfd;
 }
 
 .yui-skin-greenTheme .dayview h2, .weekview h2,

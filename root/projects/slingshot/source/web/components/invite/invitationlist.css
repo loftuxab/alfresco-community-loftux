@@ -36,9 +36,10 @@
 {
    border-bottom: 1px dashed #d9d9d9;
 }
-.invitationlist .inviteelist table .yui-dt-empty
+.invitationlist .inviteelist table tr td.yui-dt-empty
 {
-   background-color: #fff;
+   background-color: inherit;
+   border-bottom: none;   
 }
 
 .invitationlist .inviteelist .user
@@ -100,7 +101,7 @@
 .invitationlistwrapper
 {
 	background: transparent url(images/green-arrow.png) no-repeat left 15%;
-	margin: 24px 0 10px 0;
+	margin: 1em 0 0;
 	padding-left: 50px;
 }
 

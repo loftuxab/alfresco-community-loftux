@@ -168,6 +168,11 @@ body.yui-skin-hcBlack .dashlet .body a:hover {
    padding:0;
 }
 
+.yui-skin-hcBlack .yui-dt-message
+{
+   background-color:inherit;
+}
+
 .yui-skin-hcBlack .yui-panel
 {
    border-bottom:medium none;
@@ -566,7 +571,10 @@ body.yui-skin-hcBlack tr#collapseTrigger td
 }
 /* end calendar */
 /* invite page */
-.inviteusersbyemail .byemailbody,
+.inviteusersbyemail .byemailbody
+{
+   background-color: #fbfbfb;
+}
 .people-finder .results
 {
    background-color: #F6FEF5;

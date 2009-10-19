@@ -208,6 +208,11 @@ hr
    cursor:auto;
 }
 
+.yui-skin-default .yui-dt-message
+{
+   background-color:inherit;
+}
+
 /* Style the default message  */
 
 .yui-skin-default #message .bd
@@ -546,7 +551,11 @@ body.yui-skin-default .doclist tr.yui-dt-even.yui-dt-highlighted td.yui-dt-last
 /* end doclist */
 
 /* invite page */
-.inviteusersbyemail .byemailbody,
+.inviteusersbyemail .byemailbody
+{
+   background-color: #fbfbfb;
+}
+
 .people-finder .results
 {
    background-color: #f6f9fc;
