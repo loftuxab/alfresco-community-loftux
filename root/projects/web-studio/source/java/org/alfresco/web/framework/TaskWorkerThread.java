@@ -40,8 +40,10 @@ public class TaskWorkerThread extends Thread
     private AbstractTask task = null;
     private TaskManager taskManager = null;
 
-    public TaskWorkerThread(TaskManager taskManager)
+    public TaskWorkerThread(String name, TaskManager taskManager)
     {
+        super(name);
+        super.setDaemon(true);
         this.taskManager = taskManager;
     }
 

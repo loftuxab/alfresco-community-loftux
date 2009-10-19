@@ -113,7 +113,7 @@
 	<classpathentry kind="lib" path="lib/XmlSchema-1.4.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-2.0.8.jar" sourcepath="src/spring-2.0.8-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer.jar" sourcepath="src/PDFRenderer-2009-09-27-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer.jar" sourcepath="src/PDFRenderer-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0-patched.jar" sourcepath="src/tm-extractors-1.0-patched.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/poi-3.5-FINAL-20090928.jar" sourcepath="src/poi-3.5-FINAL-src.zip"/>

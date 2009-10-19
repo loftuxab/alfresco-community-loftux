@@ -45,8 +45,9 @@ public class TaskStarterThread extends Thread
     /**
      * Instantiates a new task starter thread.
      */
-    public TaskStarterThread(TaskManager taskManager)
+    public TaskStarterThread(String name, TaskManager taskManager)
     {
+        super(name);
         this.taskManager = taskManager;
     }
 
