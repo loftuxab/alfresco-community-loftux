@@ -651,9 +651,8 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
 	    
 	    rsp = sendRequest(new PostRequest(refInstancesRecord1Url,
 	    		jsonString, APPLICATION_JSON), 200);
-
-//	    System.out.println(rsp.getContentAsString());
 	    
+//	    System.out.println(rsp.getContentAsString());
 	    
         // Now retrieve the applied references from the REST API
 	    // 1. references on the 'from' record.
@@ -670,10 +669,6 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         JSONArray customRefsFromArray = (JSONArray)dataObj.get("customReferencesFrom");
         assertNotNull("JSON 'customReferencesFrom' object was null", customRefsFromArray);
 
-        for (int i = 0; i < customRefsFromArray.length(); i++) {
-//            System.out.println(customRefsFromArray.get(i));
-        }
-        
         int customRefsCount = customRefsFromArray.length();
         assertTrue("There should be at least one custom reference. Found " + customRefsFromArray, customRefsCount > 0);
         
@@ -688,7 +683,6 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         rsp = sendRequest(new GetRequest(refInstancesRecord2Url), 200);
 
         contentAsString = rsp.getContentAsString();
-//        System.out.println(contentAsString);
         
         jsonRsp = new JSONObject(new JSONTokener(contentAsString));
 
@@ -698,10 +692,6 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         customRefsToArray = (JSONArray)dataObj.get("customReferencesTo");
         assertNotNull("JSON 'customReferencesTo' object was null", customRefsToArray);
 
-        for (int i = 0; i < customRefsToArray.length(); i++) {
-//            System.out.println(customRefsToArray.get(i));
-        }
-        
         customRefsCount = customRefsToArray.length();
         assertTrue("There should be at least one custom reference. Found " + customRefsToArray, customRefsCount > 0);
         
@@ -738,7 +728,105 @@ public class RmRestApiTest extends BaseWebScriptTest implements RecordsManagemen
         assertNotNull("JSON 'customReferences' object was null", customRefsFromArray);
         assertTrue("customRefsArray was unexpectedly not empty.", customRefsFromArray.length() == 0);
     }
-    
+
+    public void testMob1630ShouldNotBeAbleToCreateTwoSupersedesReferencesOnOneRecordPair() throws Exception
+    {
+        // Create 2 test records.
+        NodeRef recordFolder = retrievePreexistingRecordFolder();
+        NodeRef testRecord1 = createRecord(recordFolder, "testRecord1" + System.currentTimeMillis(), "The from recørd");
+        NodeRef testRecord2 = createRecord(recordFolder, "testRecord2" + System.currentTimeMillis(), "The to récord");
+
+        String node1Url = testRecord1.toString().replace("://", "/");
+        String node2Url = testRecord2.toString().replace("://", "/");
+        String refInstancesRecord1Url = MessageFormat.format(REF_INSTANCES_URL_FORMAT, node1Url);
+        String refInstancesRecord2Url = MessageFormat.format(REF_INSTANCES_URL_FORMAT, node2Url);
+        
+        {// Sanity check. There should be no references defined on these new records.
+            Response rsp = sendRequest(new GetRequest(refInstancesRecord1Url), 200);
+            
+            String rspContent = rsp.getContentAsString();
+            JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+            JSONObject dataObj = jsonRsp.getJSONObject("data");
+            JSONArray refsFrom = dataObj.getJSONArray("customReferencesFrom");
+            JSONArray refsTo = dataObj.getJSONArray("customReferencesTo");
+            assertEquals("Incorrect from-refs count.", 0, refsFrom.length());
+            assertEquals("Incorrect to-refs count.", 0, refsTo.length());
+        }
+
+        // Add a supersedes ref instance between them
+        final String supersedesRefLocalName = "supersedes";
+        String jsonString = new JSONStringer().object()
+            .key("toNode").value(testRecord2.toString())
+            .key("refId").value(supersedesRefLocalName)
+            .endObject()
+        .toString();
+        
+        Response rsp = sendRequest(new PostRequest(refInstancesRecord1Url,
+                jsonString, APPLICATION_JSON), 200);
+        
+        // The bug is that we can apply two such references which should not be allowed
+        rsp = sendRequest(new PostRequest(refInstancesRecord1Url,
+                jsonString, APPLICATION_JSON), 500);
+        
+        {// Retrieve reference instances on this pair of records.
+            // The first record
+            rsp = sendRequest(new GetRequest(refInstancesRecord1Url), 200);
+            
+            String rspContent = rsp.getContentAsString();
+            JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+            JSONObject dataObj = jsonRsp.getJSONObject("data");
+            JSONArray refsFrom = dataObj.getJSONArray("customReferencesFrom");
+            JSONArray refsTo = dataObj.getJSONArray("customReferencesTo");
+            assertEquals("Incorrect from-refs count.", 1, refsFrom.length());
+            assertEquals("Incorrect to-refs count.", 0, refsTo.length());
+
+            // The second record - the back-reference
+            rsp = sendRequest(new GetRequest(refInstancesRecord2Url), 200);
+            
+            rspContent = rsp.getContentAsString();
+            jsonRsp = new JSONObject(new JSONTokener(rspContent));
+            dataObj = jsonRsp.getJSONObject("data");
+            refsFrom = dataObj.getJSONArray("customReferencesFrom");
+            refsTo = dataObj.getJSONArray("customReferencesTo");
+            assertEquals("Incorrect from-refs count.", 0, refsFrom.length());
+            assertEquals("Incorrect to-refs count.", 1, refsTo.length());
+        }
+        
+        // Delete the reference instance
+        String protocol = testRecord2.getStoreRef().getProtocol();
+        String identifier = testRecord2.getStoreRef().getIdentifier();
+        String recId = testRecord2.getId();
+        final String queryFormat = "?st={0}&si={1}&id={2}";
+        String urlQueryString = MessageFormat.format(queryFormat, protocol, identifier, recId);
+
+        rsp = sendRequest(new DeleteRequest(refInstancesRecord1Url + "/" + supersedesRefLocalName + urlQueryString), 200);
+        assertTrue(rsp.getContentAsString().contains("success"));
+
+        {// Retrieve reference instances on this pair of records.
+            // The first record
+            rsp = sendRequest(new GetRequest(refInstancesRecord1Url), 200);
+            
+            String rspContent = rsp.getContentAsString();
+            JSONObject jsonRsp = new JSONObject(new JSONTokener(rspContent));
+            JSONObject dataObj = jsonRsp.getJSONObject("data");
+            JSONArray refsFrom = dataObj.getJSONArray("customReferencesFrom");
+            JSONArray refsTo = dataObj.getJSONArray("customReferencesTo");
+            assertEquals("Incorrect from-refs count.", 0, refsFrom.length());
+            assertEquals("Incorrect to-refs count.", 0, refsTo.length());
+
+            // The second record - the back-reference
+            rsp = sendRequest(new GetRequest(refInstancesRecord2Url), 200);
+            
+            rspContent = rsp.getContentAsString();
+            jsonRsp = new JSONObject(new JSONTokener(rspContent));
+            dataObj = jsonRsp.getJSONObject("data");
+            refsFrom = dataObj.getJSONArray("customReferencesFrom");
+            refsTo = dataObj.getJSONArray("customReferencesTo");
+            assertEquals("Incorrect from-refs count.", 0, refsFrom.length());
+            assertEquals("Incorrect to-refs count.", 0, refsTo.length());
+        }
+    }
+
     public void testPostCustomPropertyDefinition() throws Exception
     {
         long currentTimeMillis = System.currentTimeMillis();
