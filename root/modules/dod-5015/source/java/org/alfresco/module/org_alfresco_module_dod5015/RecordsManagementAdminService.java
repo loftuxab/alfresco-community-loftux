@@ -196,10 +196,14 @@ public interface RecordsManagementAdminService
     
     /**
      * This method adds the specified custom reference instance between the specified nodes.
+     * Only one instance of any custom reference type is allowed in a given direction
+     * between two given records.
      * 
      * @param fromNode
      * @param toNode
      * @param assocId the server-side qname e.g. {http://www.alfresco.org/model/rmcustom/1.0}abcd-12-efgh-4567
+     * @throws AlfrescoRuntimeException if an instance of the specified reference type
+     *                                  already exists from fromNode to toNode.
      */
     public void addCustomReference(NodeRef fromNode, NodeRef toNode, QName assocId);
 

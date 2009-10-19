@@ -491,6 +491,7 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
      */
 	public void addCustomReference(NodeRef fromNode, NodeRef toNode, QName refId)
 	{
+	    // Check that a definition for the reference type exists.
 		Map<QName, AssociationDefinition> availableAssocs = this.getCustomReferenceDefinitions();
 
 		AssociationDefinition assocDef = availableAssocs.get(refId);
@@ -498,6 +499,38 @@ public class RecordsManagementAdminServiceImpl implements RecordsManagementAdmin
 		{
 			throw new IllegalArgumentException("No such custom reference: " + refId);
 		}
+
+		// Check if an instance of this reference type already exists in the same direction.
+		boolean associationAlreadyExists = false;
+        if (assocDef.isChild())
+        {
+            List<ChildAssociationRef> childAssocs = nodeService.getChildAssocs(fromNode, assocDef.getName(), assocDef.getName());
+            for (ChildAssociationRef chAssRef : childAssocs)
+            {
+                if (chAssRef.getChildRef().equals(toNode))
+                {
+                    associationAlreadyExists = true;
+                }
+            }
+        }
+        else
+        {
+            List<AssociationRef> assocs = nodeService.getTargetAssocs(fromNode, assocDef.getName());
+            for (AssociationRef assRef : assocs)
+            {
+                if (assRef.getTargetRef().equals(toNode))
+                {
+                    associationAlreadyExists = true;
+                }
+            }
+        }
+        if (associationAlreadyExists)
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("Association '").append(refId).append("' already exists from ")
+                .append(fromNode).append(" to ").append(toNode);
+            throw new AlfrescoRuntimeException(msg.toString());
+        }
 
 		// Invoke before create reference policy
 		invokeBeforeCreateReference(fromNode, toNode, refId);
