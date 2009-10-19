@@ -72,7 +72,7 @@ public class ArgumentHelper
         {
             throw new IllegalArgumentException("Argument '" + arg + "' is required.");
         }
-        else if (value.length() == 0 && nonEmpty)
+        else if (value != null && value.length() == 0 && nonEmpty)
         {
             throw new IllegalArgumentException("Argument '" + arg + "' may not be empty.");
         }
@@ -80,14 +80,22 @@ public class ArgumentHelper
     }
     
     /**
+     * @return          Returns the value assigned or the minimum value if the parameter was not present
      * @throws IllegalArgumentException if the argument doesn't match the requirements.
      */
     public int getIntegerValue(String arg, boolean mandatory, int minValue, int maxValue)
     {
         String valueStr = args.get(arg);
-        if (valueStr == null && mandatory)
+        if (valueStr == null)
         {
-            throw new IllegalArgumentException("Argument '" + arg + "' is required.");
+            if (mandatory)
+            {
+                throw new IllegalArgumentException("Argument '" + arg + "' is required.");
+            }
+            else
+            {
+                return minValue;
+            }
         }
         // Now convert
         try
