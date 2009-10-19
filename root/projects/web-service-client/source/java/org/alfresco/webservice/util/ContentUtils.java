@@ -87,6 +87,7 @@ public class ContentUtils
             // Connect to donwload servlet            
             URL url = new URL(strUrl);
             URLConnection conn = url.openConnection();
+            conn.setRequestProperty("Cookie", "JSESSIONID=" + AuthenticationUtils.getAuthenticationDetails().getSessionId() + ";");
             InputStream is = conn.getInputStream();
             int read = is.read();
             while (read != -1)

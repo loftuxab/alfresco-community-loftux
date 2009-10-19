@@ -27,6 +27,8 @@ package org.alfresco.util;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.alfresco.error.AlfrescoRuntimeException;
@@ -53,6 +55,12 @@ import org.alfresco.error.AlfrescoRuntimeException;
  */
 public class ISO8601DateFormat
 {
+    private static final ThreadLocal<Map<String, TimeZone>> timezones;
+    static
+    {
+        timezones = new ThreadLocal<Map<String,TimeZone>>();
+    }
+    
     /**
      * Format date into ISO format
      * 
@@ -169,7 +177,20 @@ public class ISO8601DateFormat
             {
                 throw new IndexOutOfBoundsException("Invalid time zone indicator " + timezoneIndicator);
             }
-            TimeZone timezone = TimeZone.getTimeZone(timezoneId);
+            
+            // Get the timezone
+            Map<String, TimeZone> timezoneMap = timezones.get();
+            if (timezoneMap == null)
+            {
+                timezoneMap = new HashMap<String, TimeZone>(3);
+                timezones.set(timezoneMap);
+            }
+            TimeZone timezone = timezoneMap.get(timezoneId);
+            if (timezone == null)
+            {
+                timezone = TimeZone.getTimeZone(timezoneId);
+                timezoneMap.put(timezoneId, timezone);
+            }
             if (!timezone.getID().equals(timezoneId))
             {
                 throw new IndexOutOfBoundsException();

@@ -83,13 +83,13 @@ public class TaskManager
 
         // create the nightkeeper thread that will make sure
         // that tasks are being processed
-        taskStarterThread = new TaskStarterThread(this);
+        taskStarterThread = new TaskStarterThread("TaskManager-Starter", this);
         taskStarterThread.start();
 
         // stock our available threads
         for (int i = 0; i < getThreadPoolSize(); i++)
         {
-            TaskWorkerThread thread = new TaskWorkerThread(this);
+            TaskWorkerThread thread = new TaskWorkerThread("TaskManager-"+ i, this);
             getThreads().put(thread.getName(), thread);
             thread.start();
 
