@@ -186,7 +186,7 @@
        */
       onActionUploadNewVersion: function dlA_onActionUploadNewVersion(assets)
       {
-         var fileName = assets.fileName,
+         var displayName = assets.displayName,
             nodeRef = assets.nodeRef;
 
          if (!this.fileUpload)
@@ -195,15 +195,15 @@
          }
 
          // Show uploader for multiple files
-         var description = this.msg("label.filter-description", assets.displayName),
-            extensions = "*" + fileName.substring(fileName.lastIndexOf("."));
+         var description = this.msg("label.filter-description", displayName),
+            extensions = "*" + displayName.substring(displayName.lastIndexOf("."));
          
          var singleUpdateConfig =
          {
             siteId: this.options.siteId,
             containerId: this.options.containerId,
             updateNodeRef: nodeRef,
-            updateFilename: fileName,
+            updateFilename: displayName,
             overwrite: true,
             filter: [
             {
