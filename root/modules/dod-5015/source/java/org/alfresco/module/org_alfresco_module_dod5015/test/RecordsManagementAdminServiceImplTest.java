@@ -515,11 +515,11 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
                             policyComponent.bindClassBehaviour(
                                     RecordsManagementPolicies.BEFORE_CREATE_REFERENCE, 
                                     this, 
-                                    new JavaBehaviour(this, "beforeCreateReference", NotificationFrequency.EVERY_EVENT));
+                                    new JavaBehaviour(RecordsManagementAdminServiceImplTest.this, "beforeCreateReference", NotificationFrequency.EVERY_EVENT));
                             policyComponent.bindClassBehaviour(
                                     RecordsManagementPolicies.ON_CREATE_REFERENCE, 
                                     this, 
-                                    new JavaBehaviour(this, "onCreateReference", NotificationFrequency.EVERY_EVENT));
+                                    new JavaBehaviour(RecordsManagementAdminServiceImplTest.this, "onCreateReference", NotificationFrequency.EVERY_EVENT));
                             
                             assertFalse(beforeMarker);
                             assertFalse(onMarker);
