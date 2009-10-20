@@ -47,22 +47,14 @@
     */
    Alfresco.RssFeed = function(htmlId)
    {
-      this.name = "Alfresco.RssFeed";
-      this.id = htmlId;
-      
+      Alfresco.RssFeed.superclass.constructor.call(this, "Alfresco.RssFeed", htmlId, []);
       this.configDialog = null;
-     
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-      
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
-      
       return this;
-   }
+   };
 
-   Alfresco.RssFeed.prototype =
-   {  
+   YAHOO.extend(Alfresco.RssFeed, Alfresco.component.Base,
+   {
+
       /**
        * Object container for initialization options
        *
@@ -71,46 +63,58 @@
        */
       options:
       {
+         /**
+          * The component id
+          *
+          * @property componentId
+          * @type string
+          * @default ""
+          */
          componentId: "",
+
+         /**
+          * THe url to the feed to display
+          *
+          * @property feedURL
+          * @type string
+          * @default ""
+          */
          feedURL: "",
-         limit: "all" // default is view all
+
+         /**
+          * The maximum limit of posts to display
+          *
+          * @property limit
+          * @type string
+          * @default "all"
+          */
+         limit: "all"
       },  
       
       /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       */
-      setOptions: function RssFeed_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },            
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */   
-      onComponentsLoaded: function()
-      {
-         Event.onContentReady(this.id, this.init, this, true);
-      },
-      
-      /**
        * Fired by YUI when parent element is available for scripting.
-       * Initialises components, including YUI widgets.
+       * Component initialisation, including instantiation of YUI widgets and event listener binding.
        *
-       * @method init
-       */ 
-      init: function()
-      {   
-         Event.addListener(this.id + "-configFeed-link", "click", this.onConfigFeedClick, this, true);
+       * @method onReady
+       */
+      onReady: function RF_onReady()
+      {
+         // Add click handler to config feed link that will be visible if user is site manager.
+         var configFeedLink = Dom.get(this.id + "-configFeed-link");
+         if (configFeedLink)
+         {
+            Event.addListener(configFeedLink, "click", this.onConfigFeedClick, this, true);            
+         }
       },
-      
-      onConfigFeedClick: function(e)
+
+      /**
+       * Called when the user clicks the config rss feed link.
+       * Will open a rss config dialog
+       *
+       * @method onConfigFeedClick
+       * @param e The click event
+       */
+      onConfigFeedClick: function RF_onConfigFeedClick(e)
       {
          var actionUrl = Alfresco.constants.URL_SERVICECONTEXT + "modules/feed/config/" + encodeURIComponent(this.options.componentId);
          
@@ -163,5 +167,6 @@
          }
          this.configDialog.show();
       }
-   };
+   });
+
 })();
