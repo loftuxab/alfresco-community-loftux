@@ -48,12 +48,12 @@
          <span class="menu-item-separator">&nbsp;</span>
          </#if>
          <span class="menu-item">
-            <span class="search-container link-menu-button"">
+            <span class="search-container link-menu-button">
                <label for="${args.htmlid}-searchtext" style="display:none">${msg("header.search.inputlabel")}</label>
                <input type="text" class="search-tinput" name="${args.htmlid}-searchtext" id="${args.htmlid}-searchtext" value="" maxlength="256" />
                <span class="search-icon">&nbsp;</span>
                <span class="menu-item-separator">&nbsp;</span>
-               <input id="${args.htmlid}-search-tbutton" type="button"/>
+               <input id="${args.htmlid}-search-tbutton" type="button" />
             </span>
          </span>
          </#if>
