@@ -392,7 +392,7 @@
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             if (oRecord.getData("canAdd"))
             {
-               elCell.innerHTML = '<a href="#" class="add-item add-' + me.eventGroup + '" title="' + me.msg("label.add-item") + '"><span class="addIcon">&nbsp;</span></a>';
+               elCell.innerHTML = '<a href="#" class="add-item add-' + me.eventGroup + '" title="' + me.msg("button.add") + '"><span class="addIcon">&nbsp;</span></a>';
             }
          };
 
@@ -404,7 +404,7 @@
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
             if (oRecord.getData("canRemove"))
             {
-               elCell.innerHTML = '<a href="#" class="remove-item remove-' + me.eventGroup + '" title="' + me.msg("label.remove-item") + '"><span class="removeIcon">&nbsp;</span></a>';
+               elCell.innerHTML = '<a href="#" class="remove-item remove-' + me.eventGroup + '" title="' + me.msg("button.remove") + '"><span class="removeIcon">&nbsp;</span></a>';
             }
          };
 
