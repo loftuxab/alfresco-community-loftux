@@ -550,6 +550,12 @@
          <zipfileset dir="${dir.name.binaries.installer.win32}"
                      prefix="commands/ImageMagick/bin"
                      includes="convert.exe" />
+         <zipfileset dir="${dir.continuous.dist}"
+                     includes="${file.name.dist.mmt}.jar"
+                     fullpath="commands/bin/alfresco-mmt.jar" />
+         <zipfileset dir="${dir.continuous.dist}"
+                     includes="${file.name.dist.bm-remote}.jar"
+                     fullpath="commands/bin/alfresco-bm-remote.jar" />
       </zip>
 
       <tar destfile="${dir.continuous.dist}/${file.name.dist.war}.tar.gz"
