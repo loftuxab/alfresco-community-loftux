@@ -71,6 +71,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.Pair;
 
 /**
  * This test class tests the definition and use of a custom RM elements at the Java services layer.
@@ -151,95 +152,127 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         setComplete();
         endTransaction();
         
-        startNewTransaction();
-        
-        UserTransaction txn1 = transactionService.getUserTransaction(true);
-        txn1.begin();
-        
-        // Create simple custom property definition (no constraint) for each type of customisable RM element
-        for (CustomisableRmElement ce : CustomisableRmElement.values())
-        {
-            String aspectName = ce.getCorrespondingAspect();
-            
-            String propLocalName = "myProp-for-"+aspectName+"-"+testRunID;
-            
-            QName dataType = DataTypeDefinition.TEXT;
-            String propTitle = "My property title";
-            String description = "My property description";
-            
-            rmAdminService.addCustomPropertyDefinition(null, aspectName, propLocalName, dataType, propTitle, description);
-        }
-        
-        txn1.commit();
-        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        // Create simple custom property definition (no constraint) for each type of customisable RM element
+                        for (CustomisableRmElement ce : CustomisableRmElement.values())
+                        {
+                            String aspectName = ce.getCorrespondingAspect();
+                            
+                            String propLocalName = "myProp-for-"+aspectName+"-"+testRunID;
+                            
+                            QName dataType = DataTypeDefinition.TEXT;
+                            String propTitle = "My property title";
+                            String description = "My property description";
+                            
+                            rmAdminService.addCustomPropertyDefinition(null, aspectName, propLocalName, dataType, propTitle, description);
+                        }
+                        return null;
+                    }          
+                });        
+
         // TODO test usages
     }
     
     public void testCreateAndUseCustomProperty() throws Exception
     {
-        // Create the necessary test object in the db: a record.
-        NodeRef recordFolder = retrievePreexistingRecordFolder();
-        NodeRef testRecord = createRecord(recordFolder, "testRecord" + System.currentTimeMillis());
-        
         setComplete();
         endTransaction();
-        
-        UserTransaction txn1 = transactionService.getUserTransaction(false);
-        txn1.begin();
 
-        declareRecord(testRecord);
+        // Create the necessary test object in the db: a record.
+        final NodeRef testRecord = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        NodeRef recordFolder = retrievePreexistingRecordFolder();
+                        NodeRef result = createRecord(recordFolder, "testRecord" + System.currentTimeMillis());
+                        return result;
+                    }
+                });
 
-        // Define a custom property.
-        QName generatedQName = rmAdminService.addCustomPropertyDefinition(null, ASPECT_CUSTOM_RECORD_FOLDER_PROPERTIES.toPrefixString(namespaceService),
-                "foo", DataTypeDefinition.BOOLEAN, "custom prop title", "custom prop description");
-        
-        // We need to commit the transaction to trigger behaviour that should reload the data dictionary model.
-        txn1.commit();
-        
-        UserTransaction txn2 = transactionService.getUserTransaction(false);
-        txn2.begin();
-        
-        // Confirm the custom property is included in the list from rmAdminService.
-        Map<QName, PropertyDefinition> customPropDefinitions = rmAdminService.getCustomPropertyDefinitions(CustomisableRmElement.RECORD_FOLDER);
-        PropertyDefinition propDefn = customPropDefinitions.get(generatedQName);
-        assertNotNull("Custom property definition from rmAdminService was null.", propDefn);
-        assertEquals(generatedQName, propDefn.getName());
-        assertEquals("foo", propDefn.getTitle());
+        // Declare it
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<NodeRef>()
+                {
+                    public NodeRef execute() throws Throwable
+                    {
+                        declareRecord(testRecord);
+                        return null;
+                    }
+                });
 
-        assertEquals(DataTypeDefinition.BOOLEAN, propDefn.getDataType().getName());
+        // Create a new custom property definition
+        final QName generatedQName = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<QName>()
+                {
+                    public QName execute() throws Throwable
+                    {
+                        QName result = rmAdminService.addCustomPropertyDefinition(null,
+                                ASPECT_CUSTOM_RECORD_FOLDER_PROPERTIES.toPrefixString(namespaceService),
+                                "foo", DataTypeDefinition.BOOLEAN, "custom prop title", "custom prop description");
+                        return result;
+                    }
+                });
         
+
         // Now we need to use the custom property.
         // So we apply the aspect containing it to our test record.
-        Map<QName, Serializable> customPropValue = new HashMap<QName, Serializable>();
-        customPropValue.put(generatedQName, true);
-        nodeService.addAspect(testRecord, ASPECT_CUSTOM_RECORD_FOLDER_PROPERTIES, customPropValue);
-        
-        txn2.commit();
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        // Confirm the custom property is included in the list from rmAdminService.
+                        Map<QName, PropertyDefinition> customPropDefinitions = rmAdminService.getCustomPropertyDefinitions(CustomisableRmElement.RECORD_FOLDER);
+                        PropertyDefinition propDefn = customPropDefinitions.get(generatedQName);
+                        assertNotNull("Custom property definition from rmAdminService was null.", propDefn);
+                        assertEquals(generatedQName, propDefn.getName());
+                        assertEquals("foo", propDefn.getTitle());
+
+                        assertEquals(DataTypeDefinition.BOOLEAN, propDefn.getDataType().getName());
+                        
+                        Map<QName, Serializable> customPropValue = new HashMap<QName, Serializable>();
+                        customPropValue.put(generatedQName, true);
+                        nodeService.addAspect(testRecord, ASPECT_CUSTOM_RECORD_FOLDER_PROPERTIES, customPropValue);
+                        return null;
+                    }
+                });
         
         // Read back the property value to make sure it was correctly applied.
-        transactionService.getUserTransaction(true);
-        Map<QName, Serializable> nodeProps = nodeService.getProperties(testRecord);
-        Serializable testProperty = nodeProps.get(generatedQName);
-        assertNotNull("The testProperty was null.", testProperty);
-        
-        boolean testPropertyValue = (Boolean)testProperty;
-        assertEquals("The test property was not 'true'.", true, testPropertyValue);
-        
-        // Check that the property has appeared in the data dictionary
-        final AspectDefinition customPropertiesAspect = dictionaryService.getAspect(ASPECT_CUSTOM_RECORD_FOLDER_PROPERTIES);
-        assertNotNull(customPropertiesAspect);
-        assertNotNull("The customProperty is not returned from the dictionaryService.",
-                customPropertiesAspect.getProperties().get(generatedQName));
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        Map<QName, Serializable> nodeProps = nodeService.getProperties(testRecord);
+                        Serializable testProperty = nodeProps.get(generatedQName);
+                        assertNotNull("The testProperty was null.", testProperty);
+                        
+                        boolean testPropertyValue = (Boolean)testProperty;
+                        assertEquals("The test property was not 'true'.", true, testPropertyValue);
+                        
+                        // Check that the property has appeared in the data dictionary
+                        final AspectDefinition customPropertiesAspect = dictionaryService.getAspect(ASPECT_CUSTOM_RECORD_FOLDER_PROPERTIES);
+                        assertNotNull(customPropertiesAspect);
+                        assertNotNull("The customProperty is not returned from the dictionaryService.",
+                                customPropertiesAspect.getProperties().get(generatedQName));
+                        return null;
+                    }
+                });
     }
     
     public void testCreateAndUseCustomChildReference() throws Exception
     {
+        setComplete();
+        endTransaction();
+
     	long now = System.currentTimeMillis();
         createAndUseCustomReference(CustomReferenceType.PARENT_CHILD, null, "superseded" + now, "superseding" + now);
     }
 
     public void testCreateAndUseCustomNonChildReference() throws Exception
     {
+        setComplete();
+        endTransaction();
+
     	long now = System.currentTimeMillis();
     	createAndUseCustomReference(CustomReferenceType.BIDIRECTIONAL, "supporting" + now, null, null);
     }
@@ -377,42 +410,72 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
 	
     public void testGetAllProperties()
     {
-        // Just dump them out for visual inspection
-        System.out.println("Available custom properties:");
-        Map<QName, PropertyDefinition> props = rmAdminService.getCustomPropertyDefinitions();
-        for (QName prop : props.keySet())
-        {
-            System.out.println("   - " + prop.toString());
-            
-            String propId = props.get(prop).getTitle();
-            assertNotNull("null client-id for " + prop, propId);
-            
-            System.out.println("       " + propId);
-        }     
+        setComplete();
+        endTransaction();
+
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        // Just dump them out for visual inspection
+                        System.out.println("Available custom properties:");
+                        Map<QName, PropertyDefinition> props = rmAdminService.getCustomPropertyDefinitions();
+                        for (QName prop : props.keySet())
+                        {
+                            System.out.println("   - " + prop.toString());
+                            
+                            String propId = props.get(prop).getTitle();
+                            assertNotNull("null client-id for " + prop, propId);
+                            
+                            System.out.println("       " + propId);
+                        }     
+                        return null;
+                    }          
+                });        
     }
 	
     public void testGetAllReferences()
     {
-        // Just dump them out for visual inspection
-        System.out.println("Available custom references:");
-        Map<QName, AssociationDefinition> references = rmAdminService.getCustomReferenceDefinitions();
-        for (QName reference : references.keySet())
-        {
-            System.out.println("    - " + reference.toString());
-            System.out.println("      " + references.get(reference).getTitle());
-        }
+        setComplete();
+        endTransaction();
+
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        // Just dump them out for visual inspection
+                        System.out.println("Available custom references:");
+                        Map<QName, AssociationDefinition> references = rmAdminService.getCustomReferenceDefinitions();
+                        for (QName reference : references.keySet())
+                        {
+                            System.out.println("    - " + reference.toString());
+                            System.out.println("      " + references.get(reference).getTitle());
+                        }
+                        return null;
+                    }          
+                });        
     }
     
     public void testGetAllConstraints()
     {
-        // Just dump them out for visual inspection
-        System.out.println("Available custom constraints:");
-        List<ConstraintDefinition> constraints = rmAdminService.getCustomConstraintDefinitions();
-        for (ConstraintDefinition constraint : constraints)
-        {
-            System.out.println("   - " + constraint.getName());
-            System.out.println("       " + constraint.getTitle());
-        }
+        setComplete();
+        endTransaction();
+
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        // Just dump them out for visual inspection
+                        System.out.println("Available custom constraints:");
+                        List<ConstraintDefinition> constraints = rmAdminService.getCustomConstraintDefinitions();
+                        for (ConstraintDefinition constraint : constraints)
+                        {
+                            System.out.println("   - " + constraint.getName());
+                            System.out.println("       " + constraint.getTitle());
+                        }
+                        return null;
+                    }          
+                });        
     }
     
 	private boolean beforeMarker = false;
@@ -421,41 +484,53 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
 	
 	public void testCreateReference() throws Exception
 	{
+	    setComplete();
+	    endTransaction();
+
 	    inTest = true;
         try
         {
             // Create the necessary test objects in the db: two records.
-            NodeRef recordFolder = retrievePreexistingRecordFolder();
-            NodeRef testRecord1 = createRecord(recordFolder, "testRecordA" + System.currentTimeMillis());
-            NodeRef testRecord2 = createRecord(recordFolder, "testRecordB" + System.currentTimeMillis());
+            final Pair<NodeRef, NodeRef> testRecords = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Pair<NodeRef, NodeRef>>()
+                    {
+                        public Pair<NodeRef, NodeRef> execute() throws Throwable
+                        {
+                            NodeRef recordFolder = retrievePreexistingRecordFolder();
+                            NodeRef rec1 = createRecord(recordFolder, "testRecordA" + System.currentTimeMillis());
+                            NodeRef rec2 = createRecord(recordFolder, "testRecordB" + System.currentTimeMillis());
+                            Pair<NodeRef, NodeRef> result = new Pair<NodeRef, NodeRef>(rec1, rec2);
+                            return result;
+                        }          
+                    });
+            final NodeRef testRecord1 = testRecords.getFirst();
+            final NodeRef testRecord2 = testRecords.getSecond();
             
-            setComplete();
-            endTransaction();
-            
-            UserTransaction txn1 = transactionService.getUserTransaction(false);
-            txn1.begin();
-    
-            declareRecord(testRecord1);
-            declareRecord(testRecord2);
-            
-            policyComponent.bindClassBehaviour(
-                    RecordsManagementPolicies.BEFORE_CREATE_REFERENCE, 
-                    this, 
-                    new JavaBehaviour(this, "beforeCreateReference", NotificationFrequency.EVERY_EVENT));
-            policyComponent.bindClassBehaviour(
-                    RecordsManagementPolicies.ON_CREATE_REFERENCE, 
-                    this, 
-                    new JavaBehaviour(this, "onCreateReference", NotificationFrequency.EVERY_EVENT));
-            
-            assertFalse(beforeMarker);
-            assertFalse(onMarker);
-            
-            rmAdminService.addCustomReference(testRecord1, testRecord2, CUSTOM_REF_VERSIONS);
-            
-            assertTrue(beforeMarker);
-            assertTrue(onMarker);
-            
-            txn1.commit();
+            transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                    {
+                        public Void execute() throws Throwable
+                        {
+                            declareRecord(testRecord1);
+                            declareRecord(testRecord2);
+                            
+                            policyComponent.bindClassBehaviour(
+                                    RecordsManagementPolicies.BEFORE_CREATE_REFERENCE, 
+                                    this, 
+                                    new JavaBehaviour(this, "beforeCreateReference", NotificationFrequency.EVERY_EVENT));
+                            policyComponent.bindClassBehaviour(
+                                    RecordsManagementPolicies.ON_CREATE_REFERENCE, 
+                                    this, 
+                                    new JavaBehaviour(this, "onCreateReference", NotificationFrequency.EVERY_EVENT));
+                            
+                            assertFalse(beforeMarker);
+                            assertFalse(onMarker);
+                            
+                            rmAdminService.addCustomReference(testRecord1, testRecord2, CUSTOM_REF_VERSIONS);
+                            
+                            assertTrue(beforeMarker);
+                            assertTrue(onMarker);
+                            return null;
+                        }          
+                    });        
         }
         finally
         {
@@ -526,133 +601,142 @@ public class RecordsManagementAdminServiceImplTest extends BaseSpringTest
         setComplete();
         endTransaction();
         
-        startNewTransaction();
-        
-        UserTransaction txn1 = transactionService.getUserTransaction(true);
-        txn1.begin();
-        
-        List<ConstraintDefinition> customConstraintDefs = rmAdminService.getCustomConstraintDefinitions();
-        assertNotNull(customConstraintDefs);
-        int beforeCnt = customConstraintDefs.size();
-        
-        txn1.commit();
-        
-        UserTransaction txn2 = transactionService.getUserTransaction(false);
-        txn2.begin();
-        
-        String conLocalName = "test-"+testRunID;
-        
-        final QName testCon = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, conLocalName);
+        final int beforeCnt =
+            transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Integer>()
+                {
+                    public Integer execute() throws Throwable
+                    {
+                        List<ConstraintDefinition> result = rmAdminService.getCustomConstraintDefinitions();
+                        assertNotNull(result);
+                        return result.size();
+                    }          
+                });        
+
         final String conTitle = "test title - "+testRunID;
-        
-        List<String> allowedValues = new ArrayList<String>(3);
+        final List<String> allowedValues = new ArrayList<String>(3);
         allowedValues.add("RED");
         allowedValues.add("AMBER");
         allowedValues.add("GREEN");
         
-        rmAdminService.addCustomConstraintDefinition(testCon, conTitle, true, allowedValues);
+        final QName testCon = transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<QName>()
+                {
+                    public QName execute() throws Throwable
+                    {
+                        String conLocalName = "test-"+testRunID;
+                        
+                        final QName result = QName.createQName(RecordsManagementCustomModel.RM_CUSTOM_URI, conLocalName);
+                        
+                        rmAdminService.addCustomConstraintDefinition(result, conTitle, true, allowedValues);
+                        return result;
+                    }          
+                });        
         
-        txn2.commit();
-        
-        setComplete();
-        endTransaction();
-        
-        // Set the current security context as System - to see allowed values (unless caveat config is also updated for admin)
-        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
-        
-        UserTransaction txn3 = transactionService.getUserTransaction(true);
-        txn3.begin();
-        
-        customConstraintDefs = rmAdminService.getCustomConstraintDefinitions();
-        assertEquals(beforeCnt+1, customConstraintDefs.size());
-        
-        boolean found = false;
-        for (ConstraintDefinition conDef : customConstraintDefs)
-        {
-            if (conDef.getName().equals(testCon))
-            {
-                assertEquals(conTitle, conDef.getTitle());
-                
-                Constraint con = conDef.getConstraint();
-                assertTrue(con instanceof RMListOfValuesConstraint);
-                
-                assertEquals("LIST", ((RMListOfValuesConstraint)con).getType());
-                assertEquals(3, ((RMListOfValuesConstraint)con).getAllowedValues().size());
-                
-                found = true;
-                break;
-            }
-        }
-        assertTrue(found);
-        
-        txn3.commit();
-        
-        // Set the current security context as admin
-        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
-        
-        UserTransaction txn4 = transactionService.getUserTransaction(false);
-        txn4.begin();
-        
-        allowedValues = new ArrayList<String>(2);
-        allowedValues.add("RED");
-        allowedValues.add("YELLOW");
-        
-        rmAdminService.changeCustomConstraintValues(testCon, allowedValues);
-        
-        txn4.commit();
         
         // Set the current security context as System - to see allowed values (unless caveat config is also updated for admin)
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
         
-        UserTransaction txn5 = transactionService.getUserTransaction(true);
-        txn5.begin();
-        
-        customConstraintDefs = rmAdminService.getCustomConstraintDefinitions();
-        assertEquals(beforeCnt+1, customConstraintDefs.size());
-        
-        found = false;
-        for (ConstraintDefinition conDef : customConstraintDefs)
-        {
-            if (conDef.getName().equals(testCon))
-            {
-                assertEquals(conTitle, conDef.getTitle());
-                
-                Constraint con = conDef.getConstraint();
-                assertTrue(con instanceof RMListOfValuesConstraint);
-                
-                assertEquals("LIST", ((RMListOfValuesConstraint)con).getType());
-                assertEquals(2, ((RMListOfValuesConstraint)con).getAllowedValues().size());
-                
-                found = true;
-                break;
-            }
-        }
-        assertTrue(found);
-        
-        txn5.commit();
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        List<ConstraintDefinition> customConstraintDefs = rmAdminService.getCustomConstraintDefinitions();
+                        assertEquals(beforeCnt+1, customConstraintDefs.size());
+                        
+                        boolean found = false;
+                        for (ConstraintDefinition conDef : customConstraintDefs)
+                        {
+                            if (conDef.getName().equals(testCon))
+                            {
+                                assertEquals(conTitle, conDef.getTitle());
+                                
+                                Constraint con = conDef.getConstraint();
+                                assertTrue(con instanceof RMListOfValuesConstraint);
+                                
+                                assertEquals("LIST", ((RMListOfValuesConstraint)con).getType());
+                                assertEquals(3, ((RMListOfValuesConstraint)con).getAllowedValues().size());
+                                
+                                found = true;
+                                break;
+                            }
+                        }
+                        assertTrue(found);
+                        return null;
+                    }          
+                });        
+
         
         // Set the current security context as admin
         AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         
-        UserTransaction txn6 = transactionService.getUserTransaction(false);
-        txn6.begin();
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        allowedValues.clear();
+                        allowedValues.add("RED");
+                        allowedValues.add("YELLOW");
+                        
+                        rmAdminService.changeCustomConstraintValues(testCon, allowedValues);
+                        return null;
+                    }          
+                });        
+        
+        // Set the current security context as System - to see allowed values (unless caveat config is also updated for admin)
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getSystemUserName());
+        
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        List<ConstraintDefinition> customConstraintDefs = rmAdminService.getCustomConstraintDefinitions();
+                        assertEquals(beforeCnt+1, customConstraintDefs.size());
+                        
+                        boolean found = false;
+                        for (ConstraintDefinition conDef : customConstraintDefs)
+                        {
+                            if (conDef.getName().equals(testCon))
+                            {
+                                assertEquals(conTitle, conDef.getTitle());
+                                
+                                Constraint con = conDef.getConstraint();
+                                assertTrue(con instanceof RMListOfValuesConstraint);
+                                
+                                assertEquals("LIST", ((RMListOfValuesConstraint)con).getType());
+                                assertEquals(2, ((RMListOfValuesConstraint)con).getAllowedValues().size());
+                                
+                                found = true;
+                                break;
+                            }
+                        }
+                        assertTrue(found);
+                        return null;
+                    }          
+                });        
+
+        
+        // Set the current security context as admin
+        AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
         
         // Add custom property to record with test constraint
-        
-        String aspectName = CustomisableRmElement.RECORD.getCorrespondingAspect();
-        
-        String propLocalName = "myProp-"+testRunID;
-        
-        QName dataType = DataTypeDefinition.TEXT;
-        String propTitle = "My property title";
-        String description = "My property description";
-        String defaultValue = null;
-        boolean multiValued = false;
-        boolean mandatory = false;
-        boolean isProtected = false;
-        
-        rmAdminService.addCustomPropertyDefinition(null, aspectName, propLocalName, dataType, propTitle, description, defaultValue, multiValued, mandatory, isProtected, testCon);
-        
-        txn6.commit();
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        String aspectName = CustomisableRmElement.RECORD.getCorrespondingAspect();
+                        
+                        String propLocalName = "myProp-"+testRunID;
+                        
+                        QName dataType = DataTypeDefinition.TEXT;
+                        String propTitle = "My property title";
+                        String description = "My property description";
+                        String defaultValue = null;
+                        boolean multiValued = false;
+                        boolean mandatory = false;
+                        boolean isProtected = false;
+                        
+                        rmAdminService.addCustomPropertyDefinition(null, aspectName, propLocalName, dataType, propTitle, description, defaultValue, multiValued, mandatory, isProtected, testCon);
+                        return null;
+                    }          
+                });        
     }
 }
