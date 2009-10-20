@@ -81,11 +81,11 @@ function main()
          // Sort the favourites to the top
          sites.sort(sortSites);
       }
-
-      // Prepare the model for the template
-      model.sites = sites;
-      model.imapServerEnabled = imapServerEnabled;
    }
+
+   // Prepare the model for the template
+   model.sites = sites;
+   model.imapServerEnabled = imapServerEnabled;
 }
 
 main();
