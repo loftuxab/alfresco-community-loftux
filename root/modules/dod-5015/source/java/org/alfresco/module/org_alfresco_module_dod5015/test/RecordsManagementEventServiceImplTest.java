@@ -31,6 +31,7 @@ import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEv
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventService;
 import org.alfresco.module.org_alfresco_module_dod5015.event.RecordsManagementEventType;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.util.BaseSpringTest;
 
@@ -44,6 +45,7 @@ public class RecordsManagementEventServiceImplTest extends BaseSpringTest implem
     protected static StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
 
 	private RecordsManagementEventService rmEventService;
+	private RetryingTransactionHelper transactionHelper;
 	
 	@Override
 	protected void onSetUpInTransaction() throws Exception 
@@ -52,6 +54,7 @@ public class RecordsManagementEventServiceImplTest extends BaseSpringTest implem
 
 		// Get the service required in the tests
 		this.rmEventService = (RecordsManagementEventService)this.applicationContext.getBean("RecordsManagementEventService");
+        this.transactionHelper = (RetryingTransactionHelper)this.applicationContext.getBean("retryingTransactionHelper");
 
 		// Set the current security context as admin
 		AuthenticationUtil.setFullyAuthenticatedUser(AuthenticationUtil.getAdminUserName());
@@ -59,41 +62,71 @@ public class RecordsManagementEventServiceImplTest extends BaseSpringTest implem
 	
 	public void testGetEventTypes()
 	{
-	    List<RecordsManagementEventType> eventTypes = this.rmEventService.getEventTypes();
-	    assertNotNull(eventTypes);
-	    for (RecordsManagementEventType eventType : eventTypes)
-        {
-            System.out.println(eventType.getName() + " - " + eventType.getDisplayLabel());
-        }
+        setComplete();
+        endTransaction();
+
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        List<RecordsManagementEventType> eventTypes = rmEventService.getEventTypes();
+                        assertNotNull(eventTypes);
+                        for (RecordsManagementEventType eventType : eventTypes)
+                        {
+                            System.out.println(eventType.getName() + " - " + eventType.getDisplayLabel());
+                        }
+                        return null;
+                    }          
+                });        
 	}
 	
 	public void testGetEvents()
 	{
-	    List<RecordsManagementEvent> events = this.rmEventService.getEvents();
-	    assertNotNull(events);
-	    for (RecordsManagementEvent event : events)
-        {
-            System.out.println(event.getName());
-        }
+        setComplete();
+        endTransaction();
+
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        List<RecordsManagementEvent> events = rmEventService.getEvents();
+                        assertNotNull(events);
+                        for (RecordsManagementEvent event : events)
+                        {
+                            System.out.println(event.getName());
+                        }
+                        return null;
+                    }          
+                });        
 	}
 	
 	public void testAddRemoveEvents()
 	{
-	    List<RecordsManagementEvent> events = this.rmEventService.getEvents();
-	    assertNotNull(events);
-	    assertFalse(containsEvent(events, "myEvent"));
-	    
-	    this.rmEventService.addEvent("rmEventType.simple", "myEvent", "My Event");
-	    
-	    events = this.rmEventService.getEvents();
-        assertNotNull(events);
-        assertTrue(containsEvent(events, "myEvent"));
-        
-        this.rmEventService.removeEvent("myEvent");
-        
-        events = this.rmEventService.getEvents();
-        assertNotNull(events);
-        assertFalse(containsEvent(events, "myEvent"));               
+        setComplete();
+        endTransaction();
+
+        transactionHelper.doInTransaction(new RetryingTransactionHelper.RetryingTransactionCallback<Void>()
+                {
+                    public Void execute() throws Throwable
+                    {
+                        List<RecordsManagementEvent> events = rmEventService.getEvents();
+                        assertNotNull(events);
+                        assertFalse(containsEvent(events, "myEvent"));
+                        
+                        rmEventService.addEvent("rmEventType.simple", "myEvent", "My Event");
+                        
+                        events = rmEventService.getEvents();
+                        assertNotNull(events);
+                        assertTrue(containsEvent(events, "myEvent"));
+                        
+                        rmEventService.removeEvent("myEvent");
+                        
+                        events = rmEventService.getEvents();
+                        assertNotNull(events);
+                        assertFalse(containsEvent(events, "myEvent"));               
+                        return null;
+                    }          
+                });        
 	}
 	
 	private boolean containsEvent(List<RecordsManagementEvent> events, String eventName)
