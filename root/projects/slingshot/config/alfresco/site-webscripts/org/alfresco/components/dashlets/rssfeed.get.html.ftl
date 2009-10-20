@@ -11,9 +11,11 @@
 //]]></script>
 <div class="dashlet rssfeed">
    <div class="title">${title!msg("label.header")}</div>
+   <#if userIsSiteManager>
    <div class="toolbar">
        <a href="#" id="${args.htmlid}-configFeed-link" class="theme-color-1">${msg("label.configure")}</a>
    </div>
+   </#if>
    <div class="body scrollableList" <#if args.height??>style="height: ${args.height}px;"</#if> id="${args.htmlid}-scrollableList">
 	<#if items?? && items?size &gt; 0>
 		<#list items as item>
