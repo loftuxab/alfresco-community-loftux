@@ -101,6 +101,14 @@ public class CustomRefDelete extends AbstractRmWebScript
             		"Unable to find reference type: " + clientsRefId);
         }
         
+        if (logger.isDebugEnabled())
+        {
+            StringBuilder msg = new StringBuilder();
+            msg.append("Removing reference ").append(qn).append(" from ")
+                .append(fromNodeRef).append(" to ").append(toNodeRef);
+            logger.debug(msg.toString());
+        }
+        
         rmAdminService.removeCustomReference(fromNodeRef, toNodeRef, qn);
         
         result.put("success", true);
