@@ -5,6 +5,7 @@
  *
  * @namespace Alfresco
  * @class Alfresco.LinksView
+ * @extends Alfresco.component.Base
  */
 (function()
 {
@@ -31,23 +32,13 @@
     */
    Alfresco.LinksView = function(htmlId)
    {
-      /* Mandatory properties */
-      this.name = "Alfresco.LinksView";
-      this.id = htmlId;
+      Alfresco.LinksView.superclass.constructor.call(this, "Alfresco.LinksView", htmlId, ["json", "connection", "event", "button", "menu"]);
 
-      /* Initialise prototype properties */
-      this.widgets = {};
       this.tagId =
       {
          id: 0,
          tags: {}
       };
-
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["json", "connection", "event", "button", "menu"], this.onComponentsLoaded, this);
 
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("tagSelected", this.onTagSelected, this);
@@ -55,8 +46,9 @@
       return this;
    };
 
-   Alfresco.LinksView.prototype =
+   YAHOO.extend(Alfresco.LinksView, Alfresco.component.Base,
    {
+
       /**
        * Object container for initialization options
        *
@@ -70,6 +62,7 @@
           *
           * @property siteId
           * @type string
+          * @default ""
           */
          siteId: "",
 
@@ -84,6 +77,10 @@
 
          /**
           * Id of the displayed link.
+          * 
+          * @property linkId
+          * @type string
+          * @default ""
           */
          linkId: ""
       },
@@ -92,14 +89,6 @@
        * Stores the data displayed by this component
        */
       linksData: null,
-
-      /**
-       * Object container for storing YUI widget instances.
-       *
-       * @property widgets
-       * @type object
-       */
-      widgets : null,
 
       /**
        * Object literal used to generate unique tag ids
@@ -117,42 +106,6 @@
        * @see setBusy/releaseBusy
        */
       busy: false,
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       */
-      setOptions: function LinksView_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.LinksView} returns 'this' for method chaining
-       */
-      setMessages: function LinksView_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function LinksView_onComponentsLoaded()
-      {
-         YAHOO.util.Event.onContentReady(this.id, this.onReady, this, true);
-      },
 
       /**
        * Fired by YUI when parent element is available for scripting.
@@ -213,7 +166,7 @@
                fn: this.loadLinksDataSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.loadlinkdata.failure")
+            failureMessage: this.msg("message.loadlinkdata.failure")
          });
       },
 
@@ -276,29 +229,32 @@
          html += '<div id="' + this.id + '-linksview" class="node linksview">';
          html += Alfresco.util.links.generateLinksActions(this, data, 'div');
 
+         // Prepare url attribute
+         var href = (data.url.substring(0, 1) === "/" || data.url.indexOf("://") !== -1 ? '' : "http://") + data.url.replace('"', encodeURIComponent('"'));
+
          // Link details
          html += '<div class="nodeContent">';
          html += '<div class="nodeTitle"><a href="' + linksViewUrl + '">' + $html(data.title) + '</a></div>';
 
          html += '<div class="nodeURL">';
-         html += '<span class="nodeAttrLabel">' + this._msg("link.url") + ": </span><a " + (data.internal ? "" : "target='_blank' class='external'") + " href='" + (data.url.substring(0, 1) === "/" || data.url.indexOf("://") !== -1 ? '' : "http://") + data.url + "'>" + $html(data.url) + '</a>';
+         html += '<span class="nodeAttrLabel">' + this.msg("link.url") + ": </span><a " + (data.internal ? '' : 'target="_blank" class="external"') + ' href="' + href + '">' + $html(data.url) + "</a>";
          html += '</div>';
 
          html += '<div class="detail">';
-         html += '<span class="nodeAttrLabel">' + this._msg("link.createdOn") + ': </span>';
+         html += '<span class="nodeAttrLabel">' + this.msg("link.createdOn") + ': </span>';
          html += '<span class="nodeAttrValue">' + Alfresco.util.formatDate(data.createdOn) + '</span>';
          html += '<span class="separator">&nbsp;</span>';
-         html += '<span class="nodeAttrLabel">' + this._msg("link.createdBy") + ': </span>';
+         html += '<span class="nodeAttrLabel">' + this.msg("link.createdBy") + ': </span>';
          html += '<span class="nodeAttrValue">' + authorLink + '</span>';
          html += '</div>';
 
          html += '<div class="detail">';
-         html += '<span class="nodeAttrLabel">' + this._msg("link.description") + ": </span>";
+         html += '<span class="nodeAttrLabel">' + this.msg("link.description") + ": </span>";
          html += '<span class="nodeAttrValue">' + $links($html(data.description)) + '</span>';
          html += '</div>';
          
          html += '<div class="nodeFooter">';
-         html += '<span class="nodeAttrLabel tagLabel">' + this._msg("link.tags") + ': </span>';
+         html += '<span class="nodeAttrLabel tagLabel">' + this.msg("link.tags") + ': </span>';
          if (data.tags.length > 0)
          {
             for (var x=0; x < data.tags.length; x++)
@@ -312,7 +268,7 @@
          }
          else
          {
-            html += '<span class="nodeAttrValue">' + this._msg("link.noTags") + '</span>';
+            html += '<span class="nodeAttrValue">' + this.msg("link.noTags") + '</span>';
          }
          html += '</div>';
 
@@ -373,11 +329,11 @@
          var me = this;
          Alfresco.util.PopupManager.displayPrompt(
          {
-            title: this._msg("message.confirm.delete.title"),
-            text: this._msg("message.confirm.delete", $html(this.linksData.title)),
+            title: this.msg("message.confirm.delete.title"),
+            text: this.msg("message.confirm.delete", $html(this.linksData.title)),
             buttons: [
             {
-               text: this._msg("button.delete"),
+               text: this.msg("button.delete"),
                handler: function LinksView_onDeleteLink_delete()
                {
                   this.destroy();
@@ -385,7 +341,7 @@
                }
             },
             {
-               text: this._msg("button.cancel"),
+               text: this.msg("button.cancel"),
                handler: function LinksView_onDeleteLink_cancel()
                {
                   this.destroy();
@@ -404,7 +360,7 @@
       _deleteLinkConfirm: function LinksView__deleteLinkConfirm(linkId)
       {
          // show busy message
-         if (! this._setBusy(this._msg('message.wait')))
+         if (! this._setBusy(this.msg('message.wait')))
          {
             return;
          }
@@ -438,13 +394,13 @@
             method: "POST",
             requestContentType : "application/json",
             responseContentType : "application/json",
-            successMessage: this._msg("message.delete.success"),
+            successMessage: this.msg("message.delete.success"),
             successCallback:
             {
                fn: onDeletedSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.delete.failure"),
+            failureMessage: this.msg("message.delete.failure"),
             failureCallback:
             {
                fn: function(response) { this._releaseBusy(); },
@@ -535,19 +491,7 @@
          {
             return false;
          }
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function LinksView_msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.LinksView", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+
+   });
 })();

@@ -24,11 +24,12 @@
  */
 
 /*
- *** Alfresco.Wiki
+ *** Alfresco.WikiPage
  * 
  * @namespace Alfresco
- * @class Alfresco.Wiki
-*/
+ * @class Alfresco.WikiPage
+ * @extends Alfresco.component.Base
+ */
 (function()
 {
    /**
@@ -44,37 +45,23 @@
    var $html = Alfresco.util.encodeHTML;
     
    /**
-    * Wiki constructor.
+    * WikiPage constructor.
     * 
     * @param {String} htmlId The HTML id of the parent element
-    * @return {Alfresco.Wiki} The new Wiki instance
+    * @return {Alfresco.WikiPage} The new Wiki instance
     * @constructor
     */
-   Alfresco.Wiki = function(containerId)
+   Alfresco.WikiPage = function(htmlId)
    {
-      this.name = "Alfresco.Wiki";
-      this.id = containerId;
-      this.widgets = {};
+      Alfresco.WikiPage.superclass.constructor.call(this, "Alfresco.WikiPage", htmlId, ["button", "container", "connection", "editor", "tabview"]);
       this.selectedTags = [];
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "editor", "tabview"], this.onComponentsLoaded, this);
-
       this.parser = new Alfresco.WikiParser();
-
       return this;
    };
 
-   Alfresco.Wiki.prototype =
+   YAHOO.extend(Alfresco.WikiPage, Alfresco.component.Base,
    {
-      /**
-       * Object container for storing YUI widget instances.
-       *
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-      
+
       /**
        * Currently selected tags.
        *
@@ -117,59 +104,95 @@
        */
       options:
       {
+         /**
+          * Current siteId.
+          *
+          * @property siteId
+          * @type string
+          * @default ""
+          */
          siteId: "",
+
+         /**
+          * The posts title.
+          *
+          * @property pageTitle
+          * @type string
+          * @default ""
+          */
          pageTitle: "",
-         mode: "view", // default is "view" mode,
-         error: null,
+
+         /**
+          * The display mode
+          *
+          * @property mode
+          * @type string
+          * @default "view"
+          */
+         mode: "view",
+
+         /**
+          * Set to true if error exist
+          *
+          * @property error
+          * @type boolean
+          * @default false
+          */
+         error: false,
+
+         /**
+          * Tags for the wiki post.
+          *
+          * @property tags
+          * @type array
+          * @default []
+          */
          tags: [],
+
+         /**
+          * Pages linked to from the wiki post.
+          *
+          * @property pages
+          * @type array
+          * @default []
+          */
          pages: [],
+
+         /**
+          * Versions of this the post.
+          *
+          * @property versions
+          * @type array
+          * @default []
+          */
          versions: [],
-         permissions: {}
+
+         /**
+          * Permissions for the current user for the wiki post.
+          *
+          * @property permissions
+          * @type array
+          * @default []
+          */
+         permissions: {},
+
+         /**
+          * The current users locale
+          *
+          * @property locale
+          * @type string
+          * @default ""
+          */
+         locale: ""
       },
-      
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       */
-      setOptions: function Wiki_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.Wiki} returns 'this' for method chaining
-       */
-      setMessages: function Wiki_setMessages(obj)
-      { 
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function Wiki_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.init, this, true);
-      },
-      
+
       /**
        * Fired by YUI when parent element is available for scripting.
        * Initialises components, including YUI widgets.
        *
-       * @method init
+       * @method onReady
        */
-      init: function Wiki_init()
+      onReady: function WikiPage_onReady()
       {
          if (this.options.error)
          {
@@ -209,7 +232,7 @@
        * @method _setupPageDetails
        * @private
        */
-      _setupPageDetails: function Wiki__setupPageDetails()
+      _setupPageDetails: function WikiPage__setupPageDetails()
       {
          var versions = this.options.versions;
 
@@ -295,11 +318,11 @@
        *
        * @method onRevertWikiVersionComplete
        */
-      onRevertWikiVersionComplete: function Wiki_onRevertWikiVersionComplete()
+      onRevertWikiVersionComplete: function WikiPage_onRevertWikiVersionComplete()
       {
          Alfresco.util.PopupManager.displayMessage(
          {
-            text: this._msg("message.revertComplete", this.name)
+            text: this.msg("message.revertComplete", this.name)
          });
 
          window.location.reload();
@@ -310,7 +333,7 @@
        *
        * @method _setupEditForm
        */
-      _setupEditForm: function Wiki__setupEditForm()
+      _setupEditForm: function WikiPage__setupEditForm()
       {
          var width = Dom.get(this.id + "-form").offsetWidth - 400;
          var height = YAHOO.env.ua.ie > 0 ? document.body.clientHeight : document.height;
@@ -342,7 +365,7 @@
             siteId: this.options.siteId,
             language:this.options.locale         
          });
-         this.pageEditor.addPageUnloadBehaviour(this._msg("message.unsavedChanges.wiki"));
+         this.pageEditor.addPageUnloadBehaviour(this.msg("message.unsavedChanges.wiki"));
          this.pageEditor.render();
 
          var saveButton = new YAHOO.widget.Button(this.id + "-save-button",
@@ -382,10 +405,10 @@
                      // Version conflict, so let the user decide what to do
                      Alfresco.util.PopupManager.displayPrompt(
                      {
-                        text: this._msg("message.confirm.newerVersion"),
+                        text: this.msg("message.confirm.newerVersion"),
                         buttons: [
                         {
-                           text: this._msg("button.savechanges"),
+                           text: this.msg("button.savechanges"),
                            handler: function Wiki_submit_forceSave()
                            {
                               // Set the "force save" flag and re-submit
@@ -398,7 +421,7 @@
                            }
                         },
                         {
-                           text: this._msg("button.cancel"),
+                           text: this.msg("button.cancel"),
                            handler: function Wiki_submit_cancel()
                            {
                               this.destroy();
@@ -412,15 +435,15 @@
                      // Unauthenticated, which is probably due to a web-tier timeout or restart
                      Alfresco.util.PopupManager.displayPrompt(
                      {
-                        title: this._msg("message.sessionTimeout.title"),
-                        text: this._msg("message.sessionTimeout.text")
+                        title: this.msg("message.sessionTimeout.title"),
+                        text: this.msg("message.sessionTimeout.text")
                      });
                   }
                   else
                   {
                      Alfresco.util.PopupManager.displayPrompt(
                      {
-                        title: this._msg("message.failure"),
+                        title: this.msg("message.failure"),
                         text: data.json.message
                      });
                   }
@@ -441,7 +464,7 @@
                this.savingPagePopup = Alfresco.util.PopupManager.displayMessage(
                {
                   displayTime: 0,
-                  text: '<span class="wait">' + $html(this._msg("message.saving", this.name)) + '</span>',
+                  text: '<span class="wait">' + $html(this.msg("message.saving", this.name)) + '</span>',
                   noEscape: true
                });
                   
@@ -487,7 +510,7 @@
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onTagLibraryTagsChanged: function Wiki_onTagLibraryTagsChanged(layer, args)
+      onTagLibraryTagsChanged: function WikiPage_onTagLibraryTagsChanged(layer, args)
       {
          this.selectedTags = args[1].tags;
       },
@@ -500,7 +523,7 @@
        * @param aArgs {array} Arguments array, [0] = DomEvent, [1] = EventTarget
        * @param p_obj {object} Object passed back from subscribe method
        */
-      onVersionSelectChange: function Wiki_onVersionSelectChange(sType, aArgs, p_obj)
+      onVersionSelectChange: function WikiPage_onVersionSelectChange(sType, aArgs, p_obj)
       {
          var versionId = aArgs[1].value;
          var actionUrl = YAHOO.lang.substitute(Alfresco.constants.PROXY_URI + "slingshot/wiki/version/{site}/{title}/{version}",
@@ -535,7 +558,7 @@
        * @param event {object} event from Alfresco.ajax.request
        * @param obj {object} contians the index of the selected version in the versions array
        */
-      onVersionInfo: function Wiki_onVersionInfo(event, obj)
+      onVersionInfo: function WikiPage_onVersionInfo(event, obj)
       {        
          // Show the content
          var page = Dom.get(this.id + "-page");
@@ -545,14 +568,14 @@
          var versionHeaderSpan = Dom.get(this.id + "-version-header");
          if (versionHeaderSpan)
          {
-            versionHeaderSpan.innerHTML = this._msg("label.shortVersion", this.name) + this.options.versions[obj.index].label;
+            versionHeaderSpan.innerHTML = this.msg("label.shortVersion", this.name) + this.options.versions[obj.index].label;
          }
 
          // Update the label in the version select menu
          var label = this.options.versions[obj.index].label;
          if (obj.index == 0)
          {
-            label += " (" + this._msg("label.latest") + ")";
+            label += " (" + this.msg("label.latest") + ")";
          }
          this.widgets.versionSelect.set("label", label);
       },
@@ -562,7 +585,7 @@
        *
        * @method _getAbsolutePath
        */
-      _getAbsolutePath: function Wiki__getAbsolutePath()
+      _getAbsolutePath: function WikiPage__getAbsolutePath()
       {
          return Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/wiki-page?title=";   
       },
@@ -574,7 +597,7 @@
        * @method onCancelSelect
        * @param e {object} Event fired
        */
-      onCancelSelect: function Wiki_onCancelSelect(e)
+      onCancelSelect: function WikiPage_onCancelSelect(e)
       {
          this.pageEditor.clearDirtyFlag();
          this._redirect();
@@ -587,7 +610,7 @@
        * @method onPageUpdated
        * @param e {object} Event fired
        */
-      onPageUpdated: function Wiki_onPageUpdated(e)
+      onPageUpdated: function WikiPage_onPageUpdated(e)
       {
          this.pageEditor.clearDirtyFlag();
          this._redirect();
@@ -598,23 +621,11 @@
        * 
        * @method _redirect
        */
-      _redirect: function Wiki__redirect()
+      _redirect: function WikiPage__redirect()
       {
-         var url = this._getAbsolutePath() + this.options.pageTitle;
+         var url = this._getAbsolutePath() + encodeURIComponent(this.options.pageTitle);
          window.location = url;   
-      },
-      
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function Wiki__msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.Wiki", Array.prototype.slice.call(arguments).slice(1));
       }
-   };   
+
+   });
 })();

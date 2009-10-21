@@ -42,11 +42,11 @@ Alfresco.util.links.generateLinksActions = function generateLinksActions(me, dat
 
    if (data.permissions["edit"])
    {
-      desc += '<' + tagName + ' class="onEditLink"><a href="#" class="link-action-link-' + tagName + '">' + me._msg("action.edit") + '</a></' + tagName + '>';
+      desc += '<' + tagName + ' class="onEditLink"><a href="#" class="link-action-link-' + tagName + '">' + me.msg("action.edit") + '</a></' + tagName + '>';
    }
    if (data.permissions["delete"])
    {
-      desc += '<' + tagName + ' class="onDeleteLink"><a href="#" class="link-action-link-' + tagName + '">' + me._msg("action.delete") + '</a></' + tagName + '>';
+      desc += '<' + tagName + ' class="onDeleteLink"><a href="#" class="link-action-link-' + tagName + '">' + me.msg("action.delete") + '</a></' + tagName + '>';
    }
    desc += '</div>';
 
