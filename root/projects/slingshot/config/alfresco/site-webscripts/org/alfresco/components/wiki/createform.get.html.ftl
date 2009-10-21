@@ -1,12 +1,9 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.WikiCreateForm("${args.htmlid}").setOptions(
       {
-         locale:'${locale?substring(0, 2)}'
-      }).setSiteId(
-      "${page.url.templateArgs["site"]!""}"
-   ).setMessages(
-      ${messages}
-   );
+         locale:'${locale?substring(0, 2)}',
+         siteId: "${page.url.templateArgs["site"]!""}"
+      }).setMessages(${messages});
 //]]></script>
 <div class="page-form-header">
    <h1>${msg("header.create")}</h1>

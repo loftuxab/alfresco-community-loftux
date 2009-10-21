@@ -43,7 +43,7 @@
    <div id="${args.htmlid}-renamepanel" class="rename-panel">
       <div class="hd"><label for="${args.htmlid}-renameTo">${msg("panel.rename.title")}</label></div>
       <div class="bd">
-         <form id="${args.htmlid}-renamePageForm" method="post" action="${url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs["site"]}/${page.url.args["title"]!""}">
+         <form id="${args.htmlid}-renamePageForm" method="post" action="${url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs["site"]}/${(page.url.args["title"]!"")?url}">
             <div class="yui-ge">
                <input type="hidden" id="${args.htmlid}-page" name="page" value="wiki-page" />
                <div class="yui-u first">

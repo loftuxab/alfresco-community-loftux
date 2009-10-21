@@ -25,7 +25,7 @@
 <#-- Error State? -->
 <#assign errorState = (!result.pagetext?? && result.message??)>
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.Wiki("${args.htmlid}").setOptions(
+   new Alfresco.WikiPage("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.templateArgs.site}",
       pageTitle: "${page.url.args["title"]!""}",
@@ -102,7 +102,7 @@
       <div id="${args.htmlid}-page" class="rich-content"><#if result.pagetext??>${result.pagetext}<#elseif result.message??><span class="error-alt">${result.message}</span></#if></div> 
 <#elseif action == "edit">           
       <div class="page-form-body">
-         <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]}" method="post">
+         <form id="${args.htmlid}-form" action="${page.url.context}/proxy/alfresco/slingshot/wiki/page/${page.url.templateArgs.site}/${page.url.args["title"]?url}" method="post">
             <fieldset>
             <#assign pageContext = page.url.context + "/page/site/" + page.url.templateArgs.site + "/wiki-page?title=" + page.url.args["title"]>
                <input type="hidden" name="context" value="${pageContext?html}" />
