@@ -5584,9 +5584,43 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 					}
 					else {
 
-						// Create a new directory and open it
+						// Split the path and walk to see which folder(s) need creating
+						
+						String[] paths = FileName.splitAllPaths( params.getPath());
+						StringBuilder pathStr = new StringBuilder( params.getPath().length());
+						int fldrSts = FileStatus.Unknown;
+						int idx = 0;
+						
+						while ( idx < paths.length) {
+						
+							// Add the current path component and check if it exists, and it is a folder
+							
+							pathStr.append( FileName.DOS_SEPERATOR_STR);
+							pathStr.append( paths[ idx++]);
 
-						disk.createDirectory(m_sess, conn, params);
+							fldrSts = disk.fileExists( m_sess, conn, pathStr.toString());
+							
+							// If the current path exists and it is a file then return an error
+							
+							if ( fldrSts == FileStatus.FileExists) {
+								if ( idx < paths.length)
+									m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTObjectNameCollision, SMBStatus.DOSFileAlreadyExists, SMBStatus.ErrDos);
+								else
+									m_sess.sendErrorResponseSMB( smbPkt, SMBStatus.NTObjectPathNotFound, SMBStatus.DOSDirectoryInvalid, SMBStatus.ErrDos);
+								return;
+							}
+							else if ( fldrSts == FileStatus.NotExist) {
+								
+								// Create the current part of the path
+								
+								FileOpenParams fldrParams = new FileOpenParams( pathStr.toString(), createDisp, accessMask, attrib, shrAccess, allocSize, createOptn,
+										rootFID, impersonLev, secFlags, smbPkt.getProcessIdFull());
+								disk.createDirectory( m_sess, conn, fldrParams);
+							}
+						}
+						
+						// Open the requested folder, should now exist
+
 						netFile = disk.openFile(m_sess, conn, params);
 						
 						// Indicate the directory was created
