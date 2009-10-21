@@ -1,7 +1,7 @@
 <webscript>
-  <shortname>Removes specified Custom Reference Instance from the specified node</shortname>
+  <shortname>Removes specified Custom Reference Instance from between the specified nodes</shortname>
   <description><![CDATA[
-  The custom reference instance will be removed from the specified node.<BR/>
+  The custom reference instance will be removed from between the specified nodes.<BR/>
   The nodeRef encoded within the URL path is the 'fromNode' in the relationship.<BR/>
   The nodeRef encoded within the query string is the 'toNode' in the relationship.<BR/>
   ]]>
