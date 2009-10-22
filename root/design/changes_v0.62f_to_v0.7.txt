@@ -193,3 +193,45 @@ CMIS-505
 
 35) REMOVED: cmis:id from workspace
 
+----- checkpoint -------
+
+36) CHANGED: Chemistry: AtomPub TCK updates
+
+- Add tests for getObjectById, getObjectByPath URI templates
+- Tighten tests for content streams
+- Minor adjustments to custom type tests
+
+37) ADDED: Abdera CMIS extension: add getPath() to CMISObject
+
+38) CHANGED: Alfresco CMIS URL bindings
+
+- CMIS front page:               /service/cmis/index.html
+- CMIS AtomPub service document: /service/cmis
+- CMIS resources:
+
+  <!-- by object id -->
+  /cmis/i/{id}                note: defaults to workspace:SpacesStore
+  /cmis/s/{store}/i/{id}
+  /cmis/r/{repo}/i/{id}       note: not implemented yet
+  
+  <!-- by path -->
+  /cmis/p{path}               note: defaults to workspace:SpacesStore
+  /cmis/s/{store}/p{path}
+  /cmis/r/{repo}/p{path}      note: not implemented yet
+ 
+  where:
+    {id} = <guid> | <guid>;<version>
+    {path} = <path>
+    {store} = <store_type>:<store_id> | <store_id> (defaults to workspace)
+    {repo} = <repository_guid> | <user-defined name>
+
+  e.g.
+    /cmis/i/{id}          => object details (props etc)
+    /cmis/i/{id}/content  => object content
+    /cmis/i/{id}/rels     => object relationships  
+  
+39) CHANGED: delete content stream
+
+Was: delete node
+Now: only delete content stream
+
