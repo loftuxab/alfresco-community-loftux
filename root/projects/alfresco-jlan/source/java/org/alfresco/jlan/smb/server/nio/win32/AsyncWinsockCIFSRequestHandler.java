@@ -565,6 +565,7 @@ public class AsyncWinsockCIFSRequestHandler extends RequestHandler implements Ru
 					// Close the session
 					
 					sess.closeSession();
+					sess.processPacket( null);
 					
 					// Update the idle session count
 					
