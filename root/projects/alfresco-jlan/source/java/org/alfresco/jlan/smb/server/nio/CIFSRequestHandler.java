@@ -554,6 +554,7 @@ public class CIFSRequestHandler extends RequestHandler implements Runnable {
 					// Close the session
 					
 					sess.closeSession();
+					sess.processPacket( null);
 					
 					// Update the idle session count
 					
