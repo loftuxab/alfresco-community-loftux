@@ -5,8 +5,8 @@ The automatic installer will install a stand alone deployment receiver.
 Here are instructions for manual install.
 
 1. Unzip the deployment zip file into a convenient location. (It does not
-   make it's own directory.) For discussion's sake let's say that the zip file
-   has been unzipped into /opt/deployment.
+   make it's own directory.) For discussion's sake let's say that the distribution file
+   has been expanded into /opt/deployment.
    
 2. Configure deployment.properties. Open deployment.properties in your
    text editor of choice.  Choose locations for each of the following:
