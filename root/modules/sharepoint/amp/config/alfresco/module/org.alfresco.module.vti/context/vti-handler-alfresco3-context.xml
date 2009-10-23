@@ -22,6 +22,7 @@
     	<property name="contentService" ref="ContentService" />    	 
     	<property name="siteService" ref="SiteService" />
     	<property name="shareUtils" ref="shareUtils" />  
+    	<property name="authorityService" ref="AuthorityService" />
     	<property name="pathHelper" ref="vtiPathHelper"/>
     	<property name="pagesMap">
     		<map>
