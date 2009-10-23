@@ -58,7 +58,7 @@
       </div>
 
       <!-- People Finder Dialog -->
-      <div id="${el}-peoplepicker" class="groups people-picker hidden">
+      <div id="${el}-peoplepicker" class="groups people-picker" style="visibility: hidden;">
          <div class="hd"><span id="${el}-peoplepicker-title">${msg("panel.adduser.header")}</span></div>
          <div class="bd">
             <div>
@@ -68,7 +68,7 @@
       </div>
 
       <!-- Group Finder Dialog -->
-      <div id="${el}-grouppicker" class="groups group-picker hidden">
+      <div id="${el}-grouppicker" class="groups group-picker" style="visibility: hidden;">
          <div class="hd"><span id="${el}-grouppicker-title">${msg("panel.addgroup.header")}</span></div>
          <div class="bd">
             <div>
@@ -78,7 +78,7 @@
       </div>
 
       <!-- Delete Group Dialog -->
-      <div id="${el}-deletegroupdialog" class="groups remove-dialog hidden">
+      <div id="${el}-deletegroupdialog" class="groups remove-dialog">
          <div class="hd">${msg("panel.deletegroup.header")}</div>
          <div class="bd">
             <div id="${el}-singleparent" class="dialog-panel">
