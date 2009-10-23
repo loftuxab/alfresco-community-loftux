@@ -167,6 +167,7 @@
    margin-top: 2px;
 }
 
+.header .yuimenu .bd div,
 .header .yuimenu .bd ul
 {
    padding:0;
@@ -187,7 +188,7 @@
 	padding: 4px 15px;
 }
 
-.header .yuimenu .bd ul li.header
+.header .yuimenu .bd div li
 {
    font-weight: bold;
    padding: 4px 15px;

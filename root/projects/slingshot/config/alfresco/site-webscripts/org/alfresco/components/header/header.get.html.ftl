@@ -63,11 +63,11 @@
    <div id="${args.htmlid}-sites-menu" class="yui-overlay menu-with-icons">
       <div class="bd">
          <#assign favDisplay><#if favouriteSites?size &gt; 0>block<#else>none</#if></#assign>
-         <ul id="${args.htmlid}-favouritesContainer" class="favourite-sites" style="display: ${favDisplay}">
-            <li class="header">
+         <div id="${args.htmlid}-favouritesContainer" class="favourite-sites" style="display: ${favDisplay}">
+            <li>
                ${msg("header.site.favouriteSites")}
             </li>
-         </ul>
+         </div>
          <ul id="${args.htmlid}-favouriteSites" class="favourite-sites-list separator" style="display: ${favDisplay}">
          <#if favouriteSites?size!=0>
          <#list favouriteSites as site>
