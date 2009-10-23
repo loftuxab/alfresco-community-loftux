@@ -3281,7 +3281,7 @@ InstallComponent 675F1AF3-A349-498E-8815-C08427B7BC0E -setup Install -type pane 
 Condition BE587B64-F450-46EC-8376-1E98292A3C18 -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E -title {File Exists Condition} -component FileExistsCondition -TreeObject::id BE587B64-F450-46EC-8376-1E98292A3C18
 InstallComponent A16AE261-F193-431D-87A3-15475394A2F8 -setup Install -type action -conditions 791611F8-7C63-43E7-8B71-C174C7010D46 -title {Enable Checkbutton} -component AddWidget -command insert -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E
 Condition 791611F8-7C63-43E7-8B71-C174C7010D46 -active Yes -parent A16AE261-F193-431D-87A3-15475394A2F8 -title {String Is Condition} -component StringIsCondition -TreeObject::id 791611F8-7C63-43E7-8B71-C174C7010D46
-InstallComponent B561EA20-6FDF-4178-B9D7-BDD7F3C3777E -setup Install -type action -conditions D2FB7E47-AAAA-485D-97D9-BE687D1A7AED -title {Rename File} -component RenameFile -command reorder -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E
+InstallComponent B561EA20-6FDF-4178-B9D7-BDD7F3C3777E -setup Install -type action -conditions D2FB7E47-AAAA-485D-97D9-BE687D1A7AED -title {Rename File} -component RenameFile -command insert -active Yes -parent 675F1AF3-A349-498E-8815-C08427B7BC0E
 Condition D2FB7E47-AAAA-485D-97D9-BE687D1A7AED -active Yes -parent B561EA20-6FDF-4178-B9D7-BDD7F3C3777E -title {String Is Condition} -component StringIsCondition -TreeObject::id D2FB7E47-AAAA-485D-97D9-BE687D1A7AED
 InstallComponent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -setup Install -type pane -conditions {6654B212-DC2E-4B87-87A4-A6651D834356 5D3CD088-B812-4912-A7BA-38C26DBAEA7B} -title {Adding Samples} -component CustomBlankPane1 -command insert -active No -parent StandardInstall
 Condition 6654B212-DC2E-4B87-87A4-A6651D834356 -active Yes -parent 7A9C9E75-F41A-40E9-9332-F460A083AA2B -title {File Exists Condition} -component FileExistsCondition -TreeObject::id 2F0CB899-1C48-4F91-9AD0-327063548555
@@ -5733,6 +5733,7 @@ F03F1387-C847-400B-A135-9A967D979941,StringMap
 "@@ALF_INDEXES@@" "<%Dir <%INDEXES%> forward%>"
 "@@ALF_CONTENT@@" "<%Dir <%CONTENT%> forward%>"
 "@@ALF_OO@@" "<%Dir <%ALF_OO%> forward%>"
+"@@OOUSER@@" "<%Dir <%ALF_DATA%>/oouser forward%>"
 "#<%ALF_DB%>#" ""
 "@@TOMCATPORT@@" "<%ALF_TOMCATPORT%>"
 "8080" "<%ALF_TOMCATPORT%>"

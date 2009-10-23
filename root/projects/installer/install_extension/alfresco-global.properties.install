@@ -20,6 +20,7 @@ db.port=@@DB_PORT@@
 # External locations
 #-------------
 ooo.exe=@@ALF_OO@@/program/soffice
+ooo.user=@@OOUSER@@
 img.root=@@ALF_IMG@@
 swf.exe=@@ALF_SWF@@/pdf2swf
 

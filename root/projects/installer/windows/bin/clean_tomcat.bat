@@ -8,3 +8,6 @@ set CATALINA_HOME=%ALF_HOME%\tomcat
 
 echo Cleaning temporary Alfresco files from Tomcat...
 rmdir /S /Q "%CATALINA_HOME%\temp\Alfresco" "%CATALINA_HOME%\work\Catalina\localhost\alfresco"
+rmdir /S /Q "%CATALINA_HOME%\work\Catalina\localhost\share"
+rmdir /S /Q "%CATALINA_HOME%\work\Catalina\localhost\mobile"
+rmdir /S /Q "%CATALINA_HOME%\work\Catalina\localhost\studio"
