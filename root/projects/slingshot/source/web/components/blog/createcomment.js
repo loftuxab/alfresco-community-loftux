@@ -249,7 +249,7 @@
              * being present. Only a "Select all" followed by delete will clean all tags, otherwise leftovers will
              * be there even if the form looks empty.
              */                       
-            if (this.widgets.editor.getContent().length < 30 || this.widgets.okButton.get("disabled"))
+            if (this.widgets.editor.getContent().length < 20 || this.widgets.okButton.get("disabled"))
             {
                // Submit was disabled and something has been typed, validate and submit will be enabled
                this.widgets.editor.save();
@@ -260,11 +260,7 @@
          // create the form that does the validation/submit
          this.widgets.commentForm = new Alfresco.forms.Form(this.id + "-form");
          this.widgets.commentForm.setShowSubmitStateDynamically(true, false);
-         this.widgets.commentForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);
-         this.widgets.commentForm.addValidation(this.id + "-content", Alfresco.forms.validation.length,
-         {
-            min: 30
-         });
+         this.widgets.commentForm.addValidation(this.id + "-content", this._validateTextContent, null);
          this.widgets.commentForm.setSubmitElements(this.widgets.okButton);
          this.widgets.commentForm.setAJAXSubmit(true,
          {
@@ -308,6 +304,23 @@
          
          // finally show the form
          Dom.removeClass(this.id + '-form-container', 'hidden');
+      },
+
+      /**
+       *
+       *
+       * @method _validateTextContent
+       * @param field {object} The element representing the field the validation is for
+       * @param args {object}
+       * @param event {object} The event that caused this handler to be called, maybe null
+       * @param form {object} The forms runtime class instance the field is being managed by
+       * @param silent {boolean} Determines whether the user should be informed upon failure
+       * @param message {string} Message to display when validation fails, maybe null
+       */
+      _validateTextContent: function CreateComment__validateTextContent(field, args, event, form, silent, message)
+      {
+         var stripHTML = /<\S[^><]*>/g;
+         return YAHOO.lang.trim(field.value.replace(stripHTML, "")).length > 0;
       },
 
       /**
