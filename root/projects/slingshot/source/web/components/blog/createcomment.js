@@ -3,6 +3,7 @@
  * 
  * @namespace Alfresco
  * @class Alfresco.CreateComment
+ * @extends Alfresco.component.Base
  */
 (function()
 {
@@ -20,19 +21,8 @@
     */
    Alfresco.CreateComment = function(htmlId)
    {
-      /* Mandatory properties */
-      this.name = "Alfresco.CreateComment";
-      this.id = htmlId;
-      
-      /* Initialise prototype properties */
-      this.widgets = {};
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
+      Alfresco.CreateComment.superclass.constructor.call(this, "Alfresco.CreateComment", htmlId, ["event", "json", "editor"]);
 
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["event", "json", "editor"], this.onComponentsLoaded, this);
-      
       /* Decoupled event listeners */
       YAHOO.Bubbling.on("setCommentedNode", this.onSetCommentedNode, this);
       YAHOO.Bubbling.on("setCanCreateComment", this.onSetCanCreateComment, this);
@@ -40,7 +30,7 @@
       return this;
    };
    
-   Alfresco.CreateComment.prototype =
+   YAHOO.extend(Alfresco.CreateComment, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -55,6 +45,7 @@
           * 
           * @property siteId
           * @type string
+          * @default ""
           */
          siteId: "",
          
@@ -69,31 +60,55 @@
          
          /**
           * Node reference of the item to comment about
+          *
+          * @property itemNodeRef
+          * @type string
+          * @default null
           */
          itemNodeRef: null,
          
          /**
           * Title of the item to comment about for activites service.
+          *
+          * @property activityTitle
+          * @type string
+          * @default null
           */
          activityTitle: null,
          
          /**
           * Page for activities link.
+          *
+          * @property activityPage
+          * @type string
+          * @default null
           */
          activityPage: null,
 
          /**
           * Params for activities link.
+          *
+          * @property activityPageParams
+          * @type object
+          * @default null
           */
          activityPageParams: null,
 
          /**
           * Width to use for comment editor
+          *
+          * @property width
+          * @type int
+          * @default 538
           */
          width: 538,
          
          /**
           * Height to use for comment editor
+          *
+          * @property height
+          * @type int
+          * @default 250
           */
          height: 250,
          
@@ -107,15 +122,7 @@
           */
          canCreateComment: false
       },
-      
-      /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: null,
-      
+
       /**
        * States whether the view has already been initialized
        *
@@ -125,38 +132,14 @@
       initialized: false,
 
       /**
-       * Set multiple initialization options at once.
+       * Fired by YUI when parent element is available for scripting.
+       * Initial History Manager event registration
        *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
+       * @method onReady
        */
-      setOptions: function CreateComment_setOptions(obj)
+      onReady: function FlashUpload_onReady()
       {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocumentList} returns 'this' for method chaining
-       */
-      setMessages: function CreateComment_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function CreateComment_onComponentsLoaded()
-      {
+         // Do nothing, UI will be created in onSetCommentedNode and/or onSetCanCreateComment instead
       },
 
       /**
@@ -243,15 +226,17 @@
       registerCreateCommentForm: function CreateComment_registerCreateCommentForm()
       {
          // register the okButton
-         this.widgets.okButton = new YAHOO.widget.Button(this.id + "-submit",
+         this.widgets.okButton = Alfresco.util.createYUIButton(this, "submit", null,
          {
-            type: "submit"
+            type: "submit",
+            disabled: true
          });
 
          // instantiate the simple editor we use for the form
          this.widgets.editor = new Alfresco.util.RichEditor(Alfresco.constants.HTML_EDITOR,this.id + '-content', this.options.editorConfig);
-         this.widgets.editor.addPageUnloadBehaviour(this._msg("message.unsavedChanges.comment"));
+         this.widgets.editor.addPageUnloadBehaviour(this.msg("message.unsavedChanges.comment"));
          this.widgets.editor.render();
+         this.widgets.editor.save();
 
          // Add validation to the rich text editor
          var keyUpIdentifier = (Alfresco.constants.HTML_EDITOR === 'YAHOO.widget.SimpleEditor') ? 'editorKeyUp' : 'onKeyUp';
@@ -264,7 +249,7 @@
              * being present. Only a "Select all" followed by delete will clean all tags, otherwise leftovers will
              * be there even if the form looks empty.
              */                       
-            if (this.widgets.editor.getContent().length < 20 || this.widgets.okButton.get("disabled"))
+            if (this.widgets.editor.getContent().length < 30 || this.widgets.okButton.get("disabled"))
             {
                // Submit was disabled and something has been typed, validate and submit will be enabled
                this.widgets.editor.save();
@@ -275,17 +260,21 @@
          // create the form that does the validation/submit
          this.widgets.commentForm = new Alfresco.forms.Form(this.id + "-form");
          this.widgets.commentForm.setShowSubmitStateDynamically(true, false);
-         this.widgets.commentForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);         
+         this.widgets.commentForm.addValidation(this.id + "-content", Alfresco.forms.validation.mandatory, null);
+         this.widgets.commentForm.addValidation(this.id + "-content", Alfresco.forms.validation.length,
+         {
+            min: 30
+         });
          this.widgets.commentForm.setSubmitElements(this.widgets.okButton);
          this.widgets.commentForm.setAJAXSubmit(true,
          {
-            successMessage: this._msg("message.createcomment.success"),
+            successMessage: this.msg("message.createcomment.success"),
             successCallback:
             {
                fn: this.onCreateFormSubmitSuccess,
                scope: this
             },
-            failureMessage: this._msg("message.createcomment.failure"),
+            failureMessage: this.msg("message.createcomment.failure"),
             failureCallback:
             {
                fn: function()
@@ -345,19 +334,7 @@
       {
          this.widgets.feedbackMessage.destroy();
          this.widgets.editor.enable();
-      },
-
-      /**
-       * Gets a custom message
-       *
-       * @method _msg
-       * @param messageId {string} The messageId to retrieve
-       * @return {string} The custom message
-       * @private
-       */
-      _msg: function CreateComment_msg(messageId)
-      {
-         return Alfresco.util.message.call(this, messageId, "Alfresco.CreateComment", Array.prototype.slice.call(arguments).slice(1));
       }
-   };
+
+   });
 })();
