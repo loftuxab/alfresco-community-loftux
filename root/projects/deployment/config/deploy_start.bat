@@ -32,11 +32,11 @@ if "%RMI_LISTEN_HOSTNAME%"=="" goto StartServerWithoutRMIHostname
 goto StartServerWithRMIHostname
 
 :StartServerWithoutRMIHostname
-start /min "Deployment Server" "%JAVA_HOME%\bin\java" -server -classpath . -Djava.ext.dirs=.;%JAVA_EXT_DIR% org.alfresco.deployment.Main application-context.xml 
+start /min "Deployment Server" "%JAVA_HOME%\bin\java" -server -classpath %~dp0 -Djava.ext.dirs=.;%JAVA_EXT_DIR% org.alfresco.deployment.Main application-context.xml
 goto End
 
 :StartServerWithRMIHostname
-start /min "Deployment Server" "%JAVA_HOME%\bin\java" -server -classpath . -Djava.ext.dirs=.;%JAVA_EXT_DIR% -Djava.rmi.server.hostname=%RMI_LISTEN_HOSTNAME% org.alfresco.deployment.Main application-context.xml 
+start /min "Deployment Server" "%JAVA_HOME%\bin\java" -server -classpath %~dp0 -Djava.ext.dirs=.;%JAVA_EXT_DIR% -Djava.rmi.server.hostname=%RMI_LISTEN_HOSTNAME% org.alfresco.deployment.Main application-context.xml 
 goto End
 
 :End

@@ -45,7 +45,7 @@ echo ====================================
 echo .
 
 if [ -z "$RMI_LISTEN_HOSTNAME" ] ; then
-    nohup $JAVA_HOME/bin/java -server -classpath . -Djava.ext.dirs=.:$JAVA_EXT_DIR org.alfresco.deployment.Main application-context.xml 
+    nohup $JAVA_HOME/bin/java -server -classpath . -Djava.ext.dirs=.:$JAVA_EXT_DIR org.alfresco.deployment.Main application-context.xml &
 else
-    nohup $JAVA_HOME/bin/java -server -classpath . -Djava.ext.dirs=.:$JAVA_EXT_DIR -Djava.rmi.server.hostname=$RMI_LISTEN_HOSTNAME org.alfresco.deployment.Main application-context.xml 
+    nohup $JAVA_HOME/bin/java -server -classpath . -Djava.ext.dirs=.:$JAVA_EXT_DIR -Djava.rmi.server.hostname=$RMI_LISTEN_HOSTNAME org.alfresco.deployment.Main application-context.xml &
 fi
