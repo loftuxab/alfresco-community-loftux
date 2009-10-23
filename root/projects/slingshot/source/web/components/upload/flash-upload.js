@@ -381,10 +381,7 @@
          Dom.removeClass(this.id + "-dialog", "hidden");
 
          // Create the panel
-         this.panel = Alfresco.util.createYUIPanel(this.id + "-dialog",
-         {
-            close: false
-         });
+         this.panel = Alfresco.util.createYUIPanel(this.id + "-dialog");
 
          /**
           * Mac Gecko bugfix for javascript losing connection to the flash uploader movie.
@@ -547,6 +544,12 @@
          {
             Dom.addClass(swfWrapper, "button-fix");
          }
+
+         var swf = Dom.getChildrenBy(Dom.get(this.id + "-flashuploader-div"), function(node)
+         {
+            return node.tagName.toLowerCase() == "embed" || node.tagName.toLowerCase() == "object";
+         })[0];
+         swf.focus();
       },
 
       /**
@@ -624,7 +627,8 @@
          // files also are included in the event.fileList. Make sure we only
          // add files to the table that haven's been added before.
          var newFiles = [],
-            data, uniqueFileToken;
+            data,
+            uniqueFileToken;
          for (var i in event.fileList)
          {
             if (this.dataTable.get("renderLoopSize") === 0)
@@ -632,9 +636,10 @@
                this.dataTable.set("renderLoopSize", 1);
             }
             data = YAHOO.widget.DataTable._cloneObject(event.fileList[i]);
-            if (!this.addedFiles[this._getUniqueFileToken(data)])
+            uniqueFileToken = this._getUniqueFileToken(data);
+            if (!this.addedFiles[uniqueFileToken])
             {
-               if (data.size === 0)
+               if (data.size === 0 && !this.addedFiles[uniqueFileToken])
                {
                   Alfresco.util.PopupManager.displayMessage(
                   {
@@ -643,12 +648,12 @@
                }
                else
                {
-                  // Since the flash movie allows the user to select one file several
-                  // times we need to keep track of the selected files by our selves
-                  uniqueFileToken = this._getUniqueFileToken(data);
-                  this.addedFiles[uniqueFileToken] = uniqueFileToken;
-                  newFiles.push(data);                  
+                  // Add file to file table
+                  newFiles.push(data);
                }
+               // Since the flash movie allows the user to select one file several
+               // times we need to keep track of the selected files by our selves
+               this.addedFiles[uniqueFileToken] = uniqueFileToken;
             }
          }
          // Add all files to table
@@ -1280,6 +1285,7 @@
                   this._onFileButtonClickHandler(flashId, oRecord.getId());
                }, this, true);
                this.fileStore[flashId].fileButton = fileButton;
+               fileButton.focus();
             }
 
             // Insert the templateInstance to the column.

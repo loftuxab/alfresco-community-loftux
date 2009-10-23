@@ -146,10 +146,7 @@
          Dom.removeClass(this.id + "-dialog", "hidden");
 
          // Create the panel
-         this.widgets.panel = Alfresco.util.createYUIPanel(this.id + "-dialog",
-         {
-            close: false
-         });
+         this.widgets.panel = Alfresco.util.createYUIPanel(this.id + "-dialog");
 
          // Save a reference to the HTMLElement displaying texts so we can alter the texts later
          this.widgets.titleText = Dom.get(this.id + "-title-span");
