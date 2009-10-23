@@ -63,6 +63,9 @@ import org.alfresco.service.cmr.model.FileInfo;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.site.SiteInfo;
 import org.alfresco.service.cmr.site.SiteService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -90,6 +93,17 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
     private AuthenticationComponent authenticationComponent;
     private SiteService siteService;
     private ShareUtils shareUtils;
+    private AuthorityService authorityService;
+    
+    /**
+     * Set authority service
+     * 
+     * @param authorityService the authority service to set ({@link AuthorityService})
+     */
+    public void setAuthorityService(AuthorityService authorityService)
+    {
+        this.authorityService = authorityService;
+    }
 
     /**
      * Set authentication component
@@ -208,8 +222,13 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
      */
     public void doRemoveDwsUser(FileInfo dwsFileInfo, String authority)
     {
-        NodeRef personNodeRef = new NodeRef(authority); 
-        String username = (String)nodeService.getProperty(personNodeRef, ContentModel.PROP_USERNAME); 
+        String username = PermissionService.GROUP_PREFIX + authority;
+        if (authorityService.findAuthorities(AuthorityType.GROUP, username).size() == 0)
+        {
+            NodeRef personNodeRef = new NodeRef(authority);
+            username = (String) nodeService.getProperty(personNodeRef, ContentModel.PROP_USERNAME);
+        }
+
         siteService.removeMembership(dwsFileInfo.getName(), username);
     }
 
@@ -284,11 +303,18 @@ public class AlfrescoDwsServiceHandler extends AbstractAlfrescoDwsServiceHandler
         while (userIterator.hasNext())
         {
             String username = userIterator.next();
-            NodeRef personNodeRef = personService.getPerson(username);
-            String firstName = nodeService.getProperty(personNodeRef, ContentModel.PROP_FIRSTNAME).toString();
-            String lastName = nodeService.getProperty(personNodeRef, ContentModel.PROP_LASTNAME).toString();
-            String email = nodeService.getProperty(personNodeRef, ContentModel.PROP_EMAIL).toString();
-            members.add(new MemberBean(personNodeRef.toString(), firstName + " " + lastName, username, email, false));
+            if (authorityService.findAuthorities(AuthorityType.GROUP, username).size() > 0)
+            {
+                members.add(new MemberBean(username.replaceFirst(PermissionService.GROUP_PREFIX, ""), username.replaceFirst(PermissionService.GROUP_PREFIX, ""), "", "", true));
+            }
+            else
+            {
+                NodeRef personNodeRef = personService.getPerson(username);
+                String firstName = nodeService.getProperty(personNodeRef, ContentModel.PROP_FIRSTNAME).toString();
+                String lastName = nodeService.getProperty(personNodeRef, ContentModel.PROP_LASTNAME).toString();
+                String email = nodeService.getProperty(personNodeRef, ContentModel.PROP_EMAIL).toString();
+                members.add(new MemberBean(personNodeRef.toString(), firstName + " " + lastName, username, email, false));
+            }
         }
 
         return members;
