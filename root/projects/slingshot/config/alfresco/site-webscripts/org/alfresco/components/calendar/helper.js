@@ -358,12 +358,12 @@ var CalendarScriptHelper  = ( function()
             var startDay_month = firstDayOfMonth.getDay();
 
             //the first day in the last month that can be shown in month view eg 26th
-            var lastMonth_days = addDays(firstDayOfMonth,(1-(startDay_month))-1).getDate();//addMonth(now,-1).toString();
-
+            var lastMonth_days = addDays(firstDayOfMonth,(1-(startDay_month))-1);//addMonth(now,-1).toString();
+            
             //counter to count number of last month days showing in view
             var numLastMonthDays = 0;
-            //counter to count number of next month days showing in view - also provides actual day 
-            var nextMonthDays = 1;
+            //date of 1st day in next month
+            var nextMonthDays = lastDayOfMonth;
             //array of dates to show in view
             var monthview_dates = [];
             //store  user events in array and key array by date
@@ -382,7 +382,7 @@ var CalendarScriptHelper  = ( function()
                     var endDate = new Date();
                     var ev = events[i];
                     eventDate.setTime(fromISOString(ev.when));
-                    endDate.setTime(fromISOString(ev.endDate))
+                    endDate.setTime(fromISOString(ev.endDate));
                     if ((eventDate.getTime() >= actualFirstDayOfMonth.getTime()) && (eventDate.getTime() < lastDayOfMonth.getTime()))
                     {
                       var key = 'ev_'+eventDate.getDate();
@@ -395,22 +395,33 @@ var CalendarScriptHelper  = ( function()
                 }
             }
             //calculate the dates to show in month view for current month
+            var numPreviousAndCurrentMonthDays = num_daysInMonth+numLastMonthDays;
+            var numCellsToRender = ((num_daysInMonth+numLastMonthDays)-((num_daysInMonth+numLastMonthDays)%7))+7;
             for(var i =0;i<42;i++)
             {
                 //last month days
                 if (i<startDay_month){
                     monthview_dates[i] = {
-                        id:'cal_last_month_cell_'+lastMonth_days,
-                        day:lastMonth_days++
+                        id:toISOString(lastMonth_days,{selector:'date'}),
+                        day:lastMonth_days.getDate()
                     };
                     numLastMonthDays++;
+                    lastMonth_days = addDays(lastMonth_days, 1);
                 }
                 //next month days
-                else if ( i>(num_daysInMonth+numLastMonthDays-1)){
+                else if ( i>=(num_daysInMonth+numLastMonthDays))
+                {
                     monthview_dates[i] = {
-                        day:nextMonthDays,
-                        id:'cal_next_month_cell_'+nextMonthDays++
+                        id:toISOString(nextMonthDays,{selector:'date'}),
+                        day:nextMonthDays.getDate()
                     };
+                    nextMonthDays = addDays(nextMonthDays, 1);
+                    //get nearest number divisible by 7 that is more than (daysinmonth and previous month)
+                    if ( i == ( ( (numLastMonthDays+num_daysInMonth) ) + ( 7 - ( (numLastMonthDays+num_daysInMonth) % 7) ) ) )
+                    {
+                       numCellsToRender = i;
+                       break;
+                    }
                 }
                 //month days
                 else {
@@ -428,6 +439,7 @@ var CalendarScriptHelper  = ( function()
                         monthview_dates[i].events = viewArgs.viewEvents['ev_'+day];
                     }
                 }
+               
             }
 
             viewArgs.dates = monthview_dates;
@@ -435,6 +447,7 @@ var CalendarScriptHelper  = ( function()
             viewArgs.startDay_month = startDay_month;
             //used to determine whether to disable cell or not
             viewArgs.num_daysInMonth = num_daysInMonth;
+            viewArgs.num_month_rows =  (numCellsToRender / 7)-1;//zero index
             return viewArgs;
         },
         initialiseAgendaView : function(d)
@@ -487,7 +500,7 @@ var CalendarScriptHelper  = ( function()
         },
         convertToISOString : function(dateObject,options)
         {
-          return toISOString(dateObject,options)
+          return toISOString(dateObject,options);
         }
     };
     

@@ -33,7 +33,7 @@
         </thead>
         
         <tbody>
-             <#list 0..5 as row><#-- ROW -->
+             <#list 0..(viewArgs.view.num_month_rows) as row><#-- ROW -->
               <tr>
                  <#list 0..6 as column><#-- COLUMN -->
                     <#assign id = (row?number * 7) + column>
