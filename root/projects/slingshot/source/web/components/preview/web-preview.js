@@ -298,11 +298,19 @@
                 */
                Event.addListener(swfId, "mouseover", function(e)
                {
-                  Dom.get(swfId).setMode("active");
+                  var swf = Dom.get(swfId);
+                  if(swf && YAHOO.lang.isFunction(swf.setMode))
+                  {
+                     Dom.get(swfId).setMode("active");
+                  }
                });
                Event.addListener(swfId, "mouseout", function(e)
                {
-                  Dom.get(swfId).setMode("inactive");
+                  var swf = Dom.get(swfId);
+                  if(swf && YAHOO.lang.isFunction(swf.setMode))
+                  {
+                     Dom.get(swfId).setMode("inactive");
+                  }
                });
             }
             else
