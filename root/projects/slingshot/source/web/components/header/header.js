@@ -176,16 +176,17 @@
             correctScope: true
          }, "keydown").enable();
                          
-         var searchMenu = new YAHOO.widget.Menu(this.id + "-searchtogglemenu");
+         var searchMenu = new YAHOO.widget.Menu(this.id + "-searchtogglemenu",
+         {
+            context: [this.id + "-search-tbutton", "br", "tr"]
+         });
          searchMenu.render();
-         searchMenu.owner = this;
-         searchMenu.subscribe("show", searchMenu.focus);
 
          var searchButton = new YAHOO.widget.Button(this.id + "-search-tbutton",
          {
-            type: "menu"
+            type: "menu",
+            menu: searchMenu
          });
-         searchButton.subscribe("click", this.openToggleSearchMenu, null, searchMenu);
          Dom.removeClass(this.id + "-searchtogglemenu", "hidden");
 
          var sitesMenu = new YAHOO.widget.Menu(this.id + "-sites-menu");
@@ -243,21 +244,7 @@
          Dom.get(this.id + "-searchtext").value = this._getToggleLabel(this.options.searchType);
          Dom.addClass(this.id + "-searchtext", "gray");
       },
-      
-      /**
-       * Show the search options menu.
-       *
-       * @method openToggleSearchMenu
-       */
-      openToggleSearchMenu: function Header_openToggleSearchMenu()
-      {
-         this.show();
-         var coord = Dom.getXY(this.owner.id + "-search-tbutton");
-         coord[0] -= (Dom.get(this.owner.id + "-searchtogglemenu").offsetWidth - Dom.get(this.owner.id + "-search-tbutton").offsetWidth);
-         coord[1] += Dom.get(this.owner.id + "-search-tbutton").offsetHeight;
-         Dom.setXY(this.id, coord);          
-      },
-      
+
       /**
        * Change the search type.
        *
