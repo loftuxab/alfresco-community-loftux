@@ -40,11 +40,11 @@
 </#if>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.startdate")}:</div>
-      <div class="yui-u" id="${args.htmlid}-startdate"><#if result.from?exists>${result.from?date("MM/dd/yyy")?string("yyyy-MM-dd")}</#if> ${msg("label.at")} ${result.start!""}</div>
+      <div class="yui-u" id="${args.htmlid}-startdate"><#if result.from?exists>${result.from?date("MM/dd/yyy")?string("yyyy-MM-dd")}</#if><#if result.allday!='true'> ${msg("label.at")} ${result.start!""} </#if></div>
    </div>
    <div class="yui-gd">
       <div class="yui-u first">${msg("label.enddate")}:</div>
-      <div class="yui-u" id="${args.htmlid}-enddate"><#if result.to?exists>${result.to?date("MM/dd/yyy")?string("yyyy-MM-dd")}</#if> ${msg("label.at")} ${result.end!""}</div>
+      <div class="yui-u" id="${args.htmlid}-enddate"><#if result.to?exists>${result.to?date("MM/dd/yyy")?string("yyyy-MM-dd")}</#if><#if result.allday!='true'> ${msg("label.at")} ${result.end!""} </#if></div>
    </div>
    <br />
    <div class="bdft">
