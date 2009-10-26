@@ -2,7 +2,27 @@
    var userProfile = new Alfresco.UserProfile("${args.htmlid}").setOptions(
    {
       userId: "${user.name}",
-      profileId: "${profile.name}"
+      profile: {
+         name: "<#if profile.name??>${profile.name?html}</#if>",
+         lastName: "<#if profile.lastName??>${profile.lastName?html}</#if>",
+         firstName: "<#if profile.firstName??>${profile.firstName?html}</#if>",
+         jobtitle: "<#if profile.jobTitle??>${profile.jobTitle?html}</#if>",
+         location: "<#if profile.location??>${profile.location?html}</#if>",
+         bio: "<#if profile.biography??>${profile.biography?html}</#if>",
+         telephone: "<#if profile.telephone??>${profile.telephone?html}</#if>",
+         mobile: "<#if profile.mobilePhone??>${profile.mobilePhone?html}</#if>",
+         email :"<#if profile.email??>${profile.email?html}</#if>",
+         skype: "<#if profile.skype??>${profile.skype?html}</#if>",
+         instantmsg: "<#if profile.instantMsg??>${profile.instantMsg?html}</#if>",
+         organization: "<#if profile.organization??>${profile.organization?html}</#if>",
+         companyaddress1: "<#if profile.companyAddress1??>${profile.companyAddress1?html}</#if>",
+         companyaddress2: "<#if profile.companyAddress2??>${profile.companyAddress2?html}</#if>",
+         companyaddress3:"<#if profile.companyAddress3??>${profile.companyAddress3?html}</#if>",
+         companypostcode: "<#if profile.companyPostcode??>${profile.companyPostcode?html}</#if>",
+         companytelephone: "<#if profile.companyTelephone??>${profile.companyTelephone?html}</#if>",
+         companyfax: "<#if profile.companyFax??>${profile.companyFax?html}</#if>",
+         companyemail: "<#if profile.companyEmail??>${profile.companyEmail?html}</#if>"
+      }
    }).setMessages(
       ${messages}
    );
@@ -125,22 +145,22 @@
          <div class="reqcolumn">&nbsp;*</div>
          <div class="rightcolumn">
             <span class="label"><label for="${el}-input-lastName">${msg("label.lastname")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-lastName" value="<#if profile.lastName??>${profile.lastName?html}</#if>" /></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-lastName" value="" /></span>
          </div>
          <div class="leftcolumn">
             <span class="label"><label for="${el}-input-firstName">${msg("label.firstname")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-firstName" value="<#if profile.firstName??>${profile.firstName?html}</#if>" />&nbsp;*</span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-firstName" value="" />&nbsp;*</span>
          </div>
       </div>
       <div class="drow">
          <div class="reqcolumn">&nbsp;</div>         
          <div class="leftcolumn">
             <span class="label"><label for="${el}-input-jobtitle">${msg("label.jobtitle")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-jobtitle" value="<#if profile.jobTitle??>${profile.jobTitle?html}</#if>" /></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-jobtitle" value="" /></span>
          </div>
          <div class="rightcolumn">
             <span class="label"><label for="${el}-input-location">${msg("label.location")}:</label></span>
-            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-location" value="<#if profile.location??>${profile.location?html}</#if>" /></span>
+            <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-location" value="" /></span>
          </div>
       </div>
       <!--
@@ -155,7 +175,7 @@
       -->
       <div class="row">
          <span class="label"><label for="${el}-input-bio">${msg("label.bio")}:</label></span>
-         <span class="input"><textarea id="${el}-input-bio" name="${el}-text-biography" rows="5" cols="60">${(profile.biography!"")?html}</textarea></span>
+         <span class="input"><textarea id="${el}-input-bio" name="${el}-text-biography" rows="5" cols="60"></textarea></span>
       </div>
       
       <div class="header-bar">${msg("label.photo")}</div>
@@ -173,45 +193,45 @@
       <div class="header-bar">${msg("label.contactinfo")}</div>
       <div class="row">
          <span class="label"><label for="${el}-input-telephone">${msg("label.telephone")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-telephone" value="<#if profile.telephone??>${profile.telephone?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-telephone" value="" /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-mobile">${msg("label.mobile")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-mobile" value="<#if profile.mobilePhone??>${profile.mobilePhone?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-mobile" value="" /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-email">${msg("label.email")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-email" value="<#if profile.email??>${profile.email?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-email" value="" /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-skype">${msg("label.skype")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-skype" value="<#if profile.skype??>${profile.skype?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-skype" value="" /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-instantmsg">${msg("label.im")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-instantmsg" value="<#if profile.instantMsg??>${profile.instantMsg?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-instantmsg" value="" /></span>
       </div>
       
       <div class="header-bar">${msg("label.companyinfo")}</div>
       <div class="row">
          <span class="label"><label for="${el}-input-organization">${msg("label.name")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-organization" value="<#if profile.organization??>${profile.organization?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-organization" value="" /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-companyaddress1">${msg("label.address")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress1" value="<#if profile.companyAddress1??>${profile.companyAddress1?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress1" value="" /></span>
       </div>
       <div class="row">
          <span class="label"></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress2" value="<#if profile.companyAddress2??>${profile.companyAddress2?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress2" value="" /></span>
       </div>
       <div class="row">
          <span class="label"></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress3" value="<#if profile.companyAddress3??>${profile.companyAddress3?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyaddress3" value="" /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-companypostcode">${msg("label.postcode")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companypostcode" value="<#if profile.companyPostcode??>${profile.companyPostcode?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companypostcode" value="" /></span>
       </div>
       <!--
       <div class="row">
@@ -221,15 +241,15 @@
       -->
       <div class="row">
          <span class="label"><label for="${el}-input-companytelephone">${msg("label.telephone")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companytelephone" value="<#if profile.companyTelephone??>${profile.companyTelephone?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companytelephone" value="" /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-companyfax">${msg("label.fax")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyfax" value="<#if profile.companyFax??>${profile.companyFax?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyfax" value="" /></span>
       </div>
       <div class="row">
          <span class="label"><label for="${el}-input-companyemail">${msg("label.email")}:</label></span>
-         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyemail" value="<#if profile.companyEmail??>${profile.companyEmail?html}</#if>" /></span>
+         <span class="input"><input type="text" maxlength="256" size="30" id="${el}-input-companyemail" value="" /></span>
       </div>
       
       <hr/>

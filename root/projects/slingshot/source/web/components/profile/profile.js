@@ -28,6 +28,7 @@
  * 
  * @namespace Alfresco
  * @class Alfresco.UserProfile
+ * @extends Alfresco.component.Base
  */
 (function()
 {
@@ -47,19 +48,11 @@
     */
    Alfresco.UserProfile = function(htmlId)
    {
-      this.name = "Alfresco.UserProfile";
-      this.id = htmlId;
-      
-      /* Register this component */
-      Alfresco.util.ComponentManager.register(this);
-
-      /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button"], this.onComponentsLoaded, this);
-      
+      Alfresco.UserProfile.superclass.constructor.call(this, "Alfresco.UserProfile", htmlId, ["button"]);
       return this;
    };
    
-   Alfresco.UserProfile.prototype =
+   YAHOO.extend(Alfresco.UserProfile, Alfresco.component.Base,
    {
       /**
        * Object container for initialization options
@@ -74,16 +67,18 @@
           * 
           * @property userId
           * @type string
+          * @default ""
           */
          userId: "",
          
          /**
-          * Id of the profile to display
+          * Profile data
           * 
-          * @property profileId
-          * @type string
+          * @property profile
+          * @type object
+          * @default {}
           */
-         profileId: ""
+         profile: {}
       },
 
       /**
@@ -95,51 +90,6 @@
       fileUpload: null,
 
       /**
-       * Object container for storing YUI widget instances.
-       * 
-       * @property widgets
-       * @type object
-       */
-      widgets: {},
-
-      /**
-       * Set multiple initialization options at once.
-       *
-       * @method setOptions
-       * @param obj {object} Object literal specifying a set of options
-       * @return {Alfresco.UserProfile} returns 'this' for method chaining
-       */
-      setOptions: function UP_setOptions(obj)
-      {
-         this.options = YAHOO.lang.merge(this.options, obj);
-         return this;
-      },
-      
-      /**
-       * Set messages for this component.
-       *
-       * @method setMessages
-       * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.UserProfile} returns 'this' for method chaining
-       */
-      setMessages: function UP_setMessages(obj)
-      {
-         Alfresco.util.addMessages(obj, this.name);
-         return this;
-      },
-      
-      /**
-       * Fired by YUILoaderHelper when required component script files have
-       * been loaded into the browser.
-       *
-       * @method onComponentsLoaded
-       */
-      onComponentsLoaded: function UP_onComponentsLoaded()
-      {
-         Event.onContentReady(this.id, this.onReady, this, true);
-      },
-   
-      /**
        * Fired by YUI when parent element is available for scripting.
        * Component initialisation, including instantiation of YUI widgets and event listener binding.
        *
@@ -147,11 +97,8 @@
        */
       onReady: function UP_onReady()
       {
-         // Reference to self used by inline functions
-         var me = this;
-         
          // Allow edit if we are displaying this users profile
-         if (this.options.profileId == this.options.userId)
+         if (this.options.profile.name == this.options.userId)
          {
             // Buttons
             this.widgets.upload = Alfresco.util.createYUIButton(this, "button-upload", this.onUpload);
@@ -197,7 +144,32 @@
        */
       onEditProfile: function UP_onEditProfile(e, p_obj)
       {
+         // Hide view panel
          Dom.addClass(this.id + "-readview", "hidden");
+
+         // Reset form data
+         var p = this.options.profile,
+            prefix = this.id + "-input-";
+         Dom.get(prefix + "lastName").value = p.lastName;
+         Dom.get(prefix + "firstName").value = p.firstName;
+         Dom.get(prefix + "jobtitle").value = p.jobtitle;
+         Dom.get(prefix + "location").value = p.location;
+         Dom.get(prefix + "bio").value = p.bio;
+         Dom.get(prefix + "telephone").value = p.telephone;
+         Dom.get(prefix + "mobile").value = p.mobile;
+         Dom.get(prefix + "email").value = p.email;
+         Dom.get(prefix + "skype").value = p.skype;
+         Dom.get(prefix + "instantmsg").value = p.instantmsg;
+         Dom.get(prefix + "organization").value = p.organization;
+         Dom.get(prefix + "companyaddress1").value = p.companyaddress1;
+         Dom.get(prefix + "companyaddress2").value = p.companyaddress2;
+         Dom.get(prefix + "companyaddress3").value = p.companyaddress3;
+         Dom.get(prefix + "companypostcode").value = p.companypostcode;
+         Dom.get(prefix + "companytelephone").value = p.companytelephone;
+         Dom.get(prefix + "companyfax").value = p.companyfax;
+         Dom.get(prefix + "companyemail").value = p.companyemail;
+
+         // Show edit panel
          Dom.removeClass(this.id + "-editview", "hidden");
       },
 
@@ -306,5 +278,6 @@
          Dom.addClass(this.id + "-editview", "hidden");
          Dom.removeClass(this.id + "-readview", "hidden");
       }
-   };
+
+   });
 })();
