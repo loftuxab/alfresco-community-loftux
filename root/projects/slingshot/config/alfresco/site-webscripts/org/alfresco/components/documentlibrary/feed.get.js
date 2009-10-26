@@ -4,7 +4,7 @@ function main()
    var feedArgs = url.templateArgs["feedArgs"],
       connector = remote.connect("alfresco-feed");
 
-   var remoteUrl = "/slingshot/doclib/doclist/" + feedArgs,
+   var remoteUrl = "/slingshot/doclib/doclist/" + encodeURI(feedArgs),
       remoteArgs = "";
    for (var arg in args)
    {
