@@ -2824,6 +2824,8 @@ Alfresco.util.DialogManager = ( function () {
                     Dom.get(this.id + "-tag-input-field").tabIndex = 8;
                     Dom.get(this.id + "-add-tag-button").tabIndex = 9;
                     form.errorContainer=null;   
+                    //disable time fields if all day event
+                    document.getElementsByName('start')[0].disabled = document.getElementsByName('end')[0].disabled = document.getElementsByName('allday')[0].checked;     
                     //hide mini-cal
                     this.dialog.hideEvent.subscribe(function() {
                      Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView').oCalendar.hide();
@@ -2866,7 +2868,7 @@ Alfresco.util.DialogManager = ( function () {
                    {
                       form.addValidation(dateElements[i],this.options._onDateValidation, { "obj": this }, "blur");
                    }
-
+                   
                    // Setup date validation
                    form.addValidation("td", this.options._onDateValidation, { "obj": this }, "focus");
                    form.addValidation("fd", this.options._onDateValidation, { "obj": this }, "focus");
@@ -2925,6 +2927,12 @@ Alfresco.util.DialogManager = ( function () {
                        this.endButton.on("click", this.options.onDateSelectButton);
                        this.endButton.on("keypress", buttonKeypressHandler);                       
                     }
+                   
+                    /* disable time fields if all day is selected */
+                    YAHOO.util.Event.addListener(document.getElementsByName('allday')[0], 'click', function(e)
+                    {
+                       document.getElementsByName('start')[0].disabled = document.getElementsByName('end')[0].disabled = (YAHOO.util.Event.getTarget(e).checked===true);
+                    });
                     YAHOO.Bubbling.on('formValidationError',Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView').onFormValidationError,this);
               },
                scope: Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView')

@@ -307,6 +307,7 @@
                           YAHOO.util.Dom.get(this.id + "-tag-input-field").value = '';
                           this.tagLibrary.setTags(tags.split(' '));
                           this.form.errorContainer=null;
+                          document.getElementsByName('start')[0].disabled = document.getElementsByName('end')[0].disabled = document.getElementsByName('allday')[0].checked;                          
                           //hide mini-cal
                           this.dialog.hideEvent.subscribe(function() {
                            Alfresco.util.ComponentManager.findFirst('Alfresco.CalendarView').oCalendar.hide();
@@ -409,6 +410,11 @@
                        this.endButton.on("click", this.options.onDateSelectButton);
                        this.endButton.on("keypress", buttonKeypressHandler);                       
                     }
+                    /* disable time fields if all day is selected */
+                   YAHOO.util.Event.addListener(document.getElementsByName('allday')[0], 'click', function(e)
+                   {
+                      document.getElementsByName('start')[0].disabled = document.getElementsByName('end')[0].disabled = (YAHOO.util.Event.getTarget(e).checked===true);
+                   });
                },
                scope: this.eventDialog
             },

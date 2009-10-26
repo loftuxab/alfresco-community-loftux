@@ -138,7 +138,16 @@
             for (var i = 0, ii = events.length; i < ii; i++)
             {
                item = events[i];
-               html += '<div><span>' + item.start + ' <a href="' + url + '">' + $html(item.name) + '</a></span></div>';
+               //if start and end match it is an allday or multiday event
+               if (item.start === item.end)
+               {
+                  html += '<div><span><a href="' + url + '">' + $html(item.name) + '</a></span></div>';                  
+               }
+               else
+               {
+                  html += '<div><span>' + item.start + ' <a href="' + url + '">' + $html(item.name) + '</a></span></div>';                  
+               }
+
             }
             html += '</div></div>';
          }
