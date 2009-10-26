@@ -41,8 +41,7 @@
    /**
     * Alfresco Slingshot aliases
     */
-   var $html = Alfresco.util.encodeHTML,
-      $msg = function(){};
+   var $html = Alfresco.util.encodeHTML;
 
    /**
     * WikiCreateForm constructor.
@@ -275,11 +274,11 @@
          {
             Alfresco.util.PopupManager.displayPrompt(
             {
-               title: $msg("message.failure.title"),
-               text: $msg("message.failure.duplicate", pageTitle),
+               title: this.msg("message.failure.title"),
+               text: this.msg("message.failure.duplicate", pageTitle),
                buttons: [
                {
-                  text: $msg("button.ok"),
+                  text: this.msg("button.ok"),
                   handler: function()
                   {
                      this.destroy();
@@ -294,15 +293,15 @@
             // Unauthenticated, which is probably due to a web-tier timeout or restart
             Alfresco.util.PopupManager.displayPrompt(
             {
-               title: $msg("message.sessionTimeout.title"),
-               text: $msg("message.sessionTimeout.text")
+               title: this.msg("message.sessionTimeout.title"),
+               text: this.msg("message.sessionTimeout.text")
             });
          }
          else
          {
             Alfresco.util.PopupManager.displayPrompt(
             {
-               title: $msg("message.failure"),
+               title: this.msg("message.failure"),
                text: e.json.message
             });
          }
