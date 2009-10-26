@@ -435,10 +435,24 @@ textarea
 
 /* Paginator link styling */
 
-.yui-skin-hcBlack .yui-pg-container a.yui-pg-next,
-.yui-skin-hcBlack .yui-pg-container a.yui-pg-previous
+.yui-skin-hcBlack .yui-pg-container span
 {
-   color:#2B6EB5;
+   color:#606060;
+}
+
+.yui-skin-hcBlack .yui-pg-container span.yui-pg-page.yui-pg-current-page
+{
+   color: #333333;
+   font-weight: bold;
+}
+
+.yui-skin-hcBlack .yui-pg-container a.yui-pg-first,
+.yui-skin-hcBlack .yui-pg-container a.yui-pg-previous,
+.yui-skin-hcBlack .yui-pg-container a.yui-pg-page,
+.yui-skin-hcBlack .yui-pg-container a.yui-pg-next,
+.yui-skin-hcBlack .yui-pg-container a.yui-pg-last
+{
+   color: #000000;
 }
 
 /* A combination of a link and splitbutton wrapped inside a span */

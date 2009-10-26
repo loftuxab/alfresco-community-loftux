@@ -407,10 +407,35 @@ textarea
 
 /* Paginator link styling */
 
-.yui-skin-greenTheme .yui-pg-container a.yui-pg-next,
-.yui-skin-greenTheme .yui-pg-container a.yui-pg-previous
+.yui-skin-greenTheme .yui-pg-container span
 {
-   color:#2B6EB5;
+   color:#606060;
+}
+
+.yui-skin-greenTheme .yui-pg-container span.yui-pg-page.yui-pg-current-page
+{
+   color: #333333;
+   font-weight: bold;
+}
+
+.yui-skin-greenTheme .yui-pg-container a.yui-pg-first,
+.yui-skin-greenTheme .yui-pg-container a.yui-pg-previous,
+.yui-skin-greenTheme .yui-pg-container a.yui-pg-page,
+.yui-skin-greenTheme .yui-pg-container a.yui-pg-next,
+.yui-skin-greenTheme .yui-pg-container a.yui-pg-last
+{
+   border-color: #CBCBCB;
+   color: #00AE42;
+   text-decoration: none;
+}
+
+.yui-skin-greenTheme .yui-pg-container a.yui-pg-first:hover,
+.yui-skin-greenTheme .yui-pg-container a.yui-pg-previous:hover,
+.yui-skin-greenTheme .yui-pg-container a.yui-pg-page:hover,
+.yui-skin-greenTheme .yui-pg-container a.yui-pg-next:hover,
+.yui-skin-greenTheme .yui-pg-container a.yui-pg-last:hover
+{
+   text-decoration: underline;
 }
 
 /* A combination of a link and splitbutton wrapped inside a span */
