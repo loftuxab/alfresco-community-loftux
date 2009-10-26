@@ -207,9 +207,8 @@ html>body .node, .reply, .comment {
 *********/
 .editReplyForm {
   margin: 4px;
-  border: thin solid #000;
   padding: 4px;
-  background-color: #FAFAFA;
+  background-color: #F7F7F7;
 }
 .editReplyForm label {
   width: 100px;
