@@ -27,13 +27,15 @@ package org.alfresco.web.site.taglib;
 import java.util.LinkedList;
 import javax.servlet.jsp.JspException;
 
-import org.alfresco.web.framework.model.Page;
-import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.framework.render.RenderContext;
-import org.alfresco.web.framework.render.RenderUtil;
 import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
+ * The "link" tag is provided so that multiple CSS resources requested by a component
+ * can be batched up into a single "style" tag with multiple @import statements.
+ * This mechanism is to workaround the MSIE bug described in KB262161 whereby IE browsers
+ * will not parse more than 30 separate CSS resource tags.
+ * 
  * @author mikeh
  */
 public class StylesheetTag extends TagBase
