@@ -37,7 +37,7 @@
          <div id="${controlId}-currentValueDisplay" class="current-values"></div>
          
          <#if form.mode != "view" && field.disabled == false>
-            <input type="hidden" id="${fieldHtmlId}" name="-" value="${field.value}" />
+            <input type="hidden" id="${fieldHtmlId}" name="-" value="${field.value?html}" />
             <input type="hidden" id="${controlId}-added" name="${field.name}_added" />
             <input type="hidden" id="${controlId}-removed" name="${field.name}_removed" />
             <div class="show-picker">
