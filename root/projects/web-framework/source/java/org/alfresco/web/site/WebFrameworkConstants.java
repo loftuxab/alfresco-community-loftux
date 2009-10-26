@@ -111,4 +111,7 @@ public class WebFrameworkConstants
     public static final String PROCESSOR_FREEMARKER = "freemarker";
     public static final String PROCESSOR_WEBSCRIPT = "webscript";
     public static final String DEFAULT_PROCESSOR = "jsp";
+    
+    // Render context values
+    public static final String STYLESHEET_RENDER_CONTEXT_NAME = "alfStylesheet"; 
 }

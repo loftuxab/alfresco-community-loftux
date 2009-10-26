@@ -1,5 +1,4 @@
 <#include "../form/form.get.head.ftl">
-<#include "dod5015-actions.head.inc">
 <!-- DoD 5015.2 Document Library Toolbar -->
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/documentlibrary/toolbar.css" />
 <@link rel="stylesheet" type="text/css" href="${page.url.context}/components/documentlibrary/dod5015-toolbar.css" />

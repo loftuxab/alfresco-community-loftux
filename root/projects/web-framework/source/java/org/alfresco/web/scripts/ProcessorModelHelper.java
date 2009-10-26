@@ -376,6 +376,7 @@ public final class ProcessorModelHelper
         addDirective(context, model, "edit", "org.alfresco.web.site.taglib.ObjectEditTag");
         addDirective(context, model, "print", "org.alfresco.web.site.taglib.ObjectPrintTag");
         addDirective(context, model, "pagelink", "org.alfresco.web.site.taglib.ObjectLinkTag");
+        addDirective(context, model, "link", "org.alfresco.web.site.taglib.StylesheetTag");
     }
     
     private static void addDirective(RenderContext context, Map<String, Object> model, String name, String className)

@@ -18,6 +18,11 @@ html>body .comment
    display: block;
 }
 
+.comment-list
+{
+   margin-right: 10px;
+}
+
 .comment-list .commentsListTitle
 {
    float: left;

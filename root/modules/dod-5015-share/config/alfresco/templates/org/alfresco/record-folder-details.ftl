@@ -14,6 +14,7 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
+      <@region id=doclibType + "actions-common" scope="template" protected=true />
       <@region id=doclibType + "path" scope="template" protected=true />
       <div class="yui-gb">
          <div class="yui-u first">
