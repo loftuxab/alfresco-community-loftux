@@ -712,7 +712,7 @@
         
         var elUl = null;
         var someHidden = false;
-        if (data.allday!=='true')
+        if (data.allday!=='allday')
         {
           data.el = 'li';  
           data.contEl = 'div';
@@ -805,7 +805,7 @@
           data.duration = Alfresco.CalendarHelper.getDuration(Alfresco.util.fromISO8601(data.dtstart),Alfresco.util.fromISO8601(data.dtend));
           data.start = data.dtstart.split('T')[1].substring(0,5);
           data.end = data.dtend.split('T')[1].substring(0,5);
-          data.allday = (data.allday==='true') ? data.allday : '';
+          data.allday = (data.allday==='allday') ? data.allday : '';
           data.tags = (YAHOO.lang.isArray(data.tags)) ? data.tags.join(' ') : data.tags;
           return data; 
        },
@@ -851,7 +851,9 @@
         {
            if (data.allday)
            {
-               Dom.addClass(Dom.getElementsByClassName('dates','p',eventEl)[0],'theme-bg-color-1');
+               var datesEl = Dom.getElementsByClassName('dates','p',eventEl)[0];
+               Dom.addClass(datesEl,'theme-bg-color-1');
+               Dom.addClass(datesEl,'theme-color-1');               
            }
            if (!data.fromDate)
            {
@@ -948,7 +950,7 @@
                       }
                    }
                    var multipleAllDayEl = document.createElement('div');
-                   multipleAllDayEl.className='allday multipleAllDay';
+                   multipleAllDayEl.className='allday multipleAllDay theme-bg-color-1';
                    multipleAllDayEl.id=eventEl.id+'-multiple'+(i+1);
                    if (targetCell)
                    {
@@ -1204,7 +1206,6 @@
           data.hidden ='';
           data.tags = data.tags.join(' ');
           data.allday = (YAHOO.lang.isUndefined(data.allday)) ? '' : data.allday;
-
           data.from = data.from +'T'+data.start;
           data.to = data.to +'T'+data.end;
           //get containing date TD cell for event
@@ -1212,7 +1213,7 @@
           //render into allday section
           if(data.allday)
           {
-            data.allday = 'true';
+            data.allday = 'allday';
             var vEventEl = Alfresco.CalendarHelper.renderTemplate('vevent',data);
             vEventEl = this.renderAllDayEvents(vEventEl,data);
             this.calEventConfig.draggable = YAHOO.util.Dom.hasClass(vEventEl,'allday') ? false : true;
