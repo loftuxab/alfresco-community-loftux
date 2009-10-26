@@ -24,7 +24,11 @@
  */
 package org.alfresco.web.framework.render;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,10 +42,12 @@ import org.alfresco.web.framework.model.TemplateType;
 import org.alfresco.web.framework.render.ProcessorContext.ProcessorDescriptor;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
  * @author muzquiano
  * @author kevinr
+ * @author mikeh
  */
 public class RenderHelper 
 {
@@ -279,6 +285,7 @@ public class RenderHelper
         }        
     }
     
+    @SuppressWarnings("unchecked")
     public static void processComponent(RenderContext context, RenderFocus renderFocus, Component component)
         throws RendererExecutionException
     {
@@ -339,6 +346,37 @@ public class RenderHelper
             
             // execute the processor
             processor.execute(processorContext, renderFocus);
+            
+            /**
+             * This is a workaround for the Internet Explorer bug detailed in KB262161
+             * "All style tags after the first 30 style tags on an HTML page are not applied in Internet Explorer"
+             * http://support.microsoft.com/kb/262161
+             */
+            if (context.hasValue(WebFrameworkConstants.STYLESHEET_RENDER_CONTEXT_NAME))
+            {
+                // stylesheets to consolidate
+                LinkedList<String> css = (LinkedList<String>)context.getValue(WebFrameworkConstants.STYLESHEET_RENDER_CONTEXT_NAME);
+                if (css != null)
+                {
+                    try
+                    {
+                        Iterator iter = css.iterator();
+                        Writer writer = context.getResponse().getWriter();
+                        writer.write("   <style type=\"text/css\" media=\"screen\">\n");
+                        while (iter.hasNext())
+                        {
+                            writer.write("      @import \"" + iter.next() + "\";\n");
+                        }
+                        writer.write("   </style>");
+                    }
+                    catch (IOException ioe)
+                    {
+                        throw new RendererExecutionException(ioe);
+                    }
+                }
+                context.removeValue(WebFrameworkConstants.STYLESHEET_RENDER_CONTEXT_NAME);
+            }
+
         }        
     }
 

@@ -1,3 +1,4 @@
+<#include "../component.head.inc">
 <!-- Actions -->
 <@script type="text/javascript" src="${page.url.context}/components/documentlibrary/actions.js"></@script>
 <!-- Simple Dialog -->

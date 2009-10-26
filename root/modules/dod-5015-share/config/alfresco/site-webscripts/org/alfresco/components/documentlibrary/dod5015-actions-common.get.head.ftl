@@ -1,3 +1,4 @@
+<#include "../component.head.inc">
 <!-- DoD 5015.2 Actions -->
 <@script type="text/javascript" src="${page.url.context}/components/documentlibrary/actions.js"></@script>
 <@script type="text/javascript" src="${page.url.context}/components/documentlibrary/dod5015-actions.js"></@script>

@@ -1,6 +1,5 @@
 <#include "include/alfresco-template.ftl" />
 <@templateHeader>
-   <@link rel="stylesheet" type="text/css" href="${url.context}/components/blog/postlist.css" />
    <@link rel="stylesheet" type="text/css" href="${url.context}/components/blog/postview.css" />
    <@link rel="stylesheet" type="text/css" href="${url.context}/templates/document-details/document-details.css" />
    <@script type="text/javascript" src="${page.url.context}/components/blog/blogdiscussions-common.js"></@script>
@@ -18,6 +17,7 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
+      <@region id=doclibType + "actions-common" scope="template" protected=true />
       <@region id=doclibType + "path" scope="template" protected=true />
 
       <div class="yui-g">

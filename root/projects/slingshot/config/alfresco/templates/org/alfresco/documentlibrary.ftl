@@ -43,6 +43,7 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
+      <@region id=doclibType + "actions-common" scope="template" protected=true />
       <div class="yui-t1" id="divDocLibraryWrapper">
          <div id="yui-main">
             <div class="yui-b" id="divDocLibraryDocs">

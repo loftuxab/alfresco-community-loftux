@@ -16,17 +16,26 @@
 </#if>
 
 <#--
-   JavaScript and (future) CSS minimisation via YUI Compressor.
-   Currently only client-side JavaScript files are compressed during build.
+   JavaScript minimisation via YUI Compressor.
 -->
 <#assign minJS=DEBUG?string(".js", "-min.js")>
 <#macro script type src>
    <script type="${type}" src="${src?replace(".js", minJS)}"></script>
 </#macro>
-<#macro link rel type href><#-- Compressing CSS not currently supported -->
-   <link rel="${rel}" type="${type}" href="${href}" />
+<#--
+   Stylesheets gathered and rendered using @import to workaround IEBug KB262161
+-->
+<#assign templateStylesheets = []>
+<#macro link rel type href>
+   <#assign templateStylesheets = templateStylesheets + [href]>
 </#macro>
-
+<#macro renderStylesheets>
+   <style type="text/css" media="screen">
+   <#list templateStylesheets as href>
+      @import "${href}";
+   </#list>
+   </style>
+</#macro>
 
 <#--
    Template "templateHeader" macro.
@@ -48,11 +57,11 @@
    <link rel="icon" href="${url.context}/favicon.ico" type="image/vnd.microsoft.icon" />
 
 <!-- Site-wide YUI Assets -->
-   <link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
+   <@link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
    <#if theme = 'default'>
-   <link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/default/skin.css" />
+      <@link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/default/skin.css" />
    <#else>
-   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/yui/assets/skin.css" />   
+      <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/yui/assets/skin.css" />   
    </#if>
 <#-- Selected components preloaded here for better UI experience. -->
 <#if DEBUG>
@@ -87,7 +96,6 @@
    <script type="text/javascript" src="${url.context}/yui/yui-patch.js"></script>
 
 <!-- Site-wide Common Assets -->
-   <#-- <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" /> -->
    <@link rel="stylesheet" type="text/css" href="${url.context}/css/base.css" />
    <@link rel="stylesheet" type="text/css" href="${url.context}/css/yui-layout.css" />   
    <@link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/presentation.css" />
@@ -116,6 +124,7 @@
 
 <!-- Template Assets -->
 <#nested>
+<@renderStylesheets />
 
 <!-- Component Assets -->
 ${head}
