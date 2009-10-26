@@ -427,10 +427,35 @@ span.mce_alfresco-imagelibrary
 
 /* Paginator link styling */
 
-.yui-skin-default .yui-pg-container a.yui-pg-next,
-.yui-skin-default .yui-pg-container a.yui-pg-previous
+.yui-skin-default .yui-pg-container span
 {
+   color:#606060;
+}
+
+.yui-skin-default .yui-pg-container span.yui-pg-page.yui-pg-current-page
+{
+   color: #333333;
+   font-weight: bold;
+}
+
+.yui-skin-default .yui-pg-container a.yui-pg-first,
+.yui-skin-default .yui-pg-container a.yui-pg-previous,
+.yui-skin-default .yui-pg-container a.yui-pg-page,
+.yui-skin-default .yui-pg-container a.yui-pg-next,
+.yui-skin-default .yui-pg-container a.yui-pg-last
+{
+   border-color: #CBCBCB;
    color: #2B6EB5;
+   text-decoration: none;
+}
+
+.yui-skin-default .yui-pg-container a.yui-pg-first:hover,
+.yui-skin-default .yui-pg-container a.yui-pg-previous:hover,
+.yui-skin-default .yui-pg-container a.yui-pg-page:hover,
+.yui-skin-default .yui-pg-container a.yui-pg-next:hover,
+.yui-skin-default .yui-pg-container a.yui-pg-last:hover
+{
+   text-decoration: underline;   
 }
 
 /* A combination of a link and splitbutton wrapped inside a span */
