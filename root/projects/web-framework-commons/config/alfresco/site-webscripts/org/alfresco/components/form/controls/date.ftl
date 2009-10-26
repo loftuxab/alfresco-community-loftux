@@ -28,7 +28,7 @@
       })();
       //]]></script>
    
-      <input id="${fieldHtmlId}" type="hidden" name="${field.name}" value="${field.value}" />
+      <input id="${fieldHtmlId}" type="hidden" name="${field.name}" value="${field.value?html}" />
    
       <label for="${controlId}-date">${field.label?html}:<#if field.mandatory><span class="mandatory-indicator">${msg("form.required.fields.marker")}</span></#if></label>
       <input id="${controlId}-date" name="-" type="text" class="date-entry" <#if field.description?exists>title="${field.description}"</#if> <#if field.disabled>disabled="true"</#if> />
