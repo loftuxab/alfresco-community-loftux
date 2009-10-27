@@ -1081,6 +1081,7 @@
              haltonfailure="${haltonfailure}" 
              dir="${projectdir}">
          <jvmarg value="-server"/>
+         <jvmarg value="-XX:MaxPermSize=128M"/>
          <classpath refid="classpath.unit.test" />
          <formatter type="xml" />
          <test name="${testcase}" 
