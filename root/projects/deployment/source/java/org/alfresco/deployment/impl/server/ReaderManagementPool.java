@@ -60,7 +60,7 @@ public class ReaderManagementPool implements ReaderManagement
      * @param is the input stream
      * @param os the output stream
      */
-    public void addCopyThread(InputStream is, 
+    public synchronized void addCopyThread(InputStream is, 
     		OutputStream os,
     		String token) 
     {
@@ -73,7 +73,7 @@ public class ReaderManagementPool implements ReaderManagement
      * 
      * @param os the output stream
      */
-    public void closeCopyThread(String token) throws IOException {
+    public synchronized void closeCopyThread(String token) throws IOException {
     	
     	ReaderJob worker = (ReaderJob)fJobs.get(token);
     	
