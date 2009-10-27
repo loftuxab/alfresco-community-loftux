@@ -996,7 +996,7 @@ Alfresco.forms.validation.mandatory = function mandatory(field, args, event, for
    if (!valid && !silent && form !== null)
    {
       // if the keyCode from the event is the TAB or SHIFT keys don't show the error
-      if (event && event.keyCode != 9 && event.keyCode != 16)
+      if (event && event.keyCode != 9 && event.keyCode != 16 || !event)
       {
          var msg = (message != null) ? message : "is mandatory.";
          form.addError(form.getFieldLabel(field.id) + " " + msg, field);
