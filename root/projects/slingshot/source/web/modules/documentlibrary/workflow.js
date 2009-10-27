@@ -392,7 +392,7 @@
          {  
             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-            var desc = '<a href="#" class="remove-person" title="' + me._msg("tooltip.remove-person") + '"></a>';
+            var desc = '<a href="#" class="remove-person" title="' + me._msg("tooltip.remove-person") + '" tabindex="0"></a>';
             elCell.innerHTML = desc;
          };
 

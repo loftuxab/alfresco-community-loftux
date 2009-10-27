@@ -10,7 +10,7 @@
             <h2>${msg("header.type")}</h2>
          </div>
          <div class="field">
-            <select id="${args.htmlid}-type" name="type" tabindex="4">
+            <select id="${args.htmlid}-type" name="type" tabindex="0">
                <option value="wf:review" selected="selected">Review &amp; Approve</option>
                <option value="wf:adhoc">Adhoc Task</option>
             </select>
@@ -30,7 +30,7 @@
             <h2>${msg("header.date")}</h2>
          </div>
          <div class="field">    
-            <input id="${args.htmlid}-dueDate-checkbox" name="-" type="checkbox" value="${msg("label.due-date.none")}" tabindex="4"/>&nbsp;
+            <input id="${args.htmlid}-dueDate-checkbox" name="-" type="checkbox" value="${msg("label.due-date.none")}" tabindex="0"/>&nbsp;
             <span id="${args.htmlid}-dueDate"><label for="${args.htmlid}-dueDate-checkbox">${msg("label.due-date.none")}</label></span>
          </div>
          <div id="${args.htmlid}-calendarOverlay" class="calendar-overlay">
@@ -42,12 +42,12 @@
             <h2>${msg("header.comment")}</h2>
          </div>
          <div class="field">
-            <textarea id="${args.htmlid}-comment" name="description" rows="3" tabindex="5"></textarea>
+            <textarea id="${args.htmlid}-comment" name="description" rows="3" tabindex="0"></textarea>
             <span>${msg("label.comment.max-length")}</span>
             </div>
          <div class="bdft">
-            <input type="button" id="${args.htmlid}-ok" value="${msg("button.assign")}" tabindex="6" />
-            <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="7" />
+            <input type="button" id="${args.htmlid}-ok" value="${msg("button.assign")}" tabindex="0" />
+            <input type="button" id="${args.htmlid}-cancel" value="${msg("button.cancel")}" tabindex="0" />
          </div>
       </form>
    </div>
