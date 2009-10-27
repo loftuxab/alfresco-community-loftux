@@ -18,7 +18,7 @@
    
    <div class="finder-wrapper">
       <div class="search-bar theme-bg-color-3">
-         <div class="search-text"><input type="text" id="${args.htmlid}-search-text" name="-" value="" maxlength="256" /></div>
+         <div class="search-text"><input type="text" id="${args.htmlid}-search-text" name="-" value="" maxlength="256" tabindex="0"/></div>
          <div class="search-button">
             <span id="${args.htmlid}-search-button" class="yui-button yui-push-button"><span class="first-child"><button>${msg("button.search")}</button></span></span>
          </div>
