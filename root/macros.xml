@@ -132,6 +132,7 @@
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.test.results}" />
          <junit showoutput="yes" printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="yes" dir="@{projectdir}">
             <jvmarg value="-server"/>
+            <jvmarg value="-XX:MaxPermSize=128M"/>
             <classpath>
             <path refid="classpath.unit.test"/>
             <path refid="classpath.unit.test.extension"/>
@@ -152,6 +153,7 @@
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.test.results}" />
          <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="no" dir="@{projectdir}">
             <jvmarg value="-server"/>
+            <jvmarg value="-XX:MaxPermSize=128M"/>
             <classpath>
             <path refid="classpath.unit.test"/>
             <path refid="classpath.unit.test.extension"/>
