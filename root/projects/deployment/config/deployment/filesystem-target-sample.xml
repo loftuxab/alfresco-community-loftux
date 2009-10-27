@@ -5,7 +5,7 @@
 <beans>
 
 	<!--
-		Sample file system target - edit and rename to make active.
+		Sample filesystem target - edit and rename to make active.
 	-->
 	
 	<bean
@@ -14,7 +14,7 @@
 
 		<!--  Your target name goes here -->
 		<property name="name">
-			<value>filesystem</value>
+			<value><!--  the name of your target --></value>
 		</property>
 	
 		<property name="registry">
@@ -27,12 +27,12 @@
 				
 				<!--  where do you want your files to go -->
 				<property name="rootDirectory">
-					<value>filesystem</value>
+					<value><!--  where to put deployed assets --></value>
 				</property>
 				
 				<!--  where to store meta data for sampleTarget-->
         		<property name="metaDataDirectory">
-            		<value>metadata/filesystem</value>
+            		<value><!--  where to store metadata --></value>
         		</property>	
 				
 				<property name="autoFix">
@@ -62,10 +62,10 @@
 					<bean
 						class="org.alfresco.deployment.impl.server.DeploymentReceiverAuthenticatorSimple">
 						<property name="user">
-							<value>${deployment.user}</value>
+							<value><!--  user here --></value>
 						</property>
 						<property name="password">
-							<value>${deployment.password}</value>
+							<value><!--  password here --></value>
 						</property>
 					</bean>
 				</property>

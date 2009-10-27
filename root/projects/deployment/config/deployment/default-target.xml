@@ -46,10 +46,10 @@
 					<bean
 						class="org.alfresco.deployment.impl.server.DeploymentReceiverAuthenticatorSimple">
 						<property name="user">
-							<value>${deployment.user}</value>
+							<value>${deployment.filesystem.default.user}</value>
 						</property>
 						<property name="password">
-							<value>${deployment.password}</value>
+							<value>${deployment.filesystem.default.password}</value>
 						</property>
 					</bean>
 				</property>
