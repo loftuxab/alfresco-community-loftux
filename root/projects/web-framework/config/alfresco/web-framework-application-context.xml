@@ -151,7 +151,7 @@
    
    <bean id="webframework.store.templates.custom" class="org.alfresco.web.scripts.ClassPathStore">
       <property name="mustExist"><value>false</value></property>
-      <property name="classPath"><value>alfresco/extension/templates</value></property>
+      <property name="classPath"><value>alfresco/web-extension/templates</value></property>
    </bean>
    
    <bean id="webframework.store.system-templates" class="org.alfresco.web.scripts.ClassPathStore">
