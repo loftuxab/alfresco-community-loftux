@@ -366,7 +366,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         {
             properties = new CmisPropertiesType();
         }
-        else
+        else if (properties.getPropertyString() != null)
         {
             for (CmisPropertyString stringProperty : properties.getPropertyString())
             {
@@ -383,14 +383,14 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             CmisPropertyString cmisPropertyString = new CmisPropertyString();
             cmisPropertyString.setPdid(EnumPropertiesBase._value1);
             cmisPropertyString.setValue(new String[] { documentName });
-            properties.setPropertyString(new CmisPropertyString[] { cmisPropertyString });
+            properties.setPropertyString(0, cmisPropertyString);
         }
         if ((null != documentTypeId) && !"".equals(documentTypeId))
         {
             CmisPropertyId idProperty = new CmisPropertyId();
             idProperty.setPdid(EnumPropertiesBase._value3);
             idProperty.setValue(new String[] { documentTypeId });
-            properties.setPropertyId(new CmisPropertyId[] { idProperty });
+            properties.setPropertyId(0, idProperty);
         }
 
         CmisContentStreamType contentStream = null;
@@ -423,7 +423,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         {
             properties = new CmisPropertiesType();
         }
-        else
+        else if (properties.getPropertyString() != null)
         {
             for (CmisPropertyString stringProperty : properties.getPropertyString())
             {
@@ -439,14 +439,14 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             CmisPropertyString cmisPropertyString = new CmisPropertyString();
             cmisPropertyString.setPdid(EnumPropertiesBase._value1);
             cmisPropertyString.setValue(new String[] { folderName });
-            properties.setPropertyString(new CmisPropertyString[] { cmisPropertyString });
+            properties.setPropertyString(0, cmisPropertyString);
         }
         if ((null != folderTypeId) && !"".equals(folderTypeId))
         {
             CmisPropertyId idProperty = new CmisPropertyId();
             idProperty.setPdid(EnumPropertiesBase._value3);
             idProperty.setValue(new String[] { folderTypeId });
-            properties.setPropertyId(new CmisPropertyId[] { idProperty });
+            properties.setPropertyId(0, idProperty);
         }
 
         LOGGER.info("[ObjectService->createFolder]");
@@ -1117,6 +1117,20 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         return enumerateAndAssertTypesHierarchy(getAndAssertTypeDescendants(null, -1, true), calculator, true);
     }
 
+    protected String searchAndAssertNotFileableType() throws Exception
+    {
+
+        return enumerateAndAssertTypesHierarchy(getAndAssertTypeDescendants(null, -1, true), new AbstractConditionCalculator()
+        {
+            @Override
+            public boolean calculate(CmisTypeDefinitionType currentType, CmisTypeDefinitionType enumeratedType)
+            {
+                return null != enumeratedType && enumeratedType.isCreatable() && !enumeratedType.getBaseTypeId().equals(EnumBaseObjectTypeIds.value1)
+                        && !enumeratedType.getBaseTypeId().equals(EnumBaseObjectTypeIds.value2) && !enumeratedType.isFileable();
+            }
+        }, true);
+    }
+
     protected String enumerateAndAssertTypesHierarchy(CmisTypeContainer[] rootContainers, AbstractConditionCalculator calculator, boolean firstIsValid)
     {
         if ((null == rootContainers) || (null == calculator) || (rootContainers.length < 1))
@@ -1476,10 +1490,10 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
     protected String createAndAssertPolicy() throws Exception
     {
-        return createAndAssertPolicy(null, getAndAssertRootFolderId());
+        return createAndAssertPolicy(null, null, null, getAndAssertRootFolderId());
     }
 
-    protected String createAndAssertPolicy(CmisPropertiesType properties, String folderId) throws Exception
+    protected String createAndAssertPolicy(String name, String policyTypeId, CmisPropertiesType properties, String folderId) throws Exception
     {
         if (null == properties)
         {
@@ -1487,13 +1501,13 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
             CmisPropertyString cmisPropertyString = new CmisPropertyString();
             cmisPropertyString.setPdid(EnumPropertiesBase._value1);
-            cmisPropertyString.setValue(new String[] { generateTestPolicyName() });
-            properties.setPropertyString(new CmisPropertyString[] { cmisPropertyString });
+            cmisPropertyString.setValue(new String[] { name == null ? generateTestPolicyName() : name });
+            properties.setPropertyString(0, cmisPropertyString);
 
             CmisPropertyId idProperty = new CmisPropertyId();
             idProperty.setPdid(EnumPropertiesBase._value3);
-            idProperty.setValue(new String[] { getAndAssertPolicyTypeId() });
-            properties.setPropertyId(new CmisPropertyId[] { idProperty });
+            idProperty.setValue(new String[] { policyTypeId == null ? getAndAssertPolicyTypeId() : policyTypeId });
+            properties.setPropertyId(0, idProperty);
 
         }
 
@@ -1515,6 +1529,34 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             {
                 return (null != enumeratedType) && enumeratedType.isCreatable()
                         && !EnumContentStreamAllowed.required.equals(((CmisTypeDocumentDefinitionType) enumeratedType).getContentStreamAllowed());
+            }
+        }, true);
+    }
+
+    protected String searchAndAssertDocumentTypeWithContentRequired() throws Exception
+    {
+        String baseDocumentTypeId = getBaseDocumentTypeId(getAndAssertTypeChildren(null, false, 0, 0));
+        return enumerateAndAssertTypesHierarchy(getAndAssertTypeDescendants(baseDocumentTypeId, -1, true), new AbstractConditionCalculator()
+        {
+            @Override
+            public boolean calculate(CmisTypeDefinitionType currentType, CmisTypeDefinitionType enumeratedType)
+            {
+                return (null != enumeratedType) && enumeratedType.isCreatable()
+                        && EnumContentStreamAllowed.required.equals(((CmisTypeDocumentDefinitionType) enumeratedType).getContentStreamAllowed());
+            }
+        }, true);
+    }
+
+    protected String searchAndAssertDocumentTypeWithContentNotAllowed() throws Exception
+    {
+        String baseDocumentTypeId = getBaseDocumentTypeId(getAndAssertTypeChildren(null, false, 0, 0));
+        return enumerateAndAssertTypesHierarchy(getAndAssertTypeDescendants(baseDocumentTypeId, -1, true), new AbstractConditionCalculator()
+        {
+            @Override
+            public boolean calculate(CmisTypeDefinitionType currentType, CmisTypeDefinitionType enumeratedType)
+            {
+                return (null != enumeratedType) && enumeratedType.isCreatable()
+                        && EnumContentStreamAllowed.notallowed.equals(((CmisTypeDocumentDefinitionType) enumeratedType).getContentStreamAllowed());
             }
         }, true);
     }

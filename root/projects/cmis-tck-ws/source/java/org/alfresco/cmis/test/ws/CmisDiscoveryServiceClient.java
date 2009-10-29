@@ -36,6 +36,7 @@ import org.alfresco.repo.cmis.ws.CmisObjectType;
 import org.alfresco.repo.cmis.ws.CmisPropertiesType;
 import org.alfresco.repo.cmis.ws.DiscoveryServicePortBindingStub;
 import org.alfresco.repo.cmis.ws.EnumBaseObjectTypeIds;
+import org.alfresco.repo.cmis.ws.EnumCapabilityChanges;
 import org.alfresco.repo.cmis.ws.EnumCapabilityQuery;
 import org.alfresco.repo.cmis.ws.EnumPropertiesBase;
 import org.alfresco.repo.cmis.ws.GetContentChanges;
@@ -423,6 +424,7 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
                 Query request = new Query();
                 request.setRepositoryId(getAndAssertRepositoryId());
                 request.setStatement("SELECT * FROM " + EnumBaseObjectTypeIds._value1 + " WHERE " + EnumPropertiesBase._value2 + "='" + checkInResponse.getDocumentId() + "'");
+                request.setSearchAllVersions(true);
                 QueryResponse queryResponse = null;
                 try
                 {
@@ -533,16 +535,23 @@ public class CmisDiscoveryServiceClient extends AbstractServiceClient
 
     public void testGetContentChanges()
     {
-        try
+        if (!getAndAssertCapabilities().getCapabilityChanges().equals(EnumCapabilityChanges.none))
         {
-            LOGGER.info("[DiscoveryService->getContentChanges]");
-            GetContentChangesResponse response = getServicesFactory().getDiscoveryService().getContentChanges(
-                    new GetContentChanges(getAndAssertRepositoryId(), null, null, null, null, null));
-            assertNotNull("getContentChanges response is NULL", response);
+            try
+            {
+                LOGGER.info("[DiscoveryService->getContentChanges]");
+                GetContentChangesResponse response = getServicesFactory().getDiscoveryService().getContentChanges(
+                        new GetContentChanges(getAndAssertRepositoryId(), null, null, null, null, null));
+                assertNotNull("getContentChanges response is NULL", response);
+            }
+            catch (Exception e)
+            {
+                fail(e.toString());
+            }
         }
-        catch (Exception e)
+        else
         {
-            fail(e.toString());
+            LOGGER.info("testGetContentChanges was skipped: Capability changes not supported");
         }
     }
 }

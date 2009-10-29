@@ -14,6 +14,10 @@
       </property>
    </bean>
 
+   <bean id="cmisTestsExecutor" class="org.alfresco.cmis.test.ws.CmisWebServiceTestSuite">
+      <property name="testableServiceNames" value="${cmis.testable.services}" />
+   </bean>
+
    <bean id="originalDictionaryServiceClient"
       class="org.alfresco.original.test.ws.OriginalDictionaryServiceClient"
       parent="abstractOriginalServiceClient">
