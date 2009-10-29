@@ -112,7 +112,6 @@
 	<classpathentry kind="lib" path="lib/xml-resolver-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/XmlSchema-1.4.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring-2.0.8.jar" sourcepath="src/spring-2.0.8-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/PDFRenderer.jar" sourcepath="src/PDFRenderer-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/geronimo-jaxws_2.1_spec-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/tm-extractors-1.0-patched.jar" sourcepath="src/tm-extractors-1.0-patched.zip"/>
@@ -136,5 +135,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/abdera/stax-api-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pdfbox-0.8.0-incubating.jar" sourcepath="src/pdfbox-0.8.0-incubating-src.jar"/>
 	<classpathentry kind="lib" path="lib/fontbox-0.8.0-incubating.jar" sourcepath="src/fontbox-0.8.0-incubating-src.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/chemistry-tck-atompub-1.0.0-SNAPSHOT.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/junit-4.6.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
