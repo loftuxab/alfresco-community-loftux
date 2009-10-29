@@ -40,23 +40,22 @@ public interface CMISConstants
 {
     // Namespace
     public static final String CMIS_NS = "http://docs.oasis-open.org/ns/cmis/core/200901";
+    public static final String CMISRA_NS = "http://docs.oasis-open.org/ns/cmis/restatom/200901";
     
     // Mimetypes
     public static final String MIMETYPE_QUERY = "application/cmisquery+xml";
     public static final String MIMETYPE_ALLOWABLEACTIONS = "application/cmisallowableactions+xml";
 
     // CMIS Service Document
-    public static final QName COLLECTION_TYPE = new QName(CMIS_NS, "collectionType");
-    public static final String COLLECTION_ROOT_CHILDREN = "rootchildren";
-    public static final String COLLECTION_ROOT_DESCENDANTS = "rootdescendants";
+    public static final QName COLLECTION_TYPE = new QName(CMISRA_NS, "collectionType");
+    public static final String COLLECTION_ROOT = "root";
     public static final String COLLECTION_CHECKEDOUT = "checkedout";
     public static final String COLLECTION_UNFILED = "unfiled";
-    public static final String COLLECTION_TYPES_CHILDREN = "typeschildren";
-    public static final String COLLECTION_TYPES_DESCENDANTS = "typesdescendants";
+    public static final String COLLECTION_TYPES = "types";
     public static final String COLLECTION_QUERY = "query";
     
     // CMIS Repository Info
-    public static final QName REPOSITORY_INFO = new QName(CMIS_NS, "repositoryInfo");
+    public static final QName REPOSITORY_INFO = new QName(CMISRA_NS, "repositoryInfo");
     public static final QName REPOSITORY_ID = new QName(CMIS_NS, "repositoryId");
     public static final QName REPOSITORY_NAME = new QName(CMIS_NS, "repositoryName");
     public static final QName REPOSITORY_RELATIONSHIP = new QName(CMIS_NS, "repositoryRelationship");
