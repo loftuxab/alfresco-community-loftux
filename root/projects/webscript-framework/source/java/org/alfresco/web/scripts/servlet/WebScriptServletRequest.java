@@ -153,7 +153,12 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
      */
     public String getURL()
     {
-        return getServicePath() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
+        String queryString = getQueryString();
+        if (queryString != null)
+        {
+            return getServicePath() + "?" + queryString;
+        }
+        return getServicePath();
     }
     
     /* (non-Javadoc)
@@ -172,7 +177,12 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
      */
     public String getQueryString()
     {
-        return req.getQueryString();
+        String queryString = req.getQueryString();
+        if (queryString != null)
+        {
+            queryString = URLDecoder.decode(queryString);
+        }
+        return queryString;
     }
     
     /* (non-Javadoc)
