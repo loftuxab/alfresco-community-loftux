@@ -37,22 +37,7 @@
       </property>
    </bean>
    
-   <bean id="webscripts.cmis.atom.extension" class="org.alfresco.web.scripts.atom.AbderaExtension">
-      <property name="abderaService" ref="webscripts.abdera"/>
-      <property name="QNames">
-         <props>
-            <prop key="cmisra_object">{http://docs.oasis-open.org/ns/cmis/restatom/200901}object</prop>
-            <prop key="cmisra_repositoryInfo">{http://docs.oasis-open.org/ns/cmis/restatom/200901}repositoryInfo</prop>
-         </props>
-      </property>
-      <property name="extensionFactories">
-         <list>
-           <bean class="org.alfresco.abdera.ext.cmis.CMISExtensionFactory"/>
-         </list>
-      </property>
-   </bean>
    
-
    <!--                      -->
    <!--  Formats / Mimetypes -->
    <!--                      -->
