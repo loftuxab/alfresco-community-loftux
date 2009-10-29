@@ -34,9 +34,10 @@ import junit.framework.TestSuite;
 import junit.textui.ResultPrinter;
 import junit.textui.TestRunner;
 
-import org.alfresco.cmis.test.ws.wsi.Profiler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class CmisWebServiceTestSuite extends TestSuite
 {
@@ -47,7 +48,79 @@ public class CmisWebServiceTestSuite extends TestSuite
     private static long time = 0;
     private static boolean flag = true;
 
+    private String[] testableServiceNames = new String[0];
+
+    public void setTestableServiceNames(String[] testableServiceNames)
+    {
+        this.testableServiceNames = testableServiceNames;
+    }
+
     public static void main(String[] args)
+    {
+        try
+        {
+            ApplicationContext applicationContext = new ClassPathXmlApplicationContext("cmis-context.xml");
+            CmisWebServiceTestSuite testsExecutor = (CmisWebServiceTestSuite) applicationContext.getBean("cmisTestsExecutor");
+            if (null != testsExecutor)
+            {
+                testsExecutor.execute();
+            }
+            else
+            {
+                LOGGER.error("CMIS Tests Executor class was not found! Testing terminated...");
+            }
+        }
+        catch (Exception e)
+        {
+            LOGGER.error("Can't run Tests. Cause error message: " + e.toString());
+        }
+    }
+
+    public void execute()
+    {
+        printLicenseInfo();
+        // LOGGER.info("\r Usage: Add '-wsi' option to run WS-I Profiler,\n if no option provided, UnitTests will be run\n");
+        // if (args != null && args.length > 0 && "-wsi".equalsIgnoreCase(args[0]))
+        // {
+        // LOGGER.info("Starting WS-I Profiler");
+        // Profiler.main(args);
+        // }
+        if ((null != testableServiceNames) && (testableServiceNames.length > 0))
+        {
+            TestRunner testRunner = new TestRunner();
+            ResultPrinter printer = new CMISResultPrinter(System.out);
+            testRunner.setPrinter(printer);
+            for (String serviceName : testableServiceNames)
+            {
+                Class<?> testableClass = null;
+                serviceName = serviceName.trim();
+                try
+                {
+                    testableClass = Class.forName("org.alfresco.cmis.test.ws.Cmis" + serviceName + "Client");
+                }
+                catch (ClassNotFoundException e)
+                {
+                    // Doing nothing
+                }
+                if (null == testableClass)
+                {
+                    LOGGER.error("Test for '" + serviceName + "' was not found!");
+                }
+                else
+                {
+                    LOGGER.info("Testing: [" + serviceName + "]");
+                    testRunner.doRun(new TestSuite(testableClass));
+                }
+            }
+            printStatusInfo();
+        }
+        else
+        {
+            LOGGER.info("No one Testable Service was configured! Nothing to test");
+        }
+    }
+
+    private void printLicenseInfo()
     {
         LOGGER.info("******************************************************************");
         LOGGER.info("*                                                                *");
@@ -56,55 +129,24 @@ public class CmisWebServiceTestSuite extends TestSuite
         LOGGER.info("*                                                                *");
         LOGGER.info("******************************************************************");
         LOGGER.info("");
-        LOGGER.info("\r Usage: Add '-wsi' option to run WS-I Profiler,\n if no option provided, UnitTests will be run\n");
-        if (args != null && args.length > 0 && "-wsi".equalsIgnoreCase(args[0]))
-        {
-            LOGGER.info("Starting WS-I Profiler");
-            Profiler.main(args);
-        }
-        else
-        {
-            LOGGER.info("Starting UnitTests");
-            LOGGER.info("");
-            TestRunner testRunner = new TestRunner();
-            ResultPrinter printer = new CMISResultPrinter(System.out);
-            testRunner.setPrinter(printer);
-            LOGGER.info("Testing DiscoveryService");
-            LOGGER.info("----------------------------");
-            testRunner.doRun(new TestSuite(CmisDiscoveryServiceClient.class));
-            LOGGER.info("Testing MultifilingService");
-            LOGGER.info("----------------------------");
-            testRunner.doRun(new TestSuite(CmisMultifilingServiceClient.class));
-            LOGGER.info("Testing NavigationService");
-            LOGGER.info("----------------------------");
-            testRunner.doRun(new TestSuite(CmisNavigationServiceClient.class));
-            LOGGER.info("Testing ObjectService");
-            LOGGER.info("----------------------------");
-            testRunner.doRun(new TestSuite(CmisObjectServiceClient.class));
-            LOGGER.info("Testing RelationshipService");
-            LOGGER.info("----------------------------");
-            testRunner.doRun(new TestSuite(CmisRelationshipServiceClient.class));
-            LOGGER.info("Testing RepositoryService");
-            LOGGER.info("----------------------------");
-            testRunner.doRun(new TestSuite(CmisRepositoryServiceClient.class));
-            LOGGER.info("Testing VersioningService");
-            LOGGER.info("----------------------------");
-            testRunner.doRun(new TestSuite(CmisVersioningServiceClient.class));
-            LOGGER.info("");
-            LOGGER.info("");
-            LOGGER.info("Finished");
-            LOGGER.info("Totally spent time: " + time + " ms");
-            LOGGER.info("------------------------------------------------------");
-            LOGGER.info("Total passed: " + (executed - failed));
-            LOGGER.info("Total failed: " + failed);
-            LOGGER.info("Total executed: " + executed);
-            LOGGER.info("------------------------------------------------------");
-        }
+        LOGGER.info("Starting CMIS Services' Tests");
+        LOGGER.info("");
+    }
+
+    private void printStatusInfo()
+    {
+        LOGGER.info("");
+        LOGGER.info("Finished");
+        LOGGER.info("Totally spent time: " + time + " ms");
+        LOGGER.info("------------------------------------------------------");
+        LOGGER.info("Totally passed: " + (executed - failed));
+        LOGGER.info("Totally failed: " + failed);
+        LOGGER.info("Totally executed: " + executed);
+        LOGGER.info("------------------------------------------------------");
     }
 
     private static class CMISResultPrinter extends ResultPrinter
     {
-
         public CMISResultPrinter(PrintStream writer)
         {
             super(writer);
@@ -113,23 +155,26 @@ public class CmisWebServiceTestSuite extends TestSuite
         @Override
         public void addError(Test test, Throwable t)
         {
+            LOGGER.info("----------------------------");
             LOGGER.info("   !!! Test failed !!!");
             LOGGER.info("Message: " + t.toString());
-            flag = false; 
+            flag = false;
         }
 
         @Override
         public void addFailure(Test test, AssertionFailedError t)
         {
+            LOGGER.info("----------------------------");
             LOGGER.info("   !!! Test failed !!!");
             LOGGER.info("Message: " + t.toString());
-            flag = false; 
+            flag = false;
         }
 
         @Override
         public void startTest(Test test)
         {
             LOGGER.info("Executing test " + test);
+            LOGGER.info("----------------------------");
             flag = true;
         }
 
@@ -138,6 +183,7 @@ public class CmisWebServiceTestSuite extends TestSuite
         {
             if (flag)
             {
+                LOGGER.info("----------------------------");
                 LOGGER.info("... test passed");
             }
             LOGGER.info("");
@@ -149,7 +195,7 @@ public class CmisWebServiceTestSuite extends TestSuite
             LOGGER.info("----------------------------");
             LOGGER.info("Passed: " + (result.runCount() - result.failureCount() - result.errorCount()));
             LOGGER.info("Failed: " + (result.failureCount() + result.errorCount()));
-            LOGGER.info("Executed : " + result.runCount());
+            LOGGER.info("Executed: " + result.runCount());
             LOGGER.info("----------------------------");
             LOGGER.info("");
             LOGGER.info("");
@@ -161,11 +207,11 @@ public class CmisWebServiceTestSuite extends TestSuite
         protected void printHeader(long runTime)
         {
             LOGGER.info("");
-            LOGGER.info("Execution summary: ");
+            LOGGER.info("Test was finished. Execution summary: ");
             LOGGER.info("Spent time: " + runTime + " ms");
             time += runTime;
         }
-        
+
         @Override
         protected void printErrors(TestResult result)
         {
@@ -177,15 +223,15 @@ public class CmisWebServiceTestSuite extends TestSuite
         }
 
         @Override
-        protected void printDefectHeader(TestFailure booBoo, int count)
+        protected void printDefectHeader(TestFailure failure, int count)
         {
-            // LOGGER.info(count + ") " + booBoo.failedTest());
+            // LOGGER.info(count + ") " + failure.failedTest());
         }
 
         @Override
-        protected void printDefectTrace(TestFailure booBoo)
+        protected void printDefectTrace(TestFailure failure)
         {
-            // LOGGER.info(BaseTestRunner.getFilteredTrace(booBoo.trace()));
+            // LOGGER.info(BaseTestRunner.getFilteredTrace(failure.trace()));
         }
     }
 }

@@ -273,11 +273,11 @@ public class CmisRepositoryServiceClient extends AbstractServiceClient
             LOGGER.info("[RepositoryService->getTypeChildren]");
             getServicesFactory().getRepositoryService().getTypeChildren(
                     new GetTypeChildren(getAndAssertRepositoryId(), "Wrong Type id", false, BigInteger.valueOf(10), BigInteger.valueOf(0)));
-            fail("No Exception was thrown");
+            fail("No Exception was thrown during getting type children for wrong typeI");
         }
         catch (Exception e)
         {
-            assertTrue("Invalid exception was thrown", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.invalidArgument));
+            assertTrue("Invalid exception was thrown during getting type children for wrong typeId", e instanceof CmisFaultType && ((CmisFaultType) e).getType().equals(EnumServiceException.invalidArgument));
         }
     }
 
