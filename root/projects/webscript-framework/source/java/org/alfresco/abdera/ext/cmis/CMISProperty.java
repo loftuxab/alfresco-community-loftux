@@ -70,13 +70,23 @@ public abstract class CMISProperty extends ExtensibleElementWrapper
     public abstract String getType();
 
     /**
-     * Gets the property name
+     * Gets the property id
      * 
      * @return  name
      */
-    public String getName()
+    public String getId()
     {
-        return getAttributeValue(CMISConstants.PROPERTY_NAME);
+        return getAttributeValue(CMISConstants.PROPERTY_ID);
+    }
+    
+    /**
+     * Gets the property display name
+     * 
+     * @return  display name
+     */
+    public String getDisplayName()
+    {
+        return getAttributeValue(CMISConstants.PROPERTY_DISPLAY_NAME);
     }
     
     /**

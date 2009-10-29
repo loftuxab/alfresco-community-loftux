@@ -39,11 +39,10 @@
    
    <bean id="webscripts.cmis.atom.extension" class="org.alfresco.web.scripts.atom.AbderaExtension">
       <property name="abderaService" ref="webscripts.abdera"/>
-      <property name="defaultNamespace"><value>http://docs.oasis-open.org/ns/cmis/core/200901</value></property>
       <property name="QNames">
          <props>
-            <prop key="cmis_object">object</prop>
-            <prop key="cmis_repositoryInfo">repositoryInfo</prop>
+            <prop key="cmisra_object">{http://docs.oasis-open.org/ns/cmis/restatom/200901}object</prop>
+            <prop key="cmisra_repositoryInfo">{http://docs.oasis-open.org/ns/cmis/restatom/200901}repositoryInfo</prop>
          </props>
       </property>
       <property name="extensionFactories">

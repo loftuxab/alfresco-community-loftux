@@ -141,11 +141,6 @@ public class CMISRepositoryInfo extends ElementWrapper
         return null;
     }
 
-    public Element getSpecificInfo()
-    {
-        return getFirstChild(CMISConstants.REPOSITORY_SPECIFIC_INFO);
-    }
-    
     public CMISCapabilities getCapabilities()
     {
         Element child = getFirstChild(CMISConstants.CAPABILITIES);

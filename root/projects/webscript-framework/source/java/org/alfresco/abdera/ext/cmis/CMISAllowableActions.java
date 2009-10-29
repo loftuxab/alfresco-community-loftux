@@ -54,39 +54,9 @@ public class CMISAllowableActions extends ElementWrapper
      */
     public CMISAllowableActions(Factory factory)
     {
-        super(factory, CMISConstants.ALLOWABLEACTIONS);
+        super(factory, CMISConstants.ALLOWABLE_ACTIONS);
     }
 
-    /**
-     * Gets the Parent Id of the Actions
-     * 
-     * @return
-     */
-    public String getParentId()
-    {
-        Element child = getFirstChild(CMISConstants.ALLOWABLEACTIONS_PARENT_ID);
-        if (child != null)
-        {
-            return child.getText();
-        }
-        return null;
-    }
-
-    /**
-     * Gets the Parent URL of the Actions
-     * 
-     * @return
-     */
-    public String getParentUrl()
-    {
-        Element child = getFirstChild(CMISConstants.ALLOWABLEACTIONS_PARENT_URL);
-        if (child != null)
-        {
-            return child.getText();
-        }
-        return null;
-    }
-    
     /**
      * Gets all allowable actions names
      * 

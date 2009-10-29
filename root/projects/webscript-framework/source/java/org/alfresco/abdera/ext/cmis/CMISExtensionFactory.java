@@ -49,22 +49,22 @@ public class CMISExtensionFactory extends AbstractExtensionFactory
     
     public CMISExtensionFactory()
     {
-        super(CMIS_NS);
+        super(CMIS_NS, CMISRA_NS);
         addImpl(REPOSITORY_INFO, CMISRepositoryInfo.class);
         addImpl(CAPABILITIES, CMISCapabilities.class);
         addImpl(OBJECT, CMISObject.class);
         addImpl(PROPERTIES, CMISProperties.class);
-        addImpl(PROPERTY_STRING, CMISPropertyString.class);
-        addImpl(PROPERTY_DECIMAL, CMISPropertyDecimal.class);
-        addImpl(PROPERTY_INTEGER, CMISPropertyInteger.class);
-        addImpl(PROPERTY_BOOLEAN, CMISPropertyBoolean.class);
-        addImpl(PROPERTY_DATETIME, CMISPropertyDateTime.class);
-        addImpl(PROPERTY_URI, CMISPropertyUri.class);
-        addImpl(PROPERTY_ID, CMISPropertyId.class);
-        addImpl(PROPERTY_XML, CMISPropertyXml.class);
-        addImpl(PROPERTY_HTML, CMISPropertyHtml.class);
-        addImpl(VALUE, CMISValue.class);
-        addImpl(ALLOWABLEACTIONS, CMISAllowableActions.class);
+        addImpl(STRING_PROPERTY, CMISPropertyString.class);
+        addImpl(DECIMAL_PROPERTY, CMISPropertyDecimal.class);
+        addImpl(INTEGER_PROPERTY, CMISPropertyInteger.class);
+        addImpl(BOOLEAN_PROPERTY, CMISPropertyBoolean.class);
+        addImpl(DATETIME_PROPERTY, CMISPropertyDateTime.class);
+        addImpl(URI_PROPERTY, CMISPropertyUri.class);
+        addImpl(ID_PROPERTY, CMISPropertyId.class);
+        addImpl(XML_PROPERTY, CMISPropertyXml.class);
+        addImpl(HTML_PROPERTY, CMISPropertyHtml.class);
+        addImpl(PROPERTY_VALUE, CMISValue.class);
+        addImpl(ALLOWABLE_ACTIONS, CMISAllowableActions.class);
         addImpl(CAN_DELETE, CMISAllowableAction.class);
         addImpl(CAN_UPDATE_PROPERTIES, CMISAllowableAction.class); 
         addImpl(CAN_GET_PROPERTIES, CMISAllowableAction.class); 
@@ -92,6 +92,7 @@ public class CMISExtensionFactory extends AbstractExtensionFactory
         addImpl(CAN_CREATE_RELATIONSHIP, CMISAllowableAction.class); 
         addImpl(CAN_CREATE_POLICY, CMISAllowableAction.class); 
         addImpl(CAN_DELETE_TREE, CMISAllowableAction.class);
+        addImpl(CHILDREN, CMISChildren.class);
     }
 
 }

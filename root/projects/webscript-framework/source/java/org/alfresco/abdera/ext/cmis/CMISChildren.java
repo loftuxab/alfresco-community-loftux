@@ -28,72 +28,84 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.abdera.factory.Factory;
+import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Element;
-import org.apache.abdera.model.ExtensibleElementWrapper;
+import org.apache.abdera.model.ElementWrapper;
+import org.apache.abdera.model.Entry;
 
 
 /**
  * CMIS Version: 0.61
  *
- * CMIS Properties Element Wrapper for the Abdera ATOM library.
+ * CMIS Children for the Abdera ATOM library.
+ * 
+ * Encapsulates access to nested children..
  * 
  * @author davidc
  */
-public class CMISProperties extends ExtensibleElementWrapper
+public class CMISChildren extends ElementWrapper /*implements Feed*/
 {
-    /**
-     * @param internal
-     */
-    public CMISProperties(Element internal)
+    public CMISChildren(Element internal)
     {
         super(internal);
     }
 
-    /**
-     * @param factory
-     */
-    public CMISProperties(Factory factory)
+    public CMISChildren(Factory factory)
     {
-        super(factory, CMISConstants.PROPERTIES);
+        super(factory, CMISConstants.CHILDREN);
     }
 
     /**
-     * Gets all property ids
+     * Gets count of child entries
      * 
-     * @return  list of property ids
+     * @return
      */
-    public List<String> getIds()
+    public int size()
     {
-        List<CMISProperty> props = getElements();
-        List<String> ids = new ArrayList<String>(props.size());
-        for (CMISProperty prop : props)
-        {
-            ids.add(prop.getId());
-        }
-        return ids;
+        return getEntries().size();
     }
     
     /**
-     * Finds property by id
+     * Gets all entries of child feed
      * 
-     * @param id  property id
-     * @return  property
+     * @return
      */
-    public CMISProperty find(String id)
+    public List<Entry> getEntries()
+    {
+        List<Element> elements = getElements();
+        List<Entry> entries = new ArrayList<Entry>(elements.size());
+        for (Element element : elements)
+        {
+            if (element instanceof Entry)
+            {
+                entries.add((Entry)element);
+            }
+        }
+        return entries;
+    }
+    
+    /**
+     * Gets entry by id
+     * 
+     * @param id
+     * @return  entry (or null, if not found)
+     */
+    public Entry getEntry(String id)
     {
         List<Element> elements = getElements();
         for (Element element : elements)
         {
-            if (element instanceof CMISProperty)
+            if (element instanceof Entry)
             {
-                CMISProperty prop = (CMISProperty)element;
-                if (id.equals(prop.getId()))
+                Entry entry = (Entry)element;
+                IRI entryId = entry.getId();
+                if (entryId != null && entryId.equals(new IRI(id)))
                 {
-                    return prop;
+                    return entry;
                 }
             }
         }
         return null;
     }
-
+    
 }
