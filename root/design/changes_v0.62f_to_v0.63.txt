@@ -1,4 +1,4 @@
-v0.62f to v0.63 Changes Implemented by Alfresco:
+v0.62f to v0.7 Changes Implemented by Alfresco:
 
 1) CHANGED: CMIS Namespaces
 
@@ -138,6 +138,11 @@ CMIS-410
 
 CMIS-357
 
+----- checkpoint -------
+
+24) ADDED: AtomPub move service implementation
+
+CMIS-88
 
 
 
@@ -173,6 +178,7 @@ x add links to feeds (check part 2)
 - change token
 - query tests via query names (driven from type definitions)
 - case sensitivity of identifiers in query (in result row)
+- CMISScript: Check args against specification (args enum)
 
 
 ====================================
