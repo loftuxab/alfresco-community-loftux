@@ -6,5 +6,5 @@ script:
 	
     var service = atom.toService(result.response);
     var workspace = service.workspaces.get(0);
-    model.repo = workspace.getExtension(atom.names.cmis_repositoryInfo);
+    model.repo = workspace.getExtension(atom.names.cmisra_repositoryInfo);
 }

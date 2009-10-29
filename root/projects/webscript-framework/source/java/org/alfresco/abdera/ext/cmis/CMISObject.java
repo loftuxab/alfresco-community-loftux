@@ -76,10 +76,10 @@ public class CMISObject extends ExtensibleElementWrapper
      */
     public CMISAllowableActions getAllowableActions()
     {
-        Element child = getFirstChild(CMISConstants.ALLOWABLEACTIONS);
+        Element child = getFirstChild(CMISConstants.ALLOWABLE_ACTIONS);
         if (child == null)
         {
-            child = addExtension(CMISConstants.ALLOWABLEACTIONS); 
+            child = addExtension(CMISConstants.ALLOWABLE_ACTIONS); 
         }
         return (CMISAllowableActions)child;
     }
@@ -109,9 +109,9 @@ public class CMISObject extends ExtensibleElementWrapper
      * 
      * @return  base type property
      */
-    public CMISProperty getBaseType()
+    public CMISProperty getBaseTypeId()
     {
-        return getProperties().find(CMISConstants.PROP_BASETYPE);
+        return getProperties().find(CMISConstants.PROP_BASE_TYPE_ID);
     }
 
     /**
@@ -295,13 +295,13 @@ public class CMISObject extends ExtensibleElementWrapper
     }
 
     /**
-     * Content Stream URI
+     * Content Stream Id
      * 
-     * @return  content stream uri property
+     * @return  content stream id property
      */
-    public CMISProperty getContentStreamUri()
+    public CMISProperty getContentStreamId()
     {
-        return getProperties().find(CMISConstants.PROP_CONTENT_STREAM_URI);
+        return getProperties().find(CMISConstants.PROP_CONTENT_STREAM_ID);
     }
     
     /**

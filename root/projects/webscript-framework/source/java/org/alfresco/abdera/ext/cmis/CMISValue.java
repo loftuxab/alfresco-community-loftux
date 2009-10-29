@@ -141,7 +141,7 @@ public class CMISValue extends ExtensibleElementWrapper
      */
     public Date getDateValue()
     {
-        // TODO: Use mechanism is reliant on Alfresco code
+        // TODO: Use mechanism not reliant on Alfresco code
         return ISO8601DateFormat.parse(getStringValue());
     }
     
