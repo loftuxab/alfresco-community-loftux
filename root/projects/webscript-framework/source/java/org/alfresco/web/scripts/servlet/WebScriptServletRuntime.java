@@ -107,7 +107,20 @@ public class WebScriptServletRuntime extends AbstractRuntime
     {
         // NOTE: Don't use req.getPathInfo() - it truncates the path at first semi-colon in Tomcat
         String requestURI = req.getRequestURI();
-        String pathInfo = requestURI.substring((req.getContextPath() + req.getServletPath()).length());
+        String serviceContextPath = req.getContextPath() + req.getServletPath();
+        String pathInfo;
+        
+        if (serviceContextPath.length() > requestURI.length())
+        {
+            // NOTE: assume a redirect has taken place e.g. tomcat welcome-page
+            // NOTE: this is unlikely, and we'll take the hit if the path contains a semi-colon
+            pathInfo = req.getPathInfo();
+        }
+        else
+        {
+            pathInfo = requestURI.substring(serviceContextPath.length());
+        }
+        
         return URLDecoder.decode(pathInfo);
     }
     
