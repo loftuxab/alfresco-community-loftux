@@ -129,6 +129,7 @@
             <prop key="atom">application/atom+xml</prop>
             <prop key="atomentry">application/atom+xml;type=entry</prop>
             <prop key="atomfeed">application/atom+xml;type=feed</prop>
+            <prop key="atomsvc">application/atomsvc+xml</prop>
             <prop key="rss">application/rss+xml</prop>
             <prop key="json">application/json</prop>
             <prop key="opensearchdescription">application/opensearchdescription+xml</prop>
@@ -149,6 +150,7 @@
             <prop key="application/atom+xml">atom</prop>
             <prop key="application/atom+xml;type=entry">atomentry</prop>
             <prop key="application/atom+xml;type=feed">atomfeed</prop>
+            <prop key="application/atomsvc+xml">atomsvc</prop>
             <prop key="application/rss+xml">rss</prop>
             <prop key="application/json">json</prop>
             <prop key="application/x-www-form-urlencoded">xwwwformurlencoded</prop>

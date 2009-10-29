@@ -44,8 +44,8 @@ public interface CMISConstants
     // Mimetypes
     public static final String MIMETYPE_ENTRY = "application/atom+xml;type=entry";
     public static final String MIMETYPE_FEED = "application/atom+xml;type=feed";
-    public static final String MIMETYPE_QUERY = "application/cmisquery+xml";
-    public static final String MIMETYPE_ALLOWABLE_ACTIONS = "application/cmisallowableactions+xml";
+    public static final String MIMETYPE_CMIS_QUERY = "application/cmisquery+xml";
+    public static final String MIMETYPE_CMIS_ALLOWABLE_ACTIONS = "application/cmisallowableactions+xml";
     public static final String MIMETYPE_CMISATOM = "application/cmisatom+xml";
     public static final String MIMETYPE_CMISTREE = "application/cmistree+xml";
     
