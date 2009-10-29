@@ -108,7 +108,7 @@ public interface CMISConstants
     public static final String DATATYPE_HTML = "html";
     
     // CMIS Relationships
-    public static final String REL_SERVICE = "repository";
+    public static final String REL_SERVICE = "service";
     public static final String REL_UP = "up";
     public static final String REL_DOWN = "down";
     public static final String REL_DESCRIBED_BY = "describedby";
