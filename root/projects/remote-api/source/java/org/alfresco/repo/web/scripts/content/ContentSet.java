@@ -28,14 +28,16 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.cmis.CMISObjectReference;
+import org.alfresco.cmis.reference.ObjectPathReference;
+import org.alfresco.cmis.reference.ReferenceFactory;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.encoding.ContentCharsetFinder;
-import org.alfresco.repo.model.Repository;
 import org.alfresco.service.cmr.dictionary.DataTypeDefinition;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
@@ -68,18 +70,18 @@ public class ContentSet extends AbstractWebScript
     private static final Log logger = LogFactory.getLog(ContentSet.class);
     
     // Component dependencies
-    private Repository repository;
+    private ReferenceFactory referenceFactory;
     private DictionaryService dictionaryService;
     private NamespaceService namespaceService;
     private ContentService contentService;
     private MimetypeService mimetypeService;
     
     /**
-     * @param repository
+     * @param reference factory
      */
-    public void setRepository(Repository repository)
+    public void setReferenceFactory(ReferenceFactory referenceFactory)
     {
-        this.repository = repository; 
+        this.referenceFactory = referenceFactory; 
     }
 
     /**
@@ -119,20 +121,24 @@ public class ContentSet extends AbstractWebScript
      */
     public void execute(WebScriptRequest req, WebScriptResponse res)
         throws IOException
-    {        
-        // convert web script URL to node reference in Repository
-        String match = req.getServiceMatch().getPath();
-        String[] matchParts = match.split("/");
+    {   
+        // create map of args
+        String[] names = req.getParameterNames();
+        Map<String, String> args = new HashMap<String, String>(names.length, 1.0f);
+        for (String name : names)
+        {
+            args.put(name, req.getParameter(name));
+        }
+        
+        // create map of template vars
         Map<String, String> templateVars = req.getServiceMatch().getTemplateVars();
-        String[] id = templateVars.get("id").split("/");
-        String[] path = new String[id.length + 2];
-        path[0] = templateVars.get("store_type");
-        path[1] = templateVars.get("store_id");
-        System.arraycopy(id, 0, path, 2, id.length);
-        NodeRef nodeRef = repository.findNodeRef(matchParts[2], path);
+        
+        // create object reference from url
+        CMISObjectReference reference = referenceFactory.createObjectReferenceFromUrl(args, templateVars);
+        NodeRef nodeRef = reference.getNodeRef();
         if (nodeRef == null)
         {
-            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Unable to find " + matchParts[2] + " reference " + Arrays.toString(path));
+            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Unable to find " + reference.toString());
         }
         
         // determine content property
@@ -153,7 +159,7 @@ public class ContentSet extends AbstractWebScript
         PropertyDefinition propertyDef = dictionaryService.getProperty(propertyQName);
         if (propertyDef == null)
         {
-            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Unable to find " + matchParts[2] + " reference " + Arrays.toString(path) + " content property " + propertyQName);
+            throw new WebScriptException(HttpServletResponse.SC_NOT_FOUND, "Unable to find content property " + propertyQName + " of " + reference.toString());
         }
         if (!propertyDef.getDataType().getName().equals(DataTypeDefinition.CONTENT))
         {
@@ -180,9 +186,9 @@ public class ContentSet extends AbstractWebScript
         String mimetype = req.getContentType();
         if (mimetype == null)
         {
-            if (matchParts[2].equals("path") || matchParts[2].equals("avmpath"))
+            if (reference instanceof ObjectPathReference)
             {
-                mimetype = mimetypeService.guessMimetype(templateVars.get("id"));
+                mimetype = mimetypeService.guessMimetype(((ObjectPathReference)reference).getPath());
             }
         }
         if (mimetype != null)
