@@ -193,6 +193,7 @@ public class CmisTypeRelationshipDefinitionType  extends org.alfresco.repo.cmis.
         elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "allowedSourceTypes"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
+        elemField.setMinOccurs(0);
         elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
@@ -200,6 +201,7 @@ public class CmisTypeRelationshipDefinitionType  extends org.alfresco.repo.cmis.
         elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "allowedTargetTypes"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
+        elemField.setMinOccurs(0);
         elemField.setMaxOccursUnbounded(true);
         typeDesc.addFieldDesc(elemField);
     }

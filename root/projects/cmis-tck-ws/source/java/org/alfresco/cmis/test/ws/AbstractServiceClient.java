@@ -737,10 +737,11 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         boolean found = false;
         LOGGER.info("[NavigationService->getChildren]");
         GetChildrenResponse childrenResponse = getServicesFactory().getNavigationService().getChildren(
-                new GetChildren(getAndAssertRepositoryId(), folderId, "*", "", false, EnumIncludeRelationships.none, "", false, null, null, null));
-        assertNotNull(childrenResponse);
-        assertNotNull(childrenResponse.getObjects());
-        assertNotNull(childrenResponse.getObjects().getObjects());
+                new GetChildren(getAndAssertRepositoryId(), folderId, PROP_OBJECT_ID, "", false, EnumIncludeRelationships.none, "", false, null, null, null));
+        if (childrenResponse == null || childrenResponse.getObjects() == null || childrenResponse.getObjects().getObjects() == null)
+        {
+            return false;
+        }
         for (int i = 0; childrenResponse.getObjects() != null && !found && i < childrenResponse.getObjects().getObjects().length; i++)
         {
             CmisObjectInFolderType cmisObjectType = childrenResponse.getObjects().getObjects(i);
@@ -763,23 +764,34 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
     protected String createAndAssertRelationship(String sourceId, String targetId) throws Exception
     {
-        return createAndAssertRelationship(sourceId, targetId, getAndAssertRelationshipTypeId());
+        return createAndAssertRelationship(sourceId, targetId, getAndAssertRelationshipTypeId(), null);
+    }
+    
+    protected String createAndAssertRelationship(String folderId) throws Exception
+    {
+        return createAndAssertRelationship(null, null, getAndAssertRelationshipTypeId(), folderId);
     }
 
     protected String createAndAssertRelationship(String sourceId, String targetId, String relationshipTypeId) throws Exception
     {
+        return createAndAssertRelationship(sourceId, targetId, relationshipTypeId, null);
+    }            
+    
+    protected String createAndAssertRelationship(String sourceId, String targetId, String relationshipTypeId, String folder) throws Exception
+    {
+        folder = folder == null ? getAndAssertRootFolderId() : folder;
         if (null == sourceId)
         {
             CmisTypeDefinitionType sourceType = getAndAssertRelationshipSourceType();
 
             if ((null != sourceType) && BASE_TYPE_FOLDER.equals(sourceType.getBaseId()))
             {
-                sourceId = createAndAssertFolder(generateTestFolderName(), sourceType.getId(), getAndAssertRootFolderId(), null);
+                sourceId = createAndAssertFolder(generateTestFolderName(), sourceType.getId(), folder, null);
             }
             else
             {
-                sourceId = createAndAssertDocument(generateTestFileName(), sourceType == null ? getAndAssertDocumentTypeId() : sourceType.getId(), getAndAssertRootFolderId(),
-                        null, TEST_CONTENT, null);
+                sourceId = createAndAssertDocument(generateTestFileName(), sourceType == null ? getAndAssertDocumentTypeId() : sourceType.getId(), folder,
+                        null, TEST_CONTENT, EnumVersioningState.none);
             }
         }
         if (null == targetId)
@@ -788,12 +800,12 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
 
             if ((null != targetType) && BASE_TYPE_FOLDER.equals(targetType.getBaseId()))
             {
-                targetId = createAndAssertFolder(generateTestFolderName(), targetType.getId(), getAndAssertRootFolderId(), null);
+                targetId = createAndAssertFolder(generateTestFolderName(), targetType.getId(), folder, null);
             }
             else
             {
-                targetId = createAndAssertDocument(generateTestFileName(), targetType == null ? getAndAssertDocumentTypeId() : targetType.getId(), getAndAssertRootFolderId(),
-                        null, "Test content" + System.currentTimeMillis(), null);
+                targetId = createAndAssertDocument(generateTestFileName(), targetType == null ? getAndAssertDocumentTypeId() : targetType.getId(), folder,
+                        null, "Test content" + System.currentTimeMillis(), EnumVersioningState.none);
             }
         }
 
@@ -806,9 +818,11 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         idProperty = new CmisPropertyId();
         idProperty.setPropertyDefinitionId(PROP_SOURCE_ID);
         idProperty.setValue(new String[] { sourceId });
+        ids[1] = idProperty;
         idProperty = new CmisPropertyId();
         idProperty.setPropertyDefinitionId(PROP_TARGET_ID);
         idProperty.setValue(new String[] { targetId });
+        ids[2] = idProperty;
         cmisPropertiesType.setPropertyId(ids);
 
         LOGGER.info("[ObjectService->createRelationship]");
@@ -816,6 +830,40 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
                 new CreateRelationship(getAndAssertRepositoryId(), cmisPropertiesType, null, null, null, null));
         assertTrue("Relationship was not created", response != null && response.getObjectId() != null);
         return response.getObjectId();
+    }
+    
+    protected String createRelationshipSourceObject(String folderId) throws Exception
+    {
+        String sourceId = null;
+        CmisTypeDefinitionType sourceType = getAndAssertRelationshipSourceType();
+
+        if ((null != sourceType) && BASE_TYPE_FOLDER.equals(sourceType.getBaseId()))
+        {
+            sourceId = createAndAssertFolder(generateTestFolderName(), sourceType.getId(), folderId, null);
+        }
+        else
+        {
+            sourceId = createAndAssertDocument(generateTestFileName(), sourceType == null ? getAndAssertDocumentTypeId() : sourceType.getId(), folderId,
+                        null, TEST_CONTENT, EnumVersioningState.none);
+        }
+        return sourceId;
+    }
+    
+    protected String createRelationshipTargetObject(String folderId) throws Exception
+    {
+        String targetId = null;
+        CmisTypeDefinitionType targetType = getAndAssertRelationshipTargetType();
+
+        if ((null != targetType) && BASE_TYPE_FOLDER.equals(targetType.getBaseId()))
+        {
+            targetId = createAndAssertFolder(generateTestFolderName(), targetType.getId(), folderId, null);
+        }
+        else
+        {
+            targetId = createAndAssertDocument(generateTestFileName(), targetType == null ? getAndAssertDocumentTypeId() : targetType.getId(), folderId,
+                        null, TEST_CONTENT, EnumVersioningState.none);
+        }
+        return targetId;
     }
 
     protected String cancelCheckOutAndAssert(String documentId) throws Exception
@@ -845,17 +893,8 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             String repositoryId = getAndAssertRepositoryId();
             ObjectServicePortBindingStub objectService = getServicesFactory().getObjectService();
             LOGGER.info("[ObjectService->deleteObject]");
-            objectService.deleteObject(new DeleteObject(repositoryId, objectId, true, null));
-            try
-            {
-                LOGGER.info("[ObjectService->getProperties]");
-                objectService.getProperties(new GetProperties(repositoryId, objectId, "*", null));
-                fail("Properties were received for deleted object with " + objectId + " Object Id");
-            }
-            catch (Exception e)
-            {
-                assertException(("deleting Object with " + objectId), e, EnumServiceException.objectNotFound);
-            }
+            objectService.deleteObject(new DeleteObject(repositoryId, objectId, allVersions, null));
+            assertFalse(("Object with Id='" + objectId + "' was not deleted"), objectExists(objectId));
         }
         catch (Exception e)
         {
@@ -867,12 +906,16 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
     {
         try
         {
-            getAndAssertObjectProperties(objectId, "*");
+            getAndAssertObjectProperties(objectId, "*", false);
             return true;
         }
         catch (Exception e)
         {
-            assertException("Getting Properties for Deleted Object", e, EnumServiceException.invalidArgument);
+            Set<EnumServiceException> expectedExceptions = new HashSet<EnumServiceException>();
+            expectedExceptions.add(EnumServiceException.runtime); // FIXME: maybe this type MUST be deleted when transaction problem will be fixed
+            expectedExceptions.add(EnumServiceException.invalidArgument);
+            expectedExceptions.add(EnumServiceException.objectNotFound);
+            assertException("Getting Properties for Deleted Object", e, expectedExceptions);
             return false;
         }
     }
@@ -951,7 +994,8 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         {
             assertNotNull("Some of type definition type object is NULL", typeDef);
             assertNotNull("Some of type definition type object id is NULL", typeDef.getId());
-            if (null != typeId)
+            if ((null != typeId) && !BASE_TYPE_DOCUMENT.getValue().equals(typeDef.getId()) && !BASE_TYPE_FOLDER.getValue().equals(typeDef.getId())
+                    && !BASE_TYPE_RELATIONSHIP.getValue().equals(typeDef.getId()) && !BASE_TYPE_POLICY.getValue().equals(typeDef.getId()))
             {
                 assertEquals(typeId, typeDef.getParentId());
             }
@@ -1043,12 +1087,11 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
                             CmisTypeRelationshipDefinitionType relationshipType = (CmisTypeRelationshipDefinitionType) enumeratedType;
                             String participantTypeId = ((null == relationshipType.getAllowedSourceTypes()) || (relationshipType.getAllowedSourceTypes().length < 1)) ? (getAndAssertFolderTypeId())
                                     : (relationshipType.getAllowedSourceTypes(0));
-                            relationshipSourceType = (null != participantTypeId) ? (getAndAssertTypeDefinition(participantTypeId)) : (null);
+                            final CmisTypeDefinitionType relationshipSourceType = (null != participantTypeId) ? (getAndAssertTypeDefinition(participantTypeId)) : (null);
                             participantTypeId = ((null == relationshipType.getAllowedTargetTypes()) || (relationshipType.getAllowedTargetTypes().length < 1)) ? (getAndAssertDocumentTypeId())
                                     : (relationshipType.getAllowedTargetTypes(0));
-                            relationshipTargetType = (null != participantTypeId) ? (getAndAssertTypeDefinition(participantTypeId)) : (null);
-                            result = (null != relationshipSourceType) && (null != relationshipTargetType);
-                        }
+                            final CmisTypeDefinitionType relationshipTargetType = (null != participantTypeId) ? (getAndAssertTypeDefinition(participantTypeId)) : (null);
+                            result = (null != relationshipSourceType) && (null != relationshipTargetType);                        
                         if (result)
                         {
                             CmisTypeContainer[] subTypes = getAndAssertTypeDescendants(enumeratedType.getId(), -1, false);
@@ -1062,10 +1105,16 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
                                     if (enumeratedType.isCreatable())
                                     {
                                         CmisTypeRelationshipDefinitionType relationshipType = (CmisTypeRelationshipDefinitionType) enumeratedType;
-                                        Set<String> allowedSourceIds = new HashSet<String>(Arrays.asList(relationshipType.getAllowedSourceTypes()));
-                                        Set<String> allowedTargetIds = new HashSet<String>(Arrays.asList(relationshipType.getAllowedTargetTypes()));
-                                        boolean validSubType = allowedSourceIds.contains(relationshipSourceType.getId())
-                                                && allowedTargetIds.contains(relationshipTargetType.getId());
+                                        Set<String> allowedSourceIds = null;
+                                        if(null != relationshipType.getAllowedSourceTypes()) {
+                                            allowedSourceIds = new HashSet<String>(Arrays.asList(relationshipType.getAllowedSourceTypes()));
+                                        }
+                                        Set<String> allowedTargetIds = null;
+                                        if(null != relationshipType.getAllowedTargetTypes()) {
+                                            allowedTargetIds = new HashSet<String>(Arrays.asList(relationshipType.getAllowedTargetTypes()));
+                                        }
+                                        boolean validSubType = ((null == allowedSourceIds) || allowedSourceIds.contains(relationshipSourceType.getId()))
+                                                && ((null == allowedTargetIds) || allowedTargetIds.contains(relationshipTargetType.getId()));
                                         if (validSubType)
                                         {
                                             currentAbility[0]++;
@@ -1081,7 +1130,10 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
                             {
                                 currentTypeAbility = currentAbility[0];
                                 relationshipSubTypes = subTypesList;
+                                AbstractServiceClient.relationshipSourceType = relationshipSourceType;
+                                AbstractServiceClient.relationshipTargetType = relationshipTargetType;
                             }
+                        }
                         }
                         return result;
                     }
@@ -1098,7 +1150,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             assertNotNull("Invalid Type Definition Response: Type Definition is undefined", documentType);
             contentStreamAllowed = documentType.getContentStreamAllowed();
             versioningAllowed = documentType.isVersionable();
-        }
+        }        
         return typeId;
     }
 
@@ -1111,7 +1163,12 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         return relationshipSubTypes;
     }
 
-    protected CmisPropertiesType getAndAssertObjectProperties(String objectId, String filter)
+    protected CmisPropertiesType getAndAssertObjectProperties(String objectId, String filter) throws Exception
+    {
+        return getAndAssertObjectProperties(objectId, filter, true);
+    }
+
+    protected CmisPropertiesType getAndAssertObjectProperties(String objectId, String filter, boolean failOnException) throws Exception
     {
         GetPropertiesResponse result = null;
         try
@@ -1121,7 +1178,14 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         }
         catch (Exception e)
         {
+            if (failOnException)
+            {
             fail(e.toString());
+        }
+            else
+            {
+                throw e;
+            }
         }
         assertNotNull(result);
         assertNotNull(result.getProperties());
@@ -1167,8 +1231,17 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
         {
             return null;
         }
-
-        final Set<String> allowedChildObjectTypeIds = new HashSet<String>(Arrays.asList(properties.getPropertyId(0).getValue()));
+        Set<String> resultIds = new HashSet<String>();        
+        if (properties != null && properties.getPropertyId(0) != null && properties.getPropertyId(0).getValue() != null
+                && properties.getPropertyId(0).getValue().length > 0)
+        {
+            resultIds = new HashSet<String>(Arrays.asList(properties.getPropertyId(0).getValue()));
+        }
+        if (resultIds == null || resultIds.isEmpty() || (resultIds.size() == 1 && resultIds.contains(null)))
+        {
+            return document ? getAndAssertFolderTypeId() : getAndAssertDocumentTypeId();
+        }
+        final Set<String> allowedChildObjectTypeIds = new HashSet<String>(resultIds);        
         BaseConditionCalculator calculator = new BaseConditionCalculator()
         {
             @Override
@@ -1498,8 +1571,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             catch (Exception e)
             {
                 fail(e.toString());
-            }
-            assertNotNull("Policy type id is NULL", policyTypeId);
+            }            
         }
         return policyTypeId;
     }
@@ -1621,7 +1693,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             fail(e.toString());
         }
         assertNotNull("Check Out response is undefined", checkOutResponse);
-        assertNotNull("Private Working Copy Id is undefined", checkOutResponse.getDocumentId());
+        assertNotNull("Private Working Copy Id is undefined", checkOutResponse.getObjectId());
         return checkOutResponse;
     }
 
@@ -1639,7 +1711,7 @@ public abstract class AbstractServiceClient extends AbstractDependencyInjectionS
             fail(e.toString());
         }
         assertNotNull("Check In response is undefined", checkInResponse);
-        assertNotNull("Checked In Document Id is undefined", checkInResponse.getDocumentId());
+        assertNotNull("Checked In Document Id is undefined", checkInResponse.getObjectId());
         return checkInResponse;
     }
 

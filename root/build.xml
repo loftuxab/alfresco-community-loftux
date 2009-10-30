@@ -733,6 +733,9 @@
       <copy todir="${dir.deploy.tomcat.webclient}/wsdl" verbose="${copy.verbose}">
          <fileset dir="${dir.project.remoteapi.src.wsdl}" />
       </copy>
+      <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes/META-INF" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.remoteapi.src.metainf}"/>
+      </copy>
    </target>
    
    <target name="deploy-webclient-changes" depends="init">

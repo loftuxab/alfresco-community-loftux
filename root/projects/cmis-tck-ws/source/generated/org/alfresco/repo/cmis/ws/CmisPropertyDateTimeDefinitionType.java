@@ -8,6 +8,8 @@
 package org.alfresco.repo.cmis.ws;
 
 public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.ws.CmisPropertyDefinitionType  implements java.io.Serializable {
+    private EnumDateTimeResolution resolution;
+
     private org.alfresco.repo.cmis.ws.CmisPropertyDateTime defaultValue;
 
     private org.alfresco.repo.cmis.ws.CmisChoiceDateTime[] choice;
@@ -31,6 +33,7 @@ public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.
            boolean orderable,
            java.lang.Boolean openChoice,
            org.apache.axis.message.MessageElement [] _any,
+           EnumDateTimeResolution resolution,
            org.alfresco.repo.cmis.ws.CmisPropertyDateTime defaultValue,
            org.alfresco.repo.cmis.ws.CmisChoiceDateTime[] choice) {
         super(
@@ -49,10 +52,20 @@ public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.
             orderable,
             openChoice,
             _any);
+        this.resolution = resolution;
         this.defaultValue = defaultValue;
         this.choice = choice;
     }
 
+    public EnumDateTimeResolution getResolution()
+    {
+        return resolution;
+    }
+
+    public void setResolution(EnumDateTimeResolution resolution)
+    {
+        this.resolution = resolution;
+    }
 
     /**
      * Gets the defaultValue value for this CmisPropertyDateTimeDefinitionType.
@@ -160,6 +173,14 @@ public class CmisPropertyDateTimeDefinitionType  extends org.alfresco.repo.cmis.
         elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "cmisPropertyDateTime"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("resolution");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "resolution"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/core/200908/", "enumDateTimeResolution"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(false);
+        elemField.setMaxOccurs(1);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("choice");

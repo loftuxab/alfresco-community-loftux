@@ -7,6 +7,11 @@
 
 package org.alfresco.repo.cmis.ws;
 
+import java.util.Iterator;
+
+import javax.activation.DataHandler;
+import javax.xml.soap.AttachmentPart;
+
 public class ObjectServicePortBindingStub extends org.apache.axis.client.Stub implements org.alfresco.repo.cmis.ws.ObjectServicePort {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
@@ -2140,7 +2145,23 @@ public class ObjectServicePortBindingStub extends org.apache.axis.client.Stub im
             throw (java.rmi.RemoteException)_resp;
         }
         else {
-            extractAttachments(_call);
+            if(_call.getResponseMessage() != null) {
+                Iterator iterator = _call.getResponseMessage().getAttachments();
+                if(iterator.hasNext()){
+                    byte b[];
+                    try
+                    {
+                        AttachmentPart part = (AttachmentPart) iterator.next();
+                        DataHandler dataHandler = part.getDataHandler();
+                        b = new byte[dataHandler.getInputStream().available()];
+                        dataHandler.getInputStream().read(b);
+                        ((org.alfresco.repo.cmis.ws.GetContentStreamResponse) _resp).getContentStream().setStream(b);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+            }
             try {
                 return (org.alfresco.repo.cmis.ws.GetContentStreamResponse) _resp;
             } catch (java.lang.Exception _exception) {

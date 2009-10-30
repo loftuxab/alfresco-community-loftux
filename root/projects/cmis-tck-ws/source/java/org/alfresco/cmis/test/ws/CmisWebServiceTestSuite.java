@@ -79,12 +79,6 @@ public class CmisWebServiceTestSuite extends TestSuite
     public void execute()
     {
         printLicenseInfo();
-        // LOGGER.info("\r Usage: Add '-wsi' option to run WS-I Profiler,\n if no option provided, UnitTests will be run\n");
-        // if (args != null && args.length > 0 && "-wsi".equalsIgnoreCase(args[0]))
-        // {
-        // LOGGER.info("Starting WS-I Profiler");
-        // Profiler.main(args);
-        // }
         if ((null != testableServiceNames) && (testableServiceNames.length > 0))
         {
             TestRunner testRunner = new TestRunner();

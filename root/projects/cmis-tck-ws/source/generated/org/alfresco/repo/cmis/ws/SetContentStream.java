@@ -10,7 +10,7 @@ package org.alfresco.repo.cmis.ws;
 public class SetContentStream  implements java.io.Serializable {
     private java.lang.String repositoryId;
 
-    private java.lang.String documentId;
+    private java.lang.String objectId;
 
     private java.lang.Boolean overwriteFlag;
 
@@ -34,7 +34,7 @@ public class SetContentStream  implements java.io.Serializable {
            org.alfresco.repo.cmis.ws.CmisContentStreamType contentStream,
            org.alfresco.repo.cmis.ws.CmisExtensionType extension) {
            this.repositoryId = repositoryId;
-           this.documentId = documentId;
+           this.objectId = documentId;
            this.overwriteFlag = overwriteFlag;
            this.changeToken = changeToken;
            this.contentStream = contentStream;
@@ -63,22 +63,22 @@ public class SetContentStream  implements java.io.Serializable {
 
 
     /**
-     * Gets the documentId value for this SetContentStream.
+     * Gets the objectId value for this SetContentStream.
      * 
-     * @return documentId
+     * @return objectId
      */
-    public java.lang.String getDocumentId() {
-        return documentId;
+    public java.lang.String getObjectId() {
+        return objectId;
     }
 
 
     /**
-     * Sets the documentId value for this SetContentStream.
+     * Sets the objectId value for this SetContentStream.
      * 
-     * @param documentId
+     * @param objectId
      */
-    public void setDocumentId(java.lang.String documentId) {
-        this.documentId = documentId;
+    public void setObjectId(java.lang.String documentId) {
+        this.objectId = documentId;
     }
 
 
@@ -180,9 +180,9 @@ public class SetContentStream  implements java.io.Serializable {
             ((this.repositoryId==null && other.getRepositoryId()==null) || 
              (this.repositoryId!=null &&
               this.repositoryId.equals(other.getRepositoryId()))) &&
-            ((this.documentId==null && other.getDocumentId()==null) || 
-             (this.documentId!=null &&
-              this.documentId.equals(other.getDocumentId()))) &&
+            ((this.objectId==null && other.getObjectId()==null) || 
+             (this.objectId!=null &&
+              this.objectId.equals(other.getObjectId()))) &&
             ((this.overwriteFlag==null && other.getOverwriteFlag()==null) || 
              (this.overwriteFlag!=null &&
               this.overwriteFlag.equals(other.getOverwriteFlag()))) &&
@@ -209,8 +209,8 @@ public class SetContentStream  implements java.io.Serializable {
         if (getRepositoryId() != null) {
             _hashCode += getRepositoryId().hashCode();
         }
-        if (getDocumentId() != null) {
-            _hashCode += getDocumentId().hashCode();
+        if (getObjectId() != null) {
+            _hashCode += getObjectId().hashCode();
         }
         if (getOverwriteFlag() != null) {
             _hashCode += getOverwriteFlag().hashCode();
@@ -241,8 +241,8 @@ public class SetContentStream  implements java.io.Serializable {
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);
         elemField = new org.apache.axis.description.ElementDesc();
-        elemField.setFieldName("documentId");
-        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "documentId"));
+        elemField.setFieldName("objectId");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://docs.oasis-open.org/ns/cmis/messaging/200908/", "objectId"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setNillable(false);
         typeDesc.addFieldDesc(elemField);

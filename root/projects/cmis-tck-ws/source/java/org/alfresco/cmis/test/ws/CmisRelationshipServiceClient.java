@@ -25,7 +25,6 @@
 package org.alfresco.cmis.test.ws;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 
 import org.alfresco.repo.cmis.ws.CmisObjectType;
 import org.alfresco.repo.cmis.ws.CmisTypeDefinitionType;
@@ -74,32 +73,10 @@ public class CmisRelationshipServiceClient extends AbstractServiceClient
             throw new Exception("Relationship Service can't be tested because no one Relationship Type with appropriate Source and Target Object Type Ids was found");
         }
 
-        sourceId = createRelationshipParticipants(sourceType, 1)[0];
-        targetId = createRelationshipParticipants(targetType, 1)[0];
+        sourceId = createRelationshipSourceObject(getAndAssertRootFolderId());
+        targetId = createRelationshipTargetObject(getAndAssertRootFolderId());
 
-        createAndAssertRelationship(sourceId, targetId, getAndAssertRelationshipTypeId());
-        for (CmisTypeDefinitionType relationshipType : getRelationshipSubTypes())
-        {
-            createAndAssertRelationship(sourceId, targetId, relationshipType.getId());
-        }
-    }
-
-    private String[] createRelationshipParticipants(CmisTypeDefinitionType typeDef, int amount) throws Exception
-    {
-        String[] result = new String[amount];
-        boolean folder = BASE_TYPE_FOLDER.equals(typeDef.getBaseId());
-        for (int i = 0; i < amount; i++)
-        {
-            if (folder)
-            {
-                result[i] = createAndAssertFolder(generateTestFolderName(), typeDef.getId(), getAndAssertRootFolderId(), null);
-            }
-            else
-            {
-                result[i] = createAndAssertDocument(generateTestFileName(), typeDef.getId(), getAndAssertRootFolderId(), null, null, null);
-            }
-        }
-        return result;
+        createAndAssertRelationship(sourceId, targetId, getAndAssertRelationshipTypeId(), getAndAssertRootFolderId());
     }
 
     /**
@@ -114,8 +91,8 @@ public class CmisRelationshipServiceClient extends AbstractServiceClient
         }
         RelationshipServicePort relationshipService = getServicesFactory().getRelationshipService(getProxyUrl() + getService().getPath());
 
-        relationshipService.getObjectRelationships(new GetObjectRelationships(getAndAssertRepositoryId(), sourceId, false, EnumRelationshipDirection.either, "Relationship", "*", false,
-                BigInteger.valueOf(0), BigInteger.valueOf(0), null));
+        relationshipService.getObjectRelationships(new GetObjectRelationships(getAndAssertRepositoryId(), sourceId, false, EnumRelationshipDirection.either, "Relationship", "*",
+                false, BigInteger.valueOf(0), BigInteger.valueOf(0), null));
     }
 
     /**
@@ -162,34 +139,25 @@ public class CmisRelationshipServiceClient extends AbstractServiceClient
     public void testGetRelationships()
     {
         GetObjectRelationshipsResponse relationshipsResponse = getAndAssertObjectRelationships(sourceId, false, null, null, null, false, null, null);
-        assertEquals("Invalid relationships amount was returned", relationshipsResponse.getObjects().getObjects().length <= (getRelationshipSubTypes().size() + 1));
+        assertTrue("Invalid relationships amount was returned", relationshipsResponse.getObjects().getObjects().length == 1);
     }
 
     public void testGetRelationshipsSource()
     {
         GetObjectRelationshipsResponse relationshipsResponse = getAndAssertObjectRelationships(sourceId, false, EnumRelationshipDirection.source, null, null, false, null, null);
-        assertTrue("Invalid relationships amount was returned", relationshipsResponse.getObjects().getObjects().length <= (getRelationshipSubTypes().size() + 1));
+        assertTrue("Invalid relationships amount was returned", relationshipsResponse.getObjects().getObjects().length == 1);
     }
 
     public void testGetRelationshipsTarget()
     {
         GetObjectRelationshipsResponse relationshipsResponse = getAndAssertObjectRelationships(targetId, false, EnumRelationshipDirection.target, null, null, false, null, null);
-        assertTrue("Invalid relationships amount was returned", relationshipsResponse.getObjects().getObjects().length <= (getRelationshipSubTypes().size() + 1));
-    }
-
-    public void testGetRelationshipsBoth()
-    {
-        GetObjectRelationshipsResponse sourceRelationshipsResponse = getAndAssertObjectRelationships(sourceId, false, EnumRelationshipDirection.either, null, null, false, null, null);
-        GetObjectRelationshipsResponse targetRelationshipsResponse = getAndAssertObjectRelationships(targetId, false, EnumRelationshipDirection.either, null, null, false, null, null);
-        int amount = getRelationshipSubTypes().size() + 1;
-        assertTrue(amount >= sourceRelationshipsResponse.getObjects().getObjects().length);
-        assertTrue(amount >= targetRelationshipsResponse.getObjects().getObjects().length);
-        assertTrue("Relationships collections for Source and Target Objects are not equal", Arrays.equals(sourceRelationshipsResponse.getObjects().getObjects(), targetRelationshipsResponse.getObjects().getObjects()));
+        assertTrue("Invalid relationships amount was returned", relationshipsResponse.getObjects().getObjects().length == 1);
     }
 
     public void testGetRelationshipsFilter() throws Exception
     {
-        GetObjectRelationshipsResponse relationshipsResponse = getAndAssertObjectRelationships(sourceId, false, EnumRelationshipDirection.either, null, "cmis:name, cmis:objectId", false, null, null);
+        GetObjectRelationshipsResponse relationshipsResponse = getAndAssertObjectRelationships(sourceId, false, EnumRelationshipDirection.either, null, PROP_OBJECT_ID + ", "
+                + PROP_SOURCE_ID, false, null, null);
         assertTrue("Invalid relationships amount was returned", relationshipsResponse.getObjects().getObjects().length <= (getRelationshipSubTypes().size() + 1));
         for (CmisObjectType objectType : relationshipsResponse.getObjects().getObjects())
         {
@@ -201,16 +169,14 @@ public class CmisRelationshipServiceClient extends AbstractServiceClient
             assertNull("Not expected properties were returned", objectType.getProperties().getPropertyInteger());
             assertNull("Not expected properties were returned", objectType.getProperties().getPropertyUri());
             assertNull("Not expected properties were returned", objectType.getProperties().getPropertyDateTime());
+            assertNull("Not expected properties were returned", objectType.getProperties().getPropertyString());
 
             assertNotNull("Expected properties were not returned", objectType.getProperties().getPropertyId());
-            assertNotNull("Expected properties were not returned", objectType.getProperties().getPropertyString());
-            assertNotNull("Expected properties were not returned", objectType.getProperties().getPropertyBoolean());
 
-            assertEquals("Expected property was not returned", 1, objectType.getProperties().getPropertyId().length);
-            assertEquals("Expected property was not returned", 1, objectType.getProperties().getPropertyString().length);
+            assertEquals("Expected property was not returned", 2, objectType.getProperties().getPropertyId().length);
 
-            assertNotNull("Expected property was not returned", getIdProperty(objectType.getProperties(), "ObjectId"));
-            assertNotNull("Expected property was not returned", getStringProperty(objectType.getProperties(), "Name"));
+            assertNotNull("Expected property was not returned", getIdProperty(objectType.getProperties(), PROP_OBJECT_ID));
+            assertNotNull("Expected property was not returned", getIdProperty(objectType.getProperties(), PROP_SOURCE_ID));
         }
     }
 
@@ -218,12 +184,15 @@ public class CmisRelationshipServiceClient extends AbstractServiceClient
     {
         try
         {
-            getAndAssertObjectRelationships("Wrong Object Id", false, EnumRelationshipDirection.either, null, "*", false, null, null);
+            LOGGER.info("[RelationshipService->getRelationships]");
+            getServicesFactory().getRelationshipService().getObjectRelationships(
+                    new GetObjectRelationships(getAndAssertRepositoryId(), "InvalidObjectId", false, EnumRelationshipDirection.either, getAndAssertRelationshipTypeId(), "*",
+                            false, null, null, null));
             fail("Relationships were returned for Invalid Object Id");
         }
         catch (Exception e)
         {
-            assertException("Object Relationships Receiving for Invlaid Object Id", e, EnumServiceException.invalidArgument);
+            assertException("Object Relationships Receiving for Invlaid Object Id", e, EnumServiceException.objectNotFound);
         }
     }
 
@@ -234,7 +203,7 @@ public class CmisRelationshipServiceClient extends AbstractServiceClient
         {
             assertNotNull("Invalid Relationships collection! No one Relationship Object may be undefined solely", relationship);
             assertNotNull("Allowable Actions for one of the Relationship Object was not returned", relationship.getAllowableActions());
-            assertTrue("Allowable Actions define that Relationship Object Properties can't be read by current user", relationship.getAllowableActions().getCanGetProperties());
+            assertTrue("Allowable Actions define that Relationship Object Properties can't be read by current user", relationship.getAllowableActions().getCanDeleteObject());
         }
     }
 
@@ -246,8 +215,9 @@ public class CmisRelationshipServiceClient extends AbstractServiceClient
         {
             LOGGER.info("[RelationshipService->getRelationships]");
             objectRelationships = getServicesFactory().getRelationshipService().getObjectRelationships(
-                    new GetObjectRelationships(getAndAssertRepositoryId(), objectId, allowSubTypes, direction, typeId, filter, includeAllowableActions, BigInteger
-                            .valueOf(maxItems), BigInteger.valueOf(skipCount), null));
+                    new GetObjectRelationships(getAndAssertRepositoryId(), objectId, allowSubTypes, direction, typeId, filter, includeAllowableActions,
+                            maxItems != null ? BigInteger.valueOf(maxItems) : BigInteger.valueOf(100), skipCount != null ? BigInteger.valueOf(skipCount) : BigInteger.valueOf(0),
+                            null));
         }
         catch (Exception e)
         {
@@ -257,27 +227,6 @@ public class CmisRelationshipServiceClient extends AbstractServiceClient
         assertNotNull("Get Object Relationships response is undefined", objectRelationships.getObjects());
         assertNotNull("Get Object Relationships response is empty", objectRelationships.getObjects().getObjects());
         return objectRelationships;
-    }
-
-    public void testGetRelationshipsPagination() throws Exception
-    {
-        GetObjectRelationshipsResponse allRelationships = getAndAssertObjectRelationships(sourceId, true, EnumRelationshipDirection.either, null, "*", false, null, null);
-        long minimalPossibleElementsAmount = allRelationships.getObjects().getObjects().length;
-        minimalPossibleElementsAmount = (minimalPossibleElementsAmount > 10) ? (10):(minimalPossibleElementsAmount - 1);
-        GetObjectRelationshipsResponse objectRelationships = getAndAssertObjectRelationships(sourceId, false, EnumRelationshipDirection.either, null, "*", false, minimalPossibleElementsAmount, 0L);
-        assertEquals(minimalPossibleElementsAmount, objectRelationships.getObjects().getObjects().length);
-        if (null != objectRelationships.getObjects().getNumItems())
-        {
-            assertEquals(minimalPossibleElementsAmount, objectRelationships.getObjects().getNumItems().longValue());
-        }
-        if (0 != minimalPossibleElementsAmount)
-        {
-            assertTrue("Has More Items must not be equal to 'false'", objectRelationships.getObjects().isHasMoreItems());
-        }
-        else
-        {
-            assertFalse("Has More Items must not be equal to 'true'", objectRelationships.getObjects().isHasMoreItems());
-        }
     }
 
     public void testGetRelationshipsAgainstSubTypes() throws Exception
