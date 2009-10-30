@@ -27,6 +27,7 @@
          <tr><td><a href="${url.serviceContext}/index/all">Browse all Web Scripts</a></td></tr>
          <tr><td><a href="${url.serviceContext}/index/uri/">Browse by Web Script URI</a></td></tr>
          <tr><td><a href="${url.serviceContext}/index/package/">Browse by Web Script Package</a></td></tr>
+         <tr><td><a href="${url.serviceContext}/index/lifecycle/">Browse by Web Script Lifecycle</a></td></tr>
       </table>
       <br/>
       <br/>
@@ -34,7 +35,6 @@
       <form action="${url.serviceContext}${url.match}" method="post">
       <input type="hidden" name="reset" value="on"/>
       <table>
-   	 <tr><td><a href="${url.serviceContext}/index/lifecycle/">Browse by Web Script Lifecycle</a></td></tr>
          <#if failures?size &gt; 0>
          <tr><td><a href="${url.serviceContext}/index/failures">Browse failed Web Scripts</a></td></tr>
          </#if>
@@ -43,7 +43,7 @@
       </table>
       <br/>
       <table>
-         <tr><td><input type="submit" name="submit" value="Refresh Web Scripts"/></td></tr>          
+         <tr><td><input type="submit" name="submit" value="Refresh Web Scripts"/></td></tr>
       </table>
       </div>
    </body>

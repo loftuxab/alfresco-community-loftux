@@ -1,9 +1,11 @@
 <webscript>
-  <shortname>CMIS Front Page</shortname>
+  <shortname>CMIS AtomPub Service Document</shortname>
   <description>
   </description>
+  
   <url>/cmis</url>
-  <format default="html"/>
+  
+  <format default="atomsvc"/>
   <authentication>none</authentication>
   <family>CMIS</family>
 </webscript>
