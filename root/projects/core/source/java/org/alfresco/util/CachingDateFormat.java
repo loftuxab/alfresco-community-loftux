@@ -24,6 +24,7 @@
  */
 package org.alfresco.util;
 
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -46,10 +47,14 @@ public class CachingDateFormat extends SimpleDateFormat
 
     /** <pre> yyyy-MM-dd'T'HH:mm:ss </pre> */
     public static final String FORMAT_FULL_GENERIC = "yyyy-MM-dd'T'HH:mm:ss";
-    
+
     /** <pre> yyyy-MM-dd'T'HH:mm:ss </pre> */
     public static final String FORMAT_CMIS_SQL = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
+    public static final String[] LENIENT_FORMATS = new String[] {"yyyy-MM-dd'T'HH:mm:ss.SSS", "yyyy-MM-dd", "yyyy-MM-dd'T'HH:mm:ss.SSSZ", "yyyy-MM-dd'T'HH:mm:ss", "yyyy-MM-dd'T'HH:mm", "yyyy-MM-dd'T'HH", "yyyy-MM-dd'T'",
+        "yyyy-MMM-dd'T'HH:mm:ss.SSS", "yyyy-MMM-dd", "yyyy-MMM-dd'T'HH:mm:ss.SSSZ", "yyyy-MMM-dd'T'HH:mm:ss", "yyyy-MMM-dd'T'HH:mm", "yyyy-MMM-dd'T'HH", "yyyy-MMM-dd'T'"
+    };
+    
     /** <pre> yyyy-MM-dd </pre> */
     public static final String FORMAT_DATE_GENERIC = "yyyy-MM-dd";
 
@@ -57,12 +62,14 @@ public class CachingDateFormat extends SimpleDateFormat
     public static final String FORMAT_TIME_GENERIC = "HH:mm:ss";
 
     private static ThreadLocal<SimpleDateFormat> s_localDateFormat = new ThreadLocal<SimpleDateFormat>();
-
+    
     private static ThreadLocal<SimpleDateFormat> s_localDateOnlyFormat = new ThreadLocal<SimpleDateFormat>();
 
     private static ThreadLocal<SimpleDateFormat> s_localTimeOnlyFormat = new ThreadLocal<SimpleDateFormat>();
     
     private static ThreadLocal<SimpleDateFormat> s_localCmisSqlDatetime = new ThreadLocal<SimpleDateFormat>();
+    
+    private static ThreadLocal<SimpleDateFormat[]> s_lenientParsers = new ThreadLocal<SimpleDateFormat[]>();
 
     transient private Map<String, Date> cacheDates = new WeakHashMap<String, Date>(89);
 
@@ -253,4 +260,45 @@ public class CachingDateFormat extends SimpleDateFormat
             return clonedDate;
         }
     }
+    
+    public static Date lenientParse(String text) throws ParseException
+    {
+        SimpleDateFormat[] formatters = getLenientFormatters();
+        for(SimpleDateFormat formatter : formatters)
+        {
+            try
+            {
+                return formatter.parse(text);
+            }
+            catch (ParseException e)
+            {
+                continue;
+            }
+        }
+        throw new ParseException("Unknown date format", 0);
+    }
+    
+    public static SimpleDateFormat[] getLenientFormatters()
+    {
+        if (s_lenientParsers.get() != null)
+        {
+            return s_lenientParsers.get();
+        }
+
+        int i = 0;
+        SimpleDateFormat[] formatters = new SimpleDateFormat[LENIENT_FORMATS.length];
+        for(String format : LENIENT_FORMATS)
+        {
+            CachingDateFormat formatter = new CachingDateFormat(format);
+            // it must be strict
+            formatter.setLenient(false);
+            formatters[i++] = formatter;
+        }
+       
+        // put this into the threadlocal object
+        s_lenientParsers.set(formatters);
+        // done
+        return s_lenientParsers.get();
+    }
+    
 }
